@@ -1,0 +1,120 @@
+/* Customize the label (the container) */
+@import "../vars";
+.container.measures.group {
+
+    span{
+      background: none;
+      font-size: 16px;
+      font-weight: 300;
+      border: 0;
+      margin:0;
+      padding: 0;
+      cursor: pointer;
+
+    }
+  .inputs.lists {
+    display: inline;
+    margin-left: 1em;
+
+    input[type="radio"] {
+      appearance: none;
+      background-color: #fff;
+      margin: 0.5em;
+      font: inherit;
+      color: currentColor;
+      width: 1.15em;
+      height: 1.15em;
+      border-radius: 50%;
+      transform: translateY(-0.035em);
+      :focus {
+        outline: max(2em, 0.15em) solid currentColor;
+        outline-offset: max(2em, 0.15em);
+      }
+    }
+
+    input[type="radio"]::before {
+      width: 13px;
+      height:13px;
+      border-radius: 50%;
+      transition: 120ms transform ease-in-out;
+    }
+
+    input[type="radio"]:checked::before {
+      transform: scale(0.7);
+    }
+
+
+
+    /*.checkbox {
+      position: absolute; // take it out of document flow
+      opacity: 0; // hide it
+
+      & + .label {
+        position: relative;
+        cursor: pointer;
+        padding: 0;
+        display: inline;
+        margin-right: 10px;
+      }
+
+      // Box.
+      & + .label:before {
+        border-radius: 50%;
+        content: '';
+        margin-right: 4px;
+        display: inline-block;
+        vertical-align: text-top;
+        width: 15px;
+        height: 15px;
+        margin-top: 2px;
+        border: 1px solid $health-color;
+
+      }
+
+      // Box hover
+      &:hover + .label:before {
+
+      }
+
+      // Box focus
+      &:focus + .label:before {
+
+      }
+
+      // Box checked
+      &:checked + .label:before {
+        background: $light-green;
+      }
+
+      // Disabled state label.
+      &:disabled + .label {
+        color: #b8b8b8;
+        cursor: auto;
+      }
+
+      // Disabled box.
+      &:disabled + .label:before {
+        box-shadow: none;
+        background: #ddd;
+      }
+
+      // Checkmark. Could be replaced with an image
+      &:checked + .label:after {
+        content: '';
+        position: absolute;
+        left: 3px;
+        top: 9px;
+        background: white;
+        width: 2px;
+        height: 2px;
+        box-shadow: 2px 0 0 white,
+        3px 0 0 white,
+        3px -1px 0 white,
+        3px -3px 0 white,
+        3px -5px 0 white,
+        3px -7px 0 white;
+        transform: rotate(45deg);
+      }
+    }*/
+  }
+}
