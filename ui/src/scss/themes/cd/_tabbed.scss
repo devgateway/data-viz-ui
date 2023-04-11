@@ -1,0 +1,203 @@
+
+.tcdi.tabbed.posts.container {
+  margin: 0px;
+  padding: 0px 20px;
+
+  .ui.container.entry-content {
+    margin: 0px;
+    padding: 25px 15px;
+  }
+
+  .download-header{
+    align-items: center;
+    .ui.container.entry-content{
+      padding-bottom: 0;
+      padding-top: 0;
+    }
+  }
+
+  .label {
+    font-weight: 400;
+    margin: 0px;
+    font-size: 15px;
+    line-height: 1.2;
+  }
+}
+
+
+.ui.grid.tabbed.posts {
+  background-color: transparent !important;
+
+  .row {
+    border: 1px solid $light-gray;
+    padding: 0;
+    margin: 0;
+  }
+
+  > .column {
+    margin: 0 0 -1px 0;
+    padding: .2vw 0 0 3px;
+      &:first-child{
+        padding-left: 0;
+      }
+
+    button.nav {
+      @include border-radii(4px, 4px, 0, 0);
+      background-color: $tab-bg;
+      border: 1px solid $light-gray;
+      height: 55px;
+      width: 100%;
+      padding: 0px 15px 0px 0px;
+      margin: 0px;
+      color: $tab-text-color;
+      text-align: left;
+      display: flex;
+      align-items: flex-start;
+
+      .label {
+        color: $tab-text-color;;
+        background-color: transparent !important;
+      }
+    }
+
+    .button.one.nav {
+      width: auto !important;
+
+    }
+  }
+
+  .column.has-icon {
+    button.nav {
+      text-align: left;
+      .icon {
+        border: 0px;
+        display: block;
+        background-size: contain;
+        background-position: center;
+        background-repeat: no-repeat;
+        width: auto;
+        float: left;
+        height: 30px;
+
+        width: auto;
+        margin-left: 10px;
+        margin-right: -5px;
+        opacity: 0.25;
+        filter: invert(1) saturate(0) brightness(200%);
+      }
+    }
+    &.active{
+      button.nav{
+        .icon{
+          filter: invert(0) saturate(0) brightness(200%);
+          opacity: 1 !important;
+        }
+      }
+    }
+  }
+
+  button.nav:hover {
+    color: #FFF;
+  }
+
+  .active {
+    button.nav {
+      color: #ffffff;
+      background-color: $cd-blue;
+      .label{
+        color: #ffffff;
+      }
+
+    }
+  }
+}
+
+
+.ui.menu.tabbed.posts {
+  padding: 0px;
+  margin: 0px;
+
+  .item {
+    margin: 0px;
+    padding: 0px;
+    color: $gray !important;
+    border: 0px;
+    font-size: 18px;
+
+    .label {
+      background-color: transparent !important;
+      color: $gray;
+      padding: 0px;
+
+    }
+
+    &:last-child {
+      &:after {
+        content: none;
+      }
+    }
+  }
+
+  .item.active {
+
+    .label {
+      background-color: transparent !important;
+      color: $green;
+      font-weight: bold;
+      padding: 0px;
+
+    }
+
+    color: $green !important;
+    font-weight: 700;
+    padding-left: $base-unit;
+
+    &:after {
+      color: $gray;
+      font-weight: normal;
+    }
+  }
+
+  a.item.active::before {
+    content: '';
+    background-image: url('/green_arrow_active.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    width: 18px !important;
+    height: 20px !important;
+    background-color: transparent !important;
+    display: block !important;
+    position: relative !important;
+    margin-left: -18px;
+    margin-right: $base-unit - 2;
+
+  }
+
+  .item::after {
+    content: '|';
+    margin-left: 18px;
+    margin-right: 18px
+  }
+
+
+}
+
+
+.container.tcdi.tabbed.posts.editing {
+  .button.nav {
+    margin-top: 20px;
+  }
+}
+
+.wp-block-tcdi-components-tabbed-posts{
+  // Light tabs option
+  .tcdi-component[data-theme='light']{
+    .ui.menu.tabbed.posts{
+      .item{
+        .label{
+          font-size: 18px;
+        }
+      }
+    }
+  }
+}

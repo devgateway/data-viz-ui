@@ -1,0 +1,72 @@
+@import '../vars';
+
+.wp-block-tcdi-components-newsletter {
+  padding: $base-unit;
+  width: $extend;
+}
+
+.tcdi.newsLetter {
+  text-align: center;
+  max-width: 500px;
+  height: $base-unit * 6;
+  margin: 1rem auto;
+
+  .ui.negative.message {
+    bottom: $base-unit;
+    right: $base-unit;
+    padding: $base-unit + 5;
+    p{
+      color: #ffffff;
+      line-height: 120%;
+    }
+  }
+
+  .ui.success.message {
+    background-color: $ke-blue;
+    bottom: $base-unit;
+    right: $base-unit;
+    padding: $base-unit + 5;
+    p{
+      color: #ffffff;
+      line-height: 120%;
+    }
+  }
+
+  .ui.primary.button {
+    opacity: 1 !important;
+    background-color: $ke-blue !important;
+  }
+
+  .ui.message {
+    margin: 0px;
+
+    p {
+      padding: 0px;
+      margin: 0px;
+      line-height: 5px;
+    }
+  }
+
+  .tcdi.newsLetter.form {
+    padding: 0px;
+    height: 42px;
+    display: flex;
+    justify-content: left;
+    margin-bottom: 3px;
+
+    .input {
+      flex-grow: 1;
+      height: $base-unit * 4;
+      > input{
+        @include border-radii(4px, 0, 0, 4px);
+      }
+    }
+
+    .ui.button {
+      @include border-radii(0, 4px, 4px, 0);
+      height: $base-unit * 4;
+      line-height: 70%;
+    }
+
+  }
+}
