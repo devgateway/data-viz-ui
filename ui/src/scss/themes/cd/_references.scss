@@ -1,0 +1,73 @@
+
+.wp-reference.tcdi-component{
+	display:inline;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: 100%;
+	vertical-align: baseline;
+  position: relative;
+  top: -0.43em;
+  z-index: 1;
+}
+.ui.popup.reference-popup{
+  max-width: 300px;
+  width: 300px;
+  p{
+    font-size: 1em;
+  }
+  a{
+    @include word-wrap;
+  }
+}
+a.wp-reference {
+  display: inline;
+  cursor: pointer;
+  display: inline !important;
+  position: relative;
+  font-size: 63%;
+  color: $light-blue;
+  content: attr(data-index) !important;
+  margin-top: 0;
+}
+
+.references.list {
+  color: #66676d;
+  margin: 20px !important;
+  padding: 10px 10px 10px 0;
+  .edit-mode-message {
+    border: 1px solid #1e1e1e;
+    padding: 10px;
+    border-radius: 2px;
+    margin-left:-10px;
+  }
+  .column {
+    padding-top: 0 !important;
+    padding-bottom: 1rem !important;
+    padding-left: 0 !important;
+  }
+  .reference {
+    font-size: 14px;
+    display: block;
+
+    .index {
+      font-size: 14px;
+      display: inline;
+    }
+
+    .index:after {
+      content: ". ";
+      margin-right: 2px;
+      font-size: 11px;
+      display: inline;
+    }
+
+    .content {
+      display: inline;
+    }
+
+    .link {
+      overflow-wrap:  break-word;
+    }
+  }
+
+}
