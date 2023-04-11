@@ -1,0 +1,42 @@
+{
+  "name": "dg-react-blocks",
+  "version": "1.1.0",
+  "private": true,
+  "description": "",
+  "author": "Sebastian Dimunzio",
+  "keywords": [
+    "WordPress",
+    "block"
+  ],
+  "homepage": "https://github.com/devgateway/tobacco-control-dashboard",
+  "repository": "git+https://github.com/devgateway/tobacco-control-dashboard",
+  "bugs": {
+    "url": "https://github.com/devgateway/tobacco-control-dashboard/issues"
+  },
+  "main": "build/index.js",
+  "devDependencies": {
+    "@babel/runtime": "^7.13.10",
+    "@wordpress/block-editor": "^9.6.0",
+    "@wordpress/components": "^19.16.0",
+    "@wordpress/icons": "^9.5.0",
+    "@wordpress/rich-text": "^5.12.0",
+    "@wordpress/scripts": "^23.6.0",
+    "dotenv": "^8.2.0",
+    "dotenv-webpack": "^6.0.2",
+    "npm-run-all": "^4.1.5"
+  },
+  "scripts": {
+    "build": "wp-scripts build",
+    "format:js": "wp-scripts format-js",
+    "lint:js": "wp-scripts lint-js",
+    "packages-update": "wp-scripts packages-update",
+    "start": "wp-scripts start"
+  },
+  "dependencies": {
+    "classnames": "^2.2.6",
+    "gzip-js": "^0.3.2",
+    "papaparse": "^5.3.1",
+    "semantic-ui-react": "^2.0.3",
+    "uuid": "^9.0.0"
+  }
+}

@@ -1,0 +1,44 @@
+@import '../vars';
+
+.edit-post-visual-editor, #root {
+  @import '../default/fonts';
+  @import '../default/illicit';
+  @import 'tabbed';
+  @import '../default/body';
+  @import '../default/gallery';
+  @import '../default/myths';
+  @import '../default/responsive';
+  @import '../default/featured';
+  @import '../default/verticalFeatured';
+
+  @import '../default/inline-list';
+  @import '../default/charts';
+  @import '../default/carousel';
+  @import '../default/pagemodules';
+  @import "showCase";
+  @import "../default/download";
+  @import "../default/downloadpdf";
+  @import "../default/filters";
+  @import "../default/map";
+  @import "../default/dataFiltersReset";
+  @import "../default/tooltip";
+  @import "references";
+  @import "../default/userMeasures";
+  @import "../default/chartNoDataMessage";
+  @import "../default/measuresGroup";
+  @import "language";
+  @import "header";
+  @import "footer";
+  @import "backtotop";
+  @import "content";
+  @import "newsLetter";
+  @import "floating";
+  @import "pagemodules";
+  @import "colors";
+  @import "search";
+  @import "../default/timeline";
+
+}
+
+
+

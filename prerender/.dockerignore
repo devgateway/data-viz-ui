@@ -1,0 +1,6 @@
+**/Dockerfile
+postgres
+docs
+*.md
+.git*
+node_modules
