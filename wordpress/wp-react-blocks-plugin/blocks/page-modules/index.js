@@ -8,7 +8,7 @@ import {ComponentWithSettings} from "../commons";
 
 const SaveComponent = (props) => {
     const {navLabel, topTopLabel} = props.attributes;
-    return (<div className={"tcdi-component"} data-component={"pageModules"} data-nav-label={navLabel}
+    return (<div className={"viz-component"} data-component={"pageModules"} data-nav-label={navLabel}
                  data-to-top-label={topTopLabel}>
         </div>
     );

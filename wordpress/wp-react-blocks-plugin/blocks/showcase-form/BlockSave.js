@@ -20,7 +20,7 @@ const SaveComponent = (props) => {
         "margin": 'auto'
     };
     return (<div className={divClass} style={divStyles}>
-            <div {...props.attributes} className={"tcdi-component"} data-component={"showCaseForm"}></div>
+            <div {...props.attributes} className={"viz-component"} data-component={"showCaseForm"}></div>
         </div>
     );
 }

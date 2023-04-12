@@ -14,7 +14,7 @@ const SaveComponent = (props) => {
     const divStyles = {}
     return (<div className={divClass} style={divStyles}>
             <div 
-                 className={"tcdi-component"}
+                 className={"viz-component"}
                  data-button-label={buttonLabel}
                  data-height={height}
                  data-width={width}

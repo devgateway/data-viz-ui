@@ -4,7 +4,7 @@ import BlockSave from "./BlockSave";
 import BlockEdit from "./BlockEdit";
 import {Generic} from '../icons'
 
-registerBlockType(process.env.BLOCKS_NS + 'tcdi-components/pdf',
+registerBlockType(process.env.BLOCKS_NS + 'viz-components/pdf',
     {
         title: __('PDF Export', "dg"),
         icon: Generic,

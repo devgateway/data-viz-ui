@@ -4,9 +4,9 @@ import BlockSave from "./BlockSave";
 import BlockEdit from "./BlockEdit";
 import {Generic} from '../icons'
 
-registerBlockType(process.env.BLOCKS_NS + 'tcdi-components/pdf-button',
+registerBlockType(process.env.BLOCKS_NS + 'viz-components/pdf-button',
     {
-        title: __('PDF Export Button', 'tcdi-components'),
+        title: __('PDF Export Button', 'viz-components'),
         icon: Generic,
         category: process.env.BLOCKS_CATEGORY,
         attributes: {

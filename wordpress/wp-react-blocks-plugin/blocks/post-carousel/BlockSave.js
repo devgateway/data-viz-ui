@@ -17,7 +17,7 @@ const SaveComponent = (props) => {
 
     return (<div className={divClass} style={divStyles}>
             <div data-items={count} data-type={type} data-taxonomy={taxonomy} data-categories={categories.toString()}
-                 className={"tcdi-component"}
+                 className={"viz-component"}
                  data-height={height}
                  data-component={"postsCarousel"}
                  data-auto-switch={autoSwitch}

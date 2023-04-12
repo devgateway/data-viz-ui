@@ -6,7 +6,7 @@ const SaveComponent = (props) => {
         },
     } = props;
 
-    return (<div    className={"tcdi-component"}  data-component={"redirect"}  data-url={redirect_url}></div>);
+    return (<div    className={"viz-component"}  data-component={"redirect"}  data-url={redirect_url}></div>);
 }
 
 

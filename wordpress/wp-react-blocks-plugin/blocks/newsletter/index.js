@@ -143,7 +143,7 @@ const SaveComponent = (props) => {
         }
     );
     return (<div {...blockProps}>
-            <div {...props.attributes} className={"tcdi-component"} data-component={"newsletter"}></div>
+            <div {...props.attributes} className={"viz-component"} data-component={"newsletter"}></div>
         </div>
 
 

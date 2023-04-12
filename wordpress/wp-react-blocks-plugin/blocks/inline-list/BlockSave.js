@@ -24,7 +24,7 @@ const SaveComponent = (props) => {
                      data-width={width}
                      data-color={colorsParams}
                      data-type={type} data-taxonomy={taxonomy} data-categories={categories.toString()}
-                     className={"tcdi-component"}
+                     className={"viz-component"}
                      data-show-post-icons={showIcons}
                      data-show-content-toggle={showContentToggle}
                      data-content-toggle-h-position={contentToggleHPosition}

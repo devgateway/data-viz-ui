@@ -214,7 +214,7 @@ function edit(props) {
         const obj = insertObject(value, {
             type: name,
             attributes: {
-                className: `wp-reference tcdi-component wp-reference-${index}`,
+                className: `wp-reference viz-component wp-reference-${index}`,
                 "data-index": `${index}`,
                 "data-link": referenceLInk ? referenceLInk : "",
                 "data-component": "reference",
@@ -341,7 +341,7 @@ const BlockSave = (props) => {
         }
     } = props;
 
-    return (<div className={"tcdi-component"}
+    return (<div className={"viz-component"}
                  data-component={"references"}
                  data-columns={columns}
                  data-height={height}

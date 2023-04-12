@@ -11,7 +11,7 @@ const SaveComponent = (props) => {
     const divClass = {}
     const divStyles = {}
 
-    return (<div className={"tcdi-component"}
+    return (<div className={"viz-component"}
              data-component={"dataFiltersReset"}
              data-group={group}
              data-app={app}

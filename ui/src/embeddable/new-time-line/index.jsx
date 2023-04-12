@@ -78,7 +78,7 @@ const Component = (props) => {
 
 
 
-    return <Container style={{height: `${height}px`}} className={`tcdi new-time-line ${editing ? '' : ''}`}
+    return <Container style={{height: `${height}px`}} className={`viz new-time-line ${editing ? '' : ''}`}
                       fluid={true}>
 
 

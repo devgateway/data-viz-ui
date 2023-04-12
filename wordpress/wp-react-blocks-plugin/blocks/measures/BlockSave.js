@@ -10,7 +10,7 @@ const SaveComponent = (props) => {
     } = props;
 
 
-    return (<div className={"tcdi-component"}
+    return (<div className={"viz-component"}
                  data-component={"measures"}
                  data-app={app}
                  data-label={label}

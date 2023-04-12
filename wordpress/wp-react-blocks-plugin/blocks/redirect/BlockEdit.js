@@ -54,7 +54,7 @@ class BlockEdit extends ComponentWithSettings {
 
 
         return (
-            <div className={"tcdi redirect"}>
+            <div className={"viz redirect"}>
                 {isSelected ? <Search
                     fluid={true}
                     aligned

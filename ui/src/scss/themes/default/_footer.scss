@@ -1,4 +1,4 @@
-.container.tcdi.footer {
+.container.viz.footer {
   margin-top: 100px;
   background-color: #5089a6;
   line-height: 16px !important;
@@ -88,7 +88,7 @@
     }
   }
 
-  .tcdi.secondary-menu.container {
+  .viz.secondary-menu.container {
     background-color: #175372;
     text-align: center;
   }
@@ -112,7 +112,7 @@
 }
 
 @media print {
-  .container.tcdi.footer {
+  .container.viz.footer {
     display: none!important;
   }
 }

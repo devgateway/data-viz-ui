@@ -143,7 +143,7 @@ function edit(props) {
         const obj = insertObject(value, {
             type: name,
             attributes: {
-                "className": `wp-info tcdi-component ignore`,
+                "className": `wp-info viz-component ignore`,
                 "data-component": "tooltip",
                 "data-description": referenceText ? referenceText : "",
             },

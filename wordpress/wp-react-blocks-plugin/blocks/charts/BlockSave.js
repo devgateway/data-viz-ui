@@ -106,14 +106,14 @@ const SaveComponent = (props) => {
         }
     } = props;
     const blockProps = useBlockProps.save({
-        className: 'tcdi component chart'
+        className: 'viz component chart'
     });
 
     const levels = [dimension1, dimension2, dimension3]
     const source = levels.filter(l => l != 'none' && l != null).join('/')
 
     return (
-        <div {...blockProps} className={"tcdi-component"}
+        <div {...blockProps} className={"viz-component"}
              data-component={"chart"}
              data-height={height}
              data-type={type}

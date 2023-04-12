@@ -74,7 +74,7 @@ const SaveComponent = (props) => {
     } = props;
     
     const blockProps = useBlockProps.save({
-        className: 'tcdi component map'
+        className: 'viz component map'
     });
 
     const levels = [dimension1, dimension2]
@@ -89,7 +89,7 @@ const SaveComponent = (props) => {
 
     return (
         <div {...blockProps}
-            className={"tcdi-component"}
+            className={"viz-component"}
              data-component={"map"}
              data-group={group}
              data-height={height}             

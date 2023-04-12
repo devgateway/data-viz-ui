@@ -27,7 +27,7 @@ const SaveComponent = (props) => {
 
     return (<div className={divClass} style={divStyles}>
             <div data-count={count} data-type={type} data-taxonomy={taxonomy} data-categories={categories.toString()}
-                 className={"tcdi-component"}
+                 className={"viz-component"}
                  data-height={height}
                  data-component={"newTimeLine"}
                  data-config={encodeURIComponent(JSON.stringify(config))}

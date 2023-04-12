@@ -81,7 +81,7 @@ const SaveComponent = (props) => {
     const divClass = {}
     const divStyles = {}
     return (<div className={divClass} style={divStyles}>
-            <div data-style={style} data-parent={parent} data-columns={columns} data-height={height}  className={"tcdi-component"} data-component={"pageGallery"}></div>
+            <div data-style={style} data-parent={parent} data-columns={columns} data-height={height}  className={"viz-component"} data-component={"pageGallery"}></div>
         </div>
 
 

@@ -40,7 +40,7 @@ const SaveComponent = (props) => {
     return (<div className={divClass} style={divStyles}>
                 <div 
                      data-height={height}
-                     className={"tcdi-component self-render-component"}
+                     className={"viz-component self-render-component"}
                      data-component={"download"}
                      data-check-png={checkPng}                     
                      data-check-jpg={checkJpg}

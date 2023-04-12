@@ -2,7 +2,7 @@
 /**
  * Plugin Name: WP React Components
  * Plugin URI: https://github.com/devgateway/dg-wp-react
- * Description: Custom UI Components for TCDI.
+ * Description: Custom UI Components for viz.
  * Version: 0.1.0
  * Author: Sebastian Dimunzio
   * @package dg

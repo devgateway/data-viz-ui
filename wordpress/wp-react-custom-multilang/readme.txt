@@ -1,6 +1,6 @@
 === WP Multilang ===
 
-Contributors: valexar (Updated by TCDI Team, please do not update this plugin)
+Contributors: valexar (Updated by viz Team, please do not update this plugin)
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=EKM42LUA5CVZ4&source=url
 Tags: localization, multilanguage, multilingual, translation, multilang
 Requires at least: 4.7

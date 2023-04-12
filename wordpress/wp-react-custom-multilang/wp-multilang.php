@@ -4,7 +4,7 @@
  * Plugin URI:        https://github.com/VaLeXaR/wp-multilang
  * GitHub Plugin URI: https://github.com/VaLeXaR/wp-multilang
  * Description:       Multilingual plugin for WordPress
- * Author:            Valentyn Riaboshtan (Updated by TCDI Team, please do not update this plugin)
+ * Author:            Valentyn Riaboshtan (Updated by viz Team, please do not update this plugin)
  * License:           GPL2
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       wp-multilang
