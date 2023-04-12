@@ -1,6 +1,6 @@
 @import "../vars";
 
-.tcdi.dashboard.gallery{
+.viz.dashboard.gallery{
   .ui.grid{
     margin-right: 0;
   }
@@ -29,14 +29,14 @@
   }
 }
 
-.tcdi.dashboard.gallery.horizontal {
+.viz.dashboard.gallery.horizontal {
 
   .grid,.column,.row{
     padding: 0px;
     margin: 0px;
   }
 }
-.tcdi.dashboard.gallery.vertical {
+.viz.dashboard.gallery.vertical {
 
   .item {
     .preview {

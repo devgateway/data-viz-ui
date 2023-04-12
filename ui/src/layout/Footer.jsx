@@ -12,7 +12,7 @@ class Footer extends Component {
 
     render() {
         const {children, fixed, location,intl: {locale}} = this.props
-        return (<Container fluid className={"tcdi footer"}>
+        return (<Container fluid className={"viz footer"}>
 
             <PageProvider locale={locale}  slug={"footer"} store={"footer"}>
                 <PageConsumer>

@@ -64,7 +64,7 @@ const PostCarousel = (props) => {
         "data-interval": interval = 10000,
         editing, parent, unique
     } = props
-    return <Container style={{height:`${height}px`}} className={`tcdi post carousel ${editing ? 'editing' : ''}`} fluid={true}>
+    return <Container style={{height:`${height}px`}} className={`viz post carousel ${editing ? 'editing' : ''}`} fluid={true}>
 
         <PostProvider type={type} taxonomy={taxonomy} categories={categories}
                       store={"carousel_" + parent + "_" + unique} page={1}

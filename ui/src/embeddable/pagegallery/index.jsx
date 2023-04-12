@@ -50,7 +50,7 @@ const Root = (props) => {
     } = props
 
     const options = {style, columns}
-    return (<Container fluid className={`tcdi dashboard gallery ${style}`}>
+    return (<Container fluid className={`viz dashboard gallery ${style}`}>
             {parent &&
                 <PageProvider locale={locale} parent={parent} store={"gallery_" + props.parent + '_' + props.unique}
                               perPage={100}>
