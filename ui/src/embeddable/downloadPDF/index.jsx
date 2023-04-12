@@ -34,7 +34,7 @@ const DownloadPdf = (props) => {
 
     }
     return (
-        <Container className={`tcdi download ${editing ? 'editing' : ''}`} fluid={true}>
+        <Container className={`viz download ${editing ? 'editing' : ''}`} fluid={true}>
             <React.Fragment>
                 <div className='downloadPdf'>
                    <Button loading={loading} className={"download"} onClick={download}>{buttonLabel}</Button>
