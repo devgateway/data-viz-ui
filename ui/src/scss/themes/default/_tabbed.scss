@@ -1,5 +1,5 @@
 
-.tcdi.tabbed.posts.container {
+.viz.tabbed.posts.container {
   margin: 0px;
   min-height: 250px;
   padding: 0px 20px;
@@ -8,7 +8,7 @@
     margin: 0px;
     padding: 25px 15px;
   }
-  .tcdi.download{
+  .viz.download{
     margin-top: -5px;
     .download-header{
       align-items: center;
@@ -183,15 +183,15 @@
 }
 
 
-.container.tcdi.tabbed.posts.editing {
+.container.viz.tabbed.posts.editing {
   .button.nav {
     margin-top: 20px;
   }
 }
 
-.wp-block-tcdi-components-tabbed-posts{
+.wp-block-viz-components-tabbed-posts{
   // Light tabs option
-  .tcdi-component[data-theme='light']{
+  .viz-component[data-theme='light']{
     .ui.menu.tabbed.posts{
       .item{
         .label{

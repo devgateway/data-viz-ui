@@ -51,10 +51,10 @@ class Index extends React.Component {
 
 
         const valid=expresion.test(email)
-        return <div className="tcdi newsLetter">
+        return <div className="viz newsLetter">
 
 
-            <div className="tcdi newsLetter form">
+            <div className="viz newsLetter form">
                 <Input icon='envelope' name="email" value={email}
                        onChange={(e, target) => onChange(target.value)}
                        iconPosition='left'
