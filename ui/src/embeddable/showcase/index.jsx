@@ -243,7 +243,7 @@ class Index extends React.Component {
         } = this.props
         const {showValidation, token, reset} = this.state
 
-        return <Container fluid={true} className="tcdi showcase">
+        return <Container fluid={true} className="viz showcase">
 
              {/*(status == 'ERROR' || editing) && <Message negative>
                 <p>{failuremessage}</p>
