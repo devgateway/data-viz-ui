@@ -1893,10 +1893,11 @@ body.illicit {
 
 .container.viz.footer {
   margin-top: 100px;
-  background-color: #5089a6;
+  background-color: #158384;
   line-height: 16px !important; }
   .container.viz.footer .bottom-bar {
-    background-color: #175372;
+    border: 1px solid red;
+    background-color: #FFF;
     border-top: 1px solid #acdef7;
     color: #ffffff;
     left: 0;
@@ -1906,8 +1907,6 @@ body.illicit {
     right: 0;
     text-align: center;
     width: 100%; }
-    .container.viz.footer .bottom-bar p {
-      font-size: 0.8rem; }
     .container.viz.footer .bottom-bar a {
       color: #acdef7; }
     .container.viz.footer .bottom-bar .license-block {
@@ -1948,7 +1947,6 @@ body.illicit {
     margin: 0px; }
   .container.viz.footer p {
     font-weight: 400;
-    font-size: 1em;
     color: white;
     padding: 1rem 0; }
     .container.viz.footer p a {
