@@ -560,66 +560,59 @@ Alternative compacted style for columns
           .edit-post-visual-editor .container.header .menu .pages .item.selected a, .edit-post-visual-editor .container.header .branding .pages .item.selected a, #root .container.header .menu .pages .item.selected a, #root .container.header .branding .pages .item.selected a {
             color: #dadada; }
         .edit-post-visual-editor .container.header .menu .pages .item.has-child-items, .edit-post-visual-editor .container.header .branding .pages .item.has-child-items, #root .container.header .menu .pages .item.has-child-items, #root .container.header .branding .pages .item.has-child-items {
-          color: #FFF;
-          padding-bottom: 27px; }
+          color: #FFF; }
           .edit-post-visual-editor .container.header .menu .pages .item.has-child-items span::after, .edit-post-visual-editor .container.header .branding .pages .item.has-child-items span::after, #root .container.header .menu .pages .item.has-child-items span::after, #root .container.header .branding .pages .item.has-child-items span::after {
             transform: rotate(90deg);
             content: '\203A';
             margin-left: 10px;
             float: right;
             display: block; }
-        .edit-post-visual-editor .container.header .menu .pages .item.selected.has-child-items, .edit-post-visual-editor .container.header .branding .pages .item.selected.has-child-items, #root .container.header .menu .pages .item.selected.has-child-items, #root .container.header .branding .pages .item.selected.has-child-items {
-          color: #5089a6;
-          border: 1px solid #dadada;
-          margin-bottom: -1px;
-          border-bottom-right-radius: 3px;
-          border-bottom-left-radius: 3px;
-          margin-bottom: -1px;
-          padding-bottom: 28px; }
-          .edit-post-visual-editor .container.header .menu .pages .item.selected.has-child-items span::after, .edit-post-visual-editor .container.header .branding .pages .item.selected.has-child-items span::after, #root .container.header .menu .pages .item.selected.has-child-items span::after, #root .container.header .branding .pages .item.selected.has-child-items span::after {
-            transform: rotate(-90deg);
-            content: '\203A';
-            margin-left: 10px;
-            float: right;
-            display: block; }
-    .edit-post-visual-editor .container.header .container.child .menu, #root .container.header .container.child .menu {
-      max-width: 100%;
-      margin-top: 0px;
-      padding: 0px;
-      border-bottom: 1px solid #dadada;
-      justify-content: center; }
-      .edit-post-visual-editor .container.header .container.child .menu .item, #root .container.header .container.child .menu .item {
-        margin-top: 1px;
-        text-transform: uppercase;
-        padding: 0px 10px;
-        margin: 0px .5%; }
-        .edit-post-visual-editor .container.header .container.child .menu .item a, #root .container.header .container.child .menu .item a {
-          color: #FFF; }
-          .edit-post-visual-editor .container.header .container.child .menu .item a:hover, #root .container.header .container.child .menu .item a:hover {
-            filter: contrast(0); }
-          .edit-post-visual-editor .container.header .container.child .menu .item a:focus, #root .container.header .container.child .menu .item a:focus {
-            box-shadow: none; }
-        .edit-post-visual-editor .container.header .container.child .menu .item .mark, .edit-post-visual-editor .container.header .container.child .menu .item.active .mark, .edit-post-visual-editor #root .container.header .container.child .menu .item.active .mark, #root .edit-post-visual-editor .container.header .container.child .menu .item.active .mark, #root .container.header .container.child .menu .item .mark, #root .container.header .container.child .menu .item.active .mark {
+        .edit-post-visual-editor .container.header .menu .pages .item.selected.has-child-items span::after, .edit-post-visual-editor .container.header .branding .pages .item.selected.has-child-items span::after, #root .container.header .menu .pages .item.selected.has-child-items span::after, #root .container.header .branding .pages .item.selected.has-child-items span::after {
+          transform: rotate(-90deg);
+          content: '\203A';
+          margin-left: 10px;
+          float: right;
+          display: block; }
+    .edit-post-visual-editor .container.header .container.child, #root .container.header .container.child {
+      background-color: #085255; }
+      .edit-post-visual-editor .container.header .container.child .menu, #root .container.header .container.child .menu {
+        max-width: 100%;
+        margin-top: 0px;
+        padding: 0px;
+        border-bottom: 1px solid #dadada;
+        justify-content: center; }
+        .edit-post-visual-editor .container.header .container.child .menu .item, #root .container.header .container.child .menu .item {
+          margin-top: 1px;
+          text-transform: uppercase;
+          padding: 0px 10px;
+          margin: 0px .5%; }
+          .edit-post-visual-editor .container.header .container.child .menu .item a, #root .container.header .container.child .menu .item a {
+            color: #FFF; }
+            .edit-post-visual-editor .container.header .container.child .menu .item a:hover, #root .container.header .container.child .menu .item a:hover {
+              filter: contrast(0); }
+            .edit-post-visual-editor .container.header .container.child .menu .item a:focus, #root .container.header .container.child .menu .item a:focus {
+              box-shadow: none; }
+          .edit-post-visual-editor .container.header .container.child .menu .item .mark, .edit-post-visual-editor .container.header .container.child .menu .item.active .mark, .edit-post-visual-editor #root .container.header .container.child .menu .item.active .mark, #root .edit-post-visual-editor .container.header .container.child .menu .item.active .mark, #root .container.header .container.child .menu .item .mark, #root .container.header .container.child .menu .item.active .mark {
+            width: 15px;
+            height: 17px;
+            background-size: 15px 15px;
+            margin-right: 11px;
+            background-image: url("/child-menu-arrow.svg");
+            background-repeat: no-repeat; }
+        .edit-post-visual-editor .container.header .container.child .menu .item.selected .mark, .edit-post-visual-editor #root .container.header .container.child .menu .item.selected .item.active .mark, #root .edit-post-visual-editor .container.header .container.child .menu .item.selected .item.active .mark, .edit-post-visual-editor #root .container.header .container.child .menu .item.active .item.selected .mark, #root .edit-post-visual-editor .container.header .container.child .menu .item.active .item.selected .mark, #root .container.header .container.child .menu .item.selected .mark {
           width: 15px;
-          height: 17px;
+          height: 16px;
           background-size: 15px 15px;
-          margin-right: 11px;
-          background-image: url("/child-menu-arrow.svg");
+          margin-right: 10px;
+          background-image: url("/header_arrow_green.png");
           background-repeat: no-repeat; }
-      .edit-post-visual-editor .container.header .container.child .menu .item.selected .mark, .edit-post-visual-editor #root .container.header .container.child .menu .item.selected .item.active .mark, #root .edit-post-visual-editor .container.header .container.child .menu .item.selected .item.active .mark, .edit-post-visual-editor #root .container.header .container.child .menu .item.active .item.selected .mark, #root .edit-post-visual-editor .container.header .container.child .menu .item.active .item.selected .mark, #root .container.header .container.child .menu .item.selected .mark {
-        width: 15px;
-        height: 16px;
-        background-size: 15px 15px;
-        margin-right: 10px;
-        background-image: url("/header_arrow_green.png");
-        background-repeat: no-repeat; }
-      .edit-post-visual-editor .container.header .container.child .menu .item.selected, #root .container.header .container.child .menu .item.selected {
-        color: #5baf95; }
-      .edit-post-visual-editor .container.header .container.child .menu .item.active .mark, .edit-post-visual-editor #root .container.header .container.child .menu .item.active .mark, #root .edit-post-visual-editor .container.header .container.child .menu .item.active .mark, #root .container.header .container.child .menu .item.active .mark {
-        background-image: url("/child-menu-arrow-active.svg"); }
-      .edit-post-visual-editor .container.header .container.child .menu .item.active a, #root .container.header .container.child .menu .item.active a {
-        font-weight: 800;
-        color: #5baf95; }
+        .edit-post-visual-editor .container.header .container.child .menu .item.selected, #root .container.header .container.child .menu .item.selected {
+          color: #5baf95; }
+        .edit-post-visual-editor .container.header .container.child .menu .item.active .mark, .edit-post-visual-editor #root .container.header .container.child .menu .item.active .mark, #root .edit-post-visual-editor .container.header .container.child .menu .item.active .mark, #root .container.header .container.child .menu .item.active .mark {
+          background-image: url("/child-menu-arrow-active.svg"); }
+        .edit-post-visual-editor .container.header .container.child .menu .item.active a, #root .container.header .container.child .menu .item.active a {
+          font-weight: 800;
+          color: #5baf95; }
   .edit-post-visual-editor .url.breadcrumbs, #root .url.breadcrumbs {
     margin-top: 30px;
     font-size: 16px;
