@@ -104,7 +104,6 @@
 
       .item.has-child-items {
         color: $menu-link-color;
-        padding-bottom: 27px;
 
         span::after {
           transform: rotate(90deg);
@@ -116,13 +115,7 @@
       }
 
       .item.selected.has-child-items {
-        color: $light-blue;
-        border: 1px solid $light-gray;
-        margin-bottom: -1px;
-        border-bottom-right-radius: 3px;
-        border-bottom-left-radius: 3px;
-        margin-bottom: -1px;
-        padding-bottom: 28px;
+
 
         span::after {
           transform: rotate(-90deg);
@@ -139,6 +132,7 @@
   }
 
   .container.child {
+    background-color: $menu-background;
     .menu {
       max-width: 100%;
       margin-top: 0px;
