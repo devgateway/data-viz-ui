@@ -1,13 +1,14 @@
 <?php
 /**
- * Plugin Name: WP React Components
- * Plugin URI: https://github.com/devgateway/dg-wp-react
+ * Plugin Name: React Components
+ * Plugin URI: https://github.com/devgateway/wp-rteact-lib
  * Description: Custom UI Components for viz.
- * Version: 0.1.0
+ * Version: 0.1.2
  * Author: Sebastian Dimunzio
   * @package dg
  */
 defined( 'ABSPATH' ) || exit;
+
 function add_custom_block_categories( $categories, $post ) {
 	return array_merge(
 		$categories,

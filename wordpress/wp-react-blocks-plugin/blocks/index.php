@@ -17,7 +17,7 @@ function wp_react_lib_init() {
 
         wp_register_script(
             'wp-lib-block-editor-js',
-            plugins_url( 'build/index.css', __FILE__ ),
+            plugins_url( 'build/index.js', __FILE__ ),
             $asset_file['dependencies'],
             $asset_file['version']
         );
