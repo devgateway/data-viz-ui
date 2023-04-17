@@ -1,10 +1,11 @@
 .container.viz.footer {
   margin-top: 100px;
-  background-color: #5089a6;
+  background-color: $footer-background;
   line-height: 16px !important;
 
   .bottom-bar {
-    background-color: #175372;
+    border: 1px solid red;
+    background-color: #FFF;
     border-top: 1px solid #acdef7;
     color: #ffffff;
     left: 0;
@@ -15,7 +16,7 @@
     text-align: center;
     width: 100%;
     p{
-      font-size: 0.8rem;
+
     }
     a{
       color: #acdef7;
@@ -74,7 +75,7 @@
 
   p {
     font-weight: 400;
-    font-size: 1em;
+
     color: white;
     padding: 1rem 0;
 

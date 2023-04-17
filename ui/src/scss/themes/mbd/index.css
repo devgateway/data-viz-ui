@@ -658,10 +658,11 @@ Alternative compacted style for columns
       display: none !important; } }
   .edit-post-visual-editor .container.viz.footer, #root .container.viz.footer {
     margin-top: 100px;
-    background-color: #5089a6;
+    background-color: #158384;
     line-height: 16px !important; }
     .edit-post-visual-editor .container.viz.footer .bottom-bar, #root .container.viz.footer .bottom-bar {
-      background-color: #175372;
+      border: 1px solid red;
+      background-color: #FFF;
       border-top: 1px solid #acdef7;
       color: #ffffff;
       left: 0;
@@ -671,8 +672,6 @@ Alternative compacted style for columns
       right: 0;
       text-align: center;
       width: 100%; }
-      .edit-post-visual-editor .container.viz.footer .bottom-bar p, #root .container.viz.footer .bottom-bar p {
-        font-size: 0.8rem; }
       .edit-post-visual-editor .container.viz.footer .bottom-bar a, #root .container.viz.footer .bottom-bar a {
         color: #acdef7; }
       .edit-post-visual-editor .container.viz.footer .bottom-bar .license-block, #root .container.viz.footer .bottom-bar .license-block {
@@ -713,7 +712,6 @@ Alternative compacted style for columns
       margin: 0px; }
     .edit-post-visual-editor .container.viz.footer p, #root .container.viz.footer p {
       font-weight: 400;
-      font-size: 1em;
       color: white;
       padding: 1rem 0; }
       .edit-post-visual-editor .container.viz.footer p a, #root .container.viz.footer p a {
