@@ -14,7 +14,7 @@ function add_custom_block_categories( $categories, $post ) {
 		array(
 			array(
 				'slug' => 'wp-react-lib-blocks',
-				'title' => __( 'React Libs Blocks', 'wp-react-lib-blocks' ),
+				'title' => __( 'React Blocks', 'wp-react-lib-blocks' ),
 			),
 		)
 	);
