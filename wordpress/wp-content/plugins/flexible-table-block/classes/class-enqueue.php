@@ -56,9 +56,9 @@ class Enqueue {
 
 		wp_register_script(
 			'flexible-table-block-editor',
-			FTB_URL . '/build/index.js',
+			FTB_URL . '/build/index.css',
 			$asset_file['dependencies'],
-			filemtime( FTB_PATH . '/build/index.js' ),
+			filemtime( FTB_PATH . '/build/index.css' ),
 		);
 
 		wp_set_script_translations( 'flexible-table-block-editor', FTB_NAMESPACE );

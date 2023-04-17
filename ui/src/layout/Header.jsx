@@ -84,10 +84,10 @@ const MenuItems = injectIntl(withRouter(({
 
     useEffect(() => {
         if (settings && settings.menu_settings && mixedMenu) {
-            
+
             const removed = []
             const newItems = menu.items.map(item => {
-                
+
                 //if menu exists in partial settgins
                 //if item  deleted
                 if (settings.menu_settings && settings.menu_settings["nav_menu_item[" + item.ID + "]"] === false) {
@@ -118,7 +118,7 @@ const MenuItems = injectIntl(withRouter(({
 
 
             })
-            setMixedMenu({...menu, items: newItems.filter((i)=>removed.indexOf(i.ID)===-1)})
+            setMixedMenu({...menu, items: newItems.filter((i) => removed.indexOf(i.ID) === -1)})
 
             /*
             const items = menu.items.map(item => {
@@ -133,7 +133,6 @@ const MenuItems = injectIntl(withRouter(({
         }
 
     }, [settings])
-    
 
 
     return mixedMenu && <React.Fragment>
@@ -220,11 +219,14 @@ const Header = ({intl, match, settings}) => {
                 </Container>
 
                 <Container fluid={true} className={"child"}>
-                    {selected && selected.child_items && <Menu fluid text>
-                        <MenuItems active={slug} locale={intl.locale} withIcons onSetSelected={e => null}
-                                   menu={{items: selected.child_items}}>}</MenuItems>
+                    {selected && selected.child_items &&
+                        <Menu fluid text>
+                            <MenuItems
+                                active={slug} locale={intl.locale}
+                                withIcons onSetSelected={e => null}
+                                menu={{items: selected.child_items}}/>
 
-                    </Menu>}
+                        </Menu>}
                 </Container>
             </Container>
 
