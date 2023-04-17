@@ -426,7 +426,7 @@ Alternative compacted style for columns
         border: 1px solid transparent;
         padding-bottom: 25px; }
         .container.header .menu .pages .item a, .container.header .branding .pages .item a {
-          color: #54657e; }
+          color: #FFF; }
           .container.header .menu .pages .item a:hover, .container.header .branding .pages .item a:hover {
             color: #5089a6; }
       .container.header .menu .pages .item.selected, .container.header .branding .pages .item.selected {
@@ -438,7 +438,7 @@ Alternative compacted style for columns
         .container.header .menu .pages .item.selected a, .container.header .branding .pages .item.selected a {
           color: #5089a6; }
       .container.header .menu .pages .item.has-child-items, .container.header .branding .pages .item.has-child-items {
-        color: #54657e;
+        color: #FFF;
         padding-bottom: 27px; }
         .container.header .menu .pages .item.has-child-items span::after, .container.header .branding .pages .item.has-child-items span::after {
           transform: rotate(90deg);
