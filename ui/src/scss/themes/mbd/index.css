@@ -560,7 +560,8 @@ Alternative compacted style for columns
           .edit-post-visual-editor .container.header .menu .pages .item.selected a, .edit-post-visual-editor .container.header .branding .pages .item.selected a, #root .container.header .menu .pages .item.selected a, #root .container.header .branding .pages .item.selected a {
             color: #dadada; }
         .edit-post-visual-editor .container.header .menu .pages .item.has-child-items, .edit-post-visual-editor .container.header .branding .pages .item.has-child-items, #root .container.header .menu .pages .item.has-child-items, #root .container.header .branding .pages .item.has-child-items {
-          color: #FFF; }
+          color: #FFF;
+          margin-bottom: 3px; }
           .edit-post-visual-editor .container.header .menu .pages .item.has-child-items span::after, .edit-post-visual-editor .container.header .branding .pages .item.has-child-items span::after, #root .container.header .menu .pages .item.has-child-items span::after, #root .container.header .branding .pages .item.has-child-items span::after {
             transform: rotate(90deg);
             content: '\203A';
