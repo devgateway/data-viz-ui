@@ -239,10 +239,6 @@ registerBlockType(process.env.BLOCKS_NS+'/map',
                 type: 'String',
                 default: '{}'
             },           
-            type: {
-                type: 'string',
-                default: "media",
-            },
             taxonomy: {
                 type: 'string',
                 default: "none",
