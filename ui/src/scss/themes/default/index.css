@@ -43,6 +43,9 @@
 .has-red-color {
   color: #ba5555; }
 
+.has-black-color {
+  color: #000; }
+
 .has-red-background-color {
   background-color: #ba5555; }
 
@@ -53,7 +56,6 @@
   background-color: #31ba1a; }
 
 p {
-  color: #66676d;
   line-height: 1.5;
   font-weight: 400;
   font-size: 1rem; }

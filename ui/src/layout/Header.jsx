@@ -144,7 +144,11 @@ const MenuItems = injectIntl(withRouter(({
 
                 {withIcons && <a href={localReplaceLink(i.url, locale)}>
                     <div className={"mark"}><span className="sr-only">{i.title}</span></div>
-                </a>} {i.child_items ?
+                </a>}
+
+
+
+                {i.child_items ?
 
                 <span onMouseOver={e => onSetSelected(i)}>{i.title}</span> :
 
