@@ -15,7 +15,6 @@ const InlineList = asyncComponent(() => import("./inlinelist/"));
 const Chart = asyncComponent(() => import("./chart/"));
 const NewsLetter = asyncComponent(() => import("./newsletter/"));
 const ShowcaseForm = asyncComponent(() => import("./showcase/"));
-const Body = asyncComponent(() => import("./body/"));
 const Filter = asyncComponent(() => import("./filter/"));
 const Download = asyncComponent(() => import("./download/"));
 const DownloadPdf = asyncComponent(() => import('./downloadPDF/'))
@@ -26,9 +25,9 @@ const ReferencesList = asyncComponent(() => import('./references/ReferencesList'
 const Reference = asyncComponent(() => import('./references/Reference'))
 const TimeLine = asyncComponent(() => import('./time-line'))
 const NewTimeLine = asyncComponent(() => import('./new-time-line'))
-
-
 const Measures = asyncComponent(() => import('./measures'))
+const Menu = asyncComponent(() => import('./menu'))
+const ChildPagesMenu = asyncComponent(() => import('./child-page-menu'))
 
 export const reducers = {
     data,
@@ -43,7 +42,6 @@ const components = {
     filter: Filter,
     showCaseForm: ShowcaseForm,
     newsLetter: NewsLetter,
-    body: Body,
     tabbedPosts: TabbedPosts,
     pageModules: PageModules,
     featuredTabs: FeaturedTabs,
@@ -57,8 +55,10 @@ const components = {
     references: ReferencesList,
     reference: Reference,
     timeLine: TimeLine,
-    newTimeLine:NewTimeLine,
-    measures: Measures
+    newTimeLine: NewTimeLine,
+    measures: Measures,
+    menu: Menu,
+    childPagesMenu: ChildPagesMenu
 
 }
 

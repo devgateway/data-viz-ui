@@ -66,12 +66,6 @@ a {
 .edit-post-visual-editor .ui, #root .ui {
   font-family: 'Roboto', sans-serif !important; }
 
-.edit-post-visual-editor .ui.container.narrow, #root .ui.container.narrow {
-  max-width: 1080px; }
-
-.edit-post-visual-editor .ui.container.fluid.desktop, #root .ui.container.fluid.desktop {
-  max-width: 1366px !important; }
-
 .edit-post-visual-editor .ui.primary.button, #root .ui.primary.button {
   background-color: #5089a6; }
 
