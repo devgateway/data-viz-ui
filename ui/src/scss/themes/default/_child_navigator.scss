@@ -1,0 +1,49 @@
+.viz.child.page.navigator {
+
+  padding: 0px;
+  margin: 0px;
+
+  margin-top: 12px;
+
+  background-color: #EEE;
+
+  .menu {
+    padding-left: .5vw;
+
+    .item.group {
+      span {
+        margin: 0px;
+        font-size: 14px;
+        font-weight: bold;
+      }
+    }
+
+    .item {
+      font-size: 12px;
+    }
+
+    .item.selected {
+      color: $green;
+    }
+
+    .menu.expanded {
+      max-height: 500px;
+      transition: max-height  200ms ease-in;
+      overflow: hidden;
+
+
+    }
+
+    .menu.collapsed {
+      overflow: hidden;
+      max-height: 0;
+
+    }
+
+    .grid, .grid .row, .grid .column {
+      padding: 0px;
+      margin: 0px;
+
+    }
+  }
+}
