@@ -28,6 +28,7 @@ const NewTimeLine = asyncComponent(() => import('./new-time-line'))
 const Measures = asyncComponent(() => import('./measures'))
 const Menu = asyncComponent(() => import('./menu'))
 const ChildPagesMenu = asyncComponent(() => import('./child-page-menu'))
+const NewMap = asyncComponent(() => import('./d3Map'))
 
 export const reducers = {
     data,
@@ -58,7 +59,8 @@ const components = {
     newTimeLine: NewTimeLine,
     measures: Measures,
     menu: Menu,
-    childPagesMenu: ChildPagesMenu
+    childPagesMenu: ChildPagesMenu,
+    newMap: NewMap
 
 }
 
