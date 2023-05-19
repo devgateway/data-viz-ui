@@ -1,3 +1,7 @@
+:root {
+  --header-height: 61px;
+  /* Update this value to match your header's height */ }
+
 * {
   -webkit-print-color-adjust: exact; }
 
@@ -1051,6 +1055,10 @@ body.illicit {
   opacity: 0.1797;
   fill: #D3A79F; }
 
+:root {
+  --header-height: 61px;
+  /* Update this value to match your header's height */ }
+
 .viz.dashboard.gallery .ui.grid {
   margin-right: 0; }
 
@@ -1207,6 +1215,10 @@ body.illicit {
     .ui.container.section .menu .item, .ui.container.section .header .item {
       border: 0 !important;
       display: none; } }
+
+:root {
+  --header-height: 61px;
+  /* Update this value to match your header's height */ }
 
 .green .left.navigator {
   top: 10px;
@@ -2405,6 +2417,10 @@ a.wp-reference {
   .downloadPdf {
     display: none; } }
 
+:root {
+  --header-height: 61px;
+  /* Update this value to match your header's height */ }
+
 .ui.container.filter {
   margin-left: 0em !important;
   margin-right: 0em !important;
@@ -2716,6 +2732,10 @@ body {
     color: white; }
   .top-navigator .ui.menu .item:before {
     width: 0px; }
+
+:root {
+  --header-height: 61px;
+  /* Update this value to match your header's height */ }
 
 .ui.container.data-filters-reset {
   margin-left: 0em !important;
