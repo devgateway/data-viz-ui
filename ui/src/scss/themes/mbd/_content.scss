@@ -21,7 +21,16 @@
   margin: 0;
   padding: 0;
   height: calc(100vh - var(--header-height));
+
   .row {
     padding: 0px;
-    }
+  }
+}
+
+@media only screen and (min-width: 1200px) {
+  .ui.container {
+    width: 80%!important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
 }
