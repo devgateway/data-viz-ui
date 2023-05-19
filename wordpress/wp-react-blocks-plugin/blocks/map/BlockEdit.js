@@ -44,7 +44,7 @@ class BlockEdit extends BlockEditWithAPIMetadata {
             this.getFile("/"+ this.props.attributes.mapFile)
         }    
       
-        this.getMapFiles()    
+        this.getMap()
         this.updateMapPosition();         
     }
 
@@ -109,7 +109,7 @@ class BlockEdit extends BlockEditWithAPIMetadata {
         })      
     }
 
-    getMapFiles() {
+    getMapFiles() {Files
         const {
             attributes: {
              fileType,
