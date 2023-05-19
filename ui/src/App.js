@@ -40,10 +40,10 @@ const messages = {
 
 const PreviewComponentParameterParser = (props) => {
 
-    
-    const componentRef=useRef( getComponentByNameIgnoreCase(props.match.params.name))
 
-    const UIComponent =componentRef.current
+    const componentRef = useRef(getComponentByNameIgnoreCase(props.match.params.name))
+
+    const UIComponent = componentRef.current
 
 
     const [params, setParams] = useState(queryString.parse(props.location.search))
@@ -51,7 +51,7 @@ const PreviewComponentParameterParser = (props) => {
         console.log("-------------------------------reading message ----------------------------------------")
         const data = event.data
         if (data.messageType && data.messageType == 'component-attributes') {
-            
+
             const newPrams = {...params}
             Object.keys(data).forEach(k => {
                 newPrams["data-" + k.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()] = typeof data[k] == 'object' ? JSON.stringify(data[k]) : data[k]
@@ -84,7 +84,7 @@ const PreviewComponentParameterParser = (props) => {
 }
 
 const InjectTitle = injectIntl((props) => {
-    
+
     //description
     document.title = props.settings.description
     console.log(props.settings)
@@ -156,12 +156,14 @@ class IntlRoutes extends Component {
                                     slug={"home"}
                                     locale={locale}
                                     store={"home"}>
-                                    <ResponsiveContainer>
-                                        <PageConsumer>
-                                            <Helmet></Helmet>
-                                            <Page></Page>
-                                        </PageConsumer>
-                                    </ResponsiveContainer>
+                                    <PageConsumer>
+                                        <ResponsiveContainer>
+                                            <PageConsumer>
+                                                <Helmet></Helmet>
+                                                <Page></Page>
+                                            </PageConsumer>
+                                        </ResponsiveContainer>
+                                    </PageConsumer>
                                 </PageProvider>
 
                             )}>
@@ -172,7 +174,7 @@ class IntlRoutes extends Component {
 
 
                             <Route path={"/:lan/preview/page/:id"} exact render={props => {
-                                
+
                                 const searchParams = new URLSearchParams(props.location.search)
                                 const preview = searchParams.get("preview")
                                 const previewNonce = searchParams.get("_wpnonce")
@@ -192,7 +194,7 @@ class IntlRoutes extends Component {
                             </Route>
 
                             <Route path={"/:lan/preview/:type/:id"} exact render={props => {
-                                
+
                                 const searchParams = new URLSearchParams(props.location.search)
                                 const preview = searchParams.get("preview")
                                 const type = props.match.params.type == 'post' ? 'posts' : props.match.params.type
