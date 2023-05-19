@@ -4,7 +4,7 @@ import BlockSave from "./BlockSave";
 import BlockEdit from "./BlockEdit";
 import Generic from "../icons";
 
-registerBlockType(process.env.BLOCKS_NS+'/new-map',
+registerBlockType(process.env.BLOCKS_NS + '/new-d3-map',
     {
         title: __('D3 Map'),
         icon: Generic,
@@ -20,29 +20,6 @@ registerBlockType(process.env.BLOCKS_NS+'/new-map',
                 default: 'default',
             },
 
-            app: {
-                type: 'string',
-                default: 'csv',
-            },
-
-            dimension1: {
-                type: 'String',
-                default: 'zone'
-            },
-            dimension2: {
-                type: 'String',
-                default: 'gender'
-            },
-
-            measures: {
-                type: "Object",
-                default: {}
-            },
-
-            csv: {
-                type: "String",
-                default: ""
-            },
             layers: {
                 type: "Array",
                 default: []

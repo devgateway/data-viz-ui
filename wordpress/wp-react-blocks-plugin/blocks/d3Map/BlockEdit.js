@@ -10,38 +10,54 @@ import {
 } from '@wordpress/components'
 
 import {__} from '@wordpress/i18n'
-import {BlockEditWithAPIMetadata, SizeConfig} from '../commons/index'
-import APIConfig from "../map/APIConfig";
-import LayerSettings from "./Layer";
-import {layerPrototype} from "./Layer"
-
+import {BlockEditWithAPIMetadata, ComponentWithSettings, SizeConfig} from '../commons/index'
+import LayerSettings from "./LayerSetting";
+import Layer from "./Layer"
 import {togglePanel} from "../commons/Util";
-import CSVSourceConfig from "../commons/CSVSourceConfig";
 
-class BlockEdit extends BlockEditWithAPIMetadata {
-    constructor() {
-        super();
+
+class BlockEdit extends ComponentWithSettings {
+    constructor(props) {
+        super(props);
+        this.onChangeLayer = this.onChangeLayer.bind(this)
+    }
+
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        const {attributes: {app}} = this.props
+        super.componentDidUpdate(prevProps, prevState, snapshot);
     }
 
     addLayer() {
+        const {setAttributes, attributes: {layers}} = this.props
         const newLayers = [...layers]
-        newLayers.push(Object.getPrototypeOf(layerPrototype))
+        newLayers.push(new Layer())
+        setAttributes({layers: newLayers})
     }
 
-    removeLayer() {
+    removeLayer(id, layer) {
 
+    }
+
+    onChangeLayer(layer) {
+        const {setAttributes, attributes: {layers}} = this.props
+        const newLayers = [...layers]
+        const index = layers.findIndex(l => l.id === layer.id);
+        if (index !== -1) {
+            newLayers[index] = layer;
+        }
+        setAttributes({layers: newLayers})
     }
 
     render() {
         const {
-            className, isSelected,
+            className,
+            isSelected,
             toggleSelection,
             setAttributes,
             attributes: {
                 panelStatus,
                 height,
                 group,
-                app,
                 layers = [],
             }
         } = this.props;
@@ -65,41 +81,17 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                     <SizeConfig setAttributes={setAttributes} panelStatus={panelStatus}
                                 height={height}></SizeConfig>
 
-
-                    <PanelBody initialOpen={false} title={__("API & Source")}>
-                        <PanelRow>
-                            <SelectControl
-                                value={[app]} // e.g: value = [ 'a', 'c' ]
-                                onChange={(app) => {
-                                    setAttributes({
-                                        app: app
-                                    })
-                                }}
-                                options={this.state.apps}
-                            />
-                        </PanelRow>
-                    </PanelBody>
-                    {app != 'csv' && <APIConfig
-                        allDimensions={this.state.dimensions}
-                        allFilters={this.state.filters}
-                        allMeasures={this.state.measures}
-                        allCategories={this.state.categories}
-                        allApps={this.state.apps}
-                        {...this.props}>
-                    </APIConfig>}
-                    {app == 'csv' &&
-                        <CSVSourceConfig {...this.props}>
-                        </CSVSourceConfig>}
-
                     <PanelBody panelStatus={panelStatus['LAYERS']}
                                onToggle={e => togglePanel("LAYERS", panelStatus, setAttributes)}
                                title={__("Layers")}>
+
                         {
-                            layers.map((layer) => <LayerSettings layer={layer}/>)
+                            layers.map((layer) => <LayerSettings
+                               onChange={this.onChangeLayer}
+                               layer={layer} {...this.props}/>)
                         }
                         <PanelRow>
-                            <Button onClick={e => removeLayer()}>-</Button>
-                            <Button onClick={e => addLayer()}>+</Button>
+                            <Button onClick={e => this.addLayer()}>+</Button>
                         </PanelRow>
 
                     </PanelBody>

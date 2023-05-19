@@ -1,22 +1,28 @@
 import {PanelBody, PanelRow} from "@wordpress/components";
 
-export const layerPrototype     = {
-    name:'New Layer',
-    file:'',
-    type:'Shape',
-    color:'#000000',
-    opacity:1,
+export class Layer {
+    id = Date.now();
+    name = 'New Layer'
+
+    app = "csv"
+    dimension1 = "none"
+    dimension2 = "none"
+    measures = []
+
+    filters = []
+
+    csv = ""
+
+    file = 'none'
+    color = '#000000'
+    opacity = 1
+    type = 'base' //base layer user will select only a file
+    //type:'shape', //shape layer user will select file and data source
+    //type:'data', //will select data source and symbols + symbols configuration
+    constructor() {
+
+    }
 }
 
-const LayerSettings =(layer)=> {
 
-    const {name,type,color,opacity} = layer
-
-    return <PanelBody title={name}>
-                <PanelRow>
-                    <label>Layer Name</label>
-                </PanelRow>
-            </PanelBody>
-}
-
-export default LayerSettings
+export default Layer

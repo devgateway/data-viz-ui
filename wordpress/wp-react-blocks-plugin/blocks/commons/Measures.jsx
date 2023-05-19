@@ -131,7 +131,7 @@ const Measures = (props) => {
               any dimensions selected
 
         */
-            ((type == 'bar' && dimension2 != 'none') || (type == 'pie' && (dimension1 != 'none' || dimension2 != 'none'))) && allMeasures && [...new Set(allMeasures.map(p => getTranslation(p.group)))].map(g => {
+            ((type == 'bar' && dimension2 != 'none') || (type == 'pie' && (dimension1 != 'none' || dimension2 != 'none')) || type=='d3Map') && allMeasures && [...new Set(allMeasures.map(p => getTranslation(p.group)))].map(g => {
                 return (<PanelBody
                         initialOpen={panelStatus[g]}
                         onToggle={e => togglePanel(g, panelStatus, setAttributes)}

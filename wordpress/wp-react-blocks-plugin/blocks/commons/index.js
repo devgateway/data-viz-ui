@@ -285,6 +285,7 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
     }
 
     componentDidMount() {
+        debugger;
         super.componentDidMount();
 
         fetch(`/api/registry/eureka/apps`, {
@@ -323,8 +324,8 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
         }
     }
 
-    loadMetadata() {
-        const {attributes: {app}} = this.props
+
+    _loadMetadata(app) {
         if (app != "csv") {
             fetch(`/api/${app}/dimensions`)
                 .then(response => {
@@ -394,6 +395,12 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
                     console.log("Error when getting categories", response)
                 })
         }
+    }
+
+    loadMetadata() {
+
+        const {attributes: {app}} = this.props
+        this._loadMetadata(app)
     }
 }
 

@@ -73,7 +73,6 @@ export class APIConfig extends Component {
     }
 
     cleanSelection(prevState) {
-
         const {setAttributes} = this.props
         setAttributes({measures: [], filters: []})
     }
@@ -140,14 +139,13 @@ export class APIConfig extends Component {
 
 
         if (type != prevType) {
+
         }
 
         if (dimension2 != prevDimension2) {
-
             //TODO ensure only one measure remains selected when selecting a second dimensions
             const uMs = Object.assign({}, measures)
             if (dimension2 != 'none') {
-
                 let i = 0; //the idea is to keep one selected
                 if (uMs[app]) {
                     const selected = Object.keys(uMs[app]).map(k => uMs[app][k].selected).length
@@ -198,7 +196,7 @@ export class APIConfig extends Component {
         } else {
             uMs[app][value] = {selected: true, format: defaultFormat}
         }
-        setAttributes({measures: uMs})        
+        setAttributes({measures: uMs})
     }
 
 
@@ -274,7 +272,7 @@ export class APIConfig extends Component {
             }
         } = this.props
 
-
+        debugger;
         const currentType = types.filter(t => t.value === type).length > 0 ? types.filter(t => t.value === type)[0] : null
 
         return (
@@ -289,7 +287,7 @@ export class APIConfig extends Component {
                         options={allDimensions}
                     />
                 </PanelRow>
-                {(type != 'line') &&<PanelRow>
+                {(type != 'line') && <PanelRow>
                     <SelectControl
                         label={__(type == 'map' ? 'Breakdown Field' : 'Second Dimension')}
                         value={[dimension2]} // e.g: value = [ 'a', 'c' ]
