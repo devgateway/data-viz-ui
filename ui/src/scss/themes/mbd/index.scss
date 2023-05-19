@@ -2,11 +2,11 @@
 @import '../vars';
 
 .edit-post-visual-editor, #root {
-  @import '../default/colors';
+  @import 'colors';
   @import '../default/fonts';
-  @import '../default/content';
-    @import "header";
-  @import "./footer";
+  @import 'content';
+  @import 'header';
+  @import 'footer';
   @import '../default/illicit';
   @import '../default/tabbed';
   @import '../default/body';
@@ -33,6 +33,7 @@
   @import "../default/references";
   @import "../default/userMeasures";
   @import "../default/child_navigator";
+  @import 'sideNavbar';
 
 }
 

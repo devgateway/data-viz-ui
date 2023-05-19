@@ -92,6 +92,9 @@ const ChildNavigator = ({pages, title, selected, onPageSelected}) => {
                     </Menu.Menu>
 
                 </Menu.Item>)}
+            <div className="navbar-footer">
+                <p className="navbar-footer-text">Data and publications were made possible through support of the United States Agency for International Development (USAID).</p>
+            </div>
         </Menu>
     </Container>
 }
