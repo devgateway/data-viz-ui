@@ -1,0 +1,27 @@
+.desktop {
+  margin: 0 !important;
+  width: 100%;
+}
+
+.entry-content {
+  width: 100%;
+}
+
+.breadcrumbs {
+  display: none;
+}
+
+.ui.fluid.container.viz.child.page.navigator {
+  margin: 0;
+  position: absolute;
+  background-color: #FFFFFF;
+}
+
+.ui.grid {
+  margin: 0;
+  padding: 0;
+  height: calc(100vh - var(--header-height));
+  .row {
+    padding: 0px;
+    }
+}
