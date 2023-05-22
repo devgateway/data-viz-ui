@@ -1,19 +1,34 @@
 import React from 'react';
 import {connect} from "react-redux";
-import D3Map from './D3map'
+import {parse} from "../utils/parseUtils";
+import Map from "./Map"
+import BaseLayer from './BaseLayer'
+import DataLayer from './DataLayer'
+
 const MapWrapper = (props) => {
     const {
         unique,
         editing,
-        "data-group": group = "default",
-        "data-app": app = 'csv',
-        'data-dimension1': dimension1 = '',
-        'data-dimension2': dimension2 = '',
+        "data-layers": dataLayers,
         "data-height": height = 600,
     } = props
+
+    const layers = parse(dataLayers)
+    debugger
     return (
         <div>
-            <D3Map></D3Map>
+            <Map height={height}>
+                {layers.map((layer, i) => {
+                    if (layer.type === 'base') {
+                        return <BaseLayer key={i} {...layer} />
+                    }
+                    if (layer.type === 'data') {
+                        return <DataLayer key={i} {...layer} />
+                    }
+
+                })}
+
+            </Map>
         </div>
     );
 
