@@ -74,6 +74,7 @@
     "smoothscroll-polyfill": "^0.4.4",
     "string-template": "^1.0.0",
     "topojson": "^3.0.2",
+    "topojson-client": "^3.1.0",
     "webpack-node-externals": "^3.0.0"
   },
   "scripts": {
