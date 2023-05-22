@@ -1,9 +1,15 @@
 import React from 'react';
 import {connect} from "react-redux";
+import BaseLayer from "./BaseLayer";
 
-const DataLayer = (props) => {
+class DataLayer extends BaseLayer {
+    constructor() {
+        super();
+    }
 
+    render() {
+        return super.render();
+    }
 
 }
-
 export default DataLayer
