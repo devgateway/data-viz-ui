@@ -41,7 +41,6 @@ const CategoricalFilter = ({value, index, items, onUpdateFilterValue}) => {
         return null;
     }
 }
-
 export class DataLayerSetting extends Component {
     constructor(props) {
         super(props);
@@ -63,13 +62,16 @@ export class DataLayerSetting extends Component {
     }
 
     cleanSelection(prevState) {
+        
         const {onChangeProperty} = this.props
         onChangeProperty("measures", [])
         onChangeProperty("filters", [])
+
         //setAttributes({measures: [], filters: []})
     }
 
     updateFilterParam(param, idx) {
+        
         const {layer: {filters}, onChangeProperty, allFilters} = this.props
         const newFilters = filters.slice()
         const selected = allFilters.filter(f => f.param === param)[0]
@@ -81,6 +83,7 @@ export class DataLayerSetting extends Component {
     }
 
     updateFilterValue(value, idx) {
+        
         const {layer: {filters}, onChangeProperty} = this.props
         const selected = filters[idx]
         let values = selected.value
@@ -97,6 +100,7 @@ export class DataLayerSetting extends Component {
     }
 
     setFilterValue(value, idx) {
+        
         const {layer: {filters}, onChangeProperty} = this.props
         const selected = filters[idx]
         let values = selected.value
@@ -109,6 +113,7 @@ export class DataLayerSetting extends Component {
     }
 
     addFilter() {
+        
         const {layer: {filters}, onChangeProperty, allFilters} = this.props
         let index = filters.length > allFilters.length ? allFilters.length : filters.length
         const newFilter = (allFilters && allFilters.length > 0) ? {
@@ -122,6 +127,7 @@ export class DataLayerSetting extends Component {
     }
 
     removeFilter(f) {
+        
         const {layer: {filters}, onChangeProperty, allFilters} = this.props
         let newFilters = filters.slice(0, -1)
         //setAttributes({filters: newFilters})
@@ -136,6 +142,7 @@ export class DataLayerSetting extends Component {
 
 
     onSetSingleMeasure(value) {
+        
         const {onChangeProperty} = this.props
         //setAttributes({measures: [value]})
         onChangeProperty("measures", [value])
@@ -143,6 +150,7 @@ export class DataLayerSetting extends Component {
     }
 
     onMeasuresChange(value) {
+        
         const {onChangeProperty, attributes: {measures}} = this.props
         if (measures.indexOf(value) > -1) {
             //setAttributes({measures: measures.filter(d => d != value)})
@@ -155,6 +163,7 @@ export class DataLayerSetting extends Component {
 
 
     items(type) {
+        
         const values = this.props.allCategories ? this.props.allCategories.filter(c => c.type === type) : []
         const cat = values.length > 0 ? values[0] : null
         let items = null
@@ -169,6 +178,7 @@ export class DataLayerSetting extends Component {
 
     render() {
         const {
+            onChangeProperty,
             allDimensions,
             allFilters,
             allMeasures,
@@ -189,14 +199,17 @@ export class DataLayerSetting extends Component {
                         label={'Matching Field'}
                         value={[dimension1]} // e.g: value = [ 'a', 'c' ]
                         onChange={(value) => {
-                            setAttributes({dimension1: value})
+                            onChangeProperty("dimension1", value)
+
                         }}
                         options={allDimensions}
                     />
                 </PanelRow>
 
             </PanelBody>,
-                <Measures onSetSingleMeasure={this.onSetSingleMeasure}
+
+                <Measures
+                        onSetSingleMeasure={this.onSetSingleMeasure}
                           onMeasuresChange={this.onMeasuresChange}
                           {...this.props} />,
                 <>
@@ -225,6 +238,4 @@ export class DataLayerSetting extends Component {
     }
 
 }
-
-
 export default DataLayerSetting;

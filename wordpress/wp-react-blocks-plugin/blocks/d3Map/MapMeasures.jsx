@@ -20,43 +20,24 @@ const Measures = (props) => {
         onSetSingleMeasure,
         allMeasures,
         setAttributes,
-        title,
         panelStatus,
         layer: {
             measures,
-            dimension1,
-            dimension2,
-            type,
             app
         }
     } = props
 
 
-    const MToggle = ({measure}) => {
-        const userMeasure = measures[app] ? measures[app][measure.value] : {}
-
-        return (<ToggleControl
-            label={getTranslation(measure)}
-            checked={userMeasure ? userMeasure.selected : false}
-            onChange={(value) => onMeasuresChange(measure.value)}/>)
-    }
-
     const MCheckbox = ({measure}) => {
-        const userMeasure = measures[app] ? measures[app][measure.value] : {}
+        
+        const userMeasure = measures ? measures[measure.value] : {}
         return <CheckboxControl
             label={getTranslation(measure)}
-            checked={userMeasure ? userMeasure.selected : false}
+            checked={measures.indexOf(measure.value) > -1}
             onChange={(value) => onSetSingleMeasure(measure.value)}/>
     }
 
 
-    const MeasureOptions = ({measure, single}) => {
-        return <PanelRow>
-            {single && <MCheckbox measure={measure}></MCheckbox>}
-            {!single && <MToggle measure={measure}></MToggle>}
-        </PanelRow>
-
-    }
 
     const countSelected = (g) => {
         if (measures[app]) {
@@ -80,15 +61,15 @@ const Measures = (props) => {
     }
 
     return <PanelBody title={__("Measures")}>
-
-
         {allMeasures && [...new Set(allMeasures.map(p => getTranslation(p.group)))].map(g => {
                 return (<PanelBody
                     onToggle={e => togglePanel(g, panelStatus, setAttributes)}
                     title={`${g} (${countSelected(g)} / ${allMeasures.filter(f => f.group === g).length} ) `}>
                     {allMeasures.filter(f => getTranslation(f.group) === g)
                         .map(m => <PanelRow>
-                            <MeasureOptions single={true} measure={m}></MeasureOptions>
+                            <PanelRow>
+                                <MCheckbox measure={m}></MCheckbox>
+                            </PanelRow>
                         </PanelRow>)}
                 </PanelBody>)
             })}

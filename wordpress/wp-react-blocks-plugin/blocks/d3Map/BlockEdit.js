@@ -11,15 +11,17 @@ import {
 
 import {__} from '@wordpress/i18n'
 import {BlockEditWithAPIMetadata, ComponentWithSettings, SizeConfig} from '../commons/index'
-import LayerSettings from "./LayerSetting";
-import Layer from "./Layer"
+import LayerSettings from "./Layer";
+import LayerObject from "./LayerObject"
 import {togglePanel} from "../commons/Util";
-
 
 class BlockEdit extends ComponentWithSettings {
     constructor(props) {
         super(props);
         this.onChangeLayer = this.onChangeLayer.bind(this)
+        //this.addLayer = this.addLayer.bind(this)
+        //this.removeLayer = this.removeLayer.bind(this)
+        //this.removeLayer = this.removeLayer.bind(this)
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
@@ -30,14 +32,16 @@ class BlockEdit extends ComponentWithSettings {
     addLayer() {
         const {setAttributes, attributes: {layers}} = this.props
         const newLayers = [...layers]
-        newLayers.push(new Layer())
+        newLayers.push(new LayerObject())
         setAttributes({layers: newLayers})
     }
-
-    removeLayer(id, layer) {
-
+    removeLayer(layer) {
+        const {setAttributes, attributes: {layers}} = this.props
+        const {id, name} = layer
+        debugger;
+        const newLayers = layers.filter(l=>l.id!=id)
+        setAttributes({layers: newLayers})
     }
-
     onChangeLayer(layer) {
         const {setAttributes, attributes: {layers}} = this.props
         const newLayers = [...layers]
@@ -47,7 +51,6 @@ class BlockEdit extends ComponentWithSettings {
         }
         setAttributes({layers: newLayers})
     }
-
     render() {
         const {
             className,
@@ -87,8 +90,11 @@ class BlockEdit extends ComponentWithSettings {
 
                         {
                             layers.map((layer) => <LayerSettings
-                               onChange={this.onChangeLayer}
-                               layer={layer} {...this.props}/>)
+                                onRemoveLayer={(e)=>this.removeLayer(layer)}
+                                onChange={this.onChangeLayer}
+                                layer={layer}
+                                {...this.props}
+                            />)
                         }
                         <PanelRow>
                             <Button onClick={e => this.addLayer()}>+</Button>
@@ -136,12 +142,8 @@ class BlockEdit extends ComponentWithSettings {
     }
 }
 
-
 const Edit = (props) => {
-
     const blockProps = useBlockProps({className: 'wp-react-component'});
     return <div {...blockProps}><BlockEdit {...props} /></div>;
-
-
 }
 export default Edit;
