@@ -97,7 +97,7 @@ class BlockEdit extends ComponentWithSettings {
                             />)
                         }
                         <PanelRow>
-                            <Button onClick={e => this.addLayer()}>+</Button>
+                            <Button variant={"primary"} onClick={e => this.addLayer()}>Add New Layer</Button>
                         </PanelRow>
 
                     </PanelBody>

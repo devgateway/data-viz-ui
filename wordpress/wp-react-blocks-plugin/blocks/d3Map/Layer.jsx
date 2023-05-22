@@ -59,27 +59,30 @@ const Layer = (props) => {
 
             </SelectControl>
         </PanelRow>,
-        <PanelBody initialOpen={false} title={__("API & Source")}>
-            <PanelRow>
-                <SelectControl
-                    value={[app]} // e.g: value = [ 'a', 'c' ]
-                    onChange={(app) => {
-                        onChangeProperty("app", app)
-                    }}
-                    options={metadata.apps}
-                />
-            </PanelRow>
-        </PanelBody>,
+        <React.Fragment>
+            {type=='data'&&<PanelBody initialOpen={false} title={__("API & Source")}>
+                <PanelRow>
+                    <SelectControl
+                        value={[app]} // e.g: value = [ 'a', 'c' ]
+                        onChange={(app) => {
+                            onChangeProperty("app", app)
+                        }}
+                        options={metadata.apps}
+                    />
+                </PanelRow>
+                <DataLayerSetting
+                    onChangeProperty={onChangeProperty}
+                    allDimensions={metadata.dimensions}
+                    allFilters={metadata.filters}
+                    allMeasures={metadata.measures}
+                    allCategories={metadata.categories}
+                    allApps={metadata.apps}
+                    layer={layer}>
+                </DataLayerSetting>
+            </PanelBody>}
+        </React.Fragment>,
 
-        <DataLayerSetting
-            onChangeProperty={onChangeProperty}
-            allDimensions={metadata.dimensions}
-            allFilters={metadata.filters}
-            allMeasures={metadata.measures}
-            allCategories={metadata.categories}
-            allApps={metadata.apps}
-            layer={layer}>
-        </DataLayerSetting>
+
     ]
 
 }
@@ -91,7 +94,7 @@ class LayerWithMetadata extends BlockEditWithAPIMetadata {
 
     componentDidMount() {
         const {layer: {name, type, file, app}} = this.props
-        
+
 
         fetch(`/api/registry/eureka/apps`, {
             headers: {
@@ -120,7 +123,7 @@ class LayerWithMetadata extends BlockEditWithAPIMetadata {
         super.componentDidUpdate(prevProps, prevState, snapshot)
         const {layer: {app}} = this.props
         const {layer: {app: prevAPP}} = prevProps
-        
+
         if ((app != prevAPP) || (prevAPP == null && app != null)) {
             this._loadMetadata(app)
         }

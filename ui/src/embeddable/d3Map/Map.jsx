@@ -70,13 +70,11 @@ class Map extends React.Component {
 
     render() {
         const {height} = this.props
-
-        debugger
         return <svg ref={this.svgRef} width={"100%"} height={height}>
             {this.state.path ? this.props.children.map(child => {
-                debugger;
                 return React.cloneElement(child, {path: this.state.path})
             }) : null}
+
         </svg>
     }
 }
