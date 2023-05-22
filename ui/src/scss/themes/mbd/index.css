@@ -146,6 +146,11 @@
     height: calc(100vh - var(--header-height)); }
     .edit-post-visual-editor .ui.grid .row, #root .ui.grid .row {
       padding: 0px; }
+  @media only screen and (min-width: 1200px) {
+    .edit-post-visual-editor .ui.container, #root .ui.container {
+      width: 80% !important;
+      margin-left: auto !important;
+      margin-right: auto !important; } }
   .edit-post-visual-editor .container.header, #root .container.header {
     background-color: #333333;
     height: var(--header-height);
