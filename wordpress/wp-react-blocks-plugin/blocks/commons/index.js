@@ -398,8 +398,7 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
     }
 
     loadMetadata() {
-
-        const {attributes: {app}} = this.props
+       const {attributes: {app}} = this.props
         this._loadMetadata(app)
     }
 }
