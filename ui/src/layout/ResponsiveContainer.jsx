@@ -82,7 +82,7 @@ class ResponsiveContainer extends Component {
 
     render() {
         const {children, fixed, locale, pages} = this.props
-        debugger;
+        
         const page = pages ? pages[0] : null;
         return (
 

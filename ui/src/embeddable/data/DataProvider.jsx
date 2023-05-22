@@ -16,7 +16,7 @@ class DataProvider extends React.Component {
     }
 
     componentDidMount() {
-        debugger
+        
         const {app, source, store, params, csv, group, editing} = this.props
 
         if (app === "csv") {
@@ -40,7 +40,7 @@ class DataProvider extends React.Component {
             || app != prevProps.app
             || prevProps.source != source
             || csv != prevProps.csv) {
-            debugger
+            
             if (app === "csv") {
                 this.props.onSetData({app, csv, store, params, group})
             } else {
