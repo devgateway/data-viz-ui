@@ -31,7 +31,7 @@ const decodeHtmlEntity = function (str) {
     return ''
 };
 const ChildNavigator = ({pages, title, selected, onPageSelected}) => {
-    debugger;
+    
     const childPages = pages ? pages.sort((a, b) => a.menu_order - b.menu_order) : []
 
     const [selectedGroup, setSelectedGroup] = useState({id: -1})
@@ -100,7 +100,7 @@ const ChildNavigator = ({pages, title, selected, onPageSelected}) => {
 }
 
 const ContentArea = ({page}) => {
-    debugger;
+    
     return <Container><PostContent post={page}></PostContent></Container>
 }
 
@@ -117,7 +117,7 @@ const Root = (props) => {
         intl: {locale}
     } = props
 
-    debugger
+    
     const [page, setPage] = useState(null)
     const styles = editing ? {padding: '4px', margin: '0px'} : {}
     return (<Container style={styles} fluid className={`viz child page navigator`}>
