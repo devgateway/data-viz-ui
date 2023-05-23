@@ -73,9 +73,7 @@ a {
   iframe {
     margin: 0px;
     padding: 0px;
-
   }
-
 
   code {
     font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
@@ -86,7 +84,7 @@ a {
   }
 
   .ui.container.narrow {
-   // max-width: 1080px;
+    // max-width: 1080px;
   }
 
   .ui.container.fluid.desktop {
@@ -246,6 +244,6 @@ h1.type {
 
 .ui.container.filter {
   .menu {
-   z-index: 1600;
+    z-index: 1600;
   }
 }
