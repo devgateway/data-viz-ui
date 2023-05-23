@@ -28,9 +28,13 @@
 }
 
 @media only screen and (min-width: 1200px) {
-  .ui.container {
-    width: 80%!important;
+
+  .ui.container.desktop {
     margin-left: auto !important;
     margin-right: auto !important;
+  }
+  .ui.container.desktop {
+    max-width: 1366px!important;
+
   }
 }
