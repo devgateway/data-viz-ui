@@ -28,6 +28,10 @@ registerBlockType(process.env.BLOCKS_NS + '/new-d3-map',
                 type: "Object",
                 default: {}
             },
+            backGroundColor: {
+                type: "string",
+                default: "#347ba2"
+            }
 
 
         },

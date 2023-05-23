@@ -1,4 +1,4 @@
-import {InspectorControls, useBlockProps} from '@wordpress/block-editor'
+import {InspectorControls, PanelColorSettings, useBlockProps} from '@wordpress/block-editor'
 import {
     Panel,
     PanelBody,
@@ -61,6 +61,7 @@ class BlockEdit extends ComponentWithSettings {
                 panelStatus,
                 height,
                 group,
+                backGroundColor,
                 layers = [],
             }
         } = this.props;
@@ -84,6 +85,27 @@ class BlockEdit extends ComponentWithSettings {
                     <SizeConfig setAttributes={setAttributes} panelStatus={panelStatus}
                                 height={height}></SizeConfig>
 
+                    <PanelBody
+                        panelStatus={panelStatus['COLORS']}
+                        onToggle={e => togglePanel("COLORS", panelStatus, setAttributes)}
+                        title={__("Colors")}>
+
+
+                            <PanelColorSettings
+                                title={__('Background')}
+                                colorSettings={[{
+                                    value: decodeURIComponent(backGroundColor), onChange: (color) => {
+                                        if (color) {
+                                            setAttributes({backGroundColor: encodeURIComponent(color)})
+                                        } else {
+                                            setAttributes({backGroundColor: null})
+                                        }
+                                    }, label: __('Background Color')
+                                }]}
+                            />
+
+
+                    </PanelBody>
                     <PanelBody panelStatus={panelStatus['LAYERS']}
                                onToggle={e => togglePanel("LAYERS", panelStatus, setAttributes)}
                                title={__("Layers")}>
