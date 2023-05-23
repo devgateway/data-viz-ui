@@ -1,0 +1,43 @@
+
+body {
+  background-color: transparent !important;
+}
+
+.d3Map {
+  width: 100%;
+  border: 1px solid red;
+  position: relative;
+  background-color: transparent;
+  overflow: hidden;
+
+  svg {
+    cursor: pointer;
+    vector-effect: non-scaling-stroke;
+  }
+
+  path {
+    vector-effect: non-scaling-stroke;
+    stroke-width: 1px;
+  }
+
+  .zoom.control {
+    font-size: 12px;
+    position: absolute;
+    left: 30px;
+    bottom: 50px;
+
+    .button {
+      height:auto;
+      margin: 0px;
+      cursor: pointer;
+      padding: 2px;
+    }
+
+    .icon {
+    }
+  }
+}
+
+
+
+
