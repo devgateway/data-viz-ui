@@ -5,12 +5,12 @@ body {
 
 .d3Map {
   width: 100%;
-  border: 1px solid red;
   position: relative;
   background-color: transparent;
   overflow: hidden;
 
   svg {
+    background-color: transparent;
     cursor: pointer;
     vector-effect: non-scaling-stroke;
   }
@@ -21,19 +21,29 @@ body {
   }
 
   .zoom.control {
-    font-size: 12px;
+    font-size: 16px;
     position: absolute;
     left: 30px;
     bottom: 50px;
 
     .button {
+      box-sizing: border-box;
+      width: 25px;
+      height: 20px;
+      background-color: #f6fdf6;
       height:auto;
-      margin: 0px;
+      margin: 2px;
       cursor: pointer;
-      padding: 2px;
+      padding: 4px;
+    }
+    .button:active{
+      border:1px solid #c2b9b9;
+      width: 24px;
+      height: 19px;
     }
 
     .icon {
+      height:auto;
     }
   }
 }

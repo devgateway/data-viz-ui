@@ -2357,26 +2357,36 @@ p {
     background-color: transparent !important; }
   .edit-post-visual-editor .d3Map, #root .d3Map {
     width: 100%;
-    border: 1px solid red;
     position: relative;
     background-color: transparent;
     overflow: hidden; }
     .edit-post-visual-editor .d3Map svg, #root .d3Map svg {
+      background-color: transparent;
       cursor: pointer;
       vector-effect: non-scaling-stroke; }
     .edit-post-visual-editor .d3Map path, #root .d3Map path {
       vector-effect: non-scaling-stroke;
       stroke-width: 1px; }
     .edit-post-visual-editor .d3Map .zoom.control, #root .d3Map .zoom.control {
-      font-size: 12px;
+      font-size: 16px;
       position: absolute;
       left: 30px;
       bottom: 50px; }
       .edit-post-visual-editor .d3Map .zoom.control .button, #root .d3Map .zoom.control .button {
+        box-sizing: border-box;
+        width: 25px;
+        height: 20px;
+        background-color: #f6fdf6;
         height: auto;
-        margin: 0px;
+        margin: 2px;
         cursor: pointer;
-        padding: 2px; }
+        padding: 4px; }
+      .edit-post-visual-editor .d3Map .zoom.control .button:active, #root .d3Map .zoom.control .button:active {
+        border: 1px solid #c2b9b9;
+        width: 24px;
+        height: 19px; }
+      .edit-post-visual-editor .d3Map .zoom.control .icon, #root .d3Map .zoom.control .icon {
+        height: auto; }
   .edit-post-visual-editor .viz.child.page.navigator, #root .viz.child.page.navigator {
     display: flex;
     height: calc(100vh - var(--header-height));
