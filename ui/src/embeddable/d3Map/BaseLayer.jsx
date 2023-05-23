@@ -45,7 +45,12 @@ class BaseLayer extends React.Component {
     }
 
     componentDidMount() {
+        const {transform} = this.props
         this.createLayer()
+        if (transform){
+            d3.select(this.gRef.current).attr('transform', transform)
+        }
+
     }
 
     render() {
