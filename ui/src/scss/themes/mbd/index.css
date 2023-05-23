@@ -147,10 +147,11 @@
     .edit-post-visual-editor .ui.grid .row, #root .ui.grid .row {
       padding: 0px; }
   @media only screen and (min-width: 1200px) {
-    .edit-post-visual-editor .ui.container, #root .ui.container {
-      width: 80% !important;
+    .edit-post-visual-editor .ui.container.desktop, #root .ui.container.desktop {
       margin-left: auto !important;
-      margin-right: auto !important; } }
+      margin-right: auto !important; }
+    .edit-post-visual-editor .ui.container.desktop, #root .ui.container.desktop {
+      max-width: 1366px !important; } }
   .edit-post-visual-editor .container.header, #root .container.header {
     background-color: #333333;
     height: var(--header-height);
@@ -2352,6 +2353,30 @@ p {
       .edit-post-visual-editor .viz.child.page.navigator .menu .grid, .edit-post-visual-editor .viz.child.page.navigator .menu .grid .row, .edit-post-visual-editor .viz.child.page.navigator .menu .grid .column, #root .viz.child.page.navigator .menu .grid, #root .viz.child.page.navigator .menu .grid .row, #root .viz.child.page.navigator .menu .grid .column {
         padding: 0px;
         margin: 0px; }
+  .edit-post-visual-editor body, #root body {
+    background-color: transparent !important; }
+  .edit-post-visual-editor .d3Map, #root .d3Map {
+    width: 100%;
+    border: 1px solid red;
+    position: relative;
+    background-color: transparent;
+    overflow: hidden; }
+    .edit-post-visual-editor .d3Map svg, #root .d3Map svg {
+      cursor: pointer;
+      vector-effect: non-scaling-stroke; }
+    .edit-post-visual-editor .d3Map path, #root .d3Map path {
+      vector-effect: non-scaling-stroke;
+      stroke-width: 1px; }
+    .edit-post-visual-editor .d3Map .zoom.control, #root .d3Map .zoom.control {
+      font-size: 12px;
+      position: absolute;
+      left: 30px;
+      bottom: 50px; }
+      .edit-post-visual-editor .d3Map .zoom.control .button, #root .d3Map .zoom.control .button {
+        height: auto;
+        margin: 0px;
+        cursor: pointer;
+        padding: 2px; }
   .edit-post-visual-editor .viz.child.page.navigator, #root .viz.child.page.navigator {
     display: flex;
     height: calc(100vh - var(--header-height));
