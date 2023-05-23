@@ -113,11 +113,11 @@ class ZoomControl extends React.Component {
         debugger;
         return <div ref={this.zoomRef} className="zoom control">
             {(editing || zoomEnabled) && <div>
-                <div className="zoom button plus" onClick={this.zoomIn}><Icon name='plus' size='large'/></div>
-                <div className="zoom button minus" onClick={this.zoomOut}><Icon name='minus' size='large'/></div>
+                <div className="zoom button plus" onClick={this.zoomIn}><Icon name='plus' size='small'/></div>
+                <div className="zoom button minus" onClick={this.zoomOut}><Icon name='minus' size='small'/></div>
                 <Popup content={<FormattedMessage id="map.reset.tooltip" defaultMessage="Reset zoom"/>}
-                       trigger={<div className="reset" onClick={this.reset}>
-                           <Icon name='repeat' size='large'/></div>}/>
+                       trigger={<div className="zoom button reset" onClick={this.reset}>
+                           <Icon name='repeat' size='small'/></div>}/>
             </div>}
 
         </div>
