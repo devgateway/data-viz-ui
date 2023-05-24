@@ -17,10 +17,12 @@
   .menu.pages {
     position: absolute;
     right: 1.7vw;
-    font-size: 0.9rem;
-    padding-top: 15px;
+    font-size: 0.85rem;
+    padding-top: 16px;
 
     .item.divided {
+      font-size: 0.85rem;
+      font-weight: 400 !important;
       padding: 0 25px 0 25px;
       border-left: 1px solid $mbd-accent-green;;
       a {
@@ -29,6 +31,9 @@
       a:hover {
         color: #FFFFFF;
       }
+    }
+    .item.divided:first-of-type {
+      border-left: 0;
     }
 
     .item.divided.selected.active {
@@ -40,7 +45,7 @@
 
   .menu, .branding, {
     margin: 0;
-    padding: 5px 0 0 1.7vw;
+    padding: 5px 0 0 0.6vw;
 
     .divider {
       display: none;
