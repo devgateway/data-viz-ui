@@ -20,7 +20,7 @@ const VerticalDashboardGallery = ({pages, width}) => {
 
 }
 
-const MediaImage = (props) => <img src={props.media && props.media.guid ? props.media.guid.rendered : null}/>
+const MediaImage = (props) => <img src={props.media && props.media.guid ? props.media.guid.rendered : null} className={'svg-icon'}/>
 const decodeHtmlEntity = function (str) {
     if (str) {
         return str.toString().replace(/&#(\d+);/g, function (match, dec) {
@@ -31,7 +31,7 @@ const decodeHtmlEntity = function (str) {
     return ''
 };
 const ChildNavigator = ({pages, title, selected, onPageSelected}) => {
-    
+
     const childPages = pages ? pages.sort((a, b) => a.menu_order - b.menu_order) : []
 
     const [selectedGroup, setSelectedGroup] = useState({id: -1})
@@ -71,14 +71,23 @@ const ChildNavigator = ({pages, title, selected, onPageSelected}) => {
 
 
     return <Container fluid={true}>
-        <Menu vertical text size={"mini"}>
+        <Menu vertical text size={"mini"} className="navbar-menu">
             <Menu.Item header>{title}</Menu.Item>
             {list.map(s =>
                 <Menu.Item
-                    className={"group"}
+                    className={`group ${s.id === selectedGroup.id ? 'group-selected' : ''}`}
                     key={s.label}
-                    onClick={e => setSelectedGroup(s)}>
-                    {s.iconComponent ? s.iconComponent : <Image src={s.icon}/>}<span>{decodeHtmlEntity(s.label)}</span>
+                    onClick={e => {
+                        setSelectedGroup(s);
+                        const groupItems = document.getElementsByClassName('group');
+                        for (let i = 0; i < groupItems.length; i++) {
+                            groupItems[i].classList.remove('group-selected');
+                        }
+                        e.currentTarget.classList.add('group-selected');
+                    }}
+                >
+                    {s.iconComponent ? s.iconComponent : <Image src={s.icon} />}
+                    <span>{decodeHtmlEntity(s.label)}</span>
 
                     <Menu.Menu className={`${s.id == selectedGroup.id ? 'expanded' : 'collapsed'}`}>
                         <PageProvider locale={"en"}
@@ -92,15 +101,15 @@ const ChildNavigator = ({pages, title, selected, onPageSelected}) => {
                     </Menu.Menu>
 
                 </Menu.Item>)}
-            <div className="navbar-footer">
-                <p className="navbar-footer-text">Data and publications were made possible through support of the United States Agency for International Development (USAID).</p>
-            </div>
         </Menu>
+        <div className="navbar-footer">
+            <p className="navbar-footer-text">Data and publications were made possible through support of the United States Agency for International Development (USAID).</p>
+        </div>
     </Container>
 }
 
 const ContentArea = ({page}) => {
-    
+
     return <Container><PostContent post={page}></PostContent></Container>
 }
 
@@ -117,7 +126,7 @@ const Root = (props) => {
         intl: {locale}
     } = props
 
-    
+
     const [page, setPage] = useState(null)
     const styles = editing ? {padding: '4px', margin: '0px'} : {}
     return (<Container style={styles} fluid className={`viz child page navigator`}>
