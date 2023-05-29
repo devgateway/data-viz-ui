@@ -8,7 +8,8 @@ $mbd-light-teal: #63A1A1;
 $mbd-accent-green: #9EB944;
 
 :root {
-  --header-height: 61px; /* Update this value to match your header's height */
+  --header-height: 61px; /* Update this value to change header's height */
+  --footer-height: 150px; /* Update this value to change footer's height */
 }
 
 $header-background:$mbd-dark-grey;
