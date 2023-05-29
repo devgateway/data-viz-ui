@@ -27,6 +27,27 @@
   }
 }
 
+/* Root container */
+.viz.child.page.navigator {
+  display: flex;
+  height: calc(100vh - var(--header-height));
+  overflow: hidden; /* Prevent horizontal overflow */
+  .ui.grid{
+    width: 100vw;
+  }
+}
+
+/* Content area */
+.fourteen.wide.column.content {
+  flex: 1; /* Let the content area fill the remaining space */
+  overflow-y: auto; /* Enable scrolling for the content area */
+  max-height: calc(100vh - var(--header-height));
+  padding: 30px 25px 25px 20px;
+  max-width: calc(100% - 200px); /* Limit the content area width */
+}
+
+
+/*
 @media only screen and (min-width: 1200px) {
 
   .ui.container.desktop {
@@ -37,4 +58,4 @@
     max-width: 1366px!important;
 
   }
-}
+}*/
