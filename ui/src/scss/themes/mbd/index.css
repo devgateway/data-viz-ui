@@ -2455,31 +2455,52 @@ p {
       margin: 0;
       padding: 0; }
       .edit-post-visual-editor .two.wide.column.navigator .item.group .svg-icon, #root .two.wide.column.navigator .item.group .svg-icon {
-        stroke: red;
-        width: 1rem;
-        margin: -6px 0.5vw 0 1vw; }
+        width: 18px;
+        margin: -6px 0.5vw 0 14px;
+        background-color: #63A1A1; }
       .edit-post-visual-editor .two.wide.column.navigator .item.group span, #root .two.wide.column.navigator .item.group span {
         display: inline-block;
         height: 2.2rem;
-        padding: 15px 0 0 0;
+        padding: 12px 0 0 0;
         font-size: 0.9rem !important;
         font-weight: 300 !important;
         color: #63A1A1; }
-    .edit-post-visual-editor .two.wide.column.navigator .item.group:hover span, #root .two.wide.column.navigator .item.group:hover span {
+    .edit-post-visual-editor .two.wide.column.navigator .item.group:not(.group-selected):hover .green-rectangle, #root .two.wide.column.navigator .item.group:not(.group-selected):hover .green-rectangle {
+      position: absolute;
+      top: 50%;
+      right: 0;
+      transform: translate(0, -50%);
+      width: 6px;
+      height: 70%;
+      background-color: #9EB944;
+      border-radius: 2px 0 0 2px; }
+    .edit-post-visual-editor .two.wide.column.navigator .item.group:not(.group-selected):hover .svg-icon, #root .two.wide.column.navigator .item.group:not(.group-selected):hover .svg-icon {
+      background-color: #FFFFFF; }
+    .edit-post-visual-editor .two.wide.column.navigator .item.group:not(.group-selected):hover span, #root .two.wide.column.navigator .item.group:not(.group-selected):hover span {
       color: #FFFFFF; }
-    .edit-post-visual-editor .two.wide.column.navigator .item.group-selected span, #root .two.wide.column.navigator .item.group-selected span {
+    .edit-post-visual-editor .two.wide.column.navigator .item.group.group-selected .green-rectangle, #root .two.wide.column.navigator .item.group.group-selected .green-rectangle {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      width: 6px;
+      height: calc(100% - 6px);
+      background-color: #9EB944;
+      border-radius: 2px 0 0 0; }
+    .edit-post-visual-editor .two.wide.column.navigator .item.group.group-selected .svg-icon, #root .two.wide.column.navigator .item.group.group-selected .svg-icon {
+      background-color: #FFFFFF; }
+    .edit-post-visual-editor .two.wide.column.navigator .item.group.group-selected span, #root .two.wide.column.navigator .item.group.group-selected span {
       color: #FFFFFF;
       font-weight: 400 !important; }
     .edit-post-visual-editor .two.wide.column.navigator .menu.collapsed, #root .two.wide.column.navigator .menu.collapsed {
       padding: 0; }
     .edit-post-visual-editor .two.wide.column.navigator .menu.expanded, #root .two.wide.column.navigator .menu.expanded {
-      padding: 0.2vw 0 0.4vw 2.8vw;
+      padding: 0.2vw 0 0.4vw 0;
       background-color: #075A5C; }
       .edit-post-visual-editor .two.wide.column.navigator .menu.expanded .item, #root .two.wide.column.navigator .menu.expanded .item {
         color: #63A1A1;
         font-size: 0.8rem;
         font-weight: 300;
-        padding: 0.7vw 0 0.7vw 0; }
+        padding: 0.7vw 0 0.7vw 43px; }
       .edit-post-visual-editor .two.wide.column.navigator .menu.expanded .item:hover, #root .two.wide.column.navigator .menu.expanded .item:hover {
         color: #FFFFFF; }
     .edit-post-visual-editor .two.wide.column.navigator .item.selected, #root .two.wide.column.navigator .item.selected {
