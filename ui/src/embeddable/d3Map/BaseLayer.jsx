@@ -22,21 +22,43 @@ class BaseLayer extends React.Component {
     }
 
     createLayer() {
-        debugger
-        const {name, file, path} = this.props
-        const g =d3.select(this.gRef.current)
+
+        const {name, file, path, mapPosition,labelFilter, labelField,labelFontSize, labelColor, fillColor, borderColor} = this.props
+        const g = d3.select(this.gRef.current)
         loadJSON(file).then((json) => {
-            debugger;
             g.attr("class", "base-layer " + name)
             g.selectAll("path").remove()
             g.selectAll("path")
                 .data(json.features)
                 .enter()
                 .append("path")
-                .attr("fill", "#EEE")
-                .attr("stroke", "#000")
+                .attr("fill", fillColor)
+                .attr("stroke", borderColor)
                 .attr("id", "state-borders")
                 .attr("d", path);
+
+
+            g.selectAll(".label").remove()
+            g.selectAll(".label")
+                .data(json.features.filter(f=>{
+                    debugger;
+                    return labelFilter.indexOf(f.properties[labelField]) == -1
+                }))
+                .enter().append("text")
+                .attr("class", "label")
+                .attr("font-size", labelFontSize+"em")
+                .text(function (d) {
+                    return d.properties[labelField]
+                })
+                .attr("color", labelColor)
+                .attr("fill", labelColor)
+                .attr("transform", function (d) {
+                    var bbox = this.getBBox();
+                    var width = bbox.width;
+                    return "translate(" +[ path.centroid(d)[0] - (width/2),path.centroid(d)[1]] + ")"
+                })
+
+            window.dispatchEvent(new Event('resize'));
         })
     }
 
@@ -45,18 +67,14 @@ class BaseLayer extends React.Component {
     }
 
     componentDidMount() {
-        const {transform} = this.props
         this.createLayer()
-        if (transform){
-            d3.select(this.gRef.current).attr('transform', transform)
-        }
+
 
     }
 
     render() {
         const {name} = this.props
-        debugger;
-        return <g className={"base "+name} ref={this.gRef}/>
+        return <g className={"base " + name} ref={this.gRef}/>
     }
 }
 
