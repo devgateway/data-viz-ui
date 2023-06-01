@@ -3,51 +3,56 @@ body {
   background-color: transparent !important;
 }
 
-.d3Map {
-  width: 100%;
-  position: relative;
-  background-color: transparent;
-  overflow: hidden;
+.d3map-container {
+  * {
+    margin: 0px;
+    padding: 0px;
+  }
 
-  svg {
+  max-width: 1200px;
+  .d3Map {
+
+    position: relative;
     background-color: transparent;
-    cursor: pointer;
-    vector-effect: non-scaling-stroke;
-  }
 
-  path {
-    vector-effect: non-scaling-stroke;
-    stroke-width: 1px;
-  }
-
-  .zoom.control {
-    font-size: 16px;
-    position: absolute;
-    left: 30px;
-    bottom: 50px;
-
-    .button {
-      box-sizing: border-box;
-      width: 25px;
-      height: 20px;
-      background-color: #f6fdf6;
-      height:auto;
-      margin: 2px;
+    svg {
+      background-color: transparent;
       cursor: pointer;
-      padding: 4px;
-    }
-    .button:active{
-      border:1px solid #c2b9b9;
-      width: 24px;
-      height: 19px;
+      vector-effect: non-scaling-stroke;
     }
 
-    .icon {
-      height:auto;
+    path {
+      vector-effect: non-scaling-stroke;
+      stroke-width: 1px;
+    }
+
+    .zoom.control {
+      font-size: 16px;
+      position: absolute;
+      left: 30px;
+      bottom: 50px;
+
+      .button {
+        box-sizing: border-box;
+        width: 25px;
+        height: 20px;
+        background-color: #f6fdf6;
+        height: auto;
+        margin: 2px;
+        cursor: pointer;
+        padding: 4px;
+      }
+
+      .button:active {
+
+      }
+
+      .icon {
+        height: auto;
+      }
     }
   }
+
 }
-
-
 
 

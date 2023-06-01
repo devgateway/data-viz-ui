@@ -1,6 +1,8 @@
 :root {
   --header-height: 61px;
-  /* Update this value to match your header's height */ }
+  /* Update this value to change header's height */
+  --footer-height: 150px;
+  /* Update this value to change footer's height */ }
 
 * {
   -webkit-print-color-adjust: exact; }
@@ -1057,7 +1059,9 @@ body.illicit {
 
 :root {
   --header-height: 61px;
-  /* Update this value to match your header's height */ }
+  /* Update this value to change header's height */
+  --footer-height: 150px;
+  /* Update this value to change footer's height */ }
 
 .viz.dashboard.gallery .ui.grid {
   margin-right: 0; }
@@ -1218,7 +1222,9 @@ body.illicit {
 
 :root {
   --header-height: 61px;
-  /* Update this value to match your header's height */ }
+  /* Update this value to change header's height */
+  --footer-height: 150px;
+  /* Update this value to change footer's height */ }
 
 .green .left.navigator {
   top: 10px;
@@ -2419,7 +2425,9 @@ a.wp-reference {
 
 :root {
   --header-height: 61px;
-  /* Update this value to match your header's height */ }
+  /* Update this value to change header's height */
+  --footer-height: 150px;
+  /* Update this value to change footer's height */ }
 
 .ui.container.filter {
   margin-left: 0em !important;
@@ -2735,7 +2743,9 @@ body {
 
 :root {
   --header-height: 61px;
-  /* Update this value to match your header's height */ }
+  /* Update this value to change header's height */
+  --footer-height: 150px;
+  /* Update this value to change footer's height */ }
 
 .ui.container.data-filters-reset {
   margin-left: 0em !important;
