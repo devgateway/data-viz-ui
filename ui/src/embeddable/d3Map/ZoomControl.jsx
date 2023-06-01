@@ -71,17 +71,11 @@ class ZoomControl extends React.Component {
     fullView() {
         const {editing, initialPosition: {x = 100, y = 23, k = 1, width: oW, height: oH}, width, height} = this.props
         const svg = this.getSvg()
-        debugger;
-
-        const dx=x/oW, dy=y/oH
-        const nx= width * dx, ny= height * dy
-
+        const dx = x / oW, dy = y / oH
+        const nx = width * dx, ny = height * dy
         svg.transition().call(this.zoom.transform, d3.zoomIdentity
-            .translate(nx ,  ny )
+            .translate(nx, ny)
             .scale(k))
-        //svg.call(this.zoom)
-
-
     }
 
     zoomEnd() {
@@ -91,12 +85,10 @@ class ZoomControl extends React.Component {
             debugger;
             window.parent.postMessage({type: 'd3map', value: ({k, x, y, width, height})}, "*");
         }
-        // d3.select(this.zoomRef.current.parentNode).selectAll("g").attr('transform', d3.event.transform)
     }
 
     render() {
         const {editing, zoomEnabled = true} = this.props
-
         return <div ref={this.zoomRef} className="zoom control">
             {(editing || zoomEnabled) && <div>
                 <div className="zoom button plus" onClick={this.zoomIn}><Icon name='plus' size='small'/></div>
