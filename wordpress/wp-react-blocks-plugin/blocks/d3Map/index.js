@@ -31,8 +31,11 @@ registerBlockType(process.env.BLOCKS_NS + '/new-d3-map',
             backGroundColor: {
                 type: "string",
                 default: "#347ba2"
-            }
-
+            },
+            mapPosition: {
+                type: "Object",
+                default: {}
+            },
 
         },
         edit: BlockEdit,

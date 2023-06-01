@@ -4,12 +4,13 @@ import {
     Button,
     CheckboxControl,
     PanelBody,
-    PanelRow,
+    PanelRow, RangeControl,
     SelectControl,
     TextControl,
     ToggleControl
 } from '@wordpress/components';
 import Measures from './MapMeasures.jsx'
+import Property from "./Property";
 
 const FilterSelector = ({param, index, options, onUpdateFilterParam}) => {
     const sortedOptions = options.sort(function (a, b) {
@@ -41,6 +42,7 @@ const CategoricalFilter = ({value, index, items, onUpdateFilterValue}) => {
         return null;
     }
 }
+
 export class DataLayerSetting extends Component {
     constructor(props) {
         super(props);
@@ -62,7 +64,7 @@ export class DataLayerSetting extends Component {
     }
 
     cleanSelection(prevState) {
-        
+
         const {onChangeProperty} = this.props
         onChangeProperty("measures", [])
         onChangeProperty("filters", [])
@@ -71,7 +73,7 @@ export class DataLayerSetting extends Component {
     }
 
     updateFilterParam(param, idx) {
-        
+
         const {layer: {filters}, onChangeProperty, allFilters} = this.props
         const newFilters = filters.slice()
         const selected = allFilters.filter(f => f.param === param)[0]
@@ -83,7 +85,7 @@ export class DataLayerSetting extends Component {
     }
 
     updateFilterValue(value, idx) {
-        
+
         const {layer: {filters}, onChangeProperty} = this.props
         const selected = filters[idx]
         let values = selected.value
@@ -100,7 +102,7 @@ export class DataLayerSetting extends Component {
     }
 
     setFilterValue(value, idx) {
-        
+
         const {layer: {filters}, onChangeProperty} = this.props
         const selected = filters[idx]
         let values = selected.value
@@ -113,7 +115,7 @@ export class DataLayerSetting extends Component {
     }
 
     addFilter() {
-        
+
         const {layer: {filters}, onChangeProperty, allFilters} = this.props
         let index = filters.length > allFilters.length ? allFilters.length : filters.length
         const newFilter = (allFilters && allFilters.length > 0) ? {
@@ -127,7 +129,7 @@ export class DataLayerSetting extends Component {
     }
 
     removeFilter(f) {
-        
+
         const {layer: {filters}, onChangeProperty, allFilters} = this.props
         let newFilters = filters.slice(0, -1)
         //setAttributes({filters: newFilters})
@@ -142,7 +144,7 @@ export class DataLayerSetting extends Component {
 
 
     onSetSingleMeasure(value) {
-        
+
         const {onChangeProperty} = this.props
         //setAttributes({measures: [value]})
         onChangeProperty("measures", [value])
@@ -150,7 +152,7 @@ export class DataLayerSetting extends Component {
     }
 
     onMeasuresChange(value) {
-        
+
         const {onChangeProperty, attributes: {measures}} = this.props
         if (measures.indexOf(value) > -1) {
             //setAttributes({measures: measures.filter(d => d != value)})
@@ -163,7 +165,7 @@ export class DataLayerSetting extends Component {
 
 
     items(type) {
-        
+
         const values = this.props.allCategories ? this.props.allCategories.filter(c => c.type === type) : []
         const cat = values.length > 0 ? values[0] : null
         let items = null
@@ -182,60 +184,106 @@ export class DataLayerSetting extends Component {
             allDimensions,
             allFilters,
             allMeasures,
+            features,
             layer: {
                 measures,
                 filters,
-                dimension1,
-                dimension2,
-                type
+                featureJoinAttribute,
+                apiJoinAttribute,
+                type,
+                useCentroidPoint,
+                useShape,
+                pointSize
             }
         } = this.props
 
 
         return (
-            [<PanelBody initialOpen={false} title={__('Fields')}>
-                <PanelRow>
-                    <SelectControl
-                        label={'Matching Field'}
-                        value={[dimension1]} // e.g: value = [ 'a', 'c' ]
-                        onChange={(value) => {
-                            onChangeProperty("dimension1", value)
+            [
+                <PanelBody title={"Join Attributes"}>
+                    <Property property={"featureJoinAttribute"} type={"select"} onChangeProperty={onChangeProperty}
+                              features={features}
+                              value={featureJoinAttribute}
+                              title={"Shape Attribute"}>
 
-                        }}
-                        options={allDimensions}
-                    />
-                </PanelRow>
+                    </Property>
+                    <PanelRow>
+                        <SelectControl
+                            label={'Api Attribute'}
+                            value={[apiJoinAttribute]} // e.g: value = [ 'a', 'c' ]
+                            onChange={(value) => {
+                                debugger
+                                onChangeProperty("apiJoinAttribute", value)
+                            }}
+                            options={allDimensions}
+                        />
+                    </PanelRow>
 
-            </PanelBody>,
-
+                </PanelBody>
+                ,
                 <Measures
-                        onSetSingleMeasure={this.onSetSingleMeasure}
-                          onMeasuresChange={this.onMeasuresChange}
-                          {...this.props} />,
-                <>
-                    <PanelBody initialOpen={false} title={__("Filters")}>
-                        {filters.map((f, index) => {
+                    onSetSingleMeasure={this.onSetSingleMeasure}
+                    onMeasuresChange={this.onMeasuresChange}
+                    {...this.props} />
+                ,
 
-                            return (
-                                <PanelBody initialOpen={true} title={__(`Filter - ${f.label}`)}>
-                                    <FilterSelector param={f.param} index={index} options={allFilters}
-                                                    onUpdateFilterParam={this.updateFilterParam}/>
-                                    {<CategoricalFilter value={f.value} index={index} items={this.items(f.type)}
-                                                        onUpdateFilterValue={this.updateFilterValue}/>}
-                                </PanelBody>)
-                        })}
+                <PanelBody initialOpen={false} title={__("Filters")}>
+                    {filters.map((f, index) => {
 
-                        <PanelRow>
+                        return (
+                            <PanelBody initialOpen={true} title={__(`Filter - ${f.label}`)}>
+                                <FilterSelector param={f.param} index={index} options={allFilters}
+                                                onUpdateFilterParam={this.updateFilterParam}/>
+                                {<CategoricalFilter value={f.value} index={index} items={this.items(f.type)}
+                                                    onUpdateFilterValue={this.updateFilterValue}/>}
+                            </PanelBody>)
+                    })}
 
-                            <Button variant={"link"} onClick={this.addFilter}>{__("Add Filter")}</Button>
-                            <Button variant={"link"} onClick={this.removeFilter}>{__("Remove")}</Button>
-                        </PanelRow>
-                    </PanelBody>
+                    <PanelRow>
 
-                </>
-            ]
-        )
+                        <Button variant={"link"} onClick={this.addFilter}>{__("Add Filter")}</Button>
+                        <Button variant={"link"} onClick={this.removeFilter}>{__("Remove")}</Button>
+                    </PanelRow>
+                </PanelBody>,
+                <PanelBody title={"Data Render"}>
+                    <PanelRow>
+                        <ToggleControl
+                            label="Centroid Point"
+                            checked={useCentroidPoint}
+                            onChange={(value) => {
+                                onChangeProperty("useCentroidPoint", value)
+                            }}
+                        />
+                    </PanelRow>
+                    <PanelRow>
+                        <ToggleControl
+                            label="Shape"
+                            checked={useShape}
+                            onChange={(value) => {
+                                onChangeProperty("useShape", value)
+                            }}
+                        />
+                    </PanelRow>
+
+                    <PanelRow>
+                        <RangeControl
+                            label="Point Size"
+                            value={pointSize}
+                            onChange={(value) => {
+                                onChangeProperty("pointSize", value)
+                            }}
+                            min={1}
+                            max={10}
+                        />
+                    </PanelRow>
+
+    </PanelBody>
+
+
+    ]
+    )
     }
 
 }
+
 export default DataLayerSetting;

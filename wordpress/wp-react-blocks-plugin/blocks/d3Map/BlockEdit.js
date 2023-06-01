@@ -29,17 +29,36 @@ class BlockEdit extends ComponentWithSettings {
         super.componentDidUpdate(prevProps, prevState, snapshot);
     }
 
+    componentDidMount() {
+        const {setAttributes} = this.props;
+        super.componentDidMount();
+
+        window.addEventListener("message", (event) => {
+                if (event.data.type == 'd3map') {
+
+                    const iframeOrigin = event.origin.split(':')[0]
+                    const parentOrigin = window.location.origin.split(':')[0]
+                    if (iframeOrigin == parentOrigin) {
+                        setAttributes({mapPosition: event.data.value})
+                    }
+                }
+            },
+            false);
+    }
+
     addLayer() {
         const {setAttributes, attributes: {layers}} = this.props
         const newLayers = [...layers]
+        debugger;
         newLayers.push(new LayerObject())
         setAttributes({layers: newLayers})
     }
+
     removeLayer(layer) {
         const {setAttributes, attributes: {layers}} = this.props
         const {id, name} = layer
         debugger;
-        const newLayers = layers.filter(l=>l.id!=id)
+        const newLayers = layers.filter(l => l.id != id)
         setAttributes({layers: newLayers})
     }
     onChangeLayer(layer) {
@@ -71,7 +90,7 @@ class BlockEdit extends ComponentWithSettings {
         return ([isSelected && (<InspectorControls>
                 <Panel header={__("Map Configuration")}>
                     <PanelBody
-                        panelStatus={panelStatus['GROUP']}
+                        initialOpen={panelStatus['GROUP']}
                         onToggle={e => togglePanel("GROUP", panelStatus, setAttributes)}
                         title={__("Group")}>
                         <PanelRow>
@@ -86,33 +105,33 @@ class BlockEdit extends ComponentWithSettings {
                                 height={height}></SizeConfig>
 
                     <PanelBody
-                        panelStatus={panelStatus['COLORS']}
+                        initialOpen={panelStatus['COLORS']}
                         onToggle={e => togglePanel("COLORS", panelStatus, setAttributes)}
                         title={__("Colors")}>
 
 
-                            <PanelColorSettings
-                                title={__('Background')}
-                                colorSettings={[{
-                                    value: decodeURIComponent(backGroundColor), onChange: (color) => {
-                                        if (color) {
-                                            setAttributes({backGroundColor: encodeURIComponent(color)})
-                                        } else {
-                                            setAttributes({backGroundColor: null})
-                                        }
-                                    }, label: __('Background Color')
-                                }]}
-                            />
+                        <PanelColorSettings
+                            title={__('Background')}
+                            colorSettings={[{
+                                value: decodeURIComponent(backGroundColor), onChange: (color) => {
+                                    if (color) {
+                                        setAttributes({backGroundColor: encodeURIComponent(color)})
+                                    } else {
+                                        setAttributes({backGroundColor: null})
+                                    }
+                                }, label: __('Background Color')
+                            }]}
+                        />
 
 
                     </PanelBody>
-                    <PanelBody panelStatus={panelStatus['LAYERS']}
+                    <PanelBody initialOpen={panelStatus['LAYERS']}
                                onToggle={e => togglePanel("LAYERS", panelStatus, setAttributes)}
                                title={__("Layers")}>
 
                         {
                             layers.map((layer) => <LayerSettings
-                                onRemoveLayer={(e)=>this.removeLayer(layer)}
+                                onRemoveLayer={(e) => this.removeLayer(layer)}
                                 onChange={this.onChangeLayer}
                                 layer={layer}
                                 {...this.props}
