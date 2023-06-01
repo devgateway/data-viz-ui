@@ -38,26 +38,52 @@
     margin: 0;
     padding: 0;
     .svg-icon {
-      stroke: red;
-      width: 1rem;
-      margin: -6px 0.5vw 0 1vw;
+      width: 18px;
+      margin: -6px 0.5vw 0 14px;
+      background-color: $mbd-light-teal;
     }
     span {
       display: inline-block;
       height: 2.2rem;
-      padding: 15px 0 0 0;
+      padding: 12px 0 0 0;
       font-size: 0.9rem !important;
       font-weight: 300 !important;
       color: $mbd-light-teal;
     }
   }
-  .item.group:hover {
+  .item.group:not(.group-selected):hover {
+    .green-rectangle {
+      position: absolute;
+      top: 50%;
+      right: 0;
+      transform: translate(0, -50%);
+      width: 6px;
+      height: 70%;
+      background-color: $mbd-accent-green;
+      border-radius: 2px 0 0 2px;
+    }
+    .svg-icon {
+      background-color: #FFFFFF;
+    }
     span {
       color: #FFFFFF;
     }
   }
-
-  .item.group-selected {
+  .item.group.group-selected {
+    .green-rectangle {
+      position: absolute;
+      //top: 50%;
+      right: 0;
+      bottom: 0;
+      //transform: translate(0, -50%);
+      width: 6px;
+      height: calc(100% - 6px);
+      background-color: $mbd-accent-green;
+      border-radius: 2px 0 0 0;
+    }
+    .svg-icon {
+      background-color: #FFFFFF;
+    }
     span {
       color: #FFFFFF;
       font-weight: 400 !important;
@@ -68,13 +94,13 @@
   }
 
   .menu.expanded {
-    padding: 0.2vw 0 0.4vw 2.8vw;
+    padding: 0.2vw 0 0.4vw 0;
     background-color: $mbd-medium-teal;
     .item {
       color: $mbd-light-teal;
       font-size: 0.8rem;
       font-weight: 300;
-      padding: 0.7vw 0 0.7vw 0;
+      padding: 0.7vw 0 0.7vw 43px;
     }
     .item:hover {
       color: #FFFFFF;
