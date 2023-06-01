@@ -88,6 +88,7 @@ const ChildNavigator = ({pages, title, selected, onPageSelected}) => {
                 >
                     {s.iconComponent ? s.iconComponent : <Image src={s.icon} />}
                     <span>{decodeHtmlEntity(s.label)}</span>
+                    <div className="green-rectangle"></div>
 
                     <Menu.Menu className={`${s.id == selectedGroup.id ? 'expanded' : 'collapsed'}`}>
                         <PageProvider locale={"en"}
