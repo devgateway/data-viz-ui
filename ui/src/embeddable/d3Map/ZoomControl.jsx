@@ -9,70 +9,57 @@ import {FormattedMessage} from "react-intl";
 class ZoomControl extends React.Component {
 
 
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
 
-        this.mapPosition = null
-        this.centered = null
-        this.mapPosition = null
         this.zooming = false
-        this.zoomed=this.zoomed.bind(this)
-        this.zoomEnd=this.zoomEnd.bind(this)
-        this.zoomIn=this.zoomIn.bind(this)
-        this.zoomOut=this.zoomOut.bind(this)
 
-        this.reset=this.reset.bind(this)
-        this.fullView=this.fullView.bind(this)
+        this.zoomEnd = this.zoomEnd.bind(this)
 
+        this.zoomed = this.zoomed.bind(this)
+        this.zoomIn = this.zoomIn.bind(this)
+        this.zoomOut = this.zoomOut.bind(this)
+
+        this.reset = this.reset.bind(this)
+        this.fullView = this.fullView.bind(this)
         this.zoomRef = React.createRef();
-
-
-        this.zoom = d3.zoom().scaleExtent([1, 1000])
+        this.zoom = d3.zoom().scaleExtent([0, 200])
             .on("zoom", this.zoomed)
             .on("end", this.zoomEnd);
-
 
 
     }
 
     componentDidMount() {
+        const {editing} = this.props
         const svg = this.getSvg()
         svg.call(this.zoom)
+        window.addEventListener('resize', () => {
+            this.fullView()
+        })
+
     }
 
     reset() {
-        //this.mapPosition = null
-        //this.tooltip.style("visibility", "hidden")
         this.fullView()
     }
 
     zoomed() {
-        //this.tooltip.style("visibility", "hidden")
         const svg = this.getSvg()
         svg.selectAll("g").attr("transform", d3.event.transform)
-
     }
 
 
-    zoomEnd() {
-        const {editing,onZoomEnd} = this.props;
-
-        const svg = this.getSvg()
-        let t = d3.event.transform;
-        onZoomEnd && onZoomEnd(d3.event.transform)
-     //   svg.selectAll("g").attr("stroke-width", 8 / (this.zoom.scale()))
-
-        this.mapPosition = {k: t.k, x: t.x, y: t.y}
-        if (editing) {
-            window.paren.postMessage({type: 'map', value: JSON.stringify({k: t.k, x: t.x, y: t.y})}, "*");
-        }
-    }
-
+    /*Button Zoom in*/
     zoomIn(e) {
-        debugger;
         const svg = this.getSvg()
         svg.transition().call(this.zoom.scaleBy, 1.5)
+    }
 
+    /*Button zoom oit*/
+    zoomOut() {
+        const svg = this.getSvg()
+        svg.transition().call(this.zoom.scaleBy, 0.6667)
     }
 
     getSvg() {
@@ -80,37 +67,36 @@ class ZoomControl extends React.Component {
         return svg
     }
 
-    zoomOut() {
-        const svg = this.getSvg()
-        svg.transition().call(this.zoom.scaleBy, 0.6667)
-    }
 
     fullView() {
-        debugger;
-        const {mapPosition, editing} = this.props
-        this.centered = null
-        this.zooming = false
+        const {editing, initialPosition: {x = 100, y = 23, k = 1, width: oW, height: oH}, width, height} = this.props
         const svg = this.getSvg()
+        debugger;
 
-        if (mapPosition && !editing) {
-            svg.transition()
-                .duration(300)
-                .call(this.zoom.transform,d3.zoomIdentity
-                    .translate(mapPosition.x, mapPosition.y)
-                    .scale(mapPosition.k))
-        } else {
+        const dx=x/oW, dy=y/oH
+        const nx= width * dx, ny= height * dy
 
-            svg.transition()
-                .duration(500)
-                .call(this.zoom.transform, d3.zoomIdentity
-                    .translate(0, 0)
-                    .scale(1))
+        svg.transition().call(this.zoom.transform, d3.zoomIdentity
+            .translate(nx ,  ny )
+            .scale(k))
+        //svg.call(this.zoom)
+
+
+    }
+
+    zoomEnd() {
+        const {editing, width, height} = this.props
+        if (editing) {
+            const {x, y, k} = d3.event.transform
+            debugger;
+            window.parent.postMessage({type: 'd3map', value: ({k, x, y, width, height})}, "*");
         }
+        // d3.select(this.zoomRef.current.parentNode).selectAll("g").attr('transform', d3.event.transform)
     }
 
     render() {
         const {editing, zoomEnabled = true} = this.props
-        debugger;
+
         return <div ref={this.zoomRef} className="zoom control">
             {(editing || zoomEnabled) && <div>
                 <div className="zoom button plus" onClick={this.zoomIn}><Icon name='plus' size='small'/></div>

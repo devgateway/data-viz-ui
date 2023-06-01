@@ -1,15 +1,29 @@
 :root {
   --header-height: 61px;
-  /* Update this value to match your header's height */ }
+  /* Update this value to change header's height */
+  --footer-height: 150px;
+  /* Update this value to change footer's height */ }
 
 .edit-post-visual-editor, #root {
   /* Styles */
+  /* Root container */
+  /* Content area */
+  /*
+@media only screen and (min-width: 1200px) {
+
+  .ui.container.desktop {
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+  .ui.container.desktop {
+    max-width: 1366px!important;
+
+  }
+}*/
   /* iPads (portrait and landscape) ----------- */
   /* Smartphones (portrait and landscape) ----------- */
   /* Smartphones (portrait) ----------- */
   /* Smartphones (portrait) ----------- */
-  /* Root container */
-  /* Content area */
   /* Nav Sidebar */ }
   .edit-post-visual-editor *, #root * {
     -webkit-print-color-adjust: exact; }
@@ -146,12 +160,22 @@
     height: calc(100vh - var(--header-height)); }
     .edit-post-visual-editor .ui.grid .row, #root .ui.grid .row {
       padding: 0px; }
-  @media only screen and (min-width: 1200px) {
-    .edit-post-visual-editor .ui.container.desktop, #root .ui.container.desktop {
-      margin-left: auto !important;
-      margin-right: auto !important; }
-    .edit-post-visual-editor .ui.container.desktop, #root .ui.container.desktop {
-      max-width: 1366px !important; } }
+  .edit-post-visual-editor .viz.child.page.navigator, #root .viz.child.page.navigator {
+    display: flex;
+    height: calc(100vh - var(--header-height));
+    overflow: hidden;
+    /* Prevent horizontal overflow */ }
+    .edit-post-visual-editor .viz.child.page.navigator .ui.grid, #root .viz.child.page.navigator .ui.grid {
+      width: 100vw; }
+  .edit-post-visual-editor .fourteen.wide.column.content, #root .fourteen.wide.column.content {
+    flex: 1;
+    /* Let the content area fill the remaining space */
+    overflow-y: auto;
+    /* Enable scrolling for the content area */
+    max-height: calc(100vh - var(--header-height));
+    padding: 30px 25px 25px 20px;
+    max-width: calc(100% - 200px);
+    /* Limit the content area width */ }
   .edit-post-visual-editor .container.header, #root .container.header {
     background-color: #333333;
     height: var(--header-height);
@@ -166,20 +190,24 @@
     .edit-post-visual-editor .container.header .menu.pages, #root .container.header .menu.pages {
       position: absolute;
       right: 1.7vw;
-      font-size: 0.9rem;
-      padding-top: 15px; }
+      font-size: 0.85rem;
+      padding-top: 16px; }
       .edit-post-visual-editor .container.header .menu.pages .item.divided, #root .container.header .menu.pages .item.divided {
+        font-size: 0.85rem;
+        font-weight: 400 !important;
         padding: 0 25px 0 25px;
         border-left: 1px solid #9EB944; }
         .edit-post-visual-editor .container.header .menu.pages .item.divided a, #root .container.header .menu.pages .item.divided a {
           color: #63A1A1; }
         .edit-post-visual-editor .container.header .menu.pages .item.divided a:hover, #root .container.header .menu.pages .item.divided a:hover {
           color: #FFFFFF; }
+      .edit-post-visual-editor .container.header .menu.pages .item.divided:first-of-type, #root .container.header .menu.pages .item.divided:first-of-type {
+        border-left: 0; }
       .edit-post-visual-editor .container.header .menu.pages .item.divided.selected.active a, #root .container.header .menu.pages .item.divided.selected.active a {
         color: #FFFFFF; }
     .edit-post-visual-editor .container.header .menu, .edit-post-visual-editor .container.header .branding, #root .container.header .menu, #root .container.header .branding {
       margin: 0;
-      padding: 5px 0 0 1.7vw; }
+      padding: 5px 0 0 0.6vw; }
       .edit-post-visual-editor .container.header .menu .divider, .edit-post-visual-editor .container.header .branding .divider, #root .container.header .menu .divider, #root .container.header .branding .divider {
         display: none; }
       .edit-post-visual-editor .container.header .menu .flag, .edit-post-visual-editor .container.header .branding .flag, #root .container.header .menu .flag, #root .container.header .branding .flag {
@@ -703,7 +731,9 @@
     fill: #D3A79F; }
   .edit-post-visual-editor :root, #root :root {
     --header-height: 61px;
-    /* Update this value to match your header's height */ }
+    /* Update this value to change header's height */
+    --footer-height: 150px;
+    /* Update this value to change footer's height */ }
   .edit-post-visual-editor .viz.dashboard.gallery .ui.grid, #root .viz.dashboard.gallery .ui.grid {
     margin-right: 0; }
   .edit-post-visual-editor .viz.dashboard.gallery .ui.grid > .row > .column, #root .viz.dashboard.gallery .ui.grid > .row > .column {
@@ -853,7 +883,9 @@
         display: none; } }
   .edit-post-visual-editor :root, #root :root {
     --header-height: 61px;
-    /* Update this value to match your header's height */ }
+    /* Update this value to change header's height */
+    --footer-height: 150px;
+    /* Update this value to change footer's height */ }
   .edit-post-visual-editor .green .left.navigator, #root .green .left.navigator {
     top: 10px;
     float: left;
@@ -1899,7 +1931,9 @@ p {
       display: none; } }
   .edit-post-visual-editor :root, #root :root {
     --header-height: 61px;
-    /* Update this value to match your header's height */ }
+    /* Update this value to change header's height */
+    --footer-height: 150px;
+    /* Update this value to change footer's height */ }
   .edit-post-visual-editor .ui.container.filter, #root .ui.container.filter {
     margin-left: 0em !important;
     margin-right: 0em !important;
@@ -2203,7 +2237,9 @@ p {
       width: 0px; }
   .edit-post-visual-editor :root, #root :root {
     --header-height: 61px;
-    /* Update this value to match your header's height */ }
+    /* Update this value to change header's height */
+    --footer-height: 150px;
+    /* Update this value to change footer's height */ }
   .edit-post-visual-editor .ui.container.data-filters-reset, #root .ui.container.data-filters-reset {
     margin-left: 0em !important;
     margin-right: 0em !important;
@@ -2355,65 +2391,53 @@ p {
         margin: 0px; }
   .edit-post-visual-editor body, #root body {
     background-color: transparent !important; }
-  .edit-post-visual-editor .d3Map, #root .d3Map {
-    width: 100%;
-    position: relative;
-    background-color: transparent;
-    overflow: hidden; }
-    .edit-post-visual-editor .d3Map svg, #root .d3Map svg {
-      background-color: transparent;
-      cursor: pointer;
-      vector-effect: non-scaling-stroke; }
-    .edit-post-visual-editor .d3Map path, #root .d3Map path {
-      vector-effect: non-scaling-stroke;
-      stroke-width: 1px; }
-    .edit-post-visual-editor .d3Map .zoom.control, #root .d3Map .zoom.control {
-      font-size: 16px;
-      position: absolute;
-      left: 30px;
-      bottom: 50px; }
-      .edit-post-visual-editor .d3Map .zoom.control .button, #root .d3Map .zoom.control .button {
-        box-sizing: border-box;
-        width: 25px;
-        height: 20px;
-        background-color: #f6fdf6;
-        height: auto;
-        margin: 2px;
+  .edit-post-visual-editor .d3map-container, #root .d3map-container {
+    max-width: 1200px; }
+    .edit-post-visual-editor .d3map-container *, #root .d3map-container * {
+      margin: 0px;
+      padding: 0px; }
+    .edit-post-visual-editor .d3map-container .d3Map, #root .d3map-container .d3Map {
+      position: relative;
+      background-color: transparent; }
+      .edit-post-visual-editor .d3map-container .d3Map svg, #root .d3map-container .d3Map svg {
+        background-color: transparent;
         cursor: pointer;
-        padding: 4px; }
-      .edit-post-visual-editor .d3Map .zoom.control .button:active, #root .d3Map .zoom.control .button:active {
-        border: 1px solid #c2b9b9;
-        width: 24px;
-        height: 19px; }
-      .edit-post-visual-editor .d3Map .zoom.control .icon, #root .d3Map .zoom.control .icon {
-        height: auto; }
-  .edit-post-visual-editor .viz.child.page.navigator, #root .viz.child.page.navigator {
-    display: flex;
-    height: calc(100vh - var(--header-height));
-    overflow: hidden;
-    /* Prevent horizontal overflow */ }
-    .edit-post-visual-editor .viz.child.page.navigator .ui.grid, #root .viz.child.page.navigator .ui.grid {
-      width: 100vw; }
-  .edit-post-visual-editor .fourteen.wide.column.content, #root .fourteen.wide.column.content {
-    flex: 1;
-    /* Let the content area fill the remaining space */
-    overflow-y: auto;
-    /* Enable scrolling for the content area */
-    max-height: calc(100vh - var(--header-height));
-    padding: 30px 25px 25px 20px;
-    max-width: calc(100% - 200px);
-    /* Limit the content area width */ }
+        vector-effect: non-scaling-stroke; }
+      .edit-post-visual-editor .d3map-container .d3Map path, #root .d3map-container .d3Map path {
+        vector-effect: non-scaling-stroke;
+        stroke-width: 1px; }
+      .edit-post-visual-editor .d3map-container .d3Map .zoom.control, #root .d3map-container .d3Map .zoom.control {
+        font-size: 16px;
+        position: absolute;
+        left: 30px;
+        bottom: 50px; }
+        .edit-post-visual-editor .d3map-container .d3Map .zoom.control .button, #root .d3map-container .d3Map .zoom.control .button {
+          box-sizing: border-box;
+          width: 25px;
+          height: 20px;
+          background-color: #f6fdf6;
+          height: auto;
+          margin: 2px;
+          cursor: pointer;
+          padding: 4px; }
+        .edit-post-visual-editor .d3map-container .d3Map .zoom.control .icon, #root .d3map-container .d3Map .zoom.control .icon {
+          height: auto; }
   .edit-post-visual-editor .two.wide.column.navigator, #root .two.wide.column.navigator {
     flex: 0 0 200px;
     /* Fixed width for the sidebar */
-    overflow-y: auto;
-    /* Enable scrolling for the sidebar */
     background-color: #06494B;
     padding: 0;
     margin: 0;
     width: 16.4vw !important;
     min-width: 253px;
     height: calc(100vh - var(--header-height)); }
+    .edit-post-visual-editor .two.wide.column.navigator .navbar-menu, #root .two.wide.column.navigator .navbar-menu {
+      overflow-y: auto;
+      /* Add vertical scroll */
+      height: calc(100vh - var(--header-height) - 1.5rem);
+      /* Set fixed height */
+      max-height: calc(100vh - var(--header-height) - 1.5rem - 153px);
+      /* Set max height with room for the footer */ }
     .edit-post-visual-editor .two.wide.column.navigator .ui.mini.text.vertical.menu, #root .two.wide.column.navigator .ui.mini.text.vertical.menu {
       padding: 0;
       margin: 0;
@@ -2423,31 +2447,58 @@ p {
       margin: 0; }
     .edit-post-visual-editor .two.wide.column.navigator .header.item, #root .two.wide.column.navigator .header.item {
       color: #9EB944;
-      font-size: 1.2rem;
-      font-weight: 600;
-      margin: 3vw 0 2vw 1.5vw; }
+      font-size: 1rem;
+      font-weight: 400;
+      margin: 0;
+      padding: 2vw 0 1vw 1.5vw; }
     .edit-post-visual-editor .two.wide.column.navigator .item.group, #root .two.wide.column.navigator .item.group {
-      margin: 0 0 0.7vw 0; }
+      margin: 0;
+      padding: 0; }
+      .edit-post-visual-editor .two.wide.column.navigator .item.group .svg-icon, #root .two.wide.column.navigator .item.group .svg-icon {
+        stroke: red;
+        width: 1rem;
+        margin: -6px 0.5vw 0 1vw; }
       .edit-post-visual-editor .two.wide.column.navigator .item.group span, #root .two.wide.column.navigator .item.group span {
-        display: block;
-        height: 2.1rem;
-        padding: 9px 0 0 1.5vw;
-        font-size: 1rem !important;
-        color: #FFFFFF; }
+        display: inline-block;
+        height: 2.2rem;
+        padding: 15px 0 0 0;
+        font-size: 0.9rem !important;
+        font-weight: 300 !important;
+        color: #63A1A1; }
+    .edit-post-visual-editor .two.wide.column.navigator .item.group:hover span, #root .two.wide.column.navigator .item.group:hover span {
+      color: #FFFFFF; }
+    .edit-post-visual-editor .two.wide.column.navigator .item.group-selected span, #root .two.wide.column.navigator .item.group-selected span {
+      color: #FFFFFF;
+      font-weight: 400 !important; }
+    .edit-post-visual-editor .two.wide.column.navigator .menu.collapsed, #root .two.wide.column.navigator .menu.collapsed {
+      padding: 0; }
     .edit-post-visual-editor .two.wide.column.navigator .menu.expanded, #root .two.wide.column.navigator .menu.expanded {
-      padding: 0.6vw 0 0.6vw 1.5vw;
+      padding: 0.2vw 0 0.4vw 2.8vw;
       background-color: #075A5C; }
       .edit-post-visual-editor .two.wide.column.navigator .menu.expanded .item, #root .two.wide.column.navigator .menu.expanded .item {
         color: #63A1A1;
-        font-size: 0.85rem;
+        font-size: 0.8rem;
+        font-weight: 300;
         padding: 0.7vw 0 0.7vw 0; }
+      .edit-post-visual-editor .two.wide.column.navigator .menu.expanded .item:hover, #root .two.wide.column.navigator .menu.expanded .item:hover {
+        color: #FFFFFF; }
     .edit-post-visual-editor .two.wide.column.navigator .item.selected, #root .two.wide.column.navigator .item.selected {
-      color: #FFFFFF !important; }
+      color: #FFFFFF !important;
+      font-weight: 400 !important; }
     .edit-post-visual-editor .two.wide.column.navigator .navbar-footer .navbar-footer-text, #root .two.wide.column.navigator .navbar-footer .navbar-footer-text {
-      border-top: 1px solid #9EB944;
-      margin: 0 1.5vw 0 1.5vw;
-      padding: 1.5vw 2px 0 2px;
+      height: var(--footer-height);
+      padding: 1.5vw 1.5vw 2vw 1.5vw;
       color: #C9C9C9;
       font-size: 0.8rem;
       position: absolute;
-      bottom: 2vw; }
+      bottom: 0;
+      background-color: #06494B; }
+    .edit-post-visual-editor .two.wide.column.navigator .navbar-footer .navbar-footer-text:before, #root .two.wide.column.navigator .navbar-footer .navbar-footer-text:before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 6.5%;
+      width: 87%;
+      height: 1px;
+      background-color: #9EB944;
+      transform: translateY(-50%); }
