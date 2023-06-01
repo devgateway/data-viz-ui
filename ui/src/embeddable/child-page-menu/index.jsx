@@ -133,7 +133,9 @@ const Root = (props) => {
     return (<Container style={styles} fluid className={`viz child page navigator`}>
             {parent &&
                 <PageProvider locale={locale}
-                              parent={parent} store={"child_menu" + props.parent + '_' + props.unique}
+                              parent={parent}
+                              noCache={true}
+                              store={"child_menu" + props.parent + '_' + props.unique}
                               perPage={100}>
                     <Grid>
                         <Grid.Row>
