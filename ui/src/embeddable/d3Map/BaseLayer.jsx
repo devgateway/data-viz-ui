@@ -23,7 +23,21 @@ class BaseLayer extends React.Component {
 
     createLayer() {
 
-        const {name, file, path, mapPosition,labelFilter, labelField,labelFontSize, labelColor, fillColor, borderColor} = this.props
+        const {
+            name,
+            file,
+            path,
+            onLayerCreated,
+            labelFilter = [],
+            labelField,
+            labelFontSize,
+            labelColor,
+            fillColor,
+            borderColor,
+            editing
+        } = this.props
+        
+        
         const g = d3.select(this.gRef.current)
         loadJSON(file).then((json) => {
             g.attr("class", "base-layer " + name)
@@ -40,13 +54,12 @@ class BaseLayer extends React.Component {
 
             g.selectAll(".label").remove()
             g.selectAll(".label")
-                .data(json.features.filter(f=>{
-                    debugger;
+                .data(json.features.filter(f => {
                     return labelFilter.indexOf(f.properties[labelField]) == -1
                 }))
                 .enter().append("text")
                 .attr("class", "label")
-                .attr("font-size", labelFontSize+"em")
+                .attr("font-size", labelFontSize + "em")
                 .text(function (d) {
                     return d.properties[labelField]
                 })
@@ -55,10 +68,10 @@ class BaseLayer extends React.Component {
                 .attr("transform", function (d) {
                     var bbox = this.getBBox();
                     var width = bbox.width;
-                    return "translate(" +[ path.centroid(d)[0] - (width/2),path.centroid(d)[1]] + ")"
+                    return "translate(" + [path.centroid(d)[0] - (width / 2), path.centroid(d)[1]] + ")"
                 })
 
-            window.dispatchEvent(new Event('resize'));
+            onLayerCreated()
         })
     }
 
@@ -68,8 +81,6 @@ class BaseLayer extends React.Component {
 
     componentDidMount() {
         this.createLayer()
-
-
     }
 
     render() {

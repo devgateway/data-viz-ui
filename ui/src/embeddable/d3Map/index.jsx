@@ -20,36 +20,45 @@ const MapWrapper = (props) => {
 
     const layers = parse(dataLayers)
     const [transform, setZoomTransform] = React.useState(null)
+    const [readyState, setReadyState] = React.useState(false)
+    const layerCreated = []
+    const onLayerCreated = (layer) => {
+        layerCreated.push(layer)
+        
+        if (layerCreated.length == layers.length) {
+            setReadyState(true)
+        }
 
-    
+    }
 
     return (
-        <Container  className={"d3map-container"}
-                   style={{backgroundColor: decode(bgColorParam), height: height+"px"}}>
-            <ProjectedContainer editing={editing}  initialPosition={parse(paramMapPosition, editing)}>
+        <Container className={"d3map-container"}
+                   style={{backgroundColor: decode(bgColorParam), height: height + "px"}}>
+            <ProjectedContainer editing={editing} initialPosition={parse(paramMapPosition, editing)}>
                 <Map>
                     {layers.map((layer, i) => {
                         if (layer.type === 'base') {
-                            return <BaseLayer key={i} {...layer} />
+                            return <BaseLayer unique={unique} onLayerCreated={e => onLayerCreated(layer)} key={i} {...layer} />
                         }
                         if (layer.type === 'data') {
-                            return <DataLayer key={i} {...layer} />
+                            return <DataLayer unique={unique} onLayerCreated={e => onLayerCreated(layer)}
+                                              key={i} {...layer} />
                         }
 
                     })}
                 </Map>
-                <ZoomControl editing={editing}/>
-
+                <ZoomControl readyState={readyState} editing={editing}/>
             </ProjectedContainer>
         </Container>
     );
 
-};
-
-const mapStateToProps = (state, ownProps) => {
-    return {}
 }
+    ;
 
-const mapActionCreators = {};
+    const mapStateToProps = (state, ownProps) => {
+        return {}
+    }
 
-export default connect(mapStateToProps, mapActionCreators)(MapWrapper)
+    const mapActionCreators = {};
+
+    export default connect(mapStateToProps, mapActionCreators)(MapWrapper)
