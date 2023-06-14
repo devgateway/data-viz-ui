@@ -11,6 +11,7 @@ import {
 } from '@wordpress/components';
 import Measures from './MapMeasures.jsx'
 import Property from "./Property";
+import BreaksGenerator from "./BreaksGenerator";
 
 const FilterSelector = ({param, index, options, onUpdateFilterParam}) => {
     const sortedOptions = options.sort(function (a, b) {
@@ -192,7 +193,7 @@ export class DataLayerSetting extends Component {
                 apiJoinAttribute,
                 type,
                 useCentroidPoint,
-                useShape,
+                pointUseFixedSize,
                 pointSize
             }
         } = this.props
@@ -245,27 +246,26 @@ export class DataLayerSetting extends Component {
                         <Button variant={"link"} onClick={this.removeFilter}>{__("Remove")}</Button>
                     </PanelRow>
                 </PanelBody>,
-                <PanelBody title={"Data Render"}>
+                <PanelBody title={"Marks & Colors"}>
                     <PanelRow>
                         <ToggleControl
-                            label="Centroid Point"
+                            label="Use Circle Mark"
                             checked={useCentroidPoint}
                             onChange={(value) => {
                                 onChangeProperty("useCentroidPoint", value)
                             }}
                         />
                     </PanelRow>
-                    <PanelRow>
-                        <ToggleControl
-                            label="Shape"
-                            checked={useShape}
-                            onChange={(value) => {
-                                onChangeProperty("useShape", value)
-                            }}
-                        />
-                    </PanelRow>
 
-                    <PanelRow>
+
+                    {useCentroidPoint && <PanelRow>
+                        <ToggleControl label={"Use fixed size"}
+                                       checked={pointUseFixedSize}
+                                       onChange={(value) => onChangeProperty("pointUseFixedSize", value)}>
+                        </ToggleControl>
+                    </PanelRow>}
+
+                    {useCentroidPoint && pointUseFixedSize && <PanelRow>
                         <RangeControl
                             label="Point Size"
                             value={pointSize}
@@ -275,13 +275,15 @@ export class DataLayerSetting extends Component {
                             min={1}
                             max={10}
                         />
-                    </PanelRow>
+                    </PanelRow>}
+                    {useCentroidPoint && !pointUseFixedSize && <PanelRow>
+                        <BreaksGenerator/>
+                    </PanelRow>}
+                </PanelBody>
 
-    </PanelBody>
 
-
-    ]
-    )
+            ]
+        )
     }
 
 }

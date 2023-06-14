@@ -51,7 +51,7 @@ export class LayerObject {
 
     useCentroidPoint = false
     pointSize = 1
-    useShape = true
+
 
     constructor() {
 

@@ -128,7 +128,6 @@ class BlockEdit extends ComponentWithSettings {
                     <PanelBody initialOpen={panelStatus['LAYERS']}
                                onToggle={e => togglePanel("LAYERS", panelStatus, setAttributes)}
                                title={__("Layers")}>
-
                         {
                             layers.map((layer) => <LayerSettings
                                 onRemoveLayer={(e) => this.removeLayer(layer)}
