@@ -49,6 +49,8 @@ class ProjectedContainer extends React.Component {
                     initialPosition,
                     height: this.getHeight(),
                     width: this.getWidth(),
+                    editing: this.props.editing
+
                 },)
             }) : null}
         </div>
