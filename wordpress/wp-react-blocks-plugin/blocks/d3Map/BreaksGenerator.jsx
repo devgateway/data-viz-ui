@@ -3,7 +3,7 @@ import * as ss from "simple-statistics"
 
 const BreaksGenerator = (props) => {
 
-    debugger;
+    
     console.log(ss.jenks([1, 2, 3, 4, 5, 6, 7, 8, 9], 3))
 
     return <>

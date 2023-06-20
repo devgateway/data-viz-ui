@@ -31,30 +31,30 @@ const Layer = (props) => {
     const [files, setFiles] = useState([])
     const [features, setFeatures] = useState([])
     useEffect(() => {
-        debugger;
+        
         getJsonFiles().then(files => {
             setFiles(toOptions(files))
-            debugger;
+            
         })
     }, [])
 
 
     useEffect(() => {
-        debugger;
+        
         fetch(file).then(response => response.json()).then(data => {
             setFeatures(data.features);
             console.log(data.features)
         });
     }, [layer.file])
     const onChangeProperty = (atrr, value) => {
-        debugger
+
         console.log("change attribute " + atrr + " to " + value)
         const newLayer = {...layer}
         newLayer[atrr] = value
         onChange(newLayer)
     }
 
-    debugger;
+    
     return [<PanelRow>
         <TextControl
             type={"String"}
@@ -141,7 +141,7 @@ const Layer = (props) => {
                         label={feature.properties[labelField]}
                         checked={labelFilter.indexOf(feature.properties[labelField]) == -1}
                         onChange={(selected) => {
-                            debugger;
+                            
                             onChangeProperty("labelFilter", !selected ? [...layer.labelFilter, feature.properties[labelField]] : layer.labelFilter.filter(f => f !== feature.properties[labelField]))
                         }}
                     />)}
@@ -189,8 +189,7 @@ class LayerWithMetadata extends BlockEditWithAPIMetadata {
 
     componentDidMount() {
         const {layer: {name, type, file, app}} = this.props
-
-
+        debugger
         fetch(`/api/registry/eureka/apps`, {
             headers: {
                 'Accept': 'application/json',
@@ -208,7 +207,7 @@ class LayerWithMetadata extends BlockEditWithAPIMetadata {
                 this._loadMetadata(app)
             })
             .catch(function (response) {
-
+                alert("error" + response)
             })
     }
 
@@ -216,14 +215,16 @@ class LayerWithMetadata extends BlockEditWithAPIMetadata {
         super.componentDidUpdate(prevProps, prevState, snapshot)
         const {layer: {app}} = this.props
         const {layer: {app: prevAPP}} = prevProps
-
+        debugger;
         if ((app != prevAPP) || (prevAPP == null && app != null)) {
+
             this._loadMetadata(app)
         }
     }
 
     render() {
         const {onRemoveLayer, layer, layer: {name, type, file, app}} = this.props
+
         return <PanelBody title={__(`${name}`)}>
             <Layer {...this.props} metadata={this.state}></Layer>
             <PanelRow>

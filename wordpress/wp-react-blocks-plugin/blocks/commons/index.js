@@ -285,7 +285,7 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
     }
 
     componentDidMount() {
-        debugger;
+
         super.componentDidMount();
 
         fetch(`/api/registry/eureka/apps`, {
@@ -326,6 +326,7 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
 
 
     _loadMetadata(app) {
+        debugger;
         if (app != "csv") {
             fetch(`/api/${app}/dimensions`)
                 .then(response => {

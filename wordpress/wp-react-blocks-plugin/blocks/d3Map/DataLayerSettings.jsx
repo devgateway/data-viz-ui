@@ -12,6 +12,7 @@ import {
 import Measures from './MapMeasures.jsx'
 import Property from "./Property";
 import BreaksGenerator from "./BreaksGenerator";
+import {BlockEditWithAPIMetadata} from "../commons";
 
 const FilterSelector = ({param, index, options, onUpdateFilterParam}) => {
     const sortedOptions = options.sort(function (a, b) {
@@ -199,10 +200,13 @@ export class DataLayerSetting extends Component {
         } = this.props
 
 
+
+
         return (
             [
-                <PanelBody title={"Join Attributes"}>
-                    <Property property={"featureJoinAttribute"} type={"select"} onChangeProperty={onChangeProperty}
+                <PanelBody title={"Join Fields"}>
+                    <Property property={"featureJoinAttribute"}
+                              type={"select"} onChangeProperty={onChangeProperty}
                               features={features}
                               value={featureJoinAttribute}
                               title={"Shape Attribute"}>
@@ -210,10 +214,9 @@ export class DataLayerSetting extends Component {
                     </Property>
                     <PanelRow>
                         <SelectControl
-                            label={'Api Attribute'}
+                            label={'Dimension'}
                             value={[apiJoinAttribute]} // e.g: value = [ 'a', 'c' ]
                             onChange={(value) => {
-                                debugger
                                 onChangeProperty("apiJoinAttribute", value)
                             }}
                             options={allDimensions}
