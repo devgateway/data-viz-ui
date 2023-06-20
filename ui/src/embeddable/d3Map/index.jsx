@@ -31,10 +31,12 @@ const MapWrapper = (props) => {
 
     }
 
+
+    
     return (
         <Container className={"d3map-container"}
-                   style={{backgroundColor: decode(bgColorParam), height: height + "px"}}>
-            <ProjectedContainer editing={editing} initialPosition={parse(paramMapPosition, editing)}>
+                   style={{backgroundColor: decode(bgColorParam), height: height + "px", width:"1190px"}}>
+            <ProjectedContainer height={height} editing={editing} initialPosition={parse(paramMapPosition, editing)}>
                 <Map>
                     {layers.map((layer, i) => {
                         if (layer.type === 'base') {
