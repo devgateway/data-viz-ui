@@ -151,7 +151,7 @@ const Layer = (props) => {
         </PanelBody>,
 
         <React.Fragment>
-            {type == 'data' && <PanelBody initialOpen={false} title={__("API & Source")}>
+            {type == 'data' && <PanelBody initialOpen={false} title={__("Data Layer Settings")}>
                 <PanelRow>
                     <SelectControl
                         value={[app]} // e.g: value = [ 'a', 'c' ]

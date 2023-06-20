@@ -13,6 +13,7 @@ import Measures from './MapMeasures.jsx'
 import Property from "./Property";
 import BreaksGenerator from "./BreaksGenerator";
 import {BlockEditWithAPIMetadata} from "../commons";
+import {PanelColorSettings} from "@wordpress/block-editor";
 
 const FilterSelector = ({param, index, options, onUpdateFilterParam}) => {
     const sortedOptions = options.sort(function (a, b) {
@@ -193,9 +194,10 @@ export class DataLayerSetting extends Component {
                 featureJoinAttribute,
                 apiJoinAttribute,
                 type,
-                useCentroidPoint,
-                pointUseFixedSize,
-                pointSize
+                breaks,
+                markFillColor,
+                markBorderColor,
+                markSizeScale
             }
         } = this.props
 
@@ -249,39 +251,52 @@ export class DataLayerSetting extends Component {
                         <Button variant={"link"} onClick={this.removeFilter}>{__("Remove")}</Button>
                     </PanelRow>
                 </PanelBody>,
+
                 <PanelBody title={"Marks & Colors"}>
                     <PanelRow>
                         <ToggleControl
                             label="Use Circle Mark"
-                            checked={useCentroidPoint}
+                            checked={true}
                             onChange={(value) => {
                                 onChangeProperty("useCentroidPoint", value)
                             }}
                         />
                     </PanelRow>
-
-
-                    {useCentroidPoint && <PanelRow>
-                        <ToggleControl label={"Use fixed size"}
-                                       checked={pointUseFixedSize}
-                                       onChange={(value) => onChangeProperty("pointUseFixedSize", value)}>
-                        </ToggleControl>
-                    </PanelRow>}
-
-                    {useCentroidPoint && pointUseFixedSize && <PanelRow>
+                     <PanelRow>
                         <RangeControl
-                            label="Point Size"
-                            value={pointSize}
+                            label="Maker Base Size"
+                            value={markSizeScale}
                             onChange={(value) => {
-                                onChangeProperty("pointSize", value)
+                                onChangeProperty("markSizeScale", value)
                             }}
-                            min={1}
+                            step={0.5}
+                            min={0}
                             max={10}
                         />
-                    </PanelRow>}
-                    {useCentroidPoint && !pointUseFixedSize && <PanelRow>
-                        <BreaksGenerator/>
-                    </PanelRow>}
+                    </PanelRow>
+                    <PanelRow>
+                        <PanelColorSettings
+                            title={__(`Fill Color`)}
+                            colorSettings={[{
+                                value: markFillColor, onChange: (fillColor) => {
+                                    onChangeProperty("markFillColor", fillColor)
+                                },
+
+                            }]}
+                        />
+                        <PanelColorSettings
+                            title={__(`Border Color`)}
+                            colorSettings={[{
+                                value: markBorderColor, onChange: (borderColor) => {
+                                    onChangeProperty("markBorderColor", borderColor)
+                                },
+
+                            }]}
+                        />
+                    </PanelRow>
+
+                    <BreaksGenerator onChangeProperty={onChangeProperty} breaks={breaks}/>
+
                 </PanelBody>
 
 
