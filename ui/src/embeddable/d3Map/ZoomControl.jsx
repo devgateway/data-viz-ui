@@ -24,20 +24,20 @@ class ZoomControl extends React.Component {
 
 
         this.fullView = this.fullView.bind(this)
-        this.transition2fullView = this.transition2fullView.bind(this)
 
+        this.transition2fullView = this.transition2fullView.bind(this)
         this._fullView = this._fullView.bind(this)
 
         this.zoomRef = React.createRef();
-        this.zoom = d3.zoom().scaleExtent([0, 200])
+
+        this.zoom = d3.zoom().scaleExtent([0, 100])
             .on("zoom", this.zoomed)
             .on("end", this.zoomEnd);
-
 
     }
 
     componentDidMount() {
-        const {editing} = this.props
+        const {editing, initialPosition: {x = 100, y = 23, k = 1, width: oW, height: oH}, width, height} = this.props
         const svg = this.getSvg()
         svg.call(this.zoom)
 
@@ -47,15 +47,33 @@ class ZoomControl extends React.Component {
         if (!prevProps.readyState && this.props.readyState) {
             this.fullView()
         }
+
+        if(prevProps.height!==this.props.height || prevProps.width!==this.props.width){
+            this.reset()
+        }
     }
 
     reset() {
+        const {
+            editing,
+            scale = 190,
+            center = [0, 0],
+            initialPosition: {x = 100, y = 23, k = 1, width: oW, height: oH},
+            width,
+            height
+        } = this.props
+        if (editing) {
 
-        this.transition2fullView()
+            this.getSvg().call(this.zoom.transform, d3.zoomIdentity)
+        } else {
+            this.transition2fullView()
+        }
+
     }
 
     zoomed() {
         const svg = this.getSvg()
+        debugger;
         svg.selectAll("g").attr("transform", d3.event.transform)
     }
 
@@ -79,41 +97,26 @@ class ZoomControl extends React.Component {
 
 
     _fullView(transition = true) {
+
         const {editing, initialPosition: {x = 100, y = 23, k = 1, width: oW, height: oH}, width, height} = this.props
-
-        const ratio = Math.min(width / oW, height / oH);
-
-        const dx = x / oW, dy = y / oH
-        const nx = width * dx, ny = height * dy
-
-        const scaledPosition = {
-            x: x * ratio,
-            y: y * ratio,
-            k: k
-        };
-        const offset = {
-            x: (width - oW * ratio) / 2,
-            y: (height - oH * ratio) / 2
-        };
-
-        const finalPosition = {
-            x: scaledPosition.x +offset.x ,
-            y: scaledPosition.y +offset.y,
-            k: scaledPosition.k
-        };
-
         const svg = this.getSvg()
 
+        const dx = x / oW
+        const dy = y / oH
 
-        if (transition) {
+
+        const nx = width * dx
+        const ny = height * dy
+
+        if (oH && oW && k) {
+            debugger
             svg.transition().call(this.zoom.transform, d3.zoomIdentity
-                .translate(nx , ny)
-                .scale(k))
-        } else {
-            svg.call(this.zoom.transform, d3.zoomIdentity
-                .translate(nx, ny)
-                .scale(k))
+                .translate(x, y)
+                .scale(k)
+            )
         }
+
+
     }
 
     transition2fullView() {
@@ -126,9 +129,10 @@ class ZoomControl extends React.Component {
 
     zoomEnd() {
         const {editing, width, height} = this.props
+        debugger;
         if (editing) {
             const {x, y, k} = d3.event.transform
-            
+            console.log({k, x, y, width, height})
             window.parent.postMessage({type: 'd3map', value: ({k, x, y, width, height})}, "*");
         }
     }
