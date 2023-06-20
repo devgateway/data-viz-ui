@@ -12,6 +12,7 @@ class Map extends React.Component {
 
     render() {
         const {height, width,projection} = this.props
+        
         return(<svg ref={this.svgRef} height={height} width={width}>
                     {projection ? this.props.children.map(child =>  React.cloneElement(child, {...this.props})) : null}
                 </svg>)

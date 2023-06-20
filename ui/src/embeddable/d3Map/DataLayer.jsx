@@ -49,7 +49,7 @@ const DataWrapper = (props) => {
         editing
     } = props
 
-    debugger
+
     return (<DataProvider
         params={getFilters(filters)}
         app={app}

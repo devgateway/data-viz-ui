@@ -22,7 +22,7 @@ class BaseLayer extends React.Component {
     }
 
     createLayer() {
-
+        
         const {
             name,
             file,
@@ -36,12 +36,17 @@ class BaseLayer extends React.Component {
             borderColor,
             editing
         } = this.props
-        
-        
+
+
         const g = d3.select(this.gRef.current)
         loadJSON(file).then((json) => {
             g.attr("class", "base-layer " + name)
+
+
             g.selectAll("path").remove()
+            g.selectAll(".label").remove()
+
+
             g.selectAll("path")
                 .data(json.features)
                 .enter()
@@ -52,7 +57,7 @@ class BaseLayer extends React.Component {
                 .attr("d", path);
 
 
-            g.selectAll(".label").remove()
+
             g.selectAll(".label")
                 .data(json.features.filter(f => {
                     return labelFilter.indexOf(f.properties[labelField]) == -1
@@ -84,7 +89,7 @@ class BaseLayer extends React.Component {
     }
 
     render() {
-        const {name} = this.props
+        const {name,height,width} = this.props
         return <g className={"base " + name} ref={this.gRef}/>
     }
 }
