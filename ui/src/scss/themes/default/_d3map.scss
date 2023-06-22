@@ -4,29 +4,30 @@ body {
 }
 
 .d3map-container {
-  * {
-    margin: 0px;
-    padding: 0px;
-  }
-
-  max-width: 1200px;
-  .d3Map {
-
+  .projected {
     position: relative;
-    background-color: transparent;
-
-    svg {
+    .map {
+      position: relative;
       background-color: transparent;
-      cursor: pointer;
-      vector-effect: non-scaling-stroke;
+      svg {
+        background-color: transparent;
+        cursor: pointer;
+        vector-effect: non-scaling-stroke;
+      }
+
+      path {
+        vector-effect: non-scaling-stroke;
+        stroke-width: 1px;
+      }
+
+      text {
+        text-anchor: middle;
+        dominant-baseline: middle;
+      }
+
     }
 
-    path {
-      vector-effect: non-scaling-stroke;
-      stroke-width: 1px;
-    }
-
-    .zoom.control {
+    .zoom {
       font-size: 16px;
       position: absolute;
       left: 30px;
@@ -52,7 +53,6 @@ body {
       }
     }
   }
-
 }
 
 
