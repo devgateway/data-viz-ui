@@ -1,71 +1,65 @@
 import React, {Children, createRef, useEffect, useState} from 'react';
 import {connect} from "react-redux";
 import * as topojson from "topojson-client";
-import * as d3 from 'd3' // d3 plugin
+import * as d3 from 'd3'
+import {decode} from "../utils/parseUtils"; // d3 plugin
 
 
 class ProjectedContainer extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {path: null, projection: null, width: 0, height: 0}
         this.divRef = React.createRef();
-        this.getHeight = this.getHeight.bind(this)
-        this.getWidth = this.getWidth.bind(this)
-        this.project=this.project.bind(this)
+        this.createProjection = this.createProjection.bind(this)
     }
 
-    getHeight() {
-        return this.divRef.current.parentNode.offsetHeight ;
-    }
-
-    getWidth() {
-        return this.divRef.current.parentNode.offsetWidth ;
-    }
-
-    compo
-
-    componentDidUpdate(prevProps, prevState, snapshot) {
-
-
-    }
-
-
-    project() {
-        const {scale = 190, center = [0, 0], initialPosition: {x = 0, y = 0, k = 0}} = this.props
+    createProjection() {
+        const {editing, height, width, scale = 200, center = [0, 0], initialPosition} = this.props
         const projection = d3.geoMercator()
             .scale(scale)
             .center(center)  // centers map at given coordinates
-            .translate([this.getWidth() / 2, this.getHeight() / 2])
-        const path = d3.geoPath().projection(projection);
-        window.setTimeout(()=>this.setState({path, projection,height:this.getHeight(),width:this.getWidth()}),500)
+            .translate([width / 2, height / 2])
 
+        const path = d3.geoPath().projection(projection);
+        return {path, projection}
     }
 
     componentDidMount() {
-        this.project()
-       window.addEventListener("resize", this.project);
-
-
+        const {path, projection} = this.createProjection()
+        this.setState({path, projection})
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-
+        if (prevProps.height !== this.props.height || prevProps.width !== this.props.width) {
+            debugger;
+            const {path, projection} = this.createProjection()
+            this.setState({path, projection})
+        }
     }
 
     render() {
-        const {initialPosition} = this.props
-
+        const {editing,backgroundColor, height, width, scale = 190, center = [0, 0], initialPosition} = this.props
         const arrayChildren = Children.toArray(this.props.children);
 
+        return <div
+                className={"projected"}
+                width={width}
+                height={height}
+                style={{
+                        margin: "auto",
+                         backgroundColor: backgroundColor,
+                        height: `${height}px`,
+                        width:`${width}px`,
 
-        return <div ref={this.divRef} className={"d3Map"}>
-
-            {this.divRef.current&&Children.map(arrayChildren, child => {
+                    }
+                 }
+            >
+            {Children.map(arrayChildren, child => {
                 return React.cloneElement(child, {
                     ...this.state,
                     initialPosition,
-                    editing: this.props.editing
-
+                    editing,
+                    height,
+                    width
                 })
 
             })}
