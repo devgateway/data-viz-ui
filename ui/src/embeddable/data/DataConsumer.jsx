@@ -3,7 +3,6 @@ import {DataContext} from './DataContext'
 
 const DataConsumer = (props) => {
 
-
     return (
         <DataContext.Consumer>
             {(data) => {
