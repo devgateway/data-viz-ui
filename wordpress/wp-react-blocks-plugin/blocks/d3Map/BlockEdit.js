@@ -30,15 +30,30 @@ class BlockEdit extends ComponentWithSettings {
     }
 
     componentDidMount() {
-        const {setAttributes} = this.props;
+        const {
+            className,
+            isSelected,
+            toggleSelection,
+            setAttributes,
+            attributes: {
+                panelStatus,
+                height,
+                width,
+                group,
+                backGroundColor,
+                layers = [],
+            }
+        } = this.props;
         super.componentDidMount();
-
+        debugger
         window.addEventListener("message", (event) => {
-                if (event.data.type == 'd3map') {
+
+                if (event.data.type == `d3_map_${group}`) {
 
                     const iframeOrigin = event.origin.split(':')[0]
                     const parentOrigin = window.location.origin.split(':')[0]
                     if (iframeOrigin == parentOrigin) {
+                        console.log("Received message from iframe "+event.data.type, event.data.value)
                         setAttributes({mapPosition: event.data.value})
                     }
                 }
@@ -49,7 +64,7 @@ class BlockEdit extends ComponentWithSettings {
     addLayer() {
         const {setAttributes, attributes: {layers}} = this.props
         const newLayers = [...layers]
-        debugger;
+
         newLayers.push(new LayerObject())
         setAttributes({layers: newLayers})
     }
@@ -57,10 +72,11 @@ class BlockEdit extends ComponentWithSettings {
     removeLayer(layer) {
         const {setAttributes, attributes: {layers}} = this.props
         const {id, name} = layer
-        debugger;
+
         const newLayers = layers.filter(l => l.id != id)
         setAttributes({layers: newLayers})
     }
+
     onChangeLayer(layer) {
         const {setAttributes, attributes: {layers}} = this.props
         const newLayers = [...layers]
@@ -70,6 +86,7 @@ class BlockEdit extends ComponentWithSettings {
         }
         setAttributes({layers: newLayers})
     }
+
     render() {
         const {
             className,
@@ -79,6 +96,7 @@ class BlockEdit extends ComponentWithSettings {
             attributes: {
                 panelStatus,
                 height,
+                width,
                 group,
                 backGroundColor,
                 layers = [],
@@ -101,8 +119,26 @@ class BlockEdit extends ComponentWithSettings {
                             />
                         </PanelRow>
                     </PanelBody>
-                    <SizeConfig setAttributes={setAttributes} panelStatus={panelStatus}
-                                height={height}></SizeConfig>
+                    <PanelBody initialOpen={panelStatus["SIZE"]}
+                               onToggle={e => togglePanel("SIZE", panelStatus, setAttributes)}
+                               title={__("Size")}>
+                        <PanelRow>
+                            <TextControl
+                                size={10}
+                                label="Height"
+                                value={height}
+                                onChange={(height) => setAttributes({height: height ? parseInt(height) : 0})}
+                            />
+                        </PanelRow>
+                        <PanelRow>
+                            <TextControl
+                                size={10}
+                                label="Width"
+                                value={width}
+                                onChange={(width) => setAttributes({width: width ? parseInt(width) : 0})}
+                            />
+                        </PanelRow>
+                    </PanelBody>
 
                     <PanelBody
                         initialOpen={panelStatus['COLORS']}
@@ -144,38 +180,43 @@ class BlockEdit extends ComponentWithSettings {
                 </Panel>
             </InspectorControls>),
 
-                (
-                    <ResizableBox
-                        size={{height}}
-                        style={{"margin": "auto", width: "100%"}}
-                        minHeight="50"
-                        minWidth="50"
-                        enable={{
-                            top: false,
-                            right: false,
-                            bottom: true,
-                            left: false,
-                            topRight: false,
-                            bottomRight: false,
-                            bottomLeft: false,
-                            topLeft: false,
-                        }}
-                        onResizeStop={(event, direction, elt, delta) => {
-                            setAttributes({
-                                height: parseInt(height + delta.height, 10),
-                            });
-                            toggleSelection(true);
-                        }}
-                        onResizeStart={() => {
-                            toggleSelection(false);
-                        }}>
+                (<div style={{margin: "auto", width: "100%"}}>
+                        <ResizableBox
+                            style={{margin: "auto"}}
+                            size={{
+                                height,
+                                width
+                            }}
+                            minHeight="50"
+                            minWidth="50"
+                            enable={{
+                                top: false,
+                                right: true,
+                                bottom: true,
+                                left: false,
+                                topRight: false,
+                                bottomRight: true,
+                                bottomLeft: false,
+                                topLeft: false,
+                            }}
+                            onResizeStop={(event, direction, elt, delta) => {
+                                setAttributes({
+                                    height: parseInt(height + delta.height, 10),
+                                    width: parseInt(width + delta.width, 10),
+                                });
+                                toggleSelection(true);
+                            }}
+                            onResizeStart={() => {
+                                toggleSelection(false);
+                            }}>
 
-                        <div>
+
                             {this.state.react_ui_url && <iframe ref={this.iframe} scrolling={"no"}
                                                                 style={divStyles}
                                                                 src={this.state.react_ui_url + "/embeddable/newMap?"}/>}
-                        </div>
-                    </ResizableBox>
+
+                        </ResizableBox>
+                    </div>
                 )]
         );
 

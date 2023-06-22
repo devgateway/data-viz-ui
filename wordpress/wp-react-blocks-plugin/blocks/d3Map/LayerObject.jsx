@@ -35,7 +35,7 @@ export class LayerObject {
 
     borderColor = '#000000'
     labelColor = '#000000'
-    labelFontSize = 0.05
+    labelFontSize = 5
 
 
     markFillColor = '#000000'
