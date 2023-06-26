@@ -95,6 +95,7 @@ class BlockEdit extends ComponentWithSettings {
             setAttributes,
             attributes: {
                 panelStatus,
+                mapPosition,
                 height,
                 width,
                 group,
@@ -128,6 +129,13 @@ class BlockEdit extends ComponentWithSettings {
                                 label="Height"
                                 value={height}
                                 onChange={(height) => setAttributes({height: height ? parseInt(height) : 0})}
+                            />
+                        </PanelRow>
+                        <PanelRow>
+                            <TextControl
+                                label={__('Position')}
+                                value={JSON.stringify(mapPosition)}
+                                onChange={(value) => null}
                             />
                         </PanelRow>
                         <PanelRow>

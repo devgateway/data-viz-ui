@@ -5,7 +5,7 @@ import {
     CheckboxControl,
     PanelBody,
     PanelRow, RangeControl,
-    SelectControl,
+    SelectControl, TextareaControl,
     TextControl,
     ToggleControl
 } from '@wordpress/components';
@@ -189,6 +189,8 @@ export class DataLayerSetting extends Component {
             allMeasures,
             features,
             layer: {
+                app,
+                csv,
                 measures,
                 filters,
                 featureJoinAttribute,
@@ -202,8 +204,6 @@ export class DataLayerSetting extends Component {
         } = this.props
 
 
-
-
         return (
             [
                 <PanelBody title={"Join Fields"}>
@@ -214,7 +214,15 @@ export class DataLayerSetting extends Component {
                               title={"Shape Attribute"}>
 
                     </Property>
-                    <PanelRow>
+                    {app == 'csv' && <PanelRow>
+                        <TextareaControl
+                            label={__("CSV Data")}
+                            value={csv}
+                            onChange={(csv) => onChangeProperty("csv", csv)}
+                        />
+                    </PanelRow>}
+
+                    {app != 'csv' && <PanelRow>
                         <SelectControl
                             label={'Dimension'}
                             value={[apiJoinAttribute]} // e.g: value = [ 'a', 'c' ]
@@ -223,35 +231,35 @@ export class DataLayerSetting extends Component {
                             }}
                             options={allDimensions}
                         />
-                    </PanelRow>
+                    </PanelRow>}
 
-                </PanelBody>
-                ,
-                <Measures
+                </PanelBody>,
+                <>
+                    {app != 'csv' && <Measures
                     onSetSingleMeasure={this.onSetSingleMeasure}
                     onMeasuresChange={this.onMeasuresChange}
-                    {...this.props} />
-                ,
+                    {...this.props} />}
+                </>,
+                <>
+                    {app!='csv'&& <PanelBody initialOpen={false} title={__("Filters")}>
+                {filters.map((f, index) => {
 
-                <PanelBody initialOpen={false} title={__("Filters")}>
-                    {filters.map((f, index) => {
+                    return (
+                        <PanelBody initialOpen={true} title={__(`Filter - ${f.label}`)}>
+                            <FilterSelector param={f.param} index={index} options={allFilters}
+                                            onUpdateFilterParam={this.updateFilterParam}/>
+                            {<CategoricalFilter value={f.value} index={index} items={this.items(f.type)}
+                                                onUpdateFilterValue={this.updateFilterValue}/>}
+                        </PanelBody>)
+                })}
 
-                        return (
-                            <PanelBody initialOpen={true} title={__(`Filter - ${f.label}`)}>
-                                <FilterSelector param={f.param} index={index} options={allFilters}
-                                                onUpdateFilterParam={this.updateFilterParam}/>
-                                {<CategoricalFilter value={f.value} index={index} items={this.items(f.type)}
-                                                    onUpdateFilterValue={this.updateFilterValue}/>}
-                            </PanelBody>)
-                    })}
+                <PanelRow>
 
-                    <PanelRow>
-
-                        <Button variant={"link"} onClick={this.addFilter}>{__("Add Filter")}</Button>
-                        <Button variant={"link"} onClick={this.removeFilter}>{__("Remove")}</Button>
-                    </PanelRow>
-                </PanelBody>,
-
+                    <Button variant={"link"} onClick={this.addFilter}>{__("Add Filter")}</Button>
+                    <Button variant={"link"} onClick={this.removeFilter}>{__("Remove")}</Button>
+                </PanelRow>
+            </PanelBody>}
+                </>,
                 <PanelBody title={"Marks & Colors"}>
                     <PanelRow>
                         <ToggleControl
@@ -262,7 +270,7 @@ export class DataLayerSetting extends Component {
                             }}
                         />
                     </PanelRow>
-                     <PanelRow>
+                    <PanelRow>
                         <RangeControl
                             label="Maker Base Size"
                             value={markSizeScale}
