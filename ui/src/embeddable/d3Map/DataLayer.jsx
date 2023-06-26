@@ -86,12 +86,10 @@ class DataLayer extends BaseLayer {
             })
             .attr("fill", labelColor)
             .text(d => {
-                    if (d.properties._value * markSizeScale / projection.scale() < 0.5) {
-                        return ""
-                    } else {
-                        return d.properties._value
-                    }
-                }
+
+                        return d.properties[labelField]
+            }
+
             )
 
 
@@ -103,7 +101,7 @@ class DataLayer extends BaseLayer {
             name,
             file,
             path,
-            onLayerCreated,
+            zoom,
             labelFilter = [],
             labelField,
             labelFontSize,
@@ -121,7 +119,6 @@ class DataLayer extends BaseLayer {
 
             const features = json.features.map(d => {
                 if (data && data.children) {
-                    debugger
                     const joinValue = d.properties[featureJoinAttribute]
                     const values = data.children.filter(d => d.value.indexOf(joinValue) > -1)
                     if (values.length > 0) {
@@ -142,12 +139,18 @@ class DataLayer extends BaseLayer {
 
             this.createBaseLayer(newJson)
             this.createDataLayer(newJson);
-            onLayerCreated()
+
+
         });
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         this.create()
+    }
+
+    componentDidMount() {
+        this.create()
+        this.props.zoom.current.fullView()
     }
 
     render() {
@@ -156,7 +159,7 @@ class DataLayer extends BaseLayer {
             name,
             file,
             path,
-            onLayerCreated,
+            zoom,
             labelFilter = [],
             labelField,
             labelFontSize,
