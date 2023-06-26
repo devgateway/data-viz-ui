@@ -21,21 +21,14 @@ const MapWrapper = (props) => {
         } = props
 
         const layers = parse(dataLayers)
-        const [readyState, setReadyState] = React.useState(false)
         const layerCreated = []
 
         const ref = useRef(null);
-        const onLayerCreated = (layer) => {
-            layerCreated.push(layer)
-            if (layerCreated.length == layers.length) {
-                setReadyState(true)
-            }
-        }
+        const zoomRef = useRef(null);
 
 
         return (
             <div ref={ref} className={"d3map-container"}>
-
                 <ProjectedContainer backgroundColor={decode(bgColorParam)}
                                     height={height}
                                     width={width}
@@ -43,17 +36,17 @@ const MapWrapper = (props) => {
                     <Map>
                         {layers.map((layer, i) => {
                             if (layer.type === 'base') {
-                                return <BaseLayer unique={unique} onLayerCreated={e => onLayerCreated(layer)}
+                                return <BaseLayer zoom={zoomRef} unique={unique}
                                                   key={i} {...layer} />
                             }
                             if (layer.type === 'data') {
-                                return <DataLayer unique={unique} onLayerCreated={e => onLayerCreated(layer)}
+                                return <DataLayer zoom={zoomRef}  unique={unique}
                                                   key={i} {...layer} />
                             }
 
                         })}
                     </Map>
-                    <ZoomControl group={group} readyState={readyState} editing={editing}/>
+                    <ZoomControl ref={zoomRef} group={group}  editing={editing}/>
                 </ProjectedContainer>
             </div>
         );
