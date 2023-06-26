@@ -4,7 +4,6 @@ import * as d3 from 'd3' // d3 plugin
 import * as topojson from "topojson-client";
 
 
-
 class BaseLayer extends React.Component {
 
 
@@ -15,6 +14,7 @@ class BaseLayer extends React.Component {
         this.create = this.create.bind(this)
         this.gRef = React.createRef();
     }
+
     loadJSON(url) {
         return new Promise((resolve, reject) => {
             d3.json(url).then(function (us, error) {
@@ -29,7 +29,7 @@ class BaseLayer extends React.Component {
             name,
             file,
             path,
-            onLayerCreated,
+            zoom,
             labelFilter = [],
             labelField,
             labelFontSize,
@@ -78,32 +78,51 @@ class BaseLayer extends React.Component {
     }
 
 
-     create(){
-         const {
-             name,
-             file,
-             path,
-             onLayerCreated,
-             labelFilter = [],
-             labelField,
-             labelFontSize,
-             labelColor,
-             fillColor,
-             borderColor,
-             editing
-         } = this.props
+    create() {
+        const {
+            name,
+            file,
+            path,
+            zoom,
+            labelFilter = [],
+            labelField,
+            labelFontSize,
+            labelColor,
+            fillColor,
+            borderColor,
+            editing
+        } = this.props
 
-         this.loadJSON(file).then(json => {
-             this.createBaseLayer(json)
-             onLayerCreated()
-         });
-     }
-    componentDidUpdate(prevProps, prevState, snapshot) {
-        this.create()
+        this.loadJSON(file).then(json => {
+            this.createBaseLayer(json)
+            debugger
+        });
     }
 
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        const {
+            name,
+            file,
+            path,
+            zoom,
+            labelFilter = [],
+            labelField,
+            labelFontSize,
+            labelColor,
+            fillColor,
+            borderColor,
+            editing
+        } = this.props
+
+            this.create()
+
+
+    }
+
+
     componentDidMount() {
-      this.create()
+        this.create()
+        this.props.zoom.current.fullView()
     }
 
     render() {

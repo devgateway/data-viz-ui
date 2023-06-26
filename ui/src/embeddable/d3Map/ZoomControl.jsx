@@ -39,7 +39,7 @@ class ZoomControl extends React.Component {
     componentDidMount() {
         const selection = this.getSelection()
         selection.call(this.zoom)
-        this.reset()
+        this.transition2fullView()
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
