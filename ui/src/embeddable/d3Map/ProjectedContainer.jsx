@@ -30,7 +30,6 @@ class ProjectedContainer extends React.Component {
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         if (prevProps.height !== this.props.height || prevProps.width !== this.props.width) {
-            debugger;
             const {path, projection} = this.createProjection()
             this.setState({path, projection})
         }
