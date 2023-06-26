@@ -196,6 +196,8 @@ export class DataLayerSetting extends Component {
                 featureJoinAttribute,
                 apiJoinAttribute,
                 type,
+                fillColor,
+                borderColor,
                 breaks,
                 markFillColor,
                 markBorderColor,
@@ -260,7 +262,8 @@ export class DataLayerSetting extends Component {
                 </PanelRow>
             </PanelBody>}
                 </>,
-                <PanelBody title={"Marks & Colors"}>
+                <PanelBody title={"Marker Defaults"}>
+
                     <PanelRow>
                         <ToggleControl
                             label="Use Circle Mark"
@@ -285,6 +288,7 @@ export class DataLayerSetting extends Component {
                     <PanelRow>
                         <PanelColorSettings
                             title={__(`Fill Color`)}
+                            value={fillColor}
                             colorSettings={[{
                                 value: markFillColor, onChange: (fillColor) => {
                                     onChangeProperty("markFillColor", fillColor)
@@ -294,6 +298,7 @@ export class DataLayerSetting extends Component {
                         />
                         <PanelColorSettings
                             title={__(`Border Color`)}
+                            value={borderColor}
                             colorSettings={[{
                                 value: markBorderColor, onChange: (borderColor) => {
                                     onChangeProperty("markBorderColor", borderColor)
@@ -303,7 +308,7 @@ export class DataLayerSetting extends Component {
                         />
                     </PanelRow>
 
-                    <BreaksGenerator onChangeProperty={onChangeProperty} breaks={breaks}/>
+                    <BreaksGenerator defaultBorderColor={markBorderColor} defaultFillColor={markFillColor} onChangeProperty={onChangeProperty} breaks={breaks}/>
 
                 </PanelBody>
 

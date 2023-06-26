@@ -2,14 +2,16 @@ import {Button, PanelBody, PanelRow, RangeControl, TextControl} from "@wordpress
 import {PanelColorSettings} from "@wordpress/block-editor";
 import {__} from '@wordpress/i18n';
 
-const BreaksGenerator = ({onChangeProperty, breaks = []}) => {
+const BreaksGenerator = ({onChangeProperty, breaks = [], defaultFillColor,defaultBorderColor}) => {
 
     const add = () => {
         const newBreaks = [...breaks]
+        debugger;
         newBreaks.push({
             start: 0,
             end: 1,
-            color: '#000000',
+            color: defaultFillColor,
+            borderColor: defaultBorderColor,
             size: .1
         })
         onChangeProperty("breaks", newBreaks)
@@ -22,6 +24,7 @@ const BreaksGenerator = ({onChangeProperty, breaks = []}) => {
     }
 
     const remove = (index) => {
+        debugger;
         const newBreaks = [...breaks]
         newBreaks.pop()
         onChangeProperty("breaks", newBreaks)
@@ -29,7 +32,7 @@ const BreaksGenerator = ({onChangeProperty, breaks = []}) => {
 
     return <>
         {breaks.map((br, index) => {
-            return (<PanelBody title={"Breaks"}>
+            return (<PanelBody title={"Break ("+br.start+"-"+br.end+")"}>
                 <PanelRow>
                     <TextControl
                         type={"Number"}
@@ -72,9 +75,9 @@ const BreaksGenerator = ({onChangeProperty, breaks = []}) => {
                     <PanelColorSettings
                         title={__(`Border Color`)}
                         colorSettings={[{
-                            value: br.color,
+                            value: br.borderColor,
                             onChange: (borderColor) => {
-                                update("color", index, borderColor)
+                                update("borderColor", index, borderColor)
                             },
 
                         }]}
