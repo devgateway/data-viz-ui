@@ -49,9 +49,19 @@ class DataLayer extends BaseLayer {
             measures,
             editing,
             data,
+            breaks,
             projection
         } = this.props
         const g = d3.select(this.gRef.current)
+
+
+        const sizeScale = d3.scaleThreshold()
+            .domain(breaks.map(d => d.end))
+            .range(breaks.map(d => d.size));
+
+        const colorScale = d3.scaleThreshold()
+            .domain(breaks.map(d => d.end))
+            .range(breaks.map(d => d.color));
 
 
         g.attr("class", "data-layer " + name)
@@ -60,7 +70,7 @@ class DataLayer extends BaseLayer {
             .data(json.features)
             .enter()
             .append("circle")
-            .attr("fill", markFillColor)
+            .attr("fill", d => colorScale(d.properties._value))
             .attr("stroke", markBorderColor)
             .attr("class", "point")
             .attr("stroke-width", 2)
@@ -68,17 +78,16 @@ class DataLayer extends BaseLayer {
             .attr("cx", d => path.centroid(d)[0])
             .attr("cy", d => path.centroid(d)[1])
             .attr('r', d => {
-                return d.properties._value * markSizeScale / projection.scale();
-
+                 return sizeScale(d.properties._value) * markSizeScale/ projection.scale()  ;
 
             })
 
 
-        g.selectAll(".label").remove()
-        g.selectAll(".label").data(json.features)
+        g.selectAll(".point-label").remove()
+        g.selectAll(".point-label").data(json.features)
             .enter()
             .append("text")
-            .attr("class", "label")
+            .attr("class", "point-label")
             .attr("x", d => path.centroid(d)[0])
             .attr("y", d => path.centroid(d)[1])
             .attr("font-size", d => {
@@ -87,9 +96,8 @@ class DataLayer extends BaseLayer {
             .attr("fill", labelColor)
             .text(d => {
 
-                        return d.properties[labelField]
-            }
-
+                    return d.properties._value
+                }
             )
 
 
@@ -98,6 +106,7 @@ class DataLayer extends BaseLayer {
 
     create() {
         const {
+            app,
             name,
             file,
             path,
@@ -116,10 +125,12 @@ class DataLayer extends BaseLayer {
 
         this.loadJSON(file).then(json => {
 
-
             const features = json.features.map(d => {
-                if (data && data.children) {
-                    const joinValue = d.properties[featureJoinAttribute]
+
+                const joinValue = d.properties[featureJoinAttribute]
+
+                if (app != 'csv' && data && data.children) {
+
                     const values = data.children.filter(d => d.value.indexOf(joinValue) > -1)
                     if (values.length > 0) {
                         const measureValue = (values[0][measures[0]])
@@ -127,8 +138,18 @@ class DataLayer extends BaseLayer {
                     } else {
                         d.properties._value = null
                     }
+                } else if (app == 'csv') {
+                    const values = data.data.filter(d => d[data.meta.fields[0]] == joinValue)
+                    if (values.length > 0) {
+                        debugger;
+                        d.properties._value = values[0][data.meta.fields[1]]
+                    } else {
+                        d.properties._value = null
+                    }
+
+
                 } else {
-                    d.properties._value = 99
+                    d.properties._value = null
                 }
                 return d
             })

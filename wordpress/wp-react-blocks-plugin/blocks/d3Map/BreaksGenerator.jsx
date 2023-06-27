@@ -32,33 +32,25 @@ const BreaksGenerator = ({onChangeProperty, breaks = [], defaultFillColor,defaul
 
     return <>
         {breaks.map((br, index) => {
-            return (<PanelBody title={"Break ("+br.start+"-"+br.end+")"}>
+            return (<PanelBody title={"Break ("+br.end+")"}>
                 <PanelRow>
                     <TextControl
                         type={"Number"}
-                        label={__("Start", "dg")}
-                        value={br.start}
-                        onChange={(value) => update("start", index, value)}
-                    />
-                </PanelRow>
-                <PanelRow>
-                    <TextControl
-                        type={"Number"}
-                        label={__("End", "dg")}
+                        label={__("Threshold", "dg")}
                         value={br.end}
                         onChange={(value) => update("end", index, value)}
                     />
                 </PanelRow>
                 <PanelRow>
                     <RangeControl
-                        label="Maker Base Size"
+                        label="Size"
                         value={br.size}
                         onChange={(value) => {
                             update("size", index, value)
                         }}
-                        step={0.5}
+                        step={1}
                         min={0}
-                        max={10}
+                        max={100}
                     />
                 </PanelRow>
                 <PanelRow>
@@ -72,16 +64,7 @@ const BreaksGenerator = ({onChangeProperty, breaks = [], defaultFillColor,defaul
 
                         }]}
                     />
-                    <PanelColorSettings
-                        title={__(`Border Color`)}
-                        colorSettings={[{
-                            value: br.borderColor,
-                            onChange: (borderColor) => {
-                                update("borderColor", index, borderColor)
-                            },
 
-                        }]}
-                    />
                 </PanelRow>
             </PanelBody>)
         })
