@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useLayoutEffect, useRef, useState} from 'react';
 import {connect} from "react-redux";
 import {decode, parse} from "../utils/parseUtils";
 import Map from "./Map"
@@ -9,42 +9,51 @@ import {Container} from "semantic-ui-react";
 import ProjectedContainer from "./ProjectedContainer";
 
 const MapWrapper = (props) => {
-    const {
-        unique,
-        editing,
-        "data-layers": dataLayers,
-        "data-height": height = 600,
-        "data-back-ground-color": bgColorParam = '#88e8dc',
-        "data-map-position": paramMapPosition = {}
-    } = props
+        const {
+            unique,
+            editing,
+            "data-group": group,
+            "data-layers": dataLayers,
+            "data-height": height = 400,
+            "data-width": width = 1000,
+            "data-back-ground-color": bgColorParam = '#88e8dc',
+            "data-map-position": paramMapPosition = {},
+            intl
+        } = props
+        debugger;
+        const layers = parse(dataLayers)
+        const layerCreated = []
 
-    const layers = parse(dataLayers)
-    const [transform, setZoomTransform] = React.useState(null)
+        const ref = useRef(null);
+        const zoomRef = useRef(null);
 
-    
 
-    return (
-        <Container  className={"d3map-container"}
-                   style={{backgroundColor: decode(bgColorParam), height: height+"px"}}>
-            <ProjectedContainer editing={editing}  initialPosition={parse(paramMapPosition, editing)}>
-                <Map>
-                    {layers.map((layer, i) => {
-                        if (layer.type === 'base') {
-                            return <BaseLayer key={i} {...layer} />
-                        }
-                        if (layer.type === 'data') {
-                            return <DataLayer key={i} {...layer} />
-                        }
+        return (
+            <div ref={ref} className={"d3map-container"}>
+                <ProjectedContainer backgroundColor={decode(bgColorParam)}
+                                    height={height}
+                                    width={width}
+                                    editing={editing} initialPosition={parse(paramMapPosition, editing)}>
+                    <Map>
+                        {layers.map((layer, i) => {
+                            if (layer.type === 'base') {
+                                return <BaseLayer intl={intl}  zoom={zoomRef} unique={unique}
+                                                  key={i} {...layer} />
+                            }
+                            if (layer.type === 'data') {
+                                return <DataLayer intl={intl} group={group} zoom={zoomRef} unique={unique}
+                                                  key={i} {...layer} />
+                            }
 
-                    })}
-                </Map>
-                <ZoomControl editing={editing}/>
+                        })}
+                    </Map>
+                    <ZoomControl ref={zoomRef} group={group} editing={editing}/>
+                </ProjectedContainer>
+            </div>
+        );
 
-            </ProjectedContainer>
-        </Container>
-    );
-
-};
+    }
+;
 
 const mapStateToProps = (state, ownProps) => {
     return {}
