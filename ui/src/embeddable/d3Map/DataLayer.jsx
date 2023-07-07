@@ -153,11 +153,12 @@ class DataLayer extends BaseLayer {
 
                 if (app != 'csv' && data && data.children) {
                     const values = data.children.filter(d => d.value.indexOf(joinValue) > -1)
-                    debugger;
+                    
                     if (values.length > 0) {
                         const measureValue = (values[0][measures[0]])
+                        d.properties.meta = values[0]
                         d.properties._value = measureValue
-                        debugger;
+                        
                     } else {
                         d.properties._value = null
                     }
@@ -165,7 +166,7 @@ class DataLayer extends BaseLayer {
                 } else if (app == 'csv') {
                     const values = data.data.filter(d => d[data.meta.fields[0]] == joinValue)
                     if (values.length > 0) {
-                        //debugger;
+                        d.properties.meta = values[0]
                         d.properties._value = values[0][data.meta.fields[1]]
                     } else {
                         d.properties._value = null
