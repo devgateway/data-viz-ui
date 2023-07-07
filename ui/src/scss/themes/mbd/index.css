@@ -146,6 +146,10 @@
   .edit-post-visual-editor .desktop, #root .desktop {
     margin: 0 !important;
     width: 100%; }
+  .edit-post-visual-editor .ui.container, #root .ui.container {
+    width: 100%;
+    margin-left: auto !important;
+    margin-right: auto !important; }
   .edit-post-visual-editor .entry-content, #root .entry-content {
     width: 100%; }
   .edit-post-visual-editor .breadcrumbs, #root .breadcrumbs {
@@ -173,9 +177,15 @@
     overflow-y: auto;
     /* Enable scrolling for the content area */
     max-height: calc(100vh - var(--header-height));
-    padding: 30px 25px 25px 20px;
+    padding: 30px 25px 30px 25px;
     max-width: calc(100% - 200px);
     /* Limit the content area width */ }
+  .edit-post-visual-editor .contextualWriteUp, #root .contextualWriteUp {
+    border-radius: 13px;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.14), 0 2px 1px rgba(0, 0, 0, 0.12), 0 1px 3px rgba(0, 0, 0, 0.2);
+    margin: 0 0 0 20px; }
+  .edit-post-visual-editor .wp-block-columns, #root .wp-block-columns {
+    margin: 0 !important; }
   .edit-post-visual-editor .container.header, #root .container.header {
     background-color: #333333;
     height: var(--header-height);
