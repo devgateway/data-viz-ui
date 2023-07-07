@@ -17,9 +17,10 @@ const MapWrapper = (props) => {
             "data-height": height = 400,
             "data-width": width = 1000,
             "data-back-ground-color": bgColorParam = '#88e8dc',
-            "data-map-position": paramMapPosition = {}
+            "data-map-position": paramMapPosition = {},
+            intl
         } = props
-
+        debugger;
         const layers = parse(dataLayers)
         const layerCreated = []
 
@@ -36,17 +37,17 @@ const MapWrapper = (props) => {
                     <Map>
                         {layers.map((layer, i) => {
                             if (layer.type === 'base') {
-                                return <BaseLayer zoom={zoomRef} unique={unique}
+                                return <BaseLayer intl={intl}  zoom={zoomRef} unique={unique}
                                                   key={i} {...layer} />
                             }
                             if (layer.type === 'data') {
-                                return <DataLayer zoom={zoomRef}  unique={unique}
+                                return <DataLayer intl={intl} group={group} zoom={zoomRef} unique={unique}
                                                   key={i} {...layer} />
                             }
 
                         })}
                     </Map>
-                    <ZoomControl ref={zoomRef} group={group}  editing={editing}/>
+                    <ZoomControl ref={zoomRef} group={group} editing={editing}/>
                 </ProjectedContainer>
             </div>
         );
