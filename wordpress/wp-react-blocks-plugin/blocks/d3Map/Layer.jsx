@@ -31,30 +31,29 @@ const Layer = (props) => {
     const [files, setFiles] = useState([])
     const [features, setFeatures] = useState([])
     useEffect(() => {
-        debugger;
+        
         getJsonFiles().then(files => {
             setFiles(toOptions(files))
-            debugger;
+            
         })
     }, [])
 
 
     useEffect(() => {
-        debugger;
+        
         fetch(file).then(response => response.json()).then(data => {
             setFeatures(data.features);
-            console.log(data.features)
         });
     }, [layer.file])
     const onChangeProperty = (atrr, value) => {
-        debugger
+        debugger;
         console.log("change attribute " + atrr + " to " + value)
         const newLayer = {...layer}
         newLayer[atrr] = value
         onChange(newLayer)
     }
 
-    debugger;
+    
     return [<PanelRow>
         <TextControl
             type={"String"}
@@ -127,11 +126,11 @@ const Layer = (props) => {
             <PanelRow>
                 <RangeControl
                     label="Size"
-                    value={layer.labelFontSize * 1000}
-                    onChange={(labelFontSize) => onChangeProperty("labelFontSize", labelFontSize / 1000)}
-                    min={0}
+                    value={layer.labelFontSize}
+                    onChange={(labelFontSize) => onChangeProperty("labelFontSize", labelFontSize )}
+                    min={1}
                     step={1}
-                    max={500}
+                    max={100}
                 />
             </PanelRow>
 
@@ -141,7 +140,7 @@ const Layer = (props) => {
                         label={feature.properties[labelField]}
                         checked={labelFilter.indexOf(feature.properties[labelField]) == -1}
                         onChange={(selected) => {
-                            debugger;
+                            
                             onChangeProperty("labelFilter", !selected ? [...layer.labelFilter, feature.properties[labelField]] : layer.labelFilter.filter(f => f !== feature.properties[labelField]))
                         }}
                     />)}
@@ -151,19 +150,9 @@ const Layer = (props) => {
         </PanelBody>,
 
         <React.Fragment>
-            {type == 'data' && <PanelBody initialOpen={false} title={__("API & Source")}>
-                <PanelRow>
-                    <SelectControl
-                        value={[app]} // e.g: value = [ 'a', 'c' ]
-                        onChange={(app) => {
-                            onChangeProperty("app", app)
-                        }}
-                        options={metadata.apps}
-                    />
-                </PanelRow>
-
-
+            {type == 'data' && <>
                 <DataLayerSetting
+                    apps={metadata.apps}
                     onChangeProperty={onChangeProperty}
                     allDimensions={metadata.dimensions}
                     allFilters={metadata.filters}
@@ -174,7 +163,7 @@ const Layer = (props) => {
                     layer={layer}>
                 </DataLayerSetting>
 
-            </PanelBody>}
+            </>}
         </React.Fragment>,
 
 
@@ -189,8 +178,6 @@ class LayerWithMetadata extends BlockEditWithAPIMetadata {
 
     componentDidMount() {
         const {layer: {name, type, file, app}} = this.props
-
-
         fetch(`/api/registry/eureka/apps`, {
             headers: {
                 'Accept': 'application/json',
@@ -208,7 +195,7 @@ class LayerWithMetadata extends BlockEditWithAPIMetadata {
                 this._loadMetadata(app)
             })
             .catch(function (response) {
-
+                alert("error" + response)
             })
     }
 
@@ -216,14 +203,15 @@ class LayerWithMetadata extends BlockEditWithAPIMetadata {
         super.componentDidUpdate(prevProps, prevState, snapshot)
         const {layer: {app}} = this.props
         const {layer: {app: prevAPP}} = prevProps
-
         if ((app != prevAPP) || (prevAPP == null && app != null)) {
+
             this._loadMetadata(app)
         }
     }
 
     render() {
         const {onRemoveLayer, layer, layer: {name, type, file, app}} = this.props
+
         return <PanelBody title={__(`${name}`)}>
             <Layer {...this.props} metadata={this.state}></Layer>
             <PanelRow>

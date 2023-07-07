@@ -32,10 +32,15 @@ export class LayerObject {
 
     file = 'none'
     fillColor = '#000000'
+
     borderColor = '#000000'
     labelColor = '#000000'
-    labelFontSize = 0.05
+    labelFontSize = 5
 
+
+    markFillColor = '#000000'
+    markBorderColor = '#000000'
+    markSizeScale = 0.5
     labelFilter = []
     opacity = 1
 
@@ -48,10 +53,11 @@ export class LayerObject {
 
     featureJoinAttribute = 'none'
     apiJoinAttribute = 'none'
-
     useCentroidPoint = false
-    pointSize = 1
-    useShape = true
+
+
+    tooltip="Value {value}"
+    breaks=[]
 
     constructor() {
 

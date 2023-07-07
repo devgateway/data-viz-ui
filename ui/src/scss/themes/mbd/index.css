@@ -2391,37 +2391,37 @@ p {
         margin: 0px; }
   .edit-post-visual-editor body, #root body {
     background-color: transparent !important; }
-  .edit-post-visual-editor .d3map-container, #root .d3map-container {
-    max-width: 1200px; }
-    .edit-post-visual-editor .d3map-container *, #root .d3map-container * {
-      margin: 0px;
-      padding: 0px; }
-    .edit-post-visual-editor .d3map-container .d3Map, #root .d3map-container .d3Map {
+  .edit-post-visual-editor .d3map-container .projected, #root .d3map-container .projected {
+    position: relative; }
+    .edit-post-visual-editor .d3map-container .projected .map, #root .d3map-container .projected .map {
       position: relative;
       background-color: transparent; }
-      .edit-post-visual-editor .d3map-container .d3Map svg, #root .d3map-container .d3Map svg {
+      .edit-post-visual-editor .d3map-container .projected .map svg, #root .d3map-container .projected .map svg {
         background-color: transparent;
         cursor: pointer;
         vector-effect: non-scaling-stroke; }
-      .edit-post-visual-editor .d3map-container .d3Map path, #root .d3map-container .d3Map path {
+      .edit-post-visual-editor .d3map-container .projected .map path, #root .d3map-container .projected .map path {
         vector-effect: non-scaling-stroke;
         stroke-width: 1px; }
-      .edit-post-visual-editor .d3map-container .d3Map .zoom.control, #root .d3map-container .d3Map .zoom.control {
-        font-size: 16px;
-        position: absolute;
-        left: 30px;
-        bottom: 50px; }
-        .edit-post-visual-editor .d3map-container .d3Map .zoom.control .button, #root .d3map-container .d3Map .zoom.control .button {
-          box-sizing: border-box;
-          width: 25px;
-          height: 20px;
-          background-color: #f6fdf6;
-          height: auto;
-          margin: 2px;
-          cursor: pointer;
-          padding: 4px; }
-        .edit-post-visual-editor .d3map-container .d3Map .zoom.control .icon, #root .d3map-container .d3Map .zoom.control .icon {
-          height: auto; }
+      .edit-post-visual-editor .d3map-container .projected .map text, #root .d3map-container .projected .map text {
+        text-anchor: middle;
+        dominant-baseline: middle; }
+    .edit-post-visual-editor .d3map-container .projected .zoom, #root .d3map-container .projected .zoom {
+      font-size: 16px;
+      position: absolute;
+      left: 30px;
+      bottom: 50px; }
+      .edit-post-visual-editor .d3map-container .projected .zoom .button, #root .d3map-container .projected .zoom .button {
+        box-sizing: border-box;
+        width: 25px;
+        height: 20px;
+        background-color: #f6fdf6;
+        height: auto;
+        margin: 2px;
+        cursor: pointer;
+        padding: 4px; }
+      .edit-post-visual-editor .d3map-container .projected .zoom .icon, #root .d3map-container .projected .zoom .icon {
+        height: auto; }
   .edit-post-visual-editor .two.wide.column.navigator, #root .two.wide.column.navigator {
     flex: 0 0 200px;
     /* Fixed width for the sidebar */

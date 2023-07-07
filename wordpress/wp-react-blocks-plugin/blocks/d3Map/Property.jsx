@@ -1,7 +1,7 @@
 import {PanelBody, PanelRow, SelectControl, TextControl, ToggleControl} from "@wordpress/components";
 
 const Property = ({features, onChangeProperty, value, property, title, type = 'toggle'}) => {
-    debugger;
+    
     const properties = features && features.length > 0 ? features[0].properties : {}
     let attributes = Object.keys(properties)
     if (type == "toggle") {

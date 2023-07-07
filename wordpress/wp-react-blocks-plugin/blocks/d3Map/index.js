@@ -11,9 +11,14 @@ registerBlockType(process.env.BLOCKS_NS + '/new-d3-map',
         category: process.env.BLOCKS_CATEGORY,
         apiVersion: 2,
         attributes: {
+          
             height: {
                 type: 'Numeric',
                 default: 500
+            },
+            width: {
+                type: 'Numeric',
+                default: 800
             },
             group: {
                 type: 'string',

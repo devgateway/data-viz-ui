@@ -4,6 +4,7 @@ import {injectIntl} from 'react-intl';
 import {DataContext} from './DataContext'
 import {getData, setData} from "../reducers/data";
 import {Container, Dimmer, Loader, Segment} from "semantic-ui-react";
+import {ini_get} from "locutus/php/info";
 
 class DataProvider extends React.Component {
 
@@ -22,9 +23,7 @@ class DataProvider extends React.Component {
         if (app === "csv") {
             this.props.onSetData({app, csv, store, params, group})
         } else {
-            if (editing) {
-                // params.v = (Math.random() + 1).toString(36).substring(7)
-            }
+
             this.setState({showLoading: false})
             this.props.onLoadData({app, source, store, params, group})
             setTimeout(this.checkLoadingTime, 100);
@@ -69,7 +68,7 @@ class DataProvider extends React.Component {
 
 
     render() {
-        const {data, style, loading, time, error, editing} = this.props
+        const {data, style,isSvg, loading,ignoreErrors, time, error, editing} = this.props
 
         if ((loading && this.state.showLoading && !editing)) {
             return (<Container style={style} className={"loading"}>
@@ -82,6 +81,9 @@ class DataProvider extends React.Component {
             </Container>)
         } else if (!error) {
             return <DataContext.Provider value={data}>{this.props.children}</DataContext.Provider>
+        }else if (error && ignoreErrors) {
+            debugger;
+            return <DataContext.Provider value={{}}>{this.props.children}</DataContext.Provider>
         } else if (error) {
             return <Segment color={"red"}>
                 <h1>500</h1>
@@ -104,6 +106,7 @@ class DataProvider extends React.Component {
 const mapStateToProps = (state, ownProps) => {
     const {store, group, app} = ownProps
 
+    debugger
     return {
         data: state.getIn(['data', ...store, 'data']),
         filters: state.getIn(['data', 'filters', app, group]),
