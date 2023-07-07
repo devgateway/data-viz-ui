@@ -20,7 +20,7 @@ const MapWrapper = (props) => {
             "data-map-position": paramMapPosition = {},
             intl
         } = props
-        debugger;
+        
         const layers = parse(dataLayers)
         const layerCreated = []
 
