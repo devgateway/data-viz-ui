@@ -1,8 +1,10 @@
 import React, {useEffect} from 'react';
+import * as ReactDOM from 'react-dom';
 import {connect} from "react-redux";
 import * as d3 from 'd3' // d3 plugin
 import * as topojson from "topojson-client";
-
+import Tooltip from "./Tooltip";
+import {injectIntl} from "react-intl";
 
 class BaseLayer extends React.Component {
 
@@ -13,6 +15,7 @@ class BaseLayer extends React.Component {
         this.createBaseLayer = this.createBaseLayer.bind(this)
         this.create = this.create.bind(this)
         this.gRef = React.createRef();
+        this.showToolTip = this.showToolTip.bind(this)
     }
 
     loadJSON(url) {
@@ -95,7 +98,7 @@ class BaseLayer extends React.Component {
 
         this.loadJSON(file).then(json => {
             this.createBaseLayer(json)
-            debugger
+
         });
     }
 
@@ -114,11 +117,36 @@ class BaseLayer extends React.Component {
             editing
         } = this.props
 
-            this.create()
+        this.create()
 
 
     }
 
+    showToolTip(content, data,color) {
+        const tip = d3.select("body").append("div")
+            .attr("class", "d3MapTooltip")
+            .style("position", "absolute")
+            //.style("background-color", color)
+            .html("")
+            .style("left", (d3.event.pageX+15) + "px")
+            .style("top", (d3.event.pageY-50) + "px")
+
+        ReactDOM.render(<Tooltip intl={this.props.intl} tooltip={content} data={data}
+                                 tooltipEnableMarkdown={false}/>, tip._groups[0][0])
+
+    }
+
+    hiddenToolTip() {
+        d3.selectAll(".d3MapTooltip").remove();
+
+    }
+
+    parseToolTipContent(content) {
+        const {data} = this.props
+        return content.replace(/\{(.+?)\}/g, function (match, p1) {
+            return data[p1]
+        })
+    }
 
     componentDidMount() {
         this.create()

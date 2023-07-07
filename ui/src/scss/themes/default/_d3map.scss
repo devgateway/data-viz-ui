@@ -3,12 +3,16 @@ body {
   background-color: transparent !important;
 }
 
+
+
 .d3map-container {
   .projected {
     position: relative;
+
     .map {
       position: relative;
       background-color: transparent;
+
       svg {
         background-color: transparent;
         cursor: pointer;
