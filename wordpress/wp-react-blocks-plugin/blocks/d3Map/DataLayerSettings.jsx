@@ -4,8 +4,10 @@ import {
     Button,
     CheckboxControl,
     PanelBody,
-    PanelRow, RangeControl,
-    SelectControl, TextareaControl,
+    PanelRow,
+    RangeControl,
+    SelectControl,
+    TextareaControl,
     TextControl,
     ToggleControl
 } from '@wordpress/components';
@@ -57,13 +59,28 @@ export class DataLayerSetting extends Component {
         this.setFilterValue = this.setFilterValue.bind(this)
         this.removeFilter = this.removeFilter.bind(this)
         this.items = this.items.bind(this)
+        this.getCSValue = this.getCSValue.bind(this)
 
         this.state = {
-            measures: [],
-            dimensions: [],
-            filters: [],
-            categories: []
+            measures: [], dimensions: [], filters: [], categories: []
         }
+    }
+
+
+    getCSValue() {
+        const {apps, features, layer: {csv, featureJoinAttribute}} = this.props
+        if (csv == '') {
+            let generatedCSV = 'id,value\n'
+            if (features && features.length > 0) {
+                features.forEach(f => {
+                    generatedCSV = generatedCSV + f.properties[featureJoinAttribute] + ', \n'
+
+                })
+            }
+
+            return generatedCSV
+        }
+        return csv
     }
 
     cleanSelection(prevState) {
@@ -122,8 +139,7 @@ export class DataLayerSetting extends Component {
         const {layer: {filters}, onChangeProperty, allFilters} = this.props
         let index = filters.length > allFilters.length ? allFilters.length : filters.length
         const newFilter = (allFilters && allFilters.length > 0) ? {
-            ...allFilters[index],
-            "value": []
+            ...allFilters[index], "value": []
         } : null
         let newFilters = filters.slice()
         newFilters.push(newFilter)
@@ -132,10 +148,8 @@ export class DataLayerSetting extends Component {
     }
 
     removeFilter(f) {
-
         const {layer: {filters}, onChangeProperty, allFilters} = this.props
         let newFilters = filters.slice(0, -1)
-        //setAttributes({filters: newFilters})
         onChangeProperty("filters", newFilters)
     }
 
@@ -147,21 +161,15 @@ export class DataLayerSetting extends Component {
 
 
     onSetSingleMeasure(value) {
-
         const {onChangeProperty} = this.props
-        //setAttributes({measures: [value]})
         onChangeProperty("measures", [value])
-
     }
 
     onMeasuresChange(value) {
-
         const {onChangeProperty, attributes: {measures}} = this.props
         if (measures.indexOf(value) > -1) {
-            //setAttributes({measures: measures.filter(d => d != value)})
             onChangeProperty("measures", measures.filter(d => d != value))
         } else {
-            //setAttributes({measures: [...measures, value]})
             onChangeProperty("measures", [...measures, value])
         }
     }
@@ -183,12 +191,7 @@ export class DataLayerSetting extends Component {
 
     render() {
         const {
-            onChangeProperty,
-            allDimensions,
-            allFilters,
-            allMeasures,
-            features,
-            layer: {
+            onChangeProperty, allDimensions, allFilters, allMeasures, features, apps, layer: {
                 app,
                 csv,
                 measures,
@@ -201,120 +204,131 @@ export class DataLayerSetting extends Component {
                 breaks,
                 markFillColor,
                 markBorderColor,
-                markSizeScale
+                markSizeScale,
+                tooltip
             }
         } = this.props
 
 
-        return (
-            [
-                <PanelBody title={"Join Fields"}>
-                    <Property property={"featureJoinAttribute"}
-                              type={"select"} onChangeProperty={onChangeProperty}
-                              features={features}
-                              value={featureJoinAttribute}
-                              title={"Shape Attribute"}>
+        return ([<PanelBody initialOpen={false} title={"Data Source"}>
+            <PanelRow>
+                <SelectControl
+                    label={__("App", "dg")}
+                    value={[app]} // e.g: value = [ 'a', 'c' ]
+                    onChange={(app) => {
+                        onChangeProperty("app", app)
+                    }}
+                    options={apps}
+                />
+            </PanelRow>
+            <Property property={"featureJoinAttribute"}
+                      type={"select"} onChangeProperty={onChangeProperty}
+                      features={features}
+                      value={featureJoinAttribute}
+                      title={"Shape Attribute"}>
 
-                    </Property>
-                    {app == 'csv' && <PanelRow>
-                        <TextareaControl
-                            label={__("CSV Data")}
-                            value={csv}
-                            onChange={(csv) => onChangeProperty("csv", csv)}
-                        />
-                    </PanelRow>}
-
-                    {app != 'csv' && <PanelRow>
-                        <SelectControl
-                            label={'Dimension'}
-                            value={[apiJoinAttribute]} // e.g: value = [ 'a', 'c' ]
-                            onChange={(value) => {
-                                onChangeProperty("apiJoinAttribute", value)
-                            }}
-                            options={allDimensions}
-                        />
-                    </PanelRow>}
-
-                </PanelBody>,
-                <>
-                    {app != 'csv' && <Measures
-                    onSetSingleMeasure={this.onSetSingleMeasure}
-                    onMeasuresChange={this.onMeasuresChange}
-                    {...this.props} />}
-                </>,
-                <>
-                    {app!='csv'&& <PanelBody initialOpen={false} title={__("Filters")}>
+            </Property>
+            {app == 'csv' && <PanelRow>
+                <TextareaControl
+                    label={__("CSV Data")}
+                    value={this.getCSValue(csv)}
+                    onChange={(csv) => onChangeProperty("csv", csv)}
+                />
+            </PanelRow>}
+            {app != 'csv' && <PanelRow>
+                <SelectControl
+                    label={'Dimension'}
+                    value={[apiJoinAttribute]} // e.g: value = [ 'a', 'c' ]
+                    onChange={(value) => {
+                        onChangeProperty("apiJoinAttribute", value)
+                    }}
+                    options={allDimensions}
+                />
+            </PanelRow>}
+            <PanelRow>
+                <TextareaControl
+                    label={__("Tooltip")}
+                    value={tooltip}
+                    help={__("You can use variables {var_name}")}
+                    onChange={(tooltip) => onChangeProperty("tooltip", tooltip)}
+                    rows={10}
+                />
+            </PanelRow>
+        </PanelBody>, <React.Fragment>
+            {app != 'csv' && <Measures
+                onSetSingleMeasure={this.onSetSingleMeasure}
+                onMeasuresChange={this.onMeasuresChange}
+                {...this.props} />}
+        </React.Fragment>, <React.Fragment>
+            {app != 'csv' && <PanelBody initialOpen={false} title={__("Filters")}>
                 {filters.map((f, index) => {
 
-                    return (
-                        <PanelBody initialOpen={true} title={__(`Filter - ${f.label}`)}>
-                            <FilterSelector param={f.param} index={index} options={allFilters}
-                                            onUpdateFilterParam={this.updateFilterParam}/>
-                            {<CategoricalFilter value={f.value} index={index} items={this.items(f.type)}
-                                                onUpdateFilterValue={this.updateFilterValue}/>}
-                        </PanelBody>)
+                    return (<PanelBody initialOpen={false} title={__(`Filter - ${f.label}`)}>
+                        <FilterSelector param={f.param} index={index} options={allFilters}
+                                        onUpdateFilterParam={this.updateFilterParam}/>
+                        {<CategoricalFilter value={f.value} index={index} items={this.items(f.type)}
+                                            onUpdateFilterValue={this.updateFilterValue}/>}
+                    </PanelBody>)
                 })}
 
                 <PanelRow>
-
                     <Button variant={"link"} onClick={this.addFilter}>{__("Add Filter")}</Button>
                     <Button variant={"link"} onClick={this.removeFilter}>{__("Remove")}</Button>
                 </PanelRow>
             </PanelBody>}
-                </>,
-                <PanelBody title={"Marker Defaults"}>
+        </React.Fragment>,
 
-                    <PanelRow>
-                        <ToggleControl
-                            label="Use Circle Mark"
-                            checked={true}
-                            onChange={(value) => {
-                                onChangeProperty("useCentroidPoint", value)
-                            }}
-                        />
-                    </PanelRow>
-                    <PanelRow>
-                        <RangeControl
-                            label="Maker Base Size"
-                            value={markSizeScale}
-                            onChange={(value) => {
-                                onChangeProperty("markSizeScale", value)
-                            }}
-                            step={0.5}
-                            min={0}
-                            max={10}
-                        />
-                    </PanelRow>
-                    <PanelRow>
-                        <PanelColorSettings
-                            title={__(`Fill Color`)}
-                            value={fillColor}
-                            colorSettings={[{
-                                value: markFillColor, onChange: (fillColor) => {
-                                    onChangeProperty("markFillColor", fillColor)
-                                },
+            <PanelBody initialOpen={false} title={"Marker Defaults"}>
+                <PanelRow>
+                    <ToggleControl
+                        label="Use Circle Mark"
+                        checked={true}
+                        onChange={(value) => {
+                            onChangeProperty("useCentroidPoint", value)
+                        }}
+                    />
+                </PanelRow>
+                <PanelRow>
+                    <RangeControl
+                        label="Maker Base Size"
+                        value={markSizeScale}
+                        onChange={(value) => {
+                            onChangeProperty("markSizeScale", value)
+                        }}
+                        step={0.5}
+                        min={0}
+                        max={10}
+                    />
+                </PanelRow>
+                <PanelRow>
+                    <PanelColorSettings
+                        title={__(`Fill Color`)}
+                        value={fillColor}
+                        colorSettings={[{
+                            value: markFillColor, onChange: (fillColor) => {
+                                onChangeProperty("markFillColor", fillColor)
+                            },
 
-                            }]}
-                        />
-                        <PanelColorSettings
-                            title={__(`Border Color`)}
-                            value={borderColor}
-                            colorSettings={[{
-                                value: markBorderColor, onChange: (borderColor) => {
-                                    onChangeProperty("markBorderColor", borderColor)
-                                },
+                        }]}
+                    />
+                    <PanelColorSettings
+                        title={__(`Border Color`)}
+                        value={borderColor}
+                        colorSettings={[{
+                            value: markBorderColor, onChange: (borderColor) => {
+                                onChangeProperty("markBorderColor", borderColor)
+                            },
 
-                            }]}
-                        />
-                    </PanelRow>
+                        }]}
+                    />
+                </PanelRow>
+                <BreaksGenerator defaultBorderColor={markBorderColor} defaultFillColor={markFillColor}
+                                 onChangeProperty={onChangeProperty} breaks={breaks}/>
 
-                    <BreaksGenerator defaultBorderColor={markBorderColor} defaultFillColor={markFillColor} onChangeProperty={onChangeProperty} breaks={breaks}/>
-
-                </PanelBody>
+            </PanelBody>
 
 
-            ]
-        )
+        ])
     }
 
 }

@@ -43,7 +43,6 @@ const Layer = (props) => {
         
         fetch(file).then(response => response.json()).then(data => {
             setFeatures(data.features);
-            console.log(data.features)
         });
     }, [layer.file])
     const onChangeProperty = (atrr, value) => {
@@ -151,19 +150,9 @@ const Layer = (props) => {
         </PanelBody>,
 
         <React.Fragment>
-            {type == 'data' && <PanelBody initialOpen={false} title={__("Data Layer Settings")}>
-                <PanelRow>
-                    <SelectControl
-                        value={[app]} // e.g: value = [ 'a', 'c' ]
-                        onChange={(app) => {
-                            onChangeProperty("app", app)
-                        }}
-                        options={metadata.apps}
-                    />
-                </PanelRow>
-
-
+            {type == 'data' && <>
                 <DataLayerSetting
+                    apps={metadata.apps}
                     onChangeProperty={onChangeProperty}
                     allDimensions={metadata.dimensions}
                     allFilters={metadata.filters}
@@ -174,7 +163,7 @@ const Layer = (props) => {
                     layer={layer}>
                 </DataLayerSetting>
 
-            </PanelBody>}
+            </>}
         </React.Fragment>,
 
 

@@ -55,6 +55,8 @@ export class LayerObject {
     apiJoinAttribute = 'none'
     useCentroidPoint = false
 
+
+    tooltip="Value {value}"
     breaks=[]
 
     constructor() {
