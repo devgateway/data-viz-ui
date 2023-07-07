@@ -26,6 +26,7 @@ class DataLayer extends BaseLayer {
     constructor() {
         super();
         this.createDataLayer = this.createDataLayer.bind(this)
+
     }
 
 
@@ -41,6 +42,7 @@ class DataLayer extends BaseLayer {
             labelColor,
             fillColor,
             borderColor,
+            tooltip,
             markFillColor,
             markBorderColor,
             markSizeScale,
@@ -62,15 +64,29 @@ class DataLayer extends BaseLayer {
         const colorScale = d3.scaleThreshold()
             .domain(breaks.map(d => d.end))
             .range(breaks.map(d => d.color));
+        let getSize = (value) => {
+            if (breaks.length > 0) {
+                return sizeScale(value) * markSizeScale / projection.scale()
+            }
+            return markSizeScale
+        }
+        let getColor = (value) => {
+            if (breaks.length > 0) {
+                return colorScale(value)
+            }
+            return markFillColor
+        }
 
+
+        const filteredData = json.features.filter(f => f.properties._value != null)
 
         g.attr("class", "data-layer " + name)
         g.selectAll(".point").remove()
         g.selectAll(".point")
-            .data(json.features)
+            .data(filteredData)
             .enter()
             .append("circle")
-            .attr("fill", d => colorScale(d.properties._value))
+            .attr("fill", d => getColor(d.properties._value))
             .attr("stroke", markBorderColor)
             .attr("class", "point")
             .attr("stroke-width", 2)
@@ -78,13 +94,21 @@ class DataLayer extends BaseLayer {
             .attr("cx", d => path.centroid(d)[0])
             .attr("cy", d => path.centroid(d)[1])
             .attr('r', d => {
-                 return sizeScale(d.properties._value) * markSizeScale/ projection.scale()  ;
+                return getSize(d.properties._value);
+            })
+
+            .on("mouseenter", (d) => {
+
+                this.showToolTip(tooltip, d.properties, getColor(d.properties._value))
 
             })
 
+            .on("mouseleave", (d) => {
+                this.hiddenToolTip()
+            })
 
         g.selectAll(".point-label").remove()
-        g.selectAll(".point-label").data(json.features)
+        g.selectAll(".point-label").data(filteredData)
             .enter()
             .append("text")
             .attr("class", "point-label")
@@ -95,10 +119,8 @@ class DataLayer extends BaseLayer {
             })
             .attr("fill", labelColor)
             .text(d => {
-
-                    return d.properties._value
-                }
-            )
+                return d.properties._value
+            })
 
 
     }
@@ -130,18 +152,20 @@ class DataLayer extends BaseLayer {
                 const joinValue = d.properties[featureJoinAttribute]
 
                 if (app != 'csv' && data && data.children) {
-
                     const values = data.children.filter(d => d.value.indexOf(joinValue) > -1)
+                    debugger;
                     if (values.length > 0) {
                         const measureValue = (values[0][measures[0]])
                         d.properties._value = measureValue
+                        debugger;
                     } else {
                         d.properties._value = null
                     }
+
                 } else if (app == 'csv') {
                     const values = data.data.filter(d => d[data.meta.fields[0]] == joinValue)
                     if (values.length > 0) {
-                        debugger;
+                        //debugger;
                         d.properties._value = values[0][data.meta.fields[1]]
                     } else {
                         d.properties._value = null
@@ -202,7 +226,6 @@ const DataWrapper = (props) => {
     const {
         name, unique, filters, csv, app, group = "default", apiJoinAttribute, editing
     } = props
-
 
     return (<DataProvider
         editing={editing}
