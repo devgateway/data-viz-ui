@@ -29,6 +29,7 @@ const Measures = asyncComponent(() => import('./measures'))
 const Menu = asyncComponent(() => import('./menu'))
 const ChildPagesMenu = asyncComponent(() => import('./child-page-menu'))
 const NewMap = asyncComponent(() => import('./d3Map'))
+const Parallax = asyncComponent(() => import('./Parallax'))
 
 export const reducers = {
     data,
@@ -60,7 +61,8 @@ const components = {
     measures: Measures,
     menu: Menu,
     childPagesMenu: ChildPagesMenu,
-    newMap: NewMap
+    newMap: NewMap,
+    parallax:Parallax
 
 }
 
