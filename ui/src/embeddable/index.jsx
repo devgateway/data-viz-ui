@@ -29,11 +29,10 @@ const Measures = asyncComponent(() => import('./measures'))
 const Menu = asyncComponent(() => import('./menu'))
 const ChildPagesMenu = asyncComponent(() => import('./child-page-menu'))
 const NewMap = asyncComponent(() => import('./d3Map'))
-const Parallax = asyncComponent(() => import('./Parallax'))
+const ParallaxContainer = asyncComponent(() => import('./parallax/'))
 
 export const reducers = {
-    data,
-    embeddable
+    data, embeddable
 }
 
 
@@ -62,11 +61,13 @@ const components = {
     menu: Menu,
     childPagesMenu: ChildPagesMenu,
     newMap: NewMap,
-    parallax:Parallax
+    parallaxContainer: ParallaxContainer,
+    redirect: () => null
 
 }
 
 export const getComponentByNameIgnoreCase = (name) => {
+    debugger;
     const k = Object.keys(components).filter(value => value.toLowerCase() == name.toLowerCase())
     return injectIntl(components[k])
 }
