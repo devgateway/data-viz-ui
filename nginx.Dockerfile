@@ -6,7 +6,7 @@ COPY react-lib/wp-react-lib/public public
 COPY react-lib/wp-react-lib/src src
 RUN npm run dist
 
-FROM node:12.16.3 AS ui
+FROM node:12.22.12 AS ui
 WORKDIR /tmp/work
 COPY ui/package*.json ./
 COPY --from=reactlib /tmp/work/package.json ../react-lib/wp-react-lib/
