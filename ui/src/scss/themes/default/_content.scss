@@ -26,11 +26,15 @@
   height: auto;
 }
 
+
 .aligncenter {
   clear: both;
   text-align: center;
 }
 
+.wp-block-image .aligncenter{
+  border:1px solid red !important;
+}
 
 figure {
   padding: 0;
