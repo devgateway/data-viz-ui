@@ -25,6 +25,7 @@ require("./measures")
 require("./vertical-featured-tabs")
 require("./child-pages-navigator")
 require("./d3Map")
+require("./parallax-container")
 
 
 

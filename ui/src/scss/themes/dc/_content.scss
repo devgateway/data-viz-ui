@@ -1,0 +1,26 @@
+@import "../default/content";
+@import '../vars';
+
+.desktop {
+  margin: 0 !important;
+  width: 100%;
+}
+
+.ui.container {
+  width: 100%;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+.entry-content {
+  width: 100%;
+}
+
+.breadcrumbs {
+  display: none;
+}
+
+.wp-block-image.aligncenter {
+  text-align: center;
+  margin:auto;
+}
