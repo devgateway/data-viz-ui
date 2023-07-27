@@ -3,8 +3,8 @@
 
 .edit-post-visual-editor, #root {
   @import 'colors';
-  @import '../default/fonts';
-  @import './content';
+  @import 'fonts';
+  @import 'content';
   @import 'header';
   @import 'footer';
   @import '../default/tabbed';
