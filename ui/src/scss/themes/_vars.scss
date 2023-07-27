@@ -1,4 +1,5 @@
-$font-family: 'Roboto', sans-serif;
+$font-family: 'Open Sans', sans-serif;
+$font-titles: 'Merriweather', serif;
 
 $mbd-dark-grey: #333333;
 $mbd-light-grey: #FCFCFC;
@@ -6,6 +7,16 @@ $mbd-dark-teal: #06494B;
 $mbd-medium-teal: #075A5C;
 $mbd-light-teal: #63A1A1;
 $mbd-accent-green: #9EB944;
+
+$dc-main-blue: #03579D;
+$dc-green: #9BC65A;
+$dc-red: #A90000;
+$dc-dark-grey: #2B2F31;
+$dc-define: #355966;
+$dc-design: #3B8E8E;
+$dc-analysis: #88AE3F;
+$dc-monitor: #F1592D;
+
 
 :root {
   --header-height: 61px; /* Update this value to change header's height */
