@@ -1,4 +1,4 @@
-FROM node:12.16.3 AS reactlib
+FROM node:12.22.12 AS reactlib
 WORKDIR /tmp/work
 COPY react-lib/wp-react-lib/package.json .
 RUN npm install
