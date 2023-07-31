@@ -7,7 +7,7 @@ class CustomColors extends Colors {
         super(colorBy, scheme, data, keys, indexBy)
 
         this._manualColor = {}
-        debugger;
+        
         this._manualColor[overallLabel] = manualColors?manualColors['Overall']:null
 
         //1 dimension by id == by measure        
