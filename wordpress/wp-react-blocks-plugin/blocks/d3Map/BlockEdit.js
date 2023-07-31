@@ -45,7 +45,7 @@ class BlockEdit extends ComponentWithSettings {
             }
         } = this.props;
         super.componentDidMount();
-        debugger
+        
         window.addEventListener("message", (event) => {
 
                 if (event.data.type == `d3_map_${group}`) {

@@ -272,7 +272,7 @@ export class APIConfig extends Component {
             }
         } = this.props
 
-        debugger;
+        
         const currentType = types.filter(t => t.value === type).length > 0 ? types.filter(t => t.value === type)[0] : null
 
         return (

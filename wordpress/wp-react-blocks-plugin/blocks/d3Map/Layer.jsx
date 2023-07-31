@@ -46,7 +46,7 @@ const Layer = (props) => {
         });
     }, [layer.file])
     const onChangeProperty = (atrr, value) => {
-        debugger;
+        
         console.log("change attribute " + atrr + " to " + value)
         const newLayer = {...layer}
         newLayer[atrr] = value

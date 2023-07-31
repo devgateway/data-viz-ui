@@ -6,7 +6,7 @@ const BreaksGenerator = ({onChangeProperty, breaks = [], defaultFillColor,defaul
 
     const add = () => {
         const newBreaks = [...breaks]
-        debugger;
+        
         newBreaks.push({
             start: 0,
             end: 1,
@@ -24,7 +24,7 @@ const BreaksGenerator = ({onChangeProperty, breaks = [], defaultFillColor,defaul
     }
 
     const remove = (index) => {
-        debugger;
+        
         const newBreaks = [...breaks]
         newBreaks.pop()
         onChangeProperty("breaks", newBreaks)

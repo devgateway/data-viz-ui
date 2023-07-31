@@ -1,7 +1,7 @@
 const SaveComponent = (props) => {
     const {
         setAttributes, attributes: {
-            count, type, taxonomy, categories, height, scrolls,
+            count, type, taxonomy, categories, height, scrolls, horizontal
         },
     } = props;
 
@@ -13,6 +13,7 @@ const SaveComponent = (props) => {
             <div
                 data-count={count}
                 data-type={type}
+                data-horizontal={horizontal}
                 data-taxonomy={taxonomy}
                 data-categories={categories.toString()}
                 className={"viz-component"}

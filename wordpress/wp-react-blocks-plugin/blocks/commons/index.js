@@ -326,7 +326,7 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
 
 
     _loadMetadata(app) {
-        debugger;
+        
         if (app != "csv") {
             fetch(`/api/${app}/dimensions`)
                 .then(response => {

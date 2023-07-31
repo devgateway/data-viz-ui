@@ -15,6 +15,10 @@ registerBlockType(process.env.BLOCKS_NS + '/parallax-container',
                 type: "Object",
                 default: {}
             },
+            horizontal: {
+                type: 'boolean',
+                default: false,
+            },
             count: {
                 type: 'numeric',
                 default: 7,

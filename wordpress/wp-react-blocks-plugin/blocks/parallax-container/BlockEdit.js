@@ -17,6 +17,7 @@ import {
 import {__} from '@wordpress/i18n';
 import {BlockEditWithFilters, SizeConfig} from "../commons";
 import apiFetch from '@wordpress/api-fetch';
+import {useEffect} from "react";
 
 const COLORS = ["#6acbd5", "#fcb535", "#f79132", "#e54957", "#0e5583", "#2fb2e4", "#fcb535"]
 const FontSelector = (props) => {
@@ -46,10 +47,26 @@ class BlockEdit extends BlockEditWithFilters {
     }
 
 
+    componentDidMount() {
+        super.componentDidMount();
+        this.onLoadPosts()
+    }
+
+    componentDidUpdate(prevProps, prevState, snapshot) {
+
+        super.componentDidUpdate(prevProps, prevState, snapshot)
+        const {attributes: {taxonomy, categories}} = this.props;
+        const {attributes: {taxonomy: prevTaxonomy, categories: prevCategories}} = prevProps;
+
+        if (taxonomy !== prevTaxonomy || categories !== prevCategories) {
+            this.onLoadPosts()
+        }
+    }
+
     onLoadPosts() {
         const {
-            toggleSelection, setAttributes, attributes: {
-                fontColor, count, scrolls, type, taxonomy, categories, height = 450, config,
+            setAttributes, attributes: {
+                configuration, type, taxonomy, categories, height = 450
             },
         } = this.props;
 
@@ -58,10 +75,22 @@ class BlockEdit extends BlockEditWithFilters {
         let url = "/wp/v2/" + (type ? type : 'posts')
 
         url += (categories ? (taxonomy ? '?' + taxonomy : '&categories') + "=" + (categories ? categories : "") : '') //ids
-
-
         apiFetch({path: url}).then((data) => {
-            alert(data)
+            debugger;
+            const newConfig = [...configuration]
+            data.forEach((post, i) => {
+                if (!newConfig[i]) {
+                    newConfig.push({})
+                    newConfig[i].offset = i
+                    newConfig[i].speed = 0
+                    newConfig[i].sticky = false
+                    newConfig[i].stickyStart = i
+                    newConfig[i].stickyEnd = i
+                    setAttributes({configuration: newConfig})
+                }
+                newConfig[i].title = post.title.rendered
+            })
+            setAttributes({configuration: newConfig})
         })
     }
 
@@ -74,26 +103,14 @@ class BlockEdit extends BlockEditWithFilters {
     render() {
         const {
             toggleSelection, setAttributes, attributes: {
-                panelStatus, scrolls, configuration, count, height = 768
+                horizontal, panelStatus, scrolls, configuration, count, height = 768
             },
         } = this.props;
 
-        const queryString = `random=`+Math.random() * (99999 - 1) + 1
+        const queryString = `random=` + Math.random() * (99999 - 1) + 1
         const divStyles = {height: height + 'px', width: '100%'}
-
-        debugger;
+        const {posts = []} = this.state
         const newConfig = [...configuration]
-
-        if (count) {
-            Array.from(Array(count).keys()).forEach(i => {
-                if (!configuration[i]) {
-                    newConfig.push({
-                        speed: 1, offset: 0, sticky: false, stickyStart: 0, stickyEnd: 0,
-
-                    })
-                }
-            })
-        }
 
 
         return (<div>
@@ -101,7 +118,9 @@ class BlockEdit extends BlockEditWithFilters {
                 <Panel header={__("Settings")}>
                     <SizeConfig initialOpen={false} setAttributes={setAttributes} height={height}
                                 panelStatus={panelStatus}></SizeConfig>
+
                     {this.renderFilters()}
+
                     <PanelBody title={__("Settings")}>
                         <PanelRow>
                             <RangeControl
@@ -118,29 +137,21 @@ class BlockEdit extends BlockEditWithFilters {
                                 style={{width: "150px"}}
                             />
                         </PanelRow>
-                        <PanelRow>
-                            <RangeControl
-                                isShiftStepEnabled={true}
-                                onChange={(count) => {
-                                    setAttributes({count: parseInt(count)})
 
-                                }}
-                                shiftStep={1}
-                                min={1}
-                                max={20}
-                                value={count}
-                                label={__("Number of Posts")}
-                                style={{width: "150px"}}
-                            />
+                        <PanelRow>
+                            <ToggleControl label={__("Horizontal")}
+                                           checked={horizontal}
+                                           onChange={(horizontal) => {
+                                               setAttributes({horizontal})
+                                           }}/>
                         </PanelRow>
                     </PanelBody>
-
-                    {count && Array.from(Array(count).keys())
-                        .map(i => <PanelBody title={"Config #" + i}>
+                    {newConfig && newConfig.map((config, i) => {
+                        return <PanelBody title={config.title}>
                             <PanelRow>
                                 <RangeControl
                                     label={__('Offset')}
-                                    value={newConfig[i].offset || 0}
+                                    value={config.offset}
                                     onChange={(offset) => {
                                         newConfig[i].offset = offset
                                         setAttributes({config: newConfig})
@@ -153,30 +164,25 @@ class BlockEdit extends BlockEditWithFilters {
                             <PanelRow>
                                 <RangeControl
                                     label={__('Speed')}
-                                    value={newConfig[i].speed || 0}
+                                    value={config.speed}
                                     onChange={(speed) => {
                                         newConfig[i].speed = speed
+
                                         setAttributes({config: newConfig})
+
                                     }}
                                     step={.1}
                                     min={-10}
                                     max={10}
                                 />
                             </PanelRow>
-                            <PanelRow>
-                                <ToggleControl label={__("Horizontal")}
-                                               checked={newConfig[i].horizontal}
-                                               onChange={(horizontal) => {
-                                                   debugger;
-                                                   newConfig[i].horizontal = horizontal
-                                                   setAttributes({configuration: newConfig})
-                                               }}/>
-                            </PanelRow>
+
                             <PanelRow>
                                 <ToggleControl label={__("Sticky")}
                                                checked={newConfig[i].sticky}
                                                onChange={(sticky) => {
                                                    newConfig[i].sticky = sticky
+
                                                    setAttributes({configuration: newConfig})
                                                }}/>
                             </PanelRow>
@@ -184,7 +190,7 @@ class BlockEdit extends BlockEditWithFilters {
                                 <PanelRow>
                                     <RangeControl
                                         label={__('Start')}
-                                        value={newConfig[i].stickyStart || 0}
+                                        value={newConfig[i].stickyStart}
                                         onChange={(stickyStart) => {
                                             newConfig[i].stickyStart = stickyStart
                                             setAttributes({config: newConfig})
@@ -197,9 +203,10 @@ class BlockEdit extends BlockEditWithFilters {
                                 <PanelRow>
                                     <RangeControl
                                         label={__('End')}
-                                        value={newConfig[i].stickyEnd || 0}
+                                        value={newConfig[i].stickyEnd}
                                         onChange={(stickyEnd) => {
                                             newConfig[i].stickyEnd = stickyEnd
+
                                             setAttributes({config: newConfig})
                                         }}
                                         step={1}
@@ -209,12 +216,12 @@ class BlockEdit extends BlockEditWithFilters {
 
                                 </PanelRow>
                             </PanelBody>}
-                        </PanelBody>)}
+                        </PanelBody>
+                    })}
 
 
                 </Panel>
             </InspectorControls>
-
 
             <ResizableBox
                 size={{height}}
@@ -231,9 +238,7 @@ class BlockEdit extends BlockEditWithFilters {
                     topLeft: false,
                 }}
                 onResizeStop={(event, direction, elt, delta) => {
-                    setAttributes({
-                        height: parseInt(height + delta.height, 10),
-                    });
+                    setAttributes({height: parseInt(height + delta.height, 10),});
                     toggleSelection(true);
                 }}
                 onResizeStart={() => {
@@ -241,11 +246,9 @@ class BlockEdit extends BlockEditWithFilters {
                 }}>
                 <div style={divStyles}>
                     {this.state.react_ui_url && <iframe ref={this.iframe} style={divStyles} scrolling={"no"}
-                                                        src={this.state.react_ui_url + "/embeddable/parallaxContainer?"+queryString}/>}
+                                                        src={this.state.react_ui_url + "/embeddable/parallaxContainer?" + queryString}/>}
                 </div>
             </ResizableBox>
-
-
         </div>);
 
     }
