@@ -8,17 +8,38 @@ import {parse} from "../utils/parseUtils";
 
 const ListOfPost = ({posts, locale, configuration}) => {
 
-    debugger;
+
+    const toProps = (conf) => {
+        if (conf.sticky) {
+            return {
+               sticky: {
+                    start: conf.sticky ? conf.stickyStart : conf.offset,
+                    end: conf.sticky ? conf.stickyEnd : conf.offset
+                }
+
+            }
+        } else {
+            return {
+                offset: conf.offset,
+                speed: conf.speed
+            }
+        }
+    }
+
+
     return (<React.Fragment>
 
         {posts && posts.map((p, idx) => (<React.Fragment>
-                {configuration[idx] &&
-                    <ParallaxLayer offset={configuration[idx].offset} speed={configuration[idx].speed}>
-                        <PostContent as={Container} fluid post={p}/>
-                    </ParallaxLayer>
+            {configuration[idx] &&
 
-                }
-            </React.Fragment>))}
+                <ParallaxLayer
+                    key={"parallax_" + idx}
+                    {...toProps(configuration[idx])} >
+                    <PostContent as={Container} fluid post={p}/>
+                </ParallaxLayer>
+
+            }
+        </React.Fragment>))}
 
     </React.Fragment>)
 
@@ -36,6 +57,7 @@ const Root = (props) => {
         "data-taxonomy": taxonomy,
         "data-categories": categories,
         "data-count": count,
+        "data-horizontal": horizontal = false,
         "data-scrolls": scrolls,
         "data-configuration": config,
         parent,
@@ -50,14 +72,15 @@ const Root = (props) => {
     debugger;
     const parallax = useRef(null)
 
-    return (<div style={{width: '100%', height: height+"px"}} className={"parallax-container"}>
-        <Parallax ref={parallax} pages={scrolls}>
+    return (<div style={{width: '100%', height: height + "px"}} className={"parallax-container"}>
+
+        <Parallax  ref={parallax} pages={scrolls}>
             <PostProvider type={type}
                           taxonomy={taxonomy}
                           categories={categories}
                           store={"parallax" + parent + "_" + unique}
                           page={1}
-                          perPage={count}>
+                          perPage={50}>
                 <PostConsumer>
                     <ListOfPost configuration={configuration}/>
                 </PostConsumer>

@@ -1,6 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700;900&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@300;400;700&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700;900&display=swap");
 :root {
   --header-height: 61px;
   /* Update this value to change header's height */
@@ -14,7 +15,7 @@ body {
   height: 100%;
   padding: 0;
   margin: 0;
-  font-family: "Roboto", sans-serif;
+  font-family: "Open Sans", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #000;
@@ -70,7 +71,7 @@ a {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace; }
 
 .edit-post-visual-editor .ui, #root .ui {
-  font-family: 'Roboto', sans-serif !important; }
+  font-family: "Open Sans", sans-serif; }
 
 .edit-post-visual-editor .ui.primary.button, #root .ui.primary.button {
   background-color: #5089a6; }
@@ -83,7 +84,7 @@ h1.type {
   padding: 0;
   margin: 0px;
   color: #5089a6;
-  font-family: Roboto, sans-serif; }
+  font-family: "Open Sans", sans-serif; }
 
 .ui.container.editing {
   margin: 0px !important;
