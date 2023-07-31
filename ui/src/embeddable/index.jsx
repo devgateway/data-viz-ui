@@ -67,7 +67,7 @@ const components = {
 }
 
 export const getComponentByNameIgnoreCase = (name) => {
-    debugger;
+    
     const k = Object.keys(components).filter(value => value.toLowerCase() == name.toLowerCase())
     return injectIntl(components[k])
 }
