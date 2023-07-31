@@ -82,7 +82,7 @@ class DataProvider extends React.Component {
         } else if (!error) {
             return <DataContext.Provider value={data}>{this.props.children}</DataContext.Provider>
         }else if (error && ignoreErrors) {
-            debugger;
+            
             return <DataContext.Provider value={{}}>{this.props.children}</DataContext.Provider>
         } else if (error) {
             return <Segment color={"red"}>
