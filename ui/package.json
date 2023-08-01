@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@artsy/fresnel": "^1.9.0",
+    "@devgateway/custom-embedded": "file:../../embeddables",
     "@devgateway/ui-css-theme": "file:../../ui-css-theme",
     "@devgateway/wp-react-lib": "file:../react-lib/wp-react-lib",
     "@nivo/bar": "0.72.0",
