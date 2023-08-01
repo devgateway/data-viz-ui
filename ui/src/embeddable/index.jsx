@@ -30,6 +30,7 @@ const Menu = asyncComponent(() => import('./menu'))
 const ChildPagesMenu = asyncComponent(() => import('./child-page-menu'))
 const NewMap = asyncComponent(() => import('./d3Map'))
 const ParallaxContainer = asyncComponent(() => import('./parallax/'))
+const Wrapped = asyncComponent(() => import('./wrapped/'))
 
 export const reducers = {
     data, embeddable
@@ -62,6 +63,7 @@ const components = {
     childPagesMenu: ChildPagesMenu,
     newMap: NewMap,
     parallaxContainer: ParallaxContainer,
+    wrapped:Wrapped,
     redirect: () => null
 
 }

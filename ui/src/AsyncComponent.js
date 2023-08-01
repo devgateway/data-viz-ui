@@ -11,11 +11,20 @@ export default function asyncComponent(importComponent) {
         }
 
         async componentDidMount() {
-            const {default: component} = await importComponent()
 
-            this.setState({
-                component: component
-            })
+            try {
+                const {default: component} = await importComponent()
+                this.setState({
+                    component: component
+                })
+            } catch (err) {
+                const c= () => <div>Component not found</div>
+                this.setState({
+                    component:c
+                })
+            }
+
+
         }
 
         render() {
