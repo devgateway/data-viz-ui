@@ -1,8 +1,13 @@
 .container.header {
-  background-color: $header-background;
+  background-color: transparent;
   height: var(--header-height);
   padding: 0px;
   margin: 0px;
+  position: relative;
+
+  .ui.text.branding.menu {
+    position: relative;
+  }
 
   .brand.logo {
     display: block;
@@ -11,7 +16,8 @@
   }
 
   .ui.search {
-    display: none;
+    position: fixed;
+    right: 30px;
   }
 
   .menu.pages {
@@ -43,9 +49,10 @@
     }
   }
 
-  .menu, .branding, {
+  .menu, .branding {
     margin: 0;
-    padding: 5px 0 0 0.6vw;
+    padding: 20px 0 0 30px;
+    position: relative;
 
     .divider {
       display: none;
@@ -56,9 +63,10 @@
     }
 
     .site.name {
-      color: #FFF;
+      color: $dc-main-blue;
       font-size: 1rem;
-      padding: 4px 0 0 5px;
+      padding: 0 0 0 5px;
+      font-weight: 800;
     }
   }
 }

@@ -150,9 +150,9 @@ const MenuItems = injectIntl(withRouter(({
 
                 {i.child_items ?
 
-                <span onClick={e => onSetSelected(i)}>{i.title}</span> :
+                    <span onClick={e => onSetSelected(i)}>{i.title}</span> :
 
-                <a onClick={e => onSetSelected(i)} href={localReplaceLink(i.url, locale)}>{i.title}</a>}
+                    <a onClick={e => onSetSelected(i)} href={localReplaceLink(i.url, locale)}>{i.title}</a>}
 
 
             </Menu.Item>)
@@ -190,7 +190,7 @@ const Header = ({intl, match, settings}) => {
 
                                 </MediaProvider>}
                                 {!window.isCustomizedPreview && settings.site_logo == 0 &&
-                                    <img className="brand logo" size="large" src='/logo_full.png'/>}
+                                    <img className="brand logo" size="large" src='/dc-logo_01.png'/>}
                             </a>
                         </Menu.Item>
 
