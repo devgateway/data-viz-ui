@@ -1,1 +1,17 @@
 @import "../default/footer";
+
+.footer {
+  background-color: $dc-dark-grey !important;
+  height: var(--footer-height);
+  padding: 0px;
+  margin: 0px;
+  width: 100%;
+  position: absolute;
+}
+
+.footer-menu {
+  position: absolute;
+  right: 50px !important;
+  max-width: 400px !important;
+  margin: 0 0 0 150px;
+}
