@@ -6,6 +6,8 @@ import {Parallax, ParallaxLayer} from '@react-spring/parallax'
 import PostContent from "../connected-templates/PostContent";
 import {parse} from "../utils/parseUtils";
 
+
+
 const ListOfPost = ({posts, locale, configuration}) => {
 
 
