@@ -2,7 +2,6 @@ ARG REPO
 ARG TAG
 FROM ${REPO}/embedded:${TAG}  AS embedded
 
-
 FROM node:12.22.12 AS reactlib
 WORKDIR /tmp/work
 COPY react-lib/wp-react-lib/package.json .
@@ -13,21 +12,17 @@ RUN npm run dist
 
 
 
-
 FROM node:12.22.12 AS ui
-
 WORKDIR /tmp/work
 COPY ui/package*.json ./
 COPY --from=reactlib /tmp/work/package.json ../react-lib/wp-react-lib/
 COPY --from=reactlib /tmp/work/dist ../react-lib/wp-react-lib/dist
 COPY --from=embedded /tmp/work/package.json ../../embedded/
-COPY --from=embedded /tmp/work/dist .../../embedded/dist
-RUN npm install \
-  && npm rebuild node-sass
-
+COPY --from=embedded /tmp/work/dist ../../embedded
+RUN npm install
+    #&& npm rebuild node-sass
 COPY ui/public public
 COPY ui/src src
-
 ARG REACT_APP_THEME
 RUN \
   REACT_APP_GA_CODE='#REACT_APP_GA_CODE#' \
@@ -41,7 +36,7 @@ RUN \
   REACT_APP_WP_SEARCH_END_POINT='#REACT_APP_WP_SEARCH_END_POINT#' \
   REACT_APP_WP_STYLES='/wp/wp-admin/load-styles.php?c=1&dir=ltr&load%5Bchunk_0%5D=dashicons,admin-bar,buttons,media-views,editor-buttons,wp-components,wp-block-editor,wp-nux,wp-editor,wp-block-library,wp-block-&load%5Bchunk_1%5D=library-theme,wp-edit-blocks,wp-edit-post,wp-format-library,wp-block-directory,common,forms,admin-menu,dashboard,list-tables,edi&load%5Bchunk_2%5D=t,revisions,media,themes,about,nav-menus,wp-pointer,widgets,site-icon,l10n,wp-auth-check&ver=5.5.6' \
    npm run build
-
+CMD ["/bin/bash"]
 
 
 FROM nginx:stable-alpine
@@ -50,3 +45,4 @@ COPY nginx.sh /usr/local/sbin/
 WORKDIR /var/www/static
 ENTRYPOINT ["/usr/local/sbin/nginx.sh"]
 CMD ["nginx", "-g", "daemon off;"]
+
