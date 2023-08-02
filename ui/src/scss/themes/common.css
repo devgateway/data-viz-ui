@@ -3,9 +3,9 @@
 @import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700;800&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700;900&display=swap");
 :root {
-  --header-height: 61px;
+  --header-height: 90px;
   /* Update this value to change header's height */
-  --footer-height: 150px;
+  --footer-height: 227px !important;
   /* Update this value to change footer's height */ }
 
 html {

@@ -1,3 +1,8 @@
+ARG REPO
+ARG TAG
+FROM ${REPO}/embedded:${TAG}  AS embedded
+
+
 FROM node:12.22.12 AS reactlib
 WORKDIR /tmp/work
 COPY react-lib/wp-react-lib/package.json .
@@ -6,12 +11,17 @@ COPY react-lib/wp-react-lib/public public
 COPY react-lib/wp-react-lib/src src
 RUN npm run dist
 
+
+
+
 FROM node:12.22.12 AS ui
+
 WORKDIR /tmp/work
 COPY ui/package*.json ./
 COPY --from=reactlib /tmp/work/package.json ../react-lib/wp-react-lib/
 COPY --from=reactlib /tmp/work/dist ../react-lib/wp-react-lib/dist
-
+COPY --from=embedded /tmp/work/package.json ../../embedded/
+COPY --from=embedded /tmp/work/dist .../../embedded/dist
 RUN npm install \
   && npm rebuild node-sass
 
