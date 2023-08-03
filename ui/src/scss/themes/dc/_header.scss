@@ -1,5 +1,5 @@
 .container.header {
-  background-color: white;
+  //background-color: #FAF6EC;
   height: var(--header-height);
   padding: 0px;
   margin: 0px;
@@ -18,6 +18,7 @@
   .ui.search {
     position: fixed;
     right: 30px;
+    display: none; // remove search until floating version is available on WP editor
   }
 
   .menu.pages {

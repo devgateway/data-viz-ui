@@ -3,6 +3,7 @@
 .desktop {
   margin: 0 !important;
   width: 100%;
+  //background-color: #FAF6EC !important;
 }
 
 .ui.container {
@@ -26,4 +27,49 @@
 
 .font-title {
   font-family: $font-titles !important;
+}
+
+.cta-buttons {
+  display: flex;
+  justify-content: center; /* Center the buttons horizontally */
+  align-items: center; /* Center the buttons vertically */
+  .cta-primary-button {
+    border: 1px solid $dc-green;
+    border-radius: 3px;
+    color: white;
+    background-color: $dc-green;
+    box-shadow: 2px 2px 1px rgba(0, 0, 0, 0.3);
+    height: 58px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+  .cta-primary-button:hover {
+    transition : 471ms;
+    padding: 10px 30px;
+    transform : translateY(-5px);
+    background-color: darken($dc-green, 8%);
+  }
+
+  .cta-secondary-button {
+    border: 1px solid $dc-green;
+    border-radius: 3px;
+    color: $dc-green;
+    //background-color: white;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    height: 58px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+  .cta-secondary-button:hover {
+    transition : 471ms;
+    padding: 10px 30px;
+    transform : translateY(-5px);
+    color: darken($dc-green, 8%);
+    border: 1px solid darken($dc-green, 8%);
+    background-color: rgba(255, 255, 255, 0.5);
+  }
 }
