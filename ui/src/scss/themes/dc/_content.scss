@@ -92,11 +92,26 @@
     display: flex;
     justify-content: start;
     align-self: start;
-    top: 0;
   }
 
-  .dc-separator {
+  .wp-block-separator {
     width: 537px;
     margin: 0;
+  }
+
+  .dc-cover-rotate {
+    transform: rotate(-90deg) translateX(-20px);
+    margin: 0 0 -120px -60px;
+    max-height: 300px;
+
+
+    .wp-block-separator {
+      width: 189px;
+    }
+  }
+
+  .dc-cover-paragraph{
+    margin-left: -150px;
+    padding: 0 26vw 0 0;
   }
 }
