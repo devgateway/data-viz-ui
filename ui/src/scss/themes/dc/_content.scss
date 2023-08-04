@@ -25,6 +25,8 @@
   margin:auto;
 }
 
+// Apply this custom CSS class in the WP editor if you want to use Merriweather font for titles
+
 .font-title {
   font-family: $font-titles !important;
 }
@@ -60,6 +62,8 @@
 }
 
 //
+
+// Styles for CTA buttons
 
 .cta-buttons {
   display: flex;
