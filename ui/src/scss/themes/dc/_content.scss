@@ -29,6 +29,36 @@
   font-family: $font-titles !important;
 }
 
+//Title and subtitle styles for different resolutions (in intro Banner of Home page only):
+
+@media (min-width: 1750px) {
+  .font-title {
+    padding: 70px 0 0 0 !important;
+    font-size: 95px !important; /* Increase font size for screens with width 768px and above */
+  }
+  .dc-cover-subtitle {
+    font-size: 39.5px !important;
+  }
+  .dc-spacer-cover{
+    height: 820px !important;
+  }
+}
+
+@media (min-width: 1500px) and (max-width: 1750px) {
+  .font-title {
+    padding: 25px 0 0 0 !important;
+    font-size: 75px !important; /* Increase font size for screens with width 768px and above */
+  }
+  .dc-cover-subtitle {
+    font-size: 32px !important;
+  }
+  .dc-spacer-cover{
+    height: 700px !important;
+  }
+}
+
+//
+
 .cta-buttons {
   display: flex;
   justify-content: center; /* Center the buttons horizontally */
@@ -90,6 +120,8 @@
   }
 }
 
+//
+
 
 //styles for covers:
 
@@ -129,7 +161,9 @@
 
 }
 
-//.ui container desktop
+//
+
+//styles for "who" section in home page:
 
 .dc-who-section {
   padding: 0 18vw 0 18vw;
@@ -139,3 +173,5 @@
 }
 
 }
+
+//
