@@ -75,6 +75,7 @@
 }
 
 //styles for the buttons that are NOT inside the intro banner:
+
 .cta-buttons-internal {
   position: absolute;
   width: 100vw;
@@ -88,6 +89,9 @@
     background-color: rgba(255, 255, 255, 0.2);
   }
 }
+
+
+//styles for covers:
 
 .wp-block-cover {
   padding: 150px 0 0 18vw;
@@ -122,5 +126,16 @@
     margin-left: -150px;
     padding: 0 18vw 0 0;
   }
+
+}
+
+//.ui container desktop
+
+.dc-who-section {
+  padding: 0 18vw 0 18vw;
+  .wp-block-separator {
+  width: 537px;
+  margin: 0;
+}
 
 }
