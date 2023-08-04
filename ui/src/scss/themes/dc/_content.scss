@@ -74,6 +74,21 @@
   }
 }
 
+//styles for the buttons that are NOT inside the intro banner:
+.cta-buttons-internal {
+  position: absolute;
+  width: 100vw;
+  left: 0;
+  .cta-secondary-button {
+    color: white;
+  }
+  .cta-secondary-button:hover {
+    color: white;
+    border: 1px solid darken($dc-green, 8%);
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+}
+
 .wp-block-cover {
   padding: 150px 0 0 18vw;
   margin: 0;
@@ -108,7 +123,4 @@
     padding: 0 18vw 0 0;
   }
 
-  .dc-model {
-    //margin-left: calc(-50vw + 50%);
-  }
 }
