@@ -75,19 +75,12 @@
 }
 
 .wp-block-cover {
-  padding: 0;
+  padding: 150px 0 0 18vw;
   margin: 0;
   display: flex;
-  /*border-bottom: 1px solid $separator-grey;
-  border-top: 1px solid $separator-grey;
-  width: 100vw;
-  margin-left: calc(-50vw + 50%);
-  margin-top: -114px;
-  object-position: right top;
-  z-index: -1;*/
 
   .wp-block-cover__inner-container{
-    margin: 150px 0 0 200px;
+    margin: 0;
     padding: 0;
     display: flex;
     justify-content: start;
@@ -102,7 +95,7 @@
   .dc-cover-rotate {
     transform: rotate(-90deg) translateX(-20px);
     margin: 0 0 -120px -60px;
-    max-height: 300px;
+    height: 300px;
 
 
     .wp-block-separator {
@@ -112,6 +105,10 @@
 
   .dc-cover-paragraph{
     margin-left: -150px;
-    padding: 0 26vw 0 0;
+    padding: 0 18vw 0 0;
+  }
+
+  .dc-model {
+    //margin-left: calc(-50vw + 50%);
   }
 }
