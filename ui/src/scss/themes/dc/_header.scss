@@ -29,23 +29,20 @@
 
     .item.divided {
       font-size: 0.85rem;
-      font-weight: 400 !important;
+      font-weight: 600 !important;
+      text-transform: lowercase;
       padding: 0 25px 0 25px;
-      border-left: 1px solid $mbd-accent-green;;
       a {
-        color: $mbd-light-teal;
+        color: $dc-green;
       }
       a:hover {
-        color: #FFFFFF;
+        color: $dc-main-blue;
       }
-    }
-    .item.divided:first-of-type {
-      border-left: 0;
     }
 
     .item.divided.selected.active {
       a {
-        color: #FFFFFF;
+        color: $dc-main-blue;
       }
     }
   }
