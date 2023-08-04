@@ -32,7 +32,8 @@
 //Title and subtitle styles for different resolutions (in intro Banner of Home page only):
 
 @media (min-width: 1750px) {
-  .font-title {
+  .dc-title {
+    font-family: $font-titles !important;
     padding: 70px 0 0 0 !important;
     font-size: 95px !important; /* Increase font size for screens with width 768px and above */
   }
@@ -45,7 +46,8 @@
 }
 
 @media (min-width: 1500px) and (max-width: 1750px) {
-  .font-title {
+  .dc-title {
+    font-family: $font-titles !important;
     padding: 25px 0 0 0 !important;
     font-size: 75px !important; /* Increase font size for screens with width 768px and above */
   }
