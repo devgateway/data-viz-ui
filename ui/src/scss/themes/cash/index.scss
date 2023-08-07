@@ -2,11 +2,11 @@
 @import '../vars';
 
 .edit-post-visual-editor, #root {
-  @import '../default/colors';
-  @import '../default/fonts';
-  @import '../default/content';
-  @import '../default/header';
-  @import '../default/footer';
+  @import 'colors';
+  @import 'fonts';
+  @import 'content';
+  @import 'header';
+  @import 'footer';
   @import '../default/tabbed';
   @import '../default/body';
   @import '../default/gallery';
@@ -33,7 +33,7 @@
   @import "../default/userMeasures";
   @import "../default/child_navigator";
   @import "../default/d3map";
-  @import './sideNavbar';
+  @import 'sideNavbar';
   @import "../default/effects";
 }
 
