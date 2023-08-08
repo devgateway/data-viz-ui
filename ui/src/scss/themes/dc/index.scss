@@ -7,7 +7,7 @@
   @import 'content';
   @import 'header';
   @import 'footer';
-  @import '../default/tabbed';
+  @import 'tabbed';
   @import '../default/body';
   @import '../default/gallery';
   @import '../default/myths';
@@ -21,7 +21,7 @@
   @import '../default/pagemodules';
   @import "../default/newsLetter";
   @import "../default/showCase";
-  @import "../default/download";
+  @import "download";
   @import "../default/search";
   @import "../default/downloadpdf";
   @import "../default/filters";
