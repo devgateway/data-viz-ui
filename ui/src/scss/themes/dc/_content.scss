@@ -86,6 +86,7 @@
     padding: 10px 30px;
     transform : translateY(-5px);
     background-color: darken($dc-green, 8%);
+    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
   }
 
   .cta-secondary-button {
@@ -107,6 +108,7 @@
     color: darken($dc-green, 8%);
     border: 1px solid darken($dc-green, 8%);
     background-color: rgba(255, 255, 255, 0.5);
+    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
   }
 }
 
@@ -123,6 +125,7 @@
     color: white;
     border: 1px solid darken($dc-green, 8%);
     background-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
   }
 }
 
