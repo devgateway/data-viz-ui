@@ -6,11 +6,11 @@ FROM node:12.22.10  AS dist
 WORKDIR /tmp/work
 COPY wordpress/wp-react-blocks-plugin/blocks/package.json ./
 #Copy custom plugins
-
 RUN npm install
 COPY wordpress/wp-react-blocks-plugin/blocks/ ./
-COPY --from=customizer /tmp/work/blocks wordpress/wp-react-blocks-plugin/blocks/custom-blocks
-RUN   sed -i "s|../../../../custom/wp/blocks/index|./custom-blocks/index" /etc/sysctl.conf
+COPY --from=customizer /tmp/work/blocks/ ../../../../custom/wp-customizer/blocks/
+RUN find ../../../../custom/wp-customizer/blocks/ -exec sed -i 's|../../../../front/wordpress/wp-react-blocks-plugin/blocks/|/tmp/work/|g' {} \;
+
 
 RUN npm run build
 
