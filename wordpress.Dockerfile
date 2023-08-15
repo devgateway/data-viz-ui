@@ -19,7 +19,7 @@ COPY wordpress/wp-theme wp-content/themes/dg-semantic
 RUN chown -R 82:82 wp-content \
   && tar -caf /wp-content.tgz wp-content
 
-FROM library/wordpress:6.2.2-fpm-alpine
+FROM library/wordpress:6.3-fpm-alpine
 COPY ./wordpress/custom/custom.ini /usr/local/etc/php/conf.d/
 COPY --from=dist /wp-content.tgz /tmp
 COPY wordpress.sh /usr/local/sbin/
