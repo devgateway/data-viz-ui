@@ -1,0 +1,65 @@
+$font-family: "Open Sans", sans-serif;
+
+$blue: #3e53a6;
+$light-blue: #5089a6;
+$dark-gray: #5c5d63;
+$breadcrumb-grey: #949494;
+$gray: #66676d;
+$light-gray: #dadada;
+$separator-grey: #ececec;
+$country-header-bg: #f4f4f4;
+$country-header-link: #a4a4a4;
+$red: #ba5555;
+$menu-link-color: #54657e;
+$brown: #a95310;
+
+$white: #ffffff;
+$blue: #3e53a6;
+$green: #5baf95;
+$green-link-color: #128d5e;
+
+$health-color: #5baf95;
+$light-green: #31ba1a;
+
+$charts-options-height: 66px;
+$charts-options-font-size: 1.02rem;
+
+$body-bg: #eff3f6;
+
+$base-unit-rel: 1rem;
+$base-unit: 10px;
+$child-menu-bg: #076283;
+$map-bg: #f3f9ff;
+$footer-title-color: #ffffff;
+$body-font-size: 18px;
+$theme-green: #449441;
+$bold-weight: 800;
+
+@mixin gray-raleway-font {
+    font-size: $charts-options-font-size;
+    color: $gray;
+    font-weight: 500;
+    font-family: "Raleway";
+}
+@mixin border-radius($radius) {
+    border-radius: $radius;
+    -webkit-border-radius: $radius;
+    -moz-border-radius: $radius;
+}
+@mixin link-arrow() {
+    background-position: 0 center;
+    background-size: $base-unit + 2;
+    background-repeat: no-repeat;
+    padding-left: $base-unit * 2;
+}
+@mixin button-icon() {
+    background-position: $base-unit center;
+    background-size: $base-unit * 2;
+    background-repeat: no-repeat;
+    padding-left: $base-unit * 4;
+}
+@mixin country-menu-item() {
+    @include border-radius(3px);
+    background: #ffffff;
+    color: $green-link-color;
+}
