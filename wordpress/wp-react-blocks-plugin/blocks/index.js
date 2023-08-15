@@ -27,6 +27,7 @@ require("./child-pages-navigator")
 require("./d3Map")
 require("./parallax-container")
 require("./wrapped-component")
+require("../../../../custom/wp-customizer/blocks/index")
 
 
 
