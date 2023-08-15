@@ -1,6 +1,6 @@
 ARG REPO
 ARG TAG
-FROM ${REPO}/customizer:${TAG}  AS embedded
+FROM ${REPO}/ui-customizer:${TAG}  AS customizer
 
 
 FROM node:12.22.12 AS reactlib
@@ -18,8 +18,8 @@ WORKDIR /tmp/work
 COPY ui/package*.json ./
 COPY --from=reactlib /tmp/work/package.json ../react-lib/wp-react-lib/
 COPY --from=reactlib /tmp/work/dist ../react-lib/wp-react-lib/dist
-COPY --from=embedded /tmp/work/package.json ../../custom/embedded/
-COPY --from=embedded /tmp/work/dist ../../custom/embedded
+COPY --from=customizer /tmp/work/package.json ../../custom/customizer/
+COPY --from=customizer /tmp/work/dist ../../custom/customizer
 RUN npm install &&  \
     npm rebuild node-sass
 COPY ui/public public
