@@ -6,7 +6,7 @@ import {Parallax, ParallaxLayer} from '@react-spring/parallax'
 import PostContent from "../connected-templates/PostContent";
 import {parse} from "../utils/parseUtils";
 import asyncComponent from "../../AsyncComponent";
-import * as external from "@devgateway/embedded";
+import * as external from "@devgateway/customizer";
 
 const Root = (props) => {
 
