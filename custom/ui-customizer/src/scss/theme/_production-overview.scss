@@ -1,0 +1,51 @@
+.last-update-date {
+    font-size: 0.8em;
+}
+
+.production-amount {
+    font-size: 1.2em;
+    color: #116282;
+    text-align: center;
+}
+
+.production-details {
+    padding-top: 0.4em;
+}
+
+.production-year {
+    color: #159ad7;
+    font-size: 0.8em;
+    float: right;
+}
+
+.production-source {
+    color: #469343;
+    font-size: 0.7em;
+    font-weight: bold;
+    font-style: italic;
+    float: left;
+    padding-top: 1.6em;
+}
+
+.production-source.white {
+    color: #ffffff;
+}
+
+.country-flag-name {
+    padding: 0.4em !important;
+}
+
+.country-flag {
+    padding-right: 0 !important;
+    img {
+        max-height: 2.6em;
+    }
+}
+
+.country-name {
+    padding-left: 0.4em !important;
+}
+
+.country-link {
+    font-size: 0.8em;
+}
