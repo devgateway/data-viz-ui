@@ -1,6 +1,7 @@
 ARG REPO
 ARG TAG
-FROM ${REPO}/embedded:${TAG}  AS embedded
+FROM ${REPO}/customizer:${TAG}  AS embedded
+
 
 FROM node:12.22.12 AS reactlib
 WORKDIR /tmp/work
@@ -17,8 +18,8 @@ WORKDIR /tmp/work
 COPY ui/package*.json ./
 COPY --from=reactlib /tmp/work/package.json ../react-lib/wp-react-lib/
 COPY --from=reactlib /tmp/work/dist ../react-lib/wp-react-lib/dist
-COPY --from=embedded /tmp/work/package.json ../../embedded/
-COPY --from=embedded /tmp/work/dist ../../embedded
+COPY --from=embedded /tmp/work/package.json ../../custom/embedded/
+COPY --from=embedded /tmp/work/dist ../../custom/embedded
 RUN npm install &&  \
     npm rebuild node-sass
 COPY ui/public public
@@ -28,7 +29,7 @@ RUN \
   REACT_APP_GA_CODE='#REACT_APP_GA_CODE#' \
   REACT_APP_DEFAULT_LOCALE='#REACT_APP_DEFAULT_LOCALE#' \
   REACT_APP_THEME="$REACT_APP_THEME" \
-  REACT_APP_TITLE='Tobacco Control Data Initiative' \
+  REACT_APP_TITLE='Data VIZ UI' \
   REACT_APP_USE_HASH_LINKS='#REACT_APP_USE_HASH_LINKS#' \
   REACT_APP_UTIL_API='/api/utils' \
   REACT_APP_WP_API='/wp/wp-json' \
