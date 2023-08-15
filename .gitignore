@@ -1,0 +1,5 @@
+.env
+data
+**/.idea/
+wordpress/uploads/
+/wordpress/wp-content/uploads/
