@@ -49,7 +49,9 @@ const BarOptions = (props) => {
             groupTotalLabel,
             groupTotalFormat,
             groupTotalLabelOffset,
-            groupTotalOffset
+            groupTotalOffset,
+            enableGridX,
+            enableGridY,
         }
     } = props;
 
@@ -114,15 +116,15 @@ const BarOptions = (props) => {
 
 
     let selectedMeasures = []
-
     if (allMeasures) {
         allMeasures.forEach(m => {
-            if (measures[m.value] && measures[app][m.value].selected) {
+            if (measures[app] && measures[app][m.value] && measures[app][m.value].selected) {
                 selectedMeasures.push(m.value)
             }
         })
     }
     const series = app == 'csv' ? getCSVSeries() : getSeries();
+
     return [<PanelBody initialOpen={false} title={__("Bar Options")}>
 
         <PanelBody initialOpen={false} title={__("Colors")}>
@@ -166,11 +168,17 @@ const BarOptions = (props) => {
                 </PanelRow>
             }
             <PanelRow>
-                <ToggleControl
-                    label={__("Show Grid Lines")}
-                    checked={showGrid}
-                    onChange={(showGrid) => setAttributes({showGrid})}/>
-            </PanelRow>
+            <ToggleControl
+                label={__("Enable Y Grid Lines")}
+                checked={enableGridY}
+                onChange={() => setAttributes({enableGridY: !enableGridY})}/>
+        </PanelRow>
+	 	<PanelRow>
+            <ToggleControl
+                label={__("Enable X Grid Lines")}
+                checked={enableGridX}
+                onChange={() => setAttributes({enableGridX: !enableGridX})}/>
+         </PanelRow>
             {app !== 'csv' &&
                 <>
                     <PanelRow>

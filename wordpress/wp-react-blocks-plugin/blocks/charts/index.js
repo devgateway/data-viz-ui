@@ -94,7 +94,7 @@ registerBlockType(process.env.BLOCKS_NS + '/chart',
 
             legendPosition: {
                 type: 'String',
-                default: "right"
+                default: "top"
             },
             marginLeft: {
                 type: 'Numeric',
@@ -166,7 +166,7 @@ registerBlockType(process.env.BLOCKS_NS + '/chart',
             },
             tickColor: {
                 type: "String",
-                default: encodeURIComponent("#f0f0f1")
+                default: encodeURIComponent("#FFFFFF")
             },
             yAxisTickValues: {
                 type: 'Numeric',
@@ -193,13 +193,18 @@ registerBlockType(process.env.BLOCKS_NS + '/chart',
                             style: "percent",
                             minimumFractionDigits: 2,
                             maximumFractionDigits: 2
-                        }
+                        },
+                        customFormat: {
+                            style: "percent",
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        },
+                        useCustomAxisFormat: false
                     },
                 }
             },
 
-            _measures: {
-            },
+            _measures: {},
             filters: {
                 type: "Array",
                 default: []
@@ -234,7 +239,7 @@ registerBlockType(process.env.BLOCKS_NS + '/chart',
             },
             useLabelBackground: {
                 type: "Boolean",
-                default: true
+                default: false
             },
 
             showGroupTotal: {
@@ -252,7 +257,7 @@ registerBlockType(process.env.BLOCKS_NS + '/chart',
 
             useCheckBoxBackground: {
                 type: "Boolean",
-                default: false
+                default: true
             },
             offsetY: {
                 type: "Numeric",
@@ -366,11 +371,11 @@ registerBlockType(process.env.BLOCKS_NS + '/chart',
             },
             highlightXAxisLine: {
                 type: "Boolean",
-                default: true
+                default: false
             },
             showTickLine: {
                 type: "Boolean",
-                default: true
+                default: false
             },
             showRightAxis: {
                 type: "Boolean",
@@ -458,19 +463,19 @@ registerBlockType(process.env.BLOCKS_NS + '/chart',
                 default: false
             },
             enableGridY: {
-                type:'Boolean',
+                type: 'Boolean',
                 default: true
             },
             enableGridX: {
-                type:'Boolean',
+                type: 'Boolean',
                 default: false
             },
             minMaxClamp: {
-                type:'Boolean',
+                type: 'Boolean',
                 default: false
             },
             reverseLegend: {
-                type:'Boolean',
+                type: 'Boolean',
                 default: false
             }
         },

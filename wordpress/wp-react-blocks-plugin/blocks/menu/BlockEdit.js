@@ -62,7 +62,7 @@ class BlockEdit extends ComponentWithSettings {
                 <ResizableBox
                     size={{height}}
                     style={{"margin": "auto", width: "100%"}}
-                    minHeight="200"
+                    minHeight="50"
                     minWidth="100"
                     enable={{
                         top: false,
