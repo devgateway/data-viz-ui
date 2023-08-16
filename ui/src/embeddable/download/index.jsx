@@ -136,9 +136,7 @@ const DownloadComponent = (props) => {
                     <Grid.Column className={ editing ? "editing ignore" : "ignore"  } width={(editing || useTitle != "true") ? 16 : 4}
                                  textAlign={"right"}>
                         <div className={"wrapper"}>
-                            <Button className={"download"} onClick={() => onClickHandler(fileType)}>
-                                {buttonLabel} {fileType === 'PNG' ? 'PNG' : 'JPG'}
-                            </Button>
+
                             <Dropdown className={"download"} data-tooltip={decodeURIComponent(tooltip)}
                                       trigger={(isCheckJPG && isCheckPNG) ?
                                           <Icon name={"download"} className='download-icon'></Icon> : null}>
@@ -156,6 +154,11 @@ const DownloadComponent = (props) => {
                                     </Dropdown.Item> : null}
                                 </Dropdown.Menu>
                             </Dropdown>
+
+                            <Button className={"download"} onClick={() => onClickHandler(fileType)}>
+                                {buttonLabel} {fileType === 'PNG' ? 'PNG' : 'JPG'}
+                            </Button>
+
                         </div>
                     </Grid.Column>
                 </Grid>
