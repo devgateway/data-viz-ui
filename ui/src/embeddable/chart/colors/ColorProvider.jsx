@@ -26,19 +26,19 @@ class ColorProvider extends React.Component {
             manualColors,
             locale,
             overallLabel,
+            customLabels,
             options: {data, keys, indexBy, dimensionsMetadata, measuresMetadata}
         } = this.props
         let colorManager;
 
-        
-        if (data) {
+           if (data) {
 
             if (scheme === "system") {
                 colorManager = new SystemColors(app,type,colorBy, scheme, data, keys, indexBy, dimensionsMetadata, measuresMetadata, locale)
             } else if (scheme === "plain_color") {
                 colorManager = new PlainColor(barColor)
             } else if (scheme == "manual") {
-                colorManager = new ManualColors(app,type,colorBy, scheme, data, dimensionsMetadata, measuresMetadata, keys, indexBy, manualColors, locale,overallLabel)
+                colorManager = new ManualColors(app,type,colorBy, scheme, data, dimensionsMetadata, measuresMetadata, keys, indexBy, manualColors, locale,overallLabel, customLabels)
             } else {
 
                 if (isSequentialColorScheme(scheme)) {

@@ -1,7 +1,7 @@
 import React from "react";
 import {getTranslatedValue, measuresMap, typesMap} from "./Utils";
 
-export const LineData = ({children, data, measures, locale}) => {
+export const LineData = ({children, data, measures, locale, customLabels}) => {
 
     const vals = []
     const {metadata} = data
@@ -18,11 +18,11 @@ export const LineData = ({children, data, measures, locale}) => {
     const chartData = Object.keys(data)
         .filter(k => measures.indexOf(k) > -1)
         .map(k => {
-            categories.add(mMap[k].label)
+            categories.add(customLabels[k] || mMap[k].label)
             measuresMetadata.add(mMap[k])
             return {
-                id: getTranslatedValue(mMap[k], locale),
-                label: getTranslatedValue(mMap[k], locale),
+                id: customLabels[k] || getTranslatedValue(mMap[k], locale),
+                label: customLabels[k] || getTranslatedValue(mMap[k], locale),
                 position: mMap && mMap[k] && mMap[k].position ? mMap[k].position : 0,
                 data: data && data.children ? data.children.map(d => {
                     const variables = new Object()
