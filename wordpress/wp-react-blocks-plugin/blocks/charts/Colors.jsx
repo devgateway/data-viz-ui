@@ -306,7 +306,7 @@ const Colors = (props) => {
 
                     allMeasures.forEach(m => {
                         
-                        if (measures[app][m.value] && measures[app][m.value].selected) {
+                        if (measures[app] && measures[app][m.value] && measures[app][m.value].selected) {
                             selectedMeasures.push(m.value)
                         }
                     })

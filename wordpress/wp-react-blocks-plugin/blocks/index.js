@@ -26,6 +26,7 @@ require("./vertical-featured-tabs")
 require("./child-pages-navigator")
 require("./d3Map")
 require("./parallax-container")
+require("./menu")
 require("./wrapped-component")
 require("../../../../custom/wp-customizer/blocks/index")
 
