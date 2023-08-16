@@ -3,9 +3,10 @@ import {getTranslatedValue, measuresMap, typesMap} from "./Utils";
 
 
 const getOptionsNoDimension = (props) => {
-    const {data, measures, swap, dimensions, locale} = props
+    const {data, measures, swap, dimensions, locale, customLabels} = props
     let options = {}
     const selectedDimensions = dimensions.filter(f => f != '')
+    const measuresMetadata = new Set()
     if (selectedDimensions.length == 0 && data) {
         const mMap = measuresMap(data)
         const categories = new Set()
@@ -31,7 +32,7 @@ const getOptionsNoDimension = (props) => {
 
             selectedMeasures.forEach(m => {
                 let row = {}
-                const label = getTranslatedValue(mMap[m.value], locale)
+                const label = customLabels[m.value] || getTranslatedValue(mMap[m.value], locale)
                 row.type = "measure"
                 row["measureFieldName"] = m.value
                 row["measure"] = label
@@ -39,12 +40,14 @@ const getOptionsNoDimension = (props) => {
                 row.variables = variables
                 series.push(row)
                 keys.add(label)
+                measuresMetadata.add(mMap[m.value])
             })
 
             options = {
                 categories,
                 indexBy,
                 keys: Array.from(keys),
+                measuresMetadata,
                 data: series
             }
         }
@@ -94,7 +97,7 @@ const includeOverallData = (props) => {
 
 const BarOneDimension = (props) => {
     let options = {}
-    const {data, measures, swap, dimensions, includeOverall, locale} = props
+    const {data, measures, swap, dimensions, includeOverall, locale, customLabels, colorBy, hiddenBars} = props   
     const selectedDimensions = dimensions.filter(f => f != '')
     const selectedMeasures = data.metadata.measures.filter(m => measures.includes(m.value)).sort((aMeasure, bMeasure) => {
         if (aMeasure.position != null && bMeasure.position != null && aMeasure.position != bMeasure.position) {
@@ -121,8 +124,8 @@ const BarOneDimension = (props) => {
         if (swap && (selectedDimensions.length == 1 && measures.length > 0)) {            
             indexBy = 'measure'
             selectedMeasures.forEach(measure => {  
-                const row = {}
-                row["measure"] = getTranslatedValue(mMap[measure.value], locale)// measureLabel(mMap, m)
+                const row = {}                
+                row["measure"] = customLabels[measure.value] || getTranslatedValue(mMap[measure.value], locale)// measureLabel(mMap, m)
                 measuresMetadata.add(mMap[measure.value])
                 data.children.forEach(d => {
                     const value = getTranslatedValue(tMap[d.type].items.filter(i => i.value === d.value)[0], locale) || d.value
@@ -147,17 +150,15 @@ const BarOneDimension = (props) => {
             data.children.forEach(d => {
                 const variables = {}
                 const row = {}
-
                 row[d.type] =  getTranslatedValue(tMap[d.type] && tMap[d.type].items ? tMap[d.type].items.filter(i => i.value === d.value)[0] : d.value, locale) || d.value
-
                 Object.keys(d).forEach(k => {
                     variables[k] = d[k]
                 })
 
                 dimensionsMetadata.add(tMap[d.type])
                 variables[d.type] = d.value.toString()
-                selectedMeasures.map(m => {                    
-                    const label = getTranslatedValue(mMap[m.value], locale)
+                selectedMeasures.map(m => {                     
+                    const label = customLabels[m.value] || getTranslatedValue(mMap[m.value], locale)
                     row[label] = d[m.value];
                     measuresMetadata.add(mMap[m.value])
                     keys.add(label)
@@ -169,14 +170,13 @@ const BarOneDimension = (props) => {
 
         }
 
-
-        options = {
+         options = {
             metadata: data.metadata,
             indexBy,
             dimensionsMetadata,
             measuresMetadata,
             keys: Array.from(keys),
-            data: series
+            data: hiddenBars && series ? series.filter(s => hiddenBars.indexOf(s[indexBy]) == -1) : series//series
         }
 
     }
@@ -186,7 +186,7 @@ const BarOneDimension = (props) => {
 
 }
 const Bar2Dimensions = (props) => {
-    const {data, measures, includeOverall, dimensions, hiddenBars, colorBy, locale} = props
+    const {data, measures, includeOverall, dimensions, hiddenBars, colorBy, locale, customLabels} = props
     const selectedDimensions = dimensions.filter(f => f != '')
     let options = {}
     if (includeOverall) {
@@ -278,11 +278,11 @@ const Bar2Dimensions = (props) => {
 
 const BarData = (props) => {
     const {data, measures, dimensions} = props
-
+   const copyData = JSON.parse(JSON.stringify(data))
     if (dimensions.length === 1) {
-        return <BarOneDimension {...props}></BarOneDimension>
+        return <BarOneDimension {...props} data={copyData}></BarOneDimension>
     } else {
-        return <Bar2Dimensions {...props}></Bar2Dimensions>
+        return <Bar2Dimensions {...props} data={copyData}></Bar2Dimensions>
     }
 }
 

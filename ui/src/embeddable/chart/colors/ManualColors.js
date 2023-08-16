@@ -2,7 +2,7 @@ import Colors from "./Colors";
 
 class CustomColors extends Colors {
 
-    constructor(app, type, colorBy, scheme, data, dimensionsMetadata, measuresMetadata, keys, indexBy, manualColors, locale, overallLabel) {
+    constructor(app, type, colorBy, scheme, data, dimensionsMetadata, measuresMetadata, keys, indexBy, manualColors, locale, overallLabel, customLabels) {
         //colorBy, scheme, data, keys, indexBy
         super(colorBy, scheme, data, keys, indexBy)
 
@@ -12,11 +12,10 @@ class CustomColors extends Colors {
 
         //1 dimension by id == by measure        
         if (app != 'csv') {
-
             const mapByDimension = (whichDimension) => {
                 items = [...dimensionsMetadata][whichDimension].items
                 if (manualColors != null && manualColors != undefined) {
-                    Object.keys(manualColors).forEach(k => {
+                    Object.keys(manualColors).forEach(k => {                        
                         const vals = items.filter(i => i.code === k);
                         if (vals.length > 0 && vals[0].labels) {
                             let translated;
@@ -32,32 +31,41 @@ class CustomColors extends Colors {
                     })
                 }
             }
+
+            const mapByMeasure = () => {
+                items = measuresMetadata
+                Object.keys(manualColors).forEach(k => {
+                    const vals = [...items].filter(i => i.value === k);
+                    if (vals.length > 0 && vals[0].labels) {
+                        const customLabel = customLabels[k]
+                        if (customLabels && customLabel) {
+                            this._manualColor[customLabel] = manualColors[k]
+                        }
+                        
+                        let translated;
+                        if (locale) {
+                            translated = vals[0].labels[locale.toUpperCase()]
+                        }
+                        if (translated) {
+                            this._manualColor[translated] = manualColors[k]
+                        } else {
+                            this._manualColor[vals[0].label] = manualColors[k]
+                        }
+                    }
+                })
+            }
+
             let items = []
             const whichDimension = type == 'line' ? 1 : colorBy === "index" ? 0 : 1
 
-            if (dimensionsMetadata.size == 1 && whichDimension == 1) {
+            if(!dimensionsMetadata) {
+                mapByMeasure()
+            } else if (dimensionsMetadata.size == 1 && whichDimension == 1) {
                 //single dimension color by measures
                 if (indexBy == "measure") {
-
-                    mapByDimension(0);
-
-                } else {
-                    items = measuresMetadata
-                    Object.keys(manualColors).forEach(k => {
-                        const vals = [...items].filter(i => i.value === k);
-                        if (vals.length > 0 && vals[0].labels) {
-
-                            let translated;
-                            if (locale) {
-                                translated = vals[0].labels[locale.toUpperCase()]
-                            }
-                            if (translated) {
-                                this._manualColor[translated] = manualColors[k]
-                            } else {
-                                this._manualColor[vals[0].label] = manualColors[k]
-                            }
-                        }
-                    })
+                    mapByDimension(0)
+                } else {                    
+                    mapByMeasure()
                 }
             } else {
                 mapByDimension(whichDimension)
