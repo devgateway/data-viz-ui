@@ -46,6 +46,7 @@ const lightenDarkenColor = (col, amt) => {
 const Chart = ({app,
                    legends,
                    tooltip,
+                   tooltipEnabled,
                    options,
                    intl,
                    groupMode,
@@ -90,7 +91,8 @@ const Chart = ({app,
                    selectedMeasures,
                    tooltipEnableMarkdown,
                    minMaxClamp,
-                   reverseLegend
+                   reverseLegend,
+                   customAxisFormat
                }) => {
 
 
@@ -406,9 +408,12 @@ const Chart = ({app,
                         legend: legends.right,
                         legendPosition: 'middle',
                         legendOffset: parseInt(offsetRight),
-                        format: value => intl.formatNumber(format.style === 'percent' ? value / 100 : value, {
-                            ...format                            
-                        })
+                        format: value => {
+                            const effectiveFormat = customAxisFormat ? customAxisFormat : format
+                            return intl.formatNumber(effectiveFormat.style === 'percent' ? value / 100 : value, {
+                                ...effectiveFormat
+                            })                    
+                    }
                     } : null}
                     enableGridY={enableGridY}
                     enableGridX={enableGridX}
@@ -431,14 +436,22 @@ const Chart = ({app,
                         legend: legends.left,
                         legendPosition: 'middle',
                         legendOffset: parseInt(offsetY),
-                        format: value => intl.formatNumber(format.style === 'percent' ? value / 100 : value, {
-                            ...format                           
-                        })
+                        format: value => {
+                            const effectiveFormat = customAxisFormat ? customAxisFormat : format
+                            return intl.formatNumber(effectiveFormat.style === 'percent' ? value / 100 : value, {
+                                ...effectiveFormat
+                            })
+                        }
                     }
                     }
 
                     tooltip={(d) => {
-                        return (<Tooltip intl={intl} format={format} d={d} tooltip={tooltip} tooltipEnableMarkdown={tooltipEnableMarkdown}/>)
+                        if (tooltipEnabled && tooltip && tooltip.trim().length > 0) {
+                            return (<Tooltip intl={intl} format={format} d={d} tooltip={tooltip} tooltipEnableMarkdown={tooltipEnableMarkdown}/>)
+                        }
+
+                        return null;
+
                     }}
                     pointSize={10}
                     pointBorderWidth={2}
