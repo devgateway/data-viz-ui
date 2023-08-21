@@ -69,7 +69,7 @@
   display: flex;
   justify-content: center; /* Center the buttons horizontally */
   align-items: center; /* Center the buttons vertically */
-  .cta-primary-button {
+  .cta-primary-button .wp-block-button__link {
     border: 1px solid $dc-green;
     border-radius: 3px;
     color: white;
@@ -83,14 +83,14 @@
     justify-content: center;
     cursor: pointer;
   }
-  .cta-primary-button:hover {
+  .cta-primary-button:hover .wp-block-button__link {
     transition : 471ms;
     transform : translateY(-5px);
     background-color: darken($dc-green, 8%);
     box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
   }
 
-  .cta-secondary-button {
+  .cta-secondary-button .wp-block-button__link {
     border: 1px solid $dc-green;
     border-radius: 3px;
     color: $dc-green;
@@ -102,7 +102,7 @@
     justify-content: center;
     cursor: pointer;
   }
-  .cta-secondary-button:hover {
+  .cta-secondary-button:hover .wp-block-button__link {
     transition : 471ms;
     transform : translateY(-5px);
     color: darken($dc-green, 8%);
@@ -118,10 +118,10 @@
   position: absolute;
   width: 100vw;
   left: 0;
-  .cta-secondary-button {
+  .cta-secondary-button .wp-block-button__link {
     color: white;
   }
-  .cta-secondary-button:hover {
+  .cta-secondary-button:hover .wp-block-button__link {
     color: white;
     border: 1px solid darken($dc-green, 8%);
     background-color: rgba(255, 255, 255, 0.2);
