@@ -10,11 +10,24 @@ function add_setting_section()
             'show_in_rest' => true,
             'type' => 'string'
         ));
+    register_setting('general', // Options group
+        'react_ui_search_type', // Option name/database
+        array(
+            'show_in_rest' => true,
+            'type' => 'string'
+        ));
 
     /* Create settings section */
     add_settings_section('wp-react-section', // Section ID
         'WP React Settings', // Section title
         'wp_react_setting_section_header', // Section callback function
+        'general'
+    // Settings page slug
+    );
+
+    add_settings_section('wp-react-search-section', // Section ID
+        'Search Widget Settings', // Section title
+        'wp_react_search_setting_section_header', // Section callback function
         'general'
     // Settings page slug
     );
@@ -28,6 +41,14 @@ function add_setting_section()
     // Section ID
     );
 
+    add_settings_field('wp-react-ui-search-type', // Field ID
+            __('Type'), // Field title
+            'wp_react_ui_search_type_callback', // Field callback function
+            'general', // Settings page slug
+            'wp-react-search-section'
+        // Section ID
+        );
+
 }
 
 
@@ -39,12 +60,30 @@ function wp_react_setting_section_header()
     echo "<p>Enter React APP base URL (include hash symbol if using hash history) </p>";
 }
 
+function wp_react_search_setting_section_header()
+{
+    echo "<p>Set type of search control </p>";
+}
+
 function wp_react_ui_callback()
 {
     ?>
     <label for="droid-identification">
         <input id="react_ui_url" class="regular-text" type="text" name="react_ui_url"
                value="<?php echo(get_option('react_ui_url')) ?>">
+    </label>
+    <?php
+}
+
+
+function wp_react_ui_search_type_callback()
+{
+    ?>
+    <label for="droid-identification">
+        <select id="react_ui_search_type" class="regular-text" type="text" name="react_ui_search_type">
+          <option value="inline" <?php echo(get_option('react_ui_search_type')=='inline'?'selected':'')?>>Inline</option>
+          <option value="floating"<?php echo(get_option('react_ui_search_type')=='floating'?'selected':'')?>>Floating</option>
+       </select>
     </label>
     <?php
 }
@@ -76,6 +115,7 @@ function show_ui_setting($request)
     $settings = array(
         "react_ui_url" => get_option("react_ui_url"),
         "react_api_url" => get_option("react_api_url"),
+        "react_search_type" =>get_option("react_ui_search_type"),
         "languages" => wpm_get_lang_option()
     );
 

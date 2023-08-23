@@ -62,6 +62,8 @@ const MenuItems = injectIntl(withRouter(({
                                              intl: {locale}
                                          }) => {
 
+    debugger;
+
     useEffect((e) => {
         if (!selected) {
             const pathSelected = getPath(menu, match)
@@ -199,7 +201,6 @@ const Header = ({intl, match, settings}) => {
                         </Menu.Item>
 
                         <Menu.Item fitted href="/">
-                            <Flag name="za"/>
                             <div className={"site name"}>{settings.name}</div>
                         </Menu.Item>
 
