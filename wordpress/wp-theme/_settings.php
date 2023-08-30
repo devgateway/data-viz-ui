@@ -16,6 +16,12 @@ function add_setting_section()
             'show_in_rest' => true,
             'type' => 'string'
         ));
+    register_setting('general', // Options group
+        'react_ui_menu_type', // Option name/database
+        array(
+            'show_in_rest' => true,
+            'type' => 'string'
+        ));
 
     /* Create settings section */
     add_settings_section('wp-react-section', // Section ID
@@ -24,15 +30,20 @@ function add_setting_section()
         'general'
     // Settings page slug
     );
-
     add_settings_section('wp-react-search-section', // Section ID
         'Search Widget Settings', // Section title
         'wp_react_search_setting_section_header', // Section callback function
         'general'
     // Settings page slug
     );
+    add_settings_section('wp-react-menu-section', // Section ID
+        'Menu Settings', // Section title
+        'wp_react_menu_setting_section_header', // Section callback function
+        'general'
+    // Settings page slug
+    );
 
-    /* Create settings field */
+
     add_settings_field('wp-react-ui-url', // Field ID
         __('WP React URI'), // Field title
         'wp_react_ui_callback', // Field callback function
@@ -40,31 +51,50 @@ function add_setting_section()
         'wp-react-section'
     // Section ID
     );
-
     add_settings_field('wp-react-ui-search-type', // Field ID
-            __('Type'), // Field title
-            'wp_react_ui_search_type_callback', // Field callback function
-            'general', // Settings page slug
-            'wp-react-search-section'
-        // Section ID
-        );
+        __('Type'), // Field title
+        'wp_react_ui_search_type_callback', // Field callback function
+        'general', // Settings page slug
+        'wp-react-search-section'
+    // Section ID
+    );
+    add_settings_field('wp-react-ui-menu-type', // Field ID
+        __('Type'), // Field title
+        'wp_react_ui_menu_type_callback', // Field callback function
+        'general', // Settings page slug
+        'wp-react-menu-section'
+    // Section ID
+    );
+
 
 }
-
-
-
-
-
+function wp_react_menu_setting_section_header()
+{
+    echo "<p>Menu type </p>";
+}
+function wp_react_ui_menu_type_callback()
+{
+    ?>
+    <label for="droid-identification">
+        <select id="react_ui_menu_type" class="regular-text" type="text" name="react_ui_menu_type">
+            <option value="classic" <?php echo(get_option('react_ui_menu_type') == 'classic' ? 'selected' : '') ?>>
+                Classic
+            </option>
+            <option value="floating"<?php echo(get_option('react_ui_menu_type') == 'floating' ? 'selected' : '') ?>>
+                Floating
+            </option>
+        </select>
+    </label>
+    <?php
+}
 function wp_react_setting_section_header()
 {
     echo "<p>Enter React APP base URL (include hash symbol if using hash history) </p>";
 }
-
 function wp_react_search_setting_section_header()
 {
     echo "<p>Set type of search control </p>";
 }
-
 function wp_react_ui_callback()
 {
     ?>
@@ -74,40 +104,37 @@ function wp_react_ui_callback()
     </label>
     <?php
 }
-
-
 function wp_react_ui_search_type_callback()
 {
     ?>
     <label for="droid-identification">
         <select id="react_ui_search_type" class="regular-text" type="text" name="react_ui_search_type">
-          <option value="inline" <?php echo(get_option('react_ui_search_type')=='inline'?'selected':'')?>>Inline</option>
-          <option value="floating"<?php echo(get_option('react_ui_search_type')=='floating'?'selected':'')?>>Floating</option>
-       </select>
+            <option value="inline" <?php echo(get_option('react_ui_search_type') == 'inline' ? 'selected' : '') ?>>
+                Inline
+            </option>
+            <option value="floating"<?php echo(get_option('react_ui_search_type') == 'floating' ? 'selected' : '') ?>>
+                Floating
+            </option>
+        </select>
     </label>
     <?php
 }
-
 function wp_react_api_url_callback()
 {
     ?>
     <label for="droid-identification">
         <input
-                id="react_api_url"
-                class="regular-text" type="text" name="react_api_url"
-                value="<?php echo(get_option('react_api_url')) ?>">
+            id="react_api_url"
+            class="regular-text" type="text" name="react_api_url"
+            value="<?php echo(get_option('react_api_url')) ?>">
     </label>
     <?php
 }
-
-
-
 function namespace_register_setting_route()
 {
     register_rest_route('dg/v1', '/settings', ['methods' => WP_REST_Server::READABLE, 'callback' => 'show_ui_setting', 'args' => namespace_get_search_args()]);
 }
 add_action('rest_api_init', 'namespace_register_setting_route');
-
 function show_ui_setting($request)
 {
 
@@ -115,7 +142,8 @@ function show_ui_setting($request)
     $settings = array(
         "react_ui_url" => get_option("react_ui_url"),
         "react_api_url" => get_option("react_api_url"),
-        "react_search_type" =>get_option("react_ui_search_type"),
+        "react_search_type" => get_option("react_ui_search_type"),
+        "react_menu_type" => get_option("react_ui_menu_type"),
         "languages" => wpm_get_lang_option()
     );
 
@@ -179,5 +207,6 @@ function show_ui_setting($request)
 
     return $response;
 }
+
 
 add_action('admin_init', 'add_setting_section');
