@@ -101,7 +101,7 @@ function custom_api_search($request)
             else:
                 $extract = $content_arr['extended'];
             endif;
-        
+
 
 
             $post_data = [
