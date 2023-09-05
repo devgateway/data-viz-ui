@@ -16,7 +16,7 @@ const localReplaceLink = (url, locale) => {
 const MenuChild = injectIntl((props) => {
 
     const {menu, locale, match, selected, active, showIcons, onSetSelected} = props
-    debugger
+    
     return <>
 
         {menu && menu.items.map((item, index) => (<Menu.Item
@@ -54,7 +54,7 @@ const InlineMenu = (props) => {
 
     } = props
 
-    debugger;
+    
     const [selected, setSelected] = useState(null)
 
     return (<Container fluid textAlign={"right"}>

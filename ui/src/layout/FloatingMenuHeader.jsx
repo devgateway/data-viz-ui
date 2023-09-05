@@ -42,7 +42,7 @@ const FloatingMenu = (props) => {
 
     return menu.items.filter(i => i.url != "#wpm-languages")
         .map((i) => {
-            debugger;
+            
             return (<Menu.Item
                 className={`divided ${i.child_items ? 'has-child-items' : ''} ${selected && selected.ID == i.ID ? 'selected' : ''}  ${active == i.slug ? "active" : ""}`}>
                 {!i.child_items &&

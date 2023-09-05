@@ -10,7 +10,7 @@ import * as external from "@devgateway/customizer";
 
 const Root = (props) => {
 
-    debugger
+    
     const [random, setRandomStore] = useState(Math.random() * (99999 - 1) + 1);
     const {
         "data-width": width,
