@@ -20,7 +20,7 @@ export default class Legend extends React.Component {
 
     render() {
         const {filteredBreaks, formattedLegendTitle, showLegendLabels, symbols, legendFontSize,
-           legendFontWeight, autoGenerateBreaks, intl, numberFormat, mapNoDataColor, showNoDataLegendItem} = this.props;
+           legendFontWeight, autoGenerateBreaks, intl, numberFormat, mapNoDataColor, showNoDataLegendItem, noDataText} = this.props;
         const legendStyle={fontSize: legendFontSize + 'px', fontWeight: legendFontWeight}        
         
         return (
@@ -61,7 +61,7 @@ export default class Legend extends React.Component {
                     <li>
                     <span className="symbol" style= {{backgroundColor: mapNoDataColor}}>
                                </span>
-                    <span className="legend-label" style={legendStyle}>No Data</span>                        
+                    <span className="legend-label" style={legendStyle}>{noDataText}</span>                        
                     </li>
                     }
                    {symbols && symbols.map((symbol,i) => {                     
