@@ -106,7 +106,7 @@ class DataProvider extends React.Component {
 const mapStateToProps = (state, ownProps) => {
     const {store, group, app} = ownProps
 
-    debugger
+    
     return {
         data: state.getIn(['data', ...store, 'data']),
         filters: state.getIn(['data', 'filters', app, group]),
