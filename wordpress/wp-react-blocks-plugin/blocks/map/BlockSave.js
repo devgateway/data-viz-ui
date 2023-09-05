@@ -69,7 +69,11 @@ const SaveComponent = (props) => {
             aggregationFormula,
             zoomLevelToShowPoints,
             zoomOnFilter,
-            zoomOnFilterField
+            zoomOnFilterField,
+            labelsExclusionList,
+            noDataText,
+            customMeasureLabels,
+            showShadingLayerLabels
         }
     } = props;
     
@@ -157,7 +161,11 @@ const SaveComponent = (props) => {
              data-aggregation-formula={aggregationFormula}
              data-zoom-level-to-show-points={zoomLevelToShowPoints}
              data-zoom-on-filter={zoomOnFilter}
-             data-zoom-on-filter-field={zoomOnFilterField}>  
+             data-zoom-on-filter-field={zoomOnFilterField}
+             data-labels-exclusion-list={labelsExclusionList}
+             data-no-data-text={noDataText}
+             data-custom-measure-labels={encodeURIComponent(JSON.stringify(customMeasureLabels))}
+             data-show-shading-layer-labels={showShadingLayerLabels}>
         </div>
     );
 }
