@@ -86,7 +86,11 @@ const MapWrapper = (props) => {
         'data-aggregation-formula': aggregationFormula = 'COUNT',
         'data-zoom-level-to-show-points': zoomLevelToShowPoints = 2,
         'data-zoom-on-filter': zoomOnFilter =  "false",
-        'data-zoom-on-filter-field': zoomOnFilterField = ""
+        'data-zoom-on-filter-field': zoomOnFilterField = "",
+        'data-no-data-text': noDataText = "No Data",
+        'data-labels-exclusion-list': labelsExclusionList = "",
+        'data-custom-measure-labels': customMeasureLabels = "{}",
+        'data-show-shading-layer-labels': showShadingLayerLabels = "ifUnitHasData",
     } = props  
 
     const decode = (value) => {
@@ -220,9 +224,13 @@ const MapWrapper = (props) => {
         defaultPointColor: decodeURIComponent(defaultPointColor),
         zoomLevelToShowPoints,
         zoomOnFilter : zoomOnFilter == true || zoomOnFilter == "true",
-        zoomOnFilterField: zoomOnFilterField
-    }  
-    
+        zoomOnFilterField: zoomOnFilterField,
+        noDataText,
+        labelsExclusionList: labelsExclusionList.split(',').map(l => l.trim()),
+        showShadingLayerLabels
+    } 
+      
+    const measureLabels = parse(customMeasureLabels) || {}
     const DataFrame = app === "csv" ? MapCSVDataFrame : MapDataFrame;   
     let measuresCSV = editing ? (parse(measures) || []).join(',') : measures    
     return (<DataProvider 
@@ -233,7 +241,7 @@ const MapWrapper = (props) => {
         editing={editing}
         store={[app, unique, ...source.split("/")]} source={source}>
         <DataConsumer>
-            <DataFrame measures={measuresCSV} multipleMeasures = {multipleMeasures} mapType={mapType} aggregationFormula={aggregationFormula}>
+            <DataFrame measures={measuresCSV} multipleMeasures = {multipleMeasures} mapType={mapType} aggregationFormula={aggregationFormula} customMeasureLabels={measureLabels}>
                 <Map  {...mapProps} />
             </DataFrame>
         </DataConsumer>

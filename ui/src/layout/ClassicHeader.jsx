@@ -157,7 +157,7 @@ const MenuItems = injectIntl(withRouter(({
 }))
 
 const Header = ({intl, match, settings}) => {
-    debugger;
+    
     const [selected, setSelected] = useState()
     const {slug} = match.params
 
