@@ -7,7 +7,7 @@ const defaultFormat = {
     "style": "percent",
     "minimumFractionDigits": 1,
     "maximumFractionDigits": 1,
-    "currency": "USD"
+    "currency": "USD"    
 }
 
 
@@ -62,6 +62,9 @@ export class APIConfig extends Component {
         this.items = this.items.bind(this)
 
         this.onFormatChange = this.onFormatChange.bind(this)
+        this.onCustomLabelToggleChange = this.onCustomLabelToggleChange.bind(this)
+        this.onCustomLabelChange = this.onCustomLabelChange.bind(this)
+        this.onUseCustomAxisFormatChange = this.onUseCustomAxisFormatChange.bind(this)
         //this.onCustomMeasureFieldChange = this.onCustomMeasureFieldChange.bind(this)
 
         this.state = {
@@ -73,6 +76,7 @@ export class APIConfig extends Component {
     }
 
     cleanSelection(prevState) {
+
         const {setAttributes} = this.props
         setAttributes({measures: [], filters: []})
     }
@@ -139,13 +143,14 @@ export class APIConfig extends Component {
 
 
         if (type != prevType) {
-
         }
 
         if (dimension2 != prevDimension2) {
+
             //TODO ensure only one measure remains selected when selecting a second dimensions
             const uMs = Object.assign({}, measures)
             if (dimension2 != 'none') {
+
                 let i = 0; //the idea is to keep one selected
                 if (uMs[app]) {
                     const selected = Object.keys(uMs[app]).map(k => uMs[app][k].selected).length
@@ -196,22 +201,32 @@ export class APIConfig extends Component {
         } else {
             uMs[app][value] = {selected: true, format: defaultFormat}
         }
-        setAttributes({measures: uMs})
+        setAttributes({measures: uMs})        
     }
 
 
-    onFormatChange(format) {
+    onFormatChange(format, field) {        
+        const {setAttributes, attributes: {app, measures}} = this.props
+        const uMs = Object.assign({}, {...measures})
+        if (!uMs[app]) {            
+            uMs[app] = {allowSelection: false, format: format, customFormat: format, selected: false}
+        }
 
+        uMs[app][field] = format
+        setAttributes({measures: uMs})
+    }
+
+    onUseCustomAxisFormatChange(value) {        
         const {setAttributes, attributes: {app, measures}} = this.props
         const uMs = Object.assign({}, {...measures})
         if (uMs[app]) {
-            uMs[app].format = format
-        } else {
-            uMs[app] = {allowSelection: false, format, selected: false}
+            uMs[app].useCustomAxisFormat = value
+            setAttributes({ measures: uMs })
+        }  else {
+            uMs[app] = {allowSelection: false, format: defaultFormat, customFormat: defaultFormat, selected: false, useCustomAxisFormat: value}
+            setAttributes({ measures: uMs })
         }
-        setAttributes({measures: uMs})
     }
-
     /*
     onCustomMeasureFieldChange(measureName, field, value) {
         
@@ -239,9 +254,29 @@ export class APIConfig extends Component {
         } else {
             uMs[app][value] = {selected: true, format: defaultFormat}
         }
+
         setAttributes({measures: uMs})
     }
 
+    onCustomLabelToggleChange(value) {
+        const {setAttributes, attributes: {app, measures}} = this.props
+        const uMs = Object.assign({}, measures)
+       
+        if (uMs[app] && uMs[app][value]) {
+            uMs[app][value].hasCustomLabel = uMs[app][value].hasCustomLabel ? false : true
+            setAttributes({measures: uMs})
+        }        
+    }
+
+    onCustomLabelChange(value, customLabel) {
+        const {setAttributes, attributes: {app, measures}} = this.props
+        const uMs = Object.assign({}, measures)
+       
+        if (uMs[app] && uMs[app][value] && uMs[app][value].hasCustomLabel) {
+            uMs[app][value].customLabel = customLabel
+            setAttributes({measures: uMs})
+        }        
+    }
 
     items(type) {
 
@@ -272,7 +307,7 @@ export class APIConfig extends Component {
             }
         } = this.props
 
-        
+
         const currentType = types.filter(t => t.value === type).length > 0 ? types.filter(t => t.value === type)[0] : null
 
         return (
@@ -287,7 +322,7 @@ export class APIConfig extends Component {
                         options={allDimensions}
                     />
                 </PanelRow>
-                {(type != 'line') && <PanelRow>
+                {(type != 'line') &&<PanelRow>
                     <SelectControl
                         label={__(type == 'map' ? 'Breakdown Field' : 'Second Dimension')}
                         value={[dimension2]} // e.g: value = [ 'a', 'c' ]
@@ -302,8 +337,11 @@ export class APIConfig extends Component {
                 <Measures
 
                     onFormatChange={this.onFormatChange}
+                    onUseCustomAxisFormatChange={this.onUseCustomAxisFormatChange}
                     onSetSingleMeasure={this.onSetSingleMeasure}
                     onMeasuresChange={this.onMeasuresChange}
+                    onCustomLabelToggleChange={this.onCustomLabelToggleChange}
+                    onCustomLabelChange={this.onCustomLabelChange}
                     {...this.props}
                     currentType={currentType}/>,
 

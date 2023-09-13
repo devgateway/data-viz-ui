@@ -6,8 +6,8 @@ import {togglePanel} from "./Util";
 
 import {getTranslatedOptions} from './APIutils'
 
-export const SizeConfig = ({height, setAttributes, panelStatus}) => {
-    return (<PanelBody initialOpen={panelStatus["SIZE"]} onToggle={e => togglePanel("SIZE", panelStatus, setAttributes)}
+export const SizeConfig = ({height, setAttributes, panelStatus,initialOpen}) => {
+    return (<PanelBody initialOpen={panelStatus?panelStatus["SIZE"]:initialOpen} onToggle={e => togglePanel("SIZE", panelStatus, setAttributes)}
                        title={__("Size")}>
         <PanelRow>
             <TextControl
@@ -88,7 +88,7 @@ export class BlockEditWithFilters extends ComponentWithSettings {
         } = this.props;
 
         super.componentDidUpdate(prevProps, prevState, snapshot)
-        if (prevProps.attributes) {
+            if (prevProps.attributes) {
             if (type != prevProps.attributes.type) {
 
             }
@@ -137,7 +137,7 @@ export class BlockEditWithFilters extends ComponentWithSettings {
     }
 
     onCategoryChanged(checked, value) {
-
+        debugger;
         const {setAttributes, attributes: {categories}} = this.props
         if (!checked) {
             setAttributes({categories: categories.filter(i => i != value)})
@@ -285,7 +285,6 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
     }
 
     componentDidMount() {
-
         super.componentDidMount();
 
         fetch(`/api/registry/eureka/apps`, {
@@ -324,9 +323,8 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
         }
     }
 
-
-    _loadMetadata(app) {
-        
+    loadMetadata() {
+        const {attributes: {app}} = this.props
         if (app != "csv") {
             fetch(`/api/${app}/dimensions`)
                 .then(response => {
@@ -396,11 +394,6 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
                     console.log("Error when getting categories", response)
                 })
         }
-    }
-
-    loadMetadata() {
-       const {attributes: {app}} = this.props
-        this._loadMetadata(app)
     }
 }
 

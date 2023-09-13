@@ -3,16 +3,44 @@ import {__} from '@wordpress/i18n';
 import Format from "../charts/Format.jsx";
 import {togglePanel} from "./Util";
 
+const defaultFormat = {
+    "style": "percent",
+    "minimumFractionDigits": 1,
+    "maximumFractionDigits": 1,
+    "currency": "USD"     
+}
 
 const CSVConfig = ({attributes: {csv, panelStatus, measures}, setAttributes}) => {
 
+    const onFormatChange = (format, field) => {           
+        const app = "csv"
+        const uMs = measures ? JSON.parse(JSON.stringify(measures)) : {}
+        if (!uMs[app]) {
+            uMs[app] = {allowSelection: false, format: Object.assign({}, defaultFormat), customFormat: Object.assign({}, {...defaultFormat}), selected: false}
+        }     
+        uMs[app][field] = format
+        setAttributes({measures: uMs})
 
-    const onFormatChange = (format) => {
         
-        setAttributes({measures: {csv: {format}}})
-
     }
 
+   const onUseCustomAxisFormatChange = (value) =>{
+        const app = "csv"
+        const uMs = measures ? JSON.parse(JSON.stringify(measures)) : {}
+        if (uMs[app]) {
+            uMs[app].useCustomAxisFormat = value
+
+            if (!uMs[app].customFormat) {
+                uMs[app].customFormat = Object.assign({}, {...defaultFormat})
+            } 
+            setAttributes({ measures: uMs })
+        }  else {
+            uMs[app] = {allowSelection: false, format: Object.assign({}, {...defaultFormat}), customFormat: Object.assign({}, {...defaultFormat}), selected: false}
+            uMs[app].useCustomAxisFormat = value
+            setAttributes({ measures: uMs })
+        }
+
+    }
 
     return (
         [<PanelBody title={__("CSV Configuration")}
@@ -27,10 +55,16 @@ const CSVConfig = ({attributes: {csv, panelStatus, measures}, setAttributes}) =>
             </PanelRow>
 
             <Format
-                format={measures["csv"] ? measures["csv"].format : {}}
-                onFormatChange={format => {
-                    onFormatChange(format)
-                }}>
+                format={measures["csv"] && measures["csv"].format ? measures["csv"].format : {}}
+                customFormat={measures["csv"] && measures["csv"].customFormat ? measures["csv"].customFormat : {}}
+                useCustomAxisFormat={measures["csv"] ? measures["csv"].useCustomAxisFormat : false}
+                onFormatChange={(newFormat, field) => {
+                    onFormatChange(newFormat, field)
+                }}
+                onUseCustomAxisFormatChange = {value => {
+                    onUseCustomAxisFormatChange(value)
+                }}
+                >
             </Format>
         </PanelBody>
         ]

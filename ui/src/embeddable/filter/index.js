@@ -359,6 +359,7 @@ const RangeFilterDropDown = connect(mapStateToProps, mapActionCreators)(({
 
 
 const CategoryFilter = (props) => {
+    debugger;
     const {data, type, showNoDataOption} = props
     const cat = data.filter(d => d.type === type)[0]
     const filteredCategories = cat ? cat.items.filter(f => {
@@ -433,6 +434,9 @@ const Filter = ({
                     "data-asc-order": ascOrder = "true",
                     intl,
                 }) => {
+
+
+    debugger
 
     const hiddenFiltersArr = parse(hiddenFilters)
     let defaultFilterType;
