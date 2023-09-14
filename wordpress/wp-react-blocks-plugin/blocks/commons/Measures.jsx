@@ -85,7 +85,7 @@ const Measures = (props) => {
     }
 
     const getSelectedMeasures = () => {
-        if (measures[app]) {
+        if (measures[app] && allMeasures) {
             return Object.keys(measures[app]).filter(k => measures[app][k].selected).map(k => {
                 return allMeasures.filter(m => m.value === k)[0]
             }).filter(m => m)
