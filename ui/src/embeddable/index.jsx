@@ -4,7 +4,6 @@ import data from './reducers/data'
 import embeddable from './reducers/embeddable'
 import {injectIntl} from "react-intl";
 import * as customizer from "@devgateway/customizer";
-import Reducers from "@devgateway/customizer/src/embedded/reducers";
 
 const TabbedPosts = asyncComponent(() => import("./tabbedposts/"));
 const PostsCarousel = asyncComponent(() => import("./postscarousel/"));
