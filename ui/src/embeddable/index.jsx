@@ -31,9 +31,6 @@ const NewMap = asyncComponent(() => import('./d3Map'))
 const ParallaxContainer = asyncComponent(() => import('./parallax/'))
 const Wrapped = asyncComponent(() => import('./wrapped/'))
 let reducerList = {data, embeddable}
-
-alert(customizer)
-
 if (customizer.Reducers) {
     reducerList = {...reducerList, ...customizer.Reducers}
 }
