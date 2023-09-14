@@ -2,6 +2,24 @@ import React from "react";
 import {getTranslatedValue, measuresMap, typesMap} from "./Utils";
 
 
+const alphaSort = (reverse, a, b) => {
+
+    if (b < a) {
+        return reverse ? -1 : 1;
+    }
+    if (b > a) {
+        return reverse ? 1 : -1;
+    }
+
+    return 0;
+
+}
+const numericSort = (reverse, a, b) => {
+
+    return reverse ? b - a : a - b
+
+}
+
 const getOptionsNoDimension = (props) => {
     const {data, measures, swap, dimensions, locale, customLabels} = props
     let options = {}
@@ -16,9 +34,9 @@ const getOptionsNoDimension = (props) => {
         if (data.metadata && data.metadata.measures) {
             const selectedMeasures = data.metadata.measures.filter(m => measures.includes(m.value)).sort((aMeasure, bMeasure) => {
                 if (aMeasure.position != null && bMeasure.position != null && aMeasure.position != bMeasure.position) {
-                   return aMeasure.position - bMeasure.position
-                }   
-                   
+                    return aMeasure.position - bMeasure.position
+                }
+
                 return 0
             })
             series = []
@@ -97,13 +115,13 @@ const includeOverallData = (props) => {
 
 const BarOneDimension = (props) => {
     let options = {}
-    const {data, measures, swap, dimensions, includeOverall, locale, customLabels, colorBy, hiddenBars} = props   
+    const {data, measures, swap, dimensions, includeOverall, locale, customLabels, colorBy, hiddenBars} = props
     const selectedDimensions = dimensions.filter(f => f != '')
     const selectedMeasures = data.metadata.measures.filter(m => measures.includes(m.value)).sort((aMeasure, bMeasure) => {
         if (aMeasure.position != null && bMeasure.position != null && aMeasure.position != bMeasure.position) {
-           return aMeasure.position - bMeasure.position
-        }   
-           
+            return aMeasure.position - bMeasure.position
+        }
+
         return 0
     })
 
@@ -121,10 +139,10 @@ const BarOneDimension = (props) => {
         let series = []
         let indexBy
 
-        if (swap && (selectedDimensions.length == 1 && measures.length > 0)) {            
+        if (swap && (selectedDimensions.length == 1 && measures.length > 0)) {
             indexBy = 'measure'
-            selectedMeasures.forEach(measure => {  
-                const row = {}                
+            selectedMeasures.forEach(measure => {
+                const row = {}
                 row["measure"] = customLabels[measure.value] || getTranslatedValue(mMap[measure.value], locale)// measureLabel(mMap, m)
                 measuresMetadata.add(mMap[measure.value])
                 data.children.forEach(d => {
@@ -146,18 +164,18 @@ const BarOneDimension = (props) => {
         } else {
 
             indexBy = data.children[0].type
-            let total = 0;          
+            let total = 0;
             data.children.forEach(d => {
                 const variables = {}
                 const row = {}
-                row[d.type] =  getTranslatedValue(tMap[d.type] && tMap[d.type].items ? tMap[d.type].items.filter(i => i.value === d.value)[0] : d.value, locale) || d.value
+                row[d.type] = getTranslatedValue(tMap[d.type] && tMap[d.type].items ? tMap[d.type].items.filter(i => i.value === d.value)[0] : d.value, locale) || d.value
                 Object.keys(d).forEach(k => {
                     variables[k] = d[k]
                 })
 
                 dimensionsMetadata.add(tMap[d.type])
                 variables[d.type] = d.value.toString()
-                selectedMeasures.map(m => {                     
+                selectedMeasures.map(m => {
                     const label = customLabels[m.value] || getTranslatedValue(mMap[m.value], locale)
                     row[label] = d[m.value];
                     measuresMetadata.add(mMap[m.value])
@@ -169,14 +187,28 @@ const BarOneDimension = (props) => {
 
 
         }
+        const allKeys = Array.from(keys)
+        const filtered = hiddenBars && series ? series.filter(s => hiddenBars.indexOf(s[indexBy]) == -1) : series
 
-         options = {
+        if (props.sort == 'alphabetically') {
+            filtered.sort((a, b) => alphaSort(props.sortreverse, a[indexBy], b[indexBy]));
+        }
+        if (props.sort == 'values') {
+
+            filtered.sort((a, b) => {
+                debugger;
+                const va =Math.max(...allKeys.map(k=>a[k]))
+                const vb = Math.max(...allKeys.map(k=>b[k]));
+                return numericSort(props.sortreverse, va, vb)
+            });
+        }
+        options = {
             metadata: data.metadata,
             indexBy,
             dimensionsMetadata,
             measuresMetadata,
-            keys: Array.from(keys),
-            data: hiddenBars && series ? series.filter(s => hiddenBars.indexOf(s[indexBy]) == -1) : series//series
+            keys: allKeys,
+            data: filtered
         }
 
     }
@@ -260,14 +292,27 @@ const Bar2Dimensions = (props) => {
             series.push(row)
         })
 
+        const filtered=(colorBy == "id") ? series : series.filter(s => hiddenBars.indexOf(s[indexBy]) == -1);
+        const allKeys = Array.from(keys)
+        if (props.sort == 'alphabetically') {
+            filtered.sort((a, b) => alphaSort(props.sortreverse, a[indexBy], b[indexBy]));
+        }
+        if (props.sort == 'values') {
+
+            filtered.sort((a, b) => {
+                debugger;
+                const va =Math.max(...allKeys.map(k=>a[k]))
+                const vb = Math.max(...allKeys.map(k=>b[k]));
+                return numericSort(props.sortreverse, va, vb)
+            });
+        }
 
         options = {
             metadata: data.metadata,
             dimensionsMetadata,
-
             indexBy,
-            keys: (colorBy == "index") ? Array.from(keys) : Array.from(keys).filter(k => hiddenBars.indexOf(k) == -1),
-            data: (colorBy == "id") ? series : series.filter(s => hiddenBars.indexOf(s[indexBy]) == -1)
+            keys: (colorBy == "index") ? allKeys : allKeys.filter(k => hiddenBars.indexOf(k) == -1),
+            data: filtered
         }
     }
 
@@ -278,7 +323,7 @@ const Bar2Dimensions = (props) => {
 
 const BarData = (props) => {
     const {data, measures, dimensions} = props
-   const copyData = JSON.parse(JSON.stringify(data))
+    const copyData = JSON.parse(JSON.stringify(data))
     if (dimensions.length === 1) {
         return <BarOneDimension {...props} data={copyData}></BarOneDimension>
     } else {
