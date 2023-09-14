@@ -477,6 +477,14 @@ registerBlockType(process.env.BLOCKS_NS + '/chart',
             reverseLegend: {
                 type: 'Boolean',
                 default: false
+            },
+            sort: {
+                type: 'string',
+                default: '',
+            },
+            sortReverse: {
+                type: 'Boolean',
+                default: false
             }
         },
 

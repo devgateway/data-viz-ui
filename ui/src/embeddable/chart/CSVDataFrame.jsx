@@ -132,6 +132,9 @@ const CSVDataFrame = ({children, data, keys, type, measures}) => {
     if (type == 'pie') {
         return <PieData data={data} keys={keys} measures={measures}>{children}</PieData>
     }
+    if (type == 'radar') {
+        return <BarData data={data} keys={keys} measures={measures}>{children}</BarData>
+    }
 }
 
 export default CSVDataFrame;

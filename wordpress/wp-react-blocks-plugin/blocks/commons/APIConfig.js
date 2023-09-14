@@ -7,7 +7,7 @@ const defaultFormat = {
     "style": "percent",
     "minimumFractionDigits": 1,
     "maximumFractionDigits": 1,
-    "currency": "USD"    
+    "currency": "USD"
 }
 
 

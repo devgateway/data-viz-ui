@@ -102,11 +102,13 @@ const SaveComponent = (props) => {
             overallLabel,
             overlays,
             minMaxClamp,
-            reverseLegend
+            reverseLegend,
+            sort,
+            sortReverse,
         }
     } = props;
     const blockProps = useBlockProps.save({
-        className: 'viz component chart'
+        className: 'tcdi component chart'
     });
 
     const levels = [dimension1, dimension2, dimension3]
@@ -122,7 +124,7 @@ const SaveComponent = (props) => {
              data-dimension2={dimension2}
              data-dimension3={dimension3}
              data-color-by={colorBy}
-             data-scheme={scheme}             
+             data-scheme={scheme}
              data-group-mode={groupMode}
              data-left-legend={leftLegend}
              data-dualMode={dualMode}
@@ -153,7 +155,7 @@ const SaveComponent = (props) => {
              data-layout={layout}
              data-reverse={reverse}
              data-offset-y={offsetY}
-             //data-csv-line-layer-data={csvLineLayerData}
+            //data-csv-line-layer-data={csvLineLayerData}
             //data-csv-line-color={csvLineColor}
             // data-csv-line-tooltip={csvLineTooltip}
             //data-csv-line-title={csvLineTitle}
@@ -214,7 +216,11 @@ const SaveComponent = (props) => {
              data-overall-label={overallLabel}
              data-overlays={encodeURIComponent(JSON.stringify(overlays))}
              data-min-max-clamp={minMaxClamp}
-             data-reverse-legend={reverseLegend}>
+             data-reverse-legend={reverseLegend}
+             data-sort={sort}
+             data-sort-reverse={sortReverse}
+        >
+
             <InnerBlocks.Content/>
         </div>
     );
