@@ -6,6 +6,7 @@ import DataConsumer from "../data/DataConsumer";
 import Map from "../map/map";
 import {parse} from "../utils/parseUtils";
 import * as d3 from "d3";
+import {injectIntl} from "react-intl";
 
 
 const getFilters = (filters) => {
@@ -32,6 +33,7 @@ class DataLayer extends BaseLayer {
 
     createDataLayer(json) {
         const {
+            format,
             name,
             file,
             path,
@@ -52,10 +54,20 @@ class DataLayer extends BaseLayer {
             editing,
             data,
             breaks,
-            projection
+            projection,
+            intl
         } = this.props
         const g = d3.select(this.gRef.current)
 
+
+
+        let numberFormat = {
+            style: (format.style === 'compacted') ? 'decimal' : format.style,
+            notation: (format.style === 'compacted') ? 'compact' : "standard",
+            currency: format.currency,
+            minimumFractionDigits: parseInt(format.minimumFractionDigits),
+            maximumFractionDigits: parseInt(format.maximumFractionDigits)
+        }
 
         const sizeScale = d3.scaleThreshold()
             .domain(breaks.map(d => d.end))
@@ -115,11 +127,13 @@ class DataLayer extends BaseLayer {
             .attr("x", d => path.centroid(d)[0])
             .attr("y", d => path.centroid(d)[1])
             .attr("font-size", d => {
+
                 return labelFontSize / projection.scale() + "em"
             })
             .attr("fill", labelColor)
             .text(d => {
-                return d.properties._value
+                return intl.formatNumber(format.style === 'percent' ? d.properties._value / 100 : d.properties._value, numberFormat)
+
             })
 
 
@@ -153,12 +167,12 @@ class DataLayer extends BaseLayer {
 
                 if (app != 'csv' && data && data.children) {
                     const values = data.children.filter(d => d.value.indexOf(joinValue) > -1)
-                    
+
                     if (values.length > 0) {
                         const measureValue = (values[0][measures[0]])
                         d.properties.meta = values[0]
                         d.properties._value = measureValue
-                        
+
                     } else {
                         d.properties._value = null
                     }
@@ -246,4 +260,4 @@ const DataWrapper = (props) => {
     </DataProvider>)
 }
 
-export default DataWrapper
+export default injectIntl(DataWrapper)
