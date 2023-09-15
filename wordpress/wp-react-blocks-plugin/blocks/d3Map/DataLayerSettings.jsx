@@ -60,12 +60,35 @@ export class DataLayerSetting extends Component {
         this.removeFilter = this.removeFilter.bind(this)
         this.items = this.items.bind(this)
         this.getCSValue = this.getCSValue.bind(this)
-
+        this.onFormatChange = this.onFormatChange.bind(this)
         this.state = {
             measures: [], dimensions: [], filters: [], categories: []
         }
     }
 
+
+    onFormatChange(format, field) {
+        const {
+            onChangeProperty, allDimensions, allFilters, allMeasures, features, apps, layer: {
+                app,
+                csv,
+                measures,
+                filters,
+                featureJoinAttribute,
+                apiJoinAttribute,
+                type,
+                fillColor,
+                borderColor,
+                breaks,
+                markFillColor,
+                markBorderColor,
+                markSizeScale,
+                tooltip
+            }
+        } = this.props
+
+        onChangeProperty("format", format);
+    }
 
     getCSValue() {
         const {apps, features, layer: {csv, featureJoinAttribute}} = this.props
@@ -256,6 +279,7 @@ export class DataLayerSetting extends Component {
             </PanelRow>
         </PanelBody>, <React.Fragment>
             {app != 'csv' && <Measures
+                onFormatChange={this.onFormatChange}
                 onSetSingleMeasure={this.onSetSingleMeasure}
                 onMeasuresChange={this.onMeasuresChange}
                 {...this.props} />}
