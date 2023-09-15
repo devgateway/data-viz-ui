@@ -14,7 +14,8 @@ class ProjectedContainer extends React.Component {
 
     createProjection() {
         const {editing, height, width, scale = 200, center = [0, 0], initialPosition} = this.props
-        const projection = d3.geoMercator()
+        const projection = d3.geoTransverseMercator()
+            .fitSize([width, height])
             .scale(scale)
             .center(center)  // centers map at given coordinates
             .translate([width / 2, height / 2])
