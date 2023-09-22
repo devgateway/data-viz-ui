@@ -1,9 +1,8 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {connect} from "react-redux";
 import BaseLayer from "./BaseLayer";
 import DataProvider from "../data/DataProvider";
 import DataConsumer from "../data/DataConsumer";
-import Map from "../map/map";
 import {parse} from "../utils/parseUtils";
 import * as d3 from "d3";
 import {injectIntl} from "react-intl";
@@ -48,6 +47,7 @@ class DataLayer extends BaseLayer {
             markFillColor,
             markBorderColor,
             markSizeScale,
+            markerLabelSize,
             featureJoinAttribute,
             apiJoinAttribute,
             measures,
@@ -55,10 +55,11 @@ class DataLayer extends BaseLayer {
             data,
             breaks,
             projection,
-            intl
+            useCentroidPoint,
+            intl,
+            zoom
         } = this.props
         const g = d3.select(this.gRef.current)
-
 
 
         let numberFormat = {
@@ -76,12 +77,14 @@ class DataLayer extends BaseLayer {
         const colorScale = d3.scaleThreshold()
             .domain(breaks.map(d => d.end))
             .range(breaks.map(d => d.color));
+
         let getSize = (value) => {
             if (breaks.length > 0) {
-                return sizeScale(value) * markSizeScale / projection.scale()
+                return sizeScale(value) * markSizeScale
             }
             return markSizeScale
         }
+
         let getColor = (value) => {
             if (breaks.length > 0) {
                 return colorScale(value)
@@ -89,58 +92,72 @@ class DataLayer extends BaseLayer {
             return markFillColor
         }
 
-
         const filteredData = json.features.filter(f => f.properties._value != null)
-
         g.attr("class", "data-layer " + name)
         g.selectAll(".point").remove()
-        g.selectAll(".point")
-            .data(filteredData)
-            .enter()
-            .append("circle")
-            .attr("fill", d => getColor(d.properties._value))
-            .attr("stroke", markBorderColor)
-            .attr("class", "point")
-            .attr("stroke-width", 2)
-            .style("vector-effect", "non-scaling-stroke")
-            .attr("cx", d => path.centroid(d)[0])
-            .attr("cy", d => path.centroid(d)[1])
-            .attr('r', d => {
-                return getSize(d.properties._value);
-            })
-
-            .on("mouseenter", (d) => {
-
-                this.showToolTip(tooltip, d.properties, getColor(d.properties._value))
-
-            })
-
-            .on("mouseleave", (d) => {
-                this.hiddenToolTip()
-            })
-
         g.selectAll(".point-label").remove()
-        g.selectAll(".point-label").data(filteredData)
-            .enter()
-            .append("text")
-            .attr("class", "point-label")
-            .attr("x", d => path.centroid(d)[0])
-            .attr("y", d => path.centroid(d)[1])
-            .attr("font-size", d => {
 
-                return labelFontSize / projection.scale() + "em"
-            })
-            .attr("fill", labelColor)
-            .text(d => {
-                return intl.formatNumber(format.style === 'percent' ? d.properties._value / 100 : d.properties._value, numberFormat)
+        if (useCentroidPoint) {
+            g.selectAll(".point")
+                .data(filteredData)
+                .enter()
+                .append("circle")
+                .attr("fill", d => getColor(d.properties._value))
+                .attr("stroke", markBorderColor)
+                .attr("class", "point")
+                .attr("stroke-width", 2)
+                .style("vector-effect", "non-scaling-stroke")
+                .attr("cx", d => path.centroid(d)[0])
+                .attr("cy", d => path.centroid(d)[1])
+                .attr('r', d => {
+                    return getSize(d.properties._value)
+                })
+                //.attr("transform", this.props.transform)
+                .on("mouseenter", (d) => {
+                    this.showToolTip(tooltip, d.properties, getColor(d.properties._value))
+                })
+                .on("mouseleave", (d) => {
+                    this.hiddenToolTip()
+                })
 
-            })
+            g.selectAll(".point-label").data(filteredData)
+                .enter()
+                .append("text")
+                .attr("class", "point-label")
+                .attr("x", d => path.centroid(d)[0])
+                .attr("y", d => path.centroid(d)[1])
+                .attr("font-size", d => {
+                    return markerLabelSize / projection.scale() + "em"
+                })
+                .attr("fill", labelColor)
+                .text(d => {
+                    return intl.formatNumber(format.style === 'percent' ? d.properties._value / 100 : d.properties._value, numberFormat)
+
+                })
+        } else {
+
+            g.selectAll("path")
+                .attr("fill", d => getColor(d.properties._value))
+                .attr("stroke", borderColor)
+                .attr("id", "state-borders")
+                .attr("d", path)
+                .attr("transform", this.props.transform)
+                .on("mouseenter", (d) => {
+                    this.showToolTip(tooltip, d.properties, getColor(d.properties._value))
+                })
+                .on("mouseleave", (d) => {
+                    this.hiddenToolTip()
+                })
+
+        }
 
 
     }
 
 
     create() {
+
+        console.log("create")
         const {
             app,
             name,
@@ -205,6 +222,8 @@ class DataLayer extends BaseLayer {
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
+        const {projection} = this.props
+
         this.create()
     }
 

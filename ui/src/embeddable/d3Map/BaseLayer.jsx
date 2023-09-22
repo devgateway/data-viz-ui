@@ -56,7 +56,9 @@ class BaseLayer extends React.Component {
             .attr("fill", fillColor)
             .attr("stroke", borderColor)
             .attr("id", "state-borders")
-            .attr("d", path);
+            .attr("d", path)
+            .attr("transform", this.props.transform)
+
 
 
         g.selectAll(".label")
