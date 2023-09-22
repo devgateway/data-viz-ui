@@ -62,6 +62,7 @@ class ZoomControl extends React.Component {
     zoomed() {
         const selection = this.getSelection()
         selection.selectAll("g").attr("transform", d3.event.transform)
+
     }
 
 
