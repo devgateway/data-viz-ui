@@ -11,11 +11,8 @@ import {
     TextControl,
     ToggleControl
 } from '@wordpress/components';
-import Measures from './MapMeasures.jsx'
-import Property from "./Property";
-import BreaksGenerator from "./BreaksGenerator";
-import {BlockEditWithAPIMetadata} from "../commons";
-import {PanelColorSettings} from "@wordpress/block-editor";
+import Measures from './utils/MapMeasures.jsx'
+import Property from "./utils/Property";
 
 const FilterSelector = ({param, index, options, onUpdateFilterParam}) => {
     const sortedOptions = options.sort(function (a, b) {
@@ -222,9 +219,11 @@ export class DataLayerSetting extends Component {
                 featureJoinAttribute,
                 apiJoinAttribute,
                 type,
+                useCentroidPoint,
                 fillColor,
                 borderColor,
                 breaks,
+
                 markFillColor,
                 markBorderColor,
                 markSizeScale,
@@ -283,7 +282,8 @@ export class DataLayerSetting extends Component {
                 onSetSingleMeasure={this.onSetSingleMeasure}
                 onMeasuresChange={this.onMeasuresChange}
                 {...this.props} />}
-        </React.Fragment>, <React.Fragment>
+        </React.Fragment>,
+            <React.Fragment>
             {app != 'csv' && <PanelBody initialOpen={false} title={__("Filters")}>
                 {filters.map((f, index) => {
 
@@ -302,52 +302,9 @@ export class DataLayerSetting extends Component {
             </PanelBody>}
         </React.Fragment>,
 
-            <PanelBody initialOpen={false} title={"Marker Defaults"}>
-                <PanelRow>
-                    <ToggleControl
-                        label="Use Circle Mark"
-                        checked={true}
-                        onChange={(value) => {
-                            onChangeProperty("useCentroidPoint", value)
-                        }}
-                    />
-                </PanelRow>
-                <PanelRow>
-                    <RangeControl
-                        label="Maker Base Size"
-                        value={markSizeScale}
-                        onChange={(value) => {
-                            onChangeProperty("markSizeScale", value)
-                        }}
-                        step={0.5}
-                        min={0}
-                        max={10}
-                    />
-                </PanelRow>
-                <PanelRow>
-                    <PanelColorSettings
-                        title={__(`Fill Color`)}
-                        value={fillColor}
-                        colorSettings={[{
-                            value: markFillColor, onChange: (fillColor) => {
-                                onChangeProperty("markFillColor", fillColor)
-                            },
+            <PanelBody initialOpen={false} title={"Styles"}>
 
-                        }]}
-                    />
-                    <PanelColorSettings
-                        title={__(`Border Color`)}
-                        value={borderColor}
-                        colorSettings={[{
-                            value: markBorderColor, onChange: (borderColor) => {
-                                onChangeProperty("markBorderColor", borderColor)
-                            },
 
-                        }]}
-                    />
-                </PanelRow>
-                <BreaksGenerator defaultBorderColor={markBorderColor} defaultFillColor={markFillColor}
-                                 onChangeProperty={onChangeProperty} breaks={breaks}/>
 
             </PanelBody>
 

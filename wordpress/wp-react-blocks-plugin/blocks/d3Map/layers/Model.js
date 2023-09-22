@@ -18,7 +18,7 @@ export const FieldSet = {
 
 }
 
-export class LayerObject {
+export class Model {
     id = Date.now();
     name = 'New Layer'
     app = "csv"
@@ -50,7 +50,12 @@ export class LayerObject {
     //type:'shape', //shape layer user will select file and data source
     //type:'data', //will select data source and symbols + symbols configuration
 
-    format = {allowSelection: false, format: format, customFormat: format, selected: false}
+    format = {
+        "style": "percent",
+        "minimumFractionDigits": 1,
+        "maximumFractionDigits": 1,
+        "currency": "USD"
+    }
     featureJoinAttribute = 'none'
     apiJoinAttribute = 'none'
     useCentroidPoint = false
@@ -67,4 +72,4 @@ export class LayerObject {
 }
 
 
-export default LayerObject
+export default Model

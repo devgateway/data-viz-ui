@@ -42,6 +42,7 @@ registerBlockType(process.env.BLOCKS_NS + '/new-d3-map',
                 default: {}
             },
 
+
         },
         edit: BlockEdit,
         save: BlockSave,
