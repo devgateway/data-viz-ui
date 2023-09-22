@@ -4,7 +4,7 @@ import {decode, parse} from "../utils/parseUtils";
 import Map from "./Map"
 import BaseLayer from './BaseLayer'
 import DataLayer from './DataLayer'
-import LatLongLayer from './DataLayer'
+import LatLongLayer from './LatLongLayer'
 import ZoomControl from "./ZoomControl";
 import {Container} from "semantic-ui-react";
 import ProjectedContainer from "./ProjectedContainer";
