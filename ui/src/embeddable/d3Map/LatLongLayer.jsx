@@ -28,6 +28,7 @@ class DataLayer extends React.Component {
     constructor() {
         super();
         this.create = this.create.bind(this)
+        this.gRef = React.createRef();
     }
 
     create() {
@@ -35,29 +36,55 @@ class DataLayer extends React.Component {
         const {
             app,
             data,
-            measures
+            markFillColor,
+            markBorderColor,
+            markSizeScale,
+            markerLabelSize,
+            measures,
+            projection
         } = this.props
 
-
+        let points = []
         const g = d3.select(this.gRef.current)
 
         if (app != 'csv' && data && data.children) {
 
 
         } else if (app == 'csv') {
-            console.log(data.fields)
-            const latField=data.meta.fields[0]
-            const longField=data.meta.fields[1]
-            const valueField=data.meta.fields[2]
 
-            g.attr("class", "data-layer ")
-            g.selectAll(".latLong").remove()
-            g.selectAll(".latLong-label").remove()
+            const latField = data.meta.fields[0]
+            const longField = data.meta.fields[1]
+            const valueField = data.meta.fields[2]
 
+            points = data.data.map((d) => {
 
+                return {
+                    x: d[latField],
+                    y: d[longField],
+                    value: d[valueField]
+                    }
+            })
 
 
         }
+        debugger;
+        g.selectAll(".latLong")
+            .data(points)
+            .enter()
+            .append("circle")
+            .attr("cx", function (d) {
+                return projection([d.y, d.x])[0];
+            })
+            .attr("cy", function (d) {
+                return projection([d.y, d.x])[1];
+            })
+            .attr("r", markSizeScale)
+            .attr("stroke-width", 2)
+            .style("vector-effect", "non-scaling-stroke")
+            .attr("stroke", markBorderColor)
+            .attr("fill",markFillColor)
+
+
 
 
     }
