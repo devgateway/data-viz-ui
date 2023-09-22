@@ -133,7 +133,9 @@ class DataLayer extends BaseLayer {
                 .text(d => {
                     return intl.formatNumber(format.style === 'percent' ? d.properties._value / 100 : d.properties._value, numberFormat)
 
-                })
+                }).on("mouseover", (d) => {
+
+            });
         } else {
 
             g.selectAll("path")
