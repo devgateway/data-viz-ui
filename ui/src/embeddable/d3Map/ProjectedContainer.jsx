@@ -59,7 +59,7 @@ class ProjectedContainer extends React.Component {
                     initialPosition,
                     editing,
                     height,
-                    width
+                    width,
                 })
 
             })}
