@@ -34,14 +34,7 @@ class DataLayer extends React.Component {
     create() {
 
         const {
-            app,
-            data,
-            markFillColor,
-            markBorderColor,
-            markSizeScale,
-            markerLabelSize,
-            measures,
-            projection
+            app, data, markFillColor, markBorderColor, markSizeScale, markerLabelSize, measures, projection, name
         } = this.props
 
         let points = []
@@ -59,15 +52,14 @@ class DataLayer extends React.Component {
             points = data.data.map((d) => {
 
                 return {
-                    x: d[latField],
-                    y: d[longField],
-                    value: d[valueField]
-                    }
+                    x: d[latField], y: d[longField], value: d[valueField]
+                }
             })
 
 
         }
-        debugger;
+        g.attr("class", "lat-long " + name)
+        g.selectAll(".latLong").remove()
         g.selectAll(".latLong")
             .data(points)
             .enter()
@@ -78,13 +70,12 @@ class DataLayer extends React.Component {
             .attr("cy", function (d) {
                 return projection([d.y, d.x])[1];
             })
+            .attr("class", "latLong")
             .attr("r", markSizeScale)
             .attr("stroke-width", 2)
             .style("vector-effect", "non-scaling-stroke")
             .attr("stroke", markBorderColor)
-            .attr("fill",markFillColor)
-
-
+            .attr("fill", markFillColor)
 
 
     }
