@@ -69,7 +69,7 @@ class BaseLayer extends React.Component {
             }))
             .enter().append("text")
             .attr("class", "label")
-            .attr("font-size", labelFontSize * 0.5 / transform.k)
+            .attr("font-size", labelFontSize * 0.5 /(transform? transform.k:1))
             .text(function (d) {
                 return d.properties[labelField]
             })
