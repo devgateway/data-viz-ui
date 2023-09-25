@@ -36,11 +36,17 @@ class DataLayer extends React.Component {
         const {
             app, data, markFillColor, markBorderColor, markSizeScale, markerLabelSize, measures, projection, name
         } = this.props
-
         let points = []
         const g = d3.select(this.gRef.current)
-
         if (app != 'csv' && data && data.children) {
+            points = data.children.map((d) => {
+                const latLong = d.value.split(',')
+
+                return {
+                    x: latLong[0], y: latLong[1], value: 1, metadata: d,
+                }
+
+            })
 
 
         } else if (app == 'csv') {
@@ -78,6 +84,11 @@ class DataLayer extends React.Component {
             .attr("fill", markFillColor)
 
 
+        if (this.props.transform) {
+            g.attr("transform", this.props.transform)
+            //g.selectAll(".label").attr("transform", this.props.transform)
+        }
+
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
@@ -87,7 +98,7 @@ class DataLayer extends React.Component {
 
     componentDidMount() {
         this.create()
-        this.props.zoom.current.fullView()
+
     }
 
     render() {
