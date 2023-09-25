@@ -59,7 +59,6 @@ class DataLayer extends BaseLayer {
             intl,
             zoom
         } = this.props
-        const g = d3.select(this.gRef.current)
 
 
         let numberFormat = {
@@ -80,7 +79,7 @@ class DataLayer extends BaseLayer {
 
         let getSize = (value) => {
             if (breaks.length > 0) {
-                return sizeScale(value) * markSizeScale
+                return sizeScale(value)
             }
             return markSizeScale
         }
@@ -93,12 +92,17 @@ class DataLayer extends BaseLayer {
         }
 
         const filteredData = json.features.filter(f => f.properties._value != null)
-        g.attr("class", "data-layer " + name)
-        g.selectAll(".point").remove()
-        g.selectAll(".point-label").remove()
+
+
+
+
+
+
+        this.g.selectAll(".point").remove()
+        this.g.selectAll(".point-label").remove()
 
         if (useCentroidPoint) {
-            g.selectAll(".point")
+            this.g.selectAll(".point")
                 .data(filteredData)
                 .enter()
                 .append("circle")
@@ -110,7 +114,7 @@ class DataLayer extends BaseLayer {
                 .attr("cx", d => path.centroid(d)[0])
                 .attr("cy", d => path.centroid(d)[1])
                 .attr('r', d => {
-                    return getSize(d.properties._value)
+                    return getSize(d.properties._value) * 1 / this.props.transform.k
                 })
                 //.attr("transform", this.props.transform)
                 .on("mouseenter", (d) => {
@@ -119,15 +123,14 @@ class DataLayer extends BaseLayer {
                 .on("mouseleave", (d) => {
                     this.hiddenToolTip()
                 })
-
-            g.selectAll(".point-label").data(filteredData)
+            this.g.selectAll(".point-label").data(filteredData)
                 .enter()
                 .append("text")
                 .attr("class", "point-label")
                 .attr("x", d => path.centroid(d)[0])
                 .attr("y", d => path.centroid(d)[1])
                 .attr("font-size", d => {
-                    return markerLabelSize / projection.scale() + "em"
+                    return (markerLabelSize * 1 / this.props.transform.k) + "px"
                 })
                 .attr("fill", labelColor)
                 .text(d => {
@@ -138,12 +141,11 @@ class DataLayer extends BaseLayer {
             });
         } else {
 
-            g.selectAll("path")
+            this.g.selectAll("path")
                 .attr("fill", d => getColor(d.properties._value))
                 .attr("stroke", borderColor)
                 .attr("id", "state-borders")
                 .attr("d", path)
-                .attr("transform", this.props.transform)
                 .on("mouseenter", (d) => {
                     this.showToolTip(tooltip, d.properties, getColor(d.properties._value))
                 })

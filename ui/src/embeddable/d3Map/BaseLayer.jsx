@@ -40,16 +40,21 @@ class BaseLayer extends React.Component {
             fillColor,
             borderColor,
             editing,
+            transform,
             projection
         } = this.props
-        const g = d3.select(this.gRef.current)
-        g.attr("class", "base-layer " + name)
 
-        g.selectAll("path").remove()
-        g.selectAll(".label").remove()
+        this.g = d3.select(this.gRef.current)
+
+        //root.selectAll(".base-layer").remove()  //add unique name
+        //this.g = root.append("g")
+
+        this.g.attr("class", "base-layer") //add unique name
+        this.g.selectAll("path").remove()
+        this.g.selectAll(".label").remove()
 
 
-        g.selectAll("path")
+        this.g.selectAll("path")
             .data(json.features)
             .enter()
             .append("path")
@@ -57,28 +62,31 @@ class BaseLayer extends React.Component {
             .attr("stroke", borderColor)
             .attr("id", "state-borders")
             .attr("d", path)
-            .attr("transform", this.props.transform)
 
-
-
-        g.selectAll(".label")
+        this.g.selectAll(".label")
             .data(json.features.filter(f => {
                 return labelFilter.indexOf(f.properties[labelField]) == -1
             }))
             .enter().append("text")
             .attr("class", "label")
-            .attr("font-size", labelFontSize / projection.scale() + "em")
+            .attr("font-size", labelFontSize * 0.5 / transform.k)
             .text(function (d) {
                 return d.properties[labelField]
             })
             .attr("color", labelColor)
             .attr("fill", labelColor)
+
             .attr("transform", function (d) {
                 var bbox = this.getBBox();
                 var width = bbox.width;
                 return "translate(" + [path.centroid(d)[0] - (width / 2), path.centroid(d)[1]] + ")"
             })
 
+            /*Apply zoom value*/
+        if (this.props.transform) {
+            this.g.attr("transform", this.props.transform)
+            //g.selectAll(".label").attr("transform", this.props.transform)
+        }
 
     }
 
@@ -109,29 +117,37 @@ class BaseLayer extends React.Component {
             name,
             file,
             path,
-            zoom,
+            transform,
             labelFilter = [],
             labelField,
             labelFontSize,
             labelColor,
             fillColor,
             borderColor,
-            editing
+            editing,
+
         } = this.props
 
-        this.create()
+        if (file !== prevProps.file || path !== prevProps.path || transform !== prevProps.transform
+            || labelFilter !== prevProps.labelFilter || labelField !== prevProps.labelField
+            || labelFontSize !== prevProps.labelFontSize || labelColor !== prevProps.labelColor
+            || fillColor !== prevProps.fillColor || borderColor !== prevProps.borderColor
+
+        ) {
+            this.create()
+        }
 
 
     }
 
-    showToolTip(content, data,color) {
+    showToolTip(content, data, color) {
         const tip = d3.select("body").append("div")
             .attr("class", "d3MapTooltip")
             .style("position", "absolute")
             //.style("background-color", color)
             .html("")
-            .style("left", (d3.event.pageX+15) + "px")
-            .style("top", (d3.event.pageY-50) + "px")
+            .style("left", (d3.event.pageX + 15) + "px")
+            .style("top", (d3.event.pageY - 50) + "px")
 
         ReactDOM.render(<Tooltip intl={this.props.intl} tooltip={content} data={data}
                                  tooltipEnableMarkdown={false}/>, tip._groups[0][0])
@@ -157,7 +173,7 @@ class BaseLayer extends React.Component {
 
     render() {
         const {name, height, width} = this.props
-        return <g className={"base " + name} ref={this.gRef}/>
+        return <g className={"base"} ref={this.gRef}/>
     }
 }
 
