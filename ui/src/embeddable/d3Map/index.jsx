@@ -41,21 +41,21 @@ const MapWrapper = (props) => {
                     <Map>
                         {layers.map((layer, i) => {
                             if (layer.type === 'base') {
-                                return <BaseLayer intl={intl} zoom={zoomRef} unique={unique}
+                                return <BaseLayer transform={transform} intl={intl} zoom={zoomRef} unique={unique}
                                                   key={i} {...layer} />
                             }
                             if (layer.type === 'data') {
-                                return <DataLayer intl={intl} group={group} zoom={zoomRef} unique={unique}
+                                return <DataLayer  transform={transform}  intl={intl} group={group} zoom={zoomRef} unique={unique}
                                                   key={i} {...layer} />
                             }
                             if (layer.type === 'dataPoints') {
-                                return <LatLongLayer intl={intl} group={group} zoom={zoomRef} unique={unique}
+                                return <LatLongLayer  transform={transform}  intl={intl} group={group} zoom={zoomRef} unique={unique}
                                                    key={i} {...layer} />
                             }
 
                         })}
                     </Map>
-                    <ZoomControl onZoomed={setTransform} width={width} height={height} ref={zoomRef} group={group}
+                    <ZoomControl  onZoomed={setTransform} width={width} height={height} ref={zoomRef} group={group}
                                  editing={editing}/>
                 </ProjectedContainer>
             </div>
