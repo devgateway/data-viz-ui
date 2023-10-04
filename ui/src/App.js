@@ -40,7 +40,7 @@ const messages = {
 
 const PreviewComponentParameterParser = (props) => {
 
-    debugger;
+
     const componentRef = useRef(getComponentByNameIgnoreCase(props.match.params.name))
 
     const UIComponent = componentRef.current

@@ -13,7 +13,7 @@ class CustomColors extends Colors {
         //1 dimension by id == by measure        
         if (app != 'csv') {
             const mapByDimension = (whichDimension) => {
-                debugger;
+                
                 const selectedDimension = [...dimensionsMetadata][whichDimension]
 
                 if (selectedDimension) {
