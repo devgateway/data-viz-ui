@@ -189,7 +189,7 @@ const ListFilterDropDown = connect(mapStateToProps, mapActionCreators)((props) =
                     }
                     onInit({app, group, param, value: filterValues})
                 }else{
-                    debugger;
+                    
                     onInit({app, group, param, value: [filterItems[0]]})
                 }
             }
@@ -359,7 +359,7 @@ const RangeFilterDropDown = connect(mapStateToProps, mapActionCreators)(({
 
 
 const CategoryFilter = (props) => {
-    debugger;
+    
     const {data, type, showNoDataOption} = props
     const cat = data.filter(d => d.type === type)[0]
     const filteredCategories = cat ? cat.items.filter(f => {

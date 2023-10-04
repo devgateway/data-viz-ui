@@ -32,6 +32,8 @@ class DataLayer extends BaseLayer {
 
     createDataLayer(json) {
         const {
+            app,
+            svg,
             format,
             name,
             file,
@@ -45,6 +47,7 @@ class DataLayer extends BaseLayer {
             borderColor,
             tooltip,
             markFillColor,
+            markLabelColor,
             markBorderColor,
             markSizeScale,
             markerLabelSize,
@@ -53,11 +56,16 @@ class DataLayer extends BaseLayer {
             measures,
             editing,
             data,
+            patternDiscriminator,
             breaks,
+            patterns,
             projection,
+            useBreaks,
             useCentroidPoint,
+            usePattern,
             intl,
-            zoom
+
+
         } = this.props
 
 
@@ -78,35 +86,121 @@ class DataLayer extends BaseLayer {
             .range(breaks.map(d => d.color));
 
         let getSize = (value) => {
-            if (breaks.length > 0) {
-                return sizeScale(value)
+            if (breaks.length > 0 && useBreaks) {
+                return markSizeScale + sizeScale(value)
             }
             return markSizeScale
         }
 
-        let getColor = (value) => {
-            if (breaks.length > 0) {
+        let getColor = (value, isMarker) => {
+
+            if (breaks.length > 0 && useBreaks) {
                 return colorScale(value)
             }
-            return markFillColor
+
+            if (isMarker) {
+                return markFillColor
+            }
+            return fillColor
         }
 
         const filteredData = json.features.filter(f => f.properties._value != null)
 
 
-
-
-
-
         this.g.selectAll(".point").remove()
         this.g.selectAll(".point-label").remove()
+        this.g.selectAll(".shape-pattern").remove()
+
+        d3.select(svg).selectAll("defs").remove()
+
+        const defs = d3.select(svg).append("defs")
+        let patternsData = []
+        if (app == "csv") {
+            patternsData = [...new Set(data.data.map(d => d[patternDiscriminator]))].map(key => {
+
+                return {
+                    key: key,
+                    type: patterns[key + "_symbol"],
+                    color: patterns[key + "_color"],
+                    rotation: patterns[key + "_rotation"]
+                }
+            })
+        } else {
+
+        }
+
+        defs.selectAll("pattern").remove()
+
+        defs.selectAll("pattern")
+            .data(patternsData).enter()
+            .append("pattern")
+            .attr('id', d => d.key)
+            .attr('patternUnits', 'userSpaceOnUse')
+            .attr('width', .25)
+            .attr('height', .25)
+            .attr("x", 0).attr("y", 0)
+            .attr("patternTransform", d => `rotate(${d.rotation})`)
+
+        patternsData.forEach(d => {
+            if (d.type === 'lines') {
+                defs.select("#" + d.key)
+                    .append("rect")
+                    .attr('width', .1)
+                    .attr('height', 1)
+                    .attr('fill', d.color)
+            }
+            if (d.type === 'squares') {
+                defs.select("#" + d.key)
+                    .append("rect")
+                    .attr('width', .15)
+                    .attr('height', .15)
+                    .attr('fill', d.color)
+                    .attr("stroke-width", 1)
+
+            }
+        })
+        /*
+              .append("rect")
+              .attr('width', .1)
+              .attr('height', .1)
+              .attr('fill', markFillColor)
+
+
+          defs.append("pattern")
+              .attr('id', 'lines')
+              .attr('patternUnits', 'userSpaceOnUse')
+              .attr('width', .2)
+              .attr('height', .2)
+              .attr("patternTransform", "rotate(45)")
+              .attr("x", 0).attr("y", 0)
+              .append("rect")
+              .attr('width', .1)
+              .attr('height', 1)
+              .attr('fill', markFillColor)
+
+
+          defs.append("pattern")
+              .attr('id', 'dots')
+              .attr('patternUnits', 'userSpaceOnUse')
+              .attr('width', .2)
+              .attr('height', .2)
+              .attr("patternTransform", "rotate(45)")
+              .attr("x", 0)
+              .attr("y", 0)
+              .append("circle")
+              .attr('fill', markFillColor)
+              .attr('cx', .15)
+              .attr('cy', .15)
+              .attr('r', .05)
+        * */
+
 
         if (useCentroidPoint) {
             this.g.selectAll(".point")
                 .data(filteredData)
                 .enter()
                 .append("circle")
-                .attr("fill", d => getColor(d.properties._value))
+                .attr("fill", d => getColor(d.properties._value, true))
                 .attr("stroke", markBorderColor)
                 .attr("class", "point")
                 .attr("stroke-width", 2)
@@ -123,6 +217,8 @@ class DataLayer extends BaseLayer {
                 .on("mouseleave", (d) => {
                     this.hiddenToolTip()
                 })
+
+
             this.g.selectAll(".point-label").data(filteredData)
                 .enter()
                 .append("text")
@@ -130,9 +226,9 @@ class DataLayer extends BaseLayer {
                 .attr("x", d => path.centroid(d)[0])
                 .attr("y", d => path.centroid(d)[1])
                 .attr("font-size", d => {
-                    return (markerLabelSize * 1 / this.props.transform.k) + "px"
+                    return (markerLabelSize * (1 / this.props.transform.k)) + "px"
                 })
-                .attr("fill", labelColor)
+                .attr("fill", markLabelColor)
                 .text(d => {
                     return intl.formatNumber(format.style === 'percent' ? d.properties._value / 100 : d.properties._value, numberFormat)
 
@@ -141,8 +237,14 @@ class DataLayer extends BaseLayer {
             });
         } else {
 
+
             this.g.selectAll("path")
-                .attr("fill", d => getColor(d.properties._value))
+                .attr("fill", d => {
+                    if (!d.properties._value) {
+                        return fillColor
+                    }
+                    return getColor(d.properties._value)
+                })
                 .attr("stroke", borderColor)
                 .attr("id", "state-borders")
                 .attr("d", path)
@@ -152,6 +254,34 @@ class DataLayer extends BaseLayer {
                 .on("mouseleave", (d) => {
                     this.hiddenToolTip()
                 })
+
+            if (usePattern) {
+                this.g.selectAll("shape-pattern")
+                    .data(json.features)
+                    .enter()
+                    .append("path")
+                    .attr("d", path)
+                    .attr("class", "shape-pattern")
+                    .attr("opacity", d => {
+                        if (useBreaks) {
+                            return 1
+                        }
+                    })
+                    .attr("fill", d => {
+                        return "transparent"
+                    })
+
+                    .attr("style", d => {
+                        if (d.properties && d.properties.meta) {
+                            const id = d.properties.meta[patternDiscriminator]
+                            return "fill:url(#" + id + ");"
+                        }else{
+                            //return "fill:red;"
+                        }
+
+                    })
+            }
+
 
         }
 
@@ -265,6 +395,7 @@ const DataWrapper = (props) => {
         name, unique, filters, csv, app, group = "default", apiJoinAttribute, editing
     } = props
 
+    debugger;
     return (<DataProvider
         editing={editing}
         params={filters}
