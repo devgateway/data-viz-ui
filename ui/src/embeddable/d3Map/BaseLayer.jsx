@@ -12,11 +12,14 @@ class BaseLayer extends React.Component {
     constructor() {
         super();
         this.loadJSON = this.loadJSON.bind(this)
-        this.createBaseLayer = this.createBaseLayer.bind(this)
-        this.create = this.create.bind(this)
-        this.gRef = React.createRef();
+
+        this.createLabels = this.createLabels.bind(this)
+        this.createPaths = this.createPaths.bind(this)
+
         this.showToolTip = this.showToolTip.bind(this)
         this.moveToolTip = this.moveToolTip.bind(this)
+        this.gRef = React.createRef();
+
     }
 
     loadJSON(url) {
@@ -28,33 +31,17 @@ class BaseLayer extends React.Component {
         })
     }
 
-    createBaseLayer(json) {
+    createPaths(json) {
         const {
-            name,
-            file,
             path,
-            zoom,
-            labelFilter = [],
-            labelSettings = {},
-            labelField,
-            labelFontSize,
-            labelColor,
             fillColor,
             borderColor,
-            editing,
-            transform,
-            projection
+
         } = this.props
         this.g = d3.select(this.gRef.current)
-
-        //root.selectAll(".base-layer").remove()  //add unique name
-        //this.g = root.append("g")
-
         this.g.attr("class", "base-layer") //add unique name
         this.g.selectAll("path").remove()
         this.g.selectAll(".label").remove()
-
-
         this.g.selectAll("path")
             .data(json.features)
             .enter()
@@ -64,6 +51,23 @@ class BaseLayer extends React.Component {
             .attr("id", "state-borders")
             .attr("d", path)
 
+        if (this.props.transform) {
+            this.g.attr("transform", this.props.transform)
+        }
+
+    }
+
+    createLabels(json) {
+        const {
+            path,
+            labelFilter = [],
+            labelSettings = {},
+            labelField,
+            labelFontSize,
+            labelColor,
+            projection
+        } = this.props
+        this.g = d3.select(this.gRef.current)
 
         const k = this.props.transform ? this.props.transform.k : 1
 
@@ -83,19 +87,17 @@ class BaseLayer extends React.Component {
                 const rotation = labelSettings[d.properties[labelField] + "_rotation"] || 0
                 const offsetX = labelSettings[d.properties[labelField] + "_offsetX"] || 0
                 const offsetY = labelSettings[d.properties[labelField] + "_offsetY"] || 0
-
                 const x = path.centroid(d)[0] + (offsetX / projection.scale())
                 const y = path.centroid(d)[1] + (offsetY / projection.scale())
-
                 return "translate(" + [x, y] + "),rotate(" + (rotation ? rotation : 0) + ")"
             })
-        /*Apply zoom value*/
         if (this.props.transform) {
             this.g.attr("transform", this.props.transform)
-            //g.selectAll(".label").attr("transform", this.props.transform)
         }
 
     }
+
+
 
 
     create() {
@@ -114,7 +116,8 @@ class BaseLayer extends React.Component {
         } = this.props
 
         this.loadJSON(file).then(json => {
-            this.createBaseLayer(json)
+            this.createPaths(json)
+            this.createLabels(json)
 
         });
     }
