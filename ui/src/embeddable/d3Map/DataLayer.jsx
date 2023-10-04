@@ -121,6 +121,7 @@ class DataLayer extends BaseLayer {
 
         }
 
+       this.createPaths(json)
 
         this.g.selectAll(".point").remove()
         this.g.selectAll(".point-label").remove()
@@ -182,43 +183,69 @@ class DataLayer extends BaseLayer {
 
             }
         })
-        /*
-              .append("rect")
-              .attr('width', .1)
-              .attr('height', .1)
-              .attr('fill', markFillColor)
+
+        if (usePattern) {
+            this.g.selectAll("shape-pattern")
+                .data(json.features)
+                .enter()
+                .append("path")
+                .attr("d", path)
+                .attr("class", "shape-pattern")
+                .attr("opacity", d => {
+                    if (useBreaks) {
+                        return .7
+                    }
+                })
+                .attr("fill", d => {
+                    return "transparent"
+                })
+
+                .attr("style", d => {
+                    if (d.properties && d.properties.meta) {
+                        const id = d.properties.meta[patternDiscriminator]
+                        return "none;fill:url(#" + id + ");"
+                    } else {
+                        // return "pointer-events:none;"
+                    }
+
+                })
+                .on("mouseenter", (d) => {
+                    this.showToolTip(tooltip, getTooltipVariables(d), getColor(d.properties._value))
+                }).on("mousemove", (d) => {
+                this.moveToolTip()
+            }).on("mouseleave", (d) => {
+                this.hiddenToolTip()
+            })
 
 
-          defs.append("pattern")
-              .attr('id', 'lines')
-              .attr('patternUnits', 'userSpaceOnUse')
-              .attr('width', .2)
-              .attr('height', .2)
-              .attr("patternTransform", "rotate(45)")
-              .attr("x", 0).attr("y", 0)
-              .append("rect")
-              .attr('width', .1)
-              .attr('height', 1)
-              .attr('fill', markFillColor)
+        }
+        if (!useCentroidPoint) {
 
 
-          defs.append("pattern")
-              .attr('id', 'dots')
-              .attr('patternUnits', 'userSpaceOnUse')
-              .attr('width', .2)
-              .attr('height', .2)
-              .attr("patternTransform", "rotate(45)")
-              .attr("x", 0)
-              .attr("y", 0)
-              .append("circle")
-              .attr('fill', markFillColor)
-              .attr('cx', .15)
-              .attr('cy', .15)
-              .attr('r', .05)
-        * */
+            this.g.selectAll("path")
+                .attr("fill", d => {
+                    if (!d.properties._value) {
+                        return fillColor
+                    }
+                    return getColor(d.properties._value)
+                })
+                .attr("stroke", borderColor)
+                .attr("id", "state-borders")
+                .attr("d", path).on("mouseenter", (d) => {
+                this.showToolTip(tooltip, getTooltipVariables(d), getColor(d.properties._value))
+            })
+                .on("mouseleave", (d) => {
+                    this.hiddenToolTip()
+                })
+                .on("mousemove", (d) => {
+                    this.moveToolTip()
+                })
 
+            this.createLabels(json)
 
+        }
         if (useCentroidPoint) {
+            this.createLabels(json)
             this.g.selectAll(".point")
                 .data(filteredData)
                 .enter()
@@ -267,65 +294,6 @@ class DataLayer extends BaseLayer {
 
             });
         } //Map Shapes
-        else {
-            this.g.selectAll("path")
-                .attr("fill", d => {
-                    if (!d.properties._value) {
-                        return fillColor
-                    }
-                    return getColor(d.properties._value)
-                })
-                .attr("stroke", borderColor)
-                .attr("id", "state-borders")
-                .attr("d", path).on("mouseenter", (d) => {
-                this.showToolTip(tooltip, getTooltipVariables(d), getColor(d.properties._value))
-            })
-                .on("mouseleave", (d) => {
-                    this.hiddenToolTip()
-                })
-                .on("mousemove", (d) => {
-                    this.moveToolTip()
-                })
-
-
-            if (usePattern) {
-                this.g.selectAll("shape-pattern")
-                    .data(json.features)
-                    .enter()
-                    .append("path")
-                    .attr("d", path)
-                    .attr("class", "shape-pattern")
-                    .attr("opacity", d => {
-                        if (useBreaks) {
-                            return .7
-                        }
-                    })
-                    .attr("fill", d => {
-                        return "transparent"
-                    })
-
-                    .attr("style", d => {
-                        if (d.properties && d.properties.meta) {
-                            const id = d.properties.meta[patternDiscriminator]
-                            return "none;fill:url(#" + id + ");"
-                        } else {
-                            // return "pointer-events:none;"
-                        }
-
-                    })
-                    .on("mouseenter", (d) => {
-                        this.showToolTip(tooltip, getTooltipVariables(d), getColor(d.properties._value))
-                    }).on("mousemove", (d) => {
-                        this.moveToolTip()
-                    }).on("mouseleave", (d) => {
-                        this.hiddenToolTip()
-                    })
-
-
-            }
-
-
-        }
 
 
     }
@@ -402,7 +370,7 @@ class DataLayer extends BaseLayer {
             const newJson = {...json, features}
 
 
-            this.createBaseLayer(newJson)
+
             this.createDataLayer(newJson);
 
 
