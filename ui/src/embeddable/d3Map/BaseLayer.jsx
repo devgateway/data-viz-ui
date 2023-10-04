@@ -16,6 +16,7 @@ class BaseLayer extends React.Component {
         this.create = this.create.bind(this)
         this.gRef = React.createRef();
         this.showToolTip = this.showToolTip.bind(this)
+        this.moveToolTip = this.moveToolTip.bind(this)
     }
 
     loadJSON(url) {
@@ -65,7 +66,7 @@ class BaseLayer extends React.Component {
 
 
         const k = this.props.transform ? this.props.transform.k : 1
-        
+
         this.g.selectAll(".label")
             .data(json.features.filter(f => {
                 return labelFilter.indexOf(f.properties[labelField]) == -1
@@ -82,7 +83,7 @@ class BaseLayer extends React.Component {
                 const rotation = labelSettings[d.properties[labelField] + "_rotation"] || 0
                 const offsetX = labelSettings[d.properties[labelField] + "_offsetX"] || 0
                 const offsetY = labelSettings[d.properties[labelField] + "_offsetY"] || 0
-                
+
                 const x = path.centroid(d)[0] + (offsetX / projection.scale())
                 const y = path.centroid(d)[1] + (offsetY / projection.scale())
 
@@ -157,17 +158,18 @@ class BaseLayer extends React.Component {
 
     }
 
+
+    moveToolTip() {
+        const tip = d3.select(".d3MapTooltip")
+            .style("left", (d3.event.pageX + 15) + "px")
+            .style("top", (d3.event.pageY - 50) + "px")
+    }
+
     hiddenToolTip() {
         d3.selectAll(".d3MapTooltip").remove();
 
     }
 
-    parseToolTipContent(content) {
-        const {data} = this.props
-        return content.replace(/\{(.+?)\}/g, function (match, p1) {
-            return data[p1]
-        })
-    }
 
     componentDidMount() {
         this.create()
