@@ -34,7 +34,7 @@ class BlockEdit extends ComponentWithSettings {
             method: 'GET'
         }).then((res) => {
             if (res) {
-                debugger;
+                
                 const menus = res.map((item, index) => {
                     return {label: item.name, value: item.name}
                 })
@@ -90,7 +90,7 @@ class BlockEdit extends ComponentWithSettings {
                             label={__('Name')}
                             value={name}
                             onChange={(name) =>{
-                                debugger;
+                                
                                 setAttributes({name: name})
 
                             } }

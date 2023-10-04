@@ -13,7 +13,7 @@ const BreaksGenerator = ({onChangeProperty, breaks = [], defaultFillColor, defau
             end: 1,
             color: defaultFillColor,
             borderColor: defaultBorderColor,
-            size: .1
+            size: 1
         })
         onChangeProperty("breaks", newBreaks)
     }

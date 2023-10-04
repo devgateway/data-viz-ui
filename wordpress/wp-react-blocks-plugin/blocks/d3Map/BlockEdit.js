@@ -12,7 +12,7 @@ import {
 import {__} from '@wordpress/i18n'
 import {BlockEditWithAPIMetadata, ComponentWithSettings, SizeConfig} from '../commons/index'
 import LayerSettings from "./layers/Base";
-import Model from "./layers/Model"
+import LayerModel from "./layers/Model"
 import {togglePanel} from "../commons/Util";
 
 class BlockEdit extends ComponentWithSettings {
@@ -65,7 +65,7 @@ class BlockEdit extends ComponentWithSettings {
         const {setAttributes, attributes: {layers}} = this.props
         const newLayers = [...layers]
 
-        newLayers.push(new Model())
+        newLayers.push({...LayerModel})
         setAttributes({layers: newLayers})
     }
 

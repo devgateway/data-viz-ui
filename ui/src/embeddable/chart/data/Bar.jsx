@@ -196,7 +196,7 @@ const BarOneDimension = (props) => {
         if (props.sort == 'values') {
 
             filtered.sort((a, b) => {
-                debugger;
+                
                 const va =Math.max(...allKeys.map(k=>a[k]))
                 const vb = Math.max(...allKeys.map(k=>b[k]));
                 return numericSort(props.sortreverse, va, vb)
@@ -300,7 +300,7 @@ const Bar2Dimensions = (props) => {
         if (props.sort == 'values') {
 
             filtered.sort((a, b) => {
-                debugger;
+                
                 const va =Math.max(...allKeys.map(k=>a[k]))
                 const vb = Math.max(...allKeys.map(k=>b[k]));
                 return numericSort(props.sortreverse, va, vb)

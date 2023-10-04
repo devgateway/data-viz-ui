@@ -15,6 +15,7 @@ import Measures from './utils/MapMeasures.jsx'
 import Property from "./utils/Property";
 import BreaksGenerator from "./utils/BreaksGenerator";
 import {PanelColorSettings} from "@wordpress/block-editor";
+import PatternGenerator from "./utils/PatternGenerator";
 
 const FilterSelector = ({param, index, options, onUpdateFilterParam}) => {
     const sortedOptions = options.sort(function (a, b) {
@@ -213,7 +214,12 @@ export class DataLayerSetting extends Component {
 
     render() {
         const {
-            onChangeProperty, allDimensions, allFilters, allMeasures, features, apps, layer: {
+            onChangeProperty,
+            allDimensions,
+            allFilters,
+            allMeasures,
+            allCategories,
+            features, apps, layer: {
                 app,
                 csv,
                 measures,
@@ -222,15 +228,22 @@ export class DataLayerSetting extends Component {
                 apiJoinAttribute,
                 type,
                 useCentroidPoint,
+                useBreaks,
                 fillColor,
                 borderColor,
+
+
                 breaks,
                 labelFontSize,
                 markFillColor,
+                markLabelColor,
                 markBorderColor,
                 markSizeScale,
                 markerLabelSize,
-                tooltip
+                tooltip,
+                usePattern,
+                patterns,
+                patternDiscriminator
             }
         } = this.props
 
@@ -246,11 +259,11 @@ export class DataLayerSetting extends Component {
                     options={apps}
                 />
             </PanelRow>
-            {type!='dataPoints' && <Property property={"featureJoinAttribute"}
-                       type={"select"} onChangeProperty={onChangeProperty}
-                       features={features}
-                       value={featureJoinAttribute}
-                       title={"Shape Attribute"}>
+            {type != 'dataPoints' && <Property property={"featureJoinAttribute"}
+                                               type={"select"} onChangeProperty={onChangeProperty}
+                                               features={features}
+                                               value={featureJoinAttribute}
+                                               title={"Shape Attribute"}>
 
             </Property>}
             {app == 'csv' && <PanelRow>
@@ -279,68 +292,64 @@ export class DataLayerSetting extends Component {
                     rows={10}
                 />
             </PanelRow>
-        </PanelBody>,
-            <React.Fragment>
+        </PanelBody>, <React.Fragment>
             {app != 'csv' && <Measures
                 onFormatChange={this.onFormatChange}
                 onSetSingleMeasure={this.onSetSingleMeasure}
                 onMeasuresChange={this.onMeasuresChange}
                 {...this.props} />}
-        </React.Fragment>,
-            <React.Fragment>
-                {app != 'csv' &&
-                <PanelBody initialOpen={false} title={__("Filters")}>
-                    {filters.map((f, index) => {
-                        return (<PanelBody initialOpen={false} title={__(`Filter - ${f.label}`)}>
-                                    <FilterSelector param={f.param} index={index} options={allFilters}
-                                            onUpdateFilterParam={this.updateFilterParam}/>
-                                    {<CategoricalFilter value={f.value} index={index} items={this.items(f.type)}
-                                                onUpdateFilterValue={this.updateFilterValue}/>}
-                                </PanelBody>)
-                        })}
+        </React.Fragment>, <React.Fragment>
+            {app != 'csv' && <PanelBody initialOpen={false} title={__("Filters")}>
+                {filters.map((f, index) => {
+                    return (<PanelBody initialOpen={false} title={__(`Filter - ${f.label}`)}>
+                        <FilterSelector param={f.param} index={index} options={allFilters}
+                                        onUpdateFilterParam={this.updateFilterParam}/>
+                        {<CategoricalFilter value={f.value} index={index} items={this.items(f.type)}
+                                            onUpdateFilterValue={this.updateFilterValue}/>}
+                    </PanelBody>)
+                })}
 
-                    <PanelRow>
-                        <Button variant={"link"} onClick={this.addFilter}>{__("Add Filter")}</Button>
-                        <Button variant={"link"} onClick={this.removeFilter}>{__("Remove")}</Button>
-                    </PanelRow>
+                <PanelRow>
+                    <Button variant={"link"} onClick={this.addFilter}>{__("Add Filter")}</Button>
+                    <Button variant={"link"} onClick={this.removeFilter}>{__("Remove")}</Button>
+                </PanelRow>
             </PanelBody>}
-        </React.Fragment>,
-        <PanelBody initialOpen={false} title={"Symbols and Styles"}>
-                <PanelRow>
-                    <ToggleControl
-                        label="Use Centroid Points"
-                        checked={useCentroidPoint}
-                        onChange={(value) => {
-                            onChangeProperty("useCentroidPoint", true)
-                        }}
-                    />
-                </PanelRow>
-                <PanelRow>
-                    <ToggleControl
-                        label="Use Shape Colors"
-                        checked={!useCentroidPoint}
-                        onChange={(value) => {
-                            onChangeProperty("useCentroidPoint", false)
-                        }}
-                    />
-                </PanelRow>
+        </React.Fragment>, <PanelBody initialOpen={false} title={"Symbols and Styles"}>
+            <PanelRow>
+                <ToggleControl
+                    label="Use Centroid Points"
+                    checked={useCentroidPoint}
+                    onChange={(value) => {
+                        onChangeProperty("useCentroidPoint", true)
+                    }}
+                />
+            </PanelRow>
+            <PanelRow>
+                <ToggleControl
+                    label="Use Shape Colors"
+                    checked={!useCentroidPoint}
+                    onChange={(value) => {
+                        onChangeProperty("useCentroidPoint", false)
+                    }}
+                />
+            </PanelRow>
 
 
-                {useCentroidPoint&&<PanelRow>
-                    <RangeControl
-                        label="Point Size Scale"
-                        value={markSizeScale}
-                        onChange={(value) => {
-                            onChangeProperty("markSizeScale", value)
-                        }}
-                        step={0.5}
-                        min={0}
-                        max={200}
-                    />
-                </PanelRow>}
-               <PanelRow>
+            {useCentroidPoint && <PanelRow>
                 <RangeControl
-                    label="Value Label Size"
+                    label="Point Base size"
+                    value={markSizeScale}
+                    onChange={(value) => {
+                        onChangeProperty("markSizeScale", value)
+                    }}
+                    step={0.5}
+                    min={0}
+                    max={200}
+                />
+            </PanelRow>}
+            <PanelRow>
+                <RangeControl
+                    label="Point Label Size"
                     value={markerLabelSize}
                     onChange={(markerLabelSize) => {
                         onChangeProperty("markerLabelSize", markerLabelSize)
@@ -349,38 +358,75 @@ export class DataLayerSetting extends Component {
 
                 </RangeControl>
             </PanelRow>
-                <PanelRow>
-                    <PanelColorSettings
-                        title={__(`Default Fill Color`)}
-                        value={fillColor}
-                        colorSettings={[{
-                            value: markFillColor, onChange: (fillColor) => {
-                                onChangeProperty("markFillColor", fillColor)
-                            },
+            {useCentroidPoint && <PanelRow>
 
-                        }]}
-                    />
-                </PanelRow>
-                <PanelRow>
-                    <PanelColorSettings
-                        title={__(`Default Border Color`)}
-                        value={borderColor}
-                        colorSettings={[{
-                            value: markBorderColor, onChange: (borderColor) => {
-                                onChangeProperty("markBorderColor", borderColor)
-                            },
+                <PanelColorSettings
+                    title={__(`Circle Fill Color`)}
+                    value={markFillColor}
+                    colorSettings={[{
+                        value: markFillColor, onChange: (markFillColor) => {
+                            onChangeProperty("markFillColor", markFillColor)
+                        },
 
-                        }]}
-                    />
-                </PanelRow>
+                    }]}
+                />
+                <PanelColorSettings
+                    title={__(`Circle Label Color`)}
+                    value={markLabelColor}
+                    colorSettings={[{
+                        value: markLabelColor, onChange: (markLabelColor) => {
+                            onChangeProperty("markLabelColor", markLabelColor)
+                        },
 
-                <BreaksGenerator
-                    showSize={useCentroidPoint}
-                    defaultBorderColor={markBorderColor}
-                    defaultFillColor={markFillColor}
-                    onChangeProperty={onChangeProperty} breaks={breaks}/>
+                    }]}
+                />
+            </PanelRow>}
+            {useCentroidPoint && <PanelRow>
+                <PanelColorSettings
+                    title={__(`Circle Border Color`)}
+                    value={borderColor}
+                    colorSettings={[{
+                        value: markBorderColor, onChange: (borderColor) => {
+                            onChangeProperty("markBorderColor", borderColor)
+                        },
 
-            </PanelBody>
+                    }]}
+                />
+            </PanelRow>}
+
+            <PanelRow>
+                <ToggleControl
+                    label="Use Breaks"
+                    checked={useBreaks}
+                    onChange={e => {
+                        onChangeProperty("useBreaks", !useBreaks)
+                    }}
+
+                />
+            </PanelRow>
+
+            {useBreaks && <BreaksGenerator
+                showSize={useCentroidPoint}
+                defaultBorderColor={markBorderColor}
+                defaultFillColor={markFillColor}
+                onChangeProperty={onChangeProperty} breaks={breaks}/>}
+
+            {!useCentroidPoint && <PanelRow>
+                <ToggleControl
+                    label="Use Patterns"
+                    checked={usePattern}
+                    onChange={e => {
+                        onChangeProperty("usePattern", !usePattern)
+                    }}
+                />
+            </PanelRow>}
+
+
+            {!useCentroidPoint && usePattern &&
+                <PatternGenerator allCategories={allCategories} allDimensions={allDimensions} defaultFillColor={fillColor} onChangeProperty={onChangeProperty}
+                                  patterns={patterns} app={app} csv={csv}
+                                  patternDiscriminator={patternDiscriminator}/>}
+        </PanelBody>
 
 
         ])

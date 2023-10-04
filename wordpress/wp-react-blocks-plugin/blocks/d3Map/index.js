@@ -18,7 +18,7 @@ registerBlockType(process.env.BLOCKS_NS + '/new-d3-map',
             },
             width: {
                 type: 'Numeric',
-                default: 800
+                default: 1024
             },
             group: {
                 type: 'string',
