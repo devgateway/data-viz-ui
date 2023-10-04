@@ -34,6 +34,7 @@ class BaseLayer extends React.Component {
             path,
             zoom,
             labelFilter = [],
+            labelSettings = {},
             labelField,
             labelFontSize,
             labelColor,
@@ -43,7 +44,6 @@ class BaseLayer extends React.Component {
             transform,
             projection
         } = this.props
-
         this.g = d3.select(this.gRef.current)
 
         //root.selectAll(".base-layer").remove()  //add unique name
@@ -63,26 +63,32 @@ class BaseLayer extends React.Component {
             .attr("id", "state-borders")
             .attr("d", path)
 
+
+        const k = this.props.transform ? this.props.transform.k : 1
+        
         this.g.selectAll(".label")
             .data(json.features.filter(f => {
                 return labelFilter.indexOf(f.properties[labelField]) == -1
             }))
             .enter().append("text")
             .attr("class", "label")
-            .attr("font-size", labelFontSize * 0.5 /(transform? transform.k:1))
+            .attr("font-size", (labelFontSize * 1 / k) + "px")
             .text(function (d) {
                 return d.properties[labelField]
             })
             .attr("color", labelColor)
             .attr("fill", labelColor)
-
             .attr("transform", function (d) {
-                var bbox = this.getBBox();
-                var width = bbox.width;
-                return "translate(" + [path.centroid(d)[0] - (width / 2), path.centroid(d)[1]] + ")"
-            })
+                const rotation = labelSettings[d.properties[labelField] + "_rotation"] || 0
+                const offsetX = labelSettings[d.properties[labelField] + "_offsetX"] || 0
+                const offsetY = labelSettings[d.properties[labelField] + "_offsetY"] || 0
+                
+                const x = path.centroid(d)[0] + (offsetX / projection.scale())
+                const y = path.centroid(d)[1] + (offsetY / projection.scale())
 
-            /*Apply zoom value*/
+                return "translate(" + [x, y] + "),rotate(" + (rotation ? rotation : 0) + ")"
+            })
+        /*Apply zoom value*/
         if (this.props.transform) {
             this.g.attr("transform", this.props.transform)
             //g.selectAll(".label").attr("transform", this.props.transform)
@@ -128,10 +134,7 @@ class BaseLayer extends React.Component {
 
         } = this.props
 
-        if (file !== prevProps.file || path !== prevProps.path || transform !== prevProps.transform
-            || labelFilter !== prevProps.labelFilter || labelField !== prevProps.labelField
-            || labelFontSize !== prevProps.labelFontSize || labelColor !== prevProps.labelColor
-            || fillColor !== prevProps.fillColor || borderColor !== prevProps.borderColor
+        if (file !== prevProps.file || path !== prevProps.path || transform !== prevProps.transform || labelFilter !== prevProps.labelFilter || labelField !== prevProps.labelField || labelFontSize !== prevProps.labelFontSize || labelColor !== prevProps.labelColor || fillColor !== prevProps.fillColor || borderColor !== prevProps.borderColor
 
         ) {
             this.create()
