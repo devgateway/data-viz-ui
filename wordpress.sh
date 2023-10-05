@@ -7,4 +7,5 @@ else
 fi
 
 exec /usr/local/bin/docker-entrypoint.sh $@
+chmod chown -R 82:82 wp-content
 chmod -R ugo+rw /var/www/html/wp-content/uploads/
