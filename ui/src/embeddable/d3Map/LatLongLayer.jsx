@@ -64,6 +64,8 @@ class DataLayer extends React.Component {
 
 
         }
+
+        const k = this.props.transform ? this.props.transform.k : 1
         g.attr("class", "lat-long " + name)
         g.selectAll(".latLong").remove()
         g.selectAll(".latLong")
@@ -77,7 +79,7 @@ class DataLayer extends React.Component {
                 return projection([d.y, d.x])[1];
             })
             .attr("class", "latLong")
-            .attr("r", markSizeScale)
+            .attr("r", e => markSizeScale * 1 / k)
             .attr("stroke-width", 2)
             .style("vector-effect", "non-scaling-stroke")
             .attr("stroke", markBorderColor)
