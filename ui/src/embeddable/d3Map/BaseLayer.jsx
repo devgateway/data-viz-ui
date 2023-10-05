@@ -98,8 +98,6 @@ class BaseLayer extends React.Component {
     }
 
 
-
-
     create() {
         const {
             name,
@@ -114,12 +112,13 @@ class BaseLayer extends React.Component {
             borderColor,
             editing
         } = this.props
+        if (file!="none") {
+            this.loadJSON(file).then(json => {
+                this.createPaths(json)
+                this.createLabels(json)
 
-        this.loadJSON(file).then(json => {
-            this.createPaths(json)
-            this.createLabels(json)
-
-        });
+            });
+        }
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
