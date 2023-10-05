@@ -18,6 +18,7 @@ import {BlockEditWithAPIMetadata, ComponentWithSettings} from "../../commons";
 import Property from "./utils/Property";
 
 import {PanelColorSettings} from "@wordpress/block-editor";
+import {togglePanel} from "../../commons/Util";
 
 const typeOptions = [
     {label: "Base", value: "base"},
@@ -90,16 +91,25 @@ const Base = (props) => {
                 <PanelColorSettings
                     title={__(`Fill Color`)}
                     colorSettings={[{
-                        value: layer.fillColor, onChange: (fillColor) => {
-                            onChangeProperty("fillColor", fillColor)
+                        clearable: true,
+                        enableAlpha: true,
+                        value: layer.fillColor,
+                        onChange: (fillColor) => {
+                            if (fillColor != null) {
+                                onChangeProperty("fillColor", fillColor)
+                            } else {
+                                onChangeProperty("fillColor", "transparent")
+                            }
                         },
-
                     }]}
                 />
                 <PanelColorSettings
                     title={__(`Border Color`)}
                     colorSettings={[{
-                        value: layer.borderColor, onChange: (borderColor) => {
+                        value: layer.borderColor,
+                        clearable: true,
+                        enableAlpha: true,
+                        onChange: (borderColor) => {
                             onChangeProperty("borderColor", borderColor)
                         },
 
@@ -110,7 +120,8 @@ const Base = (props) => {
                     title={__(`Label Color`)}
                     label="Color"
                     colorSettings={[{
-
+                        clearable: true,
+                        enableAlpha: true,
                         value: layer.labelColor, onChange: (labelColor) => {
                             onChangeProperty("labelColor", labelColor)
                         },
@@ -145,11 +156,11 @@ const Base = (props) => {
                     <PanelRow>
                         <ToggleControl
                             label={"None/All"}
-                            checked={labelFilter.length == 0 }
+                            checked={labelFilter.length == 0}
                             onChange={(checked) => {
-                                if (!checked){
+                                if (!checked) {
                                     onChangeProperty("labelFilter", features.map(f => f.properties[labelField]))
-                                }else{
+                                } else {
                                     onChangeProperty("labelFilter", [])
                                 }
 
@@ -277,18 +288,22 @@ class LayerWithMetadata extends BlockEditWithAPIMetadata {
         const {layer: {app}} = this.props
         const {layer: {app: prevAPP}} = prevProps
         if ((app != prevAPP) || (prevAPP == null && app != null)) {
-
             this._loadMetadata(app)
         }
     }
 
     render() {
-        const {onRemoveLayer, layer, layer: {name, type, file, app}} = this.props
+        const {setAttributes, onMoveTo,panelStatus, onRemoveLayer, layer, layer: {name, type, file, app}} = this.props
 
-        return <PanelBody title={__(`${name}`)}>
+        return <PanelBody
+            initialOpen={panelStatus['LAYERS_'+name]}
+            onToggle={e => togglePanel('LAYERS_'+name, panelStatus, setAttributes)} title={__("Layers")}
+            title={__(`${name}`)}>
             <Base {...this.props} metadata={this.state}></Base>
             <PanelRow>
-                <Button variant={"primary"} type onClick={onRemoveLayer}>Delete {name}</Button>
+                <Button variant={"primary"} type onClick={onRemoveLayer}>Delete</Button>
+                <Button variant={"secondary"} type onClick={e => onMoveTo(1, layer)}>Up</Button>
+                <Button variant={"secondary"} type onClick={e => onMoveTo(-1, layer)}>Down</Button>
             </PanelRow>
             <PanelRow>
             </PanelRow>
