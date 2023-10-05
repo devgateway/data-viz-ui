@@ -13,6 +13,7 @@ import {
 } from '@wordpress/components';
 import Measures from './utils/MapMeasures.jsx'
 import Property from "./utils/Property";
+import {PanelColorSettings} from "@wordpress/block-editor";
 
 const FilterSelector = ({param, index, options, onUpdateFilterParam}) => {
     const sortedOptions = options.sort(function (a, b) {
@@ -90,7 +91,7 @@ export class DataLayerSetting extends Component {
     getCSValue() {
         const {apps, features, layer: {csv, featureJoinAttribute}} = this.props
         if (csv == '') {
-            let generatedCSV = 'id,value\n'
+            let generatedCSV = 'Latitude,Longitude,value\n'
             if (features && features.length > 0) {
                 features.forEach(f => {
                     generatedCSV = generatedCSV + f.properties[featureJoinAttribute] + ', \n'
@@ -243,13 +244,7 @@ export class DataLayerSetting extends Component {
                     options={apps}
                 />
             </PanelRow>
-            <Property property={"featureJoinAttribute"}
-                      type={"select"} onChangeProperty={onChangeProperty}
-                      features={features}
-                      value={featureJoinAttribute}
-                      title={"Shape Attribute"}>
 
-            </Property>
             {app == 'csv' && <PanelRow>
                 <TextareaControl
                     label={__("CSV Data")}
@@ -303,8 +298,48 @@ export class DataLayerSetting extends Component {
         </React.Fragment>,
 
             <PanelBody initialOpen={false} title={"Styles"}>
+                <PanelRow>
+                    <RangeControl
+                        label="Points Size"
+                        value={markSizeScale}
+                        onChange={(value) => {
+                            onChangeProperty("markSizeScale", value)
+                        }}
+                        step={1}
+                        min={0}
+                        max={100}
+                    />
+                </PanelRow>
+                <PanelRow>
 
+                    <PanelColorSettings
+                        title={__(`Points Fill Color`)}
+                        value={markFillColor}
+                        colorSettings={[{
+                            clearable: true,
+                            enableAlpha: true,
+                            value: markFillColor, onChange: (markFillColor) => {
+                                onChangeProperty("markFillColor", markFillColor)
+                            },
 
+                        }]}
+                    />
+
+                </PanelRow>
+                <PanelRow>
+                <PanelColorSettings
+                    title={__(`Border Color`)}
+                    value={borderColor}
+                    colorSettings={[{
+                        clearable: true,
+                        enableAlpha: true,
+                        value: markBorderColor, onChange: (borderColor) => {
+                            onChangeProperty("markBorderColor", borderColor)
+                        },
+
+                    }]}
+                />
+            </PanelRow>
 
             </PanelBody>
 

@@ -337,14 +337,14 @@ export class DataLayerSetting extends Component {
 
             {useCentroidPoint && <PanelRow>
                 <RangeControl
-                    label="Point Base size"
+                    label="Point Base Size"
                     value={markSizeScale}
                     onChange={(value) => {
                         onChangeProperty("markSizeScale", value)
                     }}
-                    step={0.5}
+                    step={1}
                     min={0}
-                    max={200}
+                    max={100}
                 />
             </PanelRow>}
             <PanelRow>
@@ -354,6 +354,9 @@ export class DataLayerSetting extends Component {
                     onChange={(markerLabelSize) => {
                         onChangeProperty("markerLabelSize", markerLabelSize)
                     }}
+                    step={1}
+                    min={0}
+                    max={100}
                 >
 
                 </RangeControl>
@@ -364,6 +367,8 @@ export class DataLayerSetting extends Component {
                     title={__(`Circle Fill Color`)}
                     value={markFillColor}
                     colorSettings={[{
+                        clearable: true,
+                        enableAlpha: true,
                         value: markFillColor, onChange: (markFillColor) => {
                             onChangeProperty("markFillColor", markFillColor)
                         },
@@ -374,6 +379,8 @@ export class DataLayerSetting extends Component {
                     title={__(`Circle Label Color`)}
                     value={markLabelColor}
                     colorSettings={[{
+                        clearable: true,
+                        enableAlpha: true,
                         value: markLabelColor, onChange: (markLabelColor) => {
                             onChangeProperty("markLabelColor", markLabelColor)
                         },
@@ -386,6 +393,8 @@ export class DataLayerSetting extends Component {
                     title={__(`Circle Border Color`)}
                     value={borderColor}
                     colorSettings={[{
+                        clearable: true,
+                        enableAlpha: true,
                         value: markBorderColor, onChange: (borderColor) => {
                             onChangeProperty("markBorderColor", borderColor)
                         },
@@ -411,7 +420,7 @@ export class DataLayerSetting extends Component {
                 defaultFillColor={markFillColor}
                 onChangeProperty={onChangeProperty} breaks={breaks}/>}
 
-            {!useCentroidPoint && <PanelRow>
+             <PanelRow>
                 <ToggleControl
                     label="Use Patterns"
                     checked={usePattern}
@@ -419,10 +428,10 @@ export class DataLayerSetting extends Component {
                         onChangeProperty("usePattern", !usePattern)
                     }}
                 />
-            </PanelRow>}
+            </PanelRow>
 
 
-            {!useCentroidPoint && usePattern &&
+            {usePattern &&
                 <PatternGenerator allCategories={allCategories} allDimensions={allDimensions} defaultFillColor={fillColor} onChangeProperty={onChangeProperty}
                                   patterns={patterns} app={app} csv={csv}
                                   patternDiscriminator={patternDiscriminator}/>}
