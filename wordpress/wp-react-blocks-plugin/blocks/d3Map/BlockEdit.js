@@ -15,7 +15,7 @@ class BlockEdit extends ComponentWithSettings {
         this.onChangeLayer = this.onChangeLayer.bind(this)
         this.addLayer = this.addLayer.bind(this)
         this.removeLayer = this.removeLayer.bind(this)
-        this.onMoveTo = this.onMoveTo.bind(this)
+        this.onMoveLayer = this.onMoveLayer.bind(this)
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
@@ -48,7 +48,9 @@ class BlockEdit extends ComponentWithSettings {
     addLayer() {
         const {setAttributes, attributes: {layers}} = this.props
         const newLayers = [...layers]
-        newLayers.push({...LayerModel})
+        const model = {...LayerModel}
+        model.id = Date.now()
+        newLayers.push(model)
         setAttributes({layers: newLayers})
     }
 
@@ -60,6 +62,7 @@ class BlockEdit extends ComponentWithSettings {
     }
 
     onChangeLayer(layer) {
+        debugger;
         const {setAttributes, attributes: {layers}} = this.props
         const newLayers = [...layers]
         const index = layers.findIndex(l => l.id === layer.id);
@@ -69,18 +72,19 @@ class BlockEdit extends ComponentWithSettings {
         setAttributes({layers: newLayers})
     }
 
-    onMoveTo(direction, layer) {
+    onMoveLayer(direction, layer) {
+
         const {setAttributes, attributes: {layers}} = this.props
         const newLayers = [...layers]
-        const index = layers.findIndex(l => l.id === layer.id);
-        debugger;
-        if (direction === 1) {
+        const index = newLayers.findIndex(l => l.id === layer.id);
 
-        } else if (direction === -1) {
+        const newIndex = index + direction;
+        if (newIndex > -1 && newIndex < newLayers.length) {
 
+            const element = newLayers.splice(index, 1);
+            newLayers.splice(newIndex, 0, element[0]);
+            setAttributes({layers: newLayers})
         }
-
-
     }
 
     render() {
@@ -153,13 +157,14 @@ class BlockEdit extends ComponentWithSettings {
 
 
                 </PanelBody>
-                <PanelBody initialOpen={panelStatus['LAYERS']} onToggle={e => togglePanel("LAYERS", panelStatus, setAttributes)} title={__("Layers")}>
+                <PanelBody initialOpen={panelStatus['LAYERS']}
+                           onToggle={e => togglePanel("LAYERS", panelStatus, setAttributes)} title={__("Layers")}>
                     {layers.map((layer) => (<LayerSettings
                         setAttributes={setAttributes}
                         panelStatus={panelStatus}
                         onRemoveLayer={(e) => this.removeLayer(layer)}
                         onChange={this.onChangeLayer}
-                        onMoveTo={this.onChangeLayer}
+                        onMoveLayer={this.onMoveLayer}
                         layer={layer}
                         {...this.props}
                     />))}
@@ -191,8 +196,7 @@ class BlockEdit extends ComponentWithSettings {
                     }}
                     onResizeStop={(event, direction, elt, delta) => {
                         setAttributes({
-                            height: parseInt(height + delta.height, 10),
-                            width: parseInt(width + delta.width, 10),
+                            height: parseInt(height + delta.height, 10), width: parseInt(width + delta.width, 10),
                         });
                         toggleSelection(true);
                     }}

@@ -262,40 +262,43 @@ export class DataLayerSetting extends Component {
                     options={allDimensions}
                 />
             </PanelRow>}
+
             <PanelRow>
                 <TextareaControl
                     label={__("Tooltip")}
                     value={tooltip}
-                    help={__("You can use variables {var_name}")}
+                    help={__(`You can use the following variables: `)}
                     onChange={(tooltip) => onChangeProperty("tooltip", tooltip)}
                     rows={10}
                 />
+
             </PanelRow>
-        </PanelBody>, <React.Fragment>
-            {app != 'csv' && <Measures
-                onFormatChange={this.onFormatChange}
-                onSetSingleMeasure={this.onSetSingleMeasure}
-                onMeasuresChange={this.onMeasuresChange}
-                {...this.props} />}
-        </React.Fragment>,
+            {app != 'csv' && allMeasures && allMeasures.map(m => <PanelRow><p
+                style={{
+                    "margin-top": "calc(8px)",
+                    "font-size": "12px",
+                    "font-style": "normal",
+                    "color": "rgb(117, 117, 117)"}}>{"{" + m.value + "}"}</p></PanelRow>)
+            }
+        </PanelBody>,
             <React.Fragment>
-            {app != 'csv' && <PanelBody initialOpen={false} title={__("Filters")}>
-                {filters.map((f, index) => {
+                {app != 'csv' && <PanelBody initialOpen={false} title={__("Filters")}>
+                    {filters.map((f, index) => {
 
-                    return (<PanelBody initialOpen={false} title={__(`Filter - ${f.label}`)}>
-                        <FilterSelector param={f.param} index={index} options={allFilters}
-                                        onUpdateFilterParam={this.updateFilterParam}/>
-                        {<CategoricalFilter value={f.value} index={index} items={this.items(f.type)}
-                                            onUpdateFilterValue={this.updateFilterValue}/>}
-                    </PanelBody>)
-                })}
+                        return (<PanelBody initialOpen={false} title={__(`Filter - ${f.label}`)}>
+                            <FilterSelector param={f.param} index={index} options={allFilters}
+                                            onUpdateFilterParam={this.updateFilterParam}/>
+                            {<CategoricalFilter value={f.value} index={index} items={this.items(f.type)}
+                                                onUpdateFilterValue={this.updateFilterValue}/>}
+                        </PanelBody>)
+                    })}
 
-                <PanelRow>
-                    <Button variant={"link"} onClick={this.addFilter}>{__("Add Filter")}</Button>
-                    <Button variant={"link"} onClick={this.removeFilter}>{__("Remove")}</Button>
-                </PanelRow>
-            </PanelBody>}
-        </React.Fragment>,
+                    <PanelRow>
+                        <Button variant={"link"} onClick={this.addFilter}>{__("Add Filter")}</Button>
+                        <Button variant={"link"} onClick={this.removeFilter}>{__("Remove")}</Button>
+                    </PanelRow>
+                </PanelBody>}
+            </React.Fragment>,
 
             <PanelBody initialOpen={false} title={"Styles"}>
                 <PanelRow>
@@ -327,23 +330,20 @@ export class DataLayerSetting extends Component {
 
                 </PanelRow>
                 <PanelRow>
-                <PanelColorSettings
-                    title={__(`Border Color`)}
-                    value={borderColor}
-                    colorSettings={[{
-                        clearable: true,
-                        enableAlpha: true,
-                        value: markBorderColor, onChange: (borderColor) => {
-                            onChangeProperty("markBorderColor", borderColor)
-                        },
+                    <PanelColorSettings
+                        title={__(`Border Color`)}
+                        value={borderColor}
+                        colorSettings={[{
+                            clearable: true,
+                            enableAlpha: true,
+                            value: markBorderColor, onChange: (borderColor) => {
+                                onChangeProperty("markBorderColor", borderColor)
+                            },
 
-                    }]}
-                />
-            </PanelRow>
-
+                        }]}
+                    />
+                </PanelRow>
             </PanelBody>
-
-
         ])
     }
 

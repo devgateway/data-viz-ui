@@ -6,7 +6,7 @@ import {
     AnglePickerControl,
     SelectControl,
     TextControl,
-    ToggleControl
+    ToggleControl, ButtonGroup
 } from "@wordpress/components";
 import {__} from '@wordpress/i18n';
 import {getJsonFiles} from "./utils/FileUtils";
@@ -293,18 +293,27 @@ class LayerWithMetadata extends BlockEditWithAPIMetadata {
     }
 
     render() {
-        const {setAttributes, onMoveTo,panelStatus, onRemoveLayer, layer, layer: {name, type, file, app}} = this.props
+        const {
+            setAttributes,
+            onMoveLayer,
+            panelStatus,
+            onRemoveLayer,
+            layer,
+            layer: {name, type, file, app}
+        } = this.props
 
         return <PanelBody
-            initialOpen={panelStatus['LAYERS_'+name]}
-            onToggle={e => togglePanel('LAYERS_'+name, panelStatus, setAttributes)} title={__("Layers")}
+            initialOpen={panelStatus['LAYERS_' + name]}
+            onToggle={e => togglePanel('LAYERS_' + name, panelStatus, setAttributes)} title={__("Layers")}
             title={__(`${name}`)}>
             <Base {...this.props} metadata={this.state}></Base>
-            <PanelRow>
-                <Button variant={"primary"} type onClick={onRemoveLayer}>Delete</Button>
-                <Button variant={"secondary"} type onClick={e => onMoveTo(1, layer)}>Up</Button>
-                <Button variant={"secondary"} type onClick={e => onMoveTo(-1, layer)}>Down</Button>
-            </PanelRow>
+            <PanelBody>
+                <ButtonGroup>
+                    <Button variant={"secondary"} type onClick={onRemoveLayer}>Delete</Button>
+                    <Button variant={"secondary"} type onClick={e => onMoveLayer(-1, layer)}>Up</Button>
+                    <Button variant={"secondary"} type onClick={e => onMoveLayer(1, layer)}>Down</Button>
+                </ButtonGroup>
+            </PanelBody>
             <PanelRow>
             </PanelRow>
         </PanelBody>

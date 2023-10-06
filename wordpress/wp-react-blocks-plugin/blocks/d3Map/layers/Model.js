@@ -24,6 +24,7 @@ export const Model = {
     borderColor: '#000000',
     markBorderColor: '#000000',
     markSizeScale: 2,
+    markerLabelSize:1,
 
     labelColor: '#000000',
     markLabelColor: '#000000',

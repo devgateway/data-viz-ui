@@ -21,7 +21,7 @@ const Patterns = ({
         value: 'squares'
     }, {label: 'Triangle', value: 'triangle'}]
 
-    debugger;
+    
 
 
     const dims = allDimensions ? allDimensions : []
@@ -31,7 +31,7 @@ const Patterns = ({
     const items = cats.length > 0 ? cats[0].items : []
     const values = items.map(i => i.value)
 
-    debugger;
+    
     return <PanelBody title={"Patterns"}>
         <PanelRow>
             <SelectControl
