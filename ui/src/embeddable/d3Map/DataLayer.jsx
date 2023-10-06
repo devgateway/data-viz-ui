@@ -131,7 +131,7 @@ class DataLayer extends BaseLayer {
 
         const defs = d3.select(svg).append("defs")
         let patternsData = []
-        if (app == "csv" && patternDiscriminator!='none') {
+        if (app == "csv" && patternDiscriminator != 'none') {
             patternsData = [...new Set(data.data.map(d => d[patternDiscriminator]))].map(key => {
                 return {
                     key: key,
@@ -140,8 +140,8 @@ class DataLayer extends BaseLayer {
                     rotation: patterns[key + "_rotation"]
                 }
             })
-        } else if(patternDiscriminator!='none') {
-                patternsData = data.metadata.types.filter(d => d.dimension == patternDiscriminator)[0].items.map(item => {
+        } else if (patternDiscriminator != 'none') {
+            patternsData = data.metadata.types.filter(d => d.dimension == patternDiscriminator)[0].items.map(item => {
                 const key = item.value
                 return {
                     key: key,
@@ -243,6 +243,8 @@ class DataLayer extends BaseLayer {
             this.createLabels(json)
 
         }
+
+        const k = this.props.transform ? this.props.transform.k : 1
         if (useCentroidPoint) {
             this.createLabels(json)
             this.g.selectAll(".point")
@@ -257,7 +259,7 @@ class DataLayer extends BaseLayer {
                 .attr("cx", d => path.centroid(d)[0])
                 .attr("cy", d => path.centroid(d)[1])
                 .attr('r', d => {
-                    return getSize(d.properties._value) * 1 / this.props.transform.k
+                    return getSize(d.properties._value) * 1 / k
                 })
                 //.attr("transform", this.props.transform)
                 .on("mouseenter", (d) => {
@@ -335,7 +337,7 @@ class DataLayer extends BaseLayer {
                             d.properties.meta = values[0]
                             d.properties._value = measureValue
 
-                            if (patternDiscriminator && patternDiscriminator!='none') {
+                            if (patternDiscriminator && patternDiscriminator != 'none') {
                                 const patternsValues = values[0].children.filter(f => f.type == patternDiscriminator).map(d => d.value)
 
                                 const patternType = values[0].children.map(d => ({
@@ -428,7 +430,6 @@ const DataWrapper = (props) => {
     }
 
 
-
     return (<DataProvider
         editing={editing}
         params={params}
@@ -439,7 +440,7 @@ const DataWrapper = (props) => {
         ignoreErrors={true}
         isSvg={true}
         store={[app, unique, id]}
-        source={apiJoinAttribute + (patternDiscriminator != 'none' ? "/"+patternDiscriminator : '')}>
+        source={apiJoinAttribute + (patternDiscriminator != 'none' ? "/" + patternDiscriminator : '')}>
         <DataConsumer>
             <DataLayer {...props}></DataLayer>
         </DataConsumer>
