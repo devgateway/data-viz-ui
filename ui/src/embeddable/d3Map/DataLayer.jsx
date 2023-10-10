@@ -8,6 +8,11 @@ import * as d3 from "d3";
 import {injectIntl} from "react-intl";
 
 
+const toId = (key) => {
+    //replace blank space by underscore
+    return key.replace(/ /g, "_")
+}
+
 const getFilters = (filters) => {
     const ff = parse(filters) || []
     let params = {};
@@ -63,6 +68,8 @@ class DataLayer extends BaseLayer {
             useBreaks,
             useCentroidPoint,
             usePattern,
+            patternWidth=.35,
+            patternHeight=.25,
             intl,
 
 
@@ -120,7 +127,8 @@ class DataLayer extends BaseLayer {
             return {}
 
         }
-
+        this.g = d3.select(this.gRef.current)
+        this.g.attr("class", "base-layer") //add unique name
         this.createPaths(json)
 
         this.g.selectAll(".point").remove()
@@ -153,37 +161,98 @@ class DataLayer extends BaseLayer {
             })
         }
 
+
         defs.selectAll("pattern").remove()
         defs.selectAll("pattern")
             .data(patternsData).enter()
             .append("pattern")
-            .attr('id', d => d.key)
+            .attr('id', d => toId(d.key))
             .attr('patternUnits', 'userSpaceOnUse')
-            .attr('width', .25)
-            .attr('height', .25)
+            .attr('width', patternWidth)
+            .attr('height', patternHeight)
             .attr("x", 0).attr("y", 0)
             .attr("patternTransform", d => `rotate(${d.rotation})`)
 
         patternsData.forEach(d => {
             if (d.type === 'lines') {
-                defs.select("#" + d.key)
+                defs.select("#" + toId(d.key))
                     .append("rect")
-                    .attr('width', .1)
-                    .attr('height', 1)
+                    .attr("x", .05)
+                    .attr('width', .05)
+                    .attr('height', .5)
+                    .attr("opacity", .75)
                     .attr('fill', d.color)
             }
             if (d.type === 'squares') {
-                defs.select("#" + d.key)
+                defs.select("#" + toId(d.key))
                     .append("rect")
                     .attr('width', .15)
                     .attr('height', .15)
                     .attr('fill', d.color)
+                    .attr("opacity", .75)
+                    .attr("stroke-width", 1)
+
+            }
+            if (d.type === 'dots') {
+                defs.select("#" + toId(d.key))
+                    .append("circle")
+                    .attr("cx", .075)
+                    .attr("cy", .075)
+                    .attr('r', .07)
+                    .attr('fill', d.color)
+                    .attr("opacity", .75)
+                    .attr("stroke-width", 1)
+
+            }
+            if (d.type === 'triangle') {
+                defs.select("#" + toId(d.key))
+                    .append("polygon")
+                    .attr("points",".085,.0 .18,.18 0,.18")
+                    .attr('fill', d.color)
+                    .attr("opacity", .75)
                     .attr("stroke-width", 1)
 
             }
         })
 
-        if (usePattern) {
+        if (usePattern && json && json.features) {
+
+            json.features.forEach(d => {
+                let patterns = []
+                if (d.properties && d.properties.meta) {
+                    patterns = d.properties.meta[patternDiscriminator]?d.properties.meta[patternDiscriminator]:[]
+
+                    patterns.forEach(p => {
+                        this.g.append("path")
+                            .attr("d", path(d))
+                            .attr("class", "shape-pattern")
+                            .attr("opacity", d => {
+                                if (useBreaks) {
+                                    return .7
+                                }
+                            })
+                            .attr("fill", d => {
+                                return "transparent"
+                            })
+
+                            .attr("style", () => {
+                                return "none;fill:url(#" + toId(p) + ");"
+                            })
+                            .on("mouseenter", () => {
+                                this.showToolTip(tooltip, getTooltipVariables(d), getColor(d.properties._value))
+                            }).on("mousemove", (d) => {
+                            this.moveToolTip()
+                        }).on("mouseleave", (d) => {
+                            this.hiddenToolTip()
+                        })
+
+                    })
+
+
+                }
+
+            })
+            /*
             this.g.selectAll("shape-pattern")
                 .data(json.features)
                 .enter()
@@ -200,9 +269,10 @@ class DataLayer extends BaseLayer {
                 })
 
                 .attr("style", d => {
+                    debugger;
                     if (d.properties && d.properties.meta) {
                         const id = d.properties.meta[patternDiscriminator]
-                        return "none;fill:url(#" + id + ");"
+                        return "none;fill:url(#" + toId(id) + ");"
                     } else {
                         // return "pointer-events:none;"
                     }
@@ -215,7 +285,7 @@ class DataLayer extends BaseLayer {
             }).on("mouseleave", (d) => {
                 this.hiddenToolTip()
             })
-
+        */
 
         }
         if (!useCentroidPoint) {
@@ -338,13 +408,13 @@ class DataLayer extends BaseLayer {
                             d.properties._value = measureValue
 
                             if (patternDiscriminator && patternDiscriminator != 'none') {
-                                const patternsValues = values[0].children.filter(f => f.type == patternDiscriminator).map(d => d.value)
-
-                                const patternType = values[0].children.map(d => ({
-                                    value: d.value, [measures[0]]: d[measures[0]]
-                                })).sort(d => d.value)[0].value
-
-                                d.properties.meta[patternDiscriminator] = patternType
+                                const patternsValues = values[0]&&values[0].children?values[0].children.filter(f => f.type == patternDiscriminator).map(d => d.value):[]
+                                /*
+                                 const patternType = values[0].children.map(d => ({
+                                     value: d.value, [measures[0]]: d[measures[0]]
+                                 })).sort(d => d.value)[0].value
+                                 */
+                                d.properties.meta[patternDiscriminator] = patternsValues
                             }
 
                         } else {
