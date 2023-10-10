@@ -293,7 +293,7 @@ class DataLayer extends BaseLayer {
 
             this.g.selectAll("path")
                 .attr("fill", d => {
-                    if (!d.properties._value) {
+                    if (!d.properties && !d.properties._value) {
                         return fillColor
                     }
                     return getColor(d.properties._value)
