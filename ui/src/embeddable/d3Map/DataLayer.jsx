@@ -10,7 +10,8 @@ import {injectIntl} from "react-intl";
 
 const toId = (key) => {
     //replace blank space by underscore
-    return key.replace(/ /g, "_")
+    if (!key) return ""
+    return "pattern_" + key.toString().replace(/ /g, "_")
 }
 
 const getFilters = (filters) => {
@@ -140,6 +141,7 @@ class DataLayer extends BaseLayer {
         const defs = d3.select(svg).append("defs")
         let patternsData = []
         if (app == "csv" && patternDiscriminator != 'none') {
+            debugger
             patternsData = [...new Set(data.data.map(d => d[patternDiscriminator]))].map(key => {
                 return {
                     key: key,
@@ -149,7 +151,11 @@ class DataLayer extends BaseLayer {
                 }
             })
         } else if (patternDiscriminator != 'none') {
-            patternsData = data.metadata.types.filter(d => d.dimension == patternDiscriminator)[0].items.map(item => {
+
+            const types = data.metadata.types.filter(d => d.dimension == patternDiscriminator)
+
+
+            patternsData = types && types.length > 0 ? types[0].items.map(item => {
                 const key = item.value
                 return {
                     key: key,
@@ -158,7 +164,7 @@ class DataLayer extends BaseLayer {
                     rotation: patterns[key + "_rotation"]
                 }
 
-            })
+            }) : []
         }
 
 
@@ -248,34 +254,37 @@ class DataLayer extends BaseLayer {
             json.features.forEach(d => {
                 let patterns = []
                 if (d.properties && d.properties.meta) {
-                    patterns = d.properties.meta[patternDiscriminator] ? d.properties.meta[patternDiscriminator] : []
+                    debugger;
+                    patterns = (app != "csv") ? d.properties.meta[patternDiscriminator] ? d.properties.meta[patternDiscriminator] : [] : [d.properties.meta[patternDiscriminator]]
 
-                    patterns.forEach(p => {
-                        this.g.append("path")
-                            .attr("d", path(d))
-                            .attr("class", "shape-pattern")
-                            .attr("opacity", d => {
-                                if (useBreaks) {
-                                    return .7
-                                }
-                            })
-                            .attr("fill", d => {
-                                return "transparent"
+                    if (patterns && patterns.length > 0) {
+                        debugger;
+                        patterns.forEach(p => {
+                            this.g.append("path")
+                                .attr("d", path(d))
+                                .attr("class", "shape-pattern")
+                                .attr("opacity", d => {
+                                    if (useBreaks) {
+                                        return .7
+                                    }
+                                })
+                                .attr("fill", d => {
+                                    return "transparent"
+                                })
+
+                                .attr("style", () => {
+                                    return "none;fill:url(#" + toId(p) + ");"
+                                })
+                                .on("mouseenter", () => {
+                                    this.showToolTip(tooltip, getTooltipVariables(d), getColor(d.properties._value))
+                                }).on("mousemove", (d) => {
+                                this.moveToolTip()
+                            }).on("mouseleave", (d) => {
+                                this.hiddenToolTip()
                             })
 
-                            .attr("style", () => {
-                                return "none;fill:url(#" + toId(p) + ");"
-                            })
-                            .on("mouseenter", () => {
-                                this.showToolTip(tooltip, getTooltipVariables(d), getColor(d.properties._value))
-                            }).on("mousemove", (d) => {
-                            this.moveToolTip()
-                        }).on("mouseleave", (d) => {
-                            this.hiddenToolTip()
                         })
-
-                    })
-
+                    }
 
                 }
 
@@ -396,6 +405,7 @@ class DataLayer extends BaseLayer {
                         if (values.length > 0) {
                             d.properties.meta = values[0]
                             d.properties._value = values[0][data.meta.fields[1]]
+
                         } else {
                             d.properties._value = null
                         }
