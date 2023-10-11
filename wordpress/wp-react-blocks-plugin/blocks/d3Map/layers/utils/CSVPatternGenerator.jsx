@@ -20,7 +20,7 @@ const Patterns = ({csv, app, onChangeProperty, patterns, patternDiscriminator, d
     const fieldsOptions = data ? data.meta.fields.map(f => {
         return {label: f, value: f}
     }) : []
-    const values = patternDiscriminator != 'none' ? [...(new Set(data.data.map(d => d[patternDiscriminator].toString().trim())))] : []
+    const values = patternDiscriminator != 'none' ? [...(new Set(data.data.filter(d => d[patternDiscriminator] != null && d[patternDiscriminator].toString().trim() !== "").map(d => d[patternDiscriminator].toString().trim())))] : []
     return <PanelBody title={"Patterns"}>
         <PanelRow>
             <SelectControl

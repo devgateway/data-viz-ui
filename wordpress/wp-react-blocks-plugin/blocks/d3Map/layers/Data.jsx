@@ -16,6 +16,7 @@ import Property from "./utils/Property";
 import BreaksGenerator from "./utils/BreaksGenerator";
 import {PanelColorSettings} from "@wordpress/block-editor";
 import PatternGenerator from "./utils/PatternGenerator";
+import Format from '../../charts/Format.jsx'
 
 const FilterSelector = ({param, index, options, onUpdateFilterParam}) => {
     const sortedOptions = options.sort(function (a, b) {
@@ -231,7 +232,7 @@ export class DataLayerSetting extends Component {
                 useBreaks,
                 fillColor,
                 borderColor,
-
+                format,
 
                 breaks,
                 labelFontSize,
@@ -266,6 +267,7 @@ export class DataLayerSetting extends Component {
                                                title={"Shape Attribute"}>
 
             </Property>}
+
             {app == 'csv' && <PanelRow>
                 <TextareaControl
                     label={__("CSV Data")}
@@ -273,6 +275,11 @@ export class DataLayerSetting extends Component {
                     onChange={(csv) => onChangeProperty("csv", csv)}
                 />
             </PanelRow>}
+
+            {app == 'csv' && <PanelRow>
+                 <Format title={"Format"} format={format} hiddenCustomAxisFormat={true}   onFormatChange={this.onFormatChange}></Format>
+            </PanelRow>}
+
             {app != 'csv' && <PanelRow>
                 <SelectControl
                     label={'Dimension' + (type == 'dataPoints' ? 'LatLong' : '')}

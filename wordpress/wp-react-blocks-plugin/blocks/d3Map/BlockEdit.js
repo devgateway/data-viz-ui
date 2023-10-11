@@ -32,11 +32,9 @@ class BlockEdit extends ComponentWithSettings {
         super.componentDidMount();
 
         window.addEventListener("message", (event) => {
-
             if (event.data.type == `d3_map_${group}`) {
-
-                const iframeOrigin = event.origin.split(':')[0]
-                const parentOrigin = window.location.origin.split(':')[0]
+                const iframeOrigin = event.origin.split(':')[1]
+                const parentOrigin = window.location.origin.split(':')[1]
                 if (iframeOrigin == parentOrigin) {
                     console.log("Received message from iframe " + event.data.type, event.data.value)
                     setAttributes({mapPosition: event.data.value})
@@ -62,7 +60,6 @@ class BlockEdit extends ComponentWithSettings {
     }
 
     onChangeLayer(layer) {
-        debugger;
         const {setAttributes, attributes: {layers}} = this.props
         const newLayers = [...layers]
         const index = layers.findIndex(l => l.id === layer.id);

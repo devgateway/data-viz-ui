@@ -1,5 +1,6 @@
 import {PanelRow, SelectControl, TextControl, ToggleControl, PanelBody} from '@wordpress/components';
 import {__} from '@wordpress/i18n';
+
 const styles = [
     {label: 'Decimal', value: 'decimal'},
     {label: 'Compacted', value: 'compacted'},
@@ -333,7 +334,15 @@ const currencies = [
 
 const DEFAULT_FORMAT = 'DEFAULT';
 const CUSTOM_FORMAT = 'CUSTOM';
-const Format = ({format, title, onFormatChange, onUseCustomAxisFormatChange, customFormat, useCustomAxisFormat}) => {
+const Format = ({
+                    format,
+                    title,
+                    onFormatChange,
+                    onUseCustomAxisFormatChange,
+                    customFormat,
+                    hiddenCustomAxisFormat,
+                    useCustomAxisFormat
+                }) => {
 
 
     const onChangeFormat = (style, formatToUpdate) => {
@@ -359,69 +368,77 @@ const Format = ({format, title, onFormatChange, onUseCustomAxisFormatChange, cus
 
     return [
         <PanelBody initialOpen={true} title={__("Default Format")}>
-        <PanelRow>
-            <SelectControl
-                label={__('Style',"dg")}
-                value={[format.style]} // e.g: value = [ 'a', 'c' ]
-                onChange={(value) => {onChangeFormat(value, DEFAULT_FORMAT)}}
-                options={styles}
-            />
-        </PanelRow>
-        <>{format.style === "currency" && <PanelRow>
-            <SelectControl
-                label={__("Currency","dg")}
-                onChange={(value) => {
-                    onCurrencyChange(value, DEFAULT_FORMAT)
-                }}
-                value={format.currency}
-                options={currencies}
-            />
-        </PanelRow>}</>
-        <PanelRow>
-            <TextControl
-                type={"Number"}
-                label={__("Decimal Points","dg")}
-                onChange={(value) => {
-                    onDecimalChange(value, DEFAULT_FORMAT)
-                }}
-                value={format.minimumFractionDigits}
-            />
-        </PanelRow>
-        </PanelBody>,
-        <PanelRow>
-             <ToggleControl label={__("Use Custom Axis Format","dg")} checked={useCustomAxisFormat} onChange={(value) => onUseCustomAxisFormatChange(value)}/>
-        </PanelRow>,
+            <PanelRow>
+                <SelectControl
+                    label={__('Style', "dg")}
+                    value={[format.style]} // e.g: value = [ 'a', 'c' ]
+                    onChange={(value) => {
+                        onChangeFormat(value, DEFAULT_FORMAT)
+                    }}
+                    options={styles}
+                />
+            </PanelRow>
+            <>{format.style === "currency" && <PanelRow>
+                <SelectControl
+                    label={__("Currency", "dg")}
+                    onChange={(value) => {
+                        onCurrencyChange(value, DEFAULT_FORMAT)
+                    }}
+                    value={format.currency}
+                    options={currencies}
+                />
+            </PanelRow>}</>
+            <PanelRow>
+                <TextControl
+                    type={"Number"}
+                    label={__("Decimal Points", "dg")}
+                    onChange={(value) => {
+                        onDecimalChange(value, DEFAULT_FORMAT)
+                    }}
+                    value={format.minimumFractionDigits}
+                />
+            </PanelRow>
+        </PanelBody>, <>
+            {!hiddenCustomAxisFormat && <PanelRow>
+                <ToggleControl label={__("Use Custom Axis Format", "dg")} checked={useCustomAxisFormat}
+                               onChange={(value) => onUseCustomAxisFormatChange(value)}/>
+            </PanelRow>
+            }
+        </>
+        ,
         <>
-         {useCustomAxisFormat && <PanelBody initialOpen={true} title={__("Custom Axis Format")}>
-         <PanelRow>
-            <SelectControl
-                label={__('Style',"dg")}
-                value={[customFormat.style]} // e.g: value = [ 'a', 'c' ]
-                onChange={(value) => {onChangeFormat(value, CUSTOM_FORMAT)}}
-                options={styles}
-            />
-        </PanelRow>
-        <>{customFormat.style === "currency" && <PanelRow>
-            <SelectControl
-                label={__("Currency","dg")}
-                onChange={(value) => {
-                    onCurrencyChange(value, CUSTOM_FORMAT)
-                }}
-                value={customFormat.currency}
-                options={currencies}
-            />
-        </PanelRow>}</>
-        <PanelRow>
-            <TextControl
-                type={"Number"}
-                label={__("Decimal Points","dg")}
-                onChange={(value) => {
-                    onDecimalChange(value, CUSTOM_FORMAT)
-                }}
-                value={customFormat.minimumFractionDigits}
-            />
-        </PanelRow>
-        </PanelBody>}</>
+            {useCustomAxisFormat && <PanelBody initialOpen={true} title={__("Custom Axis Format")}>
+                <PanelRow>
+                    <SelectControl
+                        label={__('Style', "dg")}
+                        value={[customFormat.style]} // e.g: value = [ 'a', 'c' ]
+                        onChange={(value) => {
+                            onChangeFormat(value, CUSTOM_FORMAT)
+                        }}
+                        options={styles}
+                    />
+                </PanelRow>
+                <>{customFormat.style === "currency" && <PanelRow>
+                    <SelectControl
+                        label={__("Currency", "dg")}
+                        onChange={(value) => {
+                            onCurrencyChange(value, CUSTOM_FORMAT)
+                        }}
+                        value={customFormat.currency}
+                        options={currencies}
+                    />
+                </PanelRow>}</>
+                <PanelRow>
+                    <TextControl
+                        type={"Number"}
+                        label={__("Decimal Points", "dg")}
+                        onChange={(value) => {
+                            onDecimalChange(value, CUSTOM_FORMAT)
+                        }}
+                        value={customFormat.minimumFractionDigits}
+                    />
+                </PanelRow>
+            </PanelBody>}</>
 
     ]
 }

@@ -40,7 +40,7 @@ const Patterns = ({
                 onChange={(v) => {
                     onChangeProperty('patternDiscriminator', v)
                 }}
-                options={[{label: "None", value: "none"}, ...dims]}/>
+                options={[...dims]}/>
         </PanelRow>
 
         {values.map(field => <PanelBody title={field}>
