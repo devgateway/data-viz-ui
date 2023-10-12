@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useRef} from 'react';
 import {connect} from "react-redux";
 import * as d3 from 'd3' // d3 plugin
 import * as topojson from "topojson-client";
@@ -67,22 +67,129 @@ const BaseLayerLegend = (props) => {
     </div>
 }
 
+const toId = (key) => {
+    //replace blank space by underscore
+    if (!key) return ""
+    return "legend_pattern_" + key.toString().replace(/ /g, "_")
+}
 const DataLayerLegend = (props) => {
     const {
         markFillColor,
         fillColor,
         markSizeScale,
+        markBorderColor,
         useCentroidPoint,
         name,
         useBreaks,
         breaks,
-        usePatterns,
+        usePattern,
         patterns,
         measures,
-        borderColor
-    } = props
+        borderColor,
+        data,
+        customMeasuresLabels,
+        divRef,
+        id,
+        patternWidth = .35,
+        patternHeight = .25,
 
-    debugger;
+    } = props
+    let measureLabel = measures
+
+    if (customMeasuresLabels) {
+        measureLabel = customMeasuresLabels[measures[0]]
+    }
+
+
+    const g = d3.select(`#data-${id}`)
+    const renderedPatterns = g.selectAll("defs").selectAll("pattern")
+
+    if (usePattern&&divRef.current && renderedPatterns.size() > 0) {
+        const patternsData = renderedPatterns.data()
+        d3.select(divRef.current).select("svg").remove()
+        const g = d3.select(divRef.current).append("svg")
+
+        const defs = g.append("defs")
+        defs.selectAll("pattern").remove()
+        defs.selectAll("pattern")
+            .data(patternsData).enter()
+            .append("pattern")
+            .attr('id', d => toId(d.key))
+            .attr('patternUnits', 'userSpaceOnUse')
+            .attr('width', 5)
+            .attr('height', 5)
+            .attr("x", 0).attr("y", 0)
+            .attr("patternTransform", d => `rotate(${!d.rotation ? 0 : d.rotation})`)
+
+        patternsData.forEach(d => {
+            if (d.type === 'lines') {
+                defs.select("#" + toId(d.key))
+                    .append("rect")
+                    .attr("x", 0)
+                    .attr('width', 1)
+                    .attr('height', 10)
+                    .attr("opacity", .75)
+                    .attr('fill', d.color)
+            }
+            if (d.type === 'squares') {
+                defs.select("#" + toId(d.key))
+                    .append("rect")
+                    .attr('width', 3)
+                    .attr('height', 3)
+                    .attr('fill', d.color)
+                    .attr("opacity", 1)
+                    .attr("stroke-width", 1)
+
+            }
+            if (d.type === 'dots') {
+                defs.select("#" + toId(d.key))
+                    .append("circle")
+                    .attr("cx", 2)
+                    .attr("cy", 2)
+                    .attr('r', 2)
+                    .attr('fill', d.color)
+                    .attr("opacity", 1)
+                    .attr("stroke-width", 1)
+
+            }
+            if (d.type === 'triangle') {
+                defs.select("#" + toId(d.key))
+                    .append("polygon")
+                    .attr("points", "5,0 8,8 0,5")
+                    .attr('fill', d.color)
+                    .attr("opacity", 1)
+                    .attr("stroke-width", 1)
+
+            }
+        })
+
+
+        g.attr("width", "150px")
+            .attr("height", "auto")
+
+        g.selectAll(".legend-squares")
+            .data(patternsData)
+            .enter()
+            .append("rect")
+            .attr("width", 18)
+            .attr("height", 18)
+            .attr("y", (d, i) => (i * 22))
+            .attr("x", 20)
+            .attr("stroke", borderColor)
+            .attr("style", (d) => {
+                return "none;fill:url(#" + toId(d.key) + ");"
+            })
+
+        g.selectAll(".patterns-labels")
+            .data(patternsData)
+            .enter()
+            .append("text")
+            .attr("class","patterns-labels")
+            .attr("y", (d, i) => (i * 22))
+            .attr("x", 40)
+
+            .text(d=>d.key)
+    }
 
     return <div className={"legend"}>
         {useCentroidPoint && !useBreaks && <div>
@@ -93,11 +200,13 @@ const DataLayerLegend = (props) => {
             </div>
             <div className={"legend-breaks"}>
                 <div className={"break"}>
+
                     <div className={"break-item"} style={{
                         backgroundColor: markFillColor,
+                        border: `1px solid ${markBorderColor}`,
 
                     }}></div>
-                    <div className={"break-label"}> {measures}</div>
+                    <div className={"break-label"}> {measureLabel}</div>
                 </div>
             </div>
         </div>
@@ -109,29 +218,55 @@ const DataLayerLegend = (props) => {
                 <div className={"legend-label"}>{name}</div>
             </div>
             <div className={"legend-breaks"}>
+                <div className={"break-label"}> {measureLabel}</div>
                 {breaks.map((b, i) => {
                     return (<div className={"break"}>
                         <div className={"break-item"} style={{
                             backgroundColor: b.color,
-
+                            border: `1px solid ${borderColor}`,
                         }}></div>
-                        <div className={"break-label"}>  &lt; {b.end}</div>
+                        <div className={"break-label"}> &lt; {b.end}</div>
                     </div>)
 
                 })}
             </div>
         </div>
         }
+
+
+        {!useCentroidPoint && <div>
+            <div className={"legend-item"}>
+                <div className={"legend-color"} style={{backgroundColor: fillColor, borderColor: borderColor}}/>
+                <div className={"legend-label"}>{name}</div>
+            </div>
+            {useBreaks && <div className={"legend-breaks"}>
+                <div className={"break-label"}> {measureLabel}</div>
+                {breaks.map((b, i) => {
+                    return (<div className={"break"}>
+                        <div className={"break-item-shape"} style={{
+                            backgroundColor: b.color,
+                            border: `1px solid ${borderColor}`,
+                        }}></div>
+                        <div className={"break-label"}> &lt; {b.end}</div>
+                    </div>)
+
+                })}
+            </div>}
+        </div>
+        }
+
+
     </div>
 }
 const Legends = (props) => {
 
+    const divRef = useRef(null);
     const {layers = []} = props;
-    return <div className={"legends"}>
+    return <div className={"legends"} ref={divRef}>
         {layers.map(l => {
             return <div>
-                {l.type == "base" && <BaseLayerLegend {...l}/>}
-                {l.type == "data" && <DataLayerLegend {...l}/>}
+                {l.type == "base" && <BaseLayerLegend  {...l}/>}
+                {l.type == "data" && <DataLayerLegend divRef={divRef} {...l}/>}
             </div>
         })}
 
