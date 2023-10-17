@@ -352,7 +352,7 @@ export class DataLayerSetting extends Component {
                 <TextControl
                     label={selectedMeasureLabel}
                     help={__("Customize Measure Label")}
-                    value={customMeasuresLabels[selectedMeasureValue]}
+                    value={customMeasuresLabels ? customMeasuresLabels[selectedMeasureValue] : ""}
                     onChange={(measureLabel) => {
                         onChangeProperty("customMeasuresLabels", {
                             ...customMeasuresLabels, [selectedMeasureValue]: measureLabel
