@@ -82,46 +82,35 @@ const DataLayerLegend = (props) => {
         borderColor
     } = props
 
-    debugger;
 
     return <div className={"legend"}>
-        {useCentroidPoint && !useBreaks && <div>
-            <div className={"legend-item"}>
-                <div className={"legend-color"} style={{backgroundColor: fillColor}}/>
-                <div className={"legend-label"}>{name}</div>
-
-            </div>
-            <div className={"legend-breaks"}>
-                <div className={"break"}>
-                    <div className={"break-item"} style={{
-                        backgroundColor: markFillColor,
-
-                    }}></div>
-                    <div className={"break-label"}> {measures}</div>
-                </div>
-            </div>
-        </div>
-        }
-
-        {useCentroidPoint && useBreaks && <div>
+        <div>
             <div className={"legend-item"}>
                 <div className={"legend-color"} style={{backgroundColor: fillColor, borderColor: borderColor}}/>
                 <div className={"legend-label"}>{name}</div>
             </div>
-            <div className={"legend-breaks"}>
+            {((useCentroidPoint && !useBreaks) || (!useCentroidPoint && !useBreaks)) && <div className={"legend-breaks"}>
+                <div className={"break"}>
+                    <div className={"break-item"} style={{
+                        backgroundColor: markFillColor,
+                    }}></div>
+                    <div className={"break-label"}> {measures}</div>
+                </div>
+            </div>
+            }
+
+            {((!useCentroidPoint && useBreaks) || (useCentroidPoint && useBreaks)) && <div className={"legend-breaks"}>
                 {breaks.map((b, i) => {
                     return (<div className={"break"}>
                         <div className={"break-item"} style={{
                             backgroundColor: b.color,
-
                         }}></div>
                         <div className={"break-label"}>  &lt; {b.end}</div>
                     </div>)
-
                 })}
             </div>
+            }
         </div>
-        }
     </div>
 }
 const Legends = (props) => {
