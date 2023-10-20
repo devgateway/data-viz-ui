@@ -330,7 +330,7 @@ class DataLayer extends BaseLayer {
                 .attr("x", d => path.centroid(d)[0])
                 .attr("y", d => path.centroid(d)[1])
                 .attr("font-size", d => {
-                    return (markerLabelSize * (1 / this.props.transform.k)) + "px"
+                    return (markerLabelSize * (1 / k)) + "px"
                 })
                 .attr("fill", markLabelColor)
                 .text(d => {
