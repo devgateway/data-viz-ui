@@ -9,6 +9,7 @@ import ZoomControl from "./ZoomControl";
 import {Container} from "semantic-ui-react";
 import ProjectedContainer from "./ProjectedContainer";
 import Legends from "./Legends"
+
 const MapWrapper = (props) => {
         const {
             unique,
@@ -37,7 +38,6 @@ const MapWrapper = (props) => {
                                     height={height}
                                     width={width}
                                     editing={editing} initialPosition={parse(paramMapPosition, editing)}>
-
                     <Map>
                         {layers.map((layer, i) => {
                             if (layer.type === 'base') {
@@ -45,19 +45,23 @@ const MapWrapper = (props) => {
                                                   key={i} {...layer} />
                             }
                             if (layer.type === 'data') {
-                                return <DataLayer  transform={transform}  intl={intl} group={group} zoom={zoomRef} unique={unique}
+                                return <DataLayer transform={transform} intl={intl} group={group} zoom={zoomRef}
+                                                  unique={unique}
                                                   key={i} {...layer} />
                             }
                             if (layer.type === 'dataPoints') {
-                                return <LatLongLayer  transform={transform}  intl={intl} group={group} zoom={zoomRef} unique={unique}
-                                                   key={i} {...layer} />
+                                return <LatLongLayer transform={transform} intl={intl} group={group} zoom={zoomRef}
+                                                     unique={unique}
+                                                     key={i} {...layer} />
                             }
 
                         })}
                     </Map>
-                    <ZoomControl  onZoomed={setTransform} width={width} height={height} ref={zoomRef} group={group}
-                                 editing={editing}/>
+
+                    <ZoomControl onZoomed={setTransform} width={width} height={height} ref={zoomRef} group={group} editing={editing}/>
+
                     <Legends layers={layers}></Legends>
+
                 </ProjectedContainer>
             </div>
         );

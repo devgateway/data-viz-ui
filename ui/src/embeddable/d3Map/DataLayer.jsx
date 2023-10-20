@@ -139,12 +139,11 @@ class DataLayer extends BaseLayer {
         this.g.selectAll(".point-label").remove()
         this.g.selectAll(".shape-pattern").remove()
 
-        d3.select(svg).selectAll("defs").remove()
+        this.g.selectAll("defs").remove()
 
-        const defs = d3.select(svg).append("defs")
+        const defs =this.g.append("defs")
         let patternsData = []
         if (app == "csv" && patternDiscriminator != 'none') {
-            debugger
             patternsData = [...new Set(data.data.map(d => d[patternDiscriminator]))].map(key => {
                 return {
                     key: key,
@@ -154,10 +153,7 @@ class DataLayer extends BaseLayer {
                 }
             })
         } else if (patternDiscriminator != 'none') {
-
             const types = data.metadata.types.filter(d => d.dimension == patternDiscriminator)
-
-
             patternsData = types && types.length > 0 ? types[0].items.map(item => {
                 const key = item.value
                 return {
@@ -257,11 +253,11 @@ class DataLayer extends BaseLayer {
             json.features.forEach(d => {
                 let patterns = []
                 if (d.properties && d.properties.meta) {
-                    debugger;
+
                     patterns = (app != "csv") ? d.properties.meta[patternDiscriminator] ? d.properties.meta[patternDiscriminator] : [] : [d.properties.meta[patternDiscriminator]]
 
                     if (patterns && patterns.length > 0) {
-                        debugger;
+
                         patterns.forEach(p => {
                             this.g.append("path")
                                 .attr("d", path(d))
@@ -337,7 +333,7 @@ class DataLayer extends BaseLayer {
                 .attr("x", d => path.centroid(d)[0])
                 .attr("y", d => path.centroid(d)[1])
                 .attr("font-size", d => {
-                    return (markerLabelSize * (1 / this.props.transform.k)) + "px"
+                    return (markerLabelSize * (1 / k)) + "px"
                 })
                 .attr("fill", markLabelColor)
                 .text(d => {
@@ -461,7 +457,7 @@ class DataLayer extends BaseLayer {
             editing
         } = this.props
 
-        return <g className={"data " + id} ref={this.gRef}/>
+        return <g id={"data-" + id} className={"data " + id} ref={this.gRef}/>
     }
 
 }
