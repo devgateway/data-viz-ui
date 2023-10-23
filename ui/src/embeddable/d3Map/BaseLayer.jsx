@@ -64,7 +64,9 @@ class BaseLayer extends Layer {
             }))
             .enter().append("text")
             .attr("class", "label")
-            .attr("font-size", (labelFontSize * 1 / k) + "px")
+            .attr("font-size", d=>{
+                return Math.min((labelFontSize * 1 / k),labelFontSize/2) + "px"
+            })
             .text(function (d) {
                 return d.properties[labelField]
             })
