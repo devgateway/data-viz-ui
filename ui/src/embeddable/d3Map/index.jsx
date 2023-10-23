@@ -9,6 +9,7 @@ import ZoomControl from "./ZoomControl";
 import {Container} from "semantic-ui-react";
 import ProjectedContainer from "./ProjectedContainer";
 import Legends from "./Legends"
+import FlowLayer from "./FlowLayer";
 
 const MapWrapper = (props) => {
         const {
@@ -20,6 +21,8 @@ const MapWrapper = (props) => {
             "data-width": width = 1000,
             "data-back-ground-color": bgColorParam = '#88e8dc',
             "data-map-position": paramMapPosition = {},
+            "data-projection": projectionName = "geoMercator",
+
             intl
         } = props
 
@@ -37,6 +40,7 @@ const MapWrapper = (props) => {
                 <ProjectedContainer backgroundColor={decode(bgColorParam)}
                                     height={height}
                                     width={width}
+                                    projectionName={projectionName}
                                     editing={editing} initialPosition={parse(paramMapPosition, editing)}>
                     <Map>
                         {layers.map((layer, i) => {
@@ -45,9 +49,14 @@ const MapWrapper = (props) => {
                                                   key={i} {...layer} />
                             }
                             if (layer.type === 'data') {
-                                return <DataLayer transform={transform} intl={intl} group={group} zoom={zoomRef}
+                                return <DataLayer  transform={transform} intl={intl} group={group} zoom={zoomRef}
                                                   unique={unique}
                                                   key={i} {...layer} />
+                            }
+                            if (layer.type === 'flow') {
+                                return <FlowLayer  transform={transform} intl={intl} group={group} zoom={zoomRef}
+                                                   unique={unique}
+                                                   key={i} {...layer} />
                             }
                             if (layer.type === 'dataPoints') {
                                 return <LatLongLayer transform={transform} intl={intl} group={group} zoom={zoomRef}
@@ -59,7 +68,6 @@ const MapWrapper = (props) => {
                     </Map>
 
                     <ZoomControl onZoomed={setTransform} width={width} height={height} ref={zoomRef} group={group} editing={editing}/>
-
                     <Legends layers={layers}></Legends>
 
                 </ProjectedContainer>
