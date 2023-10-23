@@ -192,33 +192,24 @@ const DataLayerLegend = (props) => {
     }
 
     return <div className={"legend"}>
-        {useCentroidPoint && !useBreaks && <div>
+        <div>
             <div className={"legend-item"}>
-                <div className={"legend-color"} style={{backgroundColor: fillColor}}/>
+                <div className={"legend-color"} style={{backgroundColor: fillColor, borderColor: borderColor}}/>
                 <div className={"legend-label"}>{name}</div>
-
             </div>
-            <div className={"legend-breaks"}>
+            {((useCentroidPoint && !useBreaks) || (!useCentroidPoint && !useBreaks)) && <div className={"legend-breaks"}>
                 <div className={"break"}>
 
                     <div className={"break-item"} style={{
                         backgroundColor: markFillColor,
                         border: `1px solid ${markBorderColor}`,
-
                     }}></div>
                     <div className={"break-label"}> {measureLabel}</div>
                 </div>
             </div>
-        </div>
-        }
+            }
 
-        {useCentroidPoint && useBreaks && <div>
-            <div className={"legend-item"}>
-                <div className={"legend-color"} style={{backgroundColor: fillColor, borderColor: borderColor}}/>
-                <div className={"legend-label"}>{name}</div>
-            </div>
-            <div className={"legend-breaks"}>
-                <div className={"break-label"}> {measureLabel}</div>
+            {((!useCentroidPoint && useBreaks) || (useCentroidPoint && useBreaks)) && <div className={"legend-breaks"}>
                 {breaks.map((b, i) => {
                     return (<div className={"break"}>
                         <div className={"break-item"} style={{
@@ -227,35 +218,10 @@ const DataLayerLegend = (props) => {
                         }}></div>
                         <div className={"break-label"}> &lt; {b.end}</div>
                     </div>)
-
                 })}
             </div>
+            }
         </div>
-        }
-
-
-        {!useCentroidPoint && <div>
-            <div className={"legend-item"}>
-                <div className={"legend-color"} style={{backgroundColor: fillColor, borderColor: borderColor}}/>
-                <div className={"legend-label"}>{name}</div>
-            </div>
-            {useBreaks && <div className={"legend-breaks"}>
-                <div className={"break-label"}> {measureLabel}</div>
-                {breaks.map((b, i) => {
-                    return (<div className={"break"}>
-                        <div className={"break-item-shape"} style={{
-                            backgroundColor: b.color,
-                            border: `1px solid ${borderColor}`,
-                        }}></div>
-                        <div className={"break-label"}> &lt; {b.end}</div>
-                    </div>)
-
-                })}
-            </div>}
-        </div>
-        }
-
-
     </div>
 }
 const Legends = (props) => {
