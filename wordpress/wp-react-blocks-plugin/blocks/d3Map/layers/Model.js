@@ -20,10 +20,13 @@ export const Model = {
 
     fillColor: '#FFFFFF',
     markFillColor: '#FFFFFF',
+    markFillColor2: '#FFFFFF',
 
     borderColor: '#000000',
     markBorderColor: '#000000',
+    markBorderColor2: '#000000',
     markSizeScale: 2,
+    markSizeScale2: 2,
     markerLabelSize: 1,
 
     labelColor: '#000000',

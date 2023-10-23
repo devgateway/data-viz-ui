@@ -325,13 +325,15 @@ export class DataLayerSetting extends Component {
                     "font-style": "normal",
                     "color": "rgb(117, 117, 117)"
                 }}>{"{" + m.value + "}"}</p></PanelRow>)}
-        </PanelBody>, <React.Fragment>
+        </PanelBody>,
+        <React.Fragment>
             {app != 'csv' && <Measures
                 onFormatChange={this.onFormatChange}
                 onSetSingleMeasure={this.onSetSingleMeasure}
                 onMeasuresChange={this.onMeasuresChange}
                 {...this.props} />}
-        </React.Fragment>, <React.Fragment>
+        </React.Fragment>,
+        <React.Fragment>
             {app != 'csv' && <PanelBody initialOpen={false} title={__("Filters")}>
                 {filters.map((f, index) => {
                     return (<PanelBody initialOpen={false} title={__(`Filter - ${f.label}`)}>
@@ -347,7 +349,8 @@ export class DataLayerSetting extends Component {
                     <Button variant={"link"} onClick={this.removeFilter}>{__("Remove")}</Button>
                 </PanelRow>
             </PanelBody>}
-        </React.Fragment>, <PanelBody initialOpen={false} title={"Symbols and Styles"}>
+        </React.Fragment>,
+        <PanelBody initialOpen={false} title={"Symbols and Styles"}>
             {app != "csv" && selectedMeasureValue && <PanelRow>
                 <TextControl
                     label={selectedMeasureLabel}
@@ -367,7 +370,8 @@ export class DataLayerSetting extends Component {
                     title={__(`Default Fill Color`)}
                     value={fillColor}
                     colorSettings={[{
-                        clearable: true, enableAlpha: true, value: markFillColor, onChange: (fillColor) => {
+                        clearable: true, enableAlpha: true,
+                        value: fillColor, onChange: (fillColor) => {
                             onChangeProperty("fillColor", fillColor)
                         },
 
