@@ -13,6 +13,7 @@ import {getJsonFiles} from "./utils/FileUtils";
 import {useEffect} from "react";
 import {useState} from "@wordpress/element";
 import DataLayer from "./Data";
+import FlowLayer from "./Flow";
 import LatLongLayer from "./LatLong";
 import {BlockEditWithAPIMetadata, ComponentWithSettings} from "../../commons";
 import Property from "./utils/Property";
@@ -23,6 +24,7 @@ import {togglePanel} from "../../commons/Util";
 const typeOptions = [
     {label: "Base", value: "base"},
     {label: "Data Shape", value: "data"},
+    {label: "FLow layer ", value: "flow"},
     {label: "Data Points ", value: "dataPoints"}
 ]
 
@@ -232,6 +234,20 @@ const Base = (props) => {
                     features={features}
                     layer={layer}>
                 </DataLayer>
+
+            </>}
+            {type == 'flow' && <>
+                <FlowLayer
+                    apps={metadata.apps}
+                    onChangeProperty={onChangeProperty}
+                    allDimensions={metadata.dimensions}
+                    allFilters={metadata.filters}
+                    allMeasures={metadata.measures}
+                    allCategories={metadata.categories}
+                    allApps={metadata.apps}
+                    features={features}
+                    layer={layer}>
+                </FlowLayer>
 
             </>}
             {type == 'dataPoints' && <>

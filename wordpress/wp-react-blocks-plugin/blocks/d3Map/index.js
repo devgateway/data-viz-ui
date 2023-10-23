@@ -11,7 +11,7 @@ registerBlockType(process.env.BLOCKS_NS + '/new-d3-map',
         category: process.env.BLOCKS_CATEGORY,
         apiVersion: 2,
         attributes: {
-          
+
             height: {
                 type: 'Numeric',
                 default: 500
@@ -23,6 +23,10 @@ registerBlockType(process.env.BLOCKS_NS + '/new-d3-map',
             group: {
                 type: 'string',
                 default: 'default',
+            },
+            projection: {
+                type: 'string',
+                default: 'geoMercator',
             },
 
             layers: {

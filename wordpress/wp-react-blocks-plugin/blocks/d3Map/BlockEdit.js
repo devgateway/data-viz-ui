@@ -87,6 +87,7 @@ class BlockEdit extends ComponentWithSettings {
     render() {
         const {
             className, isSelected, toggleSelection, setAttributes, attributes: {
+                projection,
                 panelStatus, mapPosition, height, width, group, backGroundColor, layers = [],
             }
         } = this.props;
@@ -128,7 +129,40 @@ class BlockEdit extends ComponentWithSettings {
                         />
                     </PanelRow>
                 </PanelBody>
+                <PanelBody  initialOpen={panelStatus["PROJECTION"]}
+                            onToggle={e => togglePanel("PROJECTION", panelStatus, setAttributes)}
+                            title={__("Projection")}>
+                    <PanelRow>
+                        <SelectControl
+                            label={__("Projection")}
+                            value={projection}
+                            onChange={(projection) => setAttributes({projection})}
+                            options={[
+                                {
+                                    label: "geoMercator",
+                                    value: "geoMercator"
+                                },
+                                {
+                                    label: "geoEqualEarth",
+                                    value: "geoEqualEarth"
+                                },
+                                {
+                                    label: "geoNaturalEarth1",
+                                    value: "geoNaturalEarth1"
+                                },
+                                {
+                                    label: "geoAzimuthalEqualArea",
+                                    value: "geoAzimuthalEqualArea"
+                                },
+                                {
+                                    label: "geoOrthographic",
+                                    value: "geoOrthographic"
+                                }]}
+                        />
 
+
+                    </PanelRow>
+                </PanelBody>
                 <PanelBody
                     initialOpen={panelStatus['COLORS']}
                     onToggle={e => togglePanel("COLORS", panelStatus, setAttributes)}

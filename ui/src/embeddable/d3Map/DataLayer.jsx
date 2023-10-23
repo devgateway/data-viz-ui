@@ -69,8 +69,7 @@ class DataLayer extends BaseLayer {
             useBreaks,
             useCentroidPoint,
             usePattern,
-            patternWidth = .35,
-            patternHeight = .25,
+
             intl,
 
 
@@ -137,8 +136,13 @@ class DataLayer extends BaseLayer {
         this.g.selectAll(".shape-pattern").remove()
 
         this.g.selectAll("defs").remove()
+        const k = this.props.transform ? this.props.transform.k : 1
 
-        const defs =this.g.append("defs")
+        const patternWidth = 10* 1 / k
+        const patternHeight = 10* 1 / k
+
+
+        const defs = this.g.append("defs")
         let patternsData = []
         if (app == "csv" && patternDiscriminator != 'none') {
             patternsData = [...new Set(data.data.map(d => d[patternDiscriminator]))].map(key => {
@@ -180,27 +184,27 @@ class DataLayer extends BaseLayer {
                 defs.select("#" + toId(d.key))
                     .append("rect")
                     .attr("x", .05)
-                    .attr('width', .05)
-                    .attr('height', .5)
-                    .attr("opacity", .75)
+                    .attr('width', patternWidth / 2)
+                    .attr('height', patternHeight)
+                    .attr("opacity", 1)
                     .attr('fill', d.color)
             }
             if (d.type === 'squares') {
                 defs.select("#" + toId(d.key))
                     .append("rect")
-                    .attr('width', .15)
-                    .attr('height', .15)
+                    .attr('width', patternWidth / 2)
+                    .attr('height', patternHeight / 2)
                     .attr('fill', d.color)
-                    .attr("opacity", .75)
+                    .attr("opacity", 1)
                     .attr("stroke-width", 1)
 
             }
             if (d.type === 'dots') {
                 defs.select("#" + toId(d.key))
                     .append("circle")
-                    .attr("cx", .075)
-                    .attr("cy", .075)
-                    .attr('r', .07)
+                    .attr("cx", patternWidth / 2)
+                    .attr("cy", patternHeight / 2)
+                    .attr('r', patternWidth / 2.5)
                     .attr('fill', d.color)
                     .attr("opacity", .75)
                     .attr("stroke-width", 1)
@@ -209,9 +213,9 @@ class DataLayer extends BaseLayer {
             if (d.type === 'triangle') {
                 defs.select("#" + toId(d.key))
                     .append("polygon")
-                    .attr("points", ".085,.0 .18,.18 0,.18")
+                    .attr("points", `${patternWidth / 2} 0, 0 ${patternWidth}, ${patternWidth}  ${patternWidth} `)
                     .attr('fill', d.color)
-                    .attr("opacity", .75)
+                    .attr("opacity", 1)
                     .attr("stroke-width", 1)
 
             }
@@ -241,8 +245,6 @@ class DataLayer extends BaseLayer {
             this.createLabels(json)
 
         }
-
-        const k = this.props.transform ? this.props.transform.k : 1
 
 
         if (usePattern && json && json.features) {
