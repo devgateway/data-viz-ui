@@ -5,40 +5,28 @@ import * as d3 from 'd3' // d3 plugin
 import * as topojson from "topojson-client";
 import Tooltip from "./Tooltip";
 import {injectIntl} from "react-intl";
-
-class BaseLayer extends React.Component {
+import Layer from "./Layer";
+class BaseLayer extends Layer {
 
 
     constructor() {
         super();
-        this.loadJSON = this.loadJSON.bind(this)
-
-        this.createLabels = this.createLabels.bind(this)
-        this.createPaths = this.createPaths.bind(this)
-
-        this.showToolTip = this.showToolTip.bind(this)
-        this.moveToolTip = this.moveToolTip.bind(this)
         this.gRef = React.createRef();
 
     }
-
-    loadJSON(url) {
-        return new Promise((resolve, reject) => {
-            d3.json(url).then(function (us, error) {
-                if (error) reject(error);
-                resolve(us)
-            });
-        })
-    }
-
     createPaths(json) {
         const {
             path,
             fillColor,
             borderColor,
+            projection
 
         } = this.props
         this.g = d3.select(this.gRef.current)
+
+        const svg=d3.select(this.gRef.current.parentElement);
+
+
         this.g.attr("class", "base-layer") //add unique name
         this.g.selectAll("path").remove()
         this.g.selectAll(".label").remove()
@@ -56,7 +44,6 @@ class BaseLayer extends React.Component {
         }
 
     }
-
     createLabels(json) {
         const {
             path,
@@ -96,9 +83,7 @@ class BaseLayer extends React.Component {
         }
 
     }
-
-
-    create() {
+    createLayer() {
         const {
             name,
             file,
@@ -120,7 +105,6 @@ class BaseLayer extends React.Component {
             });
         }
     }
-
     componentDidUpdate(prevProps, prevState, snapshot) {
         const {
             name,
@@ -144,38 +128,6 @@ class BaseLayer extends React.Component {
         }
 
 
-    }
-
-    showToolTip(content, data, color) {
-        const tip = d3.select("body").append("div")
-            .attr("class", "d3MapTooltip")
-            .style("position", "absolute")
-            //.style("background-color", color)
-            .html("")
-            .style("left", (d3.event.pageX + 15) + "px")
-            .style("top", (d3.event.pageY - 50) + "px")
-
-        ReactDOM.render(<Tooltip intl={this.props.intl} tooltip={content} data={data}
-                                 tooltipEnableMarkdown={false}/>, tip._groups[0][0])
-
-    }
-
-
-    moveToolTip() {
-        const tip = d3.select(".d3MapTooltip")
-            .style("left", (d3.event.pageX + 15) + "px")
-            .style("top", (d3.event.pageY - 50) + "px")
-    }
-
-    hiddenToolTip() {
-        d3.selectAll(".d3MapTooltip").remove();
-
-    }
-
-
-    componentDidMount() {
-        this.create()
-        this.props.zoom.current.fullView()
     }
 
     render() {

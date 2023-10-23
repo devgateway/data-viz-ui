@@ -10,8 +10,12 @@ class Map extends React.Component {
         this.svgRef = React.createRef();
     }
 
+
+
+
     render() {
         const {height, width, projection} = this.props
+
 
         return (
             <svg viewBox={`0 0 ${width} ${height}`} className={"map"} height={height} width={width} ref={this.svgRef}>
