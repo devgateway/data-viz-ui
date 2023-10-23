@@ -101,9 +101,12 @@ class DataLayer extends BaseLayer {
         }
 
         let getColor = (value, isMarker) => {
-
             if (breaks.length > 0 && useBreaks) {
-                return colorScale(value)
+                if (value > Math.max(...breaks.map(d => parseInt(d.end)))) {
+                    return fillColor
+                } else {
+                    return colorScale(value)
+                }
             }
 
             if (isMarker) {
