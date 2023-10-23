@@ -84,35 +84,35 @@ class DataLayer extends BaseLayer {
             maximumFractionDigits: parseInt(format.maximumFractionDigits)
         }
 
-        const sizeScale = d3.scaleThreshold()
-            .domain(breaks.map(d => d.end))
-            .range(breaks.map(d => d.size));
+            const sizeScale = d3.scaleThreshold()
+                .domain(breaks.map(d => d.end))
+                .range(breaks.map(d => d.size));
 
-        const colorScale = d3.scaleThreshold()
-            .domain(breaks.map(d => d.end))
-            .range(breaks.map(d => d.color));
+            const colorScale = d3.scaleThreshold()
+                .domain(breaks.map(d => d.end))
+                .range(breaks.map(d => d.color));
 
-        let getSize = (value) => {
-            if (breaks.length > 0 && useBreaks) {
-                return markSizeScale + sizeScale(value)
-            }
-            return markSizeScale
-        }
-
-        let getColor = (value, isMarker) => {
-            if (breaks.length > 0 && useBreaks) {
-                if (value > Math.max(...breaks.map(d => parseInt(d.end)))) {
-                    return fillColor
-                } else {
-                    return colorScale(value)
+            let getSize = (value) => {
+                if (breaks.length > 0 && useBreaks) {
+                    return markSizeScale + sizeScale(value)
                 }
+                return markSizeScale
             }
 
-            if (isMarker) {
-                return markFillColor
+            let getColor = (value, isMarker) => {
+                if (breaks.length > 0 && useBreaks) {
+                    if (value > Math.max(...breaks.map(d => parseInt(d.end)))) {
+                        return fillColor
+                    } else {
+                        return colorScale(value)
+                    }
+                }
+
+                if (isMarker) {
+                    return markFillColor
+                }
+                return fillColor
             }
-            return fillColor
-        }
 
         const filteredData = json.features.filter(f => f.properties._value != null)
 
@@ -209,7 +209,7 @@ class DataLayer extends BaseLayer {
                     .attr("cy", patternHeight / 2)
                     .attr('r', patternWidth / 2.5)
                     .attr('fill', d.color)
-                    .attr("opacity", .75)
+                    .attr("opacity", 1)
                     .attr("stroke-width", 1)
 
             }
