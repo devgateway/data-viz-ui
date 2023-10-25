@@ -1,8 +1,6 @@
 ARG REPO
 ARG TAG
 FROM ${REPO}/ui-customizer:${TAG}  AS customizer
-
-
 FROM node:12.22.12 AS reactlib
 WORKDIR /tmp/work
 COPY react-lib/wp-react-lib/package.json .
