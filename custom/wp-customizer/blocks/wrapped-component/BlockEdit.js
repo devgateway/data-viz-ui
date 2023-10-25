@@ -31,7 +31,7 @@ class BlockEdit extends BlockEditWithAPIMetadata {
 
         const newAttr = [...attr]
         newAttr[idx][name] = value
-        debugger;
+        
         setAttributes({attr: newAttr})
     }
 
@@ -43,7 +43,7 @@ class BlockEdit extends BlockEditWithAPIMetadata {
         } = this.props;
         const newAttr = [...attr]
         newAttr.splice(idx, 1)
-        debugger;
+        
         setAttributes({attr: newAttr})
     }
 
