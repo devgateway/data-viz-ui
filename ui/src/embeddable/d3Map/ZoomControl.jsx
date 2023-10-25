@@ -12,6 +12,7 @@ class ZoomControl extends React.Component {
     constructor(props) {
         super(props);
         this.zooming = false
+        this.zoomstarted = this.zoomStarted.bind(this)
         this.zoomEnd = this.zoomEnd.bind(this)
         this.zoomed = this.zoomed.bind(this)
         this.zoomIn = this.zoomIn.bind(this)
@@ -22,6 +23,7 @@ class ZoomControl extends React.Component {
         this._fullView = this._fullView.bind(this)
         this.zoomRef = React.createRef();
         this.zoom = d3.zoom().scaleExtent([0, 300])
+            .on("start", this.zoomStarted)
             .on("zoom", this.zoomed)
             .on("end", this.zoomEnd);
 
@@ -35,11 +37,11 @@ class ZoomControl extends React.Component {
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         if (!prevProps.readyState && this.props.readyState) {
-              this.fullView()
+            this.fullView()
         }
 
         if (prevProps.height !== this.props.height || prevProps.width !== this.props.width) {
-              this.fullView()
+            this.fullView()
         }
     }
 
@@ -59,9 +61,15 @@ class ZoomControl extends React.Component {
 
     }
 
+
+    zoomStarted(){
+
+    }
     zoomed() {
         const selection = this.getSelection()
-        selection.selectAll("g").attr("transform", d3.event.transform)
+        //selection.selectAll("g").attr("transform", d3.event.transform)
+          this.props.onZoomed(d3.event.transform)
+
     }
 
 
