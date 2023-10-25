@@ -11,21 +11,33 @@ registerBlockType(process.env.BLOCKS_NS + '/menu',
         category: process.env.BLOCKS_CATEGORY,
         apiVersion: 2,
         attributes: {
+            icon: {
+                type: 'String',
+                default: ""
+            },
+            icon_media_id: {
+                type: 'Numeric',
+                default: null,
+            },
             name: {
                 type: 'String',
                 default: ""
             },
-            showTitle: {
+            label: {
+                type: 'String',
+                default: ""
+            },
+            showLabels: {
                 type: 'Boolean',
                 default: true
             },
-            showIcon: {
+            showIcons: {
                 type: 'Boolean',
                 default: true
             },
-            height:{
+            height: {
                 type: 'Numeric',
-                default: 500
+                default: 80
             }
         },
         edit: BlockEdit,

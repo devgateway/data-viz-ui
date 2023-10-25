@@ -208,7 +208,7 @@ class WPM_Admin_Assets {
 						href = url + query.replace(/edit_lang=[a-z]{2,4}/i, 'edit_lang=' + lang) + document.location.hash;
 					} else {
 
-					debugger;
+
 					if (query.indexOf('?')==-1){
 					    query=query+'?'
 					}

@@ -1,6 +1,6 @@
 import { Component } from "@wordpress/element"
 import {PanelColorSettings } from '@wordpress/block-editor'
-import { PanelBody, PanelRow, SelectControl, TextControl, ToggleControl, Button, ButtonGroup, RangeControl } from '@wordpress/components'
+import { PanelBody, PanelRow, SelectControl, TextControl, ToggleControl, Button, ButtonGroup, RangeControl, TextareaControl} from '@wordpress/components'
 import { __ } from '@wordpress/i18n';
 import {SizeConfig } from '../commons/index'
 import Format from "./Format"
@@ -36,7 +36,9 @@ export default class Settings  extends Component{
                 showNoDataTooltip,
                 pointLabelColor,
                 pointLabelFormat,
-                highlightedLocLabelFormat
+                highlightedLocLabelFormat,
+                labelsExclusionList,
+                noDataText
             },
             locations
         } = this.props;
@@ -76,6 +78,15 @@ export default class Settings  extends Component{
                                 }}
                                 options={[{ label: 'Only if admin unit has data', value: 'ifUnitHasData'}, {label: 'Do not show', value: 'doNotShow' }, {label: 'Show All', value: 'showAll' }]}/>
                    </PanelRow>
+                   {(showAdminUnitLabel == 'ifUnitHasData' || showAdminUnitLabel == 'showAll') &&
+                     <PanelRow>
+                     <TextareaControl
+                         label={__("Do not show these labels(use comma to separate) ")}
+                         value={labelsExclusionList}
+                         onChange={(labelsExclusionList) => setAttributes({ labelsExclusionList })}
+                     />
+                    </PanelRow>
+                   }
                     <PanelRow>
                         <ToggleControl
                             label="Map Label: Show Value"

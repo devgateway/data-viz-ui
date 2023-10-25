@@ -22,7 +22,7 @@ import Bump from "./Bump.jsx"
 import Info from "./Info.jsx"
 import Tooltip from "../commons/Tooltip.jsx";
 import {togglePanel} from "../commons/Util";
-
+import Radar from './Radar.jsx';
 
 class BlockEdit extends BlockEditWithAPIMetadata {
     constructor(props) {
@@ -262,7 +262,8 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                                     options={app == 'csv' ? [
                                         {label: 'Bar', value: 'bar'},
                                         {label: 'Pie', value: 'pie'},
-                                        {label: 'Line', value: 'line'}
+                                        {label: 'Line', value: 'line'},
+                                        {label: 'Radar', value: 'radar'}
                                     ] : types}
                                 />
 
@@ -314,6 +315,9 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                                                           {type === "bump" && <Bump allMeasures={this.state.measures}
                                                           allDimensions={this.state.dimensions}
                                                           allCategories={this.state.categories}  {...this.props}></Bump>}
+                                {type === "radar" && <Radar allMeasures={this.state.measures}
+                                                          allDimensions={this.state.dimensions}
+                                                          allCategories={this.state.categories} {...this.props}></Radar>}
                                 {type === "info" && <Info allMeasures={this.state.measures}
                                                           allDimensions={this.state.dimensions}
                                                           allCategories={this.state.categories} {...this.props}></Info>}

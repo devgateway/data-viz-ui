@@ -79,11 +79,13 @@ function custom_api_search($request)
 
             $taxonomies = get_object_taxonomies($post);
 
+
             if ($post->post_type != 'post' and $post->post_type != 'page'):
                 $parent = get_post_by_name($post->post_type);
             else:
                 $parent = get_post($post->post_parent);
             endif;
+
 
             if ($parent->post_name === 'home'):
                 $parent = null;
@@ -93,53 +95,53 @@ function custom_api_search($request)
 
             $content_arr = get_extended($post->post_content);
 
+
             if (trim($content_arr['main']) != ""):
                 $extract = $content_arr['main'];
             else:
                 $extract = $content_arr['extended'];
             endif;
 
+
+
             $post_data = [
-                        'ID' => $post->ID,
-                        'title' => $post->post_title,
-                        'slug' => $post->post_name,
-                        'type' => $post->post_type,
-                        'subtype' => $post->post_sub_type,
-                        'parent_title' => wpm_translate_post($parent, isset($request['lang']) && $request['lang'] != 'undefined' ? $request['lang'] : 'en')->post_title,
-                        'parent_slug' => $parent->post_name,
-                        'parent_type' => $parent->post_type,
-                        'parent_sub_type' => $parent->post_sub_type,
-                        'parent_ID' => $parent->ID,
-                        'parent_link' => get_permalink($parent->ID),
-                        'extract' => substr(trim(preg_replace("/[\r\n]+/", " ", strip_tags($extract))), 0, 255) . " ...",
-                        'status' => $post->post_status,
+                'ID' => $post->ID,
+                'title' => $post->post_title,
+                'slug' => $post->post_name,
+                'type' => $post->post_type,
+                'subtype' => $post->post_sub_type,
+                'parent_title' => wpm_translate_post($parent, isset($request['lang']) && $request['lang'] != 'undefined' ? $request['lang'] : 'en')->post_title,
+                'parent_slug' => $parent->post_name,
+                'parent_type' => $parent->post_type,
+                'parent_sub_type' => $parent->post_sub_type,
+                'parent_ID' => $parent->ID,
+                'parent_link' => get_permalink($parent->ID),
+                'extract' => substr(trim(preg_replace("/[\r\n]+/", " ", strip_tags($extract))), 0, 255) . " ...",
+                'status' => $post->post_status,
 
-                        'terms' => array_map(function ($term) {
-                            return wpm_translate_value($term->name, $request['lang']);
-                            }, wp_get_post_terms($post->ID, array_filter($taxonomies,
-                                function ($text) {
-                                    return $text != 'bread_crumbs';
-                                }
-                            ))),
+                'terms' => array_map(function ($term) {
+                    return wpm_translate_value($term->name, $request['lang']);
+                }, wp_get_post_terms($post->ID, array_filter($taxonomies,
+                    function ($text) {
+                        return $text != 'bread_crumbs';
+                    }
+                ))),
 
-                    'link' => get_permalink($post->ID),
-                     'bread_crumbs'=>array_map(
-                     function ($term) {
-                         return  wpm_translate_value($term->name, $request['lang']);
-                    },
-                      wp_get_post_terms($post->ID, "bread_crumbs", array( "orderby" => "parent"))),
+                'link' => get_permalink($post->ID),
 
-            ];
+     ];
 
 
-                 foreach (array_filter($taxonomies, function ($text) {
-                                                                                       return $text != 'bread_crumbs';
-                                                                                   }) as $taxonomy):
+            foreach (array_filter($taxonomies, function ($text) {
+                return $text != 'bread_crumbs';
+            }) as $taxonomy):
 
-                  $post_data[$taxonomy] = array_map(function ($term) { return  wpm_translate_value($term->name, $request['lang']);},
-                                                     wp_get_post_terms($post->ID,$taxonomy));
+                $post_data[$taxonomy] = array_map(function ($term) {
+                    return wpm_translate_value($term->name, $request['lang']);
+                },
+                    wp_get_post_terms($post->ID, $taxonomy));
 
-                endforeach;
+            endforeach;
 
 
             $post_data['metadata'] = $metadata;

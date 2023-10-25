@@ -134,6 +134,8 @@ function wpm_translate_string( $string, $language = '' ) {
  * @return array|mixed|string
  */
 function wpm_translate_value( $value, $language = '' ) {
+
+
 	if ( is_array( $value ) ) {
 		$result = array();
 		foreach ( $value as $k => $item ) {

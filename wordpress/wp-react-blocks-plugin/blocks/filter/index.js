@@ -70,11 +70,11 @@ registerBlockType(process.env.BLOCKS_NS + '/filter',
             },
             enableTextSearch: {
                 type: 'Boolean',
-                default: false 
+                default: false
             },
             showNoDataOption: {
                 type: 'Boolean',
-                default: true 
+                default: true
             },
             filterType: {
                 type: 'String',
@@ -84,7 +84,7 @@ registerBlockType(process.env.BLOCKS_NS + '/filter',
                 type: 'String',
                 default: ""
             },
-            defaultValueCriteria:{
+            defaultValueCriteria: {
                 type: 'String',
                 default: "DEFAULT_VALUE_INPUT"
             },
@@ -100,14 +100,23 @@ registerBlockType(process.env.BLOCKS_NS + '/filter',
                 type: "Array",
                 default: []
             },
-            allNoneSameBehaviour:{
+            allNoneSameBehaviour: {
                 type: 'Boolean',
-                default: false 
+                default: false
             },
-            closeOnSelect:{
+            alphabeticalSort: {
                 type: 'Boolean',
-                default: false 
+                default: true
+            },
+            ascOrder: {
+                type: 'Boolean',
+                default: true,
+            },
+            closeOnSelect: {
+                type: 'Boolean',
+                default: false
             }
+
 
         },
         edit: BlockEdit,
