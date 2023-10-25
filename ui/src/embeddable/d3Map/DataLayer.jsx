@@ -1,12 +1,18 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {connect} from "react-redux";
 import BaseLayer from "./BaseLayer";
 import DataProvider from "../data/DataProvider";
 import DataConsumer from "../data/DataConsumer";
-import Map from "../map/map";
 import {parse} from "../utils/parseUtils";
 import * as d3 from "d3";
+import {injectIntl} from "react-intl";
 
+
+const toId = (key) => {
+    //replace blank space by underscore
+    if (!key) return ""
+    return "pattern_" + key.toString().replace(/ /g, "_")
+}
 
 const getFilters = (filters) => {
     const ff = parse(filters) || []
@@ -32,7 +38,10 @@ class DataLayer extends BaseLayer {
 
     createDataLayer(json) {
         const {
-            name,
+            app,
+            svg,
+            format,
+            id,
             file,
             path,
             onLayerCreated,
@@ -44,89 +53,306 @@ class DataLayer extends BaseLayer {
             borderColor,
             tooltip,
             markFillColor,
+            markLabelColor,
             markBorderColor,
             markSizeScale,
+            markerLabelSize,
             featureJoinAttribute,
             apiJoinAttribute,
             measures,
             editing,
             data,
+            patternDiscriminator,
             breaks,
-            projection
+            patterns,
+            projection,
+            useBreaks,
+            useCentroidPoint,
+            usePattern,
+
+            intl,
+
+
         } = this.props
-        const g = d3.select(this.gRef.current)
 
 
-        const sizeScale = d3.scaleThreshold()
-            .domain(breaks.map(d => d.end))
-            .range(breaks.map(d => d.size));
-
-        const colorScale = d3.scaleThreshold()
-            .domain(breaks.map(d => d.end))
-            .range(breaks.map(d => d.color));
-        let getSize = (value) => {
-            if (breaks.length > 0) {
-                return sizeScale(value) * markSizeScale / projection.scale()
-            }
-            return markSizeScale
-        }
-        let getColor = (value) => {
-            if (breaks.length > 0) {
-                return colorScale(value)
-            }
-            return markFillColor
+        let numberFormat = {
+            style: (format.style === 'compacted') ? 'decimal' : format.style,
+            notation: (format.style === 'compacted') ? 'compact' : "standard",
+            currency: format.currency,
+            minimumFractionDigits: parseInt(format.minimumFractionDigits),
+            maximumFractionDigits: parseInt(format.maximumFractionDigits)
         }
 
+            const sizeScale = d3.scaleThreshold()
+                .domain(breaks.map(d => d.end))
+                .range(breaks.map(d => d.size));
+
+            const colorScale = d3.scaleThreshold()
+                .domain(breaks.map(d => d.end))
+                .range(breaks.map(d => d.color));
+
+            let getSize = (value) => {
+                if (breaks.length > 0 && useBreaks) {
+                    return markSizeScale + sizeScale(value)
+                }
+                return markSizeScale
+            }
+
+            let getColor = (value, isMarker) => {
+                if (breaks.length > 0 && useBreaks) {
+                    if (value > Math.max(...breaks.map(d => parseInt(d.end)))) {
+                        return fillColor
+                    } else {
+                        return colorScale(value)
+                    }
+                }
+
+                if (isMarker) {
+                    return markFillColor
+                }
+                return fillColor
+            }
 
         const filteredData = json.features.filter(f => f.properties._value != null)
 
-        g.attr("class", "data-layer " + name)
-        g.selectAll(".point").remove()
-        g.selectAll(".point")
-            .data(filteredData)
-            .enter()
-            .append("circle")
-            .attr("fill", d => getColor(d.properties._value))
-            .attr("stroke", markBorderColor)
-            .attr("class", "point")
-            .attr("stroke-width", 2)
-            .style("vector-effect", "non-scaling-stroke")
-            .attr("cx", d => path.centroid(d)[0])
-            .attr("cy", d => path.centroid(d)[1])
-            .attr('r', d => {
-                return getSize(d.properties._value);
+
+        const getTooltipVariables = (d) => {
+            if (d.properties._value) {
+                const variables = {
+                    ...d.properties, meta: {
+                        [apiJoinAttribute]: d.properties.meta ? d.properties.meta.value : '', ...d.properties.meta,
+                        value: d.properties._value
+                    }
+                }
+                return variables
+            }
+            return {}
+
+        }
+        this.g = d3.select(this.gRef.current)
+        this.g.attr("class", "base-layer") //add unique name
+        this.createPaths(json)
+
+        this.g.selectAll(".point").remove()
+        this.g.selectAll(".point-label").remove()
+        this.g.selectAll(".shape-pattern").remove()
+
+        this.g.selectAll("defs").remove()
+        const k = this.props.transform ? this.props.transform.k : 1
+
+        const patternWidth = 10* 1 / k
+        const patternHeight = 10* 1 / k
+
+
+        const defs = this.g.append("defs")
+        let patternsData = []
+        if (app == "csv" && patternDiscriminator != 'none') {
+            patternsData = [...new Set(data.data.map(d => d[patternDiscriminator]))].map(key => {
+                return {
+                    key: key,
+                    type: patterns[key + "_symbol"],
+                    color: patterns[key + "_color"],
+                    rotation: patterns[key + "_rotation"]
+                }
+            })
+        } else if (patternDiscriminator != 'none') {
+            const types = data.metadata.types.filter(d => d.dimension == patternDiscriminator)
+            patternsData = types && types.length > 0 ? types[0].items.map(item => {
+                const key = item.value
+                return {
+                    key: key,
+                    type: patterns[key + "_symbol"],
+                    color: patterns[key + "_color"],
+                    rotation: patterns[key + "_rotation"]
+                }
+
+            }) : []
+        }
+
+
+        defs.selectAll("pattern").remove()
+        defs.selectAll("pattern")
+            .data(patternsData).enter()
+            .append("pattern")
+            .attr('id', d => toId(d.key))
+            .attr('patternUnits', 'userSpaceOnUse')
+            .attr('width', patternWidth)
+            .attr('height', patternHeight)
+            .attr("x", 0).attr("y", 0)
+            .attr("patternTransform", d => `rotate(${d.rotation})`)
+
+        patternsData.forEach(d => {
+            if (d.type === 'lines') {
+                defs.select("#" + toId(d.key))
+                    .append("rect")
+                    .attr("x", .05)
+                    .attr('width', patternWidth / 2)
+                    .attr('height', patternHeight)
+                    .attr("opacity", 1)
+                    .attr('fill', d.color)
+            }
+            if (d.type === 'squares') {
+                defs.select("#" + toId(d.key))
+                    .append("rect")
+                    .attr('width', patternWidth / 2)
+                    .attr('height', patternHeight / 2)
+                    .attr('fill', d.color)
+                    .attr("opacity", 1)
+                    .attr("stroke-width", 1)
+
+            }
+            if (d.type === 'dots') {
+                defs.select("#" + toId(d.key))
+                    .append("circle")
+                    .attr("cx", patternWidth / 2)
+                    .attr("cy", patternHeight / 2)
+                    .attr('r', patternWidth / 2.5)
+                    .attr('fill', d.color)
+                    .attr("opacity", 1)
+                    .attr("stroke-width", 1)
+
+            }
+            if (d.type === 'triangle') {
+                defs.select("#" + toId(d.key))
+                    .append("polygon")
+                    .attr("points", `${patternWidth / 2} 0, 0 ${patternWidth}, ${patternWidth}  ${patternWidth} `)
+                    .attr('fill', d.color)
+                    .attr("opacity", 1)
+                    .attr("stroke-width", 1)
+
+            }
+        })
+
+
+        if (!useCentroidPoint) {
+            this.g.selectAll("path")
+                .attr("fill", d => {
+                    if (!d || !d.properties || !d.properties._value) {
+                        return fillColor
+                    }
+                    return getColor(d.properties._value)
+                })
+                .attr("stroke", borderColor)
+                .attr("id", "state-borders")
+                .attr("d", path).on("mouseenter", (d) => {
+                this.showToolTip(tooltip, getTooltipVariables(d), getColor(d.properties._value))
+            })
+                .on("mouseleave", (d) => {
+                    this.hiddenToolTip()
+                })
+                .on("mousemove", (d) => {
+                    this.moveToolTip()
+                })
+
+            this.createLabels(json)
+
+        }
+
+
+        if (usePattern && json && json.features) {
+
+            json.features.forEach(d => {
+                let patterns = []
+                if (d.properties && d.properties.meta) {
+
+                    patterns = (app != "csv") ? d.properties.meta[patternDiscriminator] ? d.properties.meta[patternDiscriminator] : [] : [d.properties.meta[patternDiscriminator]]
+
+                    if (patterns && patterns.length > 0) {
+
+                        patterns.forEach(p => {
+                            this.g.append("path")
+                                .attr("d", path(d))
+                                .attr("class", "shape-pattern")
+                                .attr("opacity", d => {
+                                    if (useBreaks) {
+                                        return .7
+                                    }
+                                })
+                                .attr("fill", d => {
+                                    return "transparent"
+                                })
+
+                                .attr("style", () => {
+                                    return "none;fill:url(#" + toId(p) + ");"
+                                })
+                                .on("mouseenter", () => {
+                                    this.showToolTip(tooltip, getTooltipVariables(d), getColor(d.properties._value))
+                                }).on("mousemove", (d) => {
+                                this.moveToolTip()
+                            }).on("mouseleave", (d) => {
+                                this.hiddenToolTip()
+                            })
+
+                        })
+                    }
+
+                }
+
             })
 
-            .on("mouseenter", (d) => {
 
-                this.showToolTip(tooltip, d.properties, getColor(d.properties._value))
+        }
 
-            })
 
-            .on("mouseleave", (d) => {
-                this.hiddenToolTip()
-            })
+        if (useCentroidPoint) {
+            this.createLabels(json)
+            this.g.selectAll(".point")
+                .data(filteredData)
+                .enter()
+                .append("circle")
+                .attr("fill", d => getColor(d.properties._value, true))
+                .attr("stroke", markBorderColor)
+                .attr("class", "point")
+                .attr("stroke-width", 2)
+                .style("vector-effect", "non-scaling-stroke")
+                .attr("cx", d => path.centroid(d)[0])
+                .attr("cy", d => path.centroid(d)[1])
+                .attr('r', d => {
+                    return getSize(d.properties._value) * 1 / k
+                })
+                //.attr("transform", this.props.transform)
+                .on("mouseenter", (d) => {
+                    if (d.properties._value) {
+                        const variables = {
+                            ...d.properties, meta: {
+                                [apiJoinAttribute]: d.properties.meta ? d.properties.meta.value : '', ...d.properties.meta,
+                                value: d.properties._value
+                            }
+                        }
+                        this.showToolTip(tooltip, variables, getColor(d.properties._value))
+                    }
+                })
+                .on("mouseleave", (d) => {
+                    this.hiddenToolTip()
+                })
 
-        g.selectAll(".point-label").remove()
-        g.selectAll(".point-label").data(filteredData)
-            .enter()
-            .append("text")
-            .attr("class", "point-label")
-            .attr("x", d => path.centroid(d)[0])
-            .attr("y", d => path.centroid(d)[1])
-            .attr("font-size", d => {
-                return labelFontSize / projection.scale() + "em"
-            })
-            .attr("fill", labelColor)
-            .text(d => {
-                return d.properties._value
-            })
+
+            this.g.selectAll(".point-label").data(filteredData)
+                .enter()
+                .append("text")
+                .attr("class", "point-label")
+                .attr("x", d => path.centroid(d)[0])
+                .attr("y", d => path.centroid(d)[1])
+                .attr("font-size", d => {
+                    return (markerLabelSize * (1 / k)) + "px"
+                })
+                .attr("fill", markLabelColor)
+                .text(d => {
+                    return intl.formatNumber(format.style === 'percent' ? d.properties._value / 100 : d.properties._value, numberFormat)
+
+                }).on("mouseover", (d) => {
+
+            });
+        } //Map Shapes
 
 
     }
 
 
     create() {
+
+        console.log("create")
         const {
             app,
             name,
@@ -142,55 +368,70 @@ class DataLayer extends BaseLayer {
             featureJoinAttribute,
             editing,
             data,
-            measures
+            measures,
+            patternDiscriminator
         } = this.props
 
-        this.loadJSON(file).then(json => {
+        if (file != "none") {
+            this.loadJSON(file).then(json => {
 
-            const features = json.features.map(d => {
+                const features = json.features.map(d => {
 
-                const joinValue = d.properties[featureJoinAttribute]
+                    const joinValue = d.properties[featureJoinAttribute]
 
-                if (app != 'csv' && data && data.children) {
-                    const values = data.children.filter(d => d.value.indexOf(joinValue) > -1)
-                    
-                    if (values.length > 0) {
-                        const measureValue = (values[0][measures[0]])
-                        d.properties.meta = values[0]
-                        d.properties._value = measureValue
-                        
+                    if (app != 'csv' && data && data.children) {
+                        const values = data.children.filter(d => d.value.indexOf(joinValue) > -1)
+                        if (values.length > 0) {
+
+                            const measureValue = (values[0][measures[0]])
+                            d.properties.meta = values[0]
+                            d.properties._value = measureValue
+
+                            if (patternDiscriminator && patternDiscriminator != 'none') {
+                                const patternsValues = values[0] && values[0].children ? values[0].children.filter(f => f.type == patternDiscriminator).map(d => d.value) : []
+                                /*
+                                 const patternType = values[0].children.map(d => ({
+                                     value: d.value, [measures[0]]: d[measures[0]]
+                                 })).sort(d => d.value)[0].value
+                                 */
+                                d.properties.meta[patternDiscriminator] = patternsValues
+                            }
+
+                        } else {
+                            d.properties._value = null
+                        }
+
+                    } else if (app == 'csv') {
+                        const values = data.data.filter(d => d[data.meta.fields[0]] == joinValue)
+                        if (values.length > 0) {
+                            d.properties.meta = values[0]
+                            d.properties._value = values[0][data.meta.fields[1]]
+
+                        } else {
+                            d.properties._value = null
+                        }
+
+
                     } else {
                         d.properties._value = null
                     }
-
-                } else if (app == 'csv') {
-                    const values = data.data.filter(d => d[data.meta.fields[0]] == joinValue)
-                    if (values.length > 0) {
-                        d.properties.meta = values[0]
-                        d.properties._value = values[0][data.meta.fields[1]]
-                    } else {
-                        d.properties._value = null
-                    }
+                    return d
+                })
 
 
-                } else {
-                    d.properties._value = null
-                }
-                return d
-            })
+                const newJson = {...json, features}
 
 
-            const newJson = {...json, features}
+                this.createDataLayer(newJson);
 
 
-            this.createBaseLayer(newJson)
-            this.createDataLayer(newJson);
-
-
-        });
+            });
+        }
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
+        const {projection} = this.props
+
         this.create()
     }
 
@@ -202,7 +443,7 @@ class DataLayer extends BaseLayer {
     render() {
 
         const {
-            name,
+            id,
             file,
             path,
             zoom,
@@ -218,27 +459,39 @@ class DataLayer extends BaseLayer {
             editing
         } = this.props
 
-        return <g className={"data " + name} ref={this.gRef}/>
+        return <g id={"data-" + id} className={"data " + id} ref={this.gRef}/>
     }
 
 }
 
 const DataWrapper = (props) => {
     const {
-        name, unique, filters, csv, app, group = "default", apiJoinAttribute, editing
+        id, unique, filters, csv, app, group = "default", apiJoinAttribute, editing, patternDiscriminator,
     } = props
+
+    let params = {}
+
+    const ff = filters || {}
+
+    if (ff && ff.forEach) {
+        ff.forEach(f => {
+            if (f.value != null && f.value.filter(v => v != null && v.toString().trim() != "").length > 0)
+                params[f.param] = f.value
+        })
+    }
+
 
     return (<DataProvider
         editing={editing}
-        params={filters}
+        params={params}
         app={app}
         csv={decodeURIComponent(csv)}
         group={group}
         editing={editing}
         ignoreErrors={true}
         isSvg={true}
-        store={[app, unique, name]}
-        source={[apiJoinAttribute]}>
+        store={[app, unique, id]}
+        source={apiJoinAttribute + (patternDiscriminator != 'none' ? "/" + patternDiscriminator : '')}>
         <DataConsumer>
             <DataLayer {...props}></DataLayer>
         </DataConsumer>
@@ -246,4 +499,4 @@ const DataWrapper = (props) => {
     </DataProvider>)
 }
 
-export default DataWrapper
+export default injectIntl(DataWrapper)
