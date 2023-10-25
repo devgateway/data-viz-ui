@@ -4,8 +4,11 @@ import DataProvider from "../data/DataProvider";
 import DataConsumer from "../data/DataConsumer";
 import {buildDivergingOptions, buildPieOptions} from './prevalenceBuilder'
 import HalfPie from "./Pie";
+
+import Radar from "./Radar";
 import Bar from "./Bar";
 import Line from "./Line";
+
 import {PostContent} from "@devgateway/wp-react-lib";
 import dataFrames from './data/index'
 
@@ -137,7 +140,9 @@ const Chart = (props) => {
         "data-offset-text": offsetText = 0,
         "data-overall-label": overallLabel = "Overall",
         "data-min-max-clamp": minMaxClamp = "false",
-        "data-reverse-legend": reverseLegend = "false"
+        "data-reverse-legend": reverseLegend = "false",
+        "data-sort": sort = "default",
+        "data-sort-reverse": sortReverse = "false",
     } = props
 
     const locale = props.intl.locale
@@ -166,7 +171,7 @@ const Chart = (props) => {
     const getMeasuresObject = () => {
         return parse(measures)
     }
-    const getSelectedFormat = () => {        
+    const getSelectedFormat = () => {
         if (measuresObject[app]) {
             let format = measuresObject[app].format
             if (!format) {
@@ -175,49 +180,49 @@ const Chart = (props) => {
                     if (measuresObject[app][keys[i]].selected && measuresObject[app][keys[i]].format) {
                         format = measuresObject[app][keys[i]].format
                         break
-                    }                
-                }               
-            }           
-            
+                    }
+                }
+            }
+
             return format
         } else {
             return measuresObject && measuresObject["csv"] ? measuresObject["csv"].format : null
         }
     }
 
-    const getCustomAxisFormat = () => { 
-        let format  = null
-        if (measuresObject[app]) {           
+    const getCustomAxisFormat = () => {
+        let format = null
+        if (measuresObject[app]) {
             const useCustomAxisFormat = measuresObject[app].useCustomAxisFormat
             if (useCustomAxisFormat && measuresObject[app].customFormat) {
                 format = measuresObject[app].customFormat
-            }                      
-            
+            }
+
         } else {
             if (measuresObject && measuresObject["csv"]) {
                 const useCustomAxisFormat = measuresObject["csv"].useCustomAxisFormat
                 if (useCustomAxisFormat && measuresObject["csv"].customFormat) {
                     format = measuresObject["csv"].customFormat
-                }                
-            }           
+                }
+            }
         }
 
         return format
     }
-    
+
     const getSelectedMeasures = () => {
         if (measuresObject[app]) {
             return Object.keys(measuresObject[app]).map(s => ({value: s, ...measuresObject[app][s]})).filter(m => m.selected).map(s => s.value)
         }
         return []
     }
-    const getCustomLabels = () => {	
+    const getCustomLabels = () => {
         const customLabels = {}
         if (measuresObject[app]) {
             const hasCustomLabels = Object.keys(measuresObject[app]).map(s => ({value: s, ...measuresObject[app][s]})).filter(m => m.selected && m.hasCustomLabel)
             hasCustomLabels.forEach(m => {
-                customLabels[m.value] = m.customLabel
-            }
+                    customLabels[m.value] = m.customLabel
+                }
             )
         }
         return customLabels
@@ -236,7 +241,9 @@ const Chart = (props) => {
     let userMeasures = getUserMeasures()
     let leftLegendForSelectedMeasure = left
     let rightLegendForSelectedMeasure = rightLegend
-    let tooltipForSelectedMeasure = tooltip
+
+    /*Decoding tooltip string*/
+    let tooltipForSelectedMeasure = decode(tooltip)
 
     if (injectedMeasures) {
         const selected = Object.keys(injectedMeasures[app].measures).map(s => ({value: s, ...injectedMeasures[app].measures[s]})).filter(m => m.selected).map(s => s.value)
@@ -256,12 +263,12 @@ const Chart = (props) => {
         notation: (selectedFormat.style === 'compacted') ? 'compact' : "standard",
         currency: selectedFormat.currency,
         minimumFractionDigits: parseInt(selectedFormat.minimumFractionDigits),
-        maximumFractionDigits: parseInt(selectedFormat.maximumFractionDigits)        
+        maximumFractionDigits: parseInt(selectedFormat.maximumFractionDigits)
     } : {
         notation: "standard",
         currency: "USD",
         minimumFractionDigits: 2,
-        maximumFractionDigits: 2        
+        maximumFractionDigits: 2
     }
 
     const customAxisFormat = getCustomAxisFormat()
@@ -288,8 +295,6 @@ const Chart = (props) => {
         bottom: bottom,
         right: rightLegendForSelectedMeasure
     }
-
-
 
 
     const chartProps = {
@@ -374,7 +379,9 @@ const Chart = (props) => {
         overallLabel,
         minMaxClamp,
         reverseLegend: reverseLegend == true || reverseLegend == "true",
-        customAxisFormat
+        customAxisFormat,
+        sort,
+        sortReverse: sortReverse == true || sortReverse == "true",
     }
 
 
@@ -402,6 +409,11 @@ const Chart = (props) => {
             case  "pie":
                 ChartDataFrame = dataFrames.PieDataFrame
                 break
+            case  "radar":
+                //TODO RADAR
+
+                ChartDataFrame = dataFrames.BarDataFrame
+                break
             default:
                 ChartDataFrame = dataFrames.BarDataFrame
                 break
@@ -422,6 +434,11 @@ const Chart = (props) => {
         case "pie":
             showNotEnoughParameters = app != 'csv' && selectedMeasures.length == 0
             Chart = HalfPie
+            break
+        case "radar":
+            showNotEnoughParameters = app != 'csv' && selectedMeasures.length == 0
+            //TODO RADAR implementation
+            Chart = Radar
             break
         default:
             Chart = <div>No Chart</div>
@@ -449,41 +466,43 @@ const Chart = (props) => {
                 editing={editing}
                 style={{"height": `${contentHeight}px`}}
                 params={params}
-                          app={app}
-                          group={group}
-                          csv={csv}
-                          editing={editing}
-                          store={[app, unique, ...dimensions]} source={dimensions.join("/")}>
+                app={app}
+                group={group}
+                csv={csv}
+                editing={editing}
+                store={[app, unique, ...dimensions]} source={dimensions.join("/")}>
 
 
                 <Container style={{"height": `${contentHeight}px`}} className={"body"} fluid={true}>
 
                     {showNotEnoughParameters && <Messages editing={editing}></Messages>}
                     {!showNotEnoughParameters && <DataConsumer>
-                            <Messages app={app} group={group} noDataMsg={noDataMsg}>  </Messages>
-                            <ChartDataFrame
+                        <Messages app={app} group={group} noDataMsg={noDataMsg}> </Messages>
+                        <ChartDataFrame
+                            locale={locale}
+                            colorBy={colorBy}
+                            hiddenBars={hiddenBars}
+                            swap={swap == 'true' || swap == true} type={type} includeTotal={true}
+                            includeOverall={includeOverall == true || includeOverall == "true"}
+                            overallLabel={overallLabel}
+                            measures={selectedMeasures}
+                            dimensions={[...dimensions]}
+                            sort={sort}
+                            sortreverse={sortReverse}
+                            customLabels={getCustomLabels()}>
+                            <ColorProvider
+                                type={type}
+                                app={app}
                                 locale={locale}
-                                colorBy={colorBy}
-                                hiddenBars={hiddenBars}
-                                swap={swap == 'true' || swap == true} type={type} includeTotal={true}
-                                includeOverall={includeOverall == true || includeOverall == "true"}
                                 overallLabel={overallLabel}
-                                measures={selectedMeasures}
-                                dimensions={[...dimensions]}
-                                customLabels={getCustomLabels()}>
-                                <ColorProvider
-                                    type={type}
-                                    app={app}
-                                    locale={locale}
-                                    overallLabel={overallLabel}
-                                    customLabels={getCustomLabels()}
-                                    manualColors={getManualColor()} colorBy={colorBy} scheme={scheme}
-                                    barColor={chartProps.barColor}>
+                                customLabels={getCustomLabels()}
+                                manualColors={getManualColor()} colorBy={colorBy} scheme={scheme}
+                                barColor={chartProps.barColor}>
 
-                                    <Chart {...chartProps}></Chart>
-                                </ColorProvider>
+                                <Chart {...chartProps}></Chart>
+                            </ColorProvider>
 
-                            </ChartDataFrame>
+                        </ChartDataFrame>
 
                     </DataConsumer>}
 

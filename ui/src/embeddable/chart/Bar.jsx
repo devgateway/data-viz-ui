@@ -226,6 +226,7 @@ const Chart = ({
     }
 
     const applyFilter = (values, filterKeys) => {
+
         if (filter) {
             if ((colors.colorBy === 'index' || colors.colorBy === 'id' || colors.colorBy === 'values') && !filterKeys) {
                 return values.filter(d => filter.indexOf(d[options.indexBy]) === -1);
@@ -754,7 +755,7 @@ const Chart = ({
                     enableLabel={barLabelPosition == POSITION_MIDDLE}
                     {...options}
                     maxValue={maxValueFromData}
-                    minValue={minValueFromData}                    
+                    minValue={minValueFromData}
                     keys={applyFilter(options.keys, true)}
                     data={applyFilter(options.data, false)}
                     groupMode={groupMode ? groupMode : "grouped"}
@@ -784,12 +785,12 @@ const Chart = ({
                             if (layout == 'vertical') {
                                 const effectiveFormat = customAxisFormat ? customAxisFormat : format
                                 return intl.formatNumber(effectiveFormat.style === 'percent' ? value / 100 : value, {
-                                    ...effectiveFormat                                    
+                                    ...effectiveFormat
                                 })
                             }
-                            
+
                             return value
-                        } 
+                        }
                     } : null}
                     axisBottom={
                         layout == 'horizontal' ? {
@@ -829,9 +830,9 @@ const Chart = ({
                                     ...effectiveFormat
                                 })
                             }
-                            
+
                             return value
-                        } 
+                        }
                     }
                     }
                     enableGridY={enableGridY}
@@ -842,10 +843,9 @@ const Chart = ({
                     padding={barPadding}
                     labelTextColor={barLabelColor}
                     label={(l) => intl.formatNumber(format.style === 'percent' ? l.value / 100 : l.value, format)}
-                    layers={layers}                    
+                    layers={layers}
                     onMouseEnter={(_data, event) => {
                     }}
-
                     onMouseLeave={(_data, event) => {
                     }}
                     motionStiffness={130}
