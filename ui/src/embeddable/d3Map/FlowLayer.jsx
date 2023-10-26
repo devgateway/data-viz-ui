@@ -121,6 +121,8 @@ class DataLayer extends BaseLayer {
         const k = this.props.transform ? this.props.transform.k : 1
 
         const originPoints = []
+
+
         filteredData.forEach(d1 => {
             //collect starting points ro be rendered later and keep them on top of the svg layers
             originPoints.push(d1)
@@ -128,19 +130,6 @@ class DataLayer extends BaseLayer {
                 dest.children.forEach(child => {
                     json.features.filter(feature => feature.properties[featureJoinAttribute] == child.value)
                         .forEach(d2 => {
-                            /*
-                             this.g.append("circle")
-                                   .attr("fill", markFillColor2)
-                                   .attr("stroke", markBorderColor2)
-                                   .attr("class", "end-point")
-                                   .attr("stroke-width", 2)
-                                   .style("vector-effect", "non-scaling-stroke")
-                                   .attr("cx", path.centroid(d2)[0])
-                                   .attr("cy", path.centroid(d2)[1])
-                                  .attr('r', () => {
-                                      return markSizeScale * 1 / k
-                                  })
-  */
 
 
                             var link = {
@@ -167,34 +156,71 @@ class DataLayer extends BaseLayer {
                                 .attr("d", "M2,2 L10,6 L2,10 L6,6 L2,2")
                                 .attr("style", "fill: " + getColor(d1.properties._value) + ";");
 
+                            const g = this.g;
 
                             this.g.append("path")
+
                                 .attr("d", path(link))
                                 .attr("class", "flow-line")
                                 .style("fill", "none")
+                                .style("cursor", "pointer")
                                 .style("stroke-dasharray", "0")
                                 .style("stroke", d => {
-                                    debugger
                                     return getColor(d1.properties._value)
                                 })
                                 .style("stroke-width", d => {
-                                    debugger
                                     return getSize(d1.properties._value)
                                 })
                                 .attr("marker-end", "url(#arrow" + d1.properties[featureJoinAttribute] + ")")
-                                .on("mouseover", d => {
-                                    /*Hidden others paths*/
-                                    d3.selectAll(".flow-line").style("stroke-opacity", 0.1)
-                                    d3.selectAll("start-point circle_"+d1.properties[featureJoinAttribute]).style("stroke-opacity", 0.1)
-                                    d3.selectAll("start-point circle_"+d1.properties[featureJoinAttribute]).style("opacity", 0.1)
-                                    d3.select(d3.event.target).style("stroke-opacity", 1)
+
+                                .on("mouseenter", d => {
+                                    g.selectAll("marker").transition().duration("200").style("opacity", 0)
+                                    g.selectAll(".start-point").transition().duration("200").style("opacity", 0)
+                                    g.selectAll(".flow-line").transition().duration("200")
+                                        .style("opacity", 0)
+                                    d3.select(d3.event.target).transition().duration("200").style("opacity", 1)
+                                    g.selectAll("#arrow" + d1.properties[featureJoinAttribute]).transition().duration("200").style("opacity", 1)
+                                    g.selectAll(".start-point.circle_" + d1.properties[featureJoinAttribute]).transition().duration("200").style("opacity", 1)
+
+                                    if (d1.properties._value) {
+
+                                        debugger;
+                                        const origin = {}
+                                        const target = {}
+
+                                        Object.keys(d1.properties).forEach(key => {
+                                            origin["origin_" + key] = d1.properties[key]
+                                        })
+                                        Object.keys(d2.properties).forEach(key => {
+                                            target["target_" + key] = d2.properties[key]
+                                        })
+                                        debugger;
+
+                                        const variables = {
+                                            ...origin,
+                                            ...target,
+                                            meta: {
+                                                [apiJoinAttribute]: d1.properties.meta ? d1.properties.meta.value : '',
+                                                ...d1.properties.meta,
+                                                value: d1.properties._value,
+
+                                            }
+                                        }
+
+                                        this.showToolTip(tooltip, variables, getColor(d1.properties._value))
+                                    }
+
+
                                 })
                                 .on("mouseout", d => {
                                     /*Hidden others paths*/
-                                    d3.selectAll(".flow-line").style("stroke-opacity", 1)
-                                    d3.selectAll("start-point circle_"+d1.properties[featureJoinAttribute]).style("stroke-opacity", 1)
+                                    this.hiddenToolTip()
+                                    d3.selectAll(".flow-line").transition().duration("100").style("opacity", 1)
+                                    g.selectAll(".start-point").transition().duration("100").style("opacity", 1)
+                                    g.selectAll("marker").transition().duration("100").style("opacity", 1)
+
                                 })
-                            ;
+
 
                         })
 
