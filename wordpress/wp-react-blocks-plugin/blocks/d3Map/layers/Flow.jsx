@@ -1,7 +1,7 @@
 import {Component} from "@wordpress/element";
 import {__} from '@wordpress/i18n';
 import {
-    Button,
+    Button, ButtonGroup,
     CheckboxControl,
     PanelBody,
     PanelRow,
@@ -95,7 +95,7 @@ export class DataLayerSetting extends Component {
     getCSValue() {
         const {apps, features, layer: {csv, featureJoinAttribute}} = this.props
         if (csv == '') {
-            let generatedCSV = 'id,value\n'
+            let generatedCSV = 'id,origin,destination,value\n'
             if (features && features.length > 0) {
                 features.forEach(f => {
                     generatedCSV = generatedCSV + f.properties[featureJoinAttribute] + ', \n'
@@ -216,7 +216,7 @@ export class DataLayerSetting extends Component {
 
     render() {
         const {
-            onChangeProperty, allDimensions, allFilters, allMeasures, allCategories, features, apps, layer: {
+            onChangeProperty, allDimensions, allFilters, allMeasures, allCategories, features, apps, layer,layer: {
                 app,
                 csv,
                 measures,
@@ -247,6 +247,8 @@ export class DataLayerSetting extends Component {
                 patternDiscriminator,
                 flowOrigin,
                 flowDestination,
+                onRemoveLayer,
+                onMoveLayer,
             }
         } = this.props
 
@@ -322,119 +324,135 @@ export class DataLayerSetting extends Component {
                     options={allDimensions}
                 />
             </PanelRow>}
+
             <PanelRow>
                 <TextareaControl
                     label={__("Tooltip")}
                     value={tooltip}
-                    help={__("You can use variables {var_name}")}
+                    help={__("You can use variables, i.e: From {origin_name} to {target_name} : {value}")}
                     onChange={(tooltip) => onChangeProperty("tooltip", tooltip)}
                     rows={10}
                 />
-
             </PanelRow>
-            {app != 'csv' && allMeasures && allMeasures.map(m => <PanelRow><p
-                style={{
-                    "margin-top": "calc(8px)",
-                    "font-size": "12px",
-                    "font-style": "normal",
-                    "color": "rgb(117, 117, 117)"
-                }}>{"{" + m.value + "}"}</p></PanelRow>)}
-        </PanelBody>, <React.Fragment>
-            {app != 'csv' && <Measures
-                onFormatChange={this.onFormatChange}
-                onSetSingleMeasure={this.onSetSingleMeasure}
-                onMeasuresChange={this.onMeasuresChange}
-                {...this.props} />}
-        </React.Fragment>, <React.Fragment>
-            {app != 'csv' && <PanelBody initialOpen={false} title={__("Filters")}>
-                {filters.map((f, index) => {
-                    return (<PanelBody initialOpen={false} title={__(`Filter - ${f.label}`)}>
-                        <FilterSelector param={f.param} index={index} options={allFilters}
-                                        onUpdateFilterParam={this.updateFilterParam}/>
-                        {<CategoricalFilter value={f.value} index={index} items={this.items(f.type)}
-                                            onUpdateFilterValue={this.updateFilterValue}/>}
-                    </PanelBody>)
-                })}
+            <PanelRow>
+                <div className={"components-base-control__help"}
+                     style={{
+                         "display": "block",
+                         "text-align": "left",
+                         "color": "rgb(117, 117, 117)"
+                     }}>
+                    {app != 'csv' && allMeasures && allMeasures.map(m => <p>{"{"}{m.value}{"{"}</p>)}
+                    <p>
+                        All features attributes are available as variables, use origin_ prefix for origin attributes and use
+                        target_ prefix for destination attributes i.e From {"{"}origin_name{"}"} to {"{"}target_name{"}"} : {"{"}value{"}"}
+                    </p>
+                </div>
+            </PanelRow>
+        </PanelBody>,
+            <React.Fragment>
+                {app != 'csv' && <Measures
+                    onFormatChange={this.onFormatChange}
+                    onSetSingleMeasure={this.onSetSingleMeasure}
+                    onMeasuresChange={this.onMeasuresChange}
+                    {...this.props} />}
+            </React.Fragment>,
+            <React.Fragment>
+                {app != 'csv' && <PanelBody initialOpen={false} title={__("Filters")}>
+                    {filters.map((f, index) => {
+                        return (<PanelBody initialOpen={false} title={__(`Filter - ${f.label}`)}>
+                            <FilterSelector param={f.param} index={index} options={allFilters}
+                                            onUpdateFilterParam={this.updateFilterParam}/>
+                            {<CategoricalFilter value={f.value} index={index} items={this.items(f.type)}
+                                                onUpdateFilterValue={this.updateFilterValue}/>}
+                        </PanelBody>)
+                    })}
 
+                    <PanelRow>
+                        <Button variant={"link"} onClick={this.addFilter}>{__("Add Filter")}</Button>
+                        <Button variant={"link"} onClick={this.removeFilter}>{__("Remove")}</Button>
+                    </PanelRow>
+                </PanelBody>}
+            </React.Fragment>, <PanelBody initialOpen={false} title={"Symbols and Styles"}>
+                {app != "csv" && selectedMeasureValue && <PanelRow>
+                    <TextControl
+                        label={selectedMeasureLabel}
+                        help={__("Customize Measure Label")}
+                        value={customMeasuresLabels ? customMeasuresLabels[selectedMeasureValue] : ""}
+                        onChange={(measureLabel) => {
+                            onChangeProperty("customMeasuresLabels", {
+                                ...customMeasuresLabels, [selectedMeasureValue]: measureLabel
+                            })
+
+
+                        }}>
+                    </TextControl>
+                </PanelRow>}
                 <PanelRow>
-                    <Button variant={"link"} onClick={this.addFilter}>{__("Add Filter")}</Button>
-                    <Button variant={"link"} onClick={this.removeFilter}>{__("Remove")}</Button>
+                    <RangeControl
+                        label="Circle Size"
+                        value={markSizeScale}
+                        onChange={(value) => {
+                            onChangeProperty("markSizeScale", value)
+                        }}
+                        step={1}
+                        min={0}
+                        max={100}
+                    />
                 </PanelRow>
-            </PanelBody>}
-        </React.Fragment>, <PanelBody initialOpen={false} title={"Symbols and Styles"}>
-            {app != "csv" && selectedMeasureValue && <PanelRow>
-                <TextControl
-                    label={selectedMeasureLabel}
-                    help={__("Customize Measure Label")}
-                    value={customMeasuresLabels ? customMeasuresLabels[selectedMeasureValue] : ""}
-                    onChange={(measureLabel) => {
-                        onChangeProperty("customMeasuresLabels", {
-                            ...customMeasuresLabels, [selectedMeasureValue]: measureLabel
-                        })
+                <PanelRow>
+                    <PanelColorSettings
+                        title={__(`Border`)}
+                        value={borderColor}
+                        colorSettings={[{
+                            clearable: true,
+                            enableAlpha: true,
+                            value: markBorderColor, onChange: (borderColor) => {
+                                onChangeProperty("markBorderColor", borderColor)
+                            },
 
+                        }]}
+                    />
+                </PanelRow>
+                <PanelRow>
+                    <PanelColorSettings
+                        title={__(`Color`)}
+                        value={markFillColor2}
+                        colorSettings={[{
+                            clearable: true, enableAlpha: true,
+                            value: markFillColor2,
+                            onChange: (markFillColor2) => {
+                                onChangeProperty("markFillColor2", markFillColor2)
+                            },
 
-                    }}>
-                </TextControl>
-            </PanelRow>}
-            <PanelRow>
-                <RangeControl
-                    label="Circle Size"
-                    value={markSizeScale}
-                    onChange={(value) => {
-                        onChangeProperty("markSizeScale", value)
-                    }}
-                    step={1}
-                    min={0}
-                    max={100}
-                />
-            </PanelRow>
-            <PanelRow>
-                <PanelColorSettings
-                    title={__(`Border`)}
-                    value={borderColor}
-                    colorSettings={[{
-                        clearable: true,
-                        enableAlpha: true,
-                        value: markBorderColor, onChange: (borderColor) => {
-                            onChangeProperty("markBorderColor", borderColor)
-                        },
+                        }]}/>
+                </PanelRow>
+                <PanelRow>
+                    <RangeControl
+                        label="Line Size"
+                        value={markSizeScale2}
+                        onChange={(value) => {
+                            onChangeProperty("markSizeScale2", value)
+                        }}
+                        step={1}
+                        min={0}
+                        max={100}
+                    />
 
-                    }]}
-                />
-            </PanelRow>
-            <PanelRow>
-                <PanelColorSettings
-                    title={__(`Color`)}
-                    value={markFillColor2}
-                    colorSettings={[{
-                        clearable: true, enableAlpha: true,
-                        value: markFillColor2,
-                        onChange: (markFillColor2) => {
-                            onChangeProperty("markFillColor2", markFillColor2)
-                        },
+                </PanelRow>
 
-                    }]}/>
-            </PanelRow>
-            <PanelRow>
-                <RangeControl
-                    label="Line Size"
-                    value={markSizeScale2}
-                    onChange={(value) => {
-                        onChangeProperty("markSizeScale2", value)
-                    }}
-                    step={1}
-                    min={0}
-                    max={100}
-                />
-
-            </PanelRow>
-
-            <BreaksGenerator
-                showSize={true}
-                defaultBorderColor={markBorderColor}
-                defaultFillColor={markFillColor}
-                onChangeProperty={onChangeProperty} breaks={breaks}/>
-        </PanelBody>
+                <BreaksGenerator
+                    showSize={true}
+                    defaultBorderColor={markBorderColor}
+                    defaultFillColor={markFillColor}
+                    onChangeProperty={onChangeProperty} breaks={breaks}/>
+            </PanelBody>,
+            <PanelBody initialOpen={false}>
+                <ButtonGroup>
+                    <Button variant={"secondary"} type onClick={onRemoveLayer}>Delete</Button>
+                    <Button variant={"secondary"} type onClick={e => onMoveLayer(-1, layer)}>Up</Button>
+                    <Button variant={"secondary"} type onClick={e => onMoveLayer(1, layer)}>Down</Button>
+                </ButtonGroup>
+            </PanelBody>
 
         ])
     }
