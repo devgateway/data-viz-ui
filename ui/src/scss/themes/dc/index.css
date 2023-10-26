@@ -231,7 +231,8 @@
       transition: 471ms;
       padding: 10px 30px;
       transform: translateY(-5px);
-      background-color: #60832a; }
+      background-color: #60832a;
+      box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2); }
     .edit-post-visual-editor .cta-buttons .cta-secondary-button, #root .cta-buttons .cta-secondary-button {
       border: 1px solid #76a234;
       border-radius: 3px;
@@ -248,7 +249,8 @@
       transform: translateY(-5px);
       color: #60832a;
       border: 1px solid #60832a;
-      background-color: rgba(255, 255, 255, 0.5); }
+      background-color: rgba(255, 255, 255, 0.5);
+      box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2); }
   .edit-post-visual-editor .cta-buttons-internal, #root .cta-buttons-internal {
     position: absolute;
     width: 100vw;
@@ -258,7 +260,8 @@
     .edit-post-visual-editor .cta-buttons-internal .cta-secondary-button:hover, #root .cta-buttons-internal .cta-secondary-button:hover {
       color: white;
       border: 1px solid #60832a;
-      background-color: rgba(255, 255, 255, 0.2); }
+      background-color: rgba(255, 255, 255, 0.2);
+      box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2); }
   .edit-post-visual-editor .wp-block-cover, #root .wp-block-cover {
     padding: 150px 0 0 18vw;
     margin: 0;
@@ -340,135 +343,45 @@
   .edit-post-visual-editor .footer-menu, #root .footer-menu {
     position: absolute;
     right: 50px !important;
-    max-width: 400px !important;
-    margin: 0 0 0 150px;
+    max-width: 550px !important;
     padding-top: 16px; }
+    .edit-post-visual-editor .footer-menu a, #root .footer-menu a {
+      color: white !important; }
+    .edit-post-visual-editor .footer-menu a:hover, #root .footer-menu a:hover {
+      color: #76a234 !important; }
   .edit-post-visual-editor .viz.tabbed.posts.container, #root .viz.tabbed.posts.container {
     margin: 0px;
     min-height: 250px;
-    padding: 0px 20px; }
+    padding: 0 20px; }
     .edit-post-visual-editor .viz.tabbed.posts.container .ui.container.entry-content, #root .viz.tabbed.posts.container .ui.container.entry-content {
       margin: 0px;
       padding: 25px 15px; }
-    .edit-post-visual-editor .viz.tabbed.posts.container .viz.download, #root .viz.tabbed.posts.container .viz.download {
-      margin-top: -5px; }
-      .edit-post-visual-editor .viz.tabbed.posts.container .viz.download .download-header, #root .viz.tabbed.posts.container .viz.download .download-header {
-        align-items: center; }
-        .edit-post-visual-editor .viz.tabbed.posts.container .viz.download .download-header .ui.container.entry-content, #root .viz.tabbed.posts.container .viz.download .download-header .ui.container.entry-content {
-          padding: 0; }
     .edit-post-visual-editor .viz.tabbed.posts.container .label, #root .viz.tabbed.posts.container .label {
-      font-weight: 400;
-      margin: 0px;
-      font-size: 16px; }
-  .edit-post-visual-editor .ui.grid.tabbed.posts, #root .ui.grid.tabbed.posts {
-    background-color: transparent !important; }
-    .edit-post-visual-editor .ui.grid.tabbed.posts .row, #root .ui.grid.tabbed.posts .row {
-      border: 1px solid #dadada;
+      display: none; }
+  .edit-post-visual-editor .ui.grid.tabbed.posts .list-icon, #root .ui.grid.tabbed.posts .list-icon {
+    background-color: #2B2F31;
+    width: 7px !important;
+    height: 7px !important;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 10px;
+    margin-top: 10px; }
+  .edit-post-visual-editor .ui.grid.tabbed.posts > .column, #root .ui.grid.tabbed.posts > .column {
+    padding: 0; }
+    .edit-post-visual-editor .ui.grid.tabbed.posts > .column button.nav, #root .ui.grid.tabbed.posts > .column button.nav {
+      height: 250px !important;
+      width: 100%;
       padding: 0;
-      margin: 0; }
-    .edit-post-visual-editor .ui.grid.tabbed.posts > .column, #root .ui.grid.tabbed.posts > .column {
-      margin: 0 0 -1px 0;
-      padding: .2vw 0 0 3px; }
-      .edit-post-visual-editor .ui.grid.tabbed.posts > .column:first-child, #root .ui.grid.tabbed.posts > .column:first-child {
-        padding-left: 0; }
-      .edit-post-visual-editor .ui.grid.tabbed.posts > .column button.nav, #root .ui.grid.tabbed.posts > .column button.nav {
-        border-top-left-radius: 4px;
-        border-top-right-radius: 4px;
-        border-bottom-right-radius: 0;
-        border-bottom-left-radius: 0;
-        -webkit-border-top-left-radius: 4px;
-        -webkit-border-top-right-radius: 4px;
-        -webkit-border-bottom-right-radius: 0;
-        -webkit-border-bottom-left-radius: 0;
-        -moz-border-radius-topleft: 4px;
-        -moz-border-radius-topright: 4px;
-        -moz-border-radius-bottomright: 0;
-        -moz-border-radius-bottomleft: 0;
-        background-color: #f4f4f4;
-        border: 1px solid #dadada;
-        height: 45px;
-        width: 100%;
-        padding: 0px;
-        margin: 0px;
-        color: #a6a6a6;
-        text-align: left; }
-        .edit-post-visual-editor .ui.grid.tabbed.posts > .column button.nav .label, #root .ui.grid.tabbed.posts > .column button.nav .label {
-          color: #a6a6a6;
-          background-color: transparent !important; }
-      .edit-post-visual-editor .ui.grid.tabbed.posts > .column .button.one.nav, #root .ui.grid.tabbed.posts > .column .button.one.nav {
-        width: auto !important; }
-    .edit-post-visual-editor .ui.grid.tabbed.posts .column.has-icon button.nav, #root .ui.grid.tabbed.posts .column.has-icon button.nav {
-      text-align: left; }
-      .edit-post-visual-editor .ui.grid.tabbed.posts .column.has-icon button.nav .icon, #root .ui.grid.tabbed.posts .column.has-icon button.nav .icon {
-        border: 0px;
-        display: block;
-        background-size: contain;
-        background-position: center;
-        background-repeat: no-repeat;
-        width: auto;
-        float: left;
-        height: 30px;
-        width: auto;
-        margin-left: 10px;
-        margin-right: -5px;
-        opacity: 0.25;
-        filter: invert(1) saturate(0) brightness(200%); }
-    .edit-post-visual-editor .ui.grid.tabbed.posts .column.has-icon.active button.nav .icon, #root .ui.grid.tabbed.posts .column.has-icon.active button.nav .icon {
-      filter: invert(0) saturate(0) brightness(200%);
-      opacity: 1 !important; }
-    .edit-post-visual-editor .ui.grid.tabbed.posts button.nav:hover, #root .ui.grid.tabbed.posts button.nav:hover {
-      color: #FFF; }
-    .edit-post-visual-editor .ui.grid.tabbed.posts .active button.nav, #root .ui.grid.tabbed.posts .active button.nav {
-      color: #ffffff;
-      background-color: #5baf95; }
-      .edit-post-visual-editor .ui.grid.tabbed.posts .active button.nav .label, #root .ui.grid.tabbed.posts .active button.nav .label {
-        color: #ffffff; }
-  .edit-post-visual-editor .ui.menu.tabbed.posts, #root .ui.menu.tabbed.posts {
-    padding: 0px;
-    margin: 0px; }
-    .edit-post-visual-editor .ui.menu.tabbed.posts .item, #root .ui.menu.tabbed.posts .item {
-      margin: 0px;
-      padding: 0px;
-      color: #66676d !important;
-      border: 0px;
-      font-size: 18px; }
-      .edit-post-visual-editor .ui.menu.tabbed.posts .item .label, #root .ui.menu.tabbed.posts .item .label {
-        background-color: transparent !important;
-        color: #66676d;
-        padding: 0px; }
-      .edit-post-visual-editor .ui.menu.tabbed.posts .item:last-child:after, #root .ui.menu.tabbed.posts .item:last-child:after {
-        content: none; }
-    .edit-post-visual-editor .ui.menu.tabbed.posts .item.active, #root .ui.menu.tabbed.posts .item.active {
-      color: #5baf95 !important;
-      font-weight: 700;
-      padding-left: 10px; }
-      .edit-post-visual-editor .ui.menu.tabbed.posts .item.active .label, #root .ui.menu.tabbed.posts .item.active .label {
-        background-color: transparent !important;
-        color: #5baf95;
-        font-weight: bold;
-        padding: 0px; }
-      .edit-post-visual-editor .ui.menu.tabbed.posts .item.active:after, #root .ui.menu.tabbed.posts .item.active:after {
-        color: #66676d;
-        font-weight: normal; }
-    .edit-post-visual-editor .ui.menu.tabbed.posts a.item.active::before, #root .ui.menu.tabbed.posts a.item.active::before {
-      content: '';
-      background-repeat: no-repeat;
-      background-position: center;
-      width: 18px !important;
-      height: 20px !important;
-      background-color: transparent !important;
-      display: block !important;
-      position: relative !important;
-      margin-left: -18px;
-      margin-right: 8px; }
-    .edit-post-visual-editor .ui.menu.tabbed.posts .item::after, #root .ui.menu.tabbed.posts .item::after {
-      content: '|';
-      margin-left: 18px;
-      margin-right: 18px; }
-  .edit-post-visual-editor .container.viz.tabbed.posts.editing .button.nav, #root .container.viz.tabbed.posts.editing .button.nav {
-    margin-top: 20px; }
-  .edit-post-visual-editor .wp-block-viz-components-tabbed-posts .viz-component[data-theme='light'] .ui.menu.tabbed.posts .item .label, #root .wp-block-viz-components-tabbed-posts .viz-component[data-theme='light'] .ui.menu.tabbed.posts .item .label {
-    font-size: 18px; }
+      margin: 0;
+      background-color: transparent;
+      border-radius: 0;
+      border-bottom: solid 9px transparent; }
+      .edit-post-visual-editor .ui.grid.tabbed.posts > .column button.nav .ui.image.icon, #root .ui.grid.tabbed.posts > .column button.nav .ui.image.icon {
+        height: 200px; }
+  .edit-post-visual-editor .ui.grid.tabbed.posts .active button.nav, #root .ui.grid.tabbed.posts .active button.nav {
+    border-bottom: solid 9px #365967; }
   .edit-post-visual-editor .body.parts, #root .body.parts {
     padding: 0px;
     margin: auto; }
@@ -1716,127 +1629,161 @@ p {
   .edit-post-visual-editor .ui.selection.dropdown.error, #root .ui.selection.dropdown.error {
     background-color: #ffffff;
     border-color: transparent; }
-  .edit-post-visual-editor .viz.download, #root .viz.download {
+  .edit-post-visual-editor .download .download-header .ui.container.entry-content, #root .download .download-header .ui.container.entry-content {
+    padding-bottom: 10px !important;
+    padding-top: 10px !important; }
+  .edit-post-visual-editor .download .wp-block-columns, #root .download .wp-block-columns {
+    margin-bottom: 15px; }
+  .edit-post-visual-editor .download .download.area, #root .download .download.area {
+    display: flex; }
+    .edit-post-visual-editor .download .download.area .ui.container.entry-content, #root .download .download.area .ui.container.entry-content {
+      padding: 0; }
+    .edit-post-visual-editor .download .download.area i.icon.question.circle, #root .download .download.area i.icon.question.circle {
+      color: red;
+      font-size: 0.8em;
+      padding: 7px; }
+      .edit-post-visual-editor .download .download.area i.icon.question.circle:before, #root .download .download.area i.icon.question.circle:before {
+        border-left: 2px solid red;
+        display: block;
+        float: left;
+        height: 20px;
+        line-height: 20px;
+        margin-left: 8px;
+        margin-top: -5px;
+        width: 45px; }
+  .edit-post-visual-editor .download .button.download, #root .download .button.download {
+    background-color: transparent;
+    color: #76a234;
+    font-size: 14px;
+    font-weight: 600;
+    z-index: 1000;
+    border: 0;
+    margin-right: 0; }
+  .edit-post-visual-editor .download .download-icon:before, #root .download .download-icon:before {
+    top: 1px;
+    margin-left: 0;
+    color: #76a234;
+    cursor: pointer;
+    padding: 7px 9px 9px 15px;
+    position: relative;
+    z-index: 999;
+    background-color: transparent !important;
+    cursor: pointer;
+    z-index: 90 !important; }
+  .edit-post-visual-editor .download .active .download-icon:before, #root .download .active .download-icon:before {
+    padding-bottom: 17px;
+    border-bottom: 0px;
+    border-bottom-left-radius: 0px !important;
+    border-bottom-right-radius: 0px !important; }
+  .edit-post-visual-editor .download .dropdown.icon, #root .download .dropdown.icon {
+    display: none; }
+  .edit-post-visual-editor .download .dropdown.download .visible.menu.transition, #root .download .dropdown.download .visible.menu.transition {
+    backface-visibility: hidden;
+    position: absolute;
+    left: auto;
+    top: 36px;
+    right: 9px;
+    padding: 15px 20px;
+    box-shadow: none;
+    border-color: #51AB8D;
+    border-radius: 0 !important;
+    border-top-left-radius: 3px !important;
+    border-bottom-left-radius: 3px !important;
+    border-bottom-right-radius: 3px !important;
+    font-size: 16px;
+    color: #51AB8D;
+    font-weight: 600;
+    z-index: 80 !important; }
+  .edit-post-visual-editor .download .dropdown.download .visible.menu.transition .item, #root .download .dropdown.download .visible.menu.transition .item {
+    padding: 12px 0px 0px 0px !important;
+    background: none !important; }
+  .edit-post-visual-editor .download .dropdown.download .visible.menu.transition .item input, #root .download .dropdown.download .visible.menu.transition .item input {
+    margin-top: 0px; }
+  .edit-post-visual-editor .download .dropdown.download input[type=radio], #root .download .dropdown.download input[type=radio] {
+    border: 1px solid #66676d;
+    font-size: 10px;
+    height: 14px;
+    width: 14px;
+    min-height: 6px;
+    min-width: 6px;
+    margin: 5px 5px 2px 0px; }
+  .edit-post-visual-editor .download .dropdown.download input[type=radio]:checked::before, #root .download .dropdown.download input[type=radio]:checked::before {
+    content: "";
+    background-color: #31ba1a;
+    height: 6px;
+    width: 6px;
+    border-radius: 50%;
+    margin: 3px; }
+  .edit-post-visual-editor .download .dropdown.download label, #root .download .dropdown.download label {
+    font-size: 16px;
+    color: #66676d; }
+  .edit-post-visual-editor .tcdi.download.has-title .download.title, #root .tcdi.download.has-title .download.title {
+    padding: 0;
+    margin: 0px;
+    float: left; }
+    .edit-post-visual-editor .tcdi.download.has-title .download.title p, #root .tcdi.download.has-title .download.title p {
+      line-height: 125%; }
+  .edit-post-visual-editor .tcdi.download.has-title .ui.grid, .edit-post-visual-editor .tcdi.download.has-title .column, #root .tcdi.download.has-title .ui.grid, #root .tcdi.download.has-title .column {
+    padding: 0px;
+    margin: 0px; }
+    .edit-post-visual-editor .tcdi.download.has-title .ui.grid .editing, .edit-post-visual-editor .tcdi.download.has-title .column .editing, #root .tcdi.download.has-title .ui.grid .editing, #root .tcdi.download.has-title .column .editing {
+      margin-top: -1rem !important; }
+  .edit-post-visual-editor .tcdi.download.has-title .ui.grid, #root .tcdi.download.has-title .ui.grid {
+    margin-bottom: -5px;
     margin-top: -5px; }
-    .edit-post-visual-editor .viz.download .download-header, #root .viz.download .download-header {
-      align-items: center; }
-      .edit-post-visual-editor .viz.download .download-header .ui.container.entry-content, #root .viz.download .download-header .ui.container.entry-content {
-        padding: 0; }
-      .edit-post-visual-editor .viz.download .download-header > .column, #root .viz.download .download-header > .column {
-        margin: 0;
-        padding: 0; }
-    .edit-post-visual-editor .viz.download .download.area, #root .viz.download .download.area {
-      display: flex; }
-      .edit-post-visual-editor .viz.download .download.area .ui.container.entry-content, #root .viz.download .download.area .ui.container.entry-content {
-        padding: 0; }
-    .edit-post-visual-editor .viz.download .wp-block-columns, #root .viz.download .wp-block-columns {
-      margin-bottom: 15px; }
-    .edit-post-visual-editor .viz.download .button.download, #root .viz.download .button.download {
-      background-color: #55889F;
-      color: #FFF;
-      font-size: 14px;
-      font-weight: 600;
-      z-index: 1000;
-      border: 1px solid;
-      margin-right: 10px; }
-    .edit-post-visual-editor .viz.download .download-icon, #root .viz.download .download-icon {
-      align-self: flex-end; }
-    .edit-post-visual-editor .viz.download .download-icon:before, #root .viz.download .download-icon:before {
-      top: 1px;
-      margin-left: -5px;
-      color: #51AB8D;
-      border: 1px solid;
-      cursor: pointer;
-      padding: 7px 9px 9px 9px;
-      position: relative;
-      z-index: 999;
-      background-color: #FFF !important;
-      border-radius: 3px;
-      cursor: pointer;
-      z-index: 90 !important; }
-    .edit-post-visual-editor .viz.download .active .download-icon:before, #root .viz.download .active .download-icon:before {
-      padding-bottom: 17px;
-      border-bottom: 0px;
-      border-bottom-left-radius: 0px !important;
-      border-bottom-right-radius: 0px !important; }
-    .edit-post-visual-editor .viz.download .dropdown.icon, #root .viz.download .dropdown.icon {
-      display: none; }
-    .edit-post-visual-editor .viz.download .dropdown.download .visible.menu.transition, #root .viz.download .dropdown.download .visible.menu.transition {
-      position: absolute;
-      left: auto;
-      top: 36px;
-      right: 9px;
-      padding: 15px 20px;
-      box-shadow: none;
-      border-color: #51AB8D;
-      border-radius: 0 !important;
-      border-top-left-radius: 3px !important;
-      border-bottom-left-radius: 3px !important;
-      border-bottom-right-radius: 3px !important;
-      font-size: 16px;
-      color: #51AB8D;
-      font-weight: 600;
-      z-index: 80 !important; }
-    .edit-post-visual-editor .viz.download .dropdown.download .visible.menu.transition .item, #root .viz.download .dropdown.download .visible.menu.transition .item {
-      padding: 12px 0px 0px 0px !important;
-      background: none !important; }
-    .edit-post-visual-editor .viz.download .dropdown.download .visible.menu.transition .item input, #root .viz.download .dropdown.download .visible.menu.transition .item input {
-      margin-top: 0px; }
-    .edit-post-visual-editor .viz.download .dropdown.download input[type=radio], #root .viz.download .dropdown.download input[type=radio] {
-      border: 1px solid #66676d;
-      font-size: 10px;
-      height: 14px;
-      width: 14px;
-      min-height: 6px;
-      min-width: 6px;
-      margin: 5px 5px 2px 0px; }
-    .edit-post-visual-editor .viz.download .dropdown.download input[type=radio]:checked::before, #root .viz.download .dropdown.download input[type=radio]:checked::before {
-      content: "";
-      background-color: #31ba1a;
-      height: 6px;
-      width: 6px;
-      border-radius: 50%;
-      margin: 3px; }
-    .edit-post-visual-editor .viz.download .dropdown.download label, #root .viz.download .dropdown.download label {
-      font-size: 16px;
-      color: #66676d; }
-    .edit-post-visual-editor .viz.download .ui.grid, .edit-post-visual-editor .viz.download .column, #root .viz.download .ui.grid, #root .viz.download .column {
-      padding: 0px;
-      margin: 0px; }
-      .edit-post-visual-editor .viz.download .ui.grid .editing, .edit-post-visual-editor .viz.download .column .editing, #root .viz.download .ui.grid .editing, #root .viz.download .column .editing {
-        margin-top: -1rem !important; }
-    .edit-post-visual-editor .viz.download .ui.grid, #root .viz.download .ui.grid {
-      margin-bottom: -5px; }
-  .edit-post-visual-editor .viz.download.light .wrapper, #root .viz.download.light .wrapper {
+  .edit-post-visual-editor .tcdi.download.light .wrapper, #root .tcdi.download.light .wrapper {
     border: 1px solid #0692fe;
     padding: 3px 5px;
     border-radius: 5px;
     float: right; }
-  .edit-post-visual-editor .viz.download.light .map.wrapper, #root .viz.download.light .map.wrapper {
-    border: none; }
-  .edit-post-visual-editor .viz.download.light .ui.button.download, #root .viz.download.light .ui.button.download {
+  .edit-post-visual-editor .tcdi.download.light .map.wrapper, #root .tcdi.download.light .map.wrapper {
+    border: none;
+    float: none;
+    overflow: hidden; }
+    @media print {
+      .edit-post-visual-editor .tcdi.download.light .map.wrapper, #root .tcdi.download.light .map.wrapper {
+        margin-left: 20px; } }
+  .edit-post-visual-editor .tcdi.download.light [data-tooltip]:after, #root .tcdi.download.light [data-tooltip]:after {
+    font-size: 0.8rem; }
+  .edit-post-visual-editor .tcdi.download.light [data-tooltip]:before, #root .tcdi.download.light [data-tooltip]:before {
+    bottom: 23px; }
+  .edit-post-visual-editor .tcdi.download.light .ui.button.download, #root .tcdi.download.light .ui.button.download {
     border: 0px;
     font-weight: 300;
-    padding: 5px 5px;
+    padding: 5px;
     background-color: #FFF;
-    color: #0692fe; }
-  .edit-post-visual-editor .viz.download.light .download-icon:before, #root .viz.download.light .download-icon:before {
-    padding: 0px 4px;
+    color: #0692fe;
+    margin-right: 0px; }
+    .edit-post-visual-editor .tcdi.download.light .ui.button.download:hover, #root .tcdi.download.light .ui.button.download:hover {
+      color: #046fbe; }
+  .edit-post-visual-editor .tcdi.download.light .dropdown.download, #root .tcdi.download.light .dropdown.download {
+    padding-right: 10px; }
+  .edit-post-visual-editor .tcdi.download.light .download-icon:before, #root .tcdi.download.light .download-icon:before {
+    border-radius: 0;
+    -webkit-border-radius: 0;
+    -moz-border-radius: 0;
     border: 0px;
-    color: #0692fe; }
-  .edit-post-visual-editor .viz.download.light .dropdown.download .visible.menu.transition, #root .viz.download.light .dropdown.download .visible.menu.transition {
+    border-left: 1px solid #0692fe;
+    color: #0692fe;
+    height: 20px;
+    margin-left: 3px;
+    padding: 0 4px 0 9px; }
+  .edit-post-visual-editor .tcdi.download.light .download-icon:hover:before, #root .tcdi.download.light .download-icon:hover:before {
+    color: #046fbe; }
+  .edit-post-visual-editor .tcdi.download.light .dropdown.download .visible.menu.transition, #root .tcdi.download.light .dropdown.download .visible.menu.transition {
     border: 1px solid #0692fe;
     top: 30px;
     right: -5px;
     font-weight: 400;
     color: #0692fe;
     border-radius: 5px; }
-  .edit-post-visual-editor .viz.download.has-title .download.title, #root .viz.download.has-title .download.title {
-    padding: 0;
-    margin: 0px;
-    float: left; }
-    .edit-post-visual-editor .viz.download.has-title .download.title p, #root .viz.download.has-title .download.title p {
-      line-height: 125%; }
+  .edit-post-visual-editor .ui.top.left.popup.title-popup, #root .ui.top.left.popup.title-popup {
+    background-color: #f7f7f7;
+    padding: 20px; }
+    .edit-post-visual-editor .ui.top.left.popup.title-popup:before, #root .ui.top.left.popup.title-popup:before {
+      background: #f7f7f7; }
+  .edit-post-visual-editor .dropdown.download::before, #root .dropdown.download::before {
+    margin-left: 9px; }
   .edit-post-visual-editor .ui.search .results.header, #root .ui.search .results.header {
     font-family: Roboto;
     color: #66676d !important;
@@ -2175,37 +2122,17 @@ p {
         .edit-post-visual-editor .map.component .measure-selector li input[type=radio], #root .map.component .measure-selector li input[type=radio] {
           margin-top: 0.1rem;
           margin-bottom: 0.25rem; }
-  .edit-post-visual-editor .back-to-top-container, #root .back-to-top-container {
-    border-radius: 5px;
-    padding: 10px;
-    position: static;
-    background-color: #ecb040; }
-    .edit-post-visual-editor .back-to-top-container .icon-wrapper, #root .back-to-top-container .icon-wrapper {
-      height: 45%;
-      font-size: 10px;
-      text-align: center;
-      position: static;
-      background-color: #ecb040; }
-      .edit-post-visual-editor .back-to-top-container .icon-wrapper .custom-icon, #root .back-to-top-container .icon-wrapper .custom-icon {
-        font-size: 25px;
-        bottom: 5px;
-        position: static;
-        text-align: center;
-        color: #fff;
-        background-color: #ecb040; }
-    .edit-post-visual-editor .back-to-top-container .btn-text, #root .back-to-top-container .btn-text {
-      height: 45%;
-      font-size: 14px;
-      color: #fff;
-      text-align: center;
-      font-weight: bold; }
   .edit-post-visual-editor .top-navigator, #root .top-navigator {
-    background-color: #5baf95;
-    right: 0px !important; }
-    .edit-post-visual-editor .top-navigator div.ui.menu a.item, #root .top-navigator div.ui.menu a.item {
-      color: white; }
-    .edit-post-visual-editor .top-navigator .ui.menu .item:before, #root .top-navigator .ui.menu .item:before {
-      width: 0px; }
+    background-color: #2B2F31;
+    right: 0px !important;
+    margin-bottom: 100px;
+    border-radius: 5px;
+    box-shadow: 0px 1px 5px rgba(0, 0, 0, 0.3); }
+  .edit-post-visual-editor .top-navigator:hover, #root .top-navigator:hover {
+    background-color: #373c3f;
+    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.4);
+    transition: 471ms;
+    transform: translateY(-5px); }
   .edit-post-visual-editor :root, #root :root {
     --header-height: 90px;
     /* Update this value to change header's height */
