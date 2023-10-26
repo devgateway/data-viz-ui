@@ -42,7 +42,7 @@ export const Model = {
     //type:'data', //will select data source and symbols + symbols configuration
     useBreaks: false,
     usePattern: false,
-
+    pointStyleBy: 'none',
     format: {
         "style": "percent",
         "minimumFractionDigits": 1,
@@ -54,6 +54,7 @@ export const Model = {
     useCentroidPoint: true,
     patternDiscriminator: 'none',
     patterns: [],
+    pointDimensionStyles: [],
     tooltip: "Value {value}",
     breaks: [],
     customMeasuresLabels: {}

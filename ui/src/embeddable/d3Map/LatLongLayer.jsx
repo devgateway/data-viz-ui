@@ -74,21 +74,43 @@ class DataLayer extends React.Component {
             markerLabelSize,
             measures,
             projection,
-            id
+            id,
+            useBreaks,
+            breaks,
+            pointDimensionStyles = [],
+            pointStyleBy,
+            dimension2
         } = this.props
+        const sizeScale = d3.scaleThreshold()
+          .domain(breaks.map(d => d.end))
+          .range(breaks.map(d => d.size));
+
+        const colorScale = d3.scaleThreshold()
+          .domain(breaks.map(d => d.end))
+          .range(breaks.map(d => d.color));
+
+        const borderScale = d3.scaleThreshold()
+          .domain(breaks.map(d => d.end))
+          .range(breaks.map(d => d.borderColor));
+
         let points = []
         const g = d3.select(this.gRef.current)
         if (app != 'csv' && data && data.children) {
             points = data.children.map((d) => {
                 const latLong = d.value.split(',')
-
-                return {
-                    x: latLong[0], y: latLong[1], value: 1, metadata: d,
+                let pointStyle = {color: markFillColor, size: markSizeScale, border: markBorderColor}
+                let value = 1
+                if (pointStyleBy === "measure") {
+                    value = d[measures[0]]
+                    pointStyle = {color: colorScale(value), size: sizeScale(value), border: borderScale(value)}
+                } else if (pointStyleBy === "dimension") {
+                    value = d.children[0].value
+                    pointStyle = {color: pointDimensionStyles[value + '_color'], size: pointDimensionStyles[value + '_size'], border: pointDimensionStyles[value + '_border']}
                 }
-
+                return {
+                    x: latLong[0], y: latLong[1], value, metadata: d, pointStyle
+                }
             })
-
-
         } else if (app == 'csv') {
 
             const latField = data.meta.fields[0]
@@ -107,8 +129,12 @@ class DataLayer extends React.Component {
 
 
         const getTooltipVariables = (d) => {
-            
-            return {...d,...d.meta}
+            const {pointStyleBy, dimension2} = this.props
+            const dimensionVariable = {}
+            if (pointStyleBy === 'dimension' && dimension2 != 'none') {
+                dimensionVariable[dimension2] = d.metadata.children[0].value
+            }
+            return {...dimensionVariable, ...d, ...d.metadata}
         }
 
         const k = this.props.transform ? this.props.transform.k : 1
@@ -125,13 +151,13 @@ class DataLayer extends React.Component {
                 return projection([d.y, d.x])[1];
             })
             .attr("class", "latLong")
-            .attr("r", e => markSizeScale * 1 / k)
+            .attr("r", e => e.pointStyle.size * 1 / k)
             .attr("stroke-width", 2)
             .style("vector-effect", "non-scaling-stroke")
-            .attr("stroke", markBorderColor)
-            .attr("fill", markFillColor)
+            .attr("stroke", e => e.pointStyle.border)
+            .attr("fill", e => e.pointStyle.color)
             .on("mouseenter", (d) => {
-                this.showToolTip(tooltip, getTooltipVariables(d), markFillColor)
+                this.showToolTip(tooltip, getTooltipVariables(d), d.pointStyle.color)
             }).on("mousemove", (d) => {
             this.moveToolTip()
         }).on("mouseleave", (d) => {
@@ -170,7 +196,7 @@ class DataLayer extends React.Component {
 
 const DataWrapper = (props) => {
     const {
-        id, unique, filters, csv, app, group = "default", apiJoinAttribute, editing
+        id, unique, filters, csv, app, group = "default", apiJoinAttribute, editing, pointDimension
     } = props
 
     let params = {}
@@ -193,7 +219,7 @@ const DataWrapper = (props) => {
         ignoreErrors={true}
         isSvg={true}
         store={[app, unique, id]}
-        source={[apiJoinAttribute]}>
+        source={[apiJoinAttribute + (pointDimension != 'none' ? "/" + pointDimension : '')]}>
         <DataConsumer>
             <DataLayer {...props}></DataLayer>
         </DataConsumer>
