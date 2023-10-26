@@ -40,31 +40,19 @@ const Measures = (props) => {
 
 
     const countSelected = (g) => {
-        if (measures[app]) {
-            const mG = allMeasures.filter(f => getTranslation(f.group) === g)
-            let count = 0
-            Object.keys(measures[app]).filter(l => mG.map(m => m.value).indexOf(l) > -1).forEach(k => {
-                if (measures[app][k].selected) {
-                    count++
-                }
-            })
-            return count
+        const groupMeasures = allMeasures.filter(m => m.group.label === g).map(m => m.value)
+        if (groupMeasures.length > 0) {
+            return groupMeasures.filter(m => measures.includes(m)).length
         }
         return 0
     }
-    const countTotal = (g) => {
-        if (g) {
-            return allMeasures.filter(f => f.group.label === g.label).length
-        }
 
-        return 0
-    }
-
-    return <PanelBody title={__("Measures")}>
+    return <PanelBody initialOpen={false} title={__("Measures")}>
         {allMeasures && [...new Set(allMeasures.map(p => getTranslation(p.group)))].map(g => {
             return (<PanelBody
+              initialOpen={false}
                 onToggle={e => togglePanel(g, panelStatus, setAttributes)}
-                title={`${g} (${countSelected(g)} / ${allMeasures.filter(f => f.group === g).length} ) `}>
+                title={`${g} (${countSelected(g)} / ${allMeasures.filter(f => f.group.label === g).length} ) `}>
                 {allMeasures.filter(f => getTranslation(f.group) === g)
                     .map(m => <PanelRow>
                         <PanelRow>
@@ -76,6 +64,7 @@ const Measures = (props) => {
 
         <Format
             format={format ? format : defaultFormat}
+            hiddenCustomAxisFormat={true}
             onFormatChange={format => {
                 onFormatChange(format)
             }}>

@@ -1,6 +1,7 @@
 import {Component} from "@wordpress/element";
 import {__} from '@wordpress/i18n';
 import {
+    AnglePickerControl,
     Button,
     CheckboxControl,
     PanelBody,
@@ -14,6 +15,7 @@ import {
 import Measures from './utils/MapMeasures.jsx'
 import Property from "./utils/Property";
 import {PanelColorSettings} from "@wordpress/block-editor";
+import BreaksGenerator from "./utils/BreaksGenerator";
 
 const FilterSelector = ({param, index, options, onUpdateFilterParam}) => {
     const sortedOptions = options.sort(function (a, b) {
@@ -65,26 +67,8 @@ export class DataLayerSetting extends Component {
     }
 
 
-    onFormatChange(format, field) {
-        const {
-            onChangeProperty, allDimensions, allFilters, allMeasures, features, apps, layer: {
-                app,
-                csv,
-                measures,
-                filters,
-                featureJoinAttribute,
-                apiJoinAttribute,
-                type,
-                fillColor,
-                borderColor,
-                breaks,
-                markFillColor,
-                markBorderColor,
-                markSizeScale,
-                tooltip
-            }
-        } = this.props
-
+    onFormatChange(format) {
+        const {onChangeProperty} = this.props
         onChangeProperty("format", format);
     }
 
@@ -212,7 +196,7 @@ export class DataLayerSetting extends Component {
 
     render() {
         const {
-            onChangeProperty, allDimensions, allFilters, allMeasures, features, apps, layer: {
+            onChangeProperty, allDimensions, allFilters, allMeasures, allCategories, features, apps, layer: {
                 app,
                 csv,
                 measures,
@@ -223,8 +207,11 @@ export class DataLayerSetting extends Component {
                 useCentroidPoint,
                 fillColor,
                 borderColor,
+                useBreaks,
                 breaks,
-
+                pointStyleBy,
+                dimension2,
+                pointDimensionStyles = [],
                 markFillColor,
                 markBorderColor,
                 markSizeScale,
@@ -232,7 +219,10 @@ export class DataLayerSetting extends Component {
             }
         } = this.props
 
-
+        const cats = dimension2 && allCategories ? allCategories.filter(c => c.type.toUpperCase() == dimension2.toUpperCase()) : []
+        const items = cats.length > 0 ? cats[0].items : []
+        const dimensionValues = items.map(i => i.value)
+        debugger
         return ([<PanelBody initialOpen={false} title={"Data Source"}>
             <PanelRow>
                 <SelectControl
@@ -280,6 +270,13 @@ export class DataLayerSetting extends Component {
                     "font-style": "normal",
                     "color": "rgb(117, 117, 117)"}}>{"{" + m.value + "}"}</p></PanelRow>)
             }
+            {app != 'csv' && pointStyleBy === 'dimension' && dimension2 != 'none' && <PanelRow><p
+              style={{
+                  "margin-top": "calc(8px)",
+                  "font-size": "12px",
+                  "font-style": "normal",
+                  "color": "rgb(117, 117, 117)"}}>{"{" + dimension2 + "}"}</p></PanelRow>
+            }
         </PanelBody>,
             <React.Fragment>
                 {app != 'csv' && <PanelBody initialOpen={false} title={__("Filters")}>
@@ -300,10 +297,10 @@ export class DataLayerSetting extends Component {
                 </PanelBody>}
             </React.Fragment>,
 
-            <PanelBody initialOpen={false} title={"Styles"}>
+            <PanelBody initialOpen={false} title={"Symbols and Styles"}>
                 <PanelRow>
                     <RangeControl
-                        label="Points Size"
+                        label={__(`Default Points Size`)}
                         value={markSizeScale}
                         onChange={(value) => {
                             onChangeProperty("markSizeScale", value)
@@ -314,9 +311,8 @@ export class DataLayerSetting extends Component {
                     />
                 </PanelRow>
                 <PanelRow>
-
                     <PanelColorSettings
-                        title={__(`Points Fill Color`)}
+                        title={__(`Default Fill Color`)}
                         value={markFillColor}
                         colorSettings={[{
                             clearable: true,
@@ -327,11 +323,10 @@ export class DataLayerSetting extends Component {
 
                         }]}
                     />
-
                 </PanelRow>
                 <PanelRow>
                     <PanelColorSettings
-                        title={__(`Border Color`)}
+                        title={__(`Default Border Color`)}
                         value={borderColor}
                         colorSettings={[{
                             clearable: true,
@@ -343,6 +338,82 @@ export class DataLayerSetting extends Component {
                         }]}
                     />
                 </PanelRow>
+                <PanelRow>
+                    <SelectControl
+                      label={"Point styles by"}
+                      value={pointStyleBy ? pointStyleBy : 'none'}
+                      onChange={(v) => {
+                          onChangeProperty('pointStyleBy', v)
+                      }}
+                      options={[{label: "None", value: "none"}, {label: "Dimension", value: "dimension"}, {label: "Measure", value: "measure"}]}/>
+                </PanelRow>
+
+                {pointStyleBy === 'measure' && <Measures
+                  onFormatChange={this.onFormatChange}
+                  onSetSingleMeasure={this.onSetSingleMeasure}
+                  {...this.props} />
+                }
+
+                {pointStyleBy === 'measure' && <BreaksGenerator
+                  showSize={useCentroidPoint}
+                  defaultBorderColor={markBorderColor}
+                  defaultFillColor={markFillColor}
+                  onChangeProperty={onChangeProperty} breaks={breaks}/>
+                }
+
+                {pointStyleBy === 'dimension' && <PanelRow>
+                    <SelectControl
+                        label={'Dimension'}
+                        value={[dimension2]}
+                        onChange={(value) => {
+                            onChangeProperty("dimension2", value)
+                        }}
+                        options={allDimensions}
+                    />
+                </PanelRow>
+                }
+                {pointStyleBy  === 'dimension' && dimensionValues.map(field => <PanelBody initialOpen={false} title={field}>
+                    <PanelRow>
+                        <RangeControl
+                          label={__(`Point Size`)}
+                          value={pointDimensionStyles[field + '_size'] ? pointDimensionStyles[field + '_size'] : 'none'}
+                          onChange={(v) => {
+                              onChangeProperty('pointDimensionStyles', {...pointDimensionStyles, [field + '_size']: v})
+                          }}
+                          step={1}
+                          min={0}
+                          max={100}
+                        />
+                    </PanelRow>
+                    <PanelRow>
+                        <PanelColorSettings
+                          title={__(`Point Fill Color`)}
+                          value={pointDimensionStyles[field + '_color'] ? pointDimensionStyles[field + '_color'] : 'none'}
+                          colorSettings={[{
+                              clearable: true,
+                              enableAlpha: true,
+                              value: pointDimensionStyles[field + '_color'] ? pointDimensionStyles[field + '_color'] : 'none', onChange: (v) => {
+                                  onChangeProperty('pointDimensionStyles', {...pointDimensionStyles, [field + '_color']: v})
+                              },
+
+                          }]}
+                        />
+                    </PanelRow>
+                    <PanelRow>
+                        <PanelColorSettings
+                          title={__(`Point Border Color`)}
+                          value={pointDimensionStyles[field + '_border'] ? pointDimensionStyles[field + '_border'] : 'none'}
+                          colorSettings={[{
+                              clearable: true,
+                              enableAlpha: true,
+                              value: pointDimensionStyles[field + '_border'] ? pointDimensionStyles[field + '_border'] : 'none', onChange: (v) => {
+                                  onChangeProperty('pointDimensionStyles', {...pointDimensionStyles, [field + '_border']: v})
+                              },
+                          }]}
+                        />
+                    </PanelRow>
+                </PanelBody>)
+                }
             </PanelBody>
         ])
     }

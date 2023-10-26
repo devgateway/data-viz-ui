@@ -4,5 +4,10 @@ export const togglePanel = (name,panelStatus, setAttributes) => {
     setAttributes({panelStatus: newStatus})
 }
 
+export const panelFocus = (name) => {
+    const newStatus = {...panelStatus}
+    newStatus[name] = newStatus[name] == true ? false : true
+    setAttributes({panelFocus: newStatus})
+}
 
 export default {togglePanel}
