@@ -93,11 +93,10 @@ class BlockEdit extends ComponentWithSettings {
         } = this.props;
 
         const divStyles = {height: height + 'px', width: '100%'};
-
         return ([isSelected && (<InspectorControls>
             <Panel header={__("Map Configuration")}>
                 <PanelBody
-                    initialOpen={panelStatus['GROUP']}
+                    initialOpen={false}//{false}//{panelStatus['GROUP']}
                     onToggle={e => togglePanel("GROUP", panelStatus, setAttributes)}
                     title={__("Group")}>
                     <PanelRow>
@@ -108,7 +107,7 @@ class BlockEdit extends ComponentWithSettings {
                         />
                     </PanelRow>
                 </PanelBody>
-                <PanelBody initialOpen={panelStatus["SIZE"]}
+                <PanelBody initialOpen={false}//{panelStatus["SIZE"]}
                            onToggle={e => togglePanel("SIZE", panelStatus, setAttributes)}
                            title={__("Size")}>
                     <PanelRow>
@@ -129,7 +128,7 @@ class BlockEdit extends ComponentWithSettings {
                         />
                     </PanelRow>
                 </PanelBody>
-                <PanelBody  initialOpen={panelStatus["PROJECTION"]}
+                <PanelBody  initialOpen={false}//{panelStatus["PROJECTION"]}
                             onToggle={e => togglePanel("PROJECTION", panelStatus, setAttributes)}
                             title={__("Projection")}>
                     <PanelRow>
@@ -164,7 +163,7 @@ class BlockEdit extends ComponentWithSettings {
                     </PanelRow>
                 </PanelBody>
                 <PanelBody
-                    initialOpen={panelStatus['COLORS']}
+                    initialOpen={false}//{panelStatus['COLORS']}
                     onToggle={e => togglePanel("COLORS", panelStatus, setAttributes)}
                     title={__("Colors")}>
 
@@ -188,7 +187,7 @@ class BlockEdit extends ComponentWithSettings {
 
 
                 </PanelBody>
-                <PanelBody initialOpen={panelStatus['LAYERS']}
+                <PanelBody initialOpen={false}//{panelStatus['LAYERS']}
                            onToggle={e => togglePanel("LAYERS", panelStatus, setAttributes)} title={__("Layers")}>
                     {layers.map((layer) => (<LayerSettings
                         setAttributes={setAttributes}

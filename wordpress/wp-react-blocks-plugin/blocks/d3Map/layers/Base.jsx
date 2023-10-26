@@ -54,14 +54,13 @@ const Base = (props) => {
             setFeatures(data.features);
         });
     }, [layer.file])
-    const onChangeProperty = (atrr, value) => {
 
+    const onChangeProperty = (atrr, value) => {
         console.log("change attribute " + atrr + " to " + value)
         const newLayer = {...layer}
         newLayer[atrr] = value
         onChange(newLayer)
     }
-
 
     return [<PanelRow>
         <TextControl
@@ -154,7 +153,7 @@ const Base = (props) => {
                     />
                 </PanelRow>
 
-                {labelField != 'none' && <PanelBody title={__("Labels")}>
+                {labelField != 'none' && <PanelBody initialOpen={false} title={__("Labels")}>
                     <PanelRow>
                         <ToggleControl
                             label={"None/All"}
@@ -179,7 +178,7 @@ const Base = (props) => {
                                 }}
                             />
                         </PanelRow>
-                        {(labelFilter.indexOf(feature.properties[labelField]) == -1) && <PanelBody>
+                        {(labelFilter.indexOf(feature.properties[labelField]) == -1) && <PanelBody initialOpen={false}>
                             <PanelRow>
                                 <RangeControl
                                     label="Offset X"
@@ -319,11 +318,11 @@ class LayerWithMetadata extends BlockEditWithAPIMetadata {
         } = this.props
 
         return <PanelBody
-            initialOpen={panelStatus['LAYERS_' + name]}
+            initialOpen={false}
             onToggle={e => togglePanel('LAYERS_' + name, panelStatus, setAttributes)} title={__("Layers")}
             title={__(`${name}`)}>
             <Base {...this.props} metadata={this.state}></Base>
-            <PanelBody>
+            <PanelBody initialOpen={false}>
                 <ButtonGroup>
                     <Button variant={"secondary"} type onClick={onRemoveLayer}>Delete</Button>
                     <Button variant={"secondary"} type onClick={e => onMoveLayer(-1, layer)}>Up</Button>
