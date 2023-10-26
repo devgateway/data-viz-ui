@@ -120,22 +120,10 @@ class DataLayer extends BaseLayer {
 
         const k = this.props.transform ? this.props.transform.k : 1
 
+        const originPoints = []
         filteredData.forEach(d1 => {
-
-
-            this.g.append("circle")
-                .attr("fill",  getColor(d1.properties._value))
-                .attr("stroke", markBorderColor)
-                .attr("class", "start-point")
-                .attr("stroke-width", 2)
-                .style("vector-effect", "non-scaling-stroke")
-                .attr("cx", path.centroid(d1)[0])
-                .attr("cy", path.centroid(d1)[1])
-                .attr('r', () => {
-                    return markSizeScale * 1 / k
-                })
-
-
+            //collect starting points ro be rendered later and keep them on top of the svg layers
+            originPoints.push(d1)
             d1.properties.destinations.forEach(dest => {
                 dest.children.forEach(child => {
                     json.features.filter(feature => feature.properties[featureJoinAttribute] == child.value)
@@ -166,7 +154,7 @@ class DataLayer extends BaseLayer {
 
                             this.g.select("defs")
                                 .append("marker")
-                                .attr("id", "arrow"+d1.properties[featureJoinAttribute])
+                                .attr("id", "arrow" + d1.properties[featureJoinAttribute])
                                 .attr("markerUnits", "strokeWidth")
                                 .attr("markerWidth", "6")
                                 .attr("markerHeight", "6")
@@ -175,8 +163,9 @@ class DataLayer extends BaseLayer {
                                 .attr("refY", "6")
                                 .attr("orient", "auto")
                                 .append("path")
-                                 .attr("d", "M2,2 L10,6 L2,10 L6,6 L2,2")
-                                .attr("style", "fill: " +  getColor(d1.properties._value) + ";");
+
+                                .attr("d", "M2,2 L10,6 L2,10 L6,6 L2,2")
+                                .attr("style", "fill: " + getColor(d1.properties._value) + ";");
 
 
                             this.g.append("path")
@@ -192,8 +181,20 @@ class DataLayer extends BaseLayer {
                                     debugger
                                     return getSize(d1.properties._value)
                                 })
-
-                                .attr("marker-end", "url(#arrow"+d1.properties[featureJoinAttribute]+")");
+                                .attr("marker-end", "url(#arrow" + d1.properties[featureJoinAttribute] + ")")
+                                .on("mouseover", d => {
+                                    /*Hidden others paths*/
+                                    d3.selectAll(".flow-line").style("stroke-opacity", 0.1)
+                                    d3.selectAll("start-point circle_"+d1.properties[featureJoinAttribute]).style("stroke-opacity", 0.1)
+                                    d3.selectAll("start-point circle_"+d1.properties[featureJoinAttribute]).style("opacity", 0.1)
+                                    d3.select(d3.event.target).style("stroke-opacity", 1)
+                                })
+                                .on("mouseout", d => {
+                                    /*Hidden others paths*/
+                                    d3.selectAll(".flow-line").style("stroke-opacity", 1)
+                                    d3.selectAll("start-point circle_"+d1.properties[featureJoinAttribute]).style("stroke-opacity", 1)
+                                })
+                            ;
 
                         })
 
@@ -201,8 +202,19 @@ class DataLayer extends BaseLayer {
                 })
             })
         })
-
-
+        originPoints.forEach(d1 => {
+            this.g.append("circle")
+                .attr("fill", getColor(d1.properties._value))
+                .attr("stroke", markBorderColor)
+                .attr("class", "start-point circle_" + d1.properties[featureJoinAttribute])
+                .attr("stroke-width", 2)
+                .style("vector-effect", "non-scaling-stroke")
+                .attr("cx", path.centroid(d1)[0])
+                .attr("cy", path.centroid(d1)[1])
+                .attr('r', () => {
+                    return markSizeScale * 1 / k
+                })
+        })
     }
 
 
