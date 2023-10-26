@@ -388,21 +388,9 @@ export class DataLayerSetting extends Component {
                     max={100}
                 />
             </PanelRow>
-
             <PanelRow>
                 <PanelColorSettings
-                    title={__(`Circle Fill Color`)}
-                    value={markFillColor}
-                    colorSettings={[{
-                        clearable: true, enableAlpha: true, value: markFillColor, onChange: (markFillColor) => {
-                            onChangeProperty("markFillColor", markFillColor)
-                        },
-
-                    }]}/>
-            </PanelRow>
-            <PanelRow>
-                <PanelColorSettings
-                    title={__(`Circle Border Color`)}
+                    title={__(`Border`)}
                     value={borderColor}
                     colorSettings={[{
                         clearable: true,
@@ -416,7 +404,7 @@ export class DataLayerSetting extends Component {
             </PanelRow>
             <PanelRow>
                 <PanelColorSettings
-                    title={__(`Line Fill Color`)}
+                    title={__(`Color`)}
                     value={markFillColor2}
                     colorSettings={[{
                         clearable: true, enableAlpha: true,
@@ -427,17 +415,17 @@ export class DataLayerSetting extends Component {
 
                     }]}/>
             </PanelRow>
-                <PanelRow>
-                    <RangeControl
-                        label="Line Size"
-                        value={markSizeScale2}
-                        onChange={(value) => {
-                            onChangeProperty("markSizeScale2", value)
-                        }}
-                        step={1}
-                        min={0}
-                        max={100}
-                    />
+            <PanelRow>
+                <RangeControl
+                    label="Line Size"
+                    value={markSizeScale2}
+                    onChange={(value) => {
+                        onChangeProperty("markSizeScale2", value)
+                    }}
+                    step={1}
+                    min={0}
+                    max={100}
+                />
 
             </PanelRow>
 
