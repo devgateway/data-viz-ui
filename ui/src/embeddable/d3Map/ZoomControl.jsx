@@ -31,8 +31,10 @@ class ZoomControl extends React.Component {
 
     componentDidMount() {
         const selection = this.getSelection()
-        selection.call(this.zoom)
-        this.transition2fullView()
+        if (selection) {
+            selection.call(this.zoom)
+            this.transition2fullView()
+        }
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
@@ -51,10 +53,12 @@ class ZoomControl extends React.Component {
         } = this.props
         if (editing) {
             const selection = this.getSelection()
-            selection.call(this.zoom.transform, d3.zoomIdentity
-                .translate(0, 0)
-                .scale(1)
-            )
+            if (selection) {
+                selection.call(this.zoom.transform, d3.zoomIdentity
+                    .translate(0, 0)
+                    .scale(1)
+                )
+            }
         } else {
             this.transition2fullView()
         }
@@ -62,13 +66,13 @@ class ZoomControl extends React.Component {
     }
 
 
-    zoomStarted(){
+    zoomStarted() {
 
     }
+
     zoomed() {
-        const selection = this.getSelection()
         //selection.selectAll("g").attr("transform", d3.event.transform)
-          this.props.onZoomed(d3.event.transform)
+        this.props.onZoomed(d3.event.transform)
 
     }
 
@@ -76,17 +80,22 @@ class ZoomControl extends React.Component {
     /*Button Zoom in*/
     zoomIn(e) {
         const selection = this.getSelection()
-        selection.transition().call(this.zoom.scaleBy, 1.5)
+        if (selection) {
+            selection.transition().call(this.zoom.scaleBy, 1.5)
+        }
     }
 
     /*Button zoom oit*/
     zoomOut() {
         const selection = this.getSelection()
-        selection.transition().call(this.zoom.scaleBy, 0.6667)
+        if (selection) {
+            selection.transition().call(this.zoom.scaleBy, 0.6667)
+        }
+
     }
 
     getSelection() {
-        const selection = d3.select(this.zoomRef.current.parentNode.getElementsByTagName('svg')[0])
+        const selection = this.zoomRef.current ? d3.select(this.zoomRef.current.parentNode.getElementsByTagName('svg')[0]) : null
         return selection
     }
 
@@ -98,7 +107,7 @@ class ZoomControl extends React.Component {
         const dy = y / oH
         const nx = width * dx
         const ny = height * dy
-        if (oH && oW && k) {
+        if (oH && oW && k && selection) {
             selection.transition().call(this.zoom.transform, d3.zoomIdentity
                 .translate(x, y)
                 .scale(k)

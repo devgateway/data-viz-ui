@@ -445,14 +445,8 @@ export class DataLayerSetting extends Component {
                     defaultBorderColor={markBorderColor}
                     defaultFillColor={markFillColor}
                     onChangeProperty={onChangeProperty} breaks={breaks}/>
-            </PanelBody>,
-            <PanelBody initialOpen={false}>
-                <ButtonGroup>
-                    <Button variant={"secondary"} type onClick={onRemoveLayer}>Delete</Button>
-                    <Button variant={"secondary"} type onClick={e => onMoveLayer(-1, layer)}>Up</Button>
-                    <Button variant={"secondary"} type onClick={e => onMoveLayer(1, layer)}>Down</Button>
-                </ButtonGroup>
             </PanelBody>
+
 
         ])
     }

@@ -88,7 +88,7 @@ const Base = (props) => {
     </PanelRow>
     }</>,
         <>
-            {type != 'dataPoints' && <PanelBody title={"Colors"} initialOpen={false}>
+            {type != 'dataPoints' && type != 'flow' && <PanelBody title={"Colors"} initialOpen={false}>
                 <PanelColorSettings
                     title={__(`Fill Color`)}
                     colorSettings={[{
@@ -133,7 +133,7 @@ const Base = (props) => {
             </PanelBody>}
         </>,
         <>
-            {type != 'dataPoints' && <PanelBody title={"Labels"} initialOpen={false}>
+            {type != 'dataPoints'&& type != 'flow' && <PanelBody title={"Labels"} initialOpen={false}>
 
                 <Property
                     title={"Label Field"}
@@ -322,7 +322,7 @@ class LayerWithMetadata extends BlockEditWithAPIMetadata {
             onToggle={e => togglePanel('LAYERS_' + name, panelStatus, setAttributes)} title={__("Layers")}
             title={__(`${name}`)}>
             <Base {...this.props} metadata={this.state}></Base>
-            <PanelBody initialOpen={false}>
+            <PanelBody>
                 <ButtonGroup>
                     <Button variant={"secondary"} type onClick={onRemoveLayer}>Delete</Button>
                     <Button variant={"secondary"} type onClick={e => onMoveLayer(-1, layer)}>Up</Button>

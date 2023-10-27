@@ -1,7 +1,7 @@
 import {Component} from "@wordpress/element";
 import {__} from '@wordpress/i18n';
 import {
-    Button,
+    Button, ButtonGroup,
     CheckboxControl,
     PanelBody,
     PanelRow,
@@ -216,7 +216,7 @@ export class DataLayerSetting extends Component {
 
     render() {
         const {
-            onChangeProperty, allDimensions, allFilters, allMeasures, allCategories, features, apps, layer: {
+            onChangeProperty, allDimensions, allFilters, allMeasures, allCategories, features, apps,layer, layer: {
                 app,
                 csv,
                 measures,
@@ -241,7 +241,9 @@ export class DataLayerSetting extends Component {
                 usePattern,
                 patterns,
                 customMeasuresLabels,
-                patternDiscriminator
+                patternDiscriminator,
+                onRemoveLayer,
+                onMoveLayer,
             }
         } = this.props
 
@@ -498,6 +500,7 @@ export class DataLayerSetting extends Component {
                                              patterns={patterns} app={app} csv={csv}
                                              patternDiscriminator={patternDiscriminator}/>}
         </PanelBody>
+
 
 
         ])
