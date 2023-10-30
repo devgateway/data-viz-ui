@@ -8,6 +8,7 @@ import {decode} from "../utils/parseUtils"; // d3 plugin
 class ProjectedContainer extends React.Component {
     constructor(props) {
         super(props);
+        this.state = {};
         this.divRef = React.createRef();
         this.createProjection = this.createProjection.bind(this)
     }
@@ -43,7 +44,6 @@ class ProjectedContainer extends React.Component {
     render() {
         const {editing, backgroundColor, height, width, scale = 190, center = [0, 0], initialPosition} = this.props
         const arrayChildren = Children.toArray(this.props.children);
-
         return <div
             className={"projected"}
             width={width}
