@@ -26,14 +26,20 @@ const MapWrapper = (props) => {
             intl
         } = props
 
-        const layers = parse(dataLayers)
+        const [layers, setLayers] = useState(parse(dataLayers))
         const layerCreated = []
-
         const ref = useRef(null);
         const zoomRef = useRef(null);
-
         const [transform, setTransform] = useState(null)
 
+        const toggleLayerView = (id) => {
+          const newLayers = layers.slice()
+          const ly = newLayers.find(l => l.id == id);
+          if (ly) {
+            ly.visible = !ly.visible
+          }
+          setLayers(newLayers)
+        }
 
         return (
             <div ref={ref} className={"d3map-container"}>
@@ -43,7 +49,7 @@ const MapWrapper = (props) => {
                                     projectionName={projectionName}
                                     editing={editing} initialPosition={parse(paramMapPosition, editing)}>
                     <Map>
-                        {layers.map((layer, i) => {
+                        {layers.filter(l => l.visible).map((layer, i) => {
                             if (layer.type === 'base') {
                                 return <BaseLayer transform={transform} intl={intl} zoom={zoomRef} unique={unique}
                                                   key={i} {...layer} />
@@ -68,7 +74,7 @@ const MapWrapper = (props) => {
                     </Map>
 
                     <ZoomControl onZoomed={setTransform} width={width} height={height} ref={zoomRef} group={group} editing={editing}/>
-                    <Legends layers={layers}></Legends>
+                    <Legends layers={layers} onItemClick={toggleLayerView}></Legends>
 
                 </ProjectedContainer>
             </div>
