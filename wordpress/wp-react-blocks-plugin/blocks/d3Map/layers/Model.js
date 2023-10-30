@@ -57,8 +57,8 @@ export const Model = {
     pointDimensionStyles: [],
     tooltip: "Value {value}",
     breaks: [],
-    customMeasuresLabels: {}
-
+    customMeasuresLabels: {},
+    visible: true
 }
 
 

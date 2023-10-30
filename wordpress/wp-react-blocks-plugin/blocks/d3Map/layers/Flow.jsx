@@ -416,12 +416,12 @@ export class DataLayerSetting extends Component {
                 <PanelRow>
                     <PanelColorSettings
                         title={__(`Color`)}
-                        value={markFillColor2}
+                        value={markFillColor}
                         colorSettings={[{
                             clearable: true, enableAlpha: true,
-                            value: markFillColor2,
-                            onChange: (markFillColor2) => {
-                                onChangeProperty("markFillColor2", markFillColor2)
+                            value: markFillColor,
+                            onChange: (markFillColor) => {
+                                onChangeProperty("markFillColor", markFillColor)
                             },
 
                         }]}/>
