@@ -35,7 +35,7 @@ const toOptions = (files) => {
 }
 
 const Base = (props) => {
-    const {onChange, metadata, layer, layer: {name, shapeColor, labelFilter, type, file, app, labelField}} = props
+    const {onChange, metadata, layer, layer: {name, shapeColor, labelFilter, type, file, app, labelField, visible}} = props
 
     const [files, setFiles] = useState([])
     const [features, setFeatures] = useState([])
@@ -62,31 +62,42 @@ const Base = (props) => {
         onChange(newLayer)
     }
 
-    return [<PanelRow>
-        <TextControl
-            type={"String"}
-            label={__("Name", "dg")}
-            onChange={name => onChangeProperty("name", name)}
-            value={name}
-        />
-    </PanelRow>, <PanelRow>
-        <SelectControl
-            label={__("Type", "dg")}
-            value={type}
-            onChange={type => onChangeProperty("type", type)}
-            options={typeOptions}
-        />
-    </PanelRow>, <>{type != 'dataPoints' && <PanelRow>
-        <SelectControl
-            type={"String"}
-            label="File"
-            onChange={file => onChangeProperty("file", file)}
-            value={file}
-            options={files}>
-
-        </SelectControl>
-    </PanelRow>
-    }</>,
+    return [
+        <PanelRow>
+            <TextControl
+                type={"String"}
+                label={__("Name", "dg")}
+                onChange={name => onChangeProperty("name", name)}
+                value={name}
+            />
+        </PanelRow>,
+        <PanelRow>
+            <ToggleControl
+              label="Default visible"
+              checked={visible}
+              onChange={e => {
+                  onChangeProperty("visible", !visible)
+              }}
+            />
+        </PanelRow>,
+        <PanelRow>
+            <SelectControl
+                label={__("Type", "dg")}
+                value={type}
+                onChange={type => onChangeProperty("type", type)}
+                options={typeOptions}
+            />
+        </PanelRow>,
+        <>{type != 'dataPoints' && <PanelRow>
+            <SelectControl
+                type={"String"}
+                label="File"
+                onChange={file => onChangeProperty("file", file)}
+                value={file}
+                options={files}>
+            </SelectControl>
+            </PanelRow>
+        }</>,
         <>
             {type != 'dataPoints' && type != 'flow' && <PanelBody title={"Colors"} initialOpen={false}>
                 <PanelColorSettings

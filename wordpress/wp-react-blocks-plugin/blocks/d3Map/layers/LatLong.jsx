@@ -215,7 +215,8 @@ export class DataLayerSetting extends Component {
                 markFillColor,
                 markBorderColor,
                 markSizeScale,
-                tooltip
+                tooltip,
+                visible = true
             }
         } = this.props
 
