@@ -69,19 +69,24 @@ const FlowLayerLegend = (props) => {
         measures,
         visible,
         id,
-        onItemClick
+        onItemClick,
+        customMeasuresLabels
     } = props
+    let measureLabel = measures[0]
+    if (customMeasuresLabels) {
+        measureLabel = customMeasuresLabels[measures[0]]
+    }
     const dimensionOptions = [...new Set(Object.keys(pointDimensionStyles).map(k => k.split('_')[0]))]
     return <div className={"legend"}>
         <div>
             <div className={"legend-item"}>
                 <div className={"legend-color legend-check"} onClick={e => onItemClick(id)}
-                     style={{backgroundColor: markFillColor, borderColor: markBorderColor}}>{visible && <>&#10003;</>}
+                     style={{backgroundColor: markFillColor, borderColor: markBorderColor}}>{visible != false && <>&#10003;</>}
                 </div>
-                <div className={"legend-label"}>{name} ({measures[0]})</div>
+                <div className={"legend-label"}>{name} ({measureLabel})</div>
             </div>
 
-            {(breaks.length > 0 && visible) && <div className={"legend-breaks"}>
+            {(breaks.length > 0 && visible != false) && <div className={"legend-breaks"}>
                 {breaks.map((b, i) => {
                     return (<div className={"break"}>
                         <div className={"break-item"} style={{
@@ -91,6 +96,13 @@ const FlowLayerLegend = (props) => {
                         <div className={"break-label"}> &lt; {b.end}</div>
                     </div>)
                 })}
+                <div className={"break"}>
+                    <div className={"break-item"} style={{
+                        backgroundColor: markFillColor,
+                        border: `1px solid ${markBorderColor}`,
+                    }}></div>
+                    <div className={"break-label"}> &gt; {Math.max(...breaks.map(b => b.end))}</div>
+                </div>
             </div>
             }
         </div>
@@ -109,19 +121,26 @@ const DataPointsLayerLegend = (props) => {
         markBorderColor,
         measures,
         visible,
-        onItemClick
+        onItemClick,
+        customMeasuresLabels
     } = props
+
+    let measureLabel = measures[0]
+    if (customMeasuresLabels) {
+        measureLabel = customMeasuresLabels[measures[0]]
+    }
+
     const dimensionOptions = [...new Set(Object.keys(pointDimensionStyles).map(k => k.split('_')[0]))]
-    const fieldLabel = pointStyleBy === "dimension" ? dimension2 : measures[0]
+    const fieldLabel = pointStyleBy === "dimension" ? dimension2 : measureLabel
     return <div className={"legend"}>
         <div>
             <div className={"legend-item"}>
                 <div className={"legend-color legend-check"} onClick={e => onItemClick(id)}
-                     style={{backgroundColor: markFillColor, borderColor: markBorderColor}}>{visible && <>&#10003;</>}
+                     style={{backgroundColor: markFillColor, borderColor: markBorderColor}}>{visible != false && <>&#10003;</>}
                 </div>
                 <div className={"legend-label"}>{name} ({fieldLabel})</div>
             </div>
-            {(pointStyleBy === "dimension"  && visible) && <div className={"legend-breaks"}>
+            {(pointStyleBy === "dimension"  && visible != false) && <div className={"legend-breaks"}>
                 {dimensionOptions.map((d) => {
                     return (<div className={"break"}>
                         <div className={"break-item"} style={{
@@ -134,7 +153,7 @@ const DataPointsLayerLegend = (props) => {
             </div>
             }
 
-            {(pointStyleBy === "measure"  && visible) && <div className={"legend-breaks"}>
+            {(pointStyleBy === "measure"  && visible != false) && <div className={"legend-breaks"}>
                 {breaks.map((b, i) => {
                     return (<div className={"break"}>
                         <div className={"break-item"} style={{
@@ -156,7 +175,7 @@ const BaseLayerLegend = (props) => {
     return <div className={"legend"}>
         <div className={"legend-item"}>
             <div className={"legend-color legend-check"} onClick={e => onItemClick(id)}
-                 style={{backgroundColor: fillColor, borderColor: borderColor}}>{visible && <>&#10003;</>}
+                 style={{backgroundColor: fillColor, borderColor: borderColor}}>{visible != false && <>&#10003;</>}
             </div>
             <div className={"legend-label"}>{name}</div>
         </div>
@@ -193,7 +212,7 @@ const DataLayerLegend = (props) => {
         visible,
         onItemClick
     } = props
-    let measureLabel = measures
+    let measureLabel = measures[0]
 
     if (customMeasuresLabels) {
         measureLabel = customMeasuresLabels[measures[0]]
@@ -203,9 +222,9 @@ const DataLayerLegend = (props) => {
     const g = d3.select(`#data-${id}`)
     const renderedPatterns = g.selectAll("defs").selectAll("pattern")
 
-    if (usePattern && divRef.current && renderedPatterns.size() > 0) {
+    d3.select(divRef.current).select("svg").remove()
+    if (usePattern && divRef.current && renderedPatterns.size() > 0 && visible != false) {
         const patternsData = renderedPatterns.data()
-        d3.select(divRef.current).select("svg").remove()
         const g = d3.select(divRef.current).append("svg")
         const defs = g.append("defs")
         defs.selectAll("pattern").remove()
@@ -298,23 +317,21 @@ const DataLayerLegend = (props) => {
         <div>
             <div className={"legend-item"}>
                 <div className={"legend-color legend-check"} onClick={e => onItemClick(id)}
-                     style={{backgroundColor: fillColor, borderColor: borderColor}}>{visible && <>&#10003;</>}
+                     style={{backgroundColor: fillColor, borderColor: borderColor}}>{visible != false && <>&#10003;</>}
                 </div>
-                <div className={"legend-label"}>{name}</div>
+                <div className={"legend-label"}>{name} ({measureLabel})</div>
             </div>
-            {((useCentroidPoint && !useBreaks)) && <div className={"legend-breaks"}>
+            {((useCentroidPoint && !useBreaks && visible != false)) && <div className={"legend-breaks"}>
                 <div className={"break"}>
                     <div className={"break-item"} style={{
                         backgroundColor: markFillColor,
                         border: `1px solid ${markBorderColor}`,
                     }}></div>
-                    <div className={"break-label"}> {measureLabel}</div>
                 </div>
             </div>
             }
 
-            {((!useCentroidPoint && useBreaks) || (useCentroidPoint && useBreaks)) && <div className={"legend-breaks"}>
-                <div className={"legend-label"}>{measureLabel}</div>
+            {(useBreaks && visible != false) && <div className={"legend-breaks"}>
                 {breaks.map((b, i) => {
                     return (<div className={"break"}>
                         <div className={"break-item"} style={{
@@ -324,6 +341,13 @@ const DataLayerLegend = (props) => {
                         <div className={"break-label"}> &lt; {b.end}</div>
                     </div>)
                 })}
+                <div className={"break"}>
+                    <div className={"break-item"} style={{
+                        backgroundColor: useCentroidPoint ? markFillColor : fillColor,
+                        border: `1px solid ${useCentroidPoint ? markBorderColor : borderColor}`,
+                    }}></div>
+                    <div className={"break-label"}> &gt; {Math.max(...breaks.map(b => b.end))}</div>
+                </div>
             </div>
             }
         </div>
