@@ -102,16 +102,12 @@ class DataLayer extends BaseLayer {
             let getColor = (value, isMarker) => {
                 if (breaks.length > 0 && useBreaks) {
                     if (value > Math.max(...breaks.map(d => parseInt(d.end)))) {
-                        return fillColor
+                        return isMarker ? markFillColor : fillColor
                     } else {
                         return colorScale(value)
                     }
                 }
-
-                if (isMarker) {
-                    return markFillColor
-                }
-                return fillColor
+                return isMarker ? markFillColor : fillColor
             }
 
         const filteredData = json.features.filter(f => f.properties._value != null)
