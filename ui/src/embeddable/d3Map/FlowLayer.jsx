@@ -77,7 +77,6 @@ class DataLayer extends BaseLayer {
             .range(breaks.map(d => d.color));
 
         let getSize = (value) => {
-            debugger;
             if (breaks.length > 0) {
                 return markSizeScale2 + sizeScale(value)
             }
@@ -86,7 +85,11 @@ class DataLayer extends BaseLayer {
 
         let getColor = (value, isMarker) => {
             if (breaks.length > 0) {
-                return colorScale(value)
+                if (value > Math.max(...breaks.map(d => parseInt(d.end)))) {
+                    return markFillColor
+                } else {
+                    return colorScale(value)
+                }
             }
             return markFillColor
         }
@@ -183,19 +186,14 @@ class DataLayer extends BaseLayer {
                                     g.selectAll(".start-point.circle_" + d1.properties[featureJoinAttribute]).transition().duration("200").style("opacity", 1)
 
                                     if (d1.properties._value) {
-
-                                        debugger;
                                         const origin = {}
                                         const target = {}
-
                                         Object.keys(d1.properties).forEach(key => {
                                             origin["origin_" + key] = d1.properties[key]
                                         })
                                         Object.keys(d2.properties).forEach(key => {
                                             target["target_" + key] = d2.properties[key]
                                         })
-                                        debugger;
-
                                         const variables = {
                                             ...origin,
                                             ...target,
@@ -203,14 +201,10 @@ class DataLayer extends BaseLayer {
                                                 [apiJoinAttribute]: d1.properties.meta ? d1.properties.meta.value : '',
                                                 ...d1.properties.meta,
                                                 value: d1.properties._value,
-
                                             }
                                         }
-
                                         this.showToolTip(tooltip, variables, getColor(d1.properties._value))
                                     }
-
-
                                 })
                                 .on("mouseout", d => {
                                     /*Hidden others paths*/
@@ -268,36 +262,6 @@ class DataLayer extends BaseLayer {
         } = this.props
 
 
-        const sizeScale = d3.scaleThreshold()
-            .domain(breaks.map(d => d.end))
-            .range(breaks.map(d => d.size));
-
-        const colorScale = d3.scaleThreshold()
-            .domain(breaks.map(d => d.end))
-            .range(breaks.map(d => d.color));
-
-        let getSize = (value) => {
-            if (breaks.length > 0) {
-                return markSizeScale + sizeScale(value)
-            }
-            return markSizeScale
-        }
-
-        let getColor = (value, isMarker) => {
-            if (breaks.length > 0) {
-                if (value > Math.max(...breaks.map(d => parseInt(d.end)))) {
-                    return fillColor
-                } else {
-                    return colorScale(value)
-                }
-            }
-
-            if (isMarker) {
-                return markFillColor
-            }
-            return fillColor
-        }
-
         if (file != "none") {
             this.loadJSON(file).then(json => {
 
@@ -312,22 +276,13 @@ class DataLayer extends BaseLayer {
                             d.properties._value = measureValue
                             d.properties.destinations = values
                         }
-
-
                     } else if (app == 'csv') {
                         debugger;
-
                     }
                     return d
                 })
-
-
                 const newJson = {...json, features}
-
-
                 this.createDataLayer(newJson);
-
-
             });
         }
     }
