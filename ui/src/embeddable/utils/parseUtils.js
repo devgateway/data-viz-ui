@@ -11,8 +11,11 @@ export const parse = (value, editing) => {
     } catch (error) {
         console.error("error parsing value:" + value)
     }
-
     return null
 }
 
-export default {decode, parse}
+export const compareJsonProps = (p1, p2) => {
+    return JSON.stringify(p1) === JSON.stringify(p2)
+}
+
+export default {decode, parse, compareJsonProps}
