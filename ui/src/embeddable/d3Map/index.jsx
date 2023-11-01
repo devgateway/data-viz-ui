@@ -1,6 +1,6 @@
-import React, {useLayoutEffect, useRef, useState} from 'react';
+import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
 import {connect} from "react-redux";
-import {decode, parse} from "../utils/parseUtils";
+import {decode, parse, compareJsonProps} from "../utils/parseUtils";
 import Map from "./Map"
 import BaseLayer from './BaseLayer'
 import DataLayer from './DataLayer'
@@ -27,10 +27,16 @@ const MapWrapper = (props) => {
         } = props
 
         const [layers, setLayers] = useState(parse(dataLayers))
-        const layerCreated = []
         const ref = useRef(null);
         const zoomRef = useRef(null);
         const [transform, setTransform] = useState(null)
+
+        useEffect(() => {
+          const newLayers = parse(dataLayers)
+          if (!compareJsonProps(layers, newLayers)) {
+            setLayers(newLayers)
+          }
+        }, [dataLayers])
 
         const toggleLayerView = (id) => {
           const newLayers = layers.slice()
@@ -49,7 +55,7 @@ const MapWrapper = (props) => {
                                     projectionName={projectionName}
                                     editing={editing} initialPosition={parse(paramMapPosition, editing)}>
                     <Map>
-                        {layers.filter(l => l.visible).map((layer, i) => {
+                        {layers.filter(l => l.visible != false).map((layer, i) => {
                             if (layer.type === 'base') {
                                 return <BaseLayer transform={transform} intl={intl} zoom={zoomRef} unique={unique}
                                                   key={i} {...layer} />
