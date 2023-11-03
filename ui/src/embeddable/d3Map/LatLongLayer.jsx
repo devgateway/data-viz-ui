@@ -105,8 +105,14 @@ class DataLayer extends React.Component {
                     value = d[measures[0]]
                     pointStyle = {color: colorScale(value), size: sizeScale(value), border: borderScale(value)}
                 } else if (pointStyleBy === "dimension") {
-                    value = d.children[0].value
-                    pointStyle = {color: pointDimensionStyles[value + '_color'], size: pointDimensionStyles[value + '_size'], border: pointDimensionStyles[value + '_border']}
+                    if (d.children) {
+                        value = d.children[0].value
+                        pointStyle = {
+                            color: pointDimensionStyles[value + '_color'],
+                            size: pointDimensionStyles[value + '_size'],
+                            border: pointDimensionStyles[value + '_border']
+                        }
+                    }
                 }
                 return {
                     x: latLong[0], y: latLong[1], value, metadata: d, pointStyle
@@ -197,9 +203,10 @@ class DataLayer extends React.Component {
 
 const DataWrapper = (props) => {
     const {
-        id, unique, filters, csv, app, group = "default", apiJoinAttribute, editing, pointDimension
+        id, unique, filters, csv, app, group = "default", apiJoinAttribute, editing, dimension2, pointStyleBy
     } = props
 
+    const secondDimension = pointStyleBy === "dimension" && dimension2 != 'none' ? "/" + dimension2 : ''
     let params = {}
     const ff = filters || {}
     if (ff && ff.forEach) {
@@ -220,7 +227,7 @@ const DataWrapper = (props) => {
         ignoreErrors={true}
         isSvg={true}
         store={[app, unique, id]}
-        source={[apiJoinAttribute + (pointDimension != 'none' ? "/" + pointDimension : '')]}>
+        source={[apiJoinAttribute + (secondDimension)]}>
         <DataConsumer>
             <DataLayer {...props}></DataLayer>
         </DataConsumer>
