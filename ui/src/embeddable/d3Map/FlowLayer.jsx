@@ -269,6 +269,7 @@ class DataLayer extends BaseLayer {
                     const joinValue = d.properties[featureJoinAttribute]
 
                     if (app != 'csv' && data && data.children) {
+                        debugger;
                         const values = data.children.filter(d => d.value.indexOf(joinValue) > -1)
                         if (values.length > 0) {
                             const measureValue = (values[0][measures[0]])

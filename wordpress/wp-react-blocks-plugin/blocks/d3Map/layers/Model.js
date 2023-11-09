@@ -58,7 +58,8 @@ export const Model = {
     tooltip: "Value {value}",
     breaks: [],
     customMeasuresLabels: {},
-    visible: true
+    visible: true,
+    flowValuesFrom: 'origin',
 }
 
 

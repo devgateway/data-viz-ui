@@ -75,15 +75,15 @@ class DataLayer extends BaseLayer {
 
         } = this.props
 
-
-        let numberFormat = {
-            style: (format.style === 'compacted') ? 'decimal' : format.style,
-            notation: (format.style === 'compacted') ? 'compact' : "standard",
-            currency: format.currency,
-            minimumFractionDigits: parseInt(format.minimumFractionDigits),
-            maximumFractionDigits: parseInt(format.maximumFractionDigits)
-        }
-
+        if (this.gRef && this.gRef.current) {
+            this.g = d3.select(this.gRef.current)
+            let numberFormat = {
+                style: (format.style === 'compacted') ? 'decimal' : format.style,
+                notation: (format.style === 'compacted') ? 'compact' : "standard",
+                currency: format.currency,
+                minimumFractionDigits: parseInt(format.minimumFractionDigits),
+                maximumFractionDigits: parseInt(format.maximumFractionDigits)
+            }
             const sizeScale = d3.scaleThreshold()
                 .domain(breaks.map(d => d.end))
                 .range(breaks.map(d => d.size));
@@ -110,238 +110,238 @@ class DataLayer extends BaseLayer {
                 return isMarker ? markFillColor : fillColor
             }
 
-        const filteredData = json.features.filter(f => f.properties._value != null)
+            const filteredData = json.features.filter(f => f.properties._value != null)
 
 
-        const getTooltipVariables = (d) => {
-            if (d.properties._value) {
-                const variables = {
-                    ...d.properties, meta: {
-                        [apiJoinAttribute]: d.properties.meta ? d.properties.meta.value : '', ...d.properties.meta,
-                        value: d.properties._value
-                    }
-                }
-                return variables
-            }
-            return {}
-
-        }
-        this.g = d3.select(this.gRef.current)
-        this.g.attr("class", "base-layer") //add unique name
-        this.createPaths(json)
-
-        this.g.selectAll(".point").remove()
-        this.g.selectAll(".point-label").remove()
-        this.g.selectAll(".shape-pattern").remove()
-
-        this.g.selectAll("defs").remove()
-        const k = this.props.transform ? this.props.transform.k : 1
-
-        const patternWidth = 10* 1 / k
-        const patternHeight = 10* 1 / k
-
-
-        const defs = this.g.append("defs")
-        let patternsData = []
-        if (app == "csv" && patternDiscriminator != 'none') {
-            patternsData = [...new Set(data.data.map(d => d[patternDiscriminator]))].map(key => {
-                return {
-                    key: key,
-                    type: patterns[key + "_symbol"],
-                    color: patterns[key + "_color"],
-                    rotation: patterns[key + "_rotation"]
-                }
-            })
-        } else if (patternDiscriminator != 'none') {
-            const types = data.metadata.types.filter(d => d.dimension == patternDiscriminator)
-            patternsData = types && types.length > 0 ? types[0].items.map(item => {
-                const key = item.value
-                return {
-                    key: key,
-                    type: patterns[key + "_symbol"],
-                    color: patterns[key + "_color"],
-                    rotation: patterns[key + "_rotation"]
-                }
-
-            }) : []
-        }
-
-
-        defs.selectAll("pattern").remove()
-        defs.selectAll("pattern")
-            .data(patternsData).enter()
-            .append("pattern")
-            .attr('id', d => toId(d.key))
-            .attr('patternUnits', 'userSpaceOnUse')
-            .attr('width', patternWidth)
-            .attr('height', patternHeight)
-            .attr("x", 0).attr("y", 0)
-            .attr("patternTransform", d => `rotate(${d.rotation})`)
-
-        patternsData.forEach(d => {
-            if (d.type === 'lines') {
-                defs.select("#" + toId(d.key))
-                    .append("rect")
-                    .attr("x", .05)
-                    .attr('width', patternWidth / 2)
-                    .attr('height', patternHeight)
-                    .attr("opacity", 1)
-                    .attr('fill', d.color)
-            }
-            if (d.type === 'squares') {
-                defs.select("#" + toId(d.key))
-                    .append("rect")
-                    .attr('width', patternWidth / 2)
-                    .attr('height', patternHeight / 2)
-                    .attr('fill', d.color)
-                    .attr("opacity", 1)
-                    .attr("stroke-width", 1)
-
-            }
-            if (d.type === 'dots') {
-                defs.select("#" + toId(d.key))
-                    .append("circle")
-                    .attr("cx", patternWidth / 2)
-                    .attr("cy", patternHeight / 2)
-                    .attr('r', patternWidth / 2.5)
-                    .attr('fill', d.color)
-                    .attr("opacity", 1)
-                    .attr("stroke-width", 1)
-
-            }
-            if (d.type === 'triangle') {
-                defs.select("#" + toId(d.key))
-                    .append("polygon")
-                    .attr("points", `${patternWidth / 2} 0, 0 ${patternWidth}, ${patternWidth}  ${patternWidth} `)
-                    .attr('fill', d.color)
-                    .attr("opacity", 1)
-                    .attr("stroke-width", 1)
-
-            }
-        })
-
-
-        if (!useCentroidPoint) {
-            this.g.selectAll("path")
-                .attr("fill", d => {
-                    if (!d || !d.properties || !d.properties._value) {
-                        return fillColor
-                    }
-                    return getColor(d.properties._value)
-                })
-                .attr("stroke", borderColor)
-                .attr("id", "state-borders")
-                .attr("d", path).on("mouseenter", (d) => {
-                this.showToolTip(tooltip, getTooltipVariables(d), getColor(d.properties._value))
-            })
-                .on("mouseleave", (d) => {
-                    this.hiddenToolTip()
-                })
-                .on("mousemove", (d) => {
-                    this.moveToolTip()
-                })
-
-            this.createLabels(json)
-
-        }
-
-
-        if (usePattern && json && json.features) {
-
-            json.features.forEach(d => {
-                let patterns = []
-                if (d.properties && d.properties.meta) {
-
-                    patterns = (app != "csv") ? d.properties.meta[patternDiscriminator] ? d.properties.meta[patternDiscriminator] : [] : [d.properties.meta[patternDiscriminator]]
-
-                    if (patterns && patterns.length > 0) {
-
-                        patterns.forEach(p => {
-                            this.g.append("path")
-                                .attr("d", path(d))
-                                .attr("class", "shape-pattern")
-                                .attr("opacity", d => {
-                                    if (useBreaks) {
-                                        return .7
-                                    }
-                                })
-                                .attr("fill", d => {
-                                    return "transparent"
-                                })
-
-                                .attr("style", () => {
-                                    return "none;fill:url(#" + toId(p) + ");"
-                                })
-                                .on("mouseenter", () => {
-                                    this.showToolTip(tooltip, getTooltipVariables(d), getColor(d.properties._value))
-                                }).on("mousemove", (d) => {
-                                this.moveToolTip()
-                            }).on("mouseleave", (d) => {
-                                this.hiddenToolTip()
-                            })
-
-                        })
-                    }
-
-                }
-
-            })
-
-
-        }
-
-
-        if (useCentroidPoint) {
-            this.createLabels(json)
-            this.g.selectAll(".point")
-                .data(filteredData)
-                .enter()
-                .append("circle")
-                .attr("fill", d => getColor(d.properties._value, true))
-                .attr("stroke", markBorderColor)
-                .attr("class", "point")
-                .attr("stroke-width", 2)
-                .style("vector-effect", "non-scaling-stroke")
-                .attr("cx", d => path.centroid(d)[0])
-                .attr("cy", d => path.centroid(d)[1])
-                .attr('r', d => {
-                    return getSize(d.properties._value) * 1 / k
-                })
-                //.attr("transform", this.props.transform)
-                .on("mouseenter", (d) => {
-                    if (d.properties._value) {
-                        const variables = {
-                            ...d.properties, meta: {
-                                [apiJoinAttribute]: d.properties.meta ? d.properties.meta.value : '', ...d.properties.meta,
-                                value: d.properties._value
-                            }
+            const getTooltipVariables = (d) => {
+                if (d.properties._value) {
+                    const variables = {
+                        ...d.properties, meta: {
+                            [apiJoinAttribute]: d.properties.meta ? d.properties.meta.value : '', ...d.properties.meta,
+                            value: d.properties._value
                         }
-                        this.showToolTip(tooltip, variables, getColor(d.properties._value))
+                    }
+                    return variables
+                }
+                return {}
+
+            }
+
+            this.g.attr("class", "base-layer") //add unique name
+            this.createPaths(json)
+
+            this.g.selectAll(".point").remove()
+            this.g.selectAll(".point-label").remove()
+            this.g.selectAll(".shape-pattern").remove()
+
+            this.g.selectAll("defs").remove()
+            const k = this.props.transform ? this.props.transform.k : 1
+
+            const patternWidth = 10 * 1 / k
+            const patternHeight = 10 * 1 / k
+
+
+            const defs = this.g.append("defs")
+            let patternsData = []
+            if (app == "csv" && patternDiscriminator != 'none') {
+                patternsData = [...new Set(data.data.map(d => d[patternDiscriminator]))].map(key => {
+                    return {
+                        key: key,
+                        type: patterns[key + "_symbol"],
+                        color: patterns[key + "_color"],
+                        rotation: patterns[key + "_rotation"]
                     }
                 })
-                .on("mouseleave", (d) => {
-                    this.hiddenToolTip()
+            } else if (patternDiscriminator != 'none') {
+                const types = data.metadata.types.filter(d => d.dimension == patternDiscriminator)
+                patternsData = types && types.length > 0 ? types[0].items.map(item => {
+                    const key = item.value
+                    return {
+                        key: key,
+                        type: patterns[key + "_symbol"],
+                        color: patterns[key + "_color"],
+                        rotation: patterns[key + "_rotation"]
+                    }
+
+                }) : []
+            }
+
+
+            defs.selectAll("pattern").remove()
+            defs.selectAll("pattern")
+                .data(patternsData).enter()
+                .append("pattern")
+                .attr('id', d => toId(d.key))
+                .attr('patternUnits', 'userSpaceOnUse')
+                .attr('width', patternWidth)
+                .attr('height', patternHeight)
+                .attr("x", 0).attr("y", 0)
+                .attr("patternTransform", d => `rotate(${d.rotation})`)
+
+            patternsData.forEach(d => {
+                if (d.type === 'lines') {
+                    defs.select("#" + toId(d.key))
+                        .append("rect")
+                        .attr("x", .05)
+                        .attr('width', patternWidth / 2)
+                        .attr('height', patternHeight)
+                        .attr("opacity", 1)
+                        .attr('fill', d.color)
+                }
+                if (d.type === 'squares') {
+                    defs.select("#" + toId(d.key))
+                        .append("rect")
+                        .attr('width', patternWidth / 2)
+                        .attr('height', patternHeight / 2)
+                        .attr('fill', d.color)
+                        .attr("opacity", 1)
+                        .attr("stroke-width", 1)
+
+                }
+                if (d.type === 'dots') {
+                    defs.select("#" + toId(d.key))
+                        .append("circle")
+                        .attr("cx", patternWidth / 2)
+                        .attr("cy", patternHeight / 2)
+                        .attr('r', patternWidth / 2.5)
+                        .attr('fill', d.color)
+                        .attr("opacity", 1)
+                        .attr("stroke-width", 1)
+
+                }
+                if (d.type === 'triangle') {
+                    defs.select("#" + toId(d.key))
+                        .append("polygon")
+                        .attr("points", `${patternWidth / 2} 0, 0 ${patternWidth}, ${patternWidth}  ${patternWidth} `)
+                        .attr('fill', d.color)
+                        .attr("opacity", 1)
+                        .attr("stroke-width", 1)
+
+                }
+            })
+
+
+            if (!useCentroidPoint) {
+                this.g.selectAll("path")
+                    .attr("fill", d => {
+                        if (!d || !d.properties || !d.properties._value) {
+                            return fillColor
+                        }
+                        return getColor(d.properties._value)
+                    })
+                    .attr("stroke", borderColor)
+                    .attr("id", "state-borders")
+                    .attr("d", path).on("mouseenter", (d) => {
+                    this.showToolTip(tooltip, getTooltipVariables(d), getColor(d.properties._value))
+                })
+                    .on("mouseleave", (d) => {
+                        this.hiddenToolTip()
+                    })
+                    .on("mousemove", (d) => {
+                        this.moveToolTip()
+                    })
+
+                this.createLabels(json)
+
+            }
+
+
+            if (usePattern && json && json.features) {
+
+                json.features.forEach(d => {
+                    let patterns = []
+                    if (d.properties && d.properties.meta) {
+
+                        patterns = (app != "csv") ? d.properties.meta[patternDiscriminator] ? d.properties.meta[patternDiscriminator] : [] : [d.properties.meta[patternDiscriminator]]
+
+                        if (patterns && patterns.length > 0) {
+
+                            patterns.forEach(p => {
+                                this.g.append("path")
+                                    .attr("d", path(d))
+                                    .attr("class", "shape-pattern")
+                                    .attr("opacity", d => {
+                                        if (useBreaks) {
+                                            return .7
+                                        }
+                                    })
+                                    .attr("fill", d => {
+                                        return "transparent"
+                                    })
+
+                                    .attr("style", () => {
+                                        return "none;fill:url(#" + toId(p) + ");"
+                                    })
+                                    .on("mouseenter", () => {
+                                        this.showToolTip(tooltip, getTooltipVariables(d), getColor(d.properties._value))
+                                    }).on("mousemove", (d) => {
+                                    this.moveToolTip()
+                                }).on("mouseleave", (d) => {
+                                    this.hiddenToolTip()
+                                })
+
+                            })
+                        }
+
+                    }
+
                 })
 
 
-            this.g.selectAll(".point-label").data(filteredData)
-                .enter()
-                .append("text")
-                .attr("class", "point-label")
-                .attr("x", d => path.centroid(d)[0])
-                .attr("y", d => path.centroid(d)[1])
-                .attr("font-size", d => {
-                    return (markerLabelSize * (1 / k)) + "px"
-                })
-                .attr("fill", markLabelColor)
-                .text(d => {
-                    return intl.formatNumber(format.style === 'percent' ? d.properties._value / 100 : d.properties._value, numberFormat)
+            }
 
-                }).on("mouseover", (d) => {
 
-            });
-        } //Map Shapes
+            if (useCentroidPoint) {
+                this.createLabels(json)
+                this.g.selectAll(".point")
+                    .data(filteredData)
+                    .enter()
+                    .append("circle")
+                    .attr("fill", d => getColor(d.properties._value, true))
+                    .attr("stroke", markBorderColor)
+                    .attr("class", "point")
+                    .attr("stroke-width", 2)
+                    .style("vector-effect", "non-scaling-stroke")
+                    .attr("cx", d => path.centroid(d)[0])
+                    .attr("cy", d => path.centroid(d)[1])
+                    .attr('r', d => {
+                        return getSize(d.properties._value) * 1 / k
+                    })
+                    //.attr("transform", this.props.transform)
+                    .on("mouseenter", (d) => {
+                        if (d.properties._value) {
+                            const variables = {
+                                ...d.properties, meta: {
+                                    [apiJoinAttribute]: d.properties.meta ? d.properties.meta.value : '', ...d.properties.meta,
+                                    value: d.properties._value
+                                }
+                            }
+                            this.showToolTip(tooltip, variables, getColor(d.properties._value))
+                        }
+                    })
+                    .on("mouseleave", (d) => {
+                        this.hiddenToolTip()
+                    })
 
+
+                this.g.selectAll(".point-label").data(filteredData)
+                    .enter()
+                    .append("text")
+                    .attr("class", "point-label")
+                    .attr("x", d => path.centroid(d)[0])
+                    .attr("y", d => path.centroid(d)[1])
+                    .attr("font-size", d => {
+                        return (markerLabelSize * (1 / k)) + "px"
+                    })
+                    .attr("fill", markLabelColor)
+                    .text(d => {
+                        return intl.formatNumber(format.style === 'percent' ? d.properties._value / 100 : d.properties._value, numberFormat)
+
+                    }).on("mouseover", (d) => {
+
+                });
+            } //Map Shapes
+        }
 
     }
 
