@@ -43,7 +43,7 @@ class BaseLayer extends React.Component {
         const {
             file,
         } = this.props
-        debugger;
+        
         if (this.state.json) {
             this.createLayer(this.state.json)
         } else {
