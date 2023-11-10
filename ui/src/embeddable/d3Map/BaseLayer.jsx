@@ -27,7 +27,7 @@ class BaseLayer extends Layer {
             this.g = d3.select(this.gRef.current)
 
             const svg = d3.select(this.gRef.current.parentElement);
-            debugger;
+            
 
             this.g.attr("class", "base-layer") //add unique name
             this.g.selectAll("path").remove()
@@ -108,7 +108,7 @@ class BaseLayer extends Layer {
 
 
         } = this.props
-        debugger;
+        
         if (file !== prevProps.file || path !== prevProps.path || projection !== prevProps.projection || transform !== prevProps.transform || labelFilter !== prevProps.labelFilter || labelField !== prevProps.labelField || labelFontSize !== prevProps.labelFontSize || labelColor !== prevProps.labelColor || fillColor !== prevProps.fillColor || borderColor !== prevProps.borderColor) {
             this.create()
         }

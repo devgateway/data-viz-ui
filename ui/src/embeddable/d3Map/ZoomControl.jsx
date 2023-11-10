@@ -32,7 +32,7 @@ class ZoomControl extends React.Component {
     componentDidMount() {
         const {zoomEnabled = true, rotationEnabled} = this.props
         const selection = this.getSelection()
-        debugger;
+        
         if (selection) {
 
             if (zoomEnabled) {
