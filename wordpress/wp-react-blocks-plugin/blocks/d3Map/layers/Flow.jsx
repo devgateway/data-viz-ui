@@ -325,17 +325,6 @@ export class DataLayerSetting extends Component {
                 />
             </PanelRow>}
 
-            {app != 'csv' && <PanelRow>
-                <SelectControl
-                    label={'Use Values From'}
-                    help={"Aggregate values by origin or destination"}
-                    value={[flowValuesFrom]} // e.g: value = [ 'a', 'c' ]
-                    onChange={(value) => {
-                        onChangeProperty("flowValuesFrom", value)
-                    }}
-                    options={[{label: 'Origin', value: 'origin'}, {label: 'Destination', value: 'destination'}]}
-                />
-            </PanelRow>}
 
             <PanelRow>
                 <TextareaControl

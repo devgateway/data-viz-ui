@@ -61,17 +61,18 @@ const BreaksGenerator = ({onChangeProperty, breaks = [], defaultFillColor, defau
     }
 
     const updateGraterThan = (property, value) => {
-        const graterThanBreaks = breaks.filter(b => b.type == 'graterThan')[0]
+        debugger;
+        const graterThanBreak = breaks.filter(b => b.type == 'graterThan')[0]
         const lessThanBreaks = breaks.filter(b => b.type == 'lessThan')
-        graterThanBreaks[property] = value
-        onChangeProperty("breaks", [...lessThanBreaks, graterThanBreaks])
+        graterThanBreak[property] = value
+        onChangeProperty("breaks", [...lessThanBreaks, graterThanBreak])
     }
 
     debugger;
     return <>
 
         <PanelRow>
-            <Button  variant="primary" onClick={e => add()}>Add Break</Button>
+            <Button variant="primary" onClick={e => add()}>Add Break</Button>
         </PanelRow>
         {breaks.map((br, index) => {
                 if (br.type == 'lessThan') {
@@ -118,11 +119,11 @@ const BreaksGenerator = ({onChangeProperty, breaks = [], defaultFillColor, defau
                 if (br.type == 'graterThan') {
                     return <PanelBody initialOpen={false} title={"Grater than (" + br.end + ")"}>
                         {showSize && <PanelRow>
-                            <TextControl
+                            <RangeControl
                                 label="Size"
-                                value={2}
+                                value={br.size}
                                 onChange={(value) => {
-                                    updateGraterThan("size", value)
+                                    updateGraterThan("size",  value)
                                 }}
                                 step={1}
                                 min={0}
@@ -133,7 +134,7 @@ const BreaksGenerator = ({onChangeProperty, breaks = [], defaultFillColor, defau
                             <PanelColorSettings
                                 title={__(`Fill Color`)}
                                 colorSettings={[{
-                                    value: defaultFillColor,
+                                    value: br.color,
                                     onChange: (fillColor) => {
                                         updateGraterThan("color", fillColor)
                                     },
