@@ -81,28 +81,38 @@ const FlowLayerLegend = (props) => {
         <div>
             <div className={"legend-item"}>
                 <div className={"legend-color legend-check"} onClick={e => onItemClick(id)}
-                     style={{backgroundColor: markFillColor, borderColor: markBorderColor}}>{visible != false && <>&#10003;</>}
+                     style={{
+                         backgroundColor: markFillColor,
+                         borderColor: markBorderColor
+                     }}>{visible != false && <>&#10003;</>}
                 </div>
                 <div className={"legend-label"}>{name} ({measureLabel})</div>
             </div>
 
             {(breaks.length > 0 && visible != false) && <div className={"legend-breaks"}>
                 {breaks.map((b, i) => {
-                    return (<div className={"break"}>
-                        <div className={"break-item"} style={{
-                            backgroundColor: b.color,
-                            border: `1px solid ${b.borderColor}`,
-                        }}></div>
-                        <div className={"break-label"}> &lt; {b.end}</div>
-                    </div>)
+                    if (b.type !== 'graterThan') {
+                        return (<div className={"break"}>
+                            <div className={"break-item"} style={{
+                                backgroundColor: b.color,
+                                border: `1px solid ${b.borderColor}`,
+                            }}></div>
+                            <div className={"break-label"}> &lt; {b.end}</div>
+                        </div>)
+                    }else{
+
+                        return ( <div className={"break"}>
+                            <div className={"break-item"} style={{
+                                backgroundColor: b.color,
+                                border: `1px solid ${b.borderColor}`,
+                            }}></div>
+                            <div className={"break-label"}> &gt; {b.end}</div>
+
+                        </div>)
+                    }
+
                 })}
-                <div className={"break"}>
-                    <div className={"break-item"} style={{
-                        backgroundColor: markFillColor,
-                        border: `1px solid ${markBorderColor}`,
-                    }}></div>
-                    <div className={"break-label"}> &gt; {Math.max(...breaks.map(b => b.end))}</div>
-                </div>
+
             </div>
             }
         </div>
@@ -136,11 +146,14 @@ const DataPointsLayerLegend = (props) => {
         <div>
             <div className={"legend-item"}>
                 <div className={"legend-color legend-check"} onClick={e => onItemClick(id)}
-                     style={{backgroundColor: markFillColor, borderColor: markBorderColor}}>{visible != false && <>&#10003;</>}
+                     style={{
+                         backgroundColor: markFillColor,
+                         borderColor: markBorderColor
+                     }}>{visible != false && <>&#10003;</>}
                 </div>
                 <div className={"legend-label"}>{name} ({fieldLabel})</div>
             </div>
-            {(pointStyleBy === "dimension"  && visible != false) && <div className={"legend-breaks"}>
+            {(pointStyleBy === "dimension" && visible != false) && <div className={"legend-breaks"}>
                 {dimensionOptions.map((d) => {
                     return (<div className={"break"}>
                         <div className={"break-item"} style={{
@@ -153,7 +166,7 @@ const DataPointsLayerLegend = (props) => {
             </div>
             }
 
-            {(pointStyleBy === "measure"  && visible != false) && <div className={"legend-breaks"}>
+            {(pointStyleBy === "measure" && visible != false) && <div className={"legend-breaks"}>
                 {breaks.map((b, i) => {
                     return (<div className={"break"}>
                         <div className={"break-item"} style={{
@@ -285,10 +298,10 @@ const DataLayerLegend = (props) => {
             .attr("height", "auto")
 
         g.append("text")
-          .attr("class","patterns-title")
-          .attr("y", 5)
-          .attr("x", 12)
-          .text(patternDiscriminator)
+            .attr("class", "patterns-title")
+            .attr("y", 5)
+            .attr("x", 12)
+            .text(patternDiscriminator)
 
         g.selectAll(".legend-squares")
             .data(patternsData)
@@ -307,10 +320,10 @@ const DataLayerLegend = (props) => {
             .data(patternsData)
             .enter()
             .append("text")
-            .attr("class","patterns-labels")
+            .attr("class", "patterns-labels")
             .attr("y", (d, i) => (i * 22) + 25)
             .attr("x", 40)
-            .text(d=>d.key)
+            .text(d => d.key)
     }
 
     return <div className={"legend"}>

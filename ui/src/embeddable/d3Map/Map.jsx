@@ -13,7 +13,7 @@ class Map extends React.Component {
 
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        debugger;
+        
         if (prevProps.projection !== this.props.projection) {
             const path = d3.geoPath().projection(this.props.projection);
             this.setState({projection: this.props.projection, path})
@@ -36,7 +36,7 @@ class Map extends React.Component {
     }
 
     componentDidMount() {
-        debugger;
+        
         const {rotationEnabled} = this.props
         var group = d3.select(this.svgRef.current).datum({
             x: 0,
