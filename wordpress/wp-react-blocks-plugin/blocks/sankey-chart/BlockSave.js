@@ -1,0 +1,229 @@
+import {useBlockProps} from '@wordpress/block-editor';
+import {InnerBlocks} from '@wordpress/editor'; // or wp.editor
+const SaveComponent = (props) => {
+    const {
+        toggleSelection, setAttributes, attributes: {
+            height,
+            width,
+            type,
+            groupMode,
+            bottomLegend,
+            leftLegend,
+            scheme,
+            colorBy,
+            dimension1,
+            dimension2,
+            dimension3,
+            dualMode,
+            toggleInfoLabel,
+            toggleChartLabel,
+            dataSourceLabel,
+            dataSource,
+            legendPosition,
+            marginLeft,
+            marginTop,
+            marginRight,
+            marginBottom,
+            showLegends,
+            legendLabel,
+            app,
+            measures,
+            tickColor,
+            tickRotation,
+            offsetText,
+            format,
+            decimals,
+            currency,
+            tooltipHTML,
+            csv,
+            startAngle,
+            endAngle,
+            layout,
+            reverse,
+            offsetY,
+            csvLineLayerData,
+            csvLineColor,
+            csvLineTooltip,
+            csvLineTitle,
+            lineLayerEnabled,
+            group,
+            maxValue,
+            valueScale,
+            filters,
+            swap,
+            noDataMessage,
+            barColor,
+            overrideTickColor,
+            fixedMaxValue,
+            fixedMinValue,
+            barPadding,
+            barLabelPosition,
+            showGrid,
+            includeOverall,
+            tooltipEnabled,
+            barInnerPadding,
+            useLabelBackground,
+            useCheckBoxBackground,
+            xLabelColor = "#000000",
+            barLabelColor = "#000000",
+            legendLabelColor = "#000000",
+            highlightXAxisLine,
+            showTickLine,
+            manualColors,
+            showRightAxis,
+            rightLegend,
+            offsetRight,
+            offsetBottom,
+            hiddenBars,
+            enableArea,
+            areaShadingCriteria,
+            areaLowerBound,
+            areaUpperBound,
+            showPoints,
+            confidenceIntervals,
+            centerLabel,
+            showArcLabels,
+            showArcLinkLabels,
+            slicePadding,
+            centerLabelFontWeight,
+            centerLabelFontSize,
+            centerLabelXOffset,
+            centerLabelYOffset,
+            groupTotalMeasure,
+            showGroupTotal,
+            groupTotalFormat,
+            groupTotalFixedPosition,
+            groupTotalLabel,
+            groupTotalLabelOffset,
+            tooltipEnableMarkdown,
+            yAxisTickValues,
+            enableGridY,
+            enableGridX,
+            overallLabel,
+            overlays,
+            minMaxClamp,
+            reverseLegend,
+            sort,
+            sortReverse,
+        }
+    } = props;
+    const blockProps = useBlockProps.save({
+        className: 'sankey chart'
+    });
+
+    const levels = [dimension1, dimension2, dimension3]
+    const source = levels.filter(l => l != 'none' && l != null).join('/')
+
+    return (
+        <div {...blockProps} className={"viz-component"}
+             data-component={"sankeychart"}
+             data-height={height}
+             data-type={type}
+             data-source={source}
+             data-dimension1={dimension1}
+             data-dimension2={dimension2}
+             data-dimension3={dimension3}
+             data-color-by={colorBy}
+             data-scheme={scheme}
+             data-group-mode={groupMode}
+             data-left-legend={leftLegend}
+             data-dualMode={dualMode}
+             data-bottom-legend={bottomLegend}
+             data-toggle-info-label={toggleInfoLabel}
+             data-toggle-chart-label={toggleChartLabel}
+             data-data-source-label={dataSourceLabel}
+             data-chart-data-source={dataSource}
+             data-margin-left={marginLeft}
+             data-margin-top={marginTop}
+             data-margin-right={marginRight}
+             data-margin-bottom={marginBottom}
+             data-show-legends={showLegends}
+             data-legend-position={legendPosition}
+             data-app={app}
+             data-tick-rotation={tickRotation}
+             data-offset-text={offsetText}
+             data-tick-color={tickColor}
+             data-line-layer-enabled={lineLayerEnabled}
+             data-measures={encodeURIComponent(JSON.stringify(measures))}
+             data-format={encodeURIComponent(JSON.stringify(format))}
+             data-decimals={decimals}
+             data-currency={currency}
+             data-csv={csv}
+             data-tooltip-html={encodeURIComponent(tooltipHTML)}
+             data-start-angle={startAngle}
+             data-end-angle={endAngle}
+             data-layout={layout}
+             data-reverse={reverse}
+             data-offset-y={offsetY}
+            //data-csv-line-layer-data={csvLineLayerData}
+            //data-csv-line-color={csvLineColor}
+            // data-csv-line-tooltip={csvLineTooltip}
+            //data-csv-line-title={csvLineTitle}
+             data-group={group}
+             data-max-value={maxValue}
+             data-value-scale={valueScale}
+             data-filters={encodeURIComponent(JSON.stringify(filters))}
+             data-swap={swap}
+             data-no-data-message={noDataMessage}
+             data-legend-label={legendLabel}
+             data-bar-color={barColor}
+             data-override-tick-color={overrideTickColor}
+             data-fixed-min-value={fixedMinValue}
+             data-fixed-max-value={fixedMaxValue}
+             data-bar-padding={barPadding}
+             data-bar-label-position={barLabelPosition}
+             data-show-grid={showGrid}
+             data-include-overall={includeOverall}
+             data-tooltip-enabled={tooltipEnabled}
+             data-x-label-color={xLabelColor}
+             data-bar-label-color={barLabelColor}
+             data-bar-inner-padding={barInnerPadding}
+             data-use-label-background={useLabelBackground}
+             data-use-check-box-background={useCheckBoxBackground}
+             data-legend-label-color={legendLabelColor}
+             data-highlight-xaxis-line={highlightXAxisLine}
+             data-show-tick-line={showTickLine}
+             data-show-right-axis={showRightAxis}
+             data-right-legend={rightLegend}
+             data-offset-right={offsetRight}
+             data-offset-bottom={offsetBottom}
+             data-enable-area={enableArea}
+             data-area-shading-criteria={areaShadingCriteria}
+             data-area-lower-bound={areaLowerBound}
+             data-area-upper-bound={areaUpperBound}
+             data-show-points={showPoints}
+             data-hidden-bars={hiddenBars.join(',')}
+             data-confidence-intervals={encodeURIComponent(JSON.stringify(confidenceIntervals))}
+             data-manual-colors={encodeURIComponent(JSON.stringify(manualColors))}
+             data-group-total-measure={groupTotalMeasure}
+             data-show-group-total={showGroupTotal}
+             data-group-total-label-offset={groupTotalLabelOffset}
+             data-group-total-format={encodeURIComponent(JSON.stringify(groupTotalFormat))}
+             data-group-total-fixed-position={groupTotalFixedPosition}
+             data-group-total-label={groupTotalLabel}
+             data-show-arc-labels={showArcLabels}
+             data-show-arc-link-labels={showArcLinkLabels}
+             data-slice-padding={slicePadding}
+             data-center-label={centerLabel}
+             data-center-label-font-weight={centerLabelFontWeight}
+             data-center-label-font-size={centerLabelFontSize}
+             data-center-label-xoffset={centerLabelXOffset}
+             data-center-label-yoffset={centerLabelYOffset}
+             data-tooltip-enable-markdown={tooltipEnableMarkdown}
+             data-y-axis-tick-values={yAxisTickValues}
+             data-enable-grid-y={enableGridY}
+             data-enable-grid-x={enableGridX}
+             data-overall-label={overallLabel}
+             data-overlays={encodeURIComponent(JSON.stringify(overlays))}
+             data-min-max-clamp={minMaxClamp}
+             data-reverse-legend={reverseLegend}
+             data-sort={sort}
+             data-sort-reverse={sortReverse}
+        >
+
+            <InnerBlocks.Content/>
+        </div>
+    );
+}
+
+export default SaveComponent

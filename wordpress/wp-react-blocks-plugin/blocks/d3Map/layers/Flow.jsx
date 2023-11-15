@@ -11,7 +11,7 @@ import {
     TextControl,
     ToggleControl
 } from '@wordpress/components';
-import Measures from './utils/MapMeasures.jsx'
+import Measures from '../../commons/Measures.jsx'
 import Property from "./utils/Property";
 import BreaksGenerator from "./utils/BreaksGenerator";
 import {PanelColorSettings} from "@wordpress/block-editor";
@@ -52,7 +52,6 @@ const CategoricalFilter = ({value, index, items, onUpdateFilterValue}) => {
 export class DataLayerSetting extends Component {
     constructor(props) {
         super(props);
-        this.onMeasuresChange = this.onMeasuresChange.bind(this)
         this.onSetSingleMeasure = this.onSetSingleMeasure.bind(this)
         this.addFilter = this.addFilter.bind(this)
         this.updateFilterParam = this.updateFilterParam.bind(this)
@@ -189,16 +188,6 @@ export class DataLayerSetting extends Component {
         const {onChangeProperty} = this.props
         onChangeProperty("measures", [value])
     }
-
-    onMeasuresChange(value) {
-        const {onChangeProperty, attributes: {measures}} = this.props
-        if (measures.indexOf(value) > -1) {
-            onChangeProperty("measures", measures.filter(d => d != value))
-        } else {
-            onChangeProperty("measures", [...measures, value])
-        }
-    }
-
 
     items(type) {
 
@@ -353,8 +342,9 @@ export class DataLayerSetting extends Component {
                 {app != 'csv' && <Measures
                     onFormatChange={this.onFormatChange}
                     onSetSingleMeasure={this.onSetSingleMeasure}
-                    onMeasuresChange={this.onMeasuresChange}
-                    {...this.props} />}
+                    measures={layer.measures}
+                    format={layer.format}
+                    {...this.props}/>}
             </React.Fragment>,
             <React.Fragment>
                 {app != 'csv' && <PanelBody initialOpen={false} title={__("Filters")}>
