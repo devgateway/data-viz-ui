@@ -2,35 +2,13 @@ import React, {useRef, useState} from "react";
 import {Container} from "semantic-ui-react";
 import DataProvider from "../data/DataProvider";
 import DataConsumer from "../data/DataConsumer";
-import {buildDivergingOptions, buildPieOptions} from './prevalenceBuilder'
-import HalfPie from "./Pie";
-
-import Radar from "./Radar";
-import Bar from "./Bar";
-import Line from "./Line";
 
 import {PostContent} from "@devgateway/wp-react-lib";
-import dataFrames from './data/index'
-
-
-import CSVDataFrame from "./CSVDataFrame";
 import ColorProvider from "../common/colors/ColorProvider"
 import Messages from "../common/Messages";
 import {connect} from "react-redux";
+import SankeyChart from "./Sankey"
 
-const PieChart = (props) => {
-    const {data, legends, colors, height} = props
-    const options = buildPieOptions(data, true)
-    return <HalfPie height={height} legends={legends} colors={colors} options={options}
-                    format={{style: "percent"}}></HalfPie>
-}
-
-const Diverging = (props) => {
-    const {data, legends, colors, height} = props
-    const options = buildDivergingOptions(data, true)
-    return <Diverging height={height} legends={legends} colors={colors} options={options}
-                      format={{style: "percent", currency: "EUR"}}></Diverging>
-}
 const Chart = (props) => {
     const {
         parent,
@@ -47,7 +25,7 @@ const Chart = (props) => {
         'data-dimension1': dimension1,
         'data-dimension2': dimension2,
         'data-dimension3': dimension3,
-        'data-color-by': colorBy = 'index',
+        'data-color-by': colorBy = 'id',
         'data-scheme': scheme = 'system',
         'data-group-mode': groupMode = 'grouped',
         'data-left-legend': left = 'Left Legend',
@@ -63,7 +41,7 @@ const Chart = (props) => {
         //'data-number-format': format = '{"style":"percent", "minimumFractionDigits": 1, "maximumFractionDigits": 1}',
         'data-tick-rotation': tickRotation = 0,
         'data-tick-color': tickColor = "rgb(92,93,99)",
-        'data-measures': measures = "{}",
+        'data-measures': measures = "[]",
         'data-format': format = "{}",
         "data-csv": csv = "",
         "data-margin-left": marginLeft = 50,
@@ -172,7 +150,7 @@ const Chart = (props) => {
         return parse(measures)
     }
     const getSelectedFormat = () => {
-        if (measuresObject[app]) {
+        /*if (measuresObject[app]) {
             let format = measuresObject[app].format
             if (!format) {
                 const keys = Object.keys(measuresObject[app])
@@ -187,76 +165,26 @@ const Chart = (props) => {
             return format
         } else {
             return measuresObject && measuresObject["csv"] ? measuresObject["csv"].format : null
-        }
+        }*/
     }
 
-    const getCustomAxisFormat = () => {
-        let format = null
-        if (measuresObject[app]) {
-            const useCustomAxisFormat = measuresObject[app].useCustomAxisFormat
-            if (useCustomAxisFormat && measuresObject[app].customFormat) {
-                format = measuresObject[app].customFormat
-            }
-
-        } else {
-            if (measuresObject && measuresObject["csv"]) {
-                const useCustomAxisFormat = measuresObject["csv"].useCustomAxisFormat
-                if (useCustomAxisFormat && measuresObject["csv"].customFormat) {
-                    format = measuresObject["csv"].customFormat
-                }
-            }
-        }
-
-        return format
-    }
-
-    const getSelectedMeasures = () => {
-        if (measuresObject[app]) {
-            return Object.keys(measuresObject[app]).map(s => ({value: s, ...measuresObject[app][s]})).filter(m => m.selected).map(s => s.value)
-        }
-        return []
-    }
     const getCustomLabels = () => {
         const customLabels = {}
-        if (measuresObject[app]) {
+        /*if (measuresObject[app]) {
             const hasCustomLabels = Object.keys(measuresObject[app]).map(s => ({value: s, ...measuresObject[app][s]})).filter(m => m.selected && m.hasCustomLabel)
             hasCustomLabels.forEach(m => {
                     customLabels[m.value] = m.customLabel
                 }
             )
-        }
+        }*/
         return customLabels
     }
-    const getUserMeasures = () => {
-        if (measuresObject[app]) {
-            return Object.keys(measuresObject[app]).filter(k => measuresObject[app][k].allowSelection)
-        }
-        return []
-    }
-
-    let measuresObject = getMeasuresObject()
-    let selectedMeasures = getSelectedMeasures()
-
     let selectedFormat = getSelectedFormat()
-    let userMeasures = getUserMeasures()
     let leftLegendForSelectedMeasure = left
     let rightLegendForSelectedMeasure = rightLegend
 
     /*Decoding tooltip string*/
     let tooltipForSelectedMeasure = decode(tooltip)
-
-    if (injectedMeasures) {
-        const selected = Object.keys(injectedMeasures[app].measures).map(s => ({value: s, ...injectedMeasures[app].measures[s]})).filter(m => m.selected).map(s => s.value)
-        measuresObject = injectedMeasures
-        selectedMeasures = selected
-        selectedFormat = getSelectedFormat()
-
-        leftLegendForSelectedMeasure = injectedMeasures.leftTitle
-        rightLegendForSelectedMeasure = injectedMeasures.rightTitle
-        if (injectedMeasures.customTooltip) {
-            tooltipForSelectedMeasure = injectedMeasures.customTooltip
-        }
-    }
 
     let numberFormat = selectedFormat ? {
         style: (selectedFormat.style === 'compacted') ? 'decimal' : selectedFormat.style,
@@ -271,17 +199,7 @@ const Chart = (props) => {
         maximumFractionDigits: 2
     }
 
-    const customAxisFormat = getCustomAxisFormat()
 
-    const groupTotalFormatObject = parse(groupTotalFormat)
-
-    let groupTotalFormatParsed = {
-        style: (groupTotalFormatObject.style === 'compacted') ? 'decimal' : groupTotalFormatObject.style,
-        notation: (groupTotalFormatObject.style === 'compacted') ? 'compact' : "standard",
-        currency: groupTotalFormatObject.currency,
-        minimumFractionDigits: parseInt(groupTotalFormatObject.minimumFractionDigits),
-        maximumFractionDigits: parseInt(groupTotalFormatObject.maximumFractionDigits)
-    }
     const [mode, setMode] = useState(editMode)
     const viewMode = editing ? editMode : mode
     const colors = {
@@ -358,7 +276,6 @@ const Chart = (props) => {
         showGroupTotal: showGroupTotal == true || showGroupTotal == "true",
         groupTotalMeasure,
         groupTotalLabel,
-        groupTotalFormat: groupTotalFormatParsed,
         groupTotalOffset,
         groupTotalFixedPosition: groupTotalFixedPosition == true || groupTotalFixedPosition == "true",
         centerLabel,
@@ -369,17 +286,14 @@ const Chart = (props) => {
         centerLabelFontSize,
         centerLabelXOffset,
         centerLabelYOffset,
-        userMeasures,
         tooltipEnableMarkdown: tooltipEnableMarkdown == true || tooltipEnableMarkdown == "true",
         yAxisTickValues,
         enableGridY: enableGridY == true || enableGridY == "true",
         enableGridX: enableGridX == true || enableGridX == "true",
         offsetText,
-        selectedMeasures,
         overallLabel,
         minMaxClamp,
         reverseLegend: reverseLegend == true || reverseLegend == "true",
-        customAxisFormat,
         sort,
         sortReverse: sortReverse == true || sortReverse == "true",
     }
@@ -395,56 +309,7 @@ const Chart = (props) => {
         })
     }
 
-
-    let ChartDataFrame = null
-    let Chart = null
-
-    if (app === "csv") {
-        ChartDataFrame = CSVDataFrame
-    } else {
-        switch (type) {
-            case  "line":
-                ChartDataFrame = dataFrames.LineDataFrame
-                break
-            case  "pie":
-                ChartDataFrame = dataFrames.PieDataFrame
-                break
-            case  "radar":
-                //TODO RADAR
-
-                ChartDataFrame = dataFrames.BarDataFrame
-                break
-            default:
-                ChartDataFrame = dataFrames.BarDataFrame
-                break
-        }
-    }
     let showNotEnoughParameters = false
-
-
-    switch (type) {
-        case  "bar":
-            Chart = Bar
-            showNotEnoughParameters = app != 'csv' && dimension1 == 'none' && selectedMeasures.length == 0
-            break
-        case  "line":
-            Chart = Line
-            showNotEnoughParameters = app != 'csv' && (selectedMeasures.length == 0 || dimension1 == 'none')
-            break
-        case "pie":
-            showNotEnoughParameters = app != 'csv' && selectedMeasures.length == 0
-            Chart = HalfPie
-            break
-        case "radar":
-            showNotEnoughParameters = app != 'csv' && selectedMeasures.length == 0
-            //TODO RADAR implementation
-            Chart = Radar
-            break
-        default:
-            Chart = <div>No Chart</div>
-            break
-    }
-
 
     const dual = (dualMode === 'true')
     const dimensions = []
@@ -454,14 +319,17 @@ const Chart = (props) => {
     if (dimension2 != 'none') {
         dimensions.push(dimension2)
     }
+    if (dimension3 != 'none') {
+        dimensions.push(dimension3)
+    }
 
-
+    if (!dimensions.length || !parse(measures)[0]) {
+        showNotEnoughParameters = true
+    }
+    debugger
     return (<div ref={ref}>
 
-
         <Container className={"chart container"} style={{"minHeight": height + 'px'}} fluid={true}>
-
-
             <DataProvider
                 editing={editing}
                 style={{"height": `${contentHeight}px`}}
@@ -471,43 +339,34 @@ const Chart = (props) => {
                 csv={csv}
                 editing={editing}
                 store={[app, unique, ...dimensions]} source={dimensions.join("/")}>
-
-
                 <Container style={{"height": `${contentHeight}px`}} className={"body"} fluid={true}>
-
                     {showNotEnoughParameters && <Messages editing={editing}></Messages>}
                     {!showNotEnoughParameters && <DataConsumer>
                         <Messages app={app} group={group} noDataMsg={noDataMsg}> </Messages>
-                        <ChartDataFrame
-                            locale={locale}
-                            colorBy={colorBy}
-                            hiddenBars={hiddenBars}
-                            swap={swap == 'true' || swap == true} type={type} includeTotal={true}
-                            includeOverall={includeOverall == true || includeOverall == "true"}
-                            overallLabel={overallLabel}
-                            measures={selectedMeasures}
-                            dimensions={[...dimensions]}
-                            sort={sort}
-                            sortreverse={sortReverse}
-                            customLabels={getCustomLabels()}>
+                        <DataFrame
+                          locale={locale}
+                          colorBy={'id'}
+                          hiddenBars={hiddenBars}
+                          swap={swap == 'true' || swap == true} type={type} includeTotal={true}
+                          includeOverall={includeOverall == true || includeOverall == "true"}
+                          overallLabel={overallLabel}
+                          dimensions={[...dimensions]}
+                          sort={sort}
+                          sortreverse={sortReverse}
+                          measure={parse(measures)[0] || null}
+                          customLabels={getCustomLabels()}>
                             <ColorProvider
-                                type={type}
-                                app={app}
-                                locale={locale}
-                                overallLabel={overallLabel}
-                                customLabels={getCustomLabels()}
-                                manualColors={getManualColor()} colorBy={colorBy} scheme={scheme}
-                                barColor={chartProps.barColor}>
-
-                                <Chart {...chartProps}></Chart>
+                              app={app}
+                              locale={locale}
+                              overallLabel={overallLabel}
+                              customLabels={getCustomLabels()}
+                              manualColors={getManualColor()} colorBy={'id'} scheme={scheme}
+                              barColor={chartProps.barColor}>
+                                <SankeyChart{...chartProps} dimensions={dimensions} measure={parse(measures)[0] || null}></SankeyChart>
                             </ColorProvider>
-
-                        </ChartDataFrame>
-
+                        </DataFrame>
                     </DataConsumer>}
-
                 </Container>
-
             </DataProvider>
 
             <br/>
@@ -520,6 +379,45 @@ const Chart = (props) => {
     </div>)
 
 }
+
+const DataFrame = (props) => {
+    const {children, data, keys, colorBy, measures} = props
+
+    const getData = (props) => {
+        const {data, dimensions, measure} = props
+        const nodes = []
+        const links = []
+        fillFormChildren(data.children, nodes, links, null, measure)
+        return {nodes, links}
+    }
+
+    const fillFormChildren = (children, nodes, links, source, measure) => {
+        children.forEach(c => {
+            if (!nodes.find(n => n.id === c.value)) {
+                nodes.push({id: c.value});
+            }
+            if (source) {
+                const link = links.find(l => l.source === source && l.target === c.value)
+                if (link) {
+                    link.value = link.value + c[measure]
+                } else {
+                    links.push({source: source, target: c.value, value: c[measure]})
+                }
+            }
+            if (c.children && c.children.length > 0) {
+                fillFormChildren(c.children, nodes, links, c.value, measure)
+            }
+        })
+    }
+    const chartData = getData(props)
+    const options = {
+        indexBy: '',
+        keys: chartData.nodes.map(n => n.id),
+        data: chartData
+    }
+    return React.Children.map(children, child => React.cloneElement(child, {options}))
+}
+
 
 const mapStateToProps = (state, ownProps) => {
     const {"data-app": app, "data-group": group,} = ownProps
