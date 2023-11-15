@@ -17,7 +17,7 @@ class BaseLayer extends React.Component {
         this.showToolTip = this.showToolTip.bind(this)
         this.moveToolTip = this.moveToolTip.bind(this)
         this.gRef = React.createRef();
-        this.state = {json:null}
+        this.state = {json: null}
 
     }
 
@@ -27,12 +27,12 @@ class BaseLayer extends React.Component {
             d3.json(url).then(function (us, error) {
                 if (error) {
                     console.log("Error loading JSON: " + error)
-                };
+                }
+                ;
                 resolve(us)
             }.bind(this));
         })
     }
-
 
 
     createLayer(json) {
@@ -43,7 +43,7 @@ class BaseLayer extends React.Component {
         const {
             file,
         } = this.props
-        
+
         if (this.state.json) {
             this.createLayer(this.state.json)
         } else {
@@ -56,17 +56,20 @@ class BaseLayer extends React.Component {
 
 
     showToolTip(content, data, color) {
-        const tip = d3.select("body").append("div")
-            .attr("class", "d3MapTooltip")
-            .style("position", "absolute")
-            //.style("background-color", color)
-            .html("")
-            .style("left", (d3.event.pageX + 15) + "px")
-            .style("top", (d3.event.pageY - 50) + "px")
+        debugger;
+        if (data) {
 
-        ReactDOM.render(<Tooltip intl={this.props.intl} tooltip={content} data={data}
-                                 tooltipEnableMarkdown={false}/>, tip._groups[0][0])
+            const tip = d3.select("body").append("div")
+                .attr("class", "d3MapTooltip")
+                .style("position", "absolute")
+                //.style("background-color", color)
+                .html("")
+                .style("left", (d3.event.pageX + 15) + "px")
+                .style("top", (d3.event.pageY - 50) + "px")
 
+            ReactDOM.render(<Tooltip intl={this.props.intl} tooltip={content} data={data}
+                                     tooltipEnableMarkdown={false}/>, tip._groups[0][0])
+        }
     }
 
 
