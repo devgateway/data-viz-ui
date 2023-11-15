@@ -50,7 +50,7 @@ const ListOfPost = ({posts, locale, configuration}) => {
 
 const Root = (props) => {
 
-    debugger
+    
     const [random, setRandomStore] = useState(Math.random() * (99999 - 1) + 1);
     const {
         "data-width": width,
@@ -71,7 +71,7 @@ const Root = (props) => {
 
     const configuration = parse(config)
 
-    debugger;
+    
     const parallax = useRef(null)
 
     return (<div style={{width: '100%', height: height + "px"}} className={"parallax-container"}>

@@ -1,7 +1,6 @@
 ARG REPO
 ARG TAG
-FROM ${REPO}/embedded:${TAG}  AS embedded
-
+FROM ${REPO}/ui-customizer:${TAG}  AS customizer
 FROM node:12.22.12 AS reactlib
 WORKDIR /tmp/work
 COPY react-lib/wp-react-lib/package.json .
@@ -11,14 +10,13 @@ COPY react-lib/wp-react-lib/src src
 RUN npm run dist
 
 
-
 FROM node:12.22.12 AS ui
 WORKDIR /tmp/work
 COPY ui/package*.json ./
 COPY --from=reactlib /tmp/work/package.json ../react-lib/wp-react-lib/
 COPY --from=reactlib /tmp/work/dist ../react-lib/wp-react-lib/dist
-COPY --from=embedded /tmp/work/package.json ../../embedded/
-COPY --from=embedded /tmp/work/dist ../../embedded
+COPY --from=customizer /tmp/work/package.json ../../custom/ui-customizer/
+COPY --from=customizer /tmp/work/dist ../../custom/ui-customizer/dist
 RUN npm install &&  \
     npm rebuild node-sass
 COPY ui/public public
@@ -28,7 +26,7 @@ RUN \
   REACT_APP_GA_CODE='#REACT_APP_GA_CODE#' \
   REACT_APP_DEFAULT_LOCALE='#REACT_APP_DEFAULT_LOCALE#' \
   REACT_APP_THEME="$REACT_APP_THEME" \
-  REACT_APP_TITLE='Tobacco Control Data Initiative' \
+  REACT_APP_TITLE='Data VIZ UI' \
   REACT_APP_USE_HASH_LINKS='#REACT_APP_USE_HASH_LINKS#' \
   REACT_APP_UTIL_API='/api/utils' \
   REACT_APP_WP_API='/wp/wp-json' \
@@ -42,6 +40,7 @@ CMD ["/bin/bash"]
 FROM nginx:stable-alpine
 COPY --from=ui /tmp/work/build /var/www/static
 COPY nginx.sh /usr/local/sbin/
+COPY nginx/nginx.conf /etc/nginx/conf.d/default.conf
 WORKDIR /var/www/static
 ENTRYPOINT ["/usr/local/sbin/nginx.sh"]
 CMD ["nginx", "-g", "daemon off;"]
