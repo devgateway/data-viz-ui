@@ -53,6 +53,7 @@ export const Model = {
     apiJoinAttribute: 'none',
     useCentroidPoint: true,
     patternDiscriminator: 'none',
+    patternDiscriminatorLabel: null,
     patterns: [],
     pointDimensionStyles: [],
     tooltip: "Value {value}",

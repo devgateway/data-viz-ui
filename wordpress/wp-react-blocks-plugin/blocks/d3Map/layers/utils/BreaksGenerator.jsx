@@ -48,7 +48,7 @@ const BreaksGenerator = ({onChangeProperty, breaks = [], defaultFillColor, defau
         let lessThanBreaks = breaks.filter(b => b.type == 'lessThan')
         const newBreaks = [...lessThanBreaks]
         newBreaks.splice(index, 1)
-        debugger;
+        
         if (newBreaks.length > 0) {
             graterThanBreaks[0].end = lessThanBreaks[newBreaks.length - 1].end
         }
@@ -61,14 +61,14 @@ const BreaksGenerator = ({onChangeProperty, breaks = [], defaultFillColor, defau
     }
 
     const updateGraterThan = (property, value) => {
-        debugger;
+        
         const graterThanBreak = breaks.filter(b => b.type == 'graterThan')[0]
         const lessThanBreaks = breaks.filter(b => b.type == 'lessThan')
         graterThanBreak[property] = value
         onChangeProperty("breaks", [...lessThanBreaks, graterThanBreak])
     }
 
-    debugger;
+    
     return <>
 
         <PanelRow>

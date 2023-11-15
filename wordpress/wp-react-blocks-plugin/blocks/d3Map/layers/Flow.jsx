@@ -256,7 +256,7 @@ export class DataLayerSetting extends Component {
         let selectedMeasureValue = ""
 
         if (app != 'csv') {
-            debugger;
+            
             const theMeasure = measures ? measures[0] : null
             const selectedMeasure = allMeasures && theMeasure ? allMeasures.filter(m => m.value == theMeasure)[0] : null
             if (selectedMeasure) {
@@ -271,7 +271,7 @@ export class DataLayerSetting extends Component {
                 }
             }
         }
-        debugger;
+        
         return ([<PanelBody initialOpen={false} title={"Data Source"}>
             <PanelRow>
                 <SelectControl

@@ -4,6 +4,7 @@ import * as d3 from 'd3' // d3 plugin
 import * as topojson from "topojson-client";
 import {Icon, Popup} from "semantic-ui-react";
 import {FormattedMessage} from "react-intl";
+import {symbol} from "prop-types";
 
 /*
   id: Date.now(),
@@ -73,7 +74,7 @@ const Breaks = ({breaks, isPoint}) => {
                 </div>)
             } else {
                 return (<div className={"break"}>
-                    <div className={`break-item ${isPoint ? 'point' : ''}`}
+                    <div className={`break-item ${symbol}`}
                          style={{
                              backgroundColor: b.color,
                              border: `1px solid ${b.borderColor}`,
@@ -118,7 +119,7 @@ const FlowLayerLegend = (props) => {
                 <div className={"legend-label"}>{name} ({measureLabel})</div>
             </div>
 
-            {(visible != false) && <Breaks breaks={breaks}></Breaks>}
+            {(visible != false) && <Breaks breaks={breaks} symbol={"arrow"}></Breaks>}
 
         </div>
     </div>
@@ -156,7 +157,13 @@ const DataPointsLayerLegend = (props) => {
                          borderColor: markBorderColor
                      }}>{visible != false && <>&#10003;</>}
                 </div>
-                <div className={"legend-label"}>{name} ({fieldLabel})</div>
+                <div className={"legend-label"}>{name} </div>
+            </div>
+            <div className={"legend"}>
+                <div className={"legend-item"}>
+                    <div className={"legend-label"}>{fieldLabel}</div>
+
+                </div>
             </div>
             {(pointStyleBy === "dimension" && visible != false) && <div className={"legend-breaks"}>
                 {dimensionOptions.map((d) => {
@@ -238,100 +245,99 @@ const DataLayerLegend = (props) => {
     }
 
 
-        const g = d3.select(`#data-${id}`)
-        const renderedPatterns = g.selectAll("defs").selectAll("pattern")
-        if (usePattern && renderedPatterns.size() > 0 && visible != false) {
-            debugger;
-            d3.select("#legend_" + id).select("svg").remove()
-            const patternsData = renderedPatterns.data()
-            const g = d3.select("#legend_" + id).append("svg")
-            const defs = g.append("defs")
-            defs.selectAll("pattern").remove()
-            defs.selectAll("pattern")
-                .data(patternsData).enter()
-                .append("pattern")
-                .attr('id', d => toId(d.key))
-                .attr('patternUnits', 'userSpaceOnUse')
-                .attr('width', 5)
-                .attr('height', 5)
-                .attr("x", 0).attr("y", 0)
-                .attr("patternTransform", d => `rotate(${!d.rotation ? 0 : d.rotation})`)
+    const g = d3.select(`#data-${id}`)
+    const renderedPatterns = g.selectAll("defs").selectAll("pattern")
+    if (usePattern && renderedPatterns.size() > 0 && visible != false) {
+        debugger;
+        d3.select("#legend_" + id).select("svg").remove()
+        const patternsData = renderedPatterns.data()
+        const g = d3.select("#legend_" + id).append("svg")
+        const defs = g.append("defs")
+        defs.selectAll("pattern").remove()
+        defs.selectAll("pattern")
+            .data(patternsData).enter()
+            .append("pattern")
+            .attr('id', d => toId(d.key))
+            .attr('patternUnits', 'userSpaceOnUse')
+            .attr('width', 5)
+            .attr('height', 5)
+            .attr("x", 0).attr("y", 0)
+            .attr("patternTransform", d => `rotate(${!d.rotation ? 0 : d.rotation})`)
 
-            patternsData.forEach(d => {
-                if (d.type === 'lines') {
-                    defs.select("#" + toId(d.key))
-                        .append("rect")
-                        .attr("x", 0)
-                        .attr('width', 1)
-                        .attr('height', 10)
-                        .attr("opacity", .75)
-                        .attr('fill', d.color)
-                }
-                if (d.type === 'squares') {
-                    defs.select("#" + toId(d.key))
-                        .append("rect")
-                        .attr('width', 3)
-                        .attr('height', 3)
-                        .attr('fill', d.color)
-                        .attr("opacity", 1)
-                        .attr("stroke-width", 1)
+        patternsData.forEach(d => {
+            if (d.type === 'lines') {
+                defs.select("#" + toId(d.key))
+                    .append("rect")
+                    .attr("x", 0)
+                    .attr('width', 1)
+                    .attr('height', 10)
+                    .attr("opacity", .75)
+                    .attr('fill', d.color)
+            }
+            if (d.type === 'squares') {
+                defs.select("#" + toId(d.key))
+                    .append("rect")
+                    .attr('width', 3)
+                    .attr('height', 3)
+                    .attr('fill', d.color)
+                    .attr("opacity", 1)
+                    .attr("stroke-width", 1)
 
-                }
-                if (d.type === 'dots') {
-                    defs.select("#" + toId(d.key))
-                        .append("circle")
-                        .attr("cx", 2)
-                        .attr("cy", 2)
-                        .attr('r', 2)
-                        .attr('fill', d.color)
-                        .attr("opacity", 1)
-                        .attr("stroke-width", 1)
+            }
+            if (d.type === 'dots') {
+                defs.select("#" + toId(d.key))
+                    .append("circle")
+                    .attr("cx", 2)
+                    .attr("cy", 2)
+                    .attr('r', 2)
+                    .attr('fill', d.color)
+                    .attr("opacity", 1)
+                    .attr("stroke-width", 1)
 
-                }
-                if (d.type === 'triangle') {
-                    defs.select("#" + toId(d.key))
-                        .append("polygon")
-                        .attr("points", "5,0 8,8 0,5")
-                        .attr('fill', d.color)
-                        .attr("opacity", 1)
-                        .attr("stroke-width", 1)
+            }
+            if (d.type === 'triangle') {
+                defs.select("#" + toId(d.key))
+                    .append("polygon")
+                    .attr("points", "5,0 8,8 0,5")
+                    .attr('fill', d.color)
+                    .attr("opacity", 1)
+                    .attr("stroke-width", 1)
 
-                }
+            }
+        })
+
+
+        g.attr("width", "150px")
+            .attr("height", "auto")
+
+        g.append("text")
+            .attr("class", "patterns-title")
+            .attr("y", 5)
+            .attr("x", 12)
+            .text(a => patternDiscriminatorLabel ? patternDiscriminatorLabel : patternDiscriminator)
+
+        g.selectAll(".legend-squares")
+            .data(patternsData)
+            .enter()
+            .append("rect")
+            .attr("width", 18)
+            .attr("height", 18)
+            .attr("y", (d, i) => (i * 22) + 25)
+            .attr("x", 20)
+            .attr("stroke", borderColor)
+            .attr("style", (d) => {
+                return "none;fill:url(#" + toId(d.key) + ");"
             })
 
-
-            g.attr("width", "150px")
-                .attr("height", "auto")
-
-            g.append("text")
-                .attr("class", "patterns-title")
-                .attr("y", 5)
-                .attr("x", 12)
-                .text(a => patternDiscriminatorLabel ? patternDiscriminatorLabel : patternDiscriminator)
-
-            g.selectAll(".legend-squares")
-                .data(patternsData)
-                .enter()
-                .append("rect")
-                .attr("width", 18)
-                .attr("height", 18)
-                .attr("y", (d, i) => (i * 22) + 25)
-                .attr("x", 20)
-                .attr("stroke", borderColor)
-                .attr("style", (d) => {
-                    return "none;fill:url(#" + toId(d.key) + ");"
-                })
-
-            g.selectAll(".patterns-labels")
-                .data(patternsData)
-                .enter()
-                .append("text")
-                .attr("class", "patterns-labels")
-                .attr("y", (d, i) => (i * 22) + 25)
-                .attr("x", 40)
-                .text(d => d.key)
-        }
-
+        g.selectAll(".patterns-labels")
+            .data(patternsData)
+            .enter()
+            .append("text")
+            .attr("class", "patterns-labels")
+            .attr("y", (d, i) => (i * 22) + 25)
+            .attr("x", 40)
+            .text(d => d.key)
+    }
 
 
     return <div className={"legend"} id={"legend_" + id}>
@@ -360,7 +366,7 @@ const DataLayerLegend = (props) => {
                     {useCentroidPoint && <div className={"legend-breaks"}>
                         <div className={"break-item"}>{measureLabel}</div>
                     </div>}
-                    <Breaks isPoint={useCentroidPoint} breaks={breaks} visible={visible}></Breaks>
+                    <Breaks symbol={useCentroidPoint ? "point" : 'square'} breaks={breaks} visible={visible}></Breaks>
                 </div>
 
             }
@@ -375,7 +381,7 @@ const Legends = (props) => {
         {layers.map(l => {
             return <div>
                 {l.type == "base" && <BaseLayerLegend {...l} onItemClick={onItemClick}/>}
-                {l.type == "data" && <DataLayerLegend  divRef={divRef} {...l} onItemClick={onItemClick}/>}
+                {l.type == "data" && <DataLayerLegend divRef={divRef} {...l} onItemClick={onItemClick}/>}
                 {l.type == "dataPoints" && <DataPointsLayerLegend {...l} onItemClick={onItemClick}/>}
                 {l.type == "flow" && <FlowLayerLegend {...l} onItemClick={onItemClick}/>}
             </div>

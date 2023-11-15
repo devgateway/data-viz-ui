@@ -223,7 +223,7 @@ export class DataLayerSetting extends Component {
         const cats = dimension2 && allCategories ? allCategories.filter(c => c.type.toUpperCase() == dimension2.toUpperCase()) : []
         const items = cats.length > 0 ? cats[0].items : []
         const dimensionValues = items.map(i => i.value)
-        debugger
+
         return ([<PanelBody initialOpen={false} title={"Data Source"}>
             <PanelRow>
                 <SelectControl
