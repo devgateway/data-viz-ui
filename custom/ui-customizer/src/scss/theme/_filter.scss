@@ -1,0 +1,101 @@
+.filter-container {
+    margin-bottom: 0em;
+    .visible.menu.transition {
+        z-index: 1001;
+        padding-top: 0.2em;
+    }
+    .wp-block-columns {
+        margin-bottom: 1em;
+    }
+}
+
+.filter-container.wp-block-columns.has-background {
+    padding: 1em;
+    padding-bottom: 0em;
+}
+
+.filter {
+    .dropdown {
+        min-width: 260px;
+        min-height: 42px;
+        height: 42px !important;
+    }
+    .button {
+        width: 100%;
+        height: auto;
+    }
+    // .ui.labeled.icon.button.left {
+    //     padding-left: 0em!important;
+    // }
+}
+
+.dropdown-popup {
+  border-radius: 0 0 0.3em 0.3em !important;
+  padding: 0 0 0 0 !important;
+  min-width: 12.2em !important
+}
+
+.dropdown-search {
+  padding: 0.4em;
+  width: 100% !important;
+}
+
+.dropdown-selection {
+  font-size: 0.7em !important;
+  margin: 0.2em 0.6em;
+  width: 100%
+}
+
+.dropdown-options {
+  margin: 0.2em 0.5em;
+}
+
+.dropdown-options-title {
+  margin-bottom: 0.2em;
+}
+
+.dropdown-options-list {
+  margin-top: 0 !important;
+  max-height: 7.6em;
+  overflow: auto;
+}
+
+.dropdown-options-option {
+  font-size: 0.7em !important;
+}
+
+.dropdown-selection-none {
+  color: #128d5e;
+  cursor: pointer;
+}
+
+.dropdown-popup.ui.bottom.left.popup:before {
+  display: none;
+}
+
+.dropdown-button {
+  background-color: #768798 !important;
+  color: #ffffff !important;
+  font-size: 0.8em !important;
+  height: 42px !important;
+  padding: 0 !important;
+  text-align: left !important;
+}
+
+.dropdown-apply {
+  background: #128d5e !important;
+  color: #ffffff !important;
+  font-size: 0.7em !important;
+  margin: 0 0.6em 0.6em 0.6em !important;
+}
+
+.separator {
+  color: #b5b5b5;
+  font-weight: 300;
+  padding-left: 1em;
+  padding-right: 1em;
+}
+
+[data-tooltip]:after{
+  font-size:.78571429rem !important;
+}

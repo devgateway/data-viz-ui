@@ -1,0 +1,419 @@
+/* 3 Less.js Mixin's for making 3 concentric semi-transparent circles */
+/* The primary circle with four sizes (small, normal, medium, large) */
+
+.leaflet-control.leaflet-bar:not(.leaflet-control-zoom) {
+    background-color: #ffffff;
+    padding: 1em;
+    margin-bottom: 2em;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    margin-bottom: 0.6em;
+}
+
+.square {
+    width: 15px;
+    height: 15px;
+    margin-right: 8px;
+    display: inline-block;
+}
+
+.map-adm-icon {
+    color: #222;
+    font-weight: bold;
+    text-align: center;
+}
+
+.map-circle {
+    background: #ff7777;
+    color: #fff;
+    font-weight: bold;
+    text-align: center;
+    text-shadow: 0 0 3px #003;
+    border-radius: 50%;
+    -moz-border-radius: 50%;
+    line-height: 20px;
+    width: 22px;
+    margin-left: 19px;
+    line-height: 22px;
+    &:before {
+        background: rgba(205, 95, 95, 0.25);
+        content: ".";
+        z-index: -1;
+        border-radius: 50%;
+        -moz-border-radius: 50%;
+        position: absolute;
+        margin-left: 0;
+        left: 0px;
+        top: -3px;
+        line-height: 26px;
+        width: 28px;
+        margin-left: 16px;
+    }
+    &:after {
+        background: rgba(205, 95, 95, 0.1);
+        content: ".";
+        z-index: -3;
+        border-radius: 50%;
+        -moz-border-radius: 50%;
+        position: absolute;
+        display: inline-block;
+        margin-left: 0;
+        left: 0px;
+        top: -5px;
+        line-height: 32px;
+        width: 34px;
+        margin-left: 13px;
+    }
+}
+
+.legend-sample {
+    .map-circle {
+        &:before {
+            display: none;
+        }
+        &:after {
+            display: none;
+        }
+    }
+}
+
+.map-circle.smaller {
+    line-height: 12px;
+    width: 14px;
+    margin-left: 23px;
+    line-height: 14px;
+    &:before {
+        margin-left: 0;
+        left: 0px;
+        top: -3px;
+        line-height: 18px;
+        width: 20px;
+        margin-left: 20px;
+        line-height: 20px;
+    }
+    &:after {
+        margin-left: 0;
+        left: 0px;
+        top: -5px;
+        width: 26px;
+        margin-left: 17px;
+        line-height: 24px;
+    }
+}
+
+.map-circle.medium {
+    line-height: 24px;
+    width: 26px;
+    margin-left: 17px;
+    &:before {
+        margin-left: 0;
+        left: 0px;
+        top: -3px;
+        line-height: 30px;
+        width: 32px;
+        margin-left: 14px;
+    }
+    &:after {
+        margin-left: 0;
+        left: 0px;
+        top: -5px;
+        line-height: 36px;
+        width: 38px;
+        margin-left: 11px;
+    }
+}
+
+.map-circle.large {
+    line-height: 38px;
+    width: 40px;
+    margin-left: 10px;
+    &:before {
+        margin-left: 0;
+        left: 0px;
+        top: -3px;
+        line-height: 44px;
+        width: 46px;
+        margin-left: 7px;
+    }
+    &:after {
+        margin-left: 0;
+        left: 0px;
+        top: -5px;
+        line-height: 50px;
+        width: 52px;
+        margin-left: 4px;
+    }
+}
+
+.map-circle.invert {
+    border-color: #ff7777;
+    background: #cd5f5f;
+}
+
+.map-circle-label {
+    font-size: 0.8em;
+    background: rgba(255, 255, 255, 0.5);
+    padding: 1px;
+    border-radius: 2px;
+}
+
+.view-more {
+    background-color: #ffffff;
+    border: none;
+    font-weight: bold;
+    height: auto;
+    margin-bottom: 10px;
+    outline: none;
+    padding: 10px;
+    text-align: center;
+    width: auto !important;
+    a,
+    a:hover {
+        color: #2789d9;
+        cursor: pointer;
+        text-decoration: underline;
+        width: auto !important;
+    }
+}
+
+.leaflet-touch .leaflet-bar {
+    border: none;
+}
+
+.map-control {
+    top: 65px;
+    a {
+        cursor: pointer;
+    }
+    img {
+        height: 26px;
+        width: 26px;
+        background: white;
+        border-radius: 4px;
+    }
+}
+.legend {
+    background-color: #ffffff;
+    color: #304f69;
+    line-height: 140%;
+    padding: 0.5em 1em 1.1em 1em;
+    .separator {
+        color: #b5b5b5;
+        font-weight: 300;
+        padding-left: 1em;
+        padding-right: 1em;
+    }
+    .circle {
+        border-radius: 50%;
+        width: 15px;
+        height: 15px;
+        margin-right: 8px;
+        background-color: none;
+        display: inline-block;
+    }
+    .square {
+        width: 15px;
+        height: 15px;
+        margin-right: 8px;
+        display: inline-block;
+    }
+    .circle.association {
+        background-color: #dc9456 !important;
+    }
+    .circle.male {
+        background-color: #509cdc !important;
+    }
+    .circle.female {
+        background-color: #db4f4f !important;
+    }
+    .circle.male.cluster {
+        background-color: #4c9aff !important;
+    }
+    .circle.female.cluster {
+        background-color: #ffab00 !important;
+    }
+    .circle.total {
+        background-color: #68945c !important;
+    }
+}
+
+.leaflet-popup-content-wrapper {
+    border-radius: 0px !important;
+}
+
+.farm-location-popup .farm-location-popup-title {
+    color: #005ce7;
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-bottom: 0px;
+}
+
+.farm-location-popup .farm-location-popup-list {
+    font-style: italic;
+}
+
+.ui.labeled.icon.button {
+    padding-bottom: 1em;
+    padding-left: 2em !important;
+    padding-right: 1em !important;
+    padding-top: 1em;
+    border: 1px solid transparent;
+    &:hover {
+        background-color: #cccccc !important;
+    }
+}
+
+.reset-filters {
+    margin-right: 9em;
+    margin-top: 0.8em;
+    .ui.icon.left.labeled.button {
+        background-color: #e0e0e0;
+        color: #a95313 !important;
+        font-size: 0.8em !important;
+        padding: 0.8em !important;
+    }
+    .ui.labeled.icon.button > .icon {
+        background-color: transparent !important;
+        padding-left: 2em !important;
+    }
+}
+
+.map-filters {
+    .ui.labeled.icon.button > .icon {
+        background-color: transparent;
+        box-shadow: none;
+        padding-left: 0.5em;
+        font-size: 0.6em;
+        opacity: 1;
+    }
+    padding: 1em 0.8em !important;
+    border-radius: 0.4em 0.4em 0em 0em;
+    .wp-block-column:not(:first-child) {
+        margin-left: 0.1em;
+    }
+    .dropdown {
+        background-color: #768798 !important;
+        color: #ffffff !important;
+        padding-left: 0.4em !important;
+        padding-bottom: 4px !important;
+        padding-top: 4px !important;
+        .text {
+            color: #ffffff;
+            font-size: 0.8em !important;
+            margin: 0.6em 0 0 0 !important;
+        }
+        .item .text {
+            color: #000000;
+            font-size: 0.8em !important;
+        }
+    }
+    .visible.menu.transition {
+        border: none;
+        margin-top: 5px !important;
+        position: absolute;
+        padding: 10px;
+        z-index: 1001;
+    }
+    .ui.label {
+        border-radius: 0.4em !important;
+    }
+}
+
+.map-wrapper {
+    border-top: none;
+    border-radius: 0em 0em 0.4em 0.4em;
+    .leaflet-container {
+        border-left: 1px solid #e6eaee;
+        border-right: 1px solid #e6eaee;
+    }
+}
+
+.map-separator {
+    margin-top: 0.4em;
+}
+
+.cluster-marker {
+    background-clip: padding-box;
+    border-radius: 20px;
+}
+
+.cluster-marker div {
+    width: 30px;
+    height: 30px;
+    margin-left: 5px;
+    margin-top: 5px;
+    text-align: center;
+    border-radius: 15px;
+    font-weight: bold;
+}
+
+.cluster-marker span {
+    line-height: 30px;
+}
+
+.female-farm-group-marker-legend, .female-farm-group-marker div {
+    background-color: #ffab00;
+}
+
+.male-farm-group-marker-legend, .male-farm-group-marker div {
+    background-color: #4c9aff;
+}
+
+.female-farm-association-group-marker-legend, .female-farm-association-group-marker div {
+    background-color: #e19702;
+}
+
+.male-farm-association-group-marker-legend, .male-farm-association-group-marker div {
+    background-color: #4267a4;
+}
+
+.female-individual-farm-group-marker-legend, .female-individual-farm-group-marker div {
+    background-color: #ffab00;
+}
+
+.male-individual-farm-group-marker-legend, .male-individual-farm-group-marker div {
+    background-color: #4c9aff;
+}
+
+.adm-name div {
+    width: 90px;
+    text-align: center;
+}
+
+.adm-name span {
+    background-color: #ffffff;
+    padding: 0.1em 0.4em;
+}
+
+.global-production-map-legend {
+    background-color: #FFFFFF;
+    font-size: 0.7em;
+    padding: 0.5em;
+    table, th, td {
+        border: 0.2em solid #FFFFFF;
+    }
+    td {
+        padding: 0.1em 0.4em;
+    }
+    tr:nth-child(1) td:nth-child(1) {
+        background-color: #D9DDD9;
+        padding: 0.2em;
+    }
+    tr:nth-child(1) td:nth-child(3) {
+        background-color: #C2E699;
+        padding: 0.2em;
+    }
+    tr:nth-child(2) td:nth-child(1) {
+        background-color: #A95313;
+    }
+    tr:nth-child(2) td:nth-child(3) {
+        background-color: #78C679;
+    }
+    tr:nth-child(3) td:nth-child(1) {
+        background-color: #FFFFCC;
+    }
+    tr:nth-child(3) td:nth-child(3) {
+        background-color: #238443;
+    }
+}
