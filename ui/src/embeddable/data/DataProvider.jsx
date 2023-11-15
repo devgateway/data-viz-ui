@@ -48,7 +48,6 @@ class DataProvider extends React.Component {
                     params.v = (Math.random() + 1).toString(36).substring(7)
                 }
                 this.setState({showLoading: false})
-                debugger;
                 this.props.onLoadData({app, source, store, params, group})
                 setTimeout(this.checkLoadingTime, 100);
             }
