@@ -205,7 +205,7 @@ class DataLayer extends BaseLayer {
             })
 
 
-            onLayerCreated(id,patternsData)
+            onLayerCreated(id, patternsData)
 
             if (!useCentroidPoint) {
                 this.g.selectAll("path")
@@ -218,7 +218,9 @@ class DataLayer extends BaseLayer {
                     .attr("stroke", borderColor)
                     .attr("id", "state-borders")
                     .attr("d", path).on("mouseenter", (d) => {
-                    this.showToolTip(tooltip, getTooltipVariables(d), brStyles.getColor(d.properties._value))
+                    if (d.properties._value) {
+                        this.showToolTip(tooltip, getTooltipVariables(d), brStyles.getColor(d.properties._value))
+                    }
                 })
                     .on("mouseleave", (d) => {
                         this.hiddenToolTip()
@@ -291,7 +293,9 @@ class DataLayer extends BaseLayer {
                     })
                     //.attr("transform", this.props.transform)
                     .on("mouseenter", (d) => {
+                        debugger;
                         if (d.properties._value) {
+
                             const variables = {
                                 ...d.properties, meta: {
                                     [apiJoinAttribute]: d.properties.meta ? d.properties.meta.value : '', ...d.properties.meta,
@@ -401,7 +405,6 @@ class DataLayer extends BaseLayer {
             });
         }
     }
-
 
 
     componentDidUpdate(prevProps, prevState, snapshot) {
