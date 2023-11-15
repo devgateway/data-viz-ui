@@ -7,6 +7,7 @@ import {parse} from "../utils/parseUtils";
 import * as d3 from "d3";
 import {injectIntl} from "react-intl";
 
+import BreaksStyles from "./BreaksStyles.js";
 
 const toId = (key) => {
     //replace blank space by underscore
@@ -75,6 +76,14 @@ class DataLayer extends BaseLayer {
 
         } = this.props
 
+
+        const brStyles = new BreaksStyles({
+            breaks: breaks,
+            defaultFillColor: markFillColor,
+            defaultBorderColor: markBorderColor,
+            defaultSize: markSizeScale
+        })
+
         if (this.gRef && this.gRef.current) {
             this.g = d3.select(this.gRef.current)
             let numberFormat = {
@@ -83,31 +92,6 @@ class DataLayer extends BaseLayer {
                 currency: format.currency,
                 minimumFractionDigits: parseInt(format.minimumFractionDigits),
                 maximumFractionDigits: parseInt(format.maximumFractionDigits)
-            }
-            const sizeScale = d3.scaleThreshold()
-                .domain(breaks.map(d => d.end))
-                .range(breaks.map(d => d.size));
-
-            const colorScale = d3.scaleThreshold()
-                .domain(breaks.map(d => d.end))
-                .range(breaks.map(d => d.color));
-
-            let getSize = (value) => {
-                if (breaks.length > 0 && useBreaks) {
-                    return markSizeScale + sizeScale(value)
-                }
-                return markSizeScale
-            }
-
-            let getColor = (value, isMarker) => {
-                if (breaks.length > 0 && useBreaks) {
-                    if (value > Math.max(...breaks.map(d => parseInt(d.end)))) {
-                        return isMarker ? markFillColor : fillColor
-                    } else {
-                        return colorScale(value)
-                    }
-                }
-                return isMarker ? markFillColor : fillColor
             }
 
             const filteredData = json.features.filter(f => f.properties._value != null)
@@ -221,18 +205,20 @@ class DataLayer extends BaseLayer {
             })
 
 
+            onLayerCreated(id,patternsData)
+
             if (!useCentroidPoint) {
                 this.g.selectAll("path")
                     .attr("fill", d => {
                         if (!d || !d.properties || !d.properties._value) {
                             return fillColor
                         }
-                        return getColor(d.properties._value)
+                        return brStyles.getColor(d.properties._value)
                     })
                     .attr("stroke", borderColor)
                     .attr("id", "state-borders")
                     .attr("d", path).on("mouseenter", (d) => {
-                    this.showToolTip(tooltip, getTooltipVariables(d), getColor(d.properties._value))
+                    this.showToolTip(tooltip, getTooltipVariables(d), brStyles.getColor(d.properties._value))
                 })
                     .on("mouseleave", (d) => {
                         this.hiddenToolTip()
@@ -244,8 +230,6 @@ class DataLayer extends BaseLayer {
                 this.createLabels(json)
 
             }
-
-
             if (usePattern && json && json.features) {
 
                 json.features.forEach(d => {
@@ -273,7 +257,7 @@ class DataLayer extends BaseLayer {
                                         return "none;fill:url(#" + toId(p) + ");"
                                     })
                                     .on("mouseenter", () => {
-                                        this.showToolTip(tooltip, getTooltipVariables(d), getColor(d.properties._value))
+                                        this.showToolTip(tooltip, getTooltipVariables(d), brStyles.getColor(d.properties._value))
                                     }).on("mousemove", (d) => {
                                     this.moveToolTip()
                                 }).on("mouseleave", (d) => {
@@ -289,15 +273,13 @@ class DataLayer extends BaseLayer {
 
 
             }
-
-
             if (useCentroidPoint) {
                 this.createLabels(json)
                 this.g.selectAll(".point")
                     .data(filteredData)
                     .enter()
                     .append("circle")
-                    .attr("fill", d => getColor(d.properties._value, true))
+                    .attr("fill", d => brStyles.getColor(d.properties._value, true))
                     .attr("stroke", markBorderColor)
                     .attr("class", "point")
                     .attr("stroke-width", 2)
@@ -305,7 +287,7 @@ class DataLayer extends BaseLayer {
                     .attr("cx", d => path.centroid(d)[0])
                     .attr("cy", d => path.centroid(d)[1])
                     .attr('r', d => {
-                        return getSize(d.properties._value) * 1 / k
+                        return brStyles.getSize(d.properties._value) * 1 / k
                     })
                     //.attr("transform", this.props.transform)
                     .on("mouseenter", (d) => {
@@ -316,7 +298,7 @@ class DataLayer extends BaseLayer {
                                     value: d.properties._value
                                 }
                             }
-                            this.showToolTip(tooltip, variables, getColor(d.properties._value))
+                            this.showToolTip(tooltip, variables, brStyles.getColor(d.properties._value))
                         }
                     })
                     .on("mouseleave", (d) => {
@@ -348,7 +330,7 @@ class DataLayer extends BaseLayer {
 
     create() {
 
-        console.log("create")
+
         const {
             app,
             name,
@@ -370,19 +352,14 @@ class DataLayer extends BaseLayer {
 
         if (file != "none") {
             this.loadJSON(file).then(json => {
-
                 const features = json.features.map(d => {
-
                     const joinValue = d.properties[featureJoinAttribute]
-
                     if (app != 'csv' && data && data.children) {
                         const values = data.children.filter(d => d.value.indexOf(joinValue) > -1)
                         if (values.length > 0) {
-
                             const measureValue = (values[0][measures[0]])
                             d.properties.meta = values[0]
                             d.properties._value = measureValue
-
                             if (patternDiscriminator && patternDiscriminator != 'none') {
                                 const patternsValues = values[0] && values[0].children ? values[0].children.filter(f => f.type == patternDiscriminator).map(d => d.value) : []
                                 /*
@@ -425,9 +402,10 @@ class DataLayer extends BaseLayer {
         }
     }
 
+
+
     componentDidUpdate(prevProps, prevState, snapshot) {
         const {projection} = this.props
-
         this.create()
     }
 

@@ -27,6 +27,7 @@ const MapWrapper = (props) => {
             intl
         } = props
 
+
         const [layers, setLayers] = useState(parse(dataLayers))
         const ref = useRef(null);
         const zoomRef = useRef(null);
@@ -49,6 +50,11 @@ const MapWrapper = (props) => {
         }
 
 
+        const [patterns, setPatterns] = useState({})
+
+        const onLayerCreated = (id, patterns) => {
+           // setPatterns({[id]: patterns})
+        }
 
 
         return (
@@ -65,7 +71,8 @@ const MapWrapper = (props) => {
                                                   key={i} {...layer} />
                             }
                             if (layer.type === 'data') {
-                                return <DataLayer transform={transform} intl={intl} group={group} zoom={zoomRef}
+                                return <DataLayer onLayerCreated={onLayerCreated} transform={transform} intl={intl}
+                                                  group={group} zoom={zoomRef}
                                                   unique={unique}
                                                   key={i} {...layer} />
                             }
@@ -81,12 +88,18 @@ const MapWrapper = (props) => {
                             }
 
                         })}
+
+
                     </Map>
 
 
-                        <ZoomControl rootationEmabled={parse(rotationEnabled, editing)} zoomEnabled={parse(zoomEnabled, editing)} onZoomed={setTransform} width={width} height={height} ref={zoomRef} group={group}
-                                     editing={editing}/>
-                    <Legends layers={layers} onItemClick={toggleLayerView}></Legends>
+                    <Legends patterns={patterns} layers={layers} onItemClick={toggleLayerView}></Legends>
+
+                    <ZoomControl rootationEmabled={parse(rotationEnabled, editing)}
+                                 zoomEnabled={parse(zoomEnabled, editing)} onZoomed={setTransform} width={width}
+                                 height={height} ref={zoomRef} group={group}
+                                 editing={editing}/>
+
 
                 </ProjectedContainer>
             </div>

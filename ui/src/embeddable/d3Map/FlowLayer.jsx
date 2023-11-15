@@ -109,7 +109,7 @@ class DataLayer extends BaseLayer {
                         } // Change these data to see ho the great circle reacts
                         //d1 is origin
                         //d2 is destination
-                        debugger;
+                        
                         this.g.select("defs")
                             .append("marker")
                             .attr("id", "arrow" + id)
@@ -138,11 +138,11 @@ class DataLayer extends BaseLayer {
                             .style("cursor", "pointer")
                             .style("stroke-dasharray", "0")
                             .style("stroke", d => {
-                                debugger;
+                                
                                 return brStyles.getColor(value)
                             })
                             .style("stroke-width", d => {
-                                debugger;
+                                
                                 return brStyles.getSize(value)
                             })
                             .attr("marker-end", "url(#arrow" + id + ")")
@@ -159,7 +159,7 @@ class DataLayer extends BaseLayer {
 
 
                                 g.selectAll(".start-point.circle_" + originID).transition().duration("200").style("opacity", 1)
-                                debugger;
+                                
                                 if (value) {
                                     const origin = {}
                                     const target = {}
