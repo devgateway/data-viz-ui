@@ -124,6 +124,7 @@ if (is_admin()) {
         $_SESSION["page_locale"] = wpm_get_language();
         $_SESSION["user_locale"] = wpm_get_user_language();
     }
+    session_write_close();
 }
 include '_admin_styles.php';
 include '_mime_types.php';

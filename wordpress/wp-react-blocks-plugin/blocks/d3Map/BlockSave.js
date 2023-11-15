@@ -9,7 +9,10 @@ const SaveComponent = (props) => {
             width,
             group,
             backGroundColor,
-            mapPosition
+            mapPosition,
+            projection,
+            zoomEnabled,
+            rotationEnabled
         }
     } = props;
 
@@ -24,9 +27,12 @@ const SaveComponent = (props) => {
              data-height={height}
              data-width={width}
              data-group={group}
+             data-projection={projection}
              data-back-ground-color={backGroundColor}
              data-map-position={encodeURIComponent(JSON.stringify(mapPosition))}
              data-component={"newMap"}
+             data-zoom-enabled={zoomEnabled}
+             data-rotation-enabled={rotationEnabled}
              data-layers={encodeURIComponent(JSON.stringify(layers))}
              >
         </div>

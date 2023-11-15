@@ -23,18 +23,18 @@ class BlockEdit extends BlockEditWithAPIMetadata {
         this.onFileTypeChanged = this.onFileTypeChanged.bind(this)
         this.getLayerColor = this.getLayerColor.bind(this)
         this.setLayerColor = this.setLayerColor.bind(this)
-        this.toggleLayer = this.toggleLayer.bind(this)   
+        this.toggleLayer = this.toggleLayer.bind(this)
         this.getValue = this.getValue.bind(this)
-        this.setValue = this.setValue.bind(this) 
-        this.updateLocationsAndCSV = this.updateLocationsAndCSV.bind(this)    
+        this.setValue = this.setValue.bind(this)
+        this.updateLocationsAndCSV = this.updateLocationsAndCSV.bind(this)
         this.extractFeatures = this.extractFeatures.bind(this)
     }
 
     componentDidMount() {
         super.componentDidMount();
-        this.getTaxonomies()        
+        this.getTaxonomies()
         const {
-            attributes: {                
+            attributes: {
                 mainLayerId
             },
         } = this.props;
@@ -42,29 +42,29 @@ class BlockEdit extends BlockEditWithAPIMetadata {
             this.getFileMetaData(this.props.attributes.mainLayerId)
         } else if (this.props.attributes.mapFile){
             this.getFile("/"+ this.props.attributes.mapFile)
-        }    
-      
-        this.getMap()
-        this.updateMapPosition();         
+        }
+
+        this.getMapFiles()
+        this.updateMapPosition();
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         const {attributes: {fileType}} = this.props;
         super.componentDidUpdate(prevProps, prevState, snapshot)
-        if (prevProps.attributes) {          
+        if (prevProps.attributes) {
             if (fileType != prevProps.attributes.fileType) {
                 this.getMapFiles()
-            }            
+            }
         }
     }
 
     shouldComponentUpdate(nextProps, nextState) {
         try {
             const currentPosition = JSON.parse(this.props.attributes.mapPosition)
-        const nextPosition = JSON.parse(nextProps.attributes.mapPosition)        
+        const nextPosition = JSON.parse(nextProps.attributes.mapPosition)
         if (currentPosition.x !== nextPosition.x ||
             currentPosition.y !== nextPosition.y ||
-            currentPosition.k !== nextPosition.k) {            
+            currentPosition.k !== nextPosition.k) {
             return false
         }
         } catch (error) {
@@ -77,7 +77,7 @@ class BlockEdit extends BlockEditWithAPIMetadata {
     getTaxonomies() {
         wp.apiFetch({
             path: '/wp/v2/taxonomies?per_page=100',
-        }).then(data => {           
+        }).then(data => {
             this.setState({
                 taxonomies: data,
             }, this.getTaxonomyValues(data));
@@ -87,7 +87,7 @@ class BlockEdit extends BlockEditWithAPIMetadata {
     getTaxonomyValues(taxonomies) {
         const typesList = []
         if (taxonomies) {
-            const txs = Object.keys(taxonomies)                
+            const txs = Object.keys(taxonomies)
             txs.forEach(t=> {
                 if (taxonomies[t].types.indexOf('attachment') != -1) {
                     typesList.push({
@@ -103,13 +103,13 @@ class BlockEdit extends BlockEditWithAPIMetadata {
             wp.apiFetch({
                 path: '/wp/v2/' + t.value + '?per_page=100',
             }).then(data => {
-                const newTaxonomyValues = [...this.state.taxonomyValues, ...data]                
+                const newTaxonomyValues = [...this.state.taxonomyValues, ...data]
                 this.setState({taxonomyValues: newTaxonomyValues});
             });
-        })      
+        })
     }
 
-    getMapFiles() {Files
+    getMapFiles() {
         const {
             attributes: {
              fileType,
@@ -123,12 +123,12 @@ class BlockEdit extends BlockEditWithAPIMetadata {
         }).then(json => {
             if (json) {
                 json.forEach(f => {
-                    mapFiles.push({value: f.id, label: f.title.rendered})                   
-                })  
-                
+                    mapFiles.push({value: f.id, label: f.title.rendered})
+                })
+
                 this.setState({mapFiles: mapFiles})
             }
-        });       
+        });
     }
 
     getFileMetaData(id) {
@@ -136,12 +136,12 @@ class BlockEdit extends BlockEditWithAPIMetadata {
         .then(response => response.json())
         .then(json => {
             if (json) {
-                this.getFile(json.source_url)                  
+                this.getFile(json.source_url)
             }
         });
     }
 
-    getFile(url) {        
+    getFile(url) {
         fetch(url)
         .then(response => response.json())
         .then(json => {
@@ -150,8 +150,8 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                    this.setState({layerData: json}, () => {
                      this.updateLocationsAndCSV(json)
                    })
-                  
-                }                
+
+                }
             }
         });
     }
@@ -159,45 +159,45 @@ class BlockEdit extends BlockEditWithAPIMetadata {
     taxonomyValueOptions() {
         const {taxonomyValues} = this.state
         const taxonomyValuesOptions = taxonomyValues && taxonomyValues.map(t => ({label: t.name, value: t.id, taxonomy: t.taxonomy}))
-        
-        return [{label: 'None', value: 'none', taxonomy: 'none'}, ...taxonomyValuesOptions] 
+
+        return [{label: 'None', value: 'none', taxonomy: 'none'}, ...taxonomyValuesOptions]
     }
 
     getCollectionField(data) {
         const topology = data ? data : this.state.layerData;
         if (topology && topology.objects) {
-            const fields = Object.keys(topology.objects)            
+            const fields = Object.keys(topology.objects)
             for (let index in fields) {
-                const field = fields[index]                
-                if (topology.objects[field].type == 'GeometryCollection') {                    
+                const field = fields[index]
+                if (topology.objects[field].type == 'GeometryCollection') {
                     return field
                 }
-            }           
+            }
         }
 
         return "collection"
     }
- 
-    mappingFieldOptions() {        
+
+    mappingFieldOptions() {
         const mappingFields = []
-        const features = this.extractFeatures()              
-        const geometry = features[0]          
+        const features = this.extractFeatures()
+        const geometry = features[0]
         if (geometry) {
             Object.keys(geometry.properties).map(k => {
                 mappingFields.push({value: k, label: k})
             })
-        }       
+        }
 
        return [{label: 'None', value: 'none'}, ...mappingFields]
     }
 
-    onFileTypeChanged(value) {       
+    onFileTypeChanged(value) {
         const {setAttributes} = this.props
         const taxonomyValues = this.taxonomyValueOptions()
         const taxonomyValue = taxonomyValues.filter(t => t.value == value)[0]
         setAttributes({fileType: value, taxonomy: taxonomyValue ? taxonomyValue.taxonomy : 'none'})
     }
-    
+
     extractFeatures() {
         const {layerData} = this.state;
         const collectionName = this.getCollectionField()
@@ -211,21 +211,21 @@ class BlockEdit extends BlockEditWithAPIMetadata {
     }
 
     updateLocationsAndCSV(layerData, field) {
-        const {setAttributes, attributes: {csv, mappingField}} = this.props;  
+        const {setAttributes, attributes: {csv, mappingField}} = this.props;
          const selectedField = field || mappingField
          const features = this.extractFeatures()
-         if (selectedField) {            
+         if (selectedField) {
             const locations = []
             features.forEach(g => {
                 if (g.properties && g.properties[selectedField]) {
                     const location = g.properties[selectedField]
-                    locations.push({ value: location, label: location })                                              
+                    locations.push({ value: location, label: location })
                 }
             })
 
             this.setState({ locations: locations })
-            
-            const csvFieldIsBlank = csv == null || csv.trim().length == 0 || csv.trim() == 'name,value'            
+
+            const csvFieldIsBlank = csv == null || csv.trim().length == 0 || csv.trim() == 'name,value'
             if (csvFieldIsBlank) {
                 let text = 'name,value\n'
                 locations.forEach(loc => {
@@ -233,9 +233,9 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                 })
                 setAttributes({ csv: text })
             }
-        }       
-    } 
-  
+        }
+    }
+
 
     updateMapPosition() {
         const {setAttributes} = this.props;
@@ -259,16 +259,16 @@ class BlockEdit extends BlockEditWithAPIMetadata {
          }
         } = this.props;
         if (enabledLayers) {
-            
-            const values = [...enabledLayers]     
+
+            const values = [...enabledLayers]
             if (value) {
-                values.push({id: itemId, index: 0})                                            
+                values.push({id: itemId, index: 0})
             } else {
-                const index = values.findIndex(l => l.id == itemId) 
+                const index = values.findIndex(l => l.id == itemId)
                 values.splice(index, 1)
-            }                                        
+            }
             setAttributes({enabledLayers: values})
-        }       
+        }
     }
 
     getLayerColor(value, field) {
@@ -281,21 +281,21 @@ class BlockEdit extends BlockEditWithAPIMetadata {
            const layer = enabledLayers.filter(l => l.id == value)[0]
            if (layer && layer[field]) {
             color = layer[field]
-           }           
+           }
         }
-        
+
         return decodeURIComponent(color)
     }
-    
+
     setLayerColor(value, field,color) {
         const {setAttributes, attributes: {
             enabledLayers
          }
      } = this.props;
         if (enabledLayers) {
-            const values = [...enabledLayers]  
-            const index = values.findIndex(l => l.id == value) 
-            values[index][field] = color ? encodeURIComponent(color) : encodeURIComponent('#f8f8f8')                                              
+            const values = [...enabledLayers]
+            const index = values.findIndex(l => l.id == value)
+            values[index][field] = color ? encodeURIComponent(color) : encodeURIComponent('#f8f8f8')
             setAttributes({enabledLayers: values})
         }
     }
@@ -312,14 +312,14 @@ class BlockEdit extends BlockEditWithAPIMetadata {
          }} = this.props;
 
          if (enabledLayers) {
-            const values = [...enabledLayers]  
-            const index = values.findIndex(l => l.id == id) 
+            const values = [...enabledLayers]
+            const index = values.findIndex(l => l.id == id)
             values[index][field] = value
             setAttributes({enabledLayers: values})
         }
     }
 
-    render() {        
+    render() {
         const {
             className, isSelected,
             toggleSelection, setAttributes, attributes: {
@@ -329,8 +329,8 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                 dimension2,
                 legendBreaks,
                 mainLayerId,
-                mappingField,                
-                filters,               
+                mappingField,
+                filters,
                 fileType,
                 mapCenter,
                 enabledLayers,
@@ -339,7 +339,8 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                 zoomLevelToShowPoints,
                 defaultPointColor,
                 zoomOnFilter,
-                zoomOnFilterField
+                zoomOnFilterField,
+                showShadingLayerLabels
             }
         } = this.props;
 
@@ -356,7 +357,7 @@ class BlockEdit extends BlockEditWithAPIMetadata {
         const divStyles = { height: height + 'px', width: '100%' };
 
         return ([isSelected && (<InspectorControls>
-            <Panel header={__("Map Configuration")}> 
+            <Panel header={__("Map Configuration")}>
             <PanelBody initialOpen={false} title={__("Map Type")}>
             <PanelRow>
             <SelectControl
@@ -368,27 +369,27 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                                 options={[{ label: 'Default', value: 'DEFAULT'}, { label: 'Points Map', value: 'POINTS_MAP' }]}
                             />
             </PanelRow>
-                </PanelBody>              
+                </PanelBody>
                 <PanelBody initialOpen={false} title={__("Data Source")}>
-                    <PanelBody initialOpen={true} title={__("Map Layers")}>                   
-                   <PanelRow>                        
-                     <SelectControl label={__("Layers Filter")} 
+                    <PanelBody initialOpen={true} title={__("Map Layers")}>
+                   <PanelRow>
+                     <SelectControl label={__("Layers Filter")}
                      options={this.taxonomyValueOptions()}
                             value={fileType}
                             onChange={this.onFileTypeChanged}
                             style={{width: "150px"}}
                        />
-                    </PanelRow> 
-                   
+                    </PanelRow>
+
                     {mapFiles && mapFiles.filter(f => f.value).map(file => {
                         return (<><PanelRow>
                             <ToggleControl
                                 label={file.label}
                                 checked={enabledLayers ? enabledLayers.findIndex(l => l.id == file.value) > -1 : false}
-                                onChange={(value) => {                                    
-                                    this.toggleLayer(file.value, value)                         
+                                onChange={(value) => {
+                                    this.toggleLayer(file.value, value)
                                 }}
-                                  />                                  
+                                  />
                                   </PanelRow>
                             {enabledLayers.findIndex(l => l.id == file.value) > -1 &&
                             <>
@@ -406,15 +407,15 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                                     ]}
                                 />
                             </PanelRow>
-                            <div style={{padding:"20px"}} >                                
+                            <div style={{padding:"20px"}} >
                         {<TextControl value={this.getValue(file.value, 'index')} label={__("Index")}
-                            onChange={(value) => {this.setValue(file.value, 'index', value)}} max={10} type="number" />}                            
-                        </div>                        
+                            onChange={(value) => {this.setValue(file.value, 'index', value)}} max={10} type="number" />}
+                        </div>
                         </>
                     }
                         </>)
-                    })}                     
-                   
+                    })}
+
                     <PanelRow>
                         <SelectControl
                             label={__('Layer Used for shading')}
@@ -428,11 +429,20 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                     </PanelRow>
                     <PanelRow>
                     <SelectControl
+                                label={__('Show Shading Layer Labels')}
+                                value={[showShadingLayerLabels]}
+                                onChange={(value) => {
+                                    setAttributes({ showShadingLayerLabels: value })
+                                }}
+                                options={[{ label: 'Only if admin unit has data', value: 'ifUnitHasData'}, {label: 'Do not show', value: 'doNotShow' }, {label: 'Show All', value: 'showAll' }]}/>
+                   </PanelRow>
+                    <PanelRow>
+                    <SelectControl
                             label={__('Mapping Field')}
                             value={[mappingField]}
-                            onChange={(value) => { 
+                            onChange={(value) => {
                             setAttributes({ mappingField: value, mapLabelField: value})
-                            this.updateLocationsAndCSV(this.state.layerData, value)                        
+                            this.updateLocationsAndCSV(this.state.layerData, value)
                         }}
                         options={this.mappingFieldOptions()}
                         />
@@ -446,9 +456,9 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                                 }}
                                 options={[{ label: 'Kenya', value: 'KEN'}, { label: 'Nigeria', value: 'NGA' }, { label: 'South Africa', value: 'ZAF' }, { label: 'West Africa', value: 'West Africa' }, { label: 'Africa', value: 'Africa' }, { label: 'Ethiopia', value: 'ETH'}, { label: 'Zambia', value: 'ZMB'},{ label: 'Democratic Republic of the Congo', value: 'DRC'}, { label: 'World', value: 'World'}]}
                             />
-                        </PanelRow> 
+                        </PanelRow>
                     </PanelBody>
-                        
+
                         <PanelBody initialOpen={true} title={__("Data")}>
                         <PanelRow>
                         <SelectControl
@@ -465,7 +475,7 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                         />
                     </PanelRow>
                         </PanelBody>
-                        
+
                 </PanelBody>
                 {app != 'csv' &&
                     <APIConfig
@@ -485,10 +495,10 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                 <Settings {...this.props} locations = {this.state.locations}> </Settings>
                 <LegendBreaks {...this.props} allMeasures={this.state.measures || []} app = {app}/>
                 <MapSymbols {...this.props} allMeasures={this.state.measures || []} app = {app} locations = {this.state.locations}/>
-                <Tooltips {...this.props} allMeasures={this.state.measures || []} app = {app} locations = {this.state.locations}></Tooltips>   
+                <Tooltips {...this.props} allMeasures={this.state.measures || []} app = {app} locations = {this.state.locations}></Tooltips>
                 {mapType == "POINTS_MAP" &&
                 <PanelBody title="Point Map Config">
-                      <PanelRow>
+                     <PanelRow>
                 <PanelColorSettings
                     title={__('Default Point Color')}
                     colorSettings={[
@@ -512,7 +522,7 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                             label={__('Aggregation Formula')}
                             value={[aggregationFormula]}
                             onChange={(value) => {
-                                setAttributes({ aggregationFormula: value })                                
+                                setAttributes({ aggregationFormula: value })
                             }}
                             options={[{label:'Count',value: 'COUNT'}, {label:'Sum',value: 'SUM'}]}
                         />
@@ -521,16 +531,17 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                     <TextControl value={zoomLevelToShowPoints} label={__("Zoom Level To Show Points")}
                                     onChange={value => setAttributes({ zoomLevelToShowPoints: value }) } type="number" />
                         </PanelRow>*/}
-                        
-                        <PanelRow>                
+
+                        <PanelRow>
                 <ToggleControl
                     label={__('Zoom on Filter')}
                     checked={zoomOnFilter}
                     onChange={() => setAttributes({ zoomOnFilter: !zoomOnFilter })}/>
             </PanelRow>
+
             {zoomOnFilter &&
                   <PanelRow>
-                            <TextControl                               
+                            <TextControl
                                 label={__('Zoom on filter data field')}
                                 value={zoomOnFilterField}
                                 onChange={(zoomOnFilterField) => setAttributes({ zoomOnFilterField })}
@@ -538,7 +549,7 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                         </PanelRow>
                         }
                 </PanelBody>
-              }         
+              }
             </Panel>
         </InspectorControls>),
 

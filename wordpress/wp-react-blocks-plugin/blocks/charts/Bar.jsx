@@ -8,6 +8,7 @@ import LineOverlay from "./LineOverlayConfig.jsx";
 import ConfidenceIntervalConfig from "./ConfidenceIntervalConfig.jsx"
 import Papa from 'papaparse'
 import GroupTotalSetting from "./GroupTotalSetting.jsx";
+import Sort from "./Sort.jsx";
 
 const BarOptions = (props) => {
     const {
@@ -49,7 +50,11 @@ const BarOptions = (props) => {
             groupTotalLabel,
             groupTotalFormat,
             groupTotalLabelOffset,
-            groupTotalOffset
+            groupTotalOffset,
+            enableGridX,
+            enableGridY,
+            sort,
+            sortReverse,
         }
     } = props;
 
@@ -114,15 +119,15 @@ const BarOptions = (props) => {
 
 
     let selectedMeasures = []
-
     if (allMeasures) {
         allMeasures.forEach(m => {
-            if (measures[m.value] && measures[app][m.value].selected) {
+            if (measures[app] && measures[app][m.value] && measures[app][m.value].selected) {
                 selectedMeasures.push(m.value)
             }
         })
     }
     const series = app == 'csv' ? getCSVSeries() : getSeries();
+
     return [<PanelBody initialOpen={false} title={__("Bar Options")}>
 
         <PanelBody initialOpen={false} title={__("Colors")}>
@@ -157,6 +162,9 @@ const BarOptions = (props) => {
                     onChange={(value) => setAttributes({reverse: (!reverse)})}/>
 
             </PanelRow>
+
+            {(app !== 'csv' && <Sort {...props}></Sort>)}
+
             {(app !== 'csv' && dimension1 != "none" && dimension2 == "none" && selectedMeasures.length > 0) &&
                 <PanelRow>
                     <ToggleControl
@@ -167,9 +175,15 @@ const BarOptions = (props) => {
             }
             <PanelRow>
                 <ToggleControl
-                    label={__("Show Grid Lines")}
-                    checked={showGrid}
-                    onChange={(showGrid) => setAttributes({showGrid})}/>
+                    label={__("Enable Y Grid Lines")}
+                    checked={enableGridY}
+                    onChange={() => setAttributes({enableGridY: !enableGridY})}/>
+            </PanelRow>
+            <PanelRow>
+                <ToggleControl
+                    label={__("Enable X Grid Lines")}
+                    checked={enableGridX}
+                    onChange={() => setAttributes({enableGridX: !enableGridX})}/>
             </PanelRow>
             {app !== 'csv' &&
                 <>
@@ -184,7 +198,7 @@ const BarOptions = (props) => {
                             <TextControl
                                 label={__('Overall Label')}
                                 value={overallLabel}
-                                onChange={(overallLabel) => setAttributes({ overallLabel })}
+                                onChange={(overallLabel) => setAttributes({overallLabel})}
                             />
                         </PanelRow>
                     }

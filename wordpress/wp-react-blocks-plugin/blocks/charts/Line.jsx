@@ -56,7 +56,7 @@ const LineOptions = (props) => {
             }
         })
     } else {
-        if (allMeasures) {           
+        if (allMeasures && measures && measures[app]) {
             const list = allMeasures.filter(measure => {
                 return (measures[app][measure.value] && measures[app][measure.value].selected)               
             }).map(m => {

@@ -47,10 +47,7 @@ registerBlockType(process.env.BLOCKS_NS+'/map',
                 type: "Array",
                 default: []
             },
-            type: {
-                type: 'string',
-                default: "map",
-            },
+
             csv: {
                 type: "String",
                 default: ""
@@ -118,7 +115,7 @@ registerBlockType(process.env.BLOCKS_NS+'/map',
             showTooltip:{
                 type:'Boolean',
                 default: true
-            }, 
+            },
             measureSelectorLabel: {
                 type: "String",
                 default: ""
@@ -130,11 +127,11 @@ registerBlockType(process.env.BLOCKS_NS+'/map',
             showOverallValue:{
                 type:'Boolean',
                 default: false
-            },	
+            },
             autoGenerateBreaks: {
                 type:'Boolean',
                 default: false
-            },	
+            },
             numberOfBreaks:{
                 type: 'Numeric',
                 default: 5
@@ -146,7 +143,7 @@ registerBlockType(process.env.BLOCKS_NS+'/map',
             showNoDataLabel: {
                 type:'Boolean',
                 default: false
-            },	
+            },
             group: {
                 type: 'String',
                 default: 'default',
@@ -157,27 +154,27 @@ registerBlockType(process.env.BLOCKS_NS+'/map',
             },
             tooltipTheme: {
                 type: 'String',
-                default: 'map-tooltip-dark',  
+                default: 'map-tooltip-dark',
             },
             labelFontColor: {
                 type: 'String',
-                default: encodeURIComponent("#595959"), 
+                default: encodeURIComponent("#595959"),
             },
             labelFontSize: {
                 type: 'Numeric',
-                default: 12, 
+                default: 12,
             },
             labelFontWeight: {
                 type: 'String',
-                default: 'normal', 
+                default: 'normal',
             },
             legendFontSize:{
                 type: 'Numeric',
-                default: 12, 
+                default: 12,
             },
             legendFontWeight:{
                 type: 'String',
-                default: 'normal', 
+                default: 'normal',
             },
             customTooltips: {
                 type: "Array",
@@ -197,23 +194,27 @@ registerBlockType(process.env.BLOCKS_NS+'/map',
             },
             tooltipFontSize:{
                 type: 'Numeric',
-                default: 14, 
+                default: 14,
             },
             showAdminUnitLabel: {
+                type: "String",
+                default: "ifUnitHasData"
+            },
+            showShadingLayerLabels: {
                 type: "String",
                 default: "showAll"
             },
             mapNoDataColor: {
                 type: 'String',
-                default: encodeURIComponent("#f8f8f8"), 
+                default: encodeURIComponent("#f8f8f8"),
             },
             mapBoundaryColor: {
                 type: 'String',
-                default: encodeURIComponent("#000"), 
+                default: encodeURIComponent("#000"),
             },
             mapFocusBoundaryColor: {
                 type: 'String',
-                default: encodeURIComponent("#000"), 
+                default: encodeURIComponent("#000"),
             },
             highlightedLocation:{
                 type: "String",
@@ -238,36 +239,40 @@ registerBlockType(process.env.BLOCKS_NS+'/map',
             mapPosition: {
                 type: 'String',
                 default: '{}'
-            },           
+            },
+            type: {
+                type: 'string',
+                default: "media",
+            },
             taxonomy: {
                 type: 'string',
                 default: "none",
-            }, 
+            },
             fileType: {
                 type: 'string',
                 default: "none",
-            },     
+            },
             panelStatus: {
                 type: "Object",
                 default: {}
-            },    
+            },
             pointLabelFormat:{
                 type: "String",
                 default: "%({value},2)"
-            },  
+            },
             pointLabelColor: {
                 type: 'String',
-                default: encodeURIComponent("#FFF"), 
+                default: encodeURIComponent("#FFF"),
             },
             defaultPointColor: {
                 type: 'String',
-                default: encodeURIComponent("#FFFF00"), 
+                default: encodeURIComponent("#FFFF00"),
             },
             mapType: {
                 type: 'String',
                 default: ""
             },
-           enableSummaryView: {
+            enableSummaryView: {
                 type:'Boolean',
                 default: false
             },
@@ -286,6 +291,18 @@ registerBlockType(process.env.BLOCKS_NS+'/map',
             zoomOnFilterField: {
                 type: 'String',
                 default: "name"
+            },
+            labelsExclusionList: {
+                type: 'String',
+                default: ""
+            },
+            noDataText: {
+                type: 'String',
+                default: "No Data"
+            },
+            customMeasureLabels: {
+                type: "Object",
+                default: {}
             }
         },
         edit: BlockEdit,

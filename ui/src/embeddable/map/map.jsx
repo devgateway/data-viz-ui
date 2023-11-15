@@ -1,6 +1,6 @@
 import {FormattedMessage, injectIntl} from 'react-intl'
 import * as d3 from 'd3' // d3 plugin
-import {Container, Grid, Icon, Popup} from 'semantic-ui-react';
+import {Container, Grid, Icon, Popup, Dimmer, Loader, Segment} from 'semantic-ui-react';
 import React from 'react'
 import * as topojson from 'topojson'
 import Legend from './legend'
@@ -23,7 +23,7 @@ const colorSchemes = {
     blues: ['#e6eeff', '#ccddff', '#b3ccff', '#99bbff', '#80aaff', '#6699ff', '#4d88ff', '#3377ff', '#1a66ff', '#0055ff']
 }
 
-class Map extends React.Component {    
+class Map extends React.Component {
     constructor(props) {
         super(props)
         this.mapContainer = React.createRef();
@@ -39,7 +39,7 @@ class Map extends React.Component {
         this.onZoomOut = this.onZoomOut.bind(this)
         this.onReset = this.onReset.bind(this)
 
-        this.onClick = this.onClick.bind(this)        
+        this.onClick = this.onClick.bind(this)
         this.showTooltip = this.showTooltip.bind(this)
         this.mousemove = this.mousemove.bind(this)
         this.mouseout = this.mouseout.bind(this)
@@ -50,7 +50,7 @@ class Map extends React.Component {
         this.getMapId = this.getMapId.bind(this)
         this.zoomed = this.zoomed.bind(this)
         this.zoomEnd = this.zoomEnd.bind(this)
-        this.drawPoints = this.drawPoints.bind(this)       
+        this.drawPoints = this.drawPoints.bind(this)
         this.extractFeatures = this.extractFeatures.bind(this)
         this.getLayers = this.getLayers.bind(this)
 
@@ -66,7 +66,7 @@ class Map extends React.Component {
             .center(props.center)  // centers map at given coordinates
             .translate([this.getWidth() / 2, this.getHeight() / 2])
         this.path = d3.geoPath().projection(this.projection)
-        this.zoom = d3.zoom().scaleExtent([1, 10])
+        this.zoom = d3.zoom().scaleExtent([1, 16])
             .on("zoom", this.zoomed)
             .on("end", this.zoomEnd);
 
@@ -74,11 +74,12 @@ class Map extends React.Component {
         this.state = {
             selectedMeasure: props.transformedData && props.transformedData.measures && props.transformedData.measures.length > 1 ? props.transformedData.measures[0] : null,
             generatedBreaks: [],
-            selectedPolygon: null
+            selectedPolygon: null,
+            layersLoading: false
         };
     }
 
-    componentDidMount() {          
+    componentDidMount() {
         this.loadLayers()
         this.tooltip = d3.select("body")
             .append("div")
@@ -89,56 +90,62 @@ class Map extends React.Component {
     componentDidCatch(error, info) {
         console.log(error)
     }
-    
-    loadLayers() {        
-        const { source, mainLayerId, enabledLayers} = this.props;  
+
+    loadLayers() {
+        const {source, mainLayerId, enabledLayers} = this.props;
         this.setState({
-            'layers': []
-        })     
+            'layers': [],
+            layersLoading: true
+        })
         if (enabledLayers && enabledLayers.length > 0) {
             const metadataFuncs = []
             enabledLayers.forEach((l) => {
-                metadataFuncs.push(new Promise((resolve, reject) => {d3.json(process.env.REACT_APP_WP_API + "/wp/v2/media/" + l.id).then((data) => {
-                    resolve({id: l.id, url: data.source_url, index: l.index})
-                }).catch(function(error) {
-                    resolve({id: l.id, url: null, index: l.index})
-                 });
-            
-            }))
+                metadataFuncs.push(new Promise((resolve, reject) => {
+                    d3.json(process.env.REACT_APP_WP_API + "/wp/v2/media/" + l.id).then((data) => {
+                        resolve({id: l.id, url: data.source_url, index: l.index})
+                    }).catch(function (error) {
+                        resolve({id: l.id, url: null, index: l.index})
+                    });
+
+                }))
             })
-    
-            Promise.all(metadataFuncs).then((metadata) => { 
+
+            Promise.all(metadataFuncs).then((metadata) => {
                 const layerFuncs = []
                 metadata.forEach(m => {
                     if (m.url) {
-                        layerFuncs.push(new Promise((resolve, reject) => {d3.json(m.url).then((data) => {
-                            resolve({id: m.id, data, index: m.index})
-                        })}))
-                    }                    
+                        layerFuncs.push(new Promise((resolve, reject) => {
+                            d3.json(m.url).then((data) => {
+                                resolve({id: m.id, data, index: m.index})
+                            })
+                        }))
+                    }
                 })
 
                 Promise.all(layerFuncs).then((layers) => {
                     this.setState({
-                        'layers': layers
+                        'layers': layers,
+                        layersLoading: false
                     })
                 })
-              });
-        }  else {
-            d3.json(source).then((data) => {                
+            });
+        } else {
+            d3.json(source).then((data) => {
                 this.setState({
-                    'layers': [{id: null, url: source, data, index: 0}]
+                    'layers': [{id: null, url: source, data, index: 0}],
+                    layersLoading: false
                 })
             })
-        }          
+        }
     }
 
-    getMainLayer(){
+    getMainLayer() {
         const layers = this.getLayers()
         const {mainLayerId, enabledLayers} = this.props;
-        let layer 
+        let layer
         if (layers) {
             layer = layers.filter(layer => layer.id == mainLayerId || layer.id == null)[0] || layers[0]
-        }         
+        }
         return layer ? layer.data : null
     }
 
@@ -151,33 +158,52 @@ class Map extends React.Component {
             zoomOnFilterField,
             appliedFilters
         } = this.props
-        
-        this.tooltip.style("visibility", "hidden")
-       
-        if (prevProps.enabledLayers.length != this.props.enabledLayers.length) {            
-            this.loadLayers()            
-        } 
 
-       const features = this.getFeatures();
-       
-       const filterUpdated = this.filterUpdated(prevProps, prevState)
-       const center = this.getCenter(features, filterUpdated)
-       const prevAppliedFilters = prevProps.appliedFilters      
-       if (prevProps.center !== this.props.center || center) {
-       
-           this.mapPosition = null
+
+        const {appliedFilters: prevAppliedFilters} = prevProps
+
+        if (zoomOnFilterField) {
+            const prevAppliedItems = []
+            const appliedItems = []
+            //Reset zoom when filters is applied
+            if (prevAppliedFilters) {
+                Object.keys(prevAppliedFilters).forEach(k => {
+                    prevAppliedItems.push(...prevAppliedFilters[k].filter(v => v != Number.MIN_SAFE_INTEGER))
+                });
+            }
+            if (appliedFilters) {
+                Object.keys(appliedFilters).forEach(k => {
+                    appliedItems.push(...appliedFilters[k].filter(v => v != Number.MIN_SAFE_INTEGER))
+                });
+            }
+            //filters reset
+            if (prevAppliedItems.length > 0 && appliedItems.length == 0) {
+                this.onReset()
+            }
+        }
+
+        this.tooltip.style("visibility", "hidden")
+
+        if (prevProps.enabledLayers.length != this.props.enabledLayers.length) {
+            this.loadLayers()
+        }
+
+        const features = this.getFeatures();
+        if (prevProps.center !== this.props.center) {
+            this.mapPosition = null
             this.projection
-            .scale(this.props.scale)
-            .center(center ? center : this.props.center)  // centers map at given coordinates
-            .translate([this.getWidth() / 2, this.getHeight() / 2])           
-        } 
-       
-        this.d3Map(features, filterUpdated)        
+                .scale(this.props.scale)
+                .center(this.props.center)  // centers map at given coordinates
+                .translate([this.getWidth() / 2, this.getHeight() / 2])
+        }
+
+        const filterUpdated = this.filterUpdated(prevProps, prevState)
+        this.d3Map(features, filterUpdated)
         if (layers && transformedData && (transformedData != prevProps.transformedData
-            || layers != prevState.layers || selectedMeasure != prevState.selectedMeasure || selectedPolygon != prevState.selectedPolygon|| mainLayer != prevState.mainLayer
-            || prevProps.mainLayerId !== this.props.mainLayerId || JSON.stringify(prevProps.enabledLayers) != JSON.stringify(this.props.enabledLayers))) {                
-                this.updateFeatures(this.getFeatures(), filterUpdated);
-         }
+            || layers != prevState.layers || selectedMeasure != prevState.selectedMeasure || selectedPolygon != prevState.selectedPolygon || mainLayer != prevState.mainLayer
+            || prevProps.mainLayerId !== this.props.mainLayerId || JSON.stringify(prevProps.enabledLayers) != JSON.stringify(this.props.enabledLayers))) {
+            this.updateFeatures(this.getFeatures(), filterUpdated);
+        }
     }
 
     getHeight() {
@@ -227,21 +253,84 @@ class Map extends React.Component {
         this.fullView()
     }
 
-    zoomed() {
-        this.tooltip.style("visibility", "hidden")
-        const group = d3.select(this.getMapId()).select('svg').select("g")
-        group.attr("transform", d3.event.transform)       
+    resizeLabels() {
+        const {labelFontSize, mapLabelField} = this.props
+        //invert the font size and label box width and height
+        const labels = d3.select(this.getMapId()).select('svg').select("g").selectAll(".map-labels-container")
+        labels.attr('x', (d) => {
+            const position = this.getLabelPosition(d)
+            if (d.properties[mapLabelField]) {
+                let boxWidth = this.getLabelBoxWidth(d);
+                boxWidth = d3.event.transform.k > 1 ? boxWidth / d3.event.transform.k : boxWidth
+                return position[0] - (boxWidth / 2);
+            } else {
+                return position[0]
+            }
+        })
+            .attr("y", (d) => {
+                const position = this.getLabelPosition(d)
+                return position[1] - (d3.event.transform.k > 1 ? 10 / d3.event.transform.k : 10);
+            }).attr("width", (d) => {
+            const width = this.getLabelBoxWidth(d)
+            return d3.event.transform.k > 1 ? width / d3.event.transform.k : width
+        })
+            .attr("height", (d) => {
+                const height = this.getLabelBoxHeight(d)
+                return d3.event.transform.k > 1 ? height / d3.event.transform.k : height
+            })
+            .attr("font-size", (d3.event.transform.k > 1 ? labelFontSize / d3.event.transform.k : labelFontSize) + "px")
     }
 
-    
+    resizePointLabels() {
+        const {labelFontSize, mapLabelField} = this.props
+        //invert the font size and label box width and height
+        const labels = d3.select(this.getMapId()).select('svg').select("g").selectAll(".point-labels-container")
+        labels.attr('x', (d) => {
+            let boxWidth = this.getLabelBoxWidth(d) + 20
+            boxWidth = d3.event.transform.k > 1 ? boxWidth / d3.event.transform.k : boxWidth
+            const position = this.projection([d.geometry.coordinates[1], d.geometry.coordinates[0]])
+            return position[0] - boxWidth / 2;
+        })
+            .attr("y", (d) => {
+                const position = this.projection([d.geometry.coordinates[1], d.geometry.coordinates[0]])
+                let adjustment = this.getLabelBoxHeight(d) / 2;
+                adjustment = d3.event.transform.k > 1 ? adjustment / d3.event.transform.k : adjustment
+                return position[1] - adjustment
+            }).attr("width", (d) => {
+            const width = this.getLabelBoxWidth(d) + 30
+            return d3.event.transform.k > 1 ? width / d3.event.transform.k : width
+        })
+            /*.attr("height", (d) => {
+                const height = this.getLabelBoxHeight(d) + 20
+                return d3.event.transform.k > 1 ? height / d3.event.transform.k : height
+            })*/
+            .attr("font-size", (d3.event.transform.k > 1 ? 12 / d3.event.transform.k : 12) + "px")
+    }
+
+    resizeCircles() {
+        //invert the radius of circles
+        const circles = d3.select(this.getMapId()).select('svg').selectAll("circle")
+        circles.attr("r", d3.event.transform.k > 1 ? 6 / d3.event.transform.k : 6)
+    }
+
+    zoomed() {
+        this.tooltip.style("visibility", "hidden")
+        const g = d3.select(this.getMapId()).select('svg').select("g")
+        g.attr("transform", d3.event.transform)
+
+        this.resizeCircles()
+        this.resizeLabels();
+        this.resizePointLabels()
+    }
+
     zoomEnd() {
         const {editing} = this.props;
         let t = d3.event.transform;
         this.mapPosition = {k: t.k, x: t.x, y: t.y}
-        if (editing) {            
-            var parentWindow = window.parent;            
+        if (editing) {
+            var parentWindow = window.parent;
             parentWindow.postMessage({type: 'map', value: JSON.stringify({k: t.k, x: t.x, y: t.y})}, "*");
-        }        
+        }
     }
 
     classColor(d) {
@@ -256,8 +345,8 @@ class Map extends React.Component {
     generateBreaks(data) {
         const {autoGenerateBreaks, numberOfBreaks, colorScheme} = this.props;
         const generatedBreaks = [];
-        if (autoGenerateBreaks) {
-            let parsedData = data.filter(d => d.properties && d.properties.value).map(d => {
+        if (autoGenerateBreaks && data && data.length > 0) {
+            let parsedData = data.filter(d => d.properties && d.properties.value!=null).map(d => {
                 return d.properties.value.toFixed(2);
             });
 
@@ -359,12 +448,12 @@ class Map extends React.Component {
 
             return (breakItem && breakItem.color) ? breakItem.color : mapNoDataColor;
         }
-        
-        const layerProps = this.props.enabledLayers.filter(l => l.id == d.properties.layerId)[0]       
-        if (layerProps && layerProps.bgColor && layerProps.bgColor != 'undefined'){
-           return layerProps.bgColor 
+
+        const layerProps = this.props.enabledLayers.filter(l => l.id == d.properties.layerId)[0]
+        if (layerProps && layerProps.bgColor && layerProps.bgColor != 'undefined') {
+            return layerProps.bgColor
         }
-      
+
         return mapNoDataColor;
     }
 
@@ -384,13 +473,13 @@ class Map extends React.Component {
         }
     }
 
-    updateFeatures(features, filterUpdated) {        
+    updateFeatures(features, filterUpdated) {
         const {
             mapLabelField,
             symbols,
             highlightedLocation
         } = this.props
-        
+
 
         const sortedFeatures = [...(features.filter((f) => {
             return highlightedLocation != f.properties[mapLabelField]
@@ -399,8 +488,8 @@ class Map extends React.Component {
         }))]
 
         this.drawPolygons(sortedFeatures)
-        this.drawLabels(sortedFeatures)        
-        this.drawPoints(sortedFeatures, filterUpdated)        
+        this.drawLabels(sortedFeatures)
+        this.drawPoints(sortedFeatures, filterUpdated)
         if (symbols.length > 0) {
             this.addSymbols(symbols, sortedFeatures)
         }
@@ -412,19 +501,27 @@ class Map extends React.Component {
             mapLabelShowValue,
             intl,
             valueFormat,
-            showNoDataLabel,            
+            showNoDataLabel,
             labelFontColor,
             labelFontWeight,
             labelFontSize,
             showAdminUnitLabel,
-            mapType           
+            mapType,
+            noDataText,
+            labelsExclusionList
         } = this.props
         const group = d3.select(this.getMapId()).select('svg').select("g")
-       
+
         group.selectAll('.map-labels')
-            .data(sortedFeatures)
+            .data(sortedFeatures.filter((f) => {
+                if (labelsExclusionList && labelsExclusionList.length > 0) {
+                    return !labelsExclusionList.includes(f.properties[mapLabelField])
+                }
+                return true
+            }))
             .enter()
             .append("foreignObject")
+            .attr("class", "map-labels-container")
             .attr('x', (d) => {
                 const position = this.getLabelPosition(d)
                 if (d.properties[mapLabelField]) {
@@ -437,56 +534,80 @@ class Map extends React.Component {
             .attr("y", (d) => {
                 const position = this.getLabelPosition(d)
                 return position[1] - 10;
-            })            
-             .attr("width", (d) => this.getLabelBoxWidth(d))
-             .attr("height", (d) => this.getLabelBoxHeight(d) )
-             .attr('overflow', 'visible') 
-             .attr("opacity", 1)
-             .attr('pointer-events', mapType == 'POINTS_MAP' ? 'none' : 'all')
-             .on("mouseover", this.showTooltip)
+            })
+            .attr("width", (d) => this.getLabelBoxWidth(d))
+            .attr("height", (d) => this.getLabelBoxHeight(d))
+            .attr('font-size', (d, i) => labelFontSize + "px")
+            .attr('overflow', 'visible')
+            .attr("opacity", 1)
+            .style('display', (d) => {
+                if (showAdminUnitLabel == SHOW_ALL || (showAdminUnitLabel == SHOW_IF_HAS_DATA && d.properties.hasDataRow)) {
+                    return 'block'
+                } else {
+                    return 'none'
+                }
+            })
+            .attr('pointer-events', mapType == 'POINTS_MAP' ? 'none' : 'all')
+            .on("mouseover", this.showTooltip)
             .on("mousemove", this.mousemove)
-            .on("mouseout", this.mouseout)                      
-            .append("xhtml:div")           
-             .style('font-size',(d, i) => labelFontSize + "px")
+            .on("mouseout", this.mouseout)
+            .append("xhtml:div")
             .style("color", (d, i) => labelFontColor)
             .style("font-weight", (d) => labelFontWeight)
-            .style("background-color", (d) => { 
-                if ((mapLabelShowValue || (!d.properties.value && showNoDataLabel) && d.properties.hasDataRow)) {
-                    return "#fff6e1";
+            .style("background-color", (d) => {
+                if (d.properties.hasDataRow && mapLabelShowValue) {
+                    if ((d.properties.value!=null) || (d.properties.value==null && showNoDataLabel)) {
+                        return "#fff6e1";
+                    }
                 }
-                 
+
                 return "none"
             })
-            .style("border-radius", (d) => "4px")            
-            .style('line-height', '150%')
-            .style('text-align', 'center')           
-            .html((d, i) => {  
-                let label = ""             
-                if (showAdminUnitLabel == SHOW_ALL || (showAdminUnitLabel == SHOW_IF_HAS_DATA && d.properties.hasDataRow)) {
-                    label = d.properties[mapLabelField];
-                    let abbrev = d.properties["abbrev"]
-                    if (label && label.length > MAX_LABEL_LEN && abbrev) {
-                        label = abbrev;
+            .style("border-radius", (d) => "4px")
+            .style('line-height', '95%')
+            .style('text-align', 'center')
+            .html((d, i) => {
+                return this.createLabel(d)
+            })
+
+    }
+
+    createLabel(d) {
+        const {
+            mapLabelField,
+            mapLabelShowValue,
+            intl,
+            valueFormat,
+            showNoDataLabel,
+            showAdminUnitLabel,
+            noDataText
+        } = this.props
+
+        let label = ""
+        if (showAdminUnitLabel == SHOW_ALL || (showAdminUnitLabel == SHOW_IF_HAS_DATA && d.properties.hasDataRow)) {
+            label = d.properties[mapLabelField];
+            let abbrev = d.properties["abbrev"]
+            if (label && label.length > MAX_LABEL_LEN && abbrev) {
+                label = abbrev;
+            }
+
+            if (mapLabelShowValue) {
+                if (d.properties.value!=null) {
+                    const variables = d.properties.variables || {}
+                    label += "<br><span class='map-label-value'>" + formatContent(valueFormat, {
+                        value: d.properties.value,
+                        ...d.properties,
+                        measure: this.getSelectedMeasure(), ...variables
+                    }, intl) + "</span>"
+                } else {
+                    if (showNoDataLabel == true && d.properties.value==null && d.properties.hasDataRow) {
+                        label += "<br><span class='map-label-value'>" + noDataText + "</span>"
                     }
-                    
-                    if (mapLabelShowValue) {
-                        if (d.properties.value) {
-                            const variables = d.properties.variables || {}
-                            label += "<br>" + formatContent(valueFormat, {
-                                value: d.properties.value,
-                                measure: this.getSelectedMeasure(), ...variables
-                            }, intl) + ""   
-                        } else {
-                            if (showNoDataLabel == true && !d.properties.value && d.properties.hasDataRow) {
-                                label += "<br>No Data"
-                            }                            
-                        }                        
-                    }                    
                 }
-                
-                return label 
-             })
-            
+            }
+        }
+
+        return label
     }
 
     drawPolygons(sortedFeatures) {
@@ -498,57 +619,57 @@ class Map extends React.Component {
         } = this.props
 
         const breaks = this.getBreaks()
-        const group = d3.select(this.getMapId()).select('svg').select("g")       
-        
-        const polygons = sortedFeatures.filter(f => f.geometry && (f.geometry && (f.geometry.type == 'Polygon' || f.geometry.type == 'MultiPolygon')))
+        const group = d3.select(this.getMapId()).select('svg').select("g")
 
+        const polygons = sortedFeatures.filter(f => f.geometry && (f.geometry && (f.geometry.type == 'Polygon' || f.geometry.type == 'MultiPolygon')))
+        
         if (polygons.length > 0) {
             group.selectAll("path").data(polygons)
-            .join('path')
-            .attr("d", this.path)
-            .attr("fill", d => this.fillColor(d, breaks))
-            .attr("stroke-width", d => {
-                if (highlightedLocation == d.properties[mapLabelField]) {
-                    return 1.2
-                } else {
-                    return 0.4;
-                }
-            })
-            .attr("stroke", d => {
-                if (highlightedLocation == d.properties[mapLabelField]) {
-                    return mapFocusBoundaryColor;
-                } else {
-                    return mapBoundaryColor;
-                }
-            })
-            .on("click", this.onPolygonClick)                       
-        }       
+                .join('path')
+                .attr("d", this.path)
+                .attr("fill", d => this.fillColor(d, breaks))
+                .attr("stroke-width", d => {
+                    if (highlightedLocation == d.properties[mapLabelField]) {
+                        return 1.2
+                    } else {
+                        return 0.4;
+                    }
+                })
+                .attr("stroke", d => {
+                    if (highlightedLocation == d.properties[mapLabelField]) {
+                        return mapFocusBoundaryColor;
+                    } else {
+                        return mapBoundaryColor;
+                    }
+                })
+                .on("click", this.onPolygonClick)
+        }
     }
 
-    drawPoints(sortedFeatures, filterUpdated) {        
-        const {           
+    drawPoints(sortedFeatures, filterUpdated) {
+        const {
             intl,
             pointLabelColor,
             pointLabelFormat,
             transformedData,
-            defaultPointColor, 
-            zoomLevelToShowPoints, 
-            mappingField,
+            defaultPointColor,
             appliedFilters,
-            zoomOnFilterField                
+            zoomOnFilterField,
+            noDataText,
+            showShadingLayerLabels
         } = this.props
 
-        
+
         const group = d3.select(this.getMapId()).select('svg').select("g")
         let pointsFromData = []
-        if (transformedData.pointsData) {        
+        if (transformedData.pointsData) {
             let selectedLocation = this.state.selectedPolygon
-            if (filterUpdated && appliedFilters && appliedFilters[zoomOnFilterField]) {            
+            if (filterUpdated && appliedFilters && appliedFilters[zoomOnFilterField]) {
                 selectedLocation = appliedFilters[zoomOnFilterField]
-            }           
-            
+            }
+
             pointsFromData = transformedData.pointsData.filter(p => p.lat && p.lng && p.label == selectedLocation).map(p => {
-                return { properties: { label: p.label, lat: p.lat, lng: p.lng, value: p.value, variables: p.variables } }
+                return {properties: {label: p.label, lat: p.lat, lng: p.lng, value: p.value, variables: p.variables}}
             })
 
             group.selectAll('.circle')
@@ -570,51 +691,65 @@ class Map extends React.Component {
                     return 2
                 })
                 .style("stroke-width", 0.5)
-                .style('fill', (d, i) => {                    
+                .style('fill', (d, i) => {
                     return defaultPointColor
                 })
-                .on("click", (d, i) => this.onPointClick(d,i))
+                .on("mouseover", (d, i) => this.onPointClick(d, i))
+                .on("mouseout", this.mouseout)
         }
-           
+
         const breaks = this.getBreaks()
-        const points = sortedFeatures.filter(f => f.geometry && f.geometry.type == 'Point')        
+        let points = []
+        if (showShadingLayerLabels == SHOW_ALL) {
+            points = sortedFeatures.filter(f => f.geometry && f.geometry.type == 'Point')
+        } else if (showShadingLayerLabels == SHOW_IF_HAS_DATA) {
+            points = sortedFeatures.filter(p => p.geometry && p.geometry.type == 'Point' && p.properties.hasDataRow)
+        }
+
         if (points.length > 0) {
-             group.selectAll('.point-labels')
-            .data(points)
-            .enter()
-            .append("foreignObject")
-            .attr('x', (d) => {
-                const width = this.getLabelBoxWidth(d) + 20
-                const position = this.projection([d.geometry.coordinates[1], d.geometry.coordinates[0]])
-                 return position[0] - width / 2;
-            })
-            .attr("y", (d) => {
-                const position = this.projection([d.geometry.coordinates[1], d.geometry.coordinates[0]])
-                return position[1] - this.getLabelBoxHeight(d) / 2;
-            })
-             .attr("width", (d) => this.getLabelBoxWidth(d) + 20)
-             .attr("height", (d) => this.getLabelBoxHeight(d) + 20)
-             .attr('overflow', 'visible')           
-             .style('opacity', 1)
-             .append("xhtml:div")
-            .style('font-size','12px')
-            .style("color", (d, i) => pointLabelColor)
-            .style("font-weight", (d) => "bold")
-            .style("background-color", (d) => this.fillColor(d, breaks))
-            .style("padding", (d) => "5px 3px 5px 3px")
-            .style("border-radius", (d) => "4px")            
-            .style('line-height', '100%')
-            .style('text-align', 'center')           
-            .html((d, i) => {
-                return formatContent(pointLabelFormat, {
-                    value: d.properties.value,
-                    locationName: d.properties[this.props.mapLabelField]
-                }, intl)                
-            })
-            .on("mouseover", this.showTooltip)
-            .on("mousemove", this.mousemove)
-            .on("mouseout", this.mouseout);
-           }
+            group.selectAll('.point-labels')
+                .data(points)
+                .enter()
+                .append("foreignObject")
+                .attr('id', (d, i) => {
+                    return "point-label" + i
+                }).attr("class", "point-labels-container")
+                .attr('x', (d) => {
+                    const width = this.getLabelBoxWidth(d) + 20
+                    const position = this.projection([d.geometry.coordinates[1], d.geometry.coordinates[0]])
+                    return position[0] - width / 2;
+                })
+                .attr("y", (d) => {
+                    const position = this.projection([d.geometry.coordinates[1], d.geometry.coordinates[0]])
+                    return position[1] - this.getLabelBoxHeight(d) / 2;
+                })
+                .attr("width", (d) => this.getLabelBoxWidth(d) + 20)
+                .attr("height", (d) => "1px")
+                .attr('overflow', 'visible')
+                .attr('font-size', '12px')
+                .style('opacity', 1)
+                .append("xhtml:div")
+                .style("color", (d, i) => pointLabelColor)
+                .style("font-weight", (d) => "bold")
+                .style("background-color", (d) => this.fillColor(d, breaks))
+                .style("padding", (d) => "5px 3px 5px 3px")
+                .style("border-radius", (d) => "4px")
+                .style('line-height', '100%')
+                .style('text-align', 'center')                
+                .html((d, i) => {
+                    return formatContent(pointLabelFormat, {
+                        value: d.properties.value,
+                        locationName: d.properties[this.props.mapLabelField]
+                    }, intl, noDataText)
+                })
+                .on("mouseover", (d, i) => {                    
+                    d3.select(this.getMapId()).select('svg').select("g").select('#point-label' + i).raise();
+                    this.showTooltip(d)
+                } )
+                .on("mousemove", this.mousemove)
+                .on("mouseout", this.mouseout);
+        }
+
     }
 
     addSymbols(symbols, features) {
@@ -745,17 +880,17 @@ class Map extends React.Component {
 
         if (mapPosition && !editing) {
             svg.transition()
-            .duration(300)
-            .call(this.zoom.transform, d3.zoomIdentity
-                .translate(mapPosition.x, mapPosition.y)
-                .scale(mapPosition.k))
+                .duration(300)
+                .call(this.zoom.transform, d3.zoomIdentity
+                    .translate(mapPosition.x, mapPosition.y)
+                    .scale(mapPosition.k))
         } else {
             svg.transition()
-            .duration(300)
-            .call(this.zoom.transform, d3.zoomIdentity
-                .translate(0, 0)
-                .scale(1))
-        }        
+                .duration(300)
+                .call(this.zoom.transform, d3.zoomIdentity
+                    .translate(0, 0)
+                    .scale(1))
+        }
     }
 
     showTooltip(d) {
@@ -770,9 +905,12 @@ class Map extends React.Component {
             mappingField,
             showNoDataTooltip,
             fields,
-            mapType
+            mapType,
+            noDataText
         } = this.props;
-        if ((showTooltip && d.properties.value != null) || (showTooltip && showNoDataTooltip) ) {
+
+        
+        if ((showTooltip && d.properties.value != null) || (showTooltip && showNoDataTooltip)) {
             const svg = d3.select(this.getMapId()).select('svg')
             const elements = svg.select("g").selectAll(".active")
             elements.attr("class", p => {
@@ -785,11 +923,14 @@ class Map extends React.Component {
 
             const format = tooltipFormat || '{locationName} %({value},2) \n {label}: %({value},2)'
             const dataVars = d.properties.variables || {}
+            
             const variables = {
+                ...d.properties,
                 value: d.properties.value,
                 measure: this.getSelectedMeasure(),
                 measureLabel: d.properties.measureLabel,
-                locationName: d.properties[mappingField], ...dataVars
+                locationName: d.properties[mappingField], ...dataVars,
+
             }
             this.tooltip.attr("class", tooltipTheme)
                 .style("position", "absolute")
@@ -798,7 +939,7 @@ class Map extends React.Component {
                 .html((e) => {
 
                     let html = `<div style='font-size:${tooltipFontSize}px;' class='tooltip-content' >`;
-                    if (d.properties.value) {
+                    if (d.properties.value!=null) {
 
                         const lines = format.split('\n')
                         let headerFormat = lines[0];
@@ -806,20 +947,20 @@ class Map extends React.Component {
                         let breakdownLineIndex = 1
                         let breakdownFormat
                         if (fields.length > 1 && mapType != 'POINTS_MAP') {
-                            breakdownLineIndex = lines.length > 2  ? 2 : 1
+                            breakdownLineIndex = lines.length > 2 ? 2 : 1
                             breakdownFormat = lines[breakdownLineIndex]
                         } else {
                             breakdownFormat = null
                         }
 
                         if (headerFormat) {
-                            html += formatContent(headerFormat, variables, intl)
+                            html += formatContent(headerFormat, variables, intl, noDataText)
                         }
                         if (overallFormat) {
                             if (!html.endsWith('<hr>')) {
                                 html += '<hr>'
                             }
-                            html += formatContent(overallFormat, variables, intl)
+                            html += formatContent(overallFormat, variables, intl, noDataText)
                         }
                         if (breakdownFormat) {
                             if (d.properties.children) {
@@ -833,7 +974,7 @@ class Map extends React.Component {
                                     if (!html.endsWith('<hr>')) {
                                         html += '<hr>'
                                     }
-                                    html += formatContent(breakdownFormat, vars, intl)
+                                    html += formatContent(breakdownFormat, vars, intl, noDataText)
                                 })
                             }
                         }
@@ -847,7 +988,7 @@ class Map extends React.Component {
                                     if (!html.endsWith('<hr>')) {
                                         html += '<hr>'
                                     }
-                                    html += formatContent(line, variables, intl)
+                                    html += formatContent(line, variables, intl, noDataText)
                                 }
                             })
 
@@ -868,7 +1009,7 @@ class Map extends React.Component {
                             measureLabel: d.properties.measureLabel,
                             locationName: d.properties[mappingField], ...dataVars
                         }
-                        html += formatContent(format, variables, intl)
+                        html += formatContent(format, variables, intl, noDataText)
                         html += "</div>"
                     }
 
@@ -900,24 +1041,25 @@ class Map extends React.Component {
         d3.event.preventDefault()
     }
 
-    onPointClick(d, i) {  
+    onPointClick(d, i) {
         this.showTooltip(d)
         this.tooltip.style("visibility", "visible")
         this.tooltip.style("top", (d3.event.pageY) + "px").style("left", (d3.event.pageX + 5) + "px");
         d3.select(this.getMapId()).select('svg').select("g").selectAll('circle')
-        .style("fill", this.props.defaultPointColor)
-        .style("stroke", "none")
+            .style("fill", this.props.defaultPointColor)
+            .style("stroke", "none")
 
-        d3.select(this.getMapId()).select('svg').select("g").select('#circle'+ i)
-        .style("fill", "#fff")
+        d3.select(this.getMapId()).select('svg').select("g").select('#circle' + i)
+            .raise()
+            .style("fill", "#fff")
     }
 
     onPolygonClick(d) {
-        const {mappingField} = this.props;  
-        if (this.state.selectedPolygon !== d.properties[mappingField]) {
-            this.setState({selectedPolygon: d.properties[mappingField]})        
-        }      
-        
+        const {mappingField} = this.props;
+        if (this.state.selectedPolygon !== d.properties[mappingField] && d.properties.value !== null) {
+            this.setState({selectedPolygon: d.properties[mappingField]})
+        }
+
     }
 
     onZoomIn(e) {
@@ -939,81 +1081,86 @@ class Map extends React.Component {
         return measure;
     }
 
-    getCollectionField() {
-        const mainLayer = this.getMainLayer()
+    getCollectionField(mainLayer) {
         const {topoJSONField} = this.props;
         if (mainLayer && mainLayer.objects) {
-            const fields = Object.keys(mainLayer.objects)            
+            const fields = Object.keys(mainLayer.objects)
             for (let index in fields) {
-                const field = fields[index]                
-                if (mainLayer.objects[field].type == 'GeometryCollection') {                    
+                const field = fields[index]
+                if (mainLayer.objects[field].type == 'GeometryCollection') {
                     return field
                 }
-            }           
+            }
         }
 
         return topoJSONField
     }
 
     extractFeatures(mainLayer) {
-        if (mainLayer && mainLayer.objects) {
-            return topojson.feature(mainLayer, mainLayer.objects[this.getCollectionField()]).features;
-         } else if (mainLayer && mainLayer.features) {
+        const collectionField = this.getCollectionField(mainLayer)
+        if (mainLayer && mainLayer.objects && mainLayer.objects[collectionField]) {
+            return topojson.feature(mainLayer, mainLayer.objects[collectionField]).features;
+        } else if (mainLayer && mainLayer.features) {
             return mainLayer.features
         }
         return []
     }
 
     getLayers() {
-        const { layers } = this.state
-        const { enabledLayers } = this.props;
-        const updatedLayers = layers.map(layer => {
-            const found = enabledLayers.find(l => l.id == layer.id)
-            layer.index = found ? found.index : 0
-            return layer
-        })
+        const {layers} = this.state
+        const {enabledLayers} = this.props;
+        if (layers && layers.length > 0) {
+            const updatedLayers = layers.map(layer => {
+                const found = enabledLayers.find(l => l.id == layer.id)
+                layer.index = found ? found.index : 0
+                return layer
+            })
 
-        return updatedLayers.sort((a, b) => {
-            if (parseInt(a.index) < parseInt(b.index)) {
-                return 1
-            }
+            return updatedLayers.sort((a, b) => {
+                if (parseInt(a.index) < parseInt(b.index)) {
+                    return 1
+                }
 
-            if (parseInt(a.index) > parseInt(b.index)) {
-                return -1
-            }
+                if (parseInt(a.index) > parseInt(b.index)) {
+                    return -1
+                }
 
-            return 0
-        })
+                return 0
+            })
+        }
+
+        return []
     }
 
     getFeatures() {
+       
         const mainLayer = this.getMainLayer()
         const layers = this.getLayers()
         if (mainLayer) {
             const {transformedData, mappingField, app, mainLayerId, enabledLayers} = this.props;
             let features = []
-            try {                
+            try {
                 features = this.extractFeatures(mainLayer)
-                features.map(f =>{
+                features.map(f => {
                     f.properties.layerId = mainLayerId
                     return f
                 })
-                if (layers) {                                            
-                        layers.forEach(layer => {
+                if (layers) {
+                    layers.forEach(layer => {
                         if (layer.id != mainLayerId) {
                             let tt = this.extractFeatures(layer.data)
-                            tt = tt.map(f =>{
-                                f.properties.layerId = layer.id 
+                            tt = tt.map(f => {
+                                f.properties.layerId = layer.id
                                 return f
                             })
-                            features = [...tt, ...features]                            
+                            features = [...tt, ...features]
                         }
-                    }) 
+                    })
                 }
             } catch (error) {
-               console.log('error updating features ..' + error)
+                console.log('error updating features ..' + error)
             }
-           
+
             const filteredFeatures = features.filter(d => d.properties != null);
             let filterLocationsData = transformedData.locationsData;
 
@@ -1035,13 +1182,18 @@ class Map extends React.Component {
                         if (transformedData.measureLabelMap && dataItem.measure && transformedData.measureLabelMap[dataItem.measure]) {
                             measureLabel = transformedData.measureLabelMap[dataItem.measure]
                         }
+                       
                         f.properties.value = dataItem.value;
                         f.properties.measure = dataItem.measure
                         f.properties.measureLabel = measureLabel
                         f.properties.children = dataItem.children;
                         f.properties.variables = dataItem.variables;
                         f.properties.hasDataRow = true;
+                        Object.keys(dataItem).forEach(key => {
+                            f.properties[key] = dataItem[key]
+                        })
                     } else {
+                        
                         f.properties.value = null;
                         f.properties.measure = null;
                         f.properties.children = null;
@@ -1058,43 +1210,43 @@ class Map extends React.Component {
 
     }
 
-    
+
     getMapId() {
         const {unique} = this.props;
         return '.map.wrapper.' + unique;
     }
-    
- filterUpdated(prevProps, prevState) {
+
+    filterUpdated(prevProps, prevState) {
         const {zoomOnFilterField} = this.props
         const prevFilters = prevProps && prevProps.appliedFilters || {}
         const appliedFilters = this.props.appliedFilters || {}
         let filterUpdated = false
-          if (prevFilters[zoomOnFilterField] != appliedFilters[zoomOnFilterField]) {
-                    filterUpdated = true
-          }
+        if (prevFilters[zoomOnFilterField] != appliedFilters[zoomOnFilterField]) {
+            filterUpdated = true
+        }
 
-         return filterUpdated
-  }
+        return filterUpdated
+    }
 
-   getCenter(features, filterUpdated) {
-         const {zoomOnFilter, zoomOnFilterField, mappingField, appliedFilters} = this.props              
+    getCenter(features, filterUpdated) {
+        const {zoomOnFilter, zoomOnFilterField, mappingField, appliedFilters} = this.props
         let center = null
         if (zoomOnFilter && zoomOnFilterField) {
-            let selectedLocation = this.state.selectedPolygon           
-            if (filterUpdated && appliedFilters && appliedFilters[zoomOnFilterField]) {            
+            let selectedLocation = this.state.selectedPolygon
+            if (filterUpdated && appliedFilters && appliedFilters[zoomOnFilterField]) {
                 selectedLocation = appliedFilters[zoomOnFilterField]
-            }           
-            
-            const featureToCenterOn = features.filter(d => d.properties != null && d.properties[mappingField] == selectedLocation)[0]
-            
-            if (featureToCenterOn && featureToCenterOn.properties != null && featureToCenterOn.properties.value) {                
-               center = this.centroid(featureToCenterOn.geometry)           
             }
-        }        
-        
+
+            const featureToCenterOn = features.filter(d => d.properties != null && d.properties[mappingField] == selectedLocation)[0]
+
+            if (featureToCenterOn && featureToCenterOn.properties != null && featureToCenterOn.properties.value) {
+                center = featureToCenterOn
+            }
+        }
+
         return center
     }
-    
+
     area(poly) {
         var s = 0.0;
         var coordinates = poly.coordinates.length > 1 ? poly.coordinates[0][0] : poly.coordinates[0];
@@ -1117,62 +1269,69 @@ class Map extends React.Component {
         return c;
     }
 
-    d3Map(features, filterUpdated) {        
+    d3Map(features, filterUpdated) {
         const {zoomEnabled, mapContainerBgColor, mapPosition, editing, mapType} = this.props;
         const breaks = this.getBreaks()
-        const container = d3.select(this.getMapId())       
-        let svg = container.select('svg')        
+        const container = d3.select(this.getMapId())
+        let svg = container.select('svg')
         if (svg.empty()) {
-            svg = container.append('svg')            
-        } else {          
+            svg = container.append('svg')
+        } else {
             svg.selectAll("*").remove()
         }
+
         svg.attr("style", function (d) {
             return `background-color:${mapContainerBgColor};`
         })
-        svg.attr("width", this.getWidth())
-        svg.attr("height", this.props.height - 100)
-    
-        
-        if (this.mapPosition) {            
-            svg.transition()
-            .duration(300)
-            .call(this.zoom.transform, d3.zoomIdentity
-                .translate(this.mapPosition.x, this.mapPosition.y)
-                .scale(this.mapPosition.k))
-        }
-       
-        if (!this.mapPosition && mapPosition && mapPosition.x && mapPosition.y && mapPosition.k) {            
-            svg.transition()
-                .duration(300)
-                .call(this.zoom.transform, d3.zoomIdentity
-                    .translate(mapPosition.x, mapPosition.y)
-                    .scale(mapPosition.k))
-        }           
-           
-        
-        if (zoomEnabled || editing) {
-            svg.call(this.zoom)
-        } else {
-            svg.on("dblclick.zoom", null);
-        }         
-       
+            .attr("width", this.getWidth())
+            .attr("height", this.props.height - 100)
+
         svg.append("g").selectAll("path")
             .data(features)
             .enter().append("path")
             .attr("fill", d => this.fillColor(d, breaks))
             .attr("d", d3.geoPath().projection(this.projection))
-            .attr("class", d => this.classColor(d))           
-            .on("mouseover", mapType !== 'POINTS_MAP' ? this.showTooltip : null )
+            .attr("class", d => this.classColor(d))
+            .on("mouseover", mapType !== 'POINTS_MAP' ? this.showTooltip : null)
             .on("mousemove", mapType !== 'POINTS_MAP' ? this.mousemove : null)
-            .on("mouseout", mapType !== 'POINTS_MAP' ? this.mouseout : null)       
-            
-            const center = this.getCenter(features, filterUpdated)
-            if (center) {                
-                  svg.transition()
-                    .call(this.zoom.scaleTo, 6)                 
-            }                 
-           
+            .on("mouseout", mapType !== 'POINTS_MAP' ? this.mouseout : null)
+
+        //TODO: move all zoom logic to a separate function
+        if (this.mapPosition) {
+            svg.transition()
+                .duration(300)
+                .call(this.zoom.transform, d3.zoomIdentity
+                    .translate(this.mapPosition.x, this.mapPosition.y)
+                    .scale(this.mapPosition.k))
+        }
+
+        if (!this.mapPosition && mapPosition && mapPosition.x && mapPosition.y && mapPosition.k) {
+            svg.transition()
+                .duration(300)
+                .call(this.zoom.transform, d3.zoomIdentity
+                    .translate(mapPosition.x, mapPosition.y)
+                    .scale(mapPosition.k))
+        }
+
+        if (zoomEnabled || editing) {
+            svg.call(this.zoom)
+        } else {
+            svg.on("dblclick.zoom", null);
+        }
+
+        const center = this.getCenter(features, filterUpdated)
+        if (center) {
+            var bounds = this.path.bounds(center);
+            // Calculate the center of the bounding box
+            var centerx = [(bounds[0][0] + bounds[1][0]) / 2, (bounds[0][1] + bounds[1][1]) / 2];
+            svg.transition()
+                .duration(750)
+                .call(this.zoom.transform, d3.zoomIdentity
+                    .translate(this.getWidth() / 2, this.getHeight() / 2)
+                    .scale(12)
+                    .translate(-centerx[0], -centerx[1]));
+        }
+
     }
 
     getAvg() {
@@ -1239,7 +1398,18 @@ class Map extends React.Component {
 
     }
 
+    renderLoader() {
+        return (<Container className={"loading"}>
+            <Segment basic={true} padded={true} textAlign={"center"} style={{margin: '30px'}}>
+                <Dimmer active inverted>
+                    <Loader size='medium'></Loader>
+                </Dimmer>
+            </Segment>
+        </Container>)
+    }
+
     render() {
+
         const {
             app,
             legendTitle,
@@ -1255,7 +1425,8 @@ class Map extends React.Component {
             labelFontColor,
             legendFontSize,
             editing,
-            highlightedLocLabelFormat
+            highlightedLocLabelFormat,
+            noDataText
         } = this.props;
 
         const nationalAverage = this.getAvg()
@@ -1270,70 +1441,78 @@ class Map extends React.Component {
         if (editing) {
             highlightedLocStyle.marginTop = "25px"
         }
+
         return (
             <div className="map component" ref={this.mapContainer}>
                 {/*editing &&
                     <div className="edit-mode-message"><p> You can drag the map or zoom using the zoom toolbar. The position of the map is saved when you save the page.</p></div>
              */}
-                <Container fluid className={"footnote "}>
-                    {
-                        <Grid columns={2}>
-                            {app != 'csv' && showOverallValue &&
-                                <Grid.Column textAlign={"left"} width={4}>
-                                    <div className="national-average-div">
-                                        <span className="national-avg-label">{nationalAverageLabel}</span><span
-                                        className="national-avg-value">{formatContent(valueFormat, {value: nationalAverage}, intl)}</span>
-                                    </div>
-                                </Grid.Column>
-                            }
-                            <Grid.Column textAlign={"right"} width={app != 'csv' && showOverallValue ? 12 : 16}>
-                                <Legend filteredBreaks={this.getBreaks()}
-                                        formattedLegendTitle={formatContent(legendTitle, {...filters}, intl)}
-                                        selectedMeasure={this.state.selectedMeasure}
-                                        {...this.props} />
-                            </Grid.Column>
-                        </Grid>}
-                    <div className="measure-selector">
-                        <ul>
-                            {measureSelectorLabel &&
-                                <li><span className="label">{measureSelectorLabel}</span></li>
-                            }
-                            {transformedData && transformedData.measures && transformedData.measures.length > 1 &&
-                                transformedData.measures.map(measure => {
-                                    return (<li onClick={this.selectedMeasureChanged.bind(this, measure)}>
-                                        <input
-                                            checked={this.getSelectedMeasure() === measure}
-                                            type="radio"
-                                            value={measure}/>
-                                        <label>{transformedData.measureLabelMap[measure] || measure}</label>
-                                    </li>)
-                                })
-                            }
-                        </ul>
+                {this.state.layersLoading && this.renderLoader()}
+                {!this.state.layersLoading &&
+                    <>
+                        <Container fluid className={"footnote "}>
+                            {
+                                <Grid columns={2}>
+                                    {app != 'csv' && showOverallValue &&
+                                        <Grid.Column textAlign={"left"} width={4}>
+                                            <div className="national-average-div">
+                                                <span className="national-avg-label">{nationalAverageLabel}</span><span
+                                                className="national-avg-value">{formatContent(valueFormat, {value: nationalAverage}, intl, noDataText)}</span>
+                                            </div>
+                                        </Grid.Column>
+                                    }
+                                    <Grid.Column textAlign={"right"} width={app != 'csv' && showOverallValue ? 12 : 16}>
+                                        <Legend filteredBreaks={this.getBreaks()}
+                                                formattedLegendTitle={formatContent(legendTitle, {...filters}, intl, noDataText)}
+                                                selectedMeasure={this.state.selectedMeasure}
+                                                {...this.props} />
+                                    </Grid.Column>
+                                </Grid>}
+                            <div className="measure-selector">
+                                <ul>
+                                    {measureSelectorLabel &&
+                                        <li><span className="label">{measureSelectorLabel}</span></li>
+                                    }
+                                    {transformedData && transformedData.measures && transformedData.measures.length > 1 &&
+                                        transformedData.measures.map(measure => {
+                                            return (<li onClick={this.selectedMeasureChanged.bind(this, measure)}>
+                                                <input
+                                                    checked={this.getSelectedMeasure() === measure}
+                                                    type="radio"
+                                                    value={measure}/>
+                                                <label>{transformedData.measureLabelMap[measure] || measure}</label>
+                                            </li>)
+                                        })
+                                    }
+                                </ul>
 
-                    </div>
-            </Container>
-              <div className={"map wrapper scaling-svg-container " + unique}
-                     style={{height: (this.props.height - 100) + 'px'}}>
-                    {highlightedLocData && highlightedLocData.value &&
-                        <div className="highlighted-loc-info" style={highlightedLocStyle}>
+                            </div>
+                        </Container>
+                        <div className={"map wrapper scaling-svg-container " + unique}
+                             style={{height: (this.props.height - 100) + 'px'}}>
+                            {highlightedLocData && highlightedLocData.value &&
+                                <div className="highlighted-loc-info" style={highlightedLocStyle}>
                            <span> {formatContent(highlightedLocLabelFormat, {
-                                value: highlightedLocData.value,
-                                locationName: highlightedLocData.label,
-                                measureName: highlightedLocData.measure
-                            }, intl)}
-                            </span>
-                        </div>
-                    }
+                               value: highlightedLocData.value,
+                               locationName: highlightedLocData.label,
+                               measureName: highlightedLocData.measure
+                           }, intl, noDataText)}
 
-                {(editing || zoomEnabled) && <div className="control panel ignore">
-                    <div className="zoom plus" onClick={this.onZoomIn}><Icon name='plus' size='large'/></div>
-                    <div className="zoom minus" onClick={this.onZoomOut}><Icon name='minus' size='large'/></div>
-                    <Popup content={<FormattedMessage id="map.reset.tooltip" defaultMessage="Reset zoom"/>}
-                           trigger={<div className="reset" onClick={this.onReset}>
-                               <Icon name='repeat' size='large'/></div>}/>
-                </div>}
-                </div> 
+                            </span>
+                                </div>
+                            }
+
+                            {(editing || zoomEnabled) && <div className="control panel ignore">
+                                <div className="zoom plus" onClick={this.onZoomIn}><Icon name='plus' size='large'/>
+                                </div>
+                                <div className="zoom minus" onClick={this.onZoomOut}><Icon name='minus' size='large'/>
+                                </div>
+                                <Popup content={<FormattedMessage id="map.reset.tooltip" defaultMessage="Reset zoom"/>}
+                                       trigger={<div className="reset" onClick={this.onReset}>
+                                           <Icon name='repeat' size='large'/></div>}/>
+                            </div>}
+                        </div>
+                    </>}
             </div>)
     }
 }

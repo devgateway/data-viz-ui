@@ -58,7 +58,7 @@ const AxisConfig = (props) => {
                     title={__('X Axis Text Background')}
                     colorSettings={[
                         {
-                            value: decodeURIComponent(tickColor ? tickColor : "#f0f0f1"),
+                            value: decodeURIComponent(tickColor ? tickColor : "#FFFFFF"),
                             onChange: (color) => {
                                 if (color) {
                                     setAttributes({tickColor: encodeURIComponent(color)})

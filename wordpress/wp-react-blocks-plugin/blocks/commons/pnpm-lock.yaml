@@ -2314,7 +2314,7 @@ packages:
       npm: '>=6.9'
     hasBin: true
     resolution:
-      integrity: sha512-4S+zm/fzt5o3tbewEhWVfCFZOPcBoeBae+7E4xFCWZ0gqnMxxZ0s4r4vizfygMgnlAuXQjJLJl+Lo1F2FKzGg==
+      integrity: sha512-4S+zm/fzt5o3tbewEhWVfCFZOPcBoeBae+7E4xFCWZ0gqnMxxZ0s4r4TcdifygMgnlAuXQjJLJl+Lo1F2FKzGg==
   /@wordpress/stylelint-config/19.0.4_stylelint@13.13.1:
     dependencies:
       stylelint: 13.13.1

@@ -76,7 +76,7 @@ class BlockEdit extends BlockEditWithFilters {
 
         url += (categories ? (taxonomy ? '?' + taxonomy : '&categories') + "=" + (categories ? categories : "") : '') //ids
         apiFetch({path: url}).then((data) => {
-            debugger;
+            
             const newConfig = [...configuration]
             data.forEach((post, i) => {
                 if (!newConfig[i]) {
