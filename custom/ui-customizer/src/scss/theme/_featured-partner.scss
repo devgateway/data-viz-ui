@@ -1,0 +1,23 @@
+.featured-partner-wrapper {
+    background-color: #ffffff !important;
+    padding: 1em;
+    margin: 0 !important;
+    .featured-partner-info {
+        padding-left: 0 !important;
+        .featured-partner-info-title {
+            color: #354052 !important;
+            margin-bottom: 0.2em !important;
+        }
+        .featured-partner-info-heading {
+            color: #a95313 !important;
+            margin-bottom: 0.4em !important;
+        }
+        .featured-partner-info-description {
+            color:#373d4b !important;
+            margin-bottom: 0.8em !important;
+        }
+        .featured-partner-info-read-more {
+            color:#373d4b !important;
+        }
+    }
+}

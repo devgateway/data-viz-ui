@@ -1,0 +1,88 @@
+.latest-resources-primary-wrapper {
+    background-color: #188F62 !important;
+    border-radius: 0.2em;
+    color: #ffffff;
+    padding: 0 !important;
+    margin: -1rem 0 -1.4em 0 !important;
+    .latest-resources-primary-image-wrapper {
+        padding: 1.4rem !important;
+    }
+    .latest-resources-primary-image {
+        width: 100% !important;
+    }
+    .latest-resources-primary-date-wrapper {
+        padding: 1.4rem 1.4rem 0 1.4rem !important;
+    }
+    .latest-resources-primary-title-wrapper {
+        padding: 0 1.4rem !important;
+    }
+    .latest-resources-primary-title {
+        font-size: 1.4em;
+    }
+    .latest-resources-primary-link-wrapper {
+        padding: 0.2em 1.4rem !important;
+    }
+    .latest-resources-primary-link-wrapper a {
+        color: #ffffff;
+        font-size: 0.8em;
+        font-weight: bold;
+    }
+}
+
+.latest-resources-secondary-wrapper {
+    border-radius: 0.2em;
+    color: #ffffff;
+    padding: 0 !important;
+    margin: 0 !important;
+    height: 50% !important;
+    opacity: 0.8;
+    z-index: 10;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-end;
+
+    .latest-resources-secondary-image {
+        background-size: 100% 100%;
+        width: 100%;
+        height: 100%;
+        background-repeat: no-repeat;
+        position: absolute;
+    }
+    .latest-resources-secondary-date-wrapper {
+        padding-bottom: 0.2em !important;
+    }
+    .latest-resources-secondary-title-wrapper {
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+    }
+    .latest-resources-secondary-title {
+        font-size: 0.9em;
+    }
+    .latest-resources-secondary-link-wrapper {
+        padding-top: 0.2em !important;
+        padding-bottom: 10px !important;
+    }
+    .latest-resources-secondary-link-wrapper a {
+        color: #ffffff;
+        font-size: 0.7em;
+        font-weight: bold;
+    }
+}
+
+.latest-resources-secondary-wrapper-1 {
+    background-color: #D6C826 !important;
+    margin-left: -0.4em !important;
+    margin-right: 0.4em !important;
+    margin-bottom: 0.4em !important;
+}
+.latest-resources-secondary-wrapper-2 {
+    background-color: #188F62 !important;
+}
+.latest-resources-secondary-wrapper-3 {
+    background-color: #575757 !important;
+    margin-left: -0.4em !important;
+    margin-right: 0.4em !important;
+}
+.latest-resources-secondary-wrapper-4 {
+    background-color: #A7541A !important;
+}

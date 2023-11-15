@@ -1,0 +1,67 @@
+{
+  "name": "@devgateway/customizer",
+  "version": "0.1.0",
+  "author": "Sebastian Dimunzio <sdimunzio@developmentgateway.org/>",
+  "private": true,
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "files": [
+    "dist",
+    "dist/css",
+    "README.md"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "react-scripts": "^5.0.0",
+    "watch": "^1.0.2"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.14.3",
+    "@babel/preset-react": "^7.13.13",
+    "node-sass": "^4.14.1"
+
+  },
+  "peerDependencies": {
+    "react": "*",
+    "react-dom": "*",
+    "react-redux": "*",
+    "semantic-ui-react": "*",
+    "immutable": "*"
+  },
+  "scripts": {
+    "dist": "node-sass ./src/scss -o ./dist/css &&  babel src/ -d dist --copy-files  && npm link",
+    "css_dist": "node-sass ./src/scss -o ./dist/css",
+    "watch": "watch 'npm run dist ' ./src",
+    "css": "watch 'npm run css_dist ' ./src"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "babel": {
+    "presets": [
+      "@babel/preset-react"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/devgateway/dg-wp-react.git"
+  },
+  "keywords": [
+    "react"
+  ]
+}

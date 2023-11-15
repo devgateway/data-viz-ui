@@ -1,10 +1,10 @@
 {
-  "name": "ui20",
-  "version": "0.1.0",
+  "name": "DVZUI",
+  "version": "1.0.0",
   "private": true,
   "dependencies": {
     "@artsy/fresnel": "^1.9.0",
-    "@devgateway/embedded": "file:../../embedded",
+    "@devgateway/customizer": "file:../../custom/ui-customizer",
     "@devgateway/wp-react-lib": "file:../react-lib/wp-react-lib",
     "@nivo/bar": "0.72.0",
     "@nivo/bump": "0.72.0",
@@ -79,6 +79,7 @@
     "string-template": "^1.0.0",
     "topojson": "^3.0.2",
     "topojson-client": "^3.1.0",
+    "versor": "^0.2.0",
     "webpack-node-externals": "^3.0.0"
   },
   "scripts": {
