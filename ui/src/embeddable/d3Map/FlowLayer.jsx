@@ -7,6 +7,7 @@ import {parse} from "../utils/parseUtils";
 import * as d3 from "d3";
 import {injectIntl} from "react-intl";
 
+import BreaksStyles from "./BreaksStyles.js";
 
 class DataLayer extends BaseLayer {
     constructor() {
@@ -18,47 +19,30 @@ class DataLayer extends BaseLayer {
 
     createDataLayer(json) {
         const {
-            app,
-            svg,
             format,
-            id,
-            file,
             path,
-            onLayerCreated,
-            labelFilter = [],
-            labelField,
-            labelFontSize,
-            labelColor,
-            fillColor,
-            borderColor,
             tooltip,
             markFillColor,
-            markFillColor2,
-            markLabelColor,
             markBorderColor,
-            markBorderColor2,
-            markSizeScale,
-            markSizeScale2,
-            markerLabelSize,
+            markSizeScale, //circle size
             featureJoinAttribute,
             apiJoinAttribute,
-            measures,
-            editing,
-            data,
-            patternDiscriminator,
-            breaks,
-            patterns,
             projection,
-            useBreaks,
-            useCentroidPoint,
-            usePattern,
-            patternWidth = .35,
-            patternHeight = .25,
-            intl,
-
-
+            breaks,
+            markSizeScale2, //arrow size
+            flowValuesFrom,
+            measures,
         } = this.props
 
+        const measure = measures[0];
+
+
+        const brStyles = new BreaksStyles({
+            breaks: breaks,
+            defaultFillColor: markFillColor,
+            defaultBorderColor: markBorderColor,
+            defaultSize: markSizeScale2
+        })
 
         let numberFormat = {
             style: (format.style === 'compacted') ? 'decimal' : format.style,
@@ -68,31 +52,6 @@ class DataLayer extends BaseLayer {
             maximumFractionDigits: parseInt(format.maximumFractionDigits)
         }
 
-        const sizeScale = d3.scaleThreshold()
-            .domain(breaks.map(d => d.end))
-            .range(breaks.map(d => d.size));
-
-        const colorScale = d3.scaleThreshold()
-            .domain(breaks.map(d => d.end))
-            .range(breaks.map(d => d.color));
-
-        let getSize = (value) => {
-            if (breaks.length > 0) {
-                return markSizeScale2 + sizeScale(value)
-            }
-            return markSizeScale2
-        }
-
-        let getColor = (value, isMarker) => {
-            if (breaks.length > 0) {
-                if (value > Math.max(...breaks.map(d => parseInt(d.end)))) {
-                    return markFillColor
-                } else {
-                    return colorScale(value)
-                }
-            }
-            return markFillColor
-        }
 
         const filteredData = json.features.filter(f => f.properties._value != null)
 
@@ -127,104 +86,120 @@ class DataLayer extends BaseLayer {
 
 
         filteredData.forEach(d1 => {
+
             //collect starting points ro be rendered later and keep them on top of the svg layers
-            originPoints.push(d1)
-            d1.properties.destinations.forEach(dest => {
-                dest.children.forEach(child => {
-                    json.features.filter(feature => feature.properties[featureJoinAttribute] == child.value)
-                        .forEach(d2 => {
+            originPoints.push(d1) //started points to be rendered later
+
+            d1.properties.destinations.forEach(child => {
+                const value = child[measure] //value by target country
+
+                json.features.filter(feature => feature.properties[featureJoinAttribute] == child.value)
+                    .forEach(d2 => {
+
+                        const originID = d1.properties[featureJoinAttribute]
+                        const id = d1.properties[featureJoinAttribute] + "--" + d2.properties[featureJoinAttribute];
+
+                        var link = {
+                            type: "LineString", coordinates: [
+                                [projection.invert(path.centroid(d1))[0],
+                                    projection.invert(path.centroid(d1))[1]
+                                ],
+                                [projection.invert(path.centroid(d2))[0],
+                                    projection.invert(path.centroid(d2))[1]]]
+                        } // Change these data to see ho the great circle reacts
+                        //d1 is origin
+                        //d2 is destination
+                        
+                        this.g.select("defs")
+                            .append("marker")
+                            .attr("id", "arrow" + id)
+                            .attr("markerUnits", "strokeWidth")
+                            .attr("markerWidth", "6")
+                            .attr("markerHeight", "6")
+                            .attr("viewBox", "0 0 24 24")
+                            .attr("refX", "6")
+                            .attr("refY", "6")
+                            .attr("orient", "auto")
+                            .append("path")
+                            .attr("d", "M2,2 L10,6 L2,10 L6,6 L2,2")
+                            .attr("d", "M2,2 L10,6 L2,10 L6,6 L2,2")
+                            .attr("style", e => {
+
+                                return "fill: " + brStyles.getColor(value) + ";"
+                            });
+
+                        const g = this.g;
+
+                        this.g.append("path")
+
+                            .attr("d", path(link))
+                            .attr("class", "flow-line")
+                            .style("fill", "none")
+                            .style("cursor", "pointer")
+                            .style("stroke-dasharray", "0")
+                            .style("stroke", d => {
+                                
+                                return brStyles.getColor(value)
+                            })
+                            .style("stroke-width", d => {
+                                
+                                return brStyles.getSize(value)
+                            })
+                            .attr("marker-end", "url(#arrow" + id + ")")
+
+                            .on("mouseenter", d => {
+                                g.selectAll("marker").transition().duration("200").style("opacity", 0)
+                                g.selectAll(".start-point").transition().duration("200").style("opacity", 0)
+                                g.selectAll(".flow-line").transition().duration("200")
+                                    .style("opacity", 0)
+
+                                d3.select(d3.event.target).transition().duration("200").style("opacity", 1)
+
+                                g.selectAll("#arrow" + id).transition().duration("200").style("opacity", 1)
 
 
-                            var link = {
-                                type: "LineString", coordinates: [
-                                    [projection.invert(path.centroid(d1))[0],
-                                        projection.invert(path.centroid(d1))[1]
-                                    ],
-                                    [projection.invert(path.centroid(d2))[0],
-                                        projection.invert(path.centroid(d2))[1]]]
-                            } // Change these data to see ho the great circle reacts
-
-                            this.g.select("defs")
-                                .append("marker")
-                                .attr("id", "arrow" + d1.properties[featureJoinAttribute])
-                                .attr("markerUnits", "strokeWidth")
-                                .attr("markerWidth", "6")
-                                .attr("markerHeight", "6")
-                                .attr("viewBox", "0 0 12 12")
-                                .attr("refX", "6")
-                                .attr("refY", "6")
-                                .attr("orient", "auto")
-                                .append("path")
-
-                                .attr("d", "M2,2 L10,6 L2,10 L6,6 L2,2")
-                                .attr("style", "fill: " + getColor(d1.properties._value) + ";");
-
-                            const g = this.g;
-
-                            this.g.append("path")
-
-                                .attr("d", path(link))
-                                .attr("class", "flow-line")
-                                .style("fill", "none")
-                                .style("cursor", "pointer")
-                                .style("stroke-dasharray", "0")
-                                .style("stroke", d => {
-                                    return getColor(d1.properties._value)
-                                })
-                                .style("stroke-width", d => {
-                                    return getSize(d1.properties._value)
-                                })
-                                .attr("marker-end", "url(#arrow" + d1.properties[featureJoinAttribute] + ")")
-
-                                .on("mouseenter", d => {
-                                    g.selectAll("marker").transition().duration("200").style("opacity", 0)
-                                    g.selectAll(".start-point").transition().duration("200").style("opacity", 0)
-                                    g.selectAll(".flow-line").transition().duration("200")
-                                        .style("opacity", 0)
-                                    d3.select(d3.event.target).transition().duration("200").style("opacity", 1)
-                                    g.selectAll("#arrow" + d1.properties[featureJoinAttribute]).transition().duration("200").style("opacity", 1)
-                                    g.selectAll(".start-point.circle_" + d1.properties[featureJoinAttribute]).transition().duration("200").style("opacity", 1)
-
-                                    if (d1.properties._value) {
-                                        const origin = {}
-                                        const target = {}
-                                        Object.keys(d1.properties).forEach(key => {
-                                            origin["origin_" + key] = d1.properties[key]
-                                        })
-                                        Object.keys(d2.properties).forEach(key => {
-                                            target["target_" + key] = d2.properties[key]
-                                        })
-                                        const variables = {
-                                            ...origin,
-                                            ...target,
-                                            meta: {
-                                                [apiJoinAttribute]: d1.properties.meta ? d1.properties.meta.value : '',
-                                                ...d1.properties.meta,
-                                                value: d1.properties._value,
-                                            }
+                                g.selectAll(".start-point.circle_" + originID).transition().duration("200").style("opacity", 1)
+                                
+                                if (value) {
+                                    const origin = {}
+                                    const target = {}
+                                    Object.keys(d1.properties).forEach(key => {
+                                        origin["origin_" + key] = d1.properties[key]
+                                    })
+                                    Object.keys(d2.properties).forEach(key => {
+                                        target["target_" + key] = d2.properties[key]
+                                    })
+                                    const variables = {
+                                        ...origin,
+                                        ...target,
+                                        meta: {
+                                            [apiJoinAttribute]: d1.properties.meta ? d1.properties.meta.value : '',
+                                            ...d1.properties.meta,
+                                            value,
                                         }
-                                        this.showToolTip(tooltip, variables, getColor(d1.properties._value))
                                     }
-                                })
-                                .on("mouseout", d => {
-                                    /*Hidden others paths*/
-                                    this.hiddenToolTip()
-                                    d3.selectAll(".flow-line").transition().duration("100").style("opacity", 1)
-                                    g.selectAll(".start-point").transition().duration("100").style("opacity", 1)
-                                    g.selectAll("marker").transition().duration("100").style("opacity", 1)
+                                    this.showToolTip(tooltip, variables, brStyles.getColor(d2.properties._value))
+                                }
+                            })
+                            .on("mouseout", d => {
+                                /*Hidden others paths*/
+                                this.hiddenToolTip()
+                                d3.selectAll(".flow-line").transition().duration("100").style("opacity", 1)
+                                g.selectAll(".start-point").transition().duration("100").style("opacity", 1)
+                                g.selectAll("marker").transition().duration("100").style("opacity", 1)
 
-                                })
+                            })
 
 
-                        })
+                    })
 
 
-                })
             })
         })
+
         originPoints.forEach(d1 => {
             this.g.append("circle")
-                .attr("fill", getColor(d1.properties._value))
+                .attr("fill", markFillColor)
                 .attr("stroke", markBorderColor)
                 .attr("class", "start-point circle_" + d1.properties[featureJoinAttribute])
                 .attr("stroke-width", 2)
@@ -234,7 +209,19 @@ class DataLayer extends BaseLayer {
                 .attr('r', () => {
                     return markSizeScale * 1 / k
                 })
+                .on("mouseenter", d => {
+
+                    this.showToolTip("{name_en}", d1.properties, "")
+
+                })
+                .on("mouseout", d => {
+                    /*Hidden others paths*/
+                    this.hiddenToolTip()
+
+
+                })
         })
+
     }
 
 
@@ -258,26 +245,24 @@ class DataLayer extends BaseLayer {
             markFillColor,
             markSizeScale,
             measures,
-            patternDiscriminator
+            flowValuesFrom
         } = this.props
 
 
         if (file != "none") {
             this.loadJSON(file).then(json => {
-
                 const features = json.features.map(d => {
                     const joinValue = d.properties[featureJoinAttribute]
-
                     if (app != 'csv' && data && data.children) {
                         const values = data.children.filter(d => d.value.indexOf(joinValue) > -1)
                         if (values.length > 0) {
                             const measureValue = (values[0][measures[0]])
                             d.properties.meta = values[0]
                             d.properties._value = measureValue
-                            d.properties.destinations = values
+                            d.properties.destinations = values[0].children
                         }
                     } else if (app == 'csv') {
-                        debugger;
+
                     }
                     return d
                 })
@@ -299,22 +284,7 @@ class DataLayer extends BaseLayer {
 
     render() {
 
-        const {
-            id,
-            file,
-            path,
-            zoom,
-            labelFilter = [],
-            labelField,
-            labelFontSize,
-            labelColor,
-            fillColor,
-            borderColor,
-            featureJoinAttribute,
-            apiJoinAttribute,
-            editing,
-            markFillColor2,
-        } = this.props
+        const {id} = this.props
 
         return <g id={"data-" + id} className={"data " + id} ref={this.gRef}>
             <defs>
@@ -326,9 +296,7 @@ class DataLayer extends BaseLayer {
 }
 
 const DataWrapper = (props) => {
-    const {
-        id, unique, filters, csv, app, group = "default", flowOrigin, editing, flowDestination,
-    } = props
+    const {id, unique, filters, csv, app, group = "default", flowOrigin, editing, flowDestination} = props
 
     let params = {}
 

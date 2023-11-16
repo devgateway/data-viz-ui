@@ -13,50 +13,63 @@ class BaseLayer extends React.Component {
         this.loadJSON = this.loadJSON.bind(this)
         this.create = this.create.bind(this)
         this.createLayer = this.createLayer.bind(this)
+        this.loadJSON = this.loadJSON.bind(this)
         this.showToolTip = this.showToolTip.bind(this)
         this.moveToolTip = this.moveToolTip.bind(this)
         this.gRef = React.createRef();
+        this.state = {json: null}
 
     }
 
     loadJSON(url) {
+
         return new Promise((resolve, reject) => {
             d3.json(url).then(function (us, error) {
-                if (error) reject(error);
+                if (error) {
+                    console.log("Error loading JSON: " + error)
+                }
+                ;
                 resolve(us)
-            });
+            }.bind(this));
         })
     }
 
 
     createLayer(json) {
+        alert("please implement createLayer")
     }
 
     create() {
         const {
             file,
-
         } = this.props
-        if (file != "none") {
+
+        if (this.state.json) {
+            this.createLayer(this.state.json)
+        } else {
             this.loadJSON(file).then(json => {
                 this.createLayer(json)
-            });
+
+            })
         }
     }
 
 
     showToolTip(content, data, color) {
-        const tip = d3.select("body").append("div")
-            .attr("class", "d3MapTooltip")
-            .style("position", "absolute")
-            //.style("background-color", color)
-            .html("")
-            .style("left", (d3.event.pageX + 15) + "px")
-            .style("top", (d3.event.pageY - 50) + "px")
+        debugger;
+        if (data) {
 
-        ReactDOM.render(<Tooltip intl={this.props.intl} tooltip={content} data={data}
-                                 tooltipEnableMarkdown={false}/>, tip._groups[0][0])
+            const tip = d3.select("body").append("div")
+                .attr("class", "d3MapTooltip")
+                .style("position", "absolute")
+                //.style("background-color", color)
+                .html("")
+                .style("left", (d3.event.pageX + 15) + "px")
+                .style("top", (d3.event.pageY - 50) + "px")
 
+            ReactDOM.render(<Tooltip intl={this.props.intl} tooltip={content} data={data}
+                                     tooltipEnableMarkdown={false}/>, tip._groups[0][0])
+        }
     }
 
 

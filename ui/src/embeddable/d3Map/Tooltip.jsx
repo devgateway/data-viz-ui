@@ -32,7 +32,6 @@ const applyFormat = (expresion, str, style, isPercent, intl, container) => {
 }
 
 export const formatContent = (tooltip, variables, intl) => {
-    debugger
     let str = template((tooltip), {...variables, ...variables.meta}).replace(/(?:\r\n|\r|\n)/g, '<br>');
     str = applyFormat(percentExpresion, str, {style: 'percent'}, true, intl)
     str = applyFormat(numericExpresion, str, {style: 'decimal'}, false, intl)
