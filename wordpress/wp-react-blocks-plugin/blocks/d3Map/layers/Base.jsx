@@ -179,7 +179,7 @@ const Base = (props) => {
                             }}
                         />
                     </PanelRow>
-                    {features && features.map(feature => <>
+                    {features && features.sort(f=>f.properties[labelField]).map(feature => <>
                         <PanelRow>
                             <ToggleControl
                                 label={feature.properties[labelField]}
@@ -189,7 +189,7 @@ const Base = (props) => {
                                 }}
                             />
                         </PanelRow>
-                        {(labelFilter.indexOf(feature.properties[labelField]) == -1) && <PanelBody initialOpen={false}>
+                        {(labelFilter.indexOf(feature.properties[labelField]) == -1) && <PanelBody title={__("Rotation")} initialOpen={false}>
                             <PanelRow>
                                 <RangeControl
                                     label="Offset X"

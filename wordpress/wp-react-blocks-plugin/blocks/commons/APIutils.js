@@ -16,6 +16,7 @@ export const getTranslatedOptions = (options) => {
 }
 
 export const getTranslation = (translatable) => {
+    
     const currentLocale = (window._user_locale ? window._user_locale : '').toUpperCase()
     let {label, labels, value} = translatable
     if (labels && labels[currentLocale]) {
