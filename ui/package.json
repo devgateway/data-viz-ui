@@ -79,6 +79,7 @@
     "string-template": "^1.0.0",
     "topojson": "^3.0.2",
     "topojson-client": "^3.1.0",
+    "versor": "^0.2.0",
     "webpack-node-externals": "^3.0.0"
   },
   "scripts": {
