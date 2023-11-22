@@ -22,9 +22,11 @@ const MapWrapper = (props) => {
             "data-back-ground-color": bgColorParam = '#88e8dc',
             "data-map-position": paramMapPosition = {},
             "data-projection": projectionName = "geoMercator",
-
+            "data-zoom-enabled": zoomEnabled = true,
+            "data-rotation-enabled": rotationEnabled = false,
             intl
         } = props
+
 
         const [layers, setLayers] = useState(parse(dataLayers))
         const ref = useRef(null);
@@ -32,20 +34,28 @@ const MapWrapper = (props) => {
         const [transform, setTransform] = useState(null)
 
         useEffect(() => {
-          const newLayers = parse(dataLayers)
-          if (!compareJsonProps(layers, newLayers)) {
-            setLayers(newLayers)
-          }
+            const newLayers = parse(dataLayers)
+            if (!compareJsonProps(layers, newLayers)) {
+                setLayers(newLayers)
+            }
         }, [dataLayers])
 
         const toggleLayerView = (id) => {
-          const newLayers = layers.slice()
-          const ly = newLayers.find(l => l.id == id);
-          if (ly) {
-            ly.visible = !ly.visible
-          }
-          setLayers(newLayers)
+            const newLayers = layers.slice()
+            const ly = newLayers.find(l => l.id == id);
+            if (ly) {
+                ly.visible = !ly.visible
+            }
+            setLayers(newLayers)
         }
+
+
+        const [patterns, setPatterns] = useState({})
+
+        const onLayerCreated = (id, patterns) => {
+           // setPatterns({[id]: patterns})
+        }
+
 
         return (
             <div ref={ref} className={"d3map-container"}>
@@ -54,21 +64,22 @@ const MapWrapper = (props) => {
                                     width={width}
                                     projectionName={projectionName}
                                     editing={editing} initialPosition={parse(paramMapPosition, editing)}>
-                    <Map>
+                    <Map rotationEnabled={parse(rotationEnabled, editing)}>
                         {layers.filter(l => l.visible != false).map((layer, i) => {
                             if (layer.type === 'base') {
                                 return <BaseLayer transform={transform} intl={intl} zoom={zoomRef} unique={unique}
                                                   key={i} {...layer} />
                             }
                             if (layer.type === 'data') {
-                                return <DataLayer  transform={transform} intl={intl} group={group} zoom={zoomRef}
+                                return <DataLayer onLayerCreated={onLayerCreated} transform={transform} intl={intl}
+                                                  group={group} zoom={zoomRef}
                                                   unique={unique}
                                                   key={i} {...layer} />
                             }
                             if (layer.type === 'flow') {
-                                return <FlowLayer  transform={transform} intl={intl} group={group} zoom={zoomRef}
-                                                   unique={unique}
-                                                   key={i} {...layer} />
+                                return <FlowLayer transform={transform} intl={intl} group={group} zoom={zoomRef}
+                                                  unique={unique}
+                                                  key={i} {...layer} />
                             }
                             if (layer.type === 'dataPoints') {
                                 return <LatLongLayer transform={transform} intl={intl} group={group} zoom={zoomRef}
@@ -77,10 +88,18 @@ const MapWrapper = (props) => {
                             }
 
                         })}
+
+
                     </Map>
 
-                    <ZoomControl onZoomed={setTransform} width={width} height={height} ref={zoomRef} group={group} editing={editing}/>
-                    <Legends layers={layers} onItemClick={toggleLayerView}></Legends>
+
+                    <Legends patterns={patterns} layers={layers} onItemClick={toggleLayerView}></Legends>
+
+                    <ZoomControl rootationEmabled={parse(rotationEnabled, editing)}
+                                 zoomEnabled={parse(zoomEnabled, editing)} onZoomed={setTransform} width={width}
+                                 height={height} ref={zoomRef} group={group}
+                                 editing={editing}/>
+
 
                 </ProjectedContainer>
             </div>
