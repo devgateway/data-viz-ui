@@ -255,6 +255,7 @@ export class DataLayerSetting extends Component {
                 }
             }
         }
+      
         return ([<PanelBody initialOpen={false} title={"Data Source"}>
             <PanelRow>
                 <SelectControl

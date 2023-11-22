@@ -89,6 +89,8 @@ class BlockEdit extends ComponentWithSettings {
             className, isSelected, toggleSelection, setAttributes, attributes: {
                 projection,
                 panelStatus, mapPosition, height, width, group, backGroundColor, layers = [],
+                rotationEnabled,
+                zoomEnabled
             }
         } = this.props;
 
@@ -128,9 +130,9 @@ class BlockEdit extends ComponentWithSettings {
                         />
                     </PanelRow>
                 </PanelBody>
-                <PanelBody  initialOpen={false}//{panelStatus["PROJECTION"]}
-                            onToggle={e => togglePanel("PROJECTION", panelStatus, setAttributes)}
-                            title={__("Projection")}>
+                <PanelBody initialOpen={false}//{panelStatus["PROJECTION"]}
+                           onToggle={e => togglePanel("PROJECTION", panelStatus, setAttributes)}
+                           title={__("Projection")}>
                     <PanelRow>
                         <SelectControl
                             label={__("Projection")}
@@ -160,6 +162,15 @@ class BlockEdit extends ComponentWithSettings {
                         />
 
 
+                    </PanelRow>
+
+                    <PanelRow>
+                        <ToggleControl label={__('Enable Rotation')} checked={rotationEnabled}
+                                       onChange={e => setAttributes({rotationEnabled: !rotationEnabled})}></ToggleControl>
+                    </PanelRow>
+                    <PanelRow>
+                        <ToggleControl label={__('Enable Zoom Controls')} checked={zoomEnabled}
+                                       onChange={e => setAttributes({zoomEnabled: !zoomEnabled})}></ToggleControl>
                     </PanelRow>
                 </PanelBody>
                 <PanelBody
