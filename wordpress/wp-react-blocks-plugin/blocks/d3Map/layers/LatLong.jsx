@@ -12,7 +12,7 @@ import {
     TextControl,
     ToggleControl
 } from '@wordpress/components';
-import Measures from './utils/MapMeasures.jsx'
+import Measures from '../../commons/Measures.jsx'
 import Property from "./utils/Property";
 import {PanelColorSettings} from "@wordpress/block-editor";
 import BreaksGenerator from "./utils/BreaksGenerator";
@@ -51,7 +51,6 @@ const CategoricalFilter = ({value, index, items, onUpdateFilterValue}) => {
 export class DataLayerSetting extends Component {
     constructor(props) {
         super(props);
-        this.onMeasuresChange = this.onMeasuresChange.bind(this)
         this.onSetSingleMeasure = this.onSetSingleMeasure.bind(this)
         this.addFilter = this.addFilter.bind(this)
         this.updateFilterParam = this.updateFilterParam.bind(this)
@@ -170,16 +169,6 @@ export class DataLayerSetting extends Component {
         onChangeProperty("measures", [value])
     }
 
-    onMeasuresChange(value) {
-        const {onChangeProperty, attributes: {measures}} = this.props
-        if (measures.indexOf(value) > -1) {
-            onChangeProperty("measures", measures.filter(d => d != value))
-        } else {
-            onChangeProperty("measures", [...measures, value])
-        }
-    }
-
-
     items(type) {
 
         const values = this.props.allCategories ? this.props.allCategories.filter(c => c.type === type) : []
@@ -201,6 +190,7 @@ export class DataLayerSetting extends Component {
                 csv,
                 measures,
                 filters,
+                format,
                 featureJoinAttribute,
                 apiJoinAttribute,
                 type,
@@ -352,7 +342,9 @@ export class DataLayerSetting extends Component {
                 {pointStyleBy === 'measure' && <Measures
                   onFormatChange={this.onFormatChange}
                   onSetSingleMeasure={this.onSetSingleMeasure}
-                  {...this.props} />
+                  measures={measures}
+                  format={format}
+                  {...this.props}/>
                 }
 
                 {pointStyleBy === 'measure' && <BreaksGenerator

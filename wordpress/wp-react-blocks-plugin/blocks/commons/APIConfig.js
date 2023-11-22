@@ -1,7 +1,7 @@
 import {Component} from "@wordpress/element";
 import {__} from '@wordpress/i18n';
 import {Button, PanelBody, PanelRow, SelectControl, ToggleControl} from '@wordpress/components';
-import Measures from './Measures.jsx'
+import ChartMeasures from './ChartMeasures.jsx'
 
 const defaultFormat = {
     "style": "percent",
@@ -334,7 +334,7 @@ export class APIConfig extends Component {
                     />
                 </PanelRow>}
             </PanelBody>,
-                <Measures
+                <ChartMeasures
 
                     onFormatChange={this.onFormatChange}
                     onUseCustomAxisFormatChange={this.onUseCustomAxisFormatChange}

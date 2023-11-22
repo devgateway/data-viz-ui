@@ -9,8 +9,8 @@ import {
     ToggleControl
 } from '@wordpress/components';
 import {__} from '@wordpress/i18n';
-import Colors from "./Colors.jsx"
-import Legends from "./Legends.jsx";
+import ChartColors from "../commons/ChartColors.jsx"
+import ChartLegends from "../commons/ChartLegends.jsx";
 
 const PieOptions = (props) => {
 
@@ -32,7 +32,7 @@ const PieOptions = (props) => {
 
     
     return [<PanelBody initialOpen={false} title={__("Pie Options")}>
-        <Colors {...props}></Colors>
+        <ChartColors {...props}></ChartColors>
         <PanelRow title={"Start Angle"}>
             <AnglePickerControl value={startAngle} onChange={value => setAttributes({startAngle: value})}/>
         </PanelRow>
@@ -62,7 +62,7 @@ const PieOptions = (props) => {
                 checked={showArcLinkLabels}
                 onChange={() => setAttributes({showArcLinkLabels: !showArcLinkLabels})}/>
         </PanelRow>
-        <Legends {...props}></Legends>
+        <ChartLegends {...props}></ChartLegends>
 
 
         <PanelBody initialOpen={false} title={__("Center Label")}>

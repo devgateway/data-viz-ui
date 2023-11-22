@@ -1,7 +1,7 @@
 import {AnglePickerControl, PanelBody, PanelRow, SelectControl} from '@wordpress/components';
 import {__} from '@wordpress/i18n';
-import Colors from "./Colors.jsx"
-import Legends from "./Legends.jsx";
+import ChartColors from "../commons/ChartColors.jsx"
+import ChartLegends from "../commons/ChartLegends.jsx";
 import Format from "./Format.jsx";
 
 const PieOptions = (props) => {
@@ -22,7 +22,7 @@ const PieOptions = (props) => {
             />
         </PanelRow>
 
-        <Colors {...props}></Colors>
+        <ChartColors {...props}></ChartColors>
 
         <Format {...props}></Format>
     </PanelBody>]

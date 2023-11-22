@@ -4,7 +4,7 @@ import {__} from '@wordpress/i18n';
 import {useEffect} from "react";
 import Papa from 'papaparse'
 import {useRef, useState} from "@wordpress/element";
-import {getTranslation} from "../commons/APIutils";
+import {getTranslation} from "./APIutils";
 
 const OVERALL = 'Overall';
 const system = [{value: "system", label: 'System Colors'}, {value: "manual", label: 'Manual Colors'}]
@@ -15,6 +15,7 @@ export const categorical = [{value: "nivo", label: 'nivo'}, {
 }, {value: "pastel1", label: 'pastel1'}, {value: "pastel2", label: 'pastel2'}, {
     value: "set1", label: 'set1'
 }, {value: "set2", label: 'set2'}, {value: "set3", label: 'set3'}]
+
 
 export const sequential = [{value: "blues", label: 'blues'}, {value: "greens", label: 'greens'}, {
     value: "greys", label: 'greys'
@@ -32,10 +33,20 @@ export const sequential = [{value: "blues", label: 'blues'}, {value: "greens", l
     value: "yellow_orange_red", label: 'yellow_orange_brown'
 }]
 
+export const diverging = [{value: "brown_blueGreen", label: 'brown_blueGreen'},
+    {value: "purpleRed_green", label: 'purpleRed_green'},
+    {value: "pink_yellowGreen", label: 'pink_yellowGreen'},
+    {value: "purple_orange", label: 'purple_orange'},
+    {value: "red_blue", label: 'red_blue'},
+    {value: "red_grey", label: 'red_grey'},
+    {value: "red_yellow_blue", label: 'red_yellow_blue'},
+    {value: "red_yellow_green", label: 'red_yellow_green'},
+    {value: "spectral", label: 'spectral'}
+]
 
 const plainColor = {value: "plain_color", label: 'Use Plain color'};
 
-const Colors = (props) => {
+const ChartColors = (props) => {
     const {
         allDimensions, allFilters, allMeasures, allCategories, allApps, setAttributes, attributes: {
             swap,
@@ -499,4 +510,4 @@ const Colors = (props) => {
         </PanelRow>]
 }
 
-export default Colors
+export default ChartColors

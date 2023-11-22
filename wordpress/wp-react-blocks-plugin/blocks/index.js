@@ -28,6 +28,7 @@ require("./d3Map")
 require("./parallax-container")
 require("./menu")
 require("./wrapped-component")
+require("./sankey-chart")
 require("../../../../custom/wp-customizer/blocks/index")
 
 
