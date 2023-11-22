@@ -1,7 +1,7 @@
 import {PanelBody, PanelRow, RangeControl, TextControl, ToggleControl} from '@wordpress/components';
 import {__} from '@wordpress/i18n';
-import Colors from "./Colors.jsx"
-import Legends from './Legends.jsx'
+import ChartColors from "../commons/ChartColors.jsx"
+import ChartLegends from '../commons/ChartLegends.jsx'
 import AxisConfig from './AxisConfig.jsx'
 import Labels from "./Labels.jsx"
 import LineOverlay from "./LineOverlayConfig.jsx";
@@ -131,7 +131,7 @@ const BarOptions = (props) => {
     return [<PanelBody initialOpen={false} title={__("Bar Options")}>
 
         <PanelBody initialOpen={false} title={__("Colors")}>
-            <Colors  {...props}></Colors>
+            <ChartColors  {...props}></ChartColors>
 
         </PanelBody>
         <PanelBody initialOpen={false} title={"Layout"}>
@@ -272,7 +272,7 @@ const BarOptions = (props) => {
             </PanelRow>
         </PanelBody>
 
-        <Legends {...props}></Legends>
+        <ChartLegends {...props}></ChartLegends>
 
         <PanelBody initialOpen={false} title={__("Line Overlay")}>
             <PanelRow>

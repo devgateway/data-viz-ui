@@ -43,8 +43,7 @@ const CSVConfig = ({attributes: {csv, panelStatus, measures}, setAttributes}) =>
     }
 
     return (
-        [<PanelBody title={__("CSV Configuration")}
-                    initialOpen={panelStatus["csv_cfg"]}
+        [<PanelBody initialOpen={false} title={__("CSV Configuration")}
                     onToggle={e => togglePanel("csv_cfg",panelStatus,setAttributes)}>
             <PanelRow>
                 <TextareaControl

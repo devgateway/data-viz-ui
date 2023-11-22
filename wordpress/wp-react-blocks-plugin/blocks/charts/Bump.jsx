@@ -1,7 +1,7 @@
 import {PanelBody, PanelRow, SelectControl} from '@wordpress/components';
 import {__} from '@wordpress/i18n';
-import Colors from "./Colors.jsx"
-import Legends from './Legends.jsx'
+import ChartColors from "../commons/ChartColors.jsx"
+import ChartLegends from '../commons/ChartLegends.jsx'
 import AxisConfig from './AxisConfig.jsx'
 
 const BumpOptions = (props) => {
@@ -9,8 +9,8 @@ const BumpOptions = (props) => {
     return [
 
         <PanelBody initialOpen={false}   title={__("Bump Options")}>
-            <Colors {...props}></Colors>
-            <Legends {...props}></Legends>
+            <ChartColors {...props}></ChartColors>
+            <ChartLegends {...props}></ChartLegends>
             {colorBy === "id" && <AxisConfig {...props}></AxisConfig>}
 
 
