@@ -32,7 +32,6 @@ class ColorProvider extends React.Component {
         let colorManager;
 
            if (data) {
-            debugger
             if (scheme === "system") {
                 colorManager = new SystemColors(app,type,colorBy, scheme, data, keys, indexBy, dimensionsMetadata, measuresMetadata, locale)
             } else if (scheme === "plain_color") {
