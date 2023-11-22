@@ -1,7 +1,7 @@
 import {PanelBody, PanelRow, SelectControl, ToggleControl} from '@wordpress/components';
 import {__} from '@wordpress/i18n';
-import Colors from "./Colors.jsx"
-import Legends from './Legends.jsx'
+import ChartColors from "../commons/ChartColors.jsx"
+import ChartLegends from '../commons/ChartLegends.jsx'
 import AxisConfig from './AxisConfig.jsx'
 import Labels from "./Labels.jsx"
 import Format from "./Format.jsx"
@@ -146,11 +146,11 @@ const LineOptions = (props) => {
         }
         </PanelBody>
         <PanelBody initialOpen={false}   title={__("Colors")}>
-        <Colors {...props}></Colors>
+        <ChartColors {...props}></ChartColors>
         </PanelBody>
         <AxisConfig {...props}></AxisConfig>
         <Labels {...props}></Labels>
-        <Legends {...props}></Legends>
+        <ChartLegends {...props}></ChartLegends>
     </PanelBody>]
 }
 

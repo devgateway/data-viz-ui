@@ -301,7 +301,6 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
                         value: a.instance[0].vipAddress,
                         settings: a.instance[0]
                     })), {label: 'CSV', value: 'csv'}] : [{label: 'CSV', value: 'csv'}]
-                  debugger
                   this.setState({
                       react_ui_url: settingsData["react_ui_url"] + '/' + window._page_locale,
                       react_api_url: settingsData["react_api_url"],
