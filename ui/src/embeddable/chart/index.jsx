@@ -14,8 +14,8 @@ import dataFrames from './data/index'
 
 
 import CSVDataFrame from "./CSVDataFrame";
-import ColorProvider from "./colors/ColorProvider"
-import Messages from "./Messages";
+import ColorProvider from "../common/colors/ColorProvider"
+import Messages from "../common/Messages";
 import {connect} from "react-redux";
 
 const PieChart = (props) => {
