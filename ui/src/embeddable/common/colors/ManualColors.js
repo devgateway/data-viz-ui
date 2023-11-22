@@ -61,10 +61,18 @@ class CustomColors extends Colors {
                 })
             }
 
+            const mapByKeys = () => {
+                Object.keys(manualColors).forEach(k => {
+                    this._manualColor[k] = manualColors[k]
+                })
+            }
+
             let items = []
             const whichDimension = type == 'line' ? 1 : colorBy === "index" ? 0 : 1
 
-            if (!dimensionsMetadata) {
+            if (!dimensionsMetadata && !measuresMetadata) {
+                mapByKeys()
+            } else if (!dimensionsMetadata) {
                 mapByMeasure()
             } else if (dimensionsMetadata.size == 1 && whichDimension == 1) {
                 //single dimension color by measures
