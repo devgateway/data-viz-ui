@@ -1,8 +1,8 @@
 import React, {useState} from 'react'
 import {injectIntl} from 'react-intl';
 import { ResponsiveRadar } from '@nivo/radar'
-import Tooltip from "./Tooltip"
-import {formatContent} from './Tooltip'
+import Tooltip from "../common/ChartTooltip"
+import {formatContent} from '../common/ChartTooltip'
 import {
     colorSchemes,
     isCategoricalColorScheme,
