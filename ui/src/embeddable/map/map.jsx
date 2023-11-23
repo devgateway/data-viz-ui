@@ -4,7 +4,7 @@ import {Container, Grid, Icon, Popup, Dimmer, Loader, Segment} from 'semantic-ui
 import React from 'react'
 import * as topojson from 'topojson'
 import Legend from './legend'
-import {formatContent} from '../common/Tooltip'
+import {formatContent} from '../common/MapTooltip'
 
 const geoStats = require('geostats')
 const COLOR_VARIABLE = "_Color_"
