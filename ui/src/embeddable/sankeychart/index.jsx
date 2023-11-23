@@ -50,7 +50,6 @@ const Chart = (props) => {
         'data-tooltip-enable-markdown': tooltipEnableMarkdown,
         'data-reverse-legend': reverseLegend,
         'data-sort': sort,
-        'data-tooltip': tooltip,
         'data-node-thickness': nodeThickness,
         'data-node-opacity': nodeOpacity,
         'data-node-hover-opacity': nodeHoverOpacity,
@@ -200,7 +199,6 @@ const Chart = (props) => {
 
         <Container className={"chart container"} style={{"minHeight": height + 'px'}} fluid={true}>
             <DataProvider
-                editing={editing}
                 style={{"height": `${contentHeight}px`}}
                 params={params}
                 app={app}
