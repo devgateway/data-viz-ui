@@ -1,7 +1,7 @@
 import React, {Fragment, useState} from 'react'
 import {injectIntl} from 'react-intl';
 import {ResponsiveLine} from '@nivo/line'
-import Tooltip from "./Tooltip"
+import Tooltip from "../common/ChartTooltip"
 import {area, line} from 'd3-shape'
 import {useTheme} from '@nivo/core'
 
