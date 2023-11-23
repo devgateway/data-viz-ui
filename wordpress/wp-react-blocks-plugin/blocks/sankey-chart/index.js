@@ -106,6 +106,10 @@ registerBlockType(process.env.BLOCKS_NS + '/sankeychart',
                 type: "String",
                 default: "dimension,Key1,Key2,Key3 \nIndex1,12,13,14 \nIndex2,22,23,34 \nIndex3,32,33,34"
             },
+            tooltipEnableMarkdown: {
+                type: 'Boolean',
+                default: false
+            },
             tooltipHTML: {
                 type: "String",
                 default: "{value}"
