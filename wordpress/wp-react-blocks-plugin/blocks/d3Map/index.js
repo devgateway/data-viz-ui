@@ -45,7 +45,14 @@ registerBlockType(process.env.BLOCKS_NS + '/new-d3-map',
                 type: "Object",
                 default: {}
             },
-
+            zoomEnabled: {
+                type: "Boolean",
+                default: true
+            },
+            rotationEnabled: {
+                type: "Boolean",
+                default: false
+            }
 
         },
         edit: BlockEdit,

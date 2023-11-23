@@ -205,7 +205,7 @@ export class DataLayerSetting extends Component {
 
     render() {
         const {
-            onChangeProperty, allDimensions, allFilters, allMeasures, allCategories, features, apps, layer,layer: {
+            onChangeProperty, allDimensions, allFilters, allMeasures, allCategories, features, apps, layer, layer: {
                 app,
                 csv,
                 measures,
@@ -237,7 +237,7 @@ export class DataLayerSetting extends Component {
                 flowOrigin,
                 flowDestination,
                 onRemoveLayer,
-                onMoveLayer,
+                flowValuesFrom,
             }
         } = this.props
 
@@ -245,7 +245,7 @@ export class DataLayerSetting extends Component {
         let selectedMeasureValue = ""
 
         if (app != 'csv') {
-            debugger;
+            
             const theMeasure = measures ? measures[0] : null
             const selectedMeasure = allMeasures && theMeasure ? allMeasures.filter(m => m.value == theMeasure)[0] : null
             if (selectedMeasure) {
@@ -260,7 +260,7 @@ export class DataLayerSetting extends Component {
                 }
             }
         }
-        debugger;
+        
         return ([<PanelBody initialOpen={false} title={"Data Source"}>
             <PanelRow>
                 <SelectControl
@@ -314,6 +314,7 @@ export class DataLayerSetting extends Component {
                 />
             </PanelRow>}
 
+
             <PanelRow>
                 <TextareaControl
                     label={__("Tooltip")}
@@ -330,10 +331,12 @@ export class DataLayerSetting extends Component {
                          "text-align": "left",
                          "color": "rgb(117, 117, 117)"
                      }}>
-                    {app != 'csv' && allMeasures && allMeasures.map(m => <p>{"{"}{m.value}{"{"}</p>)}
+                    {app != 'csv' && allMeasures && allMeasures.map(m => <p>{"{"}{m.value}{"}"}</p>)}
                     <p>
-                        All features attributes are available as variables, use origin_ prefix for origin attributes and use
-                        target_ prefix for destination attributes i.e From {"{"}origin_name{"}"} to {"{"}target_name{"}"} : {"{"}value{"}"}
+                        All features attributes are available as variables, use origin_ prefix for origin attributes and
+                        use
+                        target_ prefix for destination attributes i.e
+                        From {"{"}origin_name{"}"} to {"{"}target_name{"}"} : {"{"}value{"}"}
                     </p>
                 </div>
             </PanelRow>
@@ -377,6 +380,32 @@ export class DataLayerSetting extends Component {
                         }}>
                     </TextControl>
                 </PanelRow>}
+
+
+                <PanelColorSettings
+                    title={__(`Colors`)}
+                    value={borderColor}
+                    colorSettings={
+                        [{
+                            label: __('Border'),
+                            clearable: true,
+                            enableAlpha: true,
+                            value: markBorderColor, onChange: (borderColor) => {
+                                onChangeProperty("markBorderColor", borderColor)
+                            },
+
+                        },
+                            {
+                                label: __('Fill'),
+                                clearable: true, enableAlpha: true,
+                                value: markFillColor,
+                                onChange: (markFillColor) => {
+                                    onChangeProperty("markFillColor", markFillColor)
+                                },
+
+                            }
+                        ]}
+                />
                 <PanelRow>
                     <RangeControl
                         label="Circle Size"
@@ -388,33 +417,6 @@ export class DataLayerSetting extends Component {
                         min={0}
                         max={100}
                     />
-                </PanelRow>
-                <PanelRow>
-                    <PanelColorSettings
-                        title={__(`Border`)}
-                        value={borderColor}
-                        colorSettings={[{
-                            clearable: true,
-                            enableAlpha: true,
-                            value: markBorderColor, onChange: (borderColor) => {
-                                onChangeProperty("markBorderColor", borderColor)
-                            },
-
-                        }]}
-                    />
-                </PanelRow>
-                <PanelRow>
-                    <PanelColorSettings
-                        title={__(`Color`)}
-                        value={markFillColor}
-                        colorSettings={[{
-                            clearable: true, enableAlpha: true,
-                            value: markFillColor,
-                            onChange: (markFillColor) => {
-                                onChangeProperty("markFillColor", markFillColor)
-                            },
-
-                        }]}/>
                 </PanelRow>
                 <PanelRow>
                     <RangeControl
@@ -429,12 +431,13 @@ export class DataLayerSetting extends Component {
                     />
 
                 </PanelRow>
-
-                <BreaksGenerator
-                    showSize={true}
-                    defaultBorderColor={markBorderColor}
-                    defaultFillColor={markFillColor}
-                    onChangeProperty={onChangeProperty} breaks={breaks}/>
+                <PanelBody title={__("Breaks")}>
+                    <BreaksGenerator
+                        showSize={true}
+                        defaultBorderColor={markBorderColor}
+                        defaultFillColor={markFillColor}
+                        onChangeProperty={onChangeProperty} breaks={breaks}/>
+                </PanelBody>
             </PanelBody>
 
 
