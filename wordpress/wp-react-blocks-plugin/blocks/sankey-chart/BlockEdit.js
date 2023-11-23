@@ -508,7 +508,7 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                             </PanelBody>
                         </PanelBody>
 
-                        {/*<PanelBody initialOpen={false} title={__("Tooltip")}>
+                        <PanelBody initialOpen={false} title={__("Tooltip")}>
                             <PanelRow>
                                 <ToggleControl label={__("Enable Tooltip")} checked={tooltipEnabled}
                                                onChange={(tooltipEnabled) => {
@@ -546,7 +546,7 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                                 }
                             </>
                             }
-                        </PanelBody>*/}
+                        </PanelBody>
 
 
                         <PanelBody initialOpen={false} title={"Messages"}>
