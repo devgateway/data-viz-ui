@@ -97,7 +97,7 @@ export const formatContent = (tooltip, variables, intl) => {
 }
 
 
-const Tooltip = ({tooltip, variables, intl}) => {
+const MapTooltip = ({tooltip, variables, intl}) => {
     
     if (variables) {
         const str= formatContent(tooltip, variables, intl)
@@ -112,4 +112,4 @@ const Tooltip = ({tooltip, variables, intl}) => {
     }
 }
 
-export default Tooltip
+export default MapTooltip
