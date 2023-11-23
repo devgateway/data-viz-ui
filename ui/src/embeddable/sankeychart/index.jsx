@@ -70,7 +70,7 @@ const Chart = (props) => {
         'data-use-custom-label-color': useCustomLabelColor,
         'data-label-text-color': labelTextColor,
         'data-label-orientation': labelOrientation,
-        'data-manual-colors': manualColors
+        'data-manual-colors': manualColors = "{}"
     } = props
 
     const locale = props.intl.locale
@@ -124,7 +124,6 @@ const Chart = (props) => {
         layout,
         showLegends: (showLegends == true || showLegends == "true"),
         legendLabel,
-
         marginLeft: parseInt(marginLeft),
         marginTop: parseInt(marginTop),
         marginRight: parseInt(marginRight),
@@ -132,7 +131,7 @@ const Chart = (props) => {
         height: `${contentHeight}px`,
         legendPosition: legendPosition,
         legends,
-        //tooltip: (tooltipEnableMarkdown == true || tooltipEnableMarkdown == "true") ? tooltipForSelectedMeasure : tooltipForSelectedMeasure.replace(/\r\n/g, '<hr/>').replace(/[\r\n]/g, '<hr/>'),
+        tooltip: (tooltipEnableMarkdown == true || tooltipEnableMarkdown == "true") ? decode(tooltipHTML) : decode(tooltipHTML).replace(/\r\n/g, '<hr/>').replace(/[\r\n]/g, '<hr/>'),
         colors: colors,
         format: numberFormat,
         categories,
@@ -271,7 +270,7 @@ const DataFrame = (props) => {
                     if (link) {
                         link.value = link.value + c[measure]
                     } else {
-                        links.push({source: source, target: c.value, value: c[measure]})
+                        links.push({source: source, target: c.value, value: c[measure], data: c})
                     }
                 }
                 if (c.children && c.children.length > 0) {
