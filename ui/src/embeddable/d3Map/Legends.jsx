@@ -1,9 +1,10 @@
-import React, {useEffect, useRef} from 'react';
+import React, {useEffect, useLayoutEffect, useRef} from 'react';
 import {connect} from "react-redux";
 import * as d3 from 'd3' // d3 plugin
 import * as topojson from "topojson-client";
 import {Icon, Popup} from "semantic-ui-react";
 import {FormattedMessage} from "react-intl";
+import {symbol} from "prop-types";
 
 /*
   id: Date.now(),
@@ -57,6 +58,35 @@ import {FormattedMessage} from "react-intl";
     breaks: [],
 
 * */
+
+
+const Breaks = ({breaks, isPoint}) => {
+    return (breaks.length > 0) && <div className={"legend-breaks"}>
+        {breaks.map((b, i) => {
+            if (b.type !== 'graterThan') {
+                return (<div className={"break"}>
+                    <div className={`break-item ${isPoint ? 'point' : ''}`}
+                         style={{
+                             backgroundColor: b.color,
+                             border: `1px solid ${b.borderColor}`,
+                         }}></div>
+                    <div className={"break-label"}> &lt; {b.end}</div>
+                </div>)
+            } else {
+                return (<div className={"break"}>
+                    <div className={`break-item ${symbol}`}
+                         style={{
+                             backgroundColor: b.color,
+                             border: `1px solid ${b.borderColor}`,
+                         }}></div>
+                    <div className={"break-label"}> &gt; {b.end}</div>
+
+                </div>)
+            }
+        })}
+    </div>
+
+}
 const FlowLayerLegend = (props) => {
     const {
         name,
@@ -81,30 +111,16 @@ const FlowLayerLegend = (props) => {
         <div>
             <div className={"legend-item"}>
                 <div className={"legend-color legend-check"} onClick={e => onItemClick(id)}
-                     style={{backgroundColor: markFillColor, borderColor: markBorderColor}}>{visible != false && <>&#10003;</>}
+                     style={{
+                         backgroundColor: markFillColor,
+                         borderColor: markBorderColor
+                     }}>{visible != false && <>&#10003;</>}
                 </div>
                 <div className={"legend-label"}>{name} ({measureLabel})</div>
             </div>
 
-            {(breaks.length > 0 && visible != false) && <div className={"legend-breaks"}>
-                {breaks.map((b, i) => {
-                    return (<div className={"break"}>
-                        <div className={"break-item"} style={{
-                            backgroundColor: b.color,
-                            border: `1px solid ${b.borderColor}`,
-                        }}></div>
-                        <div className={"break-label"}> &lt; {b.end}</div>
-                    </div>)
-                })}
-                <div className={"break"}>
-                    <div className={"break-item"} style={{
-                        backgroundColor: markFillColor,
-                        border: `1px solid ${markBorderColor}`,
-                    }}></div>
-                    <div className={"break-label"}> &gt; {Math.max(...breaks.map(b => b.end))}</div>
-                </div>
-            </div>
-            }
+            {(visible != false) && <Breaks breaks={breaks} symbol={"arrow"}></Breaks>}
+
         </div>
     </div>
 }
@@ -136,11 +152,20 @@ const DataPointsLayerLegend = (props) => {
         <div>
             <div className={"legend-item"}>
                 <div className={"legend-color legend-check"} onClick={e => onItemClick(id)}
-                     style={{backgroundColor: markFillColor, borderColor: markBorderColor}}>{visible != false && <>&#10003;</>}
+                     style={{
+                         backgroundColor: markFillColor,
+                         borderColor: markBorderColor
+                     }}>{visible != false && <>&#10003;</>}
                 </div>
-                <div className={"legend-label"}>{name} ({fieldLabel})</div>
+                <div className={"legend-label"}>{name} </div>
             </div>
-            {(pointStyleBy === "dimension"  && visible != false) && <div className={"legend-breaks"}>
+            <div className={"legend"}>
+                <div className={"legend-item"}>
+                    <div className={"legend-label"}>{fieldLabel}</div>
+
+                </div>
+            </div>
+            {(pointStyleBy === "dimension" && visible != false) && <div className={"legend-breaks"}>
                 {dimensionOptions.map((d) => {
                     return (<div className={"break"}>
                         <div className={"break-item"} style={{
@@ -153,7 +178,7 @@ const DataPointsLayerLegend = (props) => {
             </div>
             }
 
-            {(pointStyleBy === "measure"  && visible != false) && <div className={"legend-breaks"}>
+            {(pointStyleBy === "measure" && visible != false) && <div className={"legend-breaks"}>
                 {breaks.map((b, i) => {
                     return (<div className={"break"}>
                         <div className={"break-item"} style={{
@@ -168,7 +193,6 @@ const DataPointsLayerLegend = (props) => {
         </div>
     </div>
 }
-
 
 const BaseLayerLegend = (props) => {
     const {fillColor, borderColor, name, visible, id, onItemClick} = props
@@ -201,9 +225,11 @@ const DataLayerLegend = (props) => {
         usePattern,
         patterns,
         patternDiscriminator,
+        patternDiscriminatorLabel,
         measures,
         borderColor,
         data,
+
         customMeasuresLabels,
         divRef,
         id,
@@ -221,11 +247,11 @@ const DataLayerLegend = (props) => {
 
     const g = d3.select(`#data-${id}`)
     const renderedPatterns = g.selectAll("defs").selectAll("pattern")
-
-    d3.select(divRef.current).select("svg").remove()
-    if (usePattern && divRef.current && renderedPatterns.size() > 0 && visible != false) {
+    if (usePattern && renderedPatterns.size() > 0 && visible != false) {
+        debugger;
+        d3.select("#legend_" + id).select("svg").remove()
         const patternsData = renderedPatterns.data()
-        const g = d3.select(divRef.current).append("svg")
+        const g = d3.select("#legend_" + id).append("svg")
         const defs = g.append("defs")
         defs.selectAll("pattern").remove()
         defs.selectAll("pattern")
@@ -285,10 +311,10 @@ const DataLayerLegend = (props) => {
             .attr("height", "auto")
 
         g.append("text")
-          .attr("class","patterns-title")
-          .attr("y", 5)
-          .attr("x", 12)
-          .text(patternDiscriminator)
+            .attr("class", "patterns-title")
+            .attr("y", 5)
+            .attr("x", 12)
+            .text(a => patternDiscriminatorLabel ? patternDiscriminatorLabel : patternDiscriminator)
 
         g.selectAll(".legend-squares")
             .data(patternsData)
@@ -307,56 +333,50 @@ const DataLayerLegend = (props) => {
             .data(patternsData)
             .enter()
             .append("text")
-            .attr("class","patterns-labels")
+            .attr("class", "patterns-labels")
             .attr("y", (d, i) => (i * 22) + 25)
             .attr("x", 40)
-            .text(d=>d.key)
+            .text(d => d.key)
     }
 
-    return <div className={"legend"}>
+
+    return <div className={"legend"} id={"legend_" + id}>
         <div>
             <div className={"legend-item"}>
                 <div className={"legend-color legend-check"} onClick={e => onItemClick(id)}
                      style={{backgroundColor: fillColor, borderColor: borderColor}}>{visible != false && <>&#10003;</>}
                 </div>
-                <div className={"legend-label"}>{name} ({measureLabel})</div>
+                <div className={"legend-label"}>{name} {!useCentroidPoint && <span>({measureLabel})</span>}</div>
+
             </div>
+
             {((useCentroidPoint && !useBreaks && visible != false)) && <div className={"legend-breaks"}>
                 <div className={"break"}>
                     <div className={"break-item"} style={{
                         backgroundColor: markFillColor,
                         border: `1px solid ${markBorderColor}`,
                     }}></div>
+                    {measureLabel}
                 </div>
             </div>
             }
 
-            {(useBreaks && visible != false) && <div className={"legend-breaks"}>
-                {breaks.map((b, i) => {
-                    return (<div className={"break"}>
-                        <div className={"break-item"} style={{
-                            backgroundColor: b.color,
-                            border: `1px solid ${borderColor}`,
-                        }}></div>
-                        <div className={"break-label"}> &lt; {b.end}</div>
-                    </div>)
-                })}
-                <div className={"break"}>
-                    <div className={"break-item"} style={{
-                        backgroundColor: useCentroidPoint ? markFillColor : fillColor,
-                        border: `1px solid ${useCentroidPoint ? markBorderColor : borderColor}`,
-                    }}></div>
-                    <div className={"break-label"}> &gt; {Math.max(...breaks.map(b => b.end))}</div>
+            {(useBreaks && visible != false) &&
+                <div>
+                    {useCentroidPoint && <div className={"legend-breaks"}>
+                        <div className={"break-item"}>{measureLabel}</div>
+                    </div>}
+                    <Breaks symbol={useCentroidPoint ? "point" : 'square'} breaks={breaks} visible={visible}></Breaks>
                 </div>
-            </div>
+
             }
         </div>
     </div>
 }
 const Legends = (props) => {
-
     const divRef = useRef(null);
     const {layers = [], onItemClick} = props;
+    debugger;
     return <div className={"legends"} ref={divRef}>
         {layers.map(l => {
             return <div>
