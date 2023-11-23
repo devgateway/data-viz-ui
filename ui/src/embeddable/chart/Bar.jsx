@@ -1,5 +1,5 @@
 import React, {Fragment, useState} from 'react'
-import Tooltip from "./Tooltip"
+import Tooltip from "../common/ChartTooltip"
 import {ResponsiveBar} from '@nivo/bar'
 import {injectIntl} from 'react-intl';
 import {useTheme} from '@nivo/core'
