@@ -145,7 +145,6 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                 dimension3,
                 app,
                 tooltipHTML,
-                tooltip,
                 format,
                 filters,
                 layout,
@@ -178,11 +177,6 @@ class BlockEdit extends BlockEditWithAPIMetadata {
         } = this.props;
 
         const {dimensions} = this.state
-        //migration code
-        if (tooltip != '') {
-            setAttributes({tooltipHTML: tooltip, tooltip: ''})
-            return null;
-        }
 
         let params = {}
         filters.forEach(f => {
@@ -514,7 +508,7 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                                                onChange={(tooltipEnabled) => {
                                                    setAttributes({
                                                        tooltipEnabled,
-                                                       tooltip: tooltipEnabled && tooltip.trim().length == 0 ? "{value}" : tooltip
+                                                       tooltipHTML: "{value}"
                                                    })
                                                }}/>
                             </PanelRow>

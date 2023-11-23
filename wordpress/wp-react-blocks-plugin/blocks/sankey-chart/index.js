@@ -114,10 +114,6 @@ registerBlockType(process.env.BLOCKS_NS + '/sankeychart',
                 type: "String",
                 default: "{value}"
             },
-            tooltip: {
-                type: "String",
-                default: "{value}"
-            },
             layout: {
                 type: "String",
                 default: "horizontal"
