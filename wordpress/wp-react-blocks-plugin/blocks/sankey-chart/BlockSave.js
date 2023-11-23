@@ -10,7 +10,6 @@ const SaveComponent = (props) => {
             dimension3,
             app,
             tooltipHTML,
-            tooltip,
             format,
             filters,
             layout,
@@ -92,7 +91,6 @@ const SaveComponent = (props) => {
              data-tooltip-enable-markdown={tooltipEnableMarkdown}
              data-reverse-legend={reverseLegend}
              data-sort={sort}
-             data-tooltip={tooltip}
              data-node-thickness={nodeThickness}
              data-node-opacity={nodeOpacity}
              data-node-hover-opacity={nodeHoverOpacity}
