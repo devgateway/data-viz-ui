@@ -1,17 +1,7 @@
-import React, {Fragment, useState} from 'react'
+import React, {useState} from 'react'
 import {ResponsiveSankey} from '@nivo/sankey'
 import {injectIntl} from 'react-intl';
-import {useTheme} from '@nivo/core'
 import Tooltip from "../common/ChartTooltip";
-
-const POSITION_MIDDLE = "middle";
-const POSITION_TOP = "top";
-const ZERO_LINE_COLOR = "#66676d";
-const GRID_LINE_COLOR = '#dddddd';
-const DEFAULT_COLOR = 'none';
-const LABEL_SKIP_WIDTH = 30;
-const LABEL_SKIP_HEIGHT = 0;
-const COLOR_VARIABLE = "_Color"
 
 const Chart = (props) => {
   const {
@@ -73,7 +63,6 @@ const Chart = (props) => {
     useCheckBoxBackground
   } = props
   const [filter, setFilter] = useState([])
-  const {colorBy, scheme} = colors
 
   const toggle = (id) => {
     const newFilter = filter.slice();
@@ -94,20 +83,6 @@ const Chart = (props) => {
       <label className="legend-title">{legendLabel}</label>
     </div>
     }</>)
-  }
-
-  const getLinkToolTip = (data) => {
-    debugger
-    return (
-      <div className="sankey-tooltip">
-        <div className="">
-          {data.source.id} - {data.target.id}
-        </div>
-        <div className="inner">
-          <label>{intl.formatNumber(format.style === 'percent' ? data.value / 100 : data.value, format)}</label>
-        </div>
-      </div>
-    );
   }
 
   const legendItems = () => {
@@ -169,7 +144,8 @@ const Chart = (props) => {
   return (
     <div style={{height: height}}>
       <>
-        {filteredData.nodes.length && filteredData.links.length && <ResponsiveSankey
+        {(filteredData.nodes.length && filteredData.links.length) ?
+          <ResponsiveSankey
           data={filteredData}
           margin={margins}
           layout={layout}
@@ -195,9 +171,7 @@ const Chart = (props) => {
               return (<Tooltip intl={intl} format={format} d={d} tooltip={tooltip} tooltipEnableMarkdown={tooltipEnableMarkdown}/>)
             }
             return null
-          }}/*{(data) => {
-            return (getLinkToolTip(data));
-          }}*/
+          }}
           enableLabels={enableLabels}
           linkHoverOpacity={linkHoverOpacity}
           nodeHoverOpacity={nodeHoverOpacity}
@@ -220,7 +194,10 @@ const Chart = (props) => {
               ]
             ]
           }}
-        />}
+        />
+        :
+          <></>
+        }
         {(legendPosition == 'top' || legendPosition == 'bottom') &&
         <div  className={`legends container has-standard-12-font-size  ${legendPosition}`}>
           <div className = "legend-sections">
