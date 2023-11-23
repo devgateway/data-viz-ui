@@ -1,7 +1,7 @@
 import React, {Fragment} from "react";
 import {line} from "d3-shape";
 import * as d3 from "d3";
-import {formatContent} from './Tooltip'
+import {formatContent} from '../common/ChartTooltip'
 import {injectIntl} from "react-intl";
 
 const Line = (data, lineColor, layout, groupMode, keys, tooltipContent, title, measure) => injectIntl((props) => {
