@@ -30,14 +30,39 @@ class ZoomControl extends React.Component {
     }
 
     componentDidMount() {
+        const {zoomEnabled = true, rotationEnabled} = this.props
         const selection = this.getSelection()
+        
         if (selection) {
-            selection.call(this.zoom)
-            this.transition2fullView()
+
+            if (zoomEnabled) {
+                selection.call(this.zoom)
+                this.transition2fullView()
+            }
+            if (rotationEnabled) {
+
+            }
         }
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
+        const selection = this.getSelection()
+        if (prevProps.zoomEnabled != this.props.zoomEnabled) {
+            if (this.props.zoomEnabled) {
+                if (selection) {
+
+                    selection.call(this.zoom)
+                    selection.on(".zoom", this.zoom)
+                    this.transition2fullView()
+                }
+            } else {
+                if (selection) {
+                    selection.on(".zoom", null)
+                }
+            }
+        }
+
+
         if (!prevProps.readyState && this.props.readyState) {
             this.fullView()
         }
@@ -45,6 +70,7 @@ class ZoomControl extends React.Component {
         if (prevProps.height !== this.props.height || prevProps.width !== this.props.width) {
             this.fullView()
         }
+
     }
 
     reset() {
@@ -135,7 +161,9 @@ class ZoomControl extends React.Component {
 
     render() {
         const {editing, zoomEnabled = true} = this.props
-        return <div ref={this.zoomRef} className="zoom">
+
+
+        return <div ref={this.zoomRef} className={`zoom ${zoomEnabled ? '' : 'disabled'}`}>
             {(editing || zoomEnabled) && <div>
                 <div className=" button plus" onClick={this.zoomIn}><Icon name='plus' size='small'/></div>
                 <div className=" button minus" onClick={this.zoomOut}><Icon name='minus' size='small'/></div>
