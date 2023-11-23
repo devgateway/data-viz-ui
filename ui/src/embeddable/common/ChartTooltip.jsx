@@ -38,7 +38,7 @@ export const formatContent = (tooltip, variables, intl, tooltipEnableMarkdown) =
     return str
 }
 
-const Tooltip = ({tooltip, d, intl, tooltipEnableMarkdown}) => {       
+const ChartTooltip = ({tooltip, d, intl, tooltipEnableMarkdown}) => {
     const {color, data} = d.datum || d.point || d
     const current = d.value || (d.datum ? d.datum.value : null) || (d.point ? d.point.data.y : null)
     if (data) {
@@ -66,6 +66,6 @@ const Tooltip = ({tooltip, d, intl, tooltipEnableMarkdown}) => {
 
 
 
-export default Tooltip
+export default ChartTooltip
 
 
