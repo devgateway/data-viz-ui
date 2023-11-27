@@ -260,7 +260,7 @@ const DataFrame = (props) => {
             return {nodes, links}
         }
 
-        const fillFormChildren = (children, nodes, links, source, measure, parentNodeValue) => {
+        const fillFormChildren = (children = [], nodes, links, source, measure, parentNodeValue) => {
             children.forEach(c => {
                 const nodeValue = {}
                 nodeValue[c.type] = c.value
@@ -281,6 +281,7 @@ const DataFrame = (props) => {
                 }
             })
         }
+
         chartData = getData(props)
         options = {
             indexBy: '',
