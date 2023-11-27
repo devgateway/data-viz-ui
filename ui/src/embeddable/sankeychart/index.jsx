@@ -254,12 +254,16 @@ const DataFrame = (props) => {
             const {data, dimensions, measure} = props
             const nodes = []
             const links = []
-            fillFormChildren(data.children, nodes, links, null, measure)
+            const nodeValue = {}
+            nodeValue[data.type] = data.value
+            fillFormChildren(data.children, nodes, links, null, measure, nodeValue)
             return {nodes, links}
         }
 
-        const fillFormChildren = (children, nodes, links, source, measure) => {
+        const fillFormChildren = (children, nodes, links, source, measure, parentNodeValue) => {
             children.forEach(c => {
+                const nodeValue = {}
+                nodeValue[c.type] = c.value
                 if (!nodes.find(n => n.id === c.value)) {
                     nodes.push({id: c.value});
                 }
@@ -268,11 +272,12 @@ const DataFrame = (props) => {
                     if (link) {
                         link.value = link.value + c[measure]
                     } else {
-                        links.push({source: source, target: c.value, value: c[measure], data: c})
+                        const data = {...c, ...nodeValue, ...parentNodeValue}
+                        links.push({source: source, target: c.value, value: c[measure], data})
                     }
                 }
                 if (c.children && c.children.length > 0) {
-                    fillFormChildren(c.children, nodes, links, c.value, measure)
+                    fillFormChildren(c.children, nodes, links, c.value, measure, nodeValue)
                 }
             })
         }
