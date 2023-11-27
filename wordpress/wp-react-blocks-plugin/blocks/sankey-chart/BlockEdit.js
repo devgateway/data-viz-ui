@@ -21,6 +21,7 @@ import {categorical, sequential, diverging} from "../commons/ChartColors";
 import {getTranslation} from "../commons/APIutils";
 import ChartLegends from "../commons/ChartLegends";
 import Papa from "papaparse";
+import DataFilters from "../commons/DataFilters";
 
 class BlockEdit extends BlockEditWithAPIMetadata {
     constructor(props) {
@@ -501,6 +502,11 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                                 <ChartLegends {...this.props}></ChartLegends>
                             </PanelBody>
                         </PanelBody>
+
+                        <DataFilters
+                          allFilters={this.state.filters}
+                          allCategories={this.state.categories}
+                          {...this.props}/>
 
                         <PanelBody initialOpen={false} title={__("Tooltip")}>
                             <PanelRow>
