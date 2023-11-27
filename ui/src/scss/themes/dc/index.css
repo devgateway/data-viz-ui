@@ -216,10 +216,12 @@
     /* Center the buttons horizontally */
     align-items: center;
     /* Center the buttons vertically */ }
-    .edit-post-visual-editor .cta-buttons .cta-primary-button, #root .cta-buttons .cta-primary-button {
+    .edit-post-visual-editor .cta-buttons .cta-primary-button .wp-block-button__link, #root .cta-buttons .cta-primary-button .wp-block-button__link {
       border: 1px solid #76a234;
       border-radius: 3px;
       color: white;
+      width: 255px;
+      margin: 0 50px 0 0;
       background-color: #76a234;
       box-shadow: 2px 2px 1px rgba(0, 0, 0, 0.3);
       height: 58px;
@@ -227,25 +229,24 @@
       align-items: center;
       justify-content: center;
       cursor: pointer; }
-    .edit-post-visual-editor .cta-buttons .cta-primary-button:hover, #root .cta-buttons .cta-primary-button:hover {
+    .edit-post-visual-editor .cta-buttons .cta-primary-button:hover .wp-block-button__link, #root .cta-buttons .cta-primary-button:hover .wp-block-button__link {
       transition: 471ms;
-      padding: 10px 30px;
       transform: translateY(-5px);
       background-color: #60832a;
       box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2); }
-    .edit-post-visual-editor .cta-buttons .cta-secondary-button, #root .cta-buttons .cta-secondary-button {
+    .edit-post-visual-editor .cta-buttons .cta-secondary-button .wp-block-button__link, #root .cta-buttons .cta-secondary-button .wp-block-button__link {
       border: 1px solid #76a234;
       border-radius: 3px;
       color: #76a234;
+      width: 255px;
       box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
       height: 58px;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer; }
-    .edit-post-visual-editor .cta-buttons .cta-secondary-button:hover, #root .cta-buttons .cta-secondary-button:hover {
+    .edit-post-visual-editor .cta-buttons .cta-secondary-button:hover .wp-block-button__link, #root .cta-buttons .cta-secondary-button:hover .wp-block-button__link {
       transition: 471ms;
-      padding: 10px 30px;
       transform: translateY(-5px);
       color: #60832a;
       border: 1px solid #60832a;
@@ -255,9 +256,9 @@
     position: absolute;
     width: 100vw;
     left: 0; }
-    .edit-post-visual-editor .cta-buttons-internal .cta-secondary-button, #root .cta-buttons-internal .cta-secondary-button {
+    .edit-post-visual-editor .cta-buttons-internal .cta-secondary-button .wp-block-button__link, #root .cta-buttons-internal .cta-secondary-button .wp-block-button__link {
       color: white; }
-    .edit-post-visual-editor .cta-buttons-internal .cta-secondary-button:hover, #root .cta-buttons-internal .cta-secondary-button:hover {
+    .edit-post-visual-editor .cta-buttons-internal .cta-secondary-button:hover .wp-block-button__link, #root .cta-buttons-internal .cta-secondary-button:hover .wp-block-button__link {
       color: white;
       border: 1px solid #60832a;
       background-color: rgba(255, 255, 255, 0.2);
