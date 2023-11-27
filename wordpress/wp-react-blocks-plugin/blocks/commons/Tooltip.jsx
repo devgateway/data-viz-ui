@@ -18,12 +18,12 @@ const Format = (props) => {
 
    
 
-    const {setAttributes,attributes: {tooltipHTML, dimension1, dimension2, measures},allMeasures, allDimensions, type} = props;
+    const {setAttributes,attributes: {tooltipHTML, dimension1, dimension2, dimension3, measures},allMeasures, allDimensions, type} = props;
 
     return [
             <PanelBody title={__("Variables")}>
                 <div>                             
-                {allDimensions.filter(d=>(d.value===dimension1 || d.value===dimension2))
+                {allDimensions.filter(d=>(d.value===dimension1 || d.value===dimension2 || d.value===dimension3))
                     .map(d=><PanelRow>
                                 <span style={{"font-size":"11px"}}>{d.label} -> {"{"}{d.value}{"}"}</span>
                             </PanelRow>)}
