@@ -380,7 +380,7 @@ class DataLayer extends BaseLayer {
             if (useCentroidPoint) {
                 this.createLabels(json)
 
-                r
+
                 this.g.selectAll(".point")
                     .data(filteredData)
                     .enter()
