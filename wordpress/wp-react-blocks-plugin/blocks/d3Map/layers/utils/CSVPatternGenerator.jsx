@@ -5,7 +5,7 @@ import {PanelColorSettings} from "@wordpress/block-editor";
 import {__} from '@wordpress/i18n';
 
 import Papa from 'papaparse'
-
+const defaultPatternColor="#000000"
 const Patterns = ({csv, app, onChangeProperty, patterns, patternDiscriminator, defaultFillColor}) => {
 
     const patternsOptions = [
@@ -47,7 +47,7 @@ const Patterns = ({csv, app, onChangeProperty, patterns, patternDiscriminator, d
                 <PanelColorSettings
                     title={__(`Color`)}
                     colorSettings={[{
-                        value: patterns[field + '_color'] ? patterns[field + '_color'] : defaultFillColor,
+                        value: patterns[field + '_color'] ? patterns[field + '_color'] : defaultPatternColor,
                         label: __('Fill Color'),
                         onChange: (color) => {
                             onChangeProperty('patterns', {...patterns, [field + '_color']: color})

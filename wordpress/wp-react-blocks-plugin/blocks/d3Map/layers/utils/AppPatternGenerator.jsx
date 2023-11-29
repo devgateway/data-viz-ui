@@ -6,6 +6,7 @@ import {__} from '@wordpress/i18n';
 
 import Papa from 'papaparse'
 
+const defaultPatternColor = "#000000"
 const Patterns = ({
                       allCategories,
                       allDimensions,
@@ -67,7 +68,7 @@ const Patterns = ({
                 <PanelColorSettings
                     title={__(`Color`)}
                     colorSettings={[{
-                        value: patterns[field + '_color'] ? patterns[field + '_color'] : defaultFillColor,
+                        value: patterns[field + '_color'] ? patterns[field + '_color'] : defaultPatternColor,
                         label: __('Fill Color'),
                         onChange: (color) => {
                             onChangeProperty('patterns', {...patterns, [field + '_color']: color})
