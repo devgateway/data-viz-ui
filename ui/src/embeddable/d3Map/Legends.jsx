@@ -5,6 +5,7 @@ import * as topojson from "topojson-client";
 import {Icon, Popup} from "semantic-ui-react";
 import {FormattedMessage} from "react-intl";
 import {symbol} from "prop-types";
+import Papa from "papaparse";
 
 /*
   id: Date.now(),
@@ -223,124 +224,42 @@ const DataLayerLegend = (props) => {
         useBreaks,
         breaks,
         usePattern,
-        patterns,
+        patternsData,
         patternDiscriminator,
         patternDiscriminatorLabel,
         measures,
         borderColor,
         data,
-
+        app,
         customMeasuresLabels,
         divRef,
         id,
         patternWidth = .35,
         patternHeight = .25,
+        group,
+        csv,
         visible,
         onItemClick
     } = props
-    let measureLabel = measures[0]
+    let measureLabel = ""
 
-    if (customMeasuresLabels) {
+
+    if (app != "csv" && customMeasuresLabels) {
         measureLabel = customMeasuresLabels[measures[0]]
-    }
-
-
-    const g = d3.select(`#data-${id}`)
-    const renderedPatterns = g.selectAll("defs").selectAll("pattern")
-    if (usePattern && renderedPatterns.size() > 0 && visible != false) {
+    } else {
+        const parsed = Papa.parse(csv, {header: true, dynamicTyping: true});
         debugger;
-        d3.select("#legend_" + id).select("svg").remove()
-        const patternsData = renderedPatterns.data()
-        const g = d3.select("#legend_" + id).append("svg")
-        const defs = g.append("defs")
-        defs.selectAll("pattern").remove()
-        defs.selectAll("pattern")
-            .data(patternsData).enter()
-            .append("pattern")
-            .attr('id', d => toId(d.key))
-            .attr('patternUnits', 'userSpaceOnUse')
-            .attr('width', 5)
-            .attr('height', 5)
-            .attr("x", 0).attr("y", 0)
-            .attr("patternTransform", d => `rotate(${!d.rotation ? 0 : d.rotation})`)
-
-        patternsData.forEach(d => {
-            if (d.type === 'lines') {
-                defs.select("#" + toId(d.key))
-                    .append("rect")
-                    .attr("x", 0)
-                    .attr('width', 1)
-                    .attr('height', 10)
-                    .attr("opacity", .75)
-                    .attr('fill', d.color)
-            }
-            if (d.type === 'squares') {
-                defs.select("#" + toId(d.key))
-                    .append("rect")
-                    .attr('width', 3)
-                    .attr('height', 3)
-                    .attr('fill', d.color)
-                    .attr("opacity", 1)
-                    .attr("stroke-width", 1)
-
-            }
-            if (d.type === 'dots') {
-                defs.select("#" + toId(d.key))
-                    .append("circle")
-                    .attr("cx", 2)
-                    .attr("cy", 2)
-                    .attr('r', 2)
-                    .attr('fill', d.color)
-                    .attr("opacity", 1)
-                    .attr("stroke-width", 1)
-
-            }
-            if (d.type === 'triangle') {
-                defs.select("#" + toId(d.key))
-                    .append("polygon")
-                    .attr("points", "5,0 8,8 0,5")
-                    .attr('fill', d.color)
-                    .attr("opacity", 1)
-                    .attr("stroke-width", 1)
-
-            }
-        })
-
-
-        g.attr("width", "150px")
-            .attr("height", "auto")
-
-        g.append("text")
-            .attr("class", "patterns-title")
-            .attr("y", 5)
-            .attr("x", 12)
-            .text(a => patternDiscriminatorLabel ? patternDiscriminatorLabel : patternDiscriminator)
-
-        g.selectAll(".legend-squares")
-            .data(patternsData)
-            .enter()
-            .append("rect")
-            .attr("width", 18)
-            .attr("height", 18)
-            .attr("y", (d, i) => (i * 22) + 25)
-            .attr("x", 20)
-            .attr("stroke", borderColor)
-            .attr("style", (d) => {
-                return "none;fill:url(#" + toId(d.key) + ");"
-            })
-
-        g.selectAll(".patterns-labels")
-            .data(patternsData)
-            .enter()
-            .append("text")
-            .attr("class", "patterns-labels")
-            .attr("y", (d, i) => (i * 22) + 25)
-            .attr("x", 40)
-            .text(d => d.key)
+        measureLabel = parsed.meta.fields.length > 0 ? parsed.meta.fields[1] : ''
     }
 
 
-    return <div className={"legend"} id={"legend_" + id}>
+    const toId = (key) => {
+        //replace blank space by underscore
+        if (!key) return ""
+        return key.toString().replace(/ /g, "_").toLocaleLowerCase()
+    }
+
+    return <div className={`legend layer_${toId(id)}`} id={toId(`${group} ${name} ${id}`)}>
         <div>
             <div className={"legend-item"}>
                 <div className={"legend-color legend-check"} onClick={e => onItemClick(id)}
@@ -352,7 +271,7 @@ const DataLayerLegend = (props) => {
 
             {((useCentroidPoint && !useBreaks && visible != false)) && <div className={"legend-breaks"}>
                 <div className={"break"}>
-                    <div className={"break-item"} style={{
+                    <div className={"break-item point"} style={{
                         backgroundColor: markFillColor,
                         border: `1px solid ${markBorderColor}`,
                     }}></div>
@@ -375,15 +294,17 @@ const DataLayerLegend = (props) => {
 }
 const Legends = (props) => {
     const divRef = useRef(null);
-    const {layers = [], onItemClick} = props;
-    debugger;
+    const {layers = [], onItemClick, patternsData, group} = props;
     return <div className={"legends"} ref={divRef}>
         {layers.map(l => {
             return <div>
-                {l.type == "base" && <BaseLayerLegend {...l} onItemClick={onItemClick}/>}
-                {l.type == "data" && <DataLayerLegend divRef={divRef} {...l} onItemClick={onItemClick}/>}
-                {l.type == "dataPoints" && <DataPointsLayerLegend {...l} onItemClick={onItemClick}/>}
-                {l.type == "flow" && <FlowLayerLegend {...l} onItemClick={onItemClick}/>}
+                {l.type == "base" && <BaseLayerLegend {...l} group={group} onItemClick={onItemClick}/>}
+                {l.type == "data" &&
+                    <DataLayerLegend group={group} patternsData={patternsData ? patternsData[l.id] : null}
+                                     divRef={divRef} {...l}
+                                     onItemClick={onItemClick}/>}
+                {l.type == "dataPoints" && <DataPointsLayerLegend group={group} {...l} onItemClick={onItemClick}/>}
+                {l.type == "flow" && <FlowLayerLegend group={group} {...l} onItemClick={onItemClick}/>}
             </div>
         })}
 

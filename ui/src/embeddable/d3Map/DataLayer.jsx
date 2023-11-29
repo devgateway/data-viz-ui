@@ -9,11 +9,18 @@ import {injectIntl} from "react-intl";
 
 import BreaksStyles from "./BreaksStyles.js";
 
+
+const toGenericID = (key) => {
+    //replace blank space by underscore
+    if (!key) return ""
+    return key.toString().replace(/ /g, "_")
+}
 const toId = (key) => {
     //replace blank space by underscore
     if (!key) return ""
-    return "pattern_" + key.toString().replace(/ /g, "_")
+    return "pattern_" + toGenericID(key)
 }
+
 
 const getFilters = (filters) => {
     const ff = parse(filters) || []
@@ -64,6 +71,7 @@ class DataLayer extends BaseLayer {
             editing,
             data,
             patternDiscriminator,
+            patternDiscriminatorLabel,
             breaks,
             patterns,
             projection,
@@ -205,8 +213,6 @@ class DataLayer extends BaseLayer {
             })
 
 
-            onLayerCreated(id, patternsData)
-
             if (!useCentroidPoint) {
                 this.g.selectAll("path")
                     .attr("fill", d => {
@@ -232,16 +238,14 @@ class DataLayer extends BaseLayer {
                 this.createLabels(json)
 
             }
-            if (usePattern && json && json.features) {
 
+
+            if (usePattern && json && json.features) {
                 json.features.forEach(d => {
                     let patterns = []
                     if (d.properties && d.properties.meta) {
-
                         patterns = (app != "csv") ? d.properties.meta[patternDiscriminator] ? d.properties.meta[patternDiscriminator] : [] : [d.properties.meta[patternDiscriminator]]
-
                         if (patterns && patterns.length > 0) {
-
                             patterns.forEach(p => {
                                 this.g.append("path")
                                     .attr("d", path(d))
@@ -273,10 +277,110 @@ class DataLayer extends BaseLayer {
 
                 })
 
+                /*Adding patterns to legends*/
+                debugger;
+                patternsData = patternsData.filter(p => {
+                    return p.type != undefined
+                }).sort((a, b) => {
+                    return new Intl.Collator(intl.locale, {caseFirst: 'upper', numeric: true, sensitivity: 'variant'})
+                        .compare(a.key, b.key);
+                })
+                debugger;
+
+
+                d3.select(this.gRef.current.parentNode.parentNode).select(`.layer_${toGenericID(id)}`).select("svg").remove()
+                const g = d3.select(this.gRef.current.parentNode.parentNode).select(`.layer_${toGenericID(id)}`).append("svg")
+                const defs = g.append("defs")
+                defs.selectAll("pattern").remove()
+                defs.selectAll("pattern")
+                    .data(patternsData).enter()
+                    .append("pattern")
+                    .attr('id', d => 'l_' + toId(d.key))
+                    .attr('patternUnits', 'userSpaceOnUse')
+                    .attr('width', 5)
+                    .attr('height', 5)
+                    .attr("x", 0).attr("y", 0)
+                    .attr("patternTransform", d => `rotate(${!d.rotation ? 0 : d.rotation})`)
+
+                patternsData.forEach(d => {
+                    if (d.type === 'lines') {
+                        defs.select("#" + 'l_' + toId(d.key))
+                            .append("rect")
+                            .attr("x", 0)
+                            .attr('width', 1)
+                            .attr('height', 10)
+                            .attr("opacity", .75)
+                            .attr('fill', d.color)
+                    }
+                    if (d.type === 'squares') {
+                        defs.select("#" + 'l_' + toId(d.key))
+                            .append("rect")
+                            .attr('width', 3)
+                            .attr('height', 3)
+                            .attr('fill', d.color)
+                            .attr("opacity", 1)
+                            .attr("stroke-width", 1)
+
+                    }
+                    if (d.type === 'dots') {
+                        defs.select("#" + 'l_' + toId(d.key))
+                            .append("circle")
+                            .attr("cx", 2)
+                            .attr("cy", 2)
+                            .attr('r', 2)
+                            .attr('fill', d.color)
+                            .attr("opacity", 1)
+                            .attr("stroke-width", 1)
+
+                    }
+                    if (d.type === 'triangle') {
+                        defs.select("#" + 'l_' + toId(d.key))
+                            .append("polygon")
+                            .attr("points", "5,0 8,8 0,5")
+                            .attr('fill', d.color)
+                            .attr("opacity", 1)
+                            .attr("stroke-width", 1)
+
+                    }
+                })
+
+                g.attr("width", "150px")
+                    .attr("height", patternsData.length * 40 + "px")
+
+                g.append("text")
+                    .attr("class", "patterns-title")
+                    .attr("y", 5)
+                    .attr("x", 12)
+                    .text(a => app === 'csv' ? patternDiscriminator : patternDiscriminatorLabel)
+
+                g.selectAll(".legend-squares")
+                    .data(patternsData)
+                    .enter()
+                    .append("rect")
+                    .attr("width", 18)
+                    .attr("height", 18)
+                    .attr("y", (d, i) => (i * 22) + 25)
+                    .attr("x", 20)
+                    .attr("stroke", borderColor)
+                    .attr("style", (d) => {
+                        return "none;fill:url(#" + 'l_' + toId(d.key) + ");"
+                    })
+
+                debugger;
+                g.selectAll(".patterns-labels")
+                    .data(patternsData)
+                    .enter()
+                    .append("text")
+                    .attr("class", "patterns-labels")
+                    .attr("y", (d, i) => (i * 22) + 25)
+                    .attr("x", 40)
+                    .text(d => d.key)
 
             }
             if (useCentroidPoint) {
                 this.createLabels(json)
+
+                r
                 this.g.selectAll(".point")
                     .data(filteredData)
                     .enter()
@@ -327,7 +431,10 @@ class DataLayer extends BaseLayer {
 
                 });
             } //Map Shapes
+
+
         }
+
 
     }
 
@@ -443,7 +550,7 @@ class DataLayer extends BaseLayer {
 
 const DataWrapper = (props) => {
     const {
-        id, unique, filters, csv, app, group = "default", apiJoinAttribute, editing, patternDiscriminator,
+        id, unique, filters, csv, app, group = "default", apiJoinAttribute, editing, patternDiscriminator, intl
     } = props
 
     let params = {}
