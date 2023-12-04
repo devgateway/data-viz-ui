@@ -93,6 +93,7 @@ const Chart = (props) => {
     const getManualColor = () => {
         return parse(manualColors)[app]
     }
+
     const formatObject = parse(format)
     let numberFormat = formatObject ? {
         style: (formatObject.style === 'compacted') ? 'decimal' : formatObject.style,
@@ -158,8 +159,8 @@ const Chart = (props) => {
         useCustomLabelColor: useCustomLabelColor == true || useCustomLabelColor == "true",
         labelTextColor,
         labelOrientation,
-        useLabelBackground,
-        useCheckBoxBackground
+        useLabelBackground: useLabelBackground == true || useLabelBackground == "true",
+        useCheckBoxBackground: useCheckBoxBackground == true || useCheckBoxBackground == "true"
     }
 
 
