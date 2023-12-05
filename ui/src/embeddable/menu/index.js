@@ -50,7 +50,7 @@ const InlineMenu = (props) => {
         "data-icon-id": iconId,
         "data-show-icons": showIcon,
         "data-show-labels": showLabel,
-        intl:locale,
+        locale,
 
     } = props
 
@@ -66,7 +66,7 @@ const InlineMenu = (props) => {
                 {label && <span className={"label"}>{label}</span>}
 
             </Menu.Item>
-            <MenuProvider slug={name} locale={"en"}>
+            <MenuProvider slug={name} locale={locale}>
                 <MenuConsumer>
                     <MenuChild onSetSelected={setSelected}></MenuChild>
                 </MenuConsumer>
