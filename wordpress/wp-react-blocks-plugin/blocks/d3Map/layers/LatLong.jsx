@@ -16,6 +16,7 @@ import Measures from '../../commons/Measures.jsx'
 import Property from "./utils/Property";
 import {PanelColorSettings} from "@wordpress/block-editor";
 import BreaksGenerator from "./utils/BreaksGenerator";
+import {compareJsonProps} from "../../../../../ui/src/embeddable/utils/parseUtils";
 
 const FilterSelector = ({param, index, options, onUpdateFilterParam}) => {
     const sortedOptions = options.sort(function (a, b) {
@@ -159,8 +160,11 @@ export class DataLayerSetting extends Component {
 
 
     componentDidUpdate(prevProps) {
-        const {onChangeProperty, layer: {type, dimension2, types}} = this.props
-        const {layer: {type: prevType, dimension2: prevDimension2}} = prevProps
+        const {onChangeProperty, allCategories, layer: {type, dimension2, types}} = this.props
+        const {allCategories: prevAllCategories, layer: {type: prevType, dimension2: prevDimension2}} = prevProps
+        if (!compareJsonProps(allCategories, prevAllCategories)) {
+            onChangeProperty("allCategories", allCategories)
+        }
     }
 
 
@@ -369,7 +373,7 @@ export class DataLayerSetting extends Component {
                     <PanelRow>
                         <RangeControl
                           label={__(`Point Size`)}
-                          value={pointDimensionStyles[field + '_size'] ? pointDimensionStyles[field + '_size'] : 'none'}
+                          value={pointDimensionStyles[field + '_size'] ? pointDimensionStyles[field + '_size'] : markSizeScale}
                           onChange={(v) => {
                               onChangeProperty('pointDimensionStyles', {...pointDimensionStyles, [field + '_size']: v})
                           }}
@@ -381,11 +385,11 @@ export class DataLayerSetting extends Component {
                     <PanelRow>
                         <PanelColorSettings
                           title={__(`Point Fill Color`)}
-                          value={pointDimensionStyles[field + '_color'] ? pointDimensionStyles[field + '_color'] : 'none'}
+                          value={pointDimensionStyles[field + '_color'] ? pointDimensionStyles[field + '_color'] : markFillColor}
                           colorSettings={[{
                               clearable: true,
                               enableAlpha: true,
-                              value: pointDimensionStyles[field + '_color'] ? pointDimensionStyles[field + '_color'] : 'none', onChange: (v) => {
+                              value: pointDimensionStyles[field + '_color'] ? pointDimensionStyles[field + '_color'] : markFillColor, onChange: (v) => {
                                   onChangeProperty('pointDimensionStyles', {...pointDimensionStyles, [field + '_color']: v})
                               },
 
@@ -395,11 +399,11 @@ export class DataLayerSetting extends Component {
                     <PanelRow>
                         <PanelColorSettings
                           title={__(`Point Border Color`)}
-                          value={pointDimensionStyles[field + '_border'] ? pointDimensionStyles[field + '_border'] : 'none'}
+                          value={pointDimensionStyles[field + '_border'] ? pointDimensionStyles[field + '_border'] : markBorderColor}
                           colorSettings={[{
                               clearable: true,
                               enableAlpha: true,
-                              value: pointDimensionStyles[field + '_border'] ? pointDimensionStyles[field + '_border'] : 'none', onChange: (v) => {
+                              value: pointDimensionStyles[field + '_border'] ? pointDimensionStyles[field + '_border'] : markBorderColor, onChange: (v) => {
                                   onChangeProperty('pointDimensionStyles', {...pointDimensionStyles, [field + '_border']: v})
                               },
                           }]}
