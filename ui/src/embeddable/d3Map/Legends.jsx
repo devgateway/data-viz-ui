@@ -139,7 +139,8 @@ const DataPointsLayerLegend = (props) => {
         measures,
         visible,
         onItemClick,
-        customMeasuresLabels
+        customMeasuresLabels,
+        allCategories
     } = props
 
     let measureLabel = measures[0]
@@ -147,7 +148,10 @@ const DataPointsLayerLegend = (props) => {
         measureLabel = customMeasuresLabels[measures[0]]
     }
 
-    const dimensionOptions = [...new Set(Object.keys(pointDimensionStyles).map(k => k.split('_')[0]))]
+    const cats = dimension2 && allCategories ? allCategories.filter(c => c.type.toUpperCase() == dimension2.toUpperCase()) : []
+    const items = cats.length > 0 ? cats[0].items : []
+    const dimensionValues = items.map(i => i.value)
+
     const fieldLabel = pointStyleBy === "dimension" ? dimension2 : measureLabel
     return <div className={"legend"}>
         <div>
@@ -167,11 +171,11 @@ const DataPointsLayerLegend = (props) => {
                 </div>
             </div>
             {(pointStyleBy === "dimension" && visible != false) && <div className={"legend-breaks"}>
-                {dimensionOptions.map((d) => {
+                {dimensionValues.map((d) => {
                     return (<div className={"break"}>
                         <div className={"break-item"} style={{
-                            backgroundColor: pointDimensionStyles[d + '_color'],
-                            border: `1px solid ${pointDimensionStyles[d + '_border']}`,
+                            backgroundColor: pointDimensionStyles[d + '_color'] || markFillColor,
+                            border: `1px solid ${pointDimensionStyles[d + '_border'] || markBorderColor}`,
                         }}></div>
                         <div className={"break-label"}>{d}</div>
                     </div>)
@@ -248,7 +252,6 @@ const DataLayerLegend = (props) => {
         measureLabel = customMeasuresLabels[measures[0]]
     } else {
         const parsed = Papa.parse(csv, {header: true, dynamicTyping: true});
-        debugger;
         measureLabel = parsed.meta.fields.length > 0 ? parsed.meta.fields[1] : ''
     }
 
