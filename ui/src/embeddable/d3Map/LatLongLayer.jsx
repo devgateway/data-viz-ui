@@ -108,9 +108,9 @@ class DataLayer extends React.Component {
                     if (d.children) {
                         value = d.children[0].value
                         pointStyle = {
-                            color: pointDimensionStyles[value + '_color'],
-                            size: pointDimensionStyles[value + '_size'],
-                            border: pointDimensionStyles[value + '_border']
+                            color: pointDimensionStyles[value + '_color'] || markFillColor,
+                            size: pointDimensionStyles[value + '_size'] || markSizeScale,
+                            border: pointDimensionStyles[value + '_border'] || markBorderColor
                         }
                     }
                 }
