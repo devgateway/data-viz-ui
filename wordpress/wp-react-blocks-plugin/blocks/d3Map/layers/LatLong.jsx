@@ -418,7 +418,4 @@ export class DataLayerSetting extends Component {
     }
 
 }
-const compareJsonProps = (p1, p2) => {
-    return JSON.stringify(p1) === JSON.stringify(p2)
-}
 export default DataLayerSetting;
