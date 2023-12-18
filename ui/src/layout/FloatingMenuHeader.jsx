@@ -78,7 +78,7 @@ const HeaderFloatingMenu = ({
     return (<MenuProvider slug={"main"} locale={locale}>
         <Menu className={"header floating branding"} text>
             <Menu.Item className={"logo"}>
-                <a href="/">
+                <a href={`/${locale}`}>
 
                     {settings.site_logo != 0 && <MediaProvider id={settings.site_logo}>
                         <MediaConsumer>
