@@ -36,6 +36,10 @@ registerBlockType(process.env.BLOCKS_NS + '/filter',
                 type: 'String',
                 default: "filter",
             },
+            filters: {
+                type: "Array",
+                default: []
+            },
             csvField: {
                 type: 'String',
                 default: "",

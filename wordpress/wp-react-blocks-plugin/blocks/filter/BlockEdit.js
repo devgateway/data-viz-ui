@@ -3,6 +3,7 @@ import {Panel, PanelBody, PanelRow, SelectControl, TextControl, ToggleControl, B
 import {__} from '@wordpress/i18n';
 import {BlockEditWithAPIMetadata} from '../commons/index'
 import {useEffect} from "react";
+import DataFilters from "../commons/DataFilters";
 
 const DEFAULT_VALUE_INPUT = 'DEFAULT_VALUE_INPUT'
 const LOWEST_VALUE = 'LOWEST_VALUE'
@@ -43,6 +44,10 @@ class BlockEdit extends BlockEditWithAPIMetadata {
         }
     }
 
+    onFilterChange() {
+        this.loadMetadata()
+    }
+
     items(type) {
         const allCategories = this.state.categories
         const values = allCategories ? allCategories.filter(c => c.type === type) : []
@@ -69,10 +74,7 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                 group,
                 placeHolder,
                 param,
-                icon,
                 app,
-                type,
-                csvField,
                 csvValue,
                 isRange,
                 allLabel,
@@ -201,6 +203,12 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                             />
                         </PanelRow>}
                     </PanelBody>
+                    {app != 'csv' && <DataFilters
+                      allFilters={this.state.filters}
+                      allCategories={this.state.categories}
+                      onChange={this.onFilterChange}
+                      {...this.props}/>
+                    }
                     {app != 'csv' && selectedFilters && selectedFilters.length > 0 &&
                         <PanelBody initialOpen={false} title={__("Hidden Filter Options")}>
                             {selectedFilters.map((f, index) => {

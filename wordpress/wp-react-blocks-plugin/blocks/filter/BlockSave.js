@@ -12,6 +12,7 @@ const SaveComponent = (props) => {
             csvValue,
             isRange,
             allLabel,
+            filters,
             noneLabel,
             startLabel,
             endLabel,
@@ -56,6 +57,7 @@ const SaveComponent = (props) => {
                  data-enable-text-search={enableTextSearch}
                  data-filter-type={filterType}
                  data-default-values={defaultValues}
+                 data-filters={encodeURIComponent(JSON.stringify(filters))}
                  data-show-no-data-option={showNoDataOption}
                  data-default-value-criteria={defaultValueCriteria}
                  data-boolean-true-label={booleanTrueLabel}
