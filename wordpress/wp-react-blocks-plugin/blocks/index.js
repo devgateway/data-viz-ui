@@ -29,6 +29,7 @@ require("./parallax-container")
 require("./menu")
 require("./wrapped-component")
 require("./sankey-chart")
+require("./data-labels")
 require("../../../../custom/wp-customizer/blocks/index")
 
 
