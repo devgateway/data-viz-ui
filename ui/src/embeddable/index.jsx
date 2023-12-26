@@ -31,6 +31,7 @@ const NewMap = asyncComponent(() => import('./d3Map'))
 const ParallaxContainer = asyncComponent(() => import('./parallax/'))
 const Wrapped = asyncComponent(() => import('./wrapped/'))
 const SankeyChart = asyncComponent(() => import('./sankeychart/'))
+const DataLabel = asyncComponent(() => import('./datalabel/'))
 let reducerList = {data, embeddable}
 if (customizer.Reducers) {
     reducerList = {...reducerList, ...customizer.Reducers}
@@ -67,6 +68,7 @@ const components = {
     parallaxContainer: ParallaxContainer,
     wrapped: Wrapped,
     sankeyChart: SankeyChart,
+    dataLabel: DataLabel,
     redirect: () => null
 
 }
