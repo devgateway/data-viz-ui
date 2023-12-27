@@ -16,8 +16,9 @@ import Measures from '../../commons/Measures.jsx'
 import Property from "./utils/Property";
 import {PanelColorSettings} from "@wordpress/block-editor";
 import BreaksGenerator from "./utils/BreaksGenerator";
-import {compareJsonProps} from "../../../../../ui/src/embeddable/utils/parseUtils";
-
+const compareJsonProps = (p1, p2) => {
+    return JSON.stringify(p1) === JSON.stringify(p2)
+}
 const FilterSelector = ({param, index, options, onUpdateFilterParam}) => {
     const sortedOptions = options.sort(function (a, b) {
         var aLabel = a.label ? a.label.toLowerCase() : "";
@@ -163,6 +164,7 @@ export class DataLayerSetting extends Component {
         const {onChangeProperty, allCategories, layer: {type, dimension2, types}} = this.props
         const {allCategories: prevAllCategories, layer: {type: prevType, dimension2: prevDimension2}} = prevProps
         if (!compareJsonProps(allCategories, prevAllCategories)) {
+
             onChangeProperty("allCategories", allCategories)
         }
     }
@@ -416,5 +418,4 @@ export class DataLayerSetting extends Component {
     }
 
 }
-
 export default DataLayerSetting;
