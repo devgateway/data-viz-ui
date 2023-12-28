@@ -85,7 +85,7 @@ const Chart = (props) => {
     }
 
     return (<div ref={ref}>
-        <Container className={"chart container"} style={{"minHeight": height + 'px'}} fluid={true}>
+        <Container className={"chart container data-label"} style={{"height": height + 'px'}} fluid={true}>
             <DataProvider
                 style={{"height": `${contentHeight}px`}}
                 params={params}
@@ -94,7 +94,7 @@ const Chart = (props) => {
                 csv={csv}
                 editing={editing}
                 store={[app, unique, ...dimensions]} source={dimensions.join("/")}>
-                <Container style={{"height": `${contentHeight}px`}} className={"body"} fluid={true}>
+                <Container style={{"height": `${contentHeight}px`}} className={"body data-label-body"} fluid={true}>
                     {!showNotEnoughParameters && <DataConsumer>
                         <DataFrame
                           locale={locale}
@@ -112,7 +112,7 @@ const Chart = (props) => {
 
             <br/>
             {childContent && viewMode == 'info' &&
-                <Container fluid={true} style={{"height": contentHeight + 'px'}} className={"body"}>
+                <Container fluid={true} style={{"height": contentHeight + 'px'}} className={"body data-label-body"}>
                     <PostContent post={{content: {rendered: childContent}}}></PostContent>
                 </Container>}
 
