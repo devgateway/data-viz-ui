@@ -138,7 +138,7 @@ class BlockEdit extends BlockEditWithAPIMetadata {
               (<ResizableBox
                   size={{height}}
                   style={{"margin": "auto", width: "100%"}}
-                  minHeight="50"
+                  minHeight="0"
                   minWidth="50"
                   enable={{
                       top: false,

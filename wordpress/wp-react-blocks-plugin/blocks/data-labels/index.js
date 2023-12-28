@@ -21,7 +21,7 @@ registerBlockType(process.env.BLOCKS_NS + '/datalabel',
             },
             height: {
                 type: 'number',
-                default: 50,
+                default: 20,
             },
             dimension1: {
                 type: 'String',
