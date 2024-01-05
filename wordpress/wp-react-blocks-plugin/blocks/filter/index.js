@@ -36,6 +36,10 @@ registerBlockType(process.env.BLOCKS_NS + '/filter',
                 type: 'String',
                 default: "filter",
             },
+            filters: {
+                type: "Array",
+                default: []
+            },
             csvField: {
                 type: 'String',
                 default: "",
@@ -115,6 +119,10 @@ registerBlockType(process.env.BLOCKS_NS + '/filter',
             closeOnSelect: {
                 type: 'Boolean',
                 default: false
+            },
+            useFilterItems: {
+                type: 'Boolean',
+                default: true
             }
 
 
