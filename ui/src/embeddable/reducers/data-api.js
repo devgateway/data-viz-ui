@@ -7,8 +7,8 @@ function queryParams(params) {
         .join('&')
 }
 
-export const getCategories=({app, params})=>{
-    return get(`${API_ROOT ? API_ROOT : ''}/api/${app}/categories/${params ? '?' + queryParams(params) : ''}`)
+export const getCategories=({app})=>{
+    return get(`${API_ROOT ? API_ROOT : ''}/api/${app}/categories/`)
 }
 
 export const getData = ({source, app, params}) => {       
