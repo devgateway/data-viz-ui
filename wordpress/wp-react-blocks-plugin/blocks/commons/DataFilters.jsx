@@ -13,7 +13,7 @@ const DataFilters = (props) => {
   }
 
   const updateFilterValue = (value, idx) => {
-    const {attributes: {filters}, setAttributes, onChange} = props
+    const {attributes: {filters}, setAttributes} = props
     const selected = filters[idx]
     let values = selected.value
     if (values.indexOf(value) > -1) {
@@ -25,7 +25,6 @@ const DataFilters = (props) => {
     const newFilters = filters.slice()
     newFilters[idx].value = values
     setAttributes({filters: newFilters})
-    onChange()
   }
 
   const addFilter = () => {

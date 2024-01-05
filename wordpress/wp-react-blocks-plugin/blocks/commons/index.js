@@ -390,14 +390,13 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
 
             fetch(`/api/${app}/categories`)
                 .then(response => {
-                    console.log('loadCategories')
                     if (!response.ok) {
                         throw new Error("HTTP status " + response.status);
                     }
                     return response.json()
                 })
                 .then(data => {
-                        debugger
+                        
                         this.setState({...this.state, categories: getTranslatedOptions(data)})
                     }
                 )
