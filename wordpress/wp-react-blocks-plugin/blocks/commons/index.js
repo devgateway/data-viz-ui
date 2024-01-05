@@ -397,7 +397,7 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
                     return response.json()
                 })
                 .then(data => {
-                        
+                        debugger
                         this.setState({...this.state, categories: getTranslatedOptions(data)})
                     }
                 )

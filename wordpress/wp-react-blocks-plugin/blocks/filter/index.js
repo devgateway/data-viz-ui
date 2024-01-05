@@ -119,6 +119,10 @@ registerBlockType(process.env.BLOCKS_NS + '/filter',
             closeOnSelect: {
                 type: 'Boolean',
                 default: false
+            },
+            useFilterItems: {
+                type: 'Boolean',
+                default: true
             }
 
 

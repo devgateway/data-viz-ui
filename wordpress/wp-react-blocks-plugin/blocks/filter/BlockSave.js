@@ -28,7 +28,8 @@ const SaveComponent = (props) => {
             allNoneSameBehaviour,
             closeOnSelect,
             alphabeticalSort,
-            ascOrder
+            ascOrder,
+            useFilterItems
         }
     } = props;
 
@@ -64,6 +65,7 @@ const SaveComponent = (props) => {
                  data-boolean-false-label={booleanFalseLabel}
                  data-hidden-filters={encodeURIComponent(JSON.stringify(hiddenFilters))}
                  data-close-on-select={closeOnSelect}
+                 data-use-filter-items={useFilterItems}
                  data-all-none-same-behaviour={allNoneSameBehaviour}>
     </div>);
 }
