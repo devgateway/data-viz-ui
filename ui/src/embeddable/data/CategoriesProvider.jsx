@@ -15,8 +15,23 @@ class DataProvider extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-         if (this.props.app != prevProps.app) {
-            this.props.onLoadData(this.props)
+        const {app, filters, source, store, params, csv, group, editing} = this.props
+        if (filters != prevProps.filters ||
+          JSON.stringify(params) != JSON.stringify(prevProps.params)
+          || app != prevProps.app
+          || prevProps.source != source
+          || csv != prevProps.csv) {
+
+            if (app === "csv") {
+                this.props.onSetData({app, csv, store, params, group})
+            } else {
+                if (editing) {
+                    params.v = (Math.random() + 1).toString(36).substring(7)
+                }
+                this.setState({showLoading: false})
+                this.props.onLoadData(this.props)//this.props.onLoadData({app, source, store, params, group})
+                setTimeout(this.checkLoadingTime, 100);
+            }
         }
     }
 
