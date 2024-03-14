@@ -11,6 +11,12 @@ function add_setting_section()
             'type' => 'string'
         ));
     register_setting('general', // Options group
+        'react_api_url', // Option name/database
+        array(
+            'show_in_rest' => true,
+            'type' => 'string'
+        ));
+    register_setting('general', // Options group
         'react_ui_search_type', // Option name/database
         array(
             'show_in_rest' => true,
@@ -43,7 +49,6 @@ function add_setting_section()
     // Settings page slug
     );
 
-
     add_settings_field('wp-react-ui-url', // Field ID
         __('WP React URI'), // Field title
         'wp_react_ui_callback', // Field callback function
@@ -51,6 +56,14 @@ function add_setting_section()
         'wp-react-section'
     // Section ID
     );
+    add_settings_field('wp-react-api-url', // Field ID
+        __('WP React API url'), // Field title
+        'wp_react_api_url_callback', // Field callback function
+        'general', // Settings page slug
+        'wp-react-section'
+    // Section ID
+    );
+
     add_settings_field('wp-react-ui-search-type', // Field ID
         __('Type'), // Field title
         'wp_react_ui_search_type_callback', // Field callback function
@@ -104,6 +117,17 @@ function wp_react_ui_callback()
     </label>
     <?php
 }
+function wp_react_api_url_callback()
+{
+    ?>
+    <label for="droid-identification">
+        <input
+            id="react_api_url"
+            class="regular-text" type="text" name="react_api_url"
+            value="<?php echo(get_option('react_api_url')) ?>">
+    </label>
+    <?php
+}
 function wp_react_ui_search_type_callback()
 {
     ?>
@@ -119,17 +143,7 @@ function wp_react_ui_search_type_callback()
     </label>
     <?php
 }
-function wp_react_api_url_callback()
-{
-    ?>
-    <label for="droid-identification">
-        <input
-            id="react_api_url"
-            class="regular-text" type="text" name="react_api_url"
-            value="<?php echo(get_option('react_api_url')) ?>">
-    </label>
-    <?php
-}
+
 function namespace_register_setting_route()
 {
     register_rest_route('dg/v1', '/settings', ['methods' => WP_REST_Server::READABLE, 'callback' => 'show_ui_setting', 'args' => namespace_get_search_args()]);
