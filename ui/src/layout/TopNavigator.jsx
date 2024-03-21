@@ -3,38 +3,35 @@ import ScrollToTopOnMount from "../ScrollTop";
 import {Menu} from 'semantic-ui-react'
 
 
-export const TopNavigator = () => {
+const TopNavigator = () => {
+    useEffect(() => {
+        const handleScroll = () => {
+            const topNavigator = document.getElementById("top-navigator");
+            if (window.pageYOffset > 150) {
+                topNavigator.classList.add("visible");
+            } else {
+                topNavigator.classList.remove("visible");
+            }
+        };
 
-  const [isVisible, setIsVisible] = useState(false)
+        window.addEventListener('scroll', handleScroll);
 
-  const toggleVisibility = () => {
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+        };
+    }, []);
 
-    if(window.pageYOffset > 300){
-      setIsVisible(true);
-    } else {
-      setIsVisible(false);
-    }
-  };
+    const scrollToTop = () => {
+        document.body.scrollIntoView({ behavior: "smooth", block: "start", inline: "start" });
+    };
 
- useEffect(() => {
-   window.addEventListener('scroll', toggleVisibility);
-   return () => {
-     window.removeEventListener('scroll', toggleVisibility);
-   }
- }, []);
-
- return(
-   <div className={isVisible ? 'opacity-100' : 'opacity-0'}>
-   <div className="top-navigator">
-   <Menu>
-     <Menu.Item onClick={e => {
-      document.body.scrollIntoView({behavior: "smooth", block: "start", inline : "start" });  
-     }}>Back to the top</Menu.Item>
-   </Menu>
-   </div>
-   </div>
- );
-
+    return (
+        <div id="top-navigator" className="top-navigator">
+            <Menu>
+                <Menu.Item onClick={scrollToTop}>Back to the top</Menu.Item>
+            </Menu>
+        </div>
+    );
 };
 
 export default TopNavigator;
