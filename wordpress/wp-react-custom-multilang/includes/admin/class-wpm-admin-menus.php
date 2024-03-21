@@ -217,6 +217,7 @@ class WPM_Admin_Menus {
 			'inline'   => __( 'Inline', 'wp-multilang' ),
 			'single'   => __( 'Single', 'wp-multilang' ),
 			'dropdown' => __( 'Dropdown', 'wp-multilang' ),
+			'toggler' => __( 'Toggler', 'wp-multilang' ),
 		);
 		?>
 		<p class="description description-wide <?php echo esc_attr( $class ); ?>">
