@@ -55,6 +55,33 @@ const Single = (props) => {
     </p>
 }
 
+const Toggler = (props) => {
+    const { menu: { menu_item_languages_show: show }, settings: { languages }, locale } = props;
+    const options = toOptions(languages, show, locale);
+    const [currentLanguage, setCurrentLanguage] = useState(locale);
+
+    const toggleLanguage = () => {
+        const nextLanguage = currentLanguage === 'en' ? 'fr' : 'en';
+        setCurrentLanguage(nextLanguage);
+        const circle = document.querySelector('.circle');
+        circle.classList.toggle('en');
+        circle.classList.toggle('fr');
+        setTimeout(() => {
+            changeLanguage(nextLanguage);
+        }, 300); // Adjust the delay time as needed
+    };
+
+    return (
+        <div className="toggler language selector">
+            <a className={`language-label ${currentLanguage === 'en' ? 'active' : ''}`} onClick={() => { changeLanguage('en'); setCurrentLanguage('en'); }}>EN</a>
+            <button className="toggle-button" onClick={toggleLanguage}>
+                <div className={`circle ${currentLanguage === 'en' ? 'en' : 'fr'}`}></div>
+            </button>
+            <a className={`language-label ${currentLanguage === 'fr' ? 'active' : ''}`} onClick={() => { changeLanguage('fr'); setCurrentLanguage('fr'); }}>FR</a>
+        </div>
+    );
+}
+
 
 const Selector = (props) => {
     const {locale, menu} = props
@@ -94,6 +121,8 @@ const Selector = (props) => {
                     return <Inline locale={locale} menu={l} settings={settings}></Inline>
                 case 'single':
                     return <Single locale={locale} menu={l} settings={settings}></Single>
+                case 'toggler':
+                    return <Toggler locale={locale} menu={l} settings={settings}></Toggler>
             }
             return null;
         })
