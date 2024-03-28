@@ -5,6 +5,7 @@ import {injectIntl} from "react-intl";
 import {withRouter} from "react-router";
 import SearchControl from "./SearchControl";
 import LangSwitcher from "./LangSwitcher";
+import {replaceLink} from "@devgateway/wp-react-lib/src/util";
 
 
 const getPath = (menu, match) => {
@@ -142,11 +143,12 @@ const MenuItems = injectIntl(withRouter(({
             return (<Menu.Item
                 className={`divided ${i.child_items ? 'has-child-items' : ''} ${selected && selected.ID == i.ID ? 'selected' : ''}  ${active == i.slug ? "active" : ""}`}>
 
-                 {i.child_items ?
+                {i.child_items ?
 
                     <span onClick={e => onSetSelected(i)}>{i.title}</span> :
 
-                    <a onClick={e => onSetSelected(i)} href={localReplaceLink(i.url, locale)}>{i.title}</a>}
+                    <a onClick={e => onSetSelected(i)}
+                       href={i.type_label === 'Custom Link' ? replaceLink(i.url, locale) : localReplaceLink(i.url, locale)}>{i.title}</a>}
 
 
             </Menu.Item>)
@@ -157,7 +159,7 @@ const MenuItems = injectIntl(withRouter(({
 }))
 
 const Header = ({intl, match, settings}) => {
-    
+
     const [selected, setSelected] = useState()
     const {slug} = match.params
 
