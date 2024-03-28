@@ -5,8 +5,6 @@ import {injectIntl} from "react-intl";
 import {withRouter} from "react-router";
 import SearchControl from "./SearchControl";
 import LangSwitcher from "./LangSwitcher";
-import {replaceLink} from "@devgateway/wp-react-lib/src/util";
-
 
 const getPath = (menu, match) => {
     let path = [];
@@ -148,7 +146,7 @@ const MenuItems = injectIntl(withRouter(({
                     <span onClick={e => onSetSelected(i)}>{i.title}</span> :
 
                     <a onClick={e => onSetSelected(i)}
-                       href={i.type_label === 'Custom Link' ? replaceLink(i.url, locale) : localReplaceLink(i.url, locale)}>{i.title}</a>}
+                       href={i.type_label === 'Custom Link' ? utils.replaceLink(i.url, locale) : localReplaceLink(i.url, locale)}>{i.title}</a>}
 
 
             </Menu.Item>)
