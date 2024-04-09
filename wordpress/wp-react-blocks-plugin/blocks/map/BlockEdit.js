@@ -119,7 +119,7 @@ class BlockEdit extends BlockEditWithAPIMetadata {
         const fileTypeFilter = taxonomy != 'none' && fileType!= 'none' ? `&${taxonomy}=${fileType}` :''
         const mapFiles = [{value:'',  label: 'None'}]
         wp.apiFetch({
-            path: '/wp/v2/media?mime_type=application/json' + fileTypeFilter,
+            path: '/wp/v2/media?per_page=100&mime_type=application/json' + fileTypeFilter,
         }).then(json => {
             if (json) {
                 json.forEach(f => {
