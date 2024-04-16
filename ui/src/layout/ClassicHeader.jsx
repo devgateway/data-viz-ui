@@ -138,6 +138,7 @@ const MenuItems = injectIntl(withRouter(({
     return mixedMenu && <React.Fragment>
 
         {mixedMenu.items.filter(i => i.url != "#wpm-languages").map(i => {
+            debugger
             return (<Menu.Item
                 className={`divided ${i.child_items ? 'has-child-items' : ''} ${selected && selected.ID == i.ID ? 'selected' : ''}  ${active == i.slug ? "active" : ""}`}>
 
@@ -146,7 +147,7 @@ const MenuItems = injectIntl(withRouter(({
                     <span onClick={e => onSetSelected(i)}>{i.title}</span> :
 
                     <a onClick={e => onSetSelected(i)}
-                       href={i.type_label === 'Custom Link' ? utils.replaceLink(i.url, locale) : localReplaceLink(i.url, locale)}>{i.title}</a>}
+                       href={i.type === 'custom' ? utils.replaceLink(i.url, locale) : localReplaceLink(i.url, locale)}>{i.title}</a>}
 
 
             </Menu.Item>)
