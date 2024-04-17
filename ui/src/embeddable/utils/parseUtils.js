@@ -2,7 +2,7 @@ export const decode = (value, editing) => {
     if (editing) {
         return value
     }
-    return decodeURIComponent(value)
+    return decodeURIComponent(value.replaceAll("%", "%25")) //replaces "%" character before decode URI to avoid errors with URI codes
 }
 
 export const parse = (value, editing) => {
