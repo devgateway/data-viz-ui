@@ -26,7 +26,7 @@ const getGroups = (measures) => {
 }
 
 const MToggle = ({onChange, checked, label}) => {
-    
+
     return (<ToggleControl
         label={label}
         checked={checked}
@@ -57,7 +57,7 @@ const Group = ({
     const groups = getGroups(allMeasures)
     const [g, setG] = useState(groups[0])
 
-    
+
 
     return (<PanelBody title={label ? label : __("New Group")}>
         <PanelRow>
@@ -76,7 +76,7 @@ const Group = ({
         </PanelRow>
 
         {app != 'csv' && groups.map(g => {
-                
+
             return (<PanelBody title={g.label}>{allMeasures.filter(m => m.group == g).map(m =>
                 <PanelRow>
                     <MToggle label={m.label} checked={measures[m.value] && measures[m.value].selected}
@@ -166,7 +166,7 @@ class BlockEdit extends BlockEditWithAPIMetadata {
     }
 
     addGroup() {
-        
+
         const {
             setAttributes,
             attributes: {
@@ -340,7 +340,7 @@ class BlockEdit extends BlockEditWithAPIMetadata {
         const queryString = ``
         const selectableGroups = measuresGroups[app] ? measuresGroups[app] : [];
 
-        
+
         return ([isSelected && (<InspectorControls>
                 <Panel header={__("Measures Configuration")}>
                     <PanelBody initialOpen={false} title={__("Group")}>

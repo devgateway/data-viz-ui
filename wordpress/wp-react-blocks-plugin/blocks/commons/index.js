@@ -33,7 +33,6 @@ export class ComponentWithSettings extends Component {
 
             if (event.data.type == 'componentReady' && event.data.value == true) {
                 if (this.iframe.current) {
-                    console.log("-----------Sending message -----------")
                     this.iframe.current.contentWindow.postMessage(({messageType: 'component-attributes', ...this.props.attributes}), "*")
                 }
             }
@@ -43,7 +42,6 @@ export class ComponentWithSettings extends Component {
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         if (this.iframe.current) {
-            console.log("-----------Sending message -----------")
             this.iframe.current.contentWindow.postMessage(({messageType: 'component-attributes', ...this.props.attributes}), "*")
         }
     }
@@ -59,10 +57,7 @@ export class ComponentWithSettings extends Component {
         });
     }
 }
-
-
 export class BlockEditWithFilters extends ComponentWithSettings {
-
     constructor(props) {
         super(props);
         this.state = {
@@ -137,7 +132,7 @@ export class BlockEditWithFilters extends ComponentWithSettings {
     }
 
     onCategoryChanged(checked, value) {
-        
+
         const {setAttributes, attributes: {categories}} = this.props
         if (!checked) {
             setAttributes({categories: categories.filter(i => i != value)})
@@ -278,7 +273,6 @@ export class BlockEditWithFilters extends ComponentWithSettings {
     }
 }
 
-
 export class BlockEditWithAPIMetadata extends ComponentWithSettings {
     constructor(props) {
         super(props);
@@ -291,28 +285,28 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
                     'Accept': 'application/json',
                 },
             })
-              .then(response => response.json())
-              .then(data => {
+                .then(response => response.json())
+                .then(data => {
 
-                  const apps = data.applications ? [...data.applications.application
-                    .filter(a => a.instance[0].metadata.type === 'data')
-                    .map(a => ({
-                        label: a.name,
-                        value: a.instance[0].vipAddress,
-                        settings: a.instance[0]
-                    })), {label: 'CSV', value: 'csv'}] : [{label: 'CSV', value: 'csv'}]
-                  this.setState({
-                      react_ui_url: settingsData["react_ui_url"] + '/' + window._page_locale,
-                      react_api_url: settingsData["react_api_url"],
-                      site_language: settingsData["site_language"],
-                      current_language: new URLSearchParams(document.location.search).get("edit_lang"),
-                      apps
-                  });
-                  this.loadMetadata()
-              })
-              .catch(function (response) {
+                    const apps = data.applications ? [...data.applications.application
+                        .filter(a => a.instance[0].metadata.type === 'data')
+                        .map(a => ({
+                            label: a.name,
+                            value: a.instance[0].vipAddress,
+                            settings: a.instance[0]
+                        })), {label: 'CSV', value: 'csv'}] : [{label: 'CSV', value: 'csv'}]
+                    this.setState({
+                        react_ui_url: settingsData["react_ui_url"] + '/' + window._page_locale,
+                        react_api_url: settingsData["react_api_url"],
+                        site_language: settingsData["site_language"],
+                        current_language: new URLSearchParams(document.location.search).get("edit_lang"),
+                        apps
+                    });
+                    this.loadMetadata()
+                })
+                .catch(function (response) {
 
-              })
+                })
 
         });
 
@@ -324,16 +318,13 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
         const {attributes: {app}} = this.props
         const {attributes: {app: prevAPP}} = prevProps
 
-
         if (app != prevAPP) {
-
             this.loadMetadata()
         }
     }
 
-
-    _loadMetadata(app) {
-
+    loadMetadata() {
+        const {attributes: {app}} = this.props
         if (app != "csv") {
             fetch(`/api/${app}/dimensions`)
                 .then(response => {
@@ -390,14 +381,12 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
 
             fetch(`/api/${app}/categories`)
                 .then(response => {
-                    console.log('loadCategories')
                     if (!response.ok) {
                         throw new Error("HTTP status " + response.status);
                     }
                     return response.json()
                 })
                 .then(data => {
-                        debugger
                         this.setState({...this.state, categories: getTranslatedOptions(data)})
                     }
                 )
@@ -406,12 +395,6 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
                 })
         }
     }
-
-    loadMetadata() {
-       const {attributes: {app}} = this.props
-        this._loadMetadata(app)
-    }
 }
 
 export default SizeConfig
-

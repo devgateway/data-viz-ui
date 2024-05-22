@@ -96,6 +96,7 @@ const SaveComponent = (props) => {
             groupTotalLabel,
             groupTotalLabelOffset,
             tooltipEnableMarkdown,
+            xAxisTickValues,
             yAxisTickValues,
             enableGridY,
             enableGridX,
@@ -105,6 +106,17 @@ const SaveComponent = (props) => {
             reverseLegend,
             sort,
             sortReverse,
+            sort2Dimension,
+            radarCurve,
+            radarFillOpacity,
+            radarBorderWidth,
+            radarGridLevels,
+            radarGridShape,
+            radarGridLabelOffset,
+            radarEnableDots,
+            radarDotSize,
+            radarEnableDotLabel,
+            radarDotLabelOffset
         }
     } = props;
     const blockProps = useBlockProps.save({
@@ -115,7 +127,7 @@ const SaveComponent = (props) => {
     const source = levels.filter(l => l != 'none' && l != null).join('/')
 
     return (
-        <div {...blockProps} className={"viz-component"}
+        <div {...blockProps} className={"tcdi-component"}
              data-component={"chart"}
              data-height={height}
              data-type={type}
@@ -211,6 +223,7 @@ const SaveComponent = (props) => {
              data-center-label-yoffset={centerLabelYOffset}
              data-tooltip-enable-markdown={tooltipEnableMarkdown}
              data-y-axis-tick-values={yAxisTickValues}
+             data-x-axis-tick-values={xAxisTickValues}
              data-enable-grid-y={enableGridY}
              data-enable-grid-x={enableGridX}
              data-overall-label={overallLabel}
@@ -219,11 +232,21 @@ const SaveComponent = (props) => {
              data-reverse-legend={reverseLegend}
              data-sort={sort}
              data-sort-reverse={sortReverse}
-        >
-
+             data-sort2dimension={sort2Dimension}
+             data-radar-curve={radarCurve}
+             data-radar-fill-opacity={radarFillOpacity}
+             data-radar-border-width={radarBorderWidth}
+             data-radar-grid-levels={radarGridLevels}
+             data-radar-grid-shape={radarGridShape}
+             data-radar-grid-label-offset={radarGridLabelOffset}
+             data-radar-enable-dots={radarEnableDots}
+             data-radar-dot-size={radarDotSize}
+             data-radar-enable-dot-label={radarEnableDotLabel}
+             data-radar-dot-label-offset={radarDotLabelOffset}>
             <InnerBlocks.Content/>
         </div>
     );
 }
 
 export default SaveComponent
+

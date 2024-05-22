@@ -31,7 +31,28 @@ class BlockEdit extends BlockEditWithAPIMetadata {
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        const {attributes: {app}} = this.props
+        const {setAttributes, attributes: {type,colorBy,dimension1, dimension2, types, measures, app}} = this.props
+        const {attributes: {type: prevType, dimension2: prevDimension2}} = prevProps
+
+        if (type != prevType) {
+            if (type == 'radar') {
+                if (colorBy != 'id') {
+                    setAttributes({colorBy: 'id'})
+
+                }
+            }
+            if (type == 'pie') {
+
+                if (dimension1 != 'none' && dimension2 == 'none' && colorBy != 'index') {
+                    setAttributes({colorBy: 'index'})
+
+                }
+                if (dimension1 != 'none' && dimension2 != 'none' && colorBy != 'id') {
+                    setAttributes({colorBy: 'id'})
+
+                }
+            }
+        }
         super.componentDidUpdate(prevProps, prevState, snapshot);
     }
 
@@ -153,7 +174,7 @@ class BlockEdit extends BlockEditWithAPIMetadata {
             Object.keys(measures)
                 .filter(k => ['global', 'csv']
                     .indexOf(k) == -1).forEach(k => {
-                        
+
                     if (measures[k].selected) {
                         appMeasures[app][k] = measures[k]
                     }
@@ -323,14 +344,14 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                                                           allCategories={this.state.categories} {...this.props}></Info>}
 
 
-                                {app == 'csv' &&
+                                {app == 'csv' && type!='radar' &&
                                     <PanelBody initialOpen={false} title={__("Tooltip")}>
                                         <PanelRow>
                                             <ToggleControl label={__("Enable Tooltip")} checked={tooltipEnabled}
-                                                           onChange={(tooltipEnabled) => {
+                                                           onChange={(isToolTipEnabled) => {
                                                                setAttributes({
-                                                                   tooltipEnabled,
-                                                                   tooltip: tooltipEnabled && tooltip.trim().length == 0 ? "{value}" : tooltip
+                                                                   tooltipEnabled: isToolTipEnabled,
+                                                                   tooltip: setTooltipState(isToolTipEnabled, tooltipHTML)
                                                                })
                                                            }}/>
                                         </PanelRow>
@@ -374,14 +395,14 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                                         }
                                     </PanelBody>
                                 }
-                                {app != 'csv' &&
+                                {app != 'csv' && type!='radar' &&
                                     <PanelBody initialOpen={false} title={__("Tooltip")}>
                                         <PanelRow>
                                             <ToggleControl label={__("Enable Tooltip")} checked={tooltipEnabled}
-                                                           onChange={(tooltipEnabled) => {
+                                                           onChange={(isToolTipEnabled) => {
                                                                setAttributes({
-                                                                   tooltipEnabled,
-                                                                   tooltip: tooltipEnabled && tooltip.trim().length == 0 ? "{value}" : tooltip
+                                                                   tooltipEnabled: isToolTipEnabled,
+                                                                   tooltip: setTooltipState(isToolTipEnabled, tooltipHTML)
                                                                })
                                                            }}/>
                                         </PanelRow>
@@ -454,6 +475,11 @@ class BlockEdit extends BlockEditWithAPIMetadata {
 
     }
 }
+
+function setTooltipState (isTooltipEnabled, tooltipHTML) {
+    return isTooltipEnabled && tooltipHTML.trim().length === 0 ? "{value}" : tooltipHTML;
+}
+
 
 const Edit = (props) => {
     const blockProps = useBlockProps();

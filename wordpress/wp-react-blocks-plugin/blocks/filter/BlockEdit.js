@@ -3,7 +3,6 @@ import {Panel, PanelBody, PanelRow, SelectControl, TextControl, ToggleControl, B
 import {__} from '@wordpress/i18n';
 import {BlockEditWithAPIMetadata} from '../commons/index'
 import {useEffect} from "react";
-import DataFilters from "../commons/DataFilters";
 
 const DEFAULT_VALUE_INPUT = 'DEFAULT_VALUE_INPUT'
 const LOWEST_VALUE = 'LOWEST_VALUE'
@@ -32,7 +31,6 @@ class BlockEdit extends BlockEditWithAPIMetadata {
         super(props);
         this.iframe = React.createRef();
         this.updateHiddenFilters = this.updateHiddenFilters.bind(this)
-        //this.onFilterChange = this.onFilterChange.bind(this)
         this.items = this.items.bind(this)
     }
 
@@ -44,10 +42,6 @@ class BlockEdit extends BlockEditWithAPIMetadata {
             setAttributes({hiddenFilters: [...hiddenFilters, value]})
         }
     }
-
-    /*onFilterChange() {
-        this.loadMetadata();
-    }*/
 
     items(type) {
         const allCategories = this.state.categories
@@ -75,7 +69,10 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                 group,
                 placeHolder,
                 param,
+                icon,
                 app,
+                type,
+                csvField,
                 csvValue,
                 isRange,
                 allLabel,
@@ -92,8 +89,7 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                 defaultValueCriteria,
                 hiddenFilters,
                 allNoneSameBehaviour,
-                closeOnSelect,
-                useFilterItems
+                closeOnSelect
             }
         } = this.props;
 
@@ -205,33 +201,14 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                             />
                         </PanelRow>}
                     </PanelBody>
-                    {app != 'csv' && <PanelBody initialOpen={false} title={__("Filter or hide items")}>
-                        <PanelRow>
-                            <ToggleControl
-                              label={__("Filter items")}
-                              checked={useFilterItems}
-                              onChange={() => setAttributes({useFilterItems: !useFilterItems, filters: [], hiddenFilters: []})}/>
-                        </PanelRow>
-                        <PanelRow>
-                            <ToggleControl
-                              label={__("Hide items")}
-                              checked={!useFilterItems}
-                              onChange={() => setAttributes({useFilterItems: !useFilterItems, filters: [], hiddenFilters: []})}/>
-                        </PanelRow>
-                            {useFilterItems && <DataFilters
-                              allFilters={this.state.filters}
-                              allCategories={this.state.categories}
-                              {...this.props}/>
-                            }
-                            {!useFilterItems && <PanelBody initialOpen={false} title={__("Hidden Filter Options")}>
-                                {(selectedFilters || []).map((f, index) => {
-                                    return (
-                                      <CategoricalFilter value={hiddenFilters} index={index} items={this.items(f.type)}
-                                                         onUpdateFilterValue={this.updateHiddenFilters}/>)
-                                })}
-                            </PanelBody>
-                            }
-                    </PanelBody>}
+                    {app != 'csv' && selectedFilters && selectedFilters.length > 0 &&
+                        <PanelBody initialOpen={false} title={__("Hidden Filter Options")}>
+                            {selectedFilters.map((f, index) => {
+                                return (
+                                    <CategoricalFilter value={hiddenFilters} index={index} items={this.items(f.type)}
+                                                       onUpdateFilterValue={this.updateHiddenFilters}/>)
+                            })}
+                        </PanelBody>}
                     <PanelBody title={__("Labels")}>
                         <PanelRow>
                             <TextControl

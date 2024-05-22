@@ -17,13 +17,13 @@ const FilterSelector = ({param, index, options, onUpdateFilterParam}) => {
         var bLabel = b.label ? b.label.toLowerCase() : "";
         return aLabel < bLabel ? -1 : aLabel > bLabel ? 1 : 0;
     });
-    
+
     return <SelectControl onChange={(value) => {
         onUpdateFilterParam(value, index)
     }} value={param} options={sortedOptions}/>
 }
 
-const CategoricalFilter = ({value, index, items, onUpdateFilterValue}) => {    
+const CategoricalFilter = ({value, index, items, onUpdateFilterValue}) => {
     if (items) {
         const sortedItems = items.sort(function(a,b) {
             /*
@@ -47,7 +47,7 @@ const CategoricalFilter = ({value, index, items, onUpdateFilterValue}) => {
     {label: 'Pie', value: 'pie', supports: {singleMeasure: true, singleDimension: false}},
     {label: 'Line', value: 'line', supports: {singleMeasure: false, singleDimension: true}},
     {label: 'Map', value: 'map', supports: {singleMeasure: true, singleDimension: false}}]*/
-    
+
 export class APIConfig extends Component {
     constructor(props) {
         super(props);
@@ -161,7 +161,6 @@ export class APIConfig extends Component {
     }
 
     onMeasuresChange(value) {
-        
         const {setAttributes, attributes: {measures}} = this.props
         if (measures.indexOf(value) > -1) {
             setAttributes({measures: measures.filter(d => d != value)})
@@ -196,7 +195,7 @@ export class APIConfig extends Component {
                 dimension1,
                 dimension2,
                 type,
-                types                
+                types
             }
         } = this.props
 
@@ -236,7 +235,7 @@ export class APIConfig extends Component {
                                 <FilterSelector param={f.param} index={index} options={allFilters}
                                                 onUpdateFilterParam={this.updateFilterParam}/>
                                 {<CategoricalFilter value={f.value} index={index} items={this.items(f.type)}
-                                                    onUpdateFilterValue={this.updateFilterValue}/>}                               
+                                                    onUpdateFilterValue={this.updateFilterValue}/>}
                             </PanelBody>)
                     })}
 
@@ -246,8 +245,8 @@ export class APIConfig extends Component {
                         <Button variant={"link"} onClick={this.removeFilter}>{__("Remove")}</Button>
                     </PanelRow>
                 </PanelBody>
-                
-                </>          
+
+                </>
             ]
         )
     }

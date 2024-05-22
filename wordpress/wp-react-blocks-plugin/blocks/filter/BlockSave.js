@@ -37,7 +37,7 @@ const SaveComponent = (props) => {
     const divStyles = {}
 
 
-    return (<div className={"viz-component"}
+    return (<div className={"tcdi-component"}
                  data-component={"filter"}
                  data-app={app}
                  data-icon={icon}
