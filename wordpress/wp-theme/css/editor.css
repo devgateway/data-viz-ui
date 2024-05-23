@@ -79,3 +79,12 @@ p.wp-block.rich-text {
     flex-shrink: 0;
     max-width: 100%;
 }
+
+.wpm-language-fr, .wpm-language-en {
+    position: fixed !important;
+    background-color: #FFFFFF !important;
+    border: 1px solid #DCDCDC !important;
+}
+.interface-navigable-region.interface-interface-skeleton__secondary-sidebar {
+    z-index: 1 !important;
+}
