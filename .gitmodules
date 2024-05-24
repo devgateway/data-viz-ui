@@ -1,4 +1,3 @@
 [submodule "react-lib"]
 	path = react-lib
-	branch = TCDI-DATA-VIZ-migration-latest
 	url = git@github.com:devgateway/wp-react-lib.git
