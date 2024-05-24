@@ -80,6 +80,9 @@ const DownloadComponent = (props) => {
     const save = (type) => {
 
          cloneNode(componentRef.current).then(function (node) {
+
+             [...node.getElementsByTagName("input")].forEach(e=>e.remove())
+
               //add source url
               const addSourceURL = includeSourceURL == "true";
               if (addSourceURL) {
@@ -87,6 +90,10 @@ const DownloadComponent = (props) => {
                   urlNode.style.marginLeft = sourceURLMarginLeft + "px"
                   urlNode.style.marginTop = sourceURLMarginTop + "px"
                   urlNode.style.fontSize = sourceURLFontSize + "px"
+                  urlNode.style.fontFamily = 'Roboto, sans-serif';
+                  urlNode.style.fontWeight = '400';
+                  urlNode.style.color = '#66676d';
+                  urlNode.style.opacity = '0.75';
                   urlNode.innerHTML = window.location.href
                   node.appendChild(urlNode)
               }
@@ -136,29 +143,34 @@ const DownloadComponent = (props) => {
                     <Grid.Column className={ editing ? "editing ignore" : "ignore"  } width={(editing || useTitle != "true") ? 16 : 4}
                                  textAlign={"right"}>
                         <div className={"wrapper"}>
-
+                            <Button className={"download"} onClick={() => onClickHandler(fileType)}>
+                                {buttonLabel} {fileType === 'PNG' ? 'PNG' : 'JPG'}
+                            </Button>
                             <Dropdown className={"download"} data-tooltip={decodeURIComponent(tooltip)}
                                       trigger={(isCheckJPG && isCheckPNG) ?
                                           <Icon name={"download"} className='download-icon'></Icon> : null}>
                                 <Dropdown.Menu>
                                     {title}
-                                    {(isCheckPNG == 'true' || isCheckPNG == true) ? <Dropdown.Item onClick={() => onClickHandler('PNG')}>
-                                        <input type='radio' value='PNG' checked={fileType === 'PNG'}
-                                               onChange={handleChange}/>
-                                        <label>{pngText}</label>
-                                    </Dropdown.Item> : null}
-                                    {(isCheckJPG == 'true' || isCheckJPG == true) ? <Dropdown.Item onClick={() => onClickHandler('JPG')}>
-                                        <input type='radio' value='JPG' checked={fileType === 'JPG'}
-                                               onChange={handleChange}/>
-                                        <label>{jpgText}</label>
-                                    </Dropdown.Item> : null}
+                                    {(isCheckPNG == 'true' || isCheckPNG == true) ? (
+                                        <Dropdown.Item onClick={() => {
+                                            setFileType('PNG');
+                                            onClickHandler('PNG');
+                                        }}>
+                                            <input type='radio' value='PNG' checked={fileType === 'PNG'} onChange={handleChange} />
+                                            <label>{pngText}</label>
+                                        </Dropdown.Item>
+                                    ) : null}
+                                    {(isCheckJPG == 'true' || isCheckJPG == true) ? (
+                                        <Dropdown.Item onClick={() => {
+                                            setFileType('JPG');
+                                            onClickHandler('JPG');
+                                        }}>
+                                            <input type='radio' value='JPG' checked={fileType === 'JPG'} onChange={handleChange} />
+                                            <label>{jpgText}</label>
+                                        </Dropdown.Item>
+                                    ) : null}
                                 </Dropdown.Menu>
                             </Dropdown>
-
-                            <Button className={"download"} onClick={() => onClickHandler(fileType)}>
-                                {buttonLabel} {fileType === 'PNG' ? 'PNG' : 'JPG'}
-                            </Button>
-
                         </div>
                     </Grid.Column>
                 </Grid>
