@@ -1,5 +1,5 @@
 (function (global) {
-    
+
 
     var util = newUtil();
     var inliner = newInliner();
@@ -155,18 +155,30 @@
             .then(util.makeImage)
             .then(util.delay(100))
             .then(function (image) {
-                var canvas = newCanvas(domNode);
-                canvas.getContext('2d').drawImage(image, 0, 0);
+                var canvas = newCanvas(domNode, options);
+                var ctx = canvas.getContext('2d');
+                ctx.drawImage(image, 0, 0);
                 return canvas;
+            })
+            .catch(function (error) {
+                console.error("Failed to draw canvas:", error);
             });
 
-        function newCanvas(domNode) {
+        function newCanvas(domNode, options) {
             var canvas = document.createElement('canvas');
-            canvas.width = options.width || util.width(domNode);
-            canvas.height = options.height || util.height(domNode);
+            var rect = domNode.getBoundingClientRect(); // Get accurate dimensions including CSS effects
+            var scale = window.devicePixelRatio || 1; // Handle high DPI screens
+
+            // Adjust canvas size according to the pixel ratio
+            canvas.width = (options.width || rect.width) * scale;
+            canvas.height = (options.height || rect.height) * scale;
+            canvas.style.width = (options.width || rect.width) + "px";
+            canvas.style.height = (options.height || rect.height) + "px";
+
+            var ctx = canvas.getContext('2d');
+            ctx.scale(scale, scale); // Normalize coordinate system to use CSS pixels
 
             if (options.bgcolor) {
-                var ctx = canvas.getContext('2d');
                 ctx.fillStyle = options.bgcolor;
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
             }

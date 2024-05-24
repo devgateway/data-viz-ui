@@ -49,7 +49,7 @@ export const formatContent = (
   return str;
 };
 
-const ChartTooltip = ({ tooltip, d, intl, tooltipEnableMarkdown }) => {
+const Tooltip = ({ tooltip, d, intl, tooltipEnableMarkdown }) => {
   const { color, data } = d.datum || d.point || d;
   const current =
     d.value ||
@@ -89,4 +89,4 @@ const ChartTooltip = ({ tooltip, d, intl, tooltipEnableMarkdown }) => {
   }
 };
 
-export default ChartTooltip;
+export default Tooltip;
