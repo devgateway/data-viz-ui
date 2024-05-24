@@ -29,7 +29,7 @@ const SaveComponent = (props) => {
                 data-type={type}
                 data-taxonomy={taxonomy}
                 data-categories={categories.toString()}
-                className={"tcdi-component"}
+                className={"viz-component"}
                 data-read-more-label={readMoreLabel}
                 data-use-scrolls={useScrolls}
                 data-component={"featuredTabs"}
