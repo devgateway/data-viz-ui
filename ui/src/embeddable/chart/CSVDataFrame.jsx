@@ -134,6 +134,8 @@ const BarData = ({ children, data, measures }) => {
     keys: keys,
     data: json,
   };
+  console.log('children....', children)
+  console.log('options....', options)
   return React.Children.map(children, (child) =>
     React.cloneElement(child, { options })
   );
