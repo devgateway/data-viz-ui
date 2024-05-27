@@ -13,7 +13,7 @@ class Map extends React.Component {
 
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        
+
         if (prevProps.projection !== this.props.projection) {
             const path = d3.geoPath().projection(this.props.projection);
             this.setState({projection: this.props.projection, path})
@@ -36,7 +36,7 @@ class Map extends React.Component {
     }
 
     componentDidMount() {
-        
+
         const {rotationEnabled} = this.props
         var group = d3.select(this.svgRef.current).datum({
             x: 0,
@@ -48,7 +48,7 @@ class Map extends React.Component {
 
     }
 
-    dragged(d) {
+    dragged(event, d) {
         const origin = {
             x: 0,
             y: 0
@@ -62,8 +62,8 @@ class Map extends React.Component {
             .range([90, -90]);
 
         const r = {
-            x: λ((d.x = d3.event.x)),
-            y: φ((d.y = d3.event.y))
+            x: λ((d.x = event.x)),
+            y: φ((d.y = event.y))
         };
         projection.rotate([origin.x + r.x, origin.y + r.y]);
         const path = d3.geoPath().projection(projection);

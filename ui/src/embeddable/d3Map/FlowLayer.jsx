@@ -109,7 +109,7 @@ class DataLayer extends BaseLayer {
                         } // Change these data to see ho the great circle reacts
                         //d1 is origin
                         //d2 is destination
-                        
+
                         this.g.select("defs")
                             .append("marker")
                             .attr("id", "arrow" + id)
@@ -138,28 +138,28 @@ class DataLayer extends BaseLayer {
                             .style("cursor", "pointer")
                             .style("stroke-dasharray", "0")
                             .style("stroke", d => {
-                                
+
                                 return brStyles.getColor(value)
                             })
                             .style("stroke-width", d => {
-                                
+
                                 return brStyles.getSize(value)
                             })
                             .attr("marker-end", "url(#arrow" + id + ")")
 
-                            .on("mouseenter", d => {
+                            .on("mouseenter", (event, d) => {
                                 g.selectAll("marker").transition().duration("200").style("opacity", 0)
                                 g.selectAll(".start-point").transition().duration("200").style("opacity", 0)
                                 g.selectAll(".flow-line").transition().duration("200")
                                     .style("opacity", 0)
 
-                                d3.select(d3.event.target).transition().duration("200").style("opacity", 1)
+                                d3.select(event.target).transition().duration("200").style("opacity", 1)
 
                                 g.selectAll("#arrow" + id).transition().duration("200").style("opacity", 1)
 
 
                                 g.selectAll(".start-point.circle_" + originID).transition().duration("200").style("opacity", 1)
-                                
+
                                 if (value) {
                                     const origin = {}
                                     const target = {}
@@ -316,7 +316,6 @@ const DataWrapper = (props) => {
         app={app}
         csv={decodeURIComponent(csv)}
         group={group}
-        editing={editing}
         ignoreErrors={true}
         isSvg={true}
         store={[app, unique, id]}
