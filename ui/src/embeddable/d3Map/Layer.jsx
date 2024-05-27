@@ -1,10 +1,7 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import * as ReactDOM from 'react-dom';
-import {connect} from "react-redux";
 import * as d3 from 'd3' // d3 plugin
-import * as topojson from "topojson-client";
 import Tooltip from "./Tooltip";
-import {injectIntl} from "react-intl";
 
 class BaseLayer extends React.Component {
 
@@ -55,8 +52,7 @@ class BaseLayer extends React.Component {
     }
 
 
-    showToolTip(content, data, color) {
-        debugger;
+    showToolTip(content, data, color, event) {
         if (data) {
 
             const tip = d3.select("body").append("div")
@@ -64,8 +60,8 @@ class BaseLayer extends React.Component {
                 .style("position", "absolute")
                 //.style("background-color", color)
                 .html("")
-                .style("left", (d3.event.pageX + 15) + "px")
-                .style("top", (d3.event.pageY - 50) + "px")
+                .style("left", (event.pageX + 15) + "px")
+                .style("top", (event.pageY - 50) + "px")
 
             ReactDOM.render(<Tooltip intl={this.props.intl} tooltip={content} data={data}
                                      tooltipEnableMarkdown={false}/>, tip._groups[0][0])
@@ -73,13 +69,13 @@ class BaseLayer extends React.Component {
     }
 
 
-    moveToolTip() {
+    moveToolTip(event) {
         const tip = d3.select(".d3MapTooltip")
-            .style("left", (d3.event.pageX + 15) + "px")
-            .style("top", (d3.event.pageY - 50) + "px")
+            .style("left", (event.pageX + 15) + "px")
+            .style("top", (event.pageY - 50) + "px")
     }
 
-    hiddenToolTip() {
+    hiddenToolTip(event) {
         d3.selectAll(".d3MapTooltip").remove();
 
     }

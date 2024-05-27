@@ -12,7 +12,7 @@ import {
 import React from "react";
 import * as topojson from "topojson";
 import Legend from "./legend";
-import { formatContent } from "../common/Tooltip";
+import { formatContent } from "../common/MapTooltip";
 
 const geoStats = require("geostats");
 const COLOR_VARIABLE = "_Color_";
