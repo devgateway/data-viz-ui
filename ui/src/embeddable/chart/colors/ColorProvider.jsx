@@ -1,63 +1,103 @@
-import { colorSchemes } from "@nivo/colors";
-import * as d3 from "d3";
+import React from "react";
+import SystemColors from "./SystemColors";
+import PlainColor from "./PlainColor";
+import ManualColors from "./ManualColors";
+import {
+  isCategoricalColorScheme,
+  isSequentialColorScheme,
+} from "@nivo/colors";
+import SequentialColors from "./SequentialColors";
+import CategoricalColors from "./CategoricalColors";
 
-import Colors from "./Colors";
+const COLOR_VARIABLE = "_Color";
 
-class CategoricalColors extends Colors {
-  constructor(colorBy, scheme, data, keys, indexBy) {
-    super(colorBy, scheme, data, keys, indexBy);
-
-    if (colorBy === "index") {
-      this._domain = this.data.map((d) => d[this.indexBy]);
-    }
-    if (colorBy === "id") {
-      this._domain = this.keys;
-    }
-
-    if (colorBy === "values") {
-      const values = data
-        .map((d) => keys.map((k) => d[k]))
-        .flatMap((d) => d)
-        .filter((n) => n != undefined);
-      this._domain = [Math.min(...values), Math.max(...values)];
-    }
-
-    this._color = d3.scaleOrdinal(colorSchemes[this.scheme]);
-    this._color.domain(this._domain);
+class ColorProvider extends React.Component {
+  constructor(props) {
+    super(props);
   }
 
-  getColorByValue(value) {
-    if (this.colorBy === "values") {
-      return "gray";
-    }
-    return this.color(value);
-  }
+  render() {
+    const {
+      app,
+      type,
+      colorBy,
+      scheme,
+      barColor,
+      manualColors,
+      locale,
+      overallLabel,
+      customLabels,
+      options: { data, keys, indexBy, dimensionsMetadata, measuresMetadata },
+    } = this.props;
+    let colorManager;
 
-  getColor(id, datum) {
-    if (this.colorBy === "index") {
-      return this.color(datum[this.indexBy]);
-    }
-    if (this.colorBy === "id") {
-      //console.log(`Bar color  ${id} : ${this.color(id)}`)
-      return this.color(id);
-    }
-    return "gray";
-  }
+    if (data) {
+      if (scheme === "system") {
+        colorManager = new SystemColors(
+          app,
+          type,
+          colorBy,
+          scheme,
+          data,
+          keys,
+          indexBy,
+          dimensionsMetadata,
+          measuresMetadata,
+          locale
+        );
+      } else if (scheme === "plain_color") {
+        colorManager = new PlainColor(barColor);
+      } else if (scheme == "manual") {
+        colorManager = new ManualColors(
+          app,
+          type,
+          colorBy,
+          scheme,
+          data,
+          dimensionsMetadata,
+          measuresMetadata,
+          keys,
+          indexBy,
+          manualColors,
+          locale,
+          overallLabel,
+          customLabels
+        );
+      } else {
+        if (isSequentialColorScheme(scheme)) {
+          colorManager = new SequentialColors(
+            colorBy,
+            scheme,
+            data,
+            keys,
+            indexBy
+          );
+        }
+        if (isCategoricalColorScheme(scheme)) {
+          colorManager = new CategoricalColors(
+            colorBy,
+            scheme,
+            data,
+            keys,
+            indexBy
+          );
+        }
+      }
 
-  getColorByIndex(value) {
-    if (this.colorBy === "values") {
-      return "gray";
+      return (
+        <div>
+          {React.Children.map(this.props.children, (child) =>
+            React.cloneElement(child, {
+              ...this.props,
+              colorGenerator: colorManager,
+            })
+          )}
+        </div>
+      );
+    } else {
+      return null;
     }
-    return this.color(value);
-  }
-
-  getColorByKey(value) {
-    if (this.colorBy === "values") {
-      return "gray";
-    }
-
-    return this.color(value);
   }
 }
 
-export default CategoricalColors;
+export default ColorProvider;
