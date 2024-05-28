@@ -1,3 +1,4 @@
 [submodule "react-lib"]
 	path = react-lib
 	url = git@github.com:devgateway/wp-react-lib.git
+	branch = master
