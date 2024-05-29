@@ -1,6 +1,6 @@
 
 
-FROM node:12.22.12 AS reactlib
+FROM node:18.18.2 AS reactlib
 WORKDIR /tmp/work
 COPY react-lib/wp-react-lib/package.json .
 RUN npm install
@@ -11,7 +11,7 @@ RUN npm run dist
 
 
 
-FROM node:12.22.12 AS ui
+FROM node:18.18.2 AS ui
 
 WORKDIR /tmp/work
 COPY ui/package*.json ./
