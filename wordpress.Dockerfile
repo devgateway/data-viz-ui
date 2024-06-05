@@ -2,7 +2,7 @@ ARG REPO
 ARG TAG
 FROM ${REPO}/wp-customizer:${TAG}  AS customizer
 
-FROM node:12.22.10  AS dist
+FROM node:18.18.2 AS dist
 WORKDIR /tmp/work
 COPY wordpress/wp-react-blocks-plugin/blocks/package.json ./
 #Copy custom plugins

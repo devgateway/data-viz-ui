@@ -33,6 +33,7 @@
     "start": "wp-scripts start"
   },
   "dependencies": {
+    "ajv": "^8.15.0",
     "classnames": "^2.2.6",
     "gzip-js": "^0.3.2",
     "papaparse": "^5.3.1",
