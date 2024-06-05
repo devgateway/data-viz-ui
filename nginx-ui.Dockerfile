@@ -3,7 +3,7 @@
 FROM node:18.18.2 AS reactlib
 WORKDIR /tmp/work
 COPY react-lib/wp-react-lib/package.json .
-RUN npm install
+RUN npm install --legacy-peer-deps
 COPY react-lib/wp-react-lib/public public
 COPY react-lib/wp-react-lib/src src
 RUN npm run dist
@@ -18,8 +18,7 @@ COPY ui/package*.json ./
 COPY ui/craco.config.js ./
 COPY --from=reactlib /tmp/work/package.json ../react-lib/wp-react-lib/
 COPY --from=reactlib /tmp/work/dist ../react-lib/wp-react-lib/dist
-RUN npm install \
-  && npm rebuild node-sass
+RUN npm install --legacy-peer-deps
 
 COPY ui/public public
 COPY ui/src src
