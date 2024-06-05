@@ -33,6 +33,9 @@ const Wrapped = asyncComponent(() => import('./wrapped/'))
 const SankeyChart = asyncComponent(() => import('./sankeychart/'))
 const DataLabel = asyncComponent(() => import('./datalabel/'))
 let reducerList = {data, embeddable}
+
+
+
 if (customizer.Reducers) {
     reducerList = {...reducerList, ...customizer.Reducers}
 }
