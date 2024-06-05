@@ -15,6 +15,7 @@ FROM node:18.18.2 AS ui
 
 WORKDIR /tmp/work
 COPY ui/package*.json ./
+COPY ui/craco.config.js ./
 COPY --from=reactlib /tmp/work/package.json ../react-lib/wp-react-lib/
 COPY --from=reactlib /tmp/work/dist ../react-lib/wp-react-lib/dist
 RUN npm install \
