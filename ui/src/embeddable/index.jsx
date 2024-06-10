@@ -32,6 +32,7 @@ const ParallaxContainer = asyncComponent(() => import('./parallax/'))
 const Wrapped = asyncComponent(() => import('./wrapped/'))
 const SankeyChart = asyncComponent(() => import('./sankeychart/'))
 const DataLabel = asyncComponent(() => import('./datalabel/'))
+const Body = asyncComponent(() => import('./body/'))
 let reducerList = {data, embeddable}
 if (customizer.Reducers) {
     reducerList = {...reducerList, ...customizer.Reducers}
@@ -69,6 +70,7 @@ const components = {
     wrapped: Wrapped,
     sankeyChart: SankeyChart,
     dataLabel: DataLabel,
+    body: Body,
     redirect: () => null
 
 }
