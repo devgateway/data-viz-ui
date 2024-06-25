@@ -153,7 +153,7 @@ class BlockEdit extends BlockEditWithAPIMetadata {
             Object.keys(measures)
                 .filter(k => ['global', 'csv']
                     .indexOf(k) == -1).forEach(k => {
-                        
+
                     if (measures[k].selected) {
                         appMeasures[app][k] = measures[k]
                     }
@@ -275,6 +275,7 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                                 <PanelBody initialOpen={false} title={__("API & Source")}>
                                     <PanelRow>
                                         <SelectControl
+                                            label={__('Provider')}
                                             value={[app]} // e.g: value = [ 'a', 'c' ]
                                             onChange={(app) => {
                                                 setAttributes({
@@ -311,13 +312,14 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                                 {type === "line" && <Line {...this.props}
                                                           allMeasures={this.state.measures}
                                                           allDimensions={this.state.dimensions}
-                                                          allCategories={this.state.categories} measures={measures}></Line>}
-                                                          {type === "bump" && <Bump allMeasures={this.state.measures}
+                                                          allCategories={this.state.categories}
+                                                          measures={measures}></Line>}
+                                {type === "bump" && <Bump allMeasures={this.state.measures}
                                                           allDimensions={this.state.dimensions}
                                                           allCategories={this.state.categories}  {...this.props}></Bump>}
                                 {type === "radar" && <Radar allMeasures={this.state.measures}
-                                                          allDimensions={this.state.dimensions}
-                                                          allCategories={this.state.categories} {...this.props}></Radar>}
+                                                            allDimensions={this.state.dimensions}
+                                                            allCategories={this.state.categories} {...this.props}></Radar>}
                                 {type === "info" && <Info allMeasures={this.state.measures}
                                                           allDimensions={this.state.dimensions}
                                                           allCategories={this.state.categories} {...this.props}></Info>}
