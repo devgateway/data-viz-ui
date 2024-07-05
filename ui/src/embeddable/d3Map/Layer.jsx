@@ -56,7 +56,7 @@ class BaseLayer extends React.Component {
 
 
     showToolTip(content, data, color) {
-        debugger;
+        
         if (data) {
 
             const tip = d3.select("body").append("div")
