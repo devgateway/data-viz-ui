@@ -33,4 +33,5 @@
     "reduced.fertility.men": "Diminution de la fertilité (hommes)",
     "ailments.title": "Les Cancers",
     "ailments.otherConditions": "Autres pathologies"
+    "app.greeting": "Bonjour {name} !"
 }
