@@ -278,14 +278,14 @@ class DataLayer extends BaseLayer {
                 })
 
                 /*Adding patterns to legends*/
-                debugger;
+                
                 patternsData = patternsData.filter(p => {
                     return p.type != undefined
                 }).sort((a, b) => {
                     return new Intl.Collator(intl.locale, {caseFirst: 'upper', numeric: true, sensitivity: 'variant'})
                         .compare(a.key, b.key);
                 })
-                debugger;
+                
 
 
                 d3.select(this.gRef.current.parentNode.parentNode).select(`.layer_${toGenericID(id)}`).select("svg").remove()
@@ -366,7 +366,7 @@ class DataLayer extends BaseLayer {
                         return "none;fill:url(#" + 'l_' + toId(d.key) + ");"
                     })
 
-                debugger;
+                
                 g.selectAll(".patterns-labels")
                     .data(patternsData)
                     .enter()
@@ -397,7 +397,7 @@ class DataLayer extends BaseLayer {
                     })
                     //.attr("transform", this.props.transform)
                     .on("mouseenter", (d) => {
-                        debugger;
+                        
                         if (d.properties._value) {
 
                             const variables = {
