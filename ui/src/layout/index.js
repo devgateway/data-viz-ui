@@ -1,6 +1,6 @@
-import ResponsiveContainer from './ResponsiveContainer.jsx'
+import DefaultResponsiveContainer from './ResponsiveContainer.jsx'
 import * as customizer from "@devgateway/customizer";
 
-const determineLayout = () => customizer.hasOwnProperty('ResponsiveContainer') ? customizer.ResponsiveContainer : ResponsiveContainer
+const ResponsiveContainer = customizer.ResponsiveContainer || DefaultResponsiveContainer;
 
-export default determineLayout();
+export default ResponsiveContainer;
