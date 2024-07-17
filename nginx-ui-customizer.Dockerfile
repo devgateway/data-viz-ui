@@ -9,7 +9,6 @@ COPY react-lib/wp-react-lib/public public
 COPY react-lib/wp-react-lib/src src
 RUN npm run dist
 
-
 FROM node:18.18.2 AS ui
 WORKDIR /tmp/work
 COPY ui/package*.json ./
@@ -18,6 +17,7 @@ COPY --from=reactlib /tmp/work/package.json ../react-lib/wp-react-lib/
 COPY --from=reactlib /tmp/work/dist ../react-lib/wp-react-lib/dist
 COPY --from=customizer /tmp/work/package.json ../../custom/ui-customizer/
 COPY --from=customizer /tmp/work/dist ../../custom/ui-customizer/dist
+COPY --from=customizer /tmp/work/dist/public public
 RUN npm install --legacy-peer-deps
 COPY ui/public public
 COPY ui/src src
