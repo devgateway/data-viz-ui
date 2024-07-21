@@ -171,11 +171,15 @@ const Chart = (props) => {
   const locale = props.intl.locale;
   const ref = useRef(null);
   const decode = (value) => {
-    if (editing) {
+    try {
+      if (editing) {
+        return value;
+      }
+      return decodeURIComponent(value);
+    } catch(err) {
+      console.error("error decoding value:" + value);
       return value;
     }
-    console.log('URI to be decoded...', value)
-    return decodeURIComponent(value);
   };
 
   const parse = (value) => {
