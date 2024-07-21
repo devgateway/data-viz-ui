@@ -174,6 +174,7 @@ const Chart = (props) => {
     if (editing) {
       return value;
     }
+    console.log('URI to be decoded...', value)
     return decodeURIComponent(value);
   };
 
