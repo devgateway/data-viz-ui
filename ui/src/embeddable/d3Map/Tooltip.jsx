@@ -1,8 +1,4 @@
 import React from "react";
-import ReactMarkdown from 'react-markdown'
-import remarkGfm from 'remark-gfm'
-import ReactDom from 'react-dom'
-import rehypeRaw from 'rehype-raw'
 
 
 const template = require("string-template")
