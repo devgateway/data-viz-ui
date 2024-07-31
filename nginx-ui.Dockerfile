@@ -42,7 +42,7 @@ RUN \
 FROM nginx:stable-alpine
 COPY --from=ui /tmp/work/build /var/www/static
 COPY nginx.sh /usr/local/sbin/
-COPY ../custom/deploy/nginx.conf /etc/nginx/conf.d/default.conf
+
 WORKDIR /var/www/static
 ENTRYPOINT ["/usr/local/sbin/nginx.sh"]
 CMD ["nginx", "-g", "daemon off;"]
