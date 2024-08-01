@@ -26,9 +26,9 @@ COPY wordpress/wp-theme wp-content/themes/dg-semantic
 
 
 #Copy custom function file
-COPY --from=customizer /tmp/work/wp-theme/_functions.php  wp-content/wp-theme/dg-semantic/_functions.php
+COPY --from=customizer /tmp/work/wp-theme/_functions.php  wp-content/themes/dg-semantic/_functions.php
 #Copy custom editor.html
-COPY --from=customizer /tmp/work/wp-theme/css/*  wp-content/wp-theme/dg-semantic/css/
+COPY --from=customizer /tmp/work/wp-theme/css/*  wp-content/themes/dg-semantic/css/
 
 
 RUN chown -R 82:82 wp-content \
