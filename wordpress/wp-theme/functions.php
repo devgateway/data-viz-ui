@@ -133,6 +133,6 @@ include '_customization.php';
 include '_wpm_config.php';
 include '_settings.php';
 include '_search.php';
+
 include '_functions.php';
 
-//  require get_template_directory() . '/inc/customizer.php';
