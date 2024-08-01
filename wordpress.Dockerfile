@@ -25,7 +25,7 @@ COPY wordpress/wp-react-custom-multilang wp-content/plugins/wp-multilang
 COPY wordpress/wp-theme wp-content/themes/dg-semantic
 
 #Copy custom function file
-COPY --from=customizer /tmp/work/wp-theme/_functions.php  wp-content/dg-semantic/_functions.php
+COPY --from=customizer /tmp/work/wp-theme/_functions.php  wp-content/wp-theme/dg-semantic/_functions.php
 #Copy custom editor.html
 COPY --from=customizer /tmp/work/wp-theme/css/*  wp-content/dg-semantic/css/
 
