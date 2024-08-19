@@ -1,5 +1,5 @@
-//require("./block-styles/index")
-//require("./block-styles/columns")
+require("./block-styles/index")
+require("./block-styles/columns")
 require("./tabbed-posts")
 require("./charts")
 require("./featured-tabs")
