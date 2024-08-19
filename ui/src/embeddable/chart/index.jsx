@@ -503,7 +503,7 @@ const Chart = (props) => {
     case "line":
       Chart = Line;
       showNotEnoughParameters =
-        app != "csv" && (selectedMeasures.length == 0 || dimension1 == "none");
+        app !== "csv" && (selectedMeasures.length === 0 || dimension1 === "none");
       break;
     case "pie":
       showNotEnoughParameters = app != "csv" && selectedMeasures.length == 0;

@@ -21,6 +21,94 @@ const SHOW_ALL = "showAll";
 const SHOW_IF_HAS_DATA = "ifUnitHasData";
 const MAX_LABEL_LEN = 10;
 
+const breakpoints = {
+  mobile: {
+      min: 320,
+      max: 480
+  },
+  tablet: {
+      min: 481,
+      max: 768
+  },
+  midTablet: {
+      min: 769,
+      max: 852,
+  },
+  laptop: {
+      min: 852,
+      max: 1024
+  },
+  desktop: {
+      min: 1025,
+      max: 1365
+  },
+  wide: {
+      min: 1366,
+      max: Infinity
+  }
+};
+
+function getDeviceCategory() {
+  const userAgent = navigator.userAgent.toLowerCase();
+  const screenWidth = window.innerWidth;
+
+  // First, check based on user agent
+  if (/mobile|android|iphone|phone|ipod|blackberry|iemobile|opera mini/i.test(userAgent)) {
+      return "mobile";
+  } else if (/ipad|tablet/i.test(userAgent)) {
+      if (screenWidth > 1024) {
+          return "midTablet";
+      } else {
+          return "tablet";
+      }
+  } else if (/macintosh|windows/i.test(userAgent)) {
+      if (screenWidth > 1920) {
+          return "wide";
+      } else if (screenWidth > 1366) {
+          return "desktop";
+      } else if (screenWidth > 1024) {
+          return "laptop";
+      }
+  }
+
+  // If user agent checks don't match, fallback to screen width checks
+  if (screenWidth <= 480) {
+      return "mobile";
+  } else if (screenWidth > 480 && screenWidth <= 768) {
+      return "tablet";
+  } else if (screenWidth > 768 && screenWidth <= 1024) {
+      return "midTablet";
+  } else if (screenWidth > 1024 && screenWidth <= 1366) {
+      return "laptop";
+  } else if (screenWidth > 1366 && screenWidth <= 1920) {
+      return "desktop";
+  } else if (screenWidth > 1920) {
+      return "wide";
+  }
+
+  return "unknown";
+}
+
+const deviceTranslateMap = {
+  'mobile': 4,
+  'tablet': 4,
+  'midTablet': 2,
+  'laptop': 2,
+  'desktop': 2,
+  'wide': 2
+}
+
+const deviceMapHeight = {
+  'mobile': 330,
+  'tablet': 250,
+  'midTablet': 250,
+  'laptop': 200,
+  'desktop': 100,
+  'wide': 100
+}
+
+
+
 const colorSchemes = {
   greens: [
     "#ccffdd",
@@ -96,9 +184,11 @@ const colorSchemes = {
   ],
 };
 
+
 class Map extends React.Component {
   constructor(props) {
     super(props);
+    console.log('scale...', props.scale)
     this.mapContainer = React.createRef();
 
     this.state = { mainLayer: null, layers: null };
@@ -134,11 +224,12 @@ class Map extends React.Component {
     //map variables
     this.mapPosition = null;
     this.zooming = false;
+    this.translateValue = deviceTranslateMap[getDeviceCategory()]
     this.projection = d3
       .geoMercator()
       .scale(props.scale)
       .center(props.center) // centers map at given coordinates
-      .translate([this.getWidth() / 2, this.getHeight() / 2]);
+      .translate([this.getWidth() / this.translateValue, this.getHeight() / 2]);
     this.path = d3.geoPath().projection(this.projection);
     this.zoom = d3
       .zoom()
@@ -161,6 +252,8 @@ class Map extends React.Component {
   }
 
   componentDidMount() {
+    window.addEventListener('resize', this.handleResize);
+    window.addEventListener('scroll', this.handleScroll, { passive: true });
     this.loadLayers();
     this.tooltip = d3
       .select("body")
@@ -172,6 +265,22 @@ class Map extends React.Component {
   componentDidCatch(error, info) {
     console.log(error);
   }
+
+  handleResize = () => {
+    const features = this.getFeatures();
+    this.d3Map(features, false);
+}
+
+
+handleScroll = () => {
+  this.updateFeatures(this.getFeatures(), false);
+}
+
+
+componentWillUnmount() {
+  window.removeEventListener('resize', this.handleResize);
+  window.removeEventListener('scroll', this.handleScroll);
+}
 
   loadLayers() {
     const { source, mainLayerId, enabledLayers } = this.props;
@@ -455,7 +564,10 @@ class Map extends React.Component {
   }
 
   classColor(d) {
-    const { zoomEnabled } = this.props;
+    let { zoomEnabled } = this.props;
+    if(!zoomEnabled) {
+      zoomEnabled = ['mobile', 'tablet', 'midTablet'].includes(getDeviceCategory()) ? true: false;
+    }
     if (zoomEnabled) {
       return "active zoom-enabled";
     } else {
@@ -1133,7 +1245,7 @@ class Map extends React.Component {
   }
 
   showTooltip(event, d) {
-    const {
+    let {
       showTooltip,
       zoomEnabled,
       tooltipTheme,
@@ -1147,6 +1259,8 @@ class Map extends React.Component {
       mapType,
       noDataText,
     } = this.props;
+
+    zoomEnabled = ['mobile', 'tablet', 'midTablet'].includes(getDeviceCategory()) ? true: false;
 
     if (
       (showTooltip && d.properties.value != null) ||
@@ -1570,11 +1684,20 @@ class Map extends React.Component {
   }
 
   d3Map(features, filterUpdated) {
-    const { zoomEnabled, mapContainerBgColor, mapPosition, editing, mapType } =
+    let { zoomEnabled, mapContainerBgColor, mapPosition, editing, mapType } =
       this.props;
+      if(!zoomEnabled) {
+        zoomEnabled = ['mobile', 'tablet', 'midTablet'].includes(getDeviceCategory()) ? true: false;
+      }
     const breaks = this.getBreaks();
     const container = d3.select(this.getMapId());
     let svg = container.select("svg");
+    let containerWidth = this.getWidth();
+    if(containerWidth === 0) {
+      containerWidth = window.innerWidth;
+    }
+    const containerHeight = this.getHeight() - 100;
+
     if (svg.empty()) {
       svg = container.append("svg");
     } else {
@@ -1582,11 +1705,12 @@ class Map extends React.Component {
     }
 
     svg
-      .attr("style", function (d) {
-        return `background-color:${mapContainerBgColor};`;
-      })
-      .attr("width", this.getWidth())
-      .attr("height", this.props.height - 100);
+      .attr(
+        "style",
+        `background-color:${mapContainerBgColor};`,
+      )
+      .attr("viewBox", `0 0 ${containerWidth} ${containerHeight}`)
+      .attr("preserveAspectRatio", "xMidYMid meet")
 
     svg
       .append("g")
@@ -1601,7 +1725,6 @@ class Map extends React.Component {
       .on("mousemove", mapType !== "POINTS_MAP" ? this.mousemove : null)
       .on("mouseout", mapType !== "POINTS_MAP" ? this.mouseout : null);
 
-    //TODO: move all zoom logic to a separate function
     if (this.mapPosition) {
       svg
         .transition()
@@ -1630,6 +1753,26 @@ class Map extends React.Component {
             .translate(mapPosition.x, mapPosition.y)
             .scale(mapPosition.k),
         );
+        if(mapType === 'POINTS_MAP') {
+          let deviceTranslates = {
+            'mobile': 100,
+            'tablet': 0,
+            'midTablet': 0,
+            'desktop': 0,
+            'laptop': 0,
+            'wide': 0
+          }
+          const translateVal = deviceTranslates[getDeviceCategory()];
+          svg
+          .transition()
+          .duration(300)
+          .call(
+            this.zoom.transform,
+            d3.zoomIdentity
+              .translate(mapPosition.x + translateVal, mapPosition.y)
+              .scale(mapPosition.k),
+          );
+        }
     }
 
     if (zoomEnabled || editing) {
@@ -1638,10 +1781,10 @@ class Map extends React.Component {
       svg.on("dblclick.zoom", null);
     }
 
-    const center = this.getCenter(features, filterUpdated);
+    let center = this.getCenter(features, filterUpdated);
+    console.log('current center...', center)
     if (center) {
       var bounds = this.path.bounds(center);
-      // Calculate the center of the bounding box
       var centerx = [
         (bounds[0][0] + bounds[1][0]) / 2,
         (bounds[0][1] + bounds[1][1]) / 2,
@@ -1652,12 +1795,13 @@ class Map extends React.Component {
         .call(
           this.zoom.transform,
           d3.zoomIdentity
-            .translate(this.getWidth() / 2, this.getHeight() / 2)
+            .translate(containerWidth / 2, containerHeight / 2)
             .scale(12)
             .translate(-centerx[0], -centerx[1]),
         );
     }
   }
+
 
   getAvg() {
     const { transformedData } = this.props;
@@ -1743,7 +1887,7 @@ class Map extends React.Component {
   }
 
   render() {
-    const {
+    let {
       app,
       legendTitle,
       nationalAverageLabel,
@@ -1762,6 +1906,9 @@ class Map extends React.Component {
       noDataText,
     } = this.props;
 
+    if(!zoomEnabled) {
+      zoomEnabled = ['mobile', 'tablet'].includes(getDeviceCategory()) ? true: false;
+    }
     const nationalAverage = this.getAvg();
     const filters = this.getFilters();
     const highlightedLocData = this.getHighlightedLocationData();
@@ -1776,17 +1923,14 @@ class Map extends React.Component {
     }
 
     return (
-      <div className="map component" ref={this.mapContainer}>
-        {/*editing &&
-                    <div className="edit-mode-message"><p> You can drag the map or zoom using the zoom toolbar. The position of the map is saved when you save the page.</p></div>
-             */}
+      <div className="map component wp-data-viz-map" ref={this.mapContainer}>
         {this.state.layersLoading && this.renderLoader()}
         {!this.state.layersLoading && (
           <>
             <Container fluid className={"footnote "}>
               {
                 <Grid columns={2}>
-                  {app != "csv" && showOverallValue && (
+                  {app !== "csv" && showOverallValue && (
                     <Grid.Column textAlign={"left"} width={4}>
                       <div className="national-average-div">
                         <span className="national-avg-label">
@@ -1805,7 +1949,7 @@ class Map extends React.Component {
                   )}
                   <Grid.Column
                     textAlign={"right"}
-                    width={app != "csv" && showOverallValue ? 12 : 16}
+                    width={app !== "csv" && showOverallValue ? 12 : 16}
                   >
                     <Legend
                       filteredBreaks={this.getBreaks()}
@@ -1856,7 +2000,7 @@ class Map extends React.Component {
             </Container>
             <div
               className={"map wrapper scaling-svg-container " + unique}
-              style={{ height: this.props.height - 100 + "px" }}
+              style={{ height: this.props.height - deviceMapHeight[getDeviceCategory()] + "px" }}
             >
               {highlightedLocData && highlightedLocData.value && (
                 <div
