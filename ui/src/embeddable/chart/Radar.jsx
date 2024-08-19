@@ -1,233 +1,222 @@
-import React, {useState} from 'react'
-import {injectIntl} from 'react-intl';
-import { ResponsiveRadar } from '@nivo/radar'
-import Tooltip from "../common/ChartTooltip"
-import {formatContent} from '../common/ChartTooltip'
-import {
-    colorSchemes,
-    isCategoricalColorScheme,
-    isSequentialColorScheme,
-    sequentialColorInterpolators
-} from "@nivo/colors";
-import * as d3 from "d3";
+import React, { useState } from "react";
+import { injectIntl } from "react-intl";
+import { ResponsiveRadar } from "@nivo/radar";
+import Legends from "./Legends.jsx";
 
-
+const DEFAULT_COLOR = "none";
 
 const Chart = ({
-                   legends,
-                   marginLeft,
-                   marginTop,
-                   marginRight,
-                   marginBottom,
-                   options,
-                   intl,
-                   format,
-                   colors,
-                   groupMode,
-                   height,
-                   showLegends,
-                   legendPosition,
-                   tickRotation,
-                   tickColor,
-                   tooltip,
-                   startAngle,
-                   endAngle,
-                   legendLabel,
-                   legendCheckBack,
-                   legendLabelBack,
-                   legendLabelColor,
-                   centerLabel,
-                   showArcLabels,
-                   showArcLinkLabels,
-                   slicePadding,
-                   colorGenerator,
-                   centerLabelFontWeight,
-                   centerLabelFontSize,
-                   centerLabelXOffset,
-                   centerLabelYOffset,
-                   tooltipEnableMarkdown,
-                   reverseLegend
-               }) => {
+  legends,
+  marginLeft,
+  marginTop,
+  marginRight,
+  marginBottom,
+  options,
+  intl,
+  format,
+  height,
+  showLegends,
+  legendPosition,
+  legendLabel,
+  legendCheckBack,
+  legendLabelBack,
+  legendLabelColor,
 
-
-    const [filter, setFilter] = useState([])
-
-    const toggle = (id) => {
-
-        const newFilter = filter.slice();
-        if (newFilter.indexOf(id) > -1) {
-            const index = newFilter.indexOf(id);
-            newFilter.splice(index, 1);
-        } else {
-            newFilter.push(id)
-        }
-        setFilter(newFilter)
+  colorGenerator,
+  reverseLegend,
+  radarCurve,
+  radarFillOpacity,
+  radarBorderWidth,
+  radarGridLevels,
+  radarGridShape,
+  radarGridLabelOffset = 10,
+  radarEnableDots,
+  radarDotSize,
+  radarEnableDotLabel,
+  radarDotLabelOffset,
+}) => {
+  //Lenged Toggler filter
+  const [filter, setFilter] = useState([]);
+  const applyFilter = (values) => {
+    return values ? values.filter((d) => filter.indexOf(d) === -1) : [];
+  };
+  const toggle = (id) => {
+    const newFilter = filter.slice();
+    if (newFilter.indexOf(id) > -1) {
+      const index = newFilter.indexOf(id);
+      newFilter.splice(index, 1);
+    } else {
+      newFilter.push(id);
     }
+    setFilter(newFilter);
+  };
 
-    const applyFilter = (values) => {
+  if (!options || !options.data) {
+    //no data yet
+    return null;
+  }
 
-        if (filter) {
-            return values.filter(d => filter.indexOf(d.id) === -1);
+  //margin settings
+  let margins = {
+    top: marginTop,
+    right: marginRight,
+    bottom: marginBottom,
+    left: marginLeft,
+  };
 
-        } else {
-            return values
-        }
+  //Legends model
+  const chartLegends = options.keys.map((k) => {
+    let theColor;
+    let enabled = true;
+    if (filter.indexOf(k) > -1) {
+      enabled = false;
+      theColor = DEFAULT_COLOR;
+    } else {
+      theColor = colorGenerator.getColorByKey(k);
     }
-
-    if (!options || !options.data) {
-        return null
-    }
-
-    let margins = {top: marginTop, right: marginRight, bottom: marginBottom, left: marginLeft}
-
-
-
-
-    const getColorByPosition = (position) => {
-        if (colors.scheme) {
-            const color = colorSchemes[colors.scheme]
-            if (isSequentialColorScheme(colors.scheme)) {
-                const interpolator = sequentialColorInterpolators[colors.scheme]
-                const pos = position - (9 * parseInt((position / 9)))
-                const scale = d3.scaleSequential(interpolator).domain([0, 8])
-                return scale(pos)
-            }
-            if (isCategoricalColorScheme(colors.scheme)) {
-                if (position > color.length - 1) {
-                    const pos = position - (color.length * parseInt((position / color.length)))
-                    return colorSchemes[colors.scheme][pos]
-                } else {
-                    return colorSchemes[colors.scheme][position]
-                }
-            }
-        } else {
-            return colors.colors[position]
-        }
-    }
-
-    const getColorByKey = (id) => {
-
-        if (colors && colors.scheme) {
-            const index = options.keys.findIndex(k => k == id)
-            return getColorByPosition(index)
-        } else {
-
-            return colors.colors[options.keys.findIndex(k => k == id)]
-        }
-    }
-
-
-    const getColorByIndex = (id) => {
-
-        if (colors && colors.scheme) {
-            const index = options.data.findIndex(f => f[options.indexBy] == id)
-            return getColorByPosition(index)
-        } else {
-            return colors.colors[options.data.findIndex(f => f[options.indexBy] == id)]
-        }
-    }
-
-    const getColor = (id, d) => {
-        return getColorByIndex(id)
-    }
-
-    const chartLegends = options.data.sort((a, b) => {
-        if (a.position && b.position) {
-            return a.position - b.position
-        }
-        return 0
-    }).map((d, index) => {
-        let theColor = colorGenerator.getColor(d.id, d)
-        return {
-            color: theColor,
-            id: d.id,
-            label: d.label
-        }
-    })
-
-    const legendTitle = () => {
-        return (<>{showLegends && legendLabel &&
-            <div className={"legend item"}>
-                <label className="legend-title">{legendLabel}</label>
-            </div>
-        }</>)
-    }
-
-    const legendItems = () => {
-        if (reverseLegend) {
-            chartLegends.reverse()
-        }
-        return (<>{showLegends && chartLegends.map(legend => {
-            return (
-                <div className={"legend item"} onClick={() => toggle(legend.id)}>
-                    <input className={"ignore"}  type='checkbox'
-                           checked={filter.length == 0 || !filter.includes(legend.id)}/>
-                    <span className={legendCheckBack ? 'checkmark-with-bg' : 'checkmark'}
-                          style={{backgroundColor: legendCheckBack == true ? legend.color : "none"}}></span>
-
-                    <label style={{ backgroundColor: legendLabelBack == true ? legend.color : "none", color: legendLabelColor}}>{legend.label}</label>
-                </div>)
-        })}</>)
-    }
-
-    const CenterText = (layerProps) => {
-        const { centerX, centerY } = layerProps;
-        let centerText = centerLabel.split(/[\r\n]/g)
-        let totalValue = 0
-        if (layerProps.dataWithArc) {
-            totalValue = layerProps.dataWithArc.reduce(function (previousValue, currentValue) {
-                return previousValue + currentValue.value;
-            }, 0);
-        }
-
-        return (
-            <text
-                x={centerX}
-                y={centerY}
-                textAnchor="start"
-                dominantBaseline="central">
-                {centerText.map((label, i) => {
-                    return (<tspan x={centerX + parseInt(centerLabelXOffset)} y={centerY + parseInt(centerLabelYOffset) + (i * 20)} style={{
-                        fontSize: centerLabelFontSize + "px",
-                        fontWeight: centerLabelFontWeight,
-                        fill: "#000"
-                    }}>{formatContent(label,{totalValue}, intl)}</tspan>)
-                })}
-
-            </text>
-        );
+    return {
+      enabled: enabled,
+      color: theColor,
+      id: k,
+      label: k,
     };
+  });
 
-
+  const customLayer = (props) => {
     return (
-        <div style={{height: height}}>
-            {options && options.data && options.data.length > 0 &&
-                <>
-                    <ResponsiveRadar
-                        {...options}
-                        margin={margins}
-                        indexBy="taste"
-                    />
-                    {(legendPosition == 'top' || legendPosition == 'bottom') &&
-                        <div  className={`legends container has-standard-12-font-size  ${legendPosition}`}>
-                            <div className = "legend-sections">
-                                <div className = "title-section">
-                                    {legendTitle()}
-                                </div>
-                                <div className={`legends container has-standard-12-font-size items-section`}>
-                                    {legendItems()}
-                                </div>
-                            </div>
-                        </div>
-                    }
-                    {(legendPosition == 'right' || legendPosition == 'left') &&
-                        <div className={`legends container has-standard-12-font-size  ${legendPosition}`}>
-                            {legendTitle()}
-                            {legendItems()}
-                        </div>
-                    }
-                </>
-            }
-        </div>)
-}
-export default injectIntl(Chart)
+      <g>
+        <line
+          strokeWidth={1}
+          style={{ strokeDasharray: "4,4", stroke: "rgb(51, 51, 51)" }}
+          x1={props.centerX}
+          y1={props.centerY}
+          x2={props.centerX + props.radiusScale(70) * Math.sin(0)}
+          y2={0}
+        ></line>
+        {props.radiusScale
+          .ticks(radarGridLevels)
+          .filter((t) => t > 0)
+          .map((tick, index) => {
+            const r = props.radiusScale(tick);
+            const x = props.centerX + r * Math.sin(0) + 7;
+            const y = props.centerY - r * Math.cos(0);
+            return (
+              <g>
+                <line
+                  strokeWidth={1}
+                  style={{ stroke: "rgb(51, 51, 51)" }}
+                  x1={x - 7}
+                  y1={y - 4}
+                  x2={x - 3}
+                  y2={y - 4}
+                ></line>
+
+                <text
+                  x={x}
+                  y={y}
+                  style={{
+                    "font-family": "sans-serif",
+                    "font-size": "11px",
+                    fill: "rgb(51, 51, 51)",
+                  }}
+                >
+                  {intl.formatNumber(
+                    format.style === "percent" ? tick / 100 : tick,
+                    format
+                  )}
+                </text>
+              </g>
+            );
+          })}
+      </g>
+    );
+  };
+
+  return (
+    <div style={{ height: height }} className={"radar"}>
+      {options && options.data && options.data.length > 0 && (
+        <>
+          <ResponsiveRadar
+            data={options.data}
+            keys={applyFilter(options.keys)}
+            indexBy={options.indexBy}
+            colors={(d) => {
+              const color = colorGenerator.getColor(d.key, d);
+              return color;
+            }}
+            tooltipFormat={(d) => {
+              return intl.formatNumber(
+                format.style === "percent" ? d / 100 : d,
+                format
+              );
+            }}
+            borderColor={{ from: "color" }}
+            curve={radarCurve}
+            fillOpacity={radarFillOpacity}
+            borderWidth={radarBorderWidth}
+            gridLevels={radarGridLevels}
+            gridShape={radarGridShape}
+            gridLabelOffset={parseInt(radarGridLabelOffset)}
+            enableDots={radarEnableDots}
+            dotSize={radarDotSize}
+            //dotColor={"#CCC"}
+            //dotBorderColor={{from: 'color'}}
+            dotBorderWidth={2}
+            enableDotLabel={radarEnableDotLabel}
+            dotLabelYOffset={radarDotLabelOffset}
+            dotLabel={(d) => {
+              return intl.formatNumber(
+                format.style === "percent" ? d.value / 100 : d.value,
+                format
+              );
+            }}
+            blendMode="multiply"
+            motionConfig="wobbly"
+            margin={margins}
+            animate={true}
+            theme={{
+              tooltip: {
+                basic: {
+                  whiteSpace: "pre",
+                  display: "flex",
+                  alignItems: "center",
+                },
+                container: {
+                  background: "#EEE",
+                  boxShadow: "",
+                },
+                table: {},
+                tableCell: { padding: "3px 5px" },
+              },
+            }}
+            layers={[
+              "grid",
+              "layers",
+              "slices",
+              customLayer,
+              "dots",
+              "axes",
+              "legends",
+              "mesh",
+              "annotations",
+            ]}
+          />
+          <Legends
+            filter={filter}
+            showLegends={showLegends}
+            chartLegends={chartLegends}
+            legendLabel={legendLabel}
+            legendPosition={legendPosition}
+            legendCheckBack={legendCheckBack}
+            legendLabelBack={legendLabelBack}
+            legendLabelColor={legendLabelColor}
+            onToggle={toggle}
+            reverseLegend={reverseLegend}
+          ></Legends>
+        </>
+      )}
+    </div>
+  );
+};
+
+export default injectIntl(Chart);
