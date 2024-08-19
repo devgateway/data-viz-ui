@@ -173,7 +173,7 @@ const Chart = ({
   };
 
   const applyFilter = (values) => {
-    if (filter) {
+    if (filter.length) {
       return values.filter((v) => filter.indexOf(v.id) === -1);
     }
     return values;
@@ -487,7 +487,7 @@ const Chart = ({
   let ticks = parseInt(yAxisTickValues);
 
   const hasData =
-    options.data && options.data.filter((d) => d.data.length > 0).length;
+    options.data && options.data?.filter((d) => d?.data?.length > 0)?.length;
   if (options && options.data && hasData > 0) {
     return (
       <div style={{ height: height }}>
