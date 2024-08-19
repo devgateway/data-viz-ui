@@ -107,6 +107,14 @@ const deviceMapHeight = {
   'wide': 100
 }
 
+const deviceMapWidth = {
+  'mobile': 250,
+  'tablet': 250,
+  'midTablet': 250,
+  'laptop': 0,
+  'desktop': 0,
+  'wide': 0
+}
 
 
 const colorSchemes = {
@@ -1694,7 +1702,9 @@ componentWillUnmount() {
     let svg = container.select("svg");
     let containerWidth = this.getWidth();
     if(containerWidth === 0) {
-      containerWidth = window.innerWidth;
+      containerWidth = window.innerWidth + deviceMapWidth[getDeviceCategory()];
+    } else {
+      containerWidth += deviceMapWidth[getDeviceCategory()];
     }
     const containerHeight = this.getHeight() - 100;
 
