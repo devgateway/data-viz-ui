@@ -116,7 +116,8 @@ const SaveComponent = (props) => {
             radarEnableDots,
             radarDotSize,
             radarEnableDotLabel,
-            radarDotLabelOffset
+            radarDotLabelOffset,
+            mobileCustomization
         }
     } = props;
     const blockProps = useBlockProps.save({
@@ -242,7 +243,9 @@ const SaveComponent = (props) => {
              data-radar-enable-dots={radarEnableDots}
              data-radar-dot-size={radarDotSize}
              data-radar-enable-dot-label={radarEnableDotLabel}
-             data-radar-dot-label-offset={radarDotLabelOffset}>
+             data-radar-dot-label-offset={radarDotLabelOffset}
+             data-mobile-customization={mobileCustomization}
+             >
             <InnerBlocks.Content/>
         </div>
     );

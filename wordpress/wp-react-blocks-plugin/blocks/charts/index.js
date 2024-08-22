@@ -480,6 +480,18 @@ registerBlockType(process.env.BLOCKS_NS + '/chart',
                 type: 'Boolean',
                 default: false
             },
+            mobileCustomization: {
+                type: 'Object',
+                default: {
+                    labels: {
+                        xAxis: {},
+                        yAxis: {}
+                    },
+                    xAxisEnabled: true,
+                    tickRotation: 0,
+                    yAxisTickValues: 10,
+                }
+            },
             reverseLegend: {
                 type: 'Boolean',
                 default: false

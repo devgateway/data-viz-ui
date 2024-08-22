@@ -20,6 +20,7 @@ import Pie from "./Pie.jsx"
 import Line from "./Line.jsx"
 import Bump from "./Bump.jsx"
 import Info from "./Info.jsx"
+import MobileConfig from './MobileConfig.jsx';
 import Tooltip from "../commons/Tooltip.jsx";
 import {togglePanel} from "../commons/Util";
 import Radar from './Radar.jsx';
@@ -344,8 +345,6 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                                 {type === "info" && <Info allMeasures={this.state.measures}
                                                           allDimensions={this.state.dimensions}
                                                           allCategories={this.state.categories} {...this.props}></Info>}
-
-
                                 {app == 'csv' && type!='radar' &&
                                     <PanelBody initialOpen={false} title={__("Tooltip")}>
                                         <PanelRow>
@@ -435,6 +434,7 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                                         />
                                     </PanelRow>
                                 </PanelBody>
+                                <MobileConfig {...this.props}></MobileConfig>
                             </>
                         }
                     </Panel>

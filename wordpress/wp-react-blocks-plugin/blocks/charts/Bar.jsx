@@ -283,8 +283,6 @@ const BarOptions = (props) => {
             </PanelRow>
             {lineLayerEnabled && <LineOverlay allMeasures={allMeasures} apps={apps} {...props}></LineOverlay>}
         </PanelBody>
-
-
     </PanelBody>]
 }
 
