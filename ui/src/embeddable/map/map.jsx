@@ -196,7 +196,6 @@ const colorSchemes = {
 class Map extends React.Component {
   constructor(props) {
     super(props);
-    console.log('scale...', props.scale)
     this.mapContainer = React.createRef();
 
     this.state = { mainLayer: null, layers: null };
@@ -1792,7 +1791,6 @@ componentWillUnmount() {
     }
 
     let center = this.getCenter(features, filterUpdated);
-    console.log('current center...', center)
     if (center) {
       var bounds = this.path.bounds(center);
       var centerx = [
