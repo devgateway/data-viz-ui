@@ -22,7 +22,6 @@ function getSelectedLabelsForApp(data, appName) {
   if (!appData) {
     return [];
   }
-  console.log('appData initial', appData);
   return Object.keys(appData)
     .filter((key) => appData[key].selected) // Filter out the selected items
     .map((key) => {
@@ -78,7 +77,6 @@ const MobileConfig = (props) => {
         updateMeasureLabels(storedMeasures, measures, app);
       }
       xAxisLabels = getSelectedLabelsForApp(measures, app);
-      console.log('xAxisLabels', xAxisLabels, measures);
     }
   }
 
