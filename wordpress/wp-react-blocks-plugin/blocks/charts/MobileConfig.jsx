@@ -112,13 +112,13 @@ const MobileConfig = (props) => {
         <>
           <PanelRow>
             <ToggleControl
-              label={__("Disable X Axis Label")}
-              checked={mobileCustomization.xAxisEnabled === true}
+              label={__("Disable X Axis Labels")}
+              checked={mobileCustomization.xAxisDisabled}
               onChange={(isXAxisEnabled) =>
                 setAttributes({
                   mobileCustomization: {
                     ...mobileCustomization,
-                    xAxisEnabled: isXAxisEnabled,
+                    xAxisDisabled: isXAxisEnabled,
                   },
                 })
               }
