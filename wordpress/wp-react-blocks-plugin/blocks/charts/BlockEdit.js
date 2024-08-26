@@ -160,7 +160,8 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                 enableGridY,
                 overallLabel,
                 enableGridX,
-                minMaxClamp
+                minMaxClamp,
+                mobileCustomization
             }
         } = this.props;
 
@@ -434,7 +435,10 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                                         />
                                     </PanelRow>
                                 </PanelBody>
-                                <MobileConfig {...this.props}></MobileConfig>
+                                <MobileConfig
+                                    attributes={this.props.attributes}
+                                    setAttributes={setAttributes}>
+                                </MobileConfig>
                             </>
                         }
                     </Panel>

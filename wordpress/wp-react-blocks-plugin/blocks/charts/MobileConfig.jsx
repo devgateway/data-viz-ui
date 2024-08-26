@@ -7,6 +7,7 @@ import {
 } from "@wordpress/components";
 import { __ } from "@wordpress/i18n";
 import { useState } from "react";
+import { getTranslatedOptions } from ".././commons/APIutils";
 
 function extractAxisValues(csvData) {
   const lines = csvData.split("\n");
@@ -16,21 +17,48 @@ function extractAxisValues(csvData) {
   return firstColumnValues;
 }
 
+function getSelectedLabelsForApp(data, appName) {
+  const appData = data[appName];
+  if (!appData) {
+    return [];
+  }
+  return Object.keys(appData)
+    .filter((key) => appData[key].selected) // Filter out the selected items
+    .map((key) =>
+      appData[key].hasCustomLabel ? appData[key].customLabel : key
+    );
+}
+
 const MobileConfig = (props) => {
   const {
     setAttributes,
-    attributes: { type, mobileCustomization, csv },
+    attributes: { type, mobileCustomization, csv, app, measures, dimension1 },
   } = props;
-  const xAxisLabels = extractAxisValues(csv);
-  const [initialToggleStateXAxisLabels, setInitialToggleStateXAxisLabel] =
-    useState(true);
+  let xAxisLabels = extractAxisValues(csv);
+  if (app !== "csv") {
+    if (dimension1 !== "none") {
+      const storedCategories = JSON.parse(sessionStorage.getItem("categories"));
+      const categories =
+        storedCategories ??
+        fetch(`/api/${app}/categories`)
+          .then((response) => response.json())
+          .then((data) => getTranslatedOptions(data));
+      xAxisLabels = categories
+        .filter(
+          (category) =>
+            category.type?.toLowerCase() === dimension1?.toLowerCase()
+        )[0]
+        .items?.map((item) => item.value);
+    } else {
+      xAxisLabels = getSelectedLabelsForApp(measures, app);
+    }
+  }
 
   const onXAxisLabelChange = (label, value) => {
     const newObject = Object.assign({}, mobileCustomization);
     if (newObject && newObject.labels && newObject.labels.xAxis) {
       newObject.labels.xAxis[label] = value;
     }
-    setInitialToggleStateXAxisLabel(false);
     setAttributes({ mobileCustomization: newObject });
   };
 
@@ -90,12 +118,9 @@ const MobileConfig = (props) => {
             {xAxisLabels.map((label, index) => (
               <PanelRow key={`____${index}${label}`}>
                 <ToggleControl
+                  key={`_____${index}${label}`}
                   label={__(label)}
-                  checked={setInitialTogle(
-                    initialToggleStateXAxisLabels,
-                    label,
-                    "xAxis"
-                  )}
+                  checked={setInitialTogle(true, label, "xAxis")}
                   onChange={(value) => {
                     onXAxisLabelChange(label, value);
                   }}
@@ -124,6 +149,5 @@ const MobileConfig = (props) => {
       )}
     </PanelBody>
   );
-
 };
 export default MobileConfig;
