@@ -504,6 +504,8 @@ const Chart = ({
     }
     const width = getTextWidth(tickObject.value, "12px Roboto") + 30;
 
+    console.log('tick rotation....', tickRotation, mobileCustomization);
+
     if (tickRotation > 0 && tickRotation < 180) {
       return (
         <g transform={`translate(${tick.x},${tick.y + 30})`}>
