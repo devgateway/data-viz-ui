@@ -166,6 +166,7 @@ const Chart = (props) => {
     "data-radar-dot-size": radarDotSize = 8,
     "data-radar-enable-dot-label": radarEnableDotLabel = "true",
     "data-radar-dot-label-offset": radarDotLabelOffset = -12,
+    "data-mobile-customization": mobileCustomization = "{}",
   } = props;
 
   const locale = props.intl.locale;
@@ -455,6 +456,8 @@ const Chart = (props) => {
       radarEnableDotLabel == true || radarEnableDotLabel == "true",
     radarDotLabelOffset,
     sort2Dimension,
+    mobileCustomization,
+    dimension1
   };
 
   let params = {};
@@ -511,7 +514,6 @@ const Chart = (props) => {
       break;
     case "radar":
       showNotEnoughParameters = app != "csv" && selectedMeasures.length == 0;
-      //TODO RADAR implementation
       Chart = Radar;
       break;
     default:
