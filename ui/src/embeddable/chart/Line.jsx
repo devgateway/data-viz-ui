@@ -5,9 +5,12 @@ import Tooltip from "./Tooltip";
 import { area, line } from "d3-shape";
 import { useTheme } from "@nivo/core";
 import FlexWrapDetector from "../../layout/FlexWrapDetector";
+import deviceType from '../../utils/deviceType'
 
 const ZERO_LINE_COLOR = "#66676d";
 const DEFAULT_TICK_BG_COLOR = "#f0f0f1";
+
+const isMobile = deviceType() === "mobile";
 
 const getTextWidth = (text, font) => {
   // re-use canvas object for better performance
@@ -93,6 +96,7 @@ const Chart = ({
   minMaxClamp,
   reverseLegend,
   customAxisFormat,
+  mobileCustomization
 }) => {
   const [bottomSpacing, setBottomSpacing] = useState(50);
   const [newMarginTop, setNewMarginTop] = useState(marginTop);
@@ -190,8 +194,12 @@ const Chart = ({
   };
 
   const CustomTick = (tick) => {
+    const tickObject = Object.assign({}, tick);
+    if(isMobile && hiddenLabels.includes(tick.value)) {
+      tickObject.value = "";
+    }
     const theme = useTheme();
-    const width = getTextWidth(tick.value, "12px Roboto") + 15;
+    const width = getTextWidth(tickObject.value, "12px Roboto") + 15;
 
     if (tickRotation > 0 && tickRotation < 180) {
       return (
@@ -227,7 +235,7 @@ const Chart = ({
                 fontSize: "12px",
               }}
             >
-              {tick.value}
+              {tickObject.value}
             </text>
           </g>
         </g>
@@ -266,7 +274,7 @@ const Chart = ({
                 fontSize: "12px",
               }}
             >
-              {tick.value}
+              {tickObject.value}
             </text>
           </g>
         </g>
@@ -305,7 +313,7 @@ const Chart = ({
                 fontSize: "12px",
               }}
             >
-              {tick.value}
+              {tickObject.value}
             </text>
           </g>
         </g>
@@ -488,6 +496,19 @@ const Chart = ({
 
   const hasData =
     options.data && options.data?.filter((d) => d?.data?.length > 0)?.length;
+
+  let hiddenLabels = [];
+  const mobileConfigSettings = JSON.parse(decodeURIComponent(mobileCustomization));
+  if(isMobile) {
+      ticks = parseInt(mobileConfigSettings.yAxisTickValues);
+      const labels = new Map(Object.entries(mobileConfigSettings?.labels?.xAxis));
+      for (let [key, value] of labels) {
+        if (!value) {
+          hiddenLabels.push(key);
+        }
+      }
+  }
+
   if (options && options.data && hasData > 0) {
     return (
       <div style={{ height: height }}>
