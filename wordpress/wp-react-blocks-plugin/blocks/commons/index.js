@@ -372,7 +372,7 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
                     return response.json()
                 })
                 .then(data => {
-
+                    sessionStorage.setItem('measures', JSON.stringify(getTranslatedOptions(data)))
                     this.setState({...this.state, measures: getTranslatedOptions(data)})
                 })
                 .catch(function (response) {
