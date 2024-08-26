@@ -7,6 +7,7 @@ import { line } from "d3-shape";
 import LineLayer from "./LineLayer";
 import Papa from "papaparse";
 import FlexWrapDetector from "../../layout/FlexWrapDetector";
+import deviceType from '../../utils/deviceType'
 
 const POSITION_MIDDLE = "middle";
 const POSITION_TOP = "top";
@@ -71,12 +72,15 @@ const Chart = ({
   tooltipEnableMarkdown,
   xAxisTickValues,
   yAxisTickValues,
+  mobileCustomization,
   minMaxClamp,
   reverseLegend,
   enableGridY,
   enableGridX,
   customAxisFormat,
+  dimension1
 }) => {
+  const mobileConfigSettings = JSON.parse(decodeURIComponent(mobileCustomization));
   const normalizeLabelColor = () => {
     if (barLabelColor === "null" || barLabelColor === null || !barLabelColor) {
       return "#000000";
@@ -96,6 +100,7 @@ const Chart = ({
   const [newMarginTop, setNewMarginTop] = useState(marginTop);
   const [wrapCount, setWrapCount] = useState(0);
   const [newMarginBottom, setNewMarginBottom] = useState(marginBottom);
+  const isMobile = deviceType() === "mobile";
 
   const generateChartLegends = (
     options,
@@ -486,6 +491,10 @@ const Chart = ({
   };
 
   const CustomTick = (tick) => {
+    const tickObject = Object.assign({}, tick);
+    if(isMobile && hiddenLabels.includes(tick.value)) {
+      tickObject.value = "";
+    }
     const theme = useTheme();
     let effectiveTickColor;
     if (overrideTickColor) {
@@ -493,7 +502,7 @@ const Chart = ({
     } else {
       effectiveTickColor = legendColor(tick);
     }
-    const width = getTextWidth(tick.value, "12px Roboto") + 30;
+    const width = getTextWidth(tickObject.value, "12px Roboto") + 30;
 
     if (tickRotation > 0 && tickRotation < 180) {
       return (
@@ -529,7 +538,7 @@ const Chart = ({
                 fontSize: "12px",
               }}
             >
-              {tick.value}
+              {tickObject.value}
             </text>
           </g>
         </g>
@@ -568,7 +577,7 @@ const Chart = ({
                 fontSize: "12px",
               }}
             >
-              {tick.value}
+              {tickObject.value}
             </text>
           </g>
         </g>
@@ -607,7 +616,7 @@ const Chart = ({
                 fontSize: "12px",
               }}
             >
-              {tick.value}
+              {tickObject.value}
             </text>
           </g>
         </g>
@@ -980,6 +989,17 @@ const Chart = ({
       </>
     );
   };
+
+let hiddenLabels = [];
+if(isMobile) {
+    ticks = parseInt(mobileConfigSettings.yAxisTickValues);
+    const labels = new Map(Object.entries(mobileConfigSettings?.labels?.xAxis));
+    for (let [key, value] of labels) {
+      if (!value) {
+        hiddenLabels.push(key);
+      }
+    }
+}
 
   return (
     <div style={{ height: height }}>
