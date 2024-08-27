@@ -1066,7 +1066,7 @@ if(isMobile) {
                 : null
             }
             axisBottom={
-              isMobile && mobileConfigSettings?.xAxisDisabled === false ? null :
+              isMobile && mobileConfigSettings?.xAxisDisabled === true ? null :
               layout == "horizontal"
                 ? {
                     legend: legends.bottom,
