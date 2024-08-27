@@ -487,7 +487,7 @@ registerBlockType(process.env.BLOCKS_NS + '/chart',
                         xAxis: {},
                         yAxis: {}
                     },
-                    xAxisEnabled: true,
+                    xAxisDisabled: false,
                     tickRotation: 0,
                     yAxisTickValues: 10,
                 }
