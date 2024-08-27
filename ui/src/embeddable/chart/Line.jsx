@@ -558,7 +558,7 @@ const Chart = ({
             return colorGenerator.getColor(d.id, d);
           }}
           axisBottom={
-            isMobile && mobileConfigSettings?.xAxisDisabled === false ? null :{
+            isMobile && mobileConfigSettings?.xAxisDisabled === true ? null :{
             renderTick: CustomTick,
             legend: legends.bottom,
             legendPosition: "middle",
