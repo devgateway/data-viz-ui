@@ -1,10 +1,10 @@
 ARG REPO
 ARG TAG
 FROM ${REPO}/ui-customizer:${TAG}  AS customizer
-FROM node:18.18.2 AS reactlib
+FROM node:12.22.12 AS reactlib
 WORKDIR /tmp/work
 COPY react-lib/wp-react-lib/package.json .
-RUN npm install --legacy-peer-deps
+RUN npm install
 COPY react-lib/wp-react-lib/public public
 COPY react-lib/wp-react-lib/src src
 RUN npm run dist
