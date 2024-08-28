@@ -30,9 +30,13 @@ function getSelectedLabelsForApp(data, appName) {
 }
 
 const updateMeasureLabels = (data, measures, app) => {
+  console.log('data', data)
+  console.log('measures', measures)
+  console.log('app', app)
   const apiMeasures = getTranslatedOptions(data);
   // for each api measure, find the corresponding measure in the measures array
   // and add a label property to the measure in the measures array
+  console.log('apiMeasures', apiMeasures);
   apiMeasures.forEach((apiMeasure) => {
     const measure = measures[app][apiMeasure.value];
     if (measure) {
