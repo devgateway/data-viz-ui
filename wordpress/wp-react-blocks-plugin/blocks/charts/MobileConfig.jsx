@@ -17,6 +17,30 @@ function extractAxisValues(csvData) {
   return firstColumnValues;
 }
 
+function transformDataToAppObject(data, appName, existingObject = {}) {
+  if(existingObject[appName] !== undefined) {
+    return existingObject;
+  }
+  existingObject[appName] = {};
+  data.forEach(item => {
+      const key = item.value;
+      existingObject[appName][key] = {
+          selected: false,
+          format: {
+              style: "percent",
+              minimumFractionDigits: 1,
+              maximumFractionDigits: 1,
+              currency: "USD"
+          },
+          hasCustomLabel: false,
+          customLabel: item.label || key
+      };
+  });
+
+  return existingObject;
+}
+
+
 function getSelectedLabelsForApp(data, appName) {
   const appData = data[appName];
   if (!appData) {
@@ -30,13 +54,10 @@ function getSelectedLabelsForApp(data, appName) {
 }
 
 const updateMeasureLabels = (data, measures, app) => {
-  console.log('data', data)
-  console.log('measures', measures)
-  console.log('app', app)
+  transformDataToAppObject(data, app, measures);
   const apiMeasures = getTranslatedOptions(data);
   // for each api measure, find the corresponding measure in the measures array
   // and add a label property to the measure in the measures array
-  console.log('apiMeasures', apiMeasures);
   apiMeasures.forEach((apiMeasure) => {
     const measure = measures[app][apiMeasure.value];
     if (measure) {
@@ -53,7 +74,7 @@ const MobileConfig = (props) => {
   let xAxisLabels = extractAxisValues(csv);
   if (app !== "csv") {
     if (dimension1 !== "none") {
-      const storedCategories = JSON.parse(sessionStorage.getItem("categories"));
+      const storedCategories = JSON.parse(sessionStorage.getItem(`categories_${app}`));
       const categories =
         storedCategories ??
         fetch(`/api/${app}/categories`)
@@ -66,15 +87,13 @@ const MobileConfig = (props) => {
         )[0]
         .items?.map((item) => item.value);
     } else {
-      // get measures from session storage
-
-      const storedMeasures = JSON.parse(sessionStorage.getItem("measures"));
+      const storedMeasures = JSON.parse(sessionStorage.getItem(`measures_${app}`));
       // if measures are not present in session storage, fetch them from the API
       if (!storedMeasures) {
         fetch(`/api/${app}/measures`)
           .then((response) => response.json())
           .then((data) => {
-            sessionStorage.setItem("measures", JSON.stringify(data));
+            sessionStorage.setItem(`measures_${app}`, JSON.stringify(data));
             updateMeasureLabels(data, measures, app);
           });
       } else {
