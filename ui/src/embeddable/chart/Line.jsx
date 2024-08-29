@@ -501,7 +501,7 @@ const Chart = ({
   const mobileConfigSettings = JSON.parse(decodeURIComponent(mobileCustomization));
   if(isMobile) {
       ticks = parseInt(mobileConfigSettings.yAxisTickValues);
-      const labels = new Map(Object.entries(mobileConfigSettings?.labels?.xAxis));
+      const labels = new Map(Object.entries(mobileConfigSettings?.labels?.xAxis ?? {}));
       for (let [key, value] of labels) {
         if (!value) {
           hiddenLabels.push(key);
