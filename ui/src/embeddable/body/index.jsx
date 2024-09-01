@@ -19,13 +19,40 @@ import { injectIntl, FormattedMessage } from "react-intl";
 import messages_en from "../../translations/en.json";
 import messages_fr from "../../translations/fr.json";
 
+import getDeviceType from "../../utils/deviceType";
+
+
 class Body extends React.Component {
   constructor(props) {
     super(props);
     // No llames this.setState() aquí!
-    this.state = { counter: 0 };
+    this.state = {
+      counter: 0,
+      isMobile: ["mobile", "tablet"].includes(getDeviceType()),
+      isClicked: false,
+      selectedOption: "Cancers",
+    };
     this.onMouseOut = this.onMouseOut.bind(this);
     this.onMouseOver = this.onMouseOver.bind(this);
+    this.updateLayout = this.updateLayout.bind(this);
+    this.updateSvgLabels = this.updateSvgLabels.bind(this);
+    this.handleTextClick = this.handleTextClick.bind(this);
+  }
+
+  updateLayout() {
+    this.setState({ isMobile: ["mobile", "tablet"].includes(getDeviceType()) });
+  }
+
+  handleTextClick(e) {
+    let svg = e.target.closest("svg");
+    let btn = e.target.closest(".title");
+    if (btn) {
+      [...svg.querySelectorAll(".title")].forEach((btn) =>
+        btn.classList.remove("on")
+      );
+      btn.classList.add("on");
+      this.setState({ selectedOption: btn.innerHTML });
+    }
   }
 
   onMouseOut() {
@@ -105,12 +132,19 @@ class Body extends React.Component {
   }
 
   componentDidMount() {
-    const { intl } = this.props;
+    window.addEventListener("resize", this.updateLayout);
+    this.updateLayout();
+    this.updateSvgLabels();
+  }
 
-    const messages = {
+  updateSvgLabels() {
+    const root = d3.select(".body.parts");
+    let messages = {
       en: messages_en,
       fr: messages_fr,
     };
+    const intl = this.props.intl;
+    messages = messages[intl.locale];
 
     const left = [
       {
@@ -125,7 +159,7 @@ class Body extends React.Component {
       {
         label: intl.formatMessage({
           id: "laryngeal.cancer",
-          defaultMessage: messages["llaryngeal.cancer"],
+          defaultMessage: messages["laryngeal.cancer"],
         }),
         selector: ".larynx",
         tx: 80,
@@ -134,7 +168,7 @@ class Body extends React.Component {
       {
         label: intl.formatMessage({
           id: "oesophageal.ancer",
-          defaultMessage: messages["oesophageal.ancer"],
+          defaultMessage: messages["oesophageal.cancer"],
         }),
         selector: ".stomach",
         tx: 77,
@@ -147,7 +181,7 @@ class Body extends React.Component {
           defaultMessage: messages["tracheal.bronchial.lung.cancer"],
         }),
         selector: ".larynx",
-        tx: intl.locale == "en" ? 80 : 90,
+        tx: intl.locale === "en" ? 80 : 90,
         ty: 120,
       },
 
@@ -365,7 +399,7 @@ class Body extends React.Component {
       {
         label: intl.formatMessage({
           id: "reduced.fertility.men",
-          defaultMessage: messages["reduced.fertility"],
+          defaultMessage: messages["reduced.fertility.men"],
         }),
         selector: ".erectile",
         tx: 95,
@@ -383,43 +417,68 @@ class Body extends React.Component {
       {
         label: intl.formatMessage({
           id: "reduced.fertility.women",
-          defaultMessage: messages["reduced.fertility"],
+          defaultMessage: messages["reduced.fertility.women"],
         }),
         selector: ".Ectopic",
         tx: 95,
         ty: 242,
       },
     ];
-    let sy = 90;
-    const root = d3.select(".body.parts");
 
-    if (intl.locale == "en") {
-      root
-        .select("svg")
-        .selectAll("text.left")
+    // Clear existing labels
+    root.select("svg").selectAll("text.label").remove();
 
-        .data(left)
-        .enter()
-        .append("text")
-        .attr("class", "label")
-        .attr("x", (d, i) => -250)
-        .attr("y", (d, i) => {
-          return sy + i * 25;
-        })
-        .text((d) => d.label);
+    const { selectedOption, isMobile } = this.state;
 
-      root
-        .select("svg")
-        .selectAll("text.rigth")
-        .data(right)
-        .enter()
-        .append("text")
-        .attr("class", "label")
-        .attr("x", (d, i) => 200)
-        .attr("y", (d, i) => {
-          return sy + i * 25;
-        })
-        .text((d) => d.label);
+    let data = selectedOption === "Cancers" ? left : right;
+    let sy = 60;
+
+    const calculateX = (d, i) => {
+      if (isMobile) return 160;
+      return -250;
+    };
+
+    if (intl.locale === "en") {
+      if (!isMobile) {
+        sy = 90;
+        root
+          .select("svg")
+          .selectAll("text.left")
+
+          .data(left)
+          .enter()
+          .append("text")
+          .attr("class", "label")
+          .attr("x", (d, i) => -250)
+          .attr("y", (d, i) => {
+            return sy + i * 25;
+          })
+          .text((d) => d.label);
+
+        root
+          .select("svg")
+          .selectAll("text.rigth")
+          .data(right)
+          .enter()
+          .append("text")
+          .attr("class", "label")
+          .attr("x", (d, i) => 200)
+          .attr("y", (d, i) => {
+            return sy + i * 25;
+          })
+          .text((d) => d.label);
+      } else {
+        root
+          .select("svg")
+          .selectAll("text.label")
+          .data(data)
+          .enter()
+          .append("text")
+          .attr("class", "label")
+          .attr("x", calculateX)
+          .attr("y", (d, i) => sy + i * 25)
+          .text((d) => d.label);
+      }
     } else {
       root
         .select("svg")
@@ -437,7 +496,7 @@ class Body extends React.Component {
 
       root
         .select("svg")
-        .selectAll("text.rigth")
+        .selectAll("text.right")
         .data(right)
         .enter()
         .append("text")
@@ -448,7 +507,6 @@ class Body extends React.Component {
         })
         .text((d) => d.label);
     }
-
     root
       .select("svg")
       .selectAll("text.label")
@@ -463,12 +521,34 @@ class Body extends React.Component {
       });
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.selectedOption !== this.state.selectedOption) {
+      this.updateSvgLabels();
+    }
+  }
+
+  mobileOptions = {
+    Cancers: {
+      x: "160",
+      y: "30",
+    },
+    OtherConditions: {
+      x: "240",
+      y: "30",
+    },
+    viewBoxDims: "0 0 500 520",
+  };
+
   render() {
     return (
       <Container className="body parts">
         <svg
           className="body root"
-          viewBox="-300 0 900 520"
+          viewBox={
+            this.state.isMobile
+              ? this.mobileOptions["viewBoxDims"]
+              : "-300 0 900 520"
+          }
           xmlns="http://www.w3.org/2000/svg"
         >
           <Background className="backGround" />
@@ -485,10 +565,30 @@ class Body extends React.Component {
           <Heart className="system heart" />
           <Erectile className="system erectile" />
           <Ectopic className="system Ectopic" />
-          <text x="-250" y="60" className="title">
+          <text
+            x={
+              this.state.isMobile ? this.mobileOptions["Cancers"]["x"] : "-250"
+            }
+            y={this.state.isMobile ? this.mobileOptions["Cancers"]["y"] : "60"}
+            className="title"
+            onClick={this.handleTextClick}
+          >
             <FormattedMessage id="ailments.title" defaultMessage="Cancers" />
           </text>
-          <text x="200" y="60" className="title">
+          <text
+            x={
+              this.state.isMobile
+                ? this.mobileOptions["OtherConditions"]["x"]
+                : "200"
+            }
+            y={
+              this.state.isMobile
+                ? this.mobileOptions["OtherConditions"]["y"]
+                : "60"
+            }
+            className="title"
+            onClick={this.handleTextClick}
+          >
             <FormattedMessage
               id="ailments.otherConditions"
               defaultMessage="Other conditions"
