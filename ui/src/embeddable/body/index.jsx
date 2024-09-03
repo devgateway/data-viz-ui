@@ -43,14 +43,25 @@ class Body extends React.Component {
   }
 
   handleTextClick(e) {
-    let svg = e.target.closest("svg");
-    let btn = e.target.closest(".title");
-    if (btn) {
-      [...svg.querySelectorAll(".title")].forEach((btn) =>
-        btn.classList.remove("on"),
+    if (!this.state.isMobile) return;
+    const svg = e.target.closest("svg");
+    const titleText = e.target.closest(".title");
+    const btn = e.target.closest(".title-rect");
+
+    if (titleText || btn) {
+      [...svg.querySelectorAll(".title, .title-rect")].forEach((node) =>
+        node.classList.remove("on")
       );
-      btn.classList.add("on");
-      this.setState({ selectedOption: btn.innerHTML });
+
+      const selectedElement = titleText || btn;
+      selectedElement.classList.add("on");
+      (titleText ? titleText.previousSibling : btn.nextSibling)?.classList.add(
+        "on"
+      );
+
+      this.setState({
+        selectedOption: (titleText ? titleText : btn.nextSibling).innerHTML,
+      });
     }
   }
 
@@ -528,12 +539,12 @@ class Body extends React.Component {
 
   mobileOptions = {
     Cancers: {
-      x: "160",
-      y: "30",
+      x: 160,
+      y: 25,
     },
     OtherConditions: {
-      x: "240",
-      y: "30",
+      x: 300,
+      y: 25,
     },
     viewBoxDims: "0 0 500 520",
   };
@@ -564,35 +575,75 @@ class Body extends React.Component {
           <Heart className="system heart" />
           <Erectile className="system erectile" />
           <Ectopic className="system Ectopic" />
-          <text
-            x={
-              this.state.isMobile ? this.mobileOptions["Cancers"]["x"] : "-250"
-            }
-            y={this.state.isMobile ? this.mobileOptions["Cancers"]["y"] : "60"}
-            className="title"
-            onClick={this.handleTextClick}
-          >
-            <FormattedMessage id="ailments.title" defaultMessage="Cancers" />
-          </text>
-          <text
-            x={
-              this.state.isMobile
-                ? this.mobileOptions["OtherConditions"]["x"]
-                : "200"
-            }
-            y={
-              this.state.isMobile
-                ? this.mobileOptions["OtherConditions"]["y"]
-                : "60"
-            }
-            className="title"
-            onClick={this.handleTextClick}
-          >
-            <FormattedMessage
-              id="ailments.otherConditions"
-              defaultMessage="Other conditions"
+          <g onClick={this.handleTextClick}>
+            <rect
+              className="title-rect"
+              x={
+                this.state.isMobile
+                  ? this.mobileOptions["Cancers"]["x"] - 20
+                  : ""
+              }
+              y={
+                this.state.isMobile
+                  ? this.mobileOptions["Cancers"]["y"] - 20
+                  : "60"
+              }
+              rx="5"
+              ry="5"
+              width="100"
+              height="30"
             />
-          </text>
+            <text
+              x={
+                this.state.isMobile
+                  ? this.mobileOptions["Cancers"]["x"]
+                  : "-250"
+              }
+              y={
+                this.state.isMobile ? this.mobileOptions["Cancers"]["y"] : "60"
+              }
+              className="title"
+            >
+              <FormattedMessage id="ailments.title" defaultMessage="Cancers" />
+            </text>
+          </g>
+          <g onClick={this.handleTextClick}>
+            <rect
+              className="title-rect"
+              x={
+                this.state.isMobile
+                  ? this.mobileOptions["OtherConditions"]["x"] - 15
+                  : ""
+              }
+              y={
+                this.state.isMobile
+                  ? this.mobileOptions["OtherConditions"]["y"] - 20
+                  : ""
+              }
+              rx="5"
+              ry="5"
+              width="155"
+              height="30"
+            />
+            <text
+              x={
+                this.state.isMobile
+                  ? this.mobileOptions["OtherConditions"]["x"]
+                  : "200"
+              }
+              y={
+                this.state.isMobile
+                  ? this.mobileOptions["OtherConditions"]["y"]
+                  : "60"
+              }
+              className="title"
+            >
+              <FormattedMessage
+                id="ailments.otherConditions"
+                defaultMessage="Other conditions"
+              />
+            </text>
+          </g>
         </svg>
       </Container>
     );
