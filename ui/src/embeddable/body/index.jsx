@@ -21,7 +21,6 @@ import messages_fr from "../../translations/fr.json";
 
 import getDeviceType from "../../utils/deviceType";
 
-
 class Body extends React.Component {
   constructor(props) {
     super(props);
@@ -48,7 +47,7 @@ class Body extends React.Component {
     let btn = e.target.closest(".title");
     if (btn) {
       [...svg.querySelectorAll(".title")].forEach((btn) =>
-        btn.classList.remove("on")
+        btn.classList.remove("on"),
       );
       btn.classList.add("on");
       this.setState({ selectedOption: btn.innerHTML });
