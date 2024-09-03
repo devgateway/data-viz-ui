@@ -504,123 +504,50 @@ const Chart = ({
     }
     const width = getTextWidth(tickObject.value, "12px Roboto") + 30;
 
+    const transformText = (rotation, xOffset = 0) => (
+      <text
+        transform={`rotate(${rotation})`}
+        textAnchor={rotation === 0 ? "middle" : "start"}
+        dominantBaseline="middle"
+        style={{
+          ...theme.axis.ticks.text,
+          fill: xLabelColor === "null" ? "black" : xLabelColor,
+          fontSize: "12px",
+        }}
+      >
+        <tspan x={xOffset} dy="0" className="nivo-tick-text">
+          {tickObject.value}
+        </tspan>
+      </text>
+    );
+
+    const renderTick = (rotation, rectX, textX = 0) => (
+      <g transform={`translate(${tick.x},${tick.y + 30})`}>
+        {showTickLine && (
+          <line stroke={effectiveTickColor} strokeWidth={1.5} y1={-32} y2={-12} />
+        )}
+        <g transform={`translate(0, ${tick.y + offsetText})`}>
+          <rect
+            transform={`rotate(${rotation})`}
+            x={rectX}
+            y={-12}
+            rx={2}
+            ry={2}
+            width={width}
+            height={22}
+            fill={"#FFFFFF"}
+          />
+          {transformText(rotation, textX)}
+        </g>
+      </g>
+    );
+
     if (tickRotation > 0 && tickRotation < 180) {
-      return (
-        <g transform={`translate(${tick.x},${tick.y + 30})`}>
-          {showTickLine && (
-            <line
-              stroke={effectiveTickColor}
-              strokeWidth={1.5}
-              y1={-32}
-              y2={-12}
-            />
-          )}
-
-          <g transform={`translate(0, ${tick.y + offsetText})`}>
-            <rect
-              transform={`rotate(${tickRotation})`}
-              x={-12}
-              y={-12}
-              rx={2}
-              ry={2}
-              width={width}
-              height={22}
-              fill={"#FFFFFF"}
-            />
-
-            <text
-              transform={`rotate(${tickRotation})`}
-              textAnchor="start"
-              dominantBaseline="middle"
-              style={{
-                ...theme.axis.ticks.text,
-                fill: xLabelColor === "null" ? "black" : xLabelColor,
-                fontSize: "12px",
-              }}
-            >
-              {tickObject.value}
-            </text>
-          </g>
-        </g>
-      );
+      return renderTick(tickRotation, -12);
     } else if (tickRotation > 180 && tickRotation < 360) {
-      return (
-        <g transform={`translate(${tick.x},${tick.y + 30})`}>
-          {showTickLine && (
-            <line
-              stroke={effectiveTickColor}
-              strokeWidth={1.5}
-              y1={-32}
-              y2={-12}
-            />
-          )}
-
-          <g transform={`translate(0, ${tick.y + offsetText})`}>
-            <rect
-              transform={`rotate(${tickRotation - 180})`}
-              x={-12}
-              y={-10}
-              rx={2}
-              ry={2}
-              width={width}
-              height={22}
-              fill={"#FFFFFF"}
-            />
-
-            <text
-              transform={`rotate(${tickRotation})`}
-              textAnchor="end"
-              dominantBaseline="middle"
-              style={{
-                ...theme.axis.ticks.text,
-                fill: xLabelColor === "null" ? "black" : xLabelColor,
-                fontSize: "12px",
-              }}
-            >
-              {tickObject.value}
-            </text>
-          </g>
-        </g>
-      );
+      return renderTick(tickRotation - 180, -12, -12);
     } else {
-      return (
-        <g transform={`translate(${tick.x},${tick.y + 30})`}>
-          {showTickLine && (
-            <line
-              stroke={effectiveTickColor}
-              strokeWidth={1.5}
-              y1={-32}
-              y2={-12}
-            />
-          )}
-
-          <g transform={`translate(0, ${tick.y + offsetText})`}>
-            <rect
-              transform={`rotate(${tickRotation})`}
-              x={(-1 * width) / 2}
-              y={-12}
-              rx={2}
-              ry={2}
-              width={width}
-              height={22}
-              fill={"#FFFFFF"}
-            />
-
-            <text
-              transform={`rotate(${tickRotation})`}
-              textAnchor="middle"
-              dominantBaseline="middle"
-              style={{
-                ...theme.axis.ticks.text,
-                fill: xLabelColor === "null" ? "black" : xLabelColor,
-                fontSize: "12px",
-              }}
-            >
-              {tickObject.value}
-            </text>
-          </g>
-        </g>
-      );
+      return renderTick(tickRotation, (-1 * width) / 2);
     }
   };
   const toggle = (id) => {
