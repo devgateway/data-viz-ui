@@ -539,11 +539,11 @@ class Body extends React.Component {
 
   mobileOptions = {
     Cancers: {
-      x: 160,
+      x: 180,
       y: 25,
     },
     OtherConditions: {
-      x: 300,
+      x: 320,
       y: 25,
     },
     viewBoxDims: "0 0 500 520",
