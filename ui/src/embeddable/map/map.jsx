@@ -1694,7 +1694,7 @@ componentWillUnmount() {
     let { zoomEnabled, mapContainerBgColor, mapPosition, editing, mapType } =
       this.props;
       if(!zoomEnabled) {
-        zoomEnabled = ['mobile', 'tablet', 'midTablet'].includes(getDeviceCategory()) ? true: false;
+        zoomEnabled = ['mobile', 'tablet'].includes(getDeviceCategory()) ? true: false;
       }
     const breaks = this.getBreaks();
     const container = d3.select(this.getMapId());
