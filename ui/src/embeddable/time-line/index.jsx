@@ -495,7 +495,6 @@ const PostCarousel = (props) => {
 
 let carousel;
 if(['mobile', 'tablet', 'midTablet'].includes(getDeviceType())) {
-  console.log('here...')
     carousel = Carousel
 } else {
     carousel = PostCarousel
