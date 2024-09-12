@@ -14,12 +14,6 @@ const visibleStyle = {
   width: "auto",
 };
 
-const hiddenStyle = {
-  position: "absolute",
-  overflow: "hidden",
-  display: "none",
-};
-
 const DEFAULT_HIGHLIGHTED_POST = 0;
 
 const TimeLine = (props) => {
@@ -42,6 +36,7 @@ const TimeLine = (props) => {
     closePopupOnMouseOut,
     unique,
   } = props;
+
   const ref = useRef();
   const [displayTooltip, setDisplayTooltip] = useState(false);
   height = window.innerHeight;
@@ -55,13 +50,11 @@ const TimeLine = (props) => {
 
   const TooltipModal = ({ content, isOpen, style }) => {
     const addInlineStylesToHTML = (html) => {
-      return html
-        .replace(
-          /<ul(.*?)>/g,
-          '<ul class="has-white-color has-text-color has-standard-14-font-size" style="list-style-type:disc !important; list-style: initial !important; padding-left:20px; color:#fefefe;">'
-        );
+      return html.replace(
+        /<ul(.*?)>/g,
+        '<ul class="has-white-color has-text-color has-standard-14-font-size" style="list-style-type:disc !important; list-style: initial !important; padding-left:20px; color:#fefefe;">'
+      );
     };
-    const deviceType = getDeviceType()
     return (
       <Modal
         key={content.props.children.key + "modal"}
@@ -73,19 +66,20 @@ const TimeLine = (props) => {
         style={{
           maxHeight: "80vh",
           overflowY: "auto",
+          padding: "0.5rem",
           ...style,
         }}
       >
+        <Modal.Header style={{ ...style, borderBottom: "none" }}></Modal.Header>
         <Modal.Content
           className="styled-list-content"
-          style={{ paddingTop: "2rem", ...style }}
+          style={{ ...style }}
           dangerouslySetInnerHTML={{
             __html: addInlineStylesToHTML(
               content.props.children.props.post.content.rendered
             ),
           }}
-        >
-        </Modal.Content>
+        ></Modal.Content>
       </Modal>
     );
   };
@@ -291,8 +285,6 @@ const TimeLine = (props) => {
       .style("font-weight", () => "bold")
       .style("line-height", "1.2rem")
       .style("text-align", "left")
-      .style("text-decoration", "underline")
-      .style("text-underline-offset", "3px")
       .style("cursor", enableTitlePopup ? "pointer" : "default")
       .html((d, i) => {
         const readmore = readMoreLabel(i);
@@ -300,7 +292,9 @@ const TimeLine = (props) => {
         if (readmore) {
           title += `<br><span style="font-size:${
             parseInt(fontSize) - 3
-          }px;color:${titleColor(i)}">${readmore}</span>`;
+          }px;color:${titleColor(
+            i
+          )};text-decoration:underline;text-underline-offset:3px">${readmore}</span>`;
         }
         return title;
       })
