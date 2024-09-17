@@ -30,7 +30,7 @@ const Drop = (props) => {
         icon={'world'}
         options={options}
         onChange={(e, {name, value}) => {
-            
+
             changeLanguage(value)
         }
         }

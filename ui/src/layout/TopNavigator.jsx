@@ -1,36 +1,45 @@
-import React, {useEffect } from "react";
-import {Menu} from 'semantic-ui-react'
+import React, { useEffect, useState } from "react";
+import { Menu } from "semantic-ui-react";
 
+export const TopNavigator = (props) => {
+  const [isVisible, setIsVisible] = useState(false);
 
-const TopNavigator = () => {
-    useEffect(() => {
-        const handleScroll = () => {
-            const topNavigator = document.getElementById("top-navigator");
-            if (window.pageYOffset > 150) {
-                topNavigator.classList.add("visible");
-            } else {
-                topNavigator.classList.remove("visible");
-            }
-        };
+  const toggleVisibility = () => {
+    if (window.pageYOffset > 300) {
+      setIsVisible(true);
+    } else {
+      setIsVisible(false);
+    }
+  };
 
-        window.addEventListener('scroll', handleScroll);
-
-        return () => {
-            window.removeEventListener('scroll', handleScroll);
-        };
-    }, []);
-
-    const scrollToTop = () => {
-        document.body.scrollIntoView({ behavior: "smooth", block: "start", inline: "start" });
+  useEffect(() => {
+    window.addEventListener("scroll", toggleVisibility);
+    return () => {
+      window.removeEventListener("scroll", toggleVisibility);
     };
+  }, []);
 
-    return (
-        <div id="top-navigator" className="top-navigator">
-            <Menu>
-                <Menu.Item onClick={scrollToTop}>Back to the top</Menu.Item>
-            </Menu>
-        </div>
-    );
+  return (
+    <div className={isVisible ? "opacity-100" : "opacity-0"}>
+      <div className="top-navigator">
+        <Menu>
+          <Menu.Item
+            onClick={(e) => {
+              document.body.scrollIntoView({
+                behavior: "smooth",
+                block: "start",
+                inline: "start",
+              });
+            }}
+          >
+            {props.settings && props.settings.react_back_to_top_label
+              ? props.settings.react_back_to_top_label
+              : "Back to the top"}{" "}
+          </Menu.Item>
+        </Menu>
+      </div>
+    </div>
+  );
 };
 
 export default TopNavigator;
