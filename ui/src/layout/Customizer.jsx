@@ -11,7 +11,7 @@ const settingMappings = {
   const readCustomizationMessage = (event) => {
             console.log("-------------------------------reading customizer message ----------------------------------------")
             const data = JSON.parse(event.data);
-            
+
             const newSettings = {...customization}
 
             if (settingMappings[data.property]) {
@@ -64,7 +64,7 @@ const CustomizerWrapper = (props) => {
         };
     }, [])
 
-    
+
     return React.Children.map(props.children, (child => React.cloneElement(child, {
         ...props,
         settings: {...customization}
