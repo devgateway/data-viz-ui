@@ -13,6 +13,7 @@ import React from "react";
 import * as topojson from "topojson";
 import Legend from "./legend";
 import { formatContent } from "../common/MapTooltip";
+import getDeviceCategory from '../../utils/deviceType';
 
 const geoStats = require("geostats");
 const COLOR_VARIABLE = "_Color_";
@@ -48,46 +49,6 @@ const breakpoints = {
   }
 };
 
-function getDeviceCategory() {
-  const userAgent = navigator.userAgent.toLowerCase();
-  const screenWidth = window.innerWidth;
-
-  // First, check based on user agent
-  if (/mobile|android|iphone|phone|ipod|blackberry|iemobile|opera mini/i.test(userAgent)) {
-      return "mobile";
-  } else if (/ipad|tablet/i.test(userAgent)) {
-      if (screenWidth > 1024) {
-          return "midTablet";
-      } else {
-          return "tablet";
-      }
-  } else if (/macintosh|windows/i.test(userAgent)) {
-      if (screenWidth > 1920) {
-          return "wide";
-      } else if (screenWidth > 1366) {
-          return "desktop";
-      } else if (screenWidth > 1024) {
-          return "laptop";
-      }
-  }
-
-  // If user agent checks don't match, fallback to screen width checks
-  if (screenWidth <= 480) {
-      return "mobile";
-  } else if (screenWidth > 480 && screenWidth <= 768) {
-      return "tablet";
-  } else if (screenWidth > 768 && screenWidth <= 1024) {
-      return "midTablet";
-  } else if (screenWidth > 1024 && screenWidth <= 1366) {
-      return "laptop";
-  } else if (screenWidth > 1366 && screenWidth <= 1920) {
-      return "desktop";
-  } else if (screenWidth > 1920) {
-      return "wide";
-  }
-
-  return "unknown";
-}
 
 const deviceTranslateMap = {
   'mobile': 4,
@@ -260,7 +221,7 @@ class Map extends React.Component {
 
   componentDidMount() {
     window.addEventListener('resize', this.handleResize);
-    window.addEventListener('scroll', this.handleScroll, { passive: true });
+    window.addEventListener('scroll', this.handleScroll);
     this.loadLayers();
     this.tooltip = d3
       .select("body")
@@ -273,14 +234,19 @@ class Map extends React.Component {
     console.log(error);
   }
 
-  handleResize = () => {
+  handleResize = (event) => {
+    event.preventDefault();
     const features = this.getFeatures();
     this.d3Map(features, false);
 }
 
 
-handleScroll = () => {
-  this.updateFeatures(this.getFeatures(), false);
+handleScroll = (event) => {
+  event.preventDefault();
+  const labelsExist = d3.select(this.getMapId()).selectAll(".map-labels-container").size() > 0;
+  if (!labelsExist) {
+    this.updateFeatures(this.getFeatures(), false); // Only update features if labels are missing
+  }
 }
 
 
@@ -776,6 +742,11 @@ componentWillUnmount() {
       labelsExclusionList,
     } = this.props;
     const group = d3.select(this.getMapId()).select("svg").select("g");
+    const labelsExist = group.selectAll(".map-labels-container").size() > 0;
+    if (labelsExist) {
+      console.log("Labels already exist, skipping redraw...");
+      return; // Skip redrawing if labels are already present
+    }
 
     group
       .selectAll(".map-labels")
@@ -1915,7 +1886,7 @@ componentWillUnmount() {
     } = this.props;
 
     if(!zoomEnabled) {
-      zoomEnabled = ['mobile', 'tablet'].includes(getDeviceCategory()) ? true: false;
+      zoomEnabled = ['mobile', 'tablet', 'midTablet'].includes(getDeviceCategory()) ? true: false;
     }
     const nationalAverage = this.getAvg();
     const filters = this.getFilters();
