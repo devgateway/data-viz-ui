@@ -490,6 +490,7 @@ registerBlockType(process.env.BLOCKS_NS + '/chart',
                     xAxisDisabled: false,
                     tickRotation: 0,
                     yAxisTickValues: 10,
+                    chartLayoutOverride: false,
                 }
             },
             reverseLegend: {
