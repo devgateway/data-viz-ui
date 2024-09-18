@@ -220,7 +220,7 @@ class Map extends React.Component {
   }
 
   componentDidMount() {
-    window.addEventListener('scroll', this.handleScroll);
+    window.addEventListener('scroll', this.handleScroll, { passive: true });
     this.loadLayers();
     this.tooltip = d3
       .select("body")
@@ -234,12 +234,16 @@ class Map extends React.Component {
   }
 
 
-handleScroll = (event) => {
-  event.preventDefault();
-  const labelsExist = d3.select(this.getMapId()).selectAll(".map-labels-container").size() > 0;
-  if (!labelsExist) {
-    this.updateFeatures(this.getFeatures(), false); // Only update features if labels are missing
-  }
+handleScroll = () => {
+  // adds debounce to scroll to prevent event from rerendering the map too often
+  let scrollTimeout = null;
+  clearTimeout(scrollTimeout);
+  scrollTimeout = setTimeout(() => {
+    const labelsExist = d3.select(this.getMapId()).selectAll(".map-labels-container").size() > 0;
+    if (!labelsExist) {
+      this.updateFeatures(this.getFeatures(), false);
+    }
+  }, 300);
 }
 
 
