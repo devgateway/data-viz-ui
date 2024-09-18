@@ -98,6 +98,8 @@ const Chart = ({
   customAxisFormat,
   mobileCustomization
 }) => {
+  const mobileConfigSettings = JSON.parse(decodeURIComponent(mobileCustomization));
+  const isMobileConfigEnabled = isMobile && (mobileConfigSettings?.showCustomization ?? false);
   const [bottomSpacing, setBottomSpacing] = useState(50);
   const [newMarginTop, setNewMarginTop] = useState(marginTop);
   const [wrapCount, setWrapCount] = useState(0);
@@ -195,7 +197,7 @@ const Chart = ({
 
   const CustomTick = (tick) => {
     const tickObject = Object.assign({}, tick);
-    if(isMobile && hiddenLabels.includes(tick.value)) {
+    if(isMobileConfigEnabled && hiddenLabels.includes(tick.value)) {
       tickObject.value = "";
     }
     const theme = useTheme();
@@ -498,8 +500,7 @@ const Chart = ({
     options.data && options.data?.filter((d) => d?.data?.length > 0)?.length;
 
   let hiddenLabels = [];
-  const mobileConfigSettings = JSON.parse(decodeURIComponent(mobileCustomization));
-  if(isMobile) {
+  if(isMobileConfigEnabled) {
       ticks = parseInt(mobileConfigSettings.yAxisTickValues);
       const labels = new Map(Object.entries(mobileConfigSettings?.labels?.xAxis ?? {}));
       for (let [key, value] of labels) {
@@ -558,7 +559,7 @@ const Chart = ({
             return colorGenerator.getColor(d.id, d);
           }}
           axisBottom={
-            isMobile && mobileConfigSettings?.xAxisDisabled === true ? null :{
+            isMobileConfigEnabled && mobileConfigSettings?.xAxisDisabled === true ? null :{
             renderTick: CustomTick,
             legend: legends.bottom,
             legendPosition: "middle",
