@@ -220,7 +220,6 @@ class Map extends React.Component {
   }
 
   componentDidMount() {
-    window.addEventListener('resize', this.handleResize);
     window.addEventListener('scroll', this.handleScroll);
     this.loadLayers();
     this.tooltip = d3
@@ -234,12 +233,6 @@ class Map extends React.Component {
     console.log(error);
   }
 
-  handleResize = (event) => {
-    event.preventDefault();
-    const features = this.getFeatures();
-    this.d3Map(features, false);
-}
-
 
 handleScroll = (event) => {
   event.preventDefault();
@@ -251,7 +244,6 @@ handleScroll = (event) => {
 
 
 componentWillUnmount() {
-  window.removeEventListener('resize', this.handleResize);
   window.removeEventListener('scroll', this.handleScroll);
 }
 
