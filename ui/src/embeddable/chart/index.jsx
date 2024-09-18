@@ -357,11 +357,22 @@ const Chart = (props) => {
 
   const mobileConfigSettings = JSON.parse(decodeURIComponent(mobileCustomization));
 
+  const mobileLayout = () => {
+    if(mobileConfigSettings?.chartLayoutOverride) {
+      if(layout === 'horizontal') {
+        return 'vertical';
+      } else {
+        return 'horizontal';
+      }
+    }
+    return layout;
+  }
+
   const chartProps = {
     app,
     tickColor: decodeURIComponent(tickColor),
     tickRotation: isMobile ? mobileConfigSettings.tickRotation ?? tickRotation : tickRotation,
-    layout,
+    layout: isMobile ? mobileLayout() : layout,
     reverse: reverse == true || reverse == "true",
     showLegends: showLegends == true || showLegends == "true",
     legendLabel,
