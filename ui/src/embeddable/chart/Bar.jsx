@@ -80,7 +80,9 @@ const Chart = ({
   customAxisFormat,
   dimension1
 }) => {
+  const isMobile = deviceType() === "mobile";
   const mobileConfigSettings = JSON.parse(decodeURIComponent(mobileCustomization));
+  const isMobileCustomizationEnabled = isMobile && (mobileConfigSettings?.showCustomization ?? false)
   const normalizeLabelColor = () => {
     if (barLabelColor === "null" || barLabelColor === null || !barLabelColor) {
       return "#000000";
@@ -100,7 +102,6 @@ const Chart = ({
   const [newMarginTop, setNewMarginTop] = useState(marginTop);
   const [wrapCount, setWrapCount] = useState(0);
   const [newMarginBottom, setNewMarginBottom] = useState(marginBottom);
-  const isMobile = deviceType() === "mobile";
 
   const generateChartLegends = (
     options,
@@ -492,7 +493,7 @@ const Chart = ({
 
   const CustomTick = (tick) => {
     const tickObject = Object.assign({}, tick);
-    if(isMobile && hiddenLabels.includes(tick.value)) {
+    if(isMobileCustomizationEnabled && hiddenLabels.includes(tick.value)) {
       tickObject.value = "";
     }
     const theme = useTheme();
@@ -918,7 +919,7 @@ const Chart = ({
   };
 
 let hiddenLabels = [];
-if(isMobile) {
+if(isMobileCustomizationEnabled) {
     ticks = parseInt(mobileConfigSettings.yAxisTickValues);
     const labels = new Map(Object.entries(mobileConfigSettings?.labels?.xAxis ?? {}));
     for (let [key, value] of labels) {
@@ -993,7 +994,7 @@ if(isMobile) {
                 : null
             }
             axisBottom={
-              isMobile && mobileConfigSettings?.xAxisDisabled === true ? null :
+              isMobileCustomizationEnabled && mobileConfigSettings?.xAxisDisabled === true ? null :
               layout == "horizontal"
                 ? {
                     legend: legends.bottom,

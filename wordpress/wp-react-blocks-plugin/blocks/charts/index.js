@@ -483,6 +483,7 @@ registerBlockType(process.env.BLOCKS_NS + '/chart',
             mobileCustomization: {
                 type: 'Object',
                 default: {
+                    showCustomization: false,
                     labels: {
                         xAxis: {},
                         yAxis: {}

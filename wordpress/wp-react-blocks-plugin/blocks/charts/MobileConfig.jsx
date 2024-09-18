@@ -18,28 +18,27 @@ function extractAxisValues(csvData) {
 }
 
 function transformDataToAppObject(data, appName, existingObject = {}) {
-  if(existingObject[appName] !== undefined) {
+  if (existingObject[appName] !== undefined) {
     return existingObject;
   }
   existingObject[appName] = {};
-  data.forEach(item => {
-      const key = item.value;
-      existingObject[appName][key] = {
-          selected: false,
-          format: {
-              style: "percent",
-              minimumFractionDigits: 1,
-              maximumFractionDigits: 1,
-              currency: "USD"
-          },
-          hasCustomLabel: false,
-          customLabel: item.label || key
-      };
+  data.forEach((item) => {
+    const key = item.value;
+    existingObject[appName][key] = {
+      selected: false,
+      format: {
+        style: "percent",
+        minimumFractionDigits: 1,
+        maximumFractionDigits: 1,
+        currency: "USD",
+      },
+      hasCustomLabel: false,
+      customLabel: item.label || key,
+    };
   });
 
   return existingObject;
 }
-
 
 function getSelectedLabelsForApp(data, appName) {
   const appData = data[appName];
@@ -49,7 +48,9 @@ function getSelectedLabelsForApp(data, appName) {
   return Object.keys(appData)
     .filter((key) => appData[key].selected) // Filter out the selected items
     .map((key) => {
-      return appData[key].hasCustomLabel ? appData[key].customLabel : appData[key].label;
+      return appData[key].hasCustomLabel
+        ? appData[key].customLabel
+        : appData[key].label;
     });
 }
 
@@ -64,17 +65,21 @@ const updateMeasureLabels = (data, measures, app) => {
       measure.label = apiMeasure.label;
     }
   });
-}
+};
 
 const MobileConfig = (props) => {
   const {
     setAttributes,
     attributes: { type, mobileCustomization, csv, app, measures, dimension1 },
   } = props;
+  const [showMobileCustomization, setShowMobileCustomization] = useState(false);
+
   let xAxisLabels = extractAxisValues(csv);
   if (app !== "csv") {
     if (dimension1 !== "none") {
-      const storedCategories = JSON.parse(sessionStorage.getItem(`categories_${app}`));
+      const storedCategories = JSON.parse(
+        sessionStorage.getItem(`categories_${app}`)
+      );
       const categories =
         storedCategories ??
         fetch(`/api/${app}/categories`)
@@ -87,7 +92,9 @@ const MobileConfig = (props) => {
         )[0]
         .items?.map((item) => item.value);
     } else {
-      const storedMeasures = JSON.parse(sessionStorage.getItem(`measures_${app}`));
+      const storedMeasures = JSON.parse(
+        sessionStorage.getItem(`measures_${app}`)
+      );
       // if measures are not present in session storage, fetch them from the API
       if (!storedMeasures) {
         fetch(`/api/${app}/measures`)
@@ -111,6 +118,16 @@ const MobileConfig = (props) => {
     setAttributes({ mobileCustomization: newObject });
   };
 
+  const onShowMobileCustomizationChange = (value) => {
+    setShowMobileCustomization(value);
+    setAttributes({
+      mobileCustomization: {
+        ...mobileCustomization,
+        showCustomization: value,
+      }
+     });
+  };
+
   const setInitialTogle = (initialToggleState, label, axis) => {
     // initial toggle state is false
     if (!initialToggleState) {
@@ -131,7 +148,16 @@ const MobileConfig = (props) => {
 
   return (
     <PanelBody initialOpen={false} title={__("Mobile Customization Settings")}>
-      {isBarOrLine && (
+      <PanelRow>
+        <ToggleControl
+          label={__("Show Mobile Customization Settings")}
+          checked={showMobileCustomization}
+          onChange={(isShowMobileCustomization) =>
+            onShowMobileCustomizationChange(isShowMobileCustomization)
+          }
+        />
+      </PanelRow>
+      {isBarOrLine && showMobileCustomization && (
         <>
           <PanelRow>
             <ToggleControl
