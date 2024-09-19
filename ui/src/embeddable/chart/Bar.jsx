@@ -492,7 +492,7 @@ const Chart = ({
 
   const CustomTick = (tick) => {
     const tickObject = Object.assign({}, tick);
-    if(isMobileCustomizationEnabled && hiddenLabels.includes(tick.value)) {
+    if(isMobileCustomizationEnabled && hiddenLabels.includes(String(tickObject.value))) {
       tickObject.value = "";
     }
     const theme = useTheme();
