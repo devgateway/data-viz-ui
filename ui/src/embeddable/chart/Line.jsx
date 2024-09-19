@@ -197,7 +197,7 @@ const Chart = ({
 
   const CustomTick = (tick) => {
     const tickObject = Object.assign({}, tick);
-    if(isMobileConfigEnabled && hiddenLabels.includes(tick.value)) {
+    if(isMobileConfigEnabled && hiddenLabels.includes(String(tickObject.value))) {
       tickObject.value = "";
     }
     const theme = useTheme();
