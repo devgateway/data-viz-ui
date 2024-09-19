@@ -9,6 +9,80 @@ import { __ } from "@wordpress/i18n";
 import { useState } from "react";
 import { getTranslatedOptions } from ".././commons/APIutils";
 
+const MarginSection = ({
+  setAttributes,
+  attributes: { mobileCustomization}
+}) => {
+  const {
+    marginBottom,
+    marginLeft,
+    marginRight,
+    marginTop,
+  } = mobileCustomization;
+  return (
+    <PanelBody initialOpen={false}   title={__("Margins")}>
+    <PanelRow>
+        <RangeControl
+            label={__('Margin Bottom (Space between chart area and bottom border)')}
+            value={marginBottom}
+            onChange={(marginBottom) => setAttributes({
+                mobileCustomization: {
+                    ...mobileCustomization,
+                    marginBottom: marginBottom
+                }
+            })}
+            min={0}
+            max={500}
+        />
+    </PanelRow>
+
+    <PanelRow>
+        <RangeControl
+            label={__('Margin Left (Space between chart area and left border)')}
+            value={marginLeft}
+            initialPosition={0}
+            onChange={(marginLeft) => setAttributes({
+                mobileCustomization: {
+                    ...mobileCustomization,
+                    marginLeft: marginLeft
+                }
+            })}
+            step={1}
+            min={0}
+            max={500}/>
+    </PanelRow>
+    <PanelRow>
+        <RangeControl
+            label={__('Margin Right')}
+            value={marginRight}
+            onChange={(marginRight) => setAttributes({
+                mobileCustomization: {
+                    ...mobileCustomization,
+                    marginRight: marginRight
+                }
+            })}
+            min={0}
+            max={500}
+        />
+    </PanelRow>
+    <PanelRow>
+        <RangeControl
+            label={__('Margin Top')}
+            value={marginTop}
+            onChange={(marginTop) => setAttributes({
+                mobileCustomization: {
+                    ...mobileCustomization,
+                    marginTop: marginTop
+                }
+            })}
+            min={0}
+            max={500}
+        />
+    </PanelRow>
+</PanelBody>
+  )
+}
+
 function extractAxisValues(csvData) {
   const lines = csvData.split("\n");
   const firstColumnValues = lines?.slice(1)?.map((row) => {
@@ -235,7 +309,9 @@ const MobileConfig = (props) => {
               }
             />
           </PanelRow>
+          <MarginSection {...props} />
         </>
+
       )}
     </PanelBody>
   );
