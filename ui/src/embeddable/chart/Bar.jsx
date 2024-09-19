@@ -77,8 +77,7 @@ const Chart = ({
   reverseLegend,
   enableGridY,
   enableGridX,
-  customAxisFormat,
-  dimension1
+  customAxisFormat
 }) => {
   const isMobile = deviceType() === "mobile";
   const mobileConfigSettings = JSON.parse(decodeURIComponent(mobileCustomization));
