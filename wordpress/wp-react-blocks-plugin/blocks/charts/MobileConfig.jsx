@@ -6,82 +6,90 @@ import {
   RangeControl,
 } from "@wordpress/components";
 import { __ } from "@wordpress/i18n";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { getTranslatedOptions } from ".././commons/APIutils";
 
 const MarginSection = ({
   setAttributes,
-  attributes: { mobileCustomization}
+  attributes: { mobileCustomization },
 }) => {
-  const {
-    marginBottom,
-    marginLeft,
-    marginRight,
-    marginTop,
-  } = mobileCustomization;
+  const { marginBottom, marginLeft, marginRight, marginTop } =
+    mobileCustomization;
   return (
-    <PanelBody initialOpen={false}   title={__("Margins")}>
-    <PanelRow>
+    <PanelBody initialOpen={false} title={__("Margins")}>
+      <PanelRow>
         <RangeControl
-            label={__('Margin Bottom (Space between chart area and bottom border)')}
-            value={marginBottom}
-            onChange={(marginBottom) => setAttributes({
-                mobileCustomization: {
-                    ...mobileCustomization,
-                    marginBottom: marginBottom
-                }
-            })}
-            min={0}
-            max={500}
+          label={__(
+            "Margin Bottom (Space between chart area and bottom border)"
+          )}
+          value={marginBottom}
+          onChange={(marginBottom) =>
+            setAttributes({
+              mobileCustomization: {
+                ...mobileCustomization,
+                marginBottom: marginBottom,
+                yAxisIntervalModified: true,
+              },
+            })
+          }
+          min={0}
+          max={500}
         />
-    </PanelRow>
+      </PanelRow>
 
-    <PanelRow>
+      <PanelRow>
         <RangeControl
-            label={__('Margin Left (Space between chart area and left border)')}
-            value={marginLeft}
-            initialPosition={0}
-            onChange={(marginLeft) => setAttributes({
-                mobileCustomization: {
-                    ...mobileCustomization,
-                    marginLeft: marginLeft
-                }
-            })}
-            step={1}
-            min={0}
-            max={500}/>
-    </PanelRow>
-    <PanelRow>
-        <RangeControl
-            label={__('Margin Right')}
-            value={marginRight}
-            onChange={(marginRight) => setAttributes({
-                mobileCustomization: {
-                    ...mobileCustomization,
-                    marginRight: marginRight
-                }
-            })}
-            min={0}
-            max={500}
+          label={__("Margin Left (Space between chart area and left border)")}
+          value={marginLeft}
+          initialPosition={0}
+          onChange={(marginLeft) =>
+            setAttributes({
+              mobileCustomization: {
+                ...mobileCustomization,
+                marginLeft: marginLeft,
+              },
+            })
+          }
+          step={1}
+          min={0}
+          max={500}
         />
-    </PanelRow>
-    <PanelRow>
+      </PanelRow>
+      <PanelRow>
         <RangeControl
-            label={__('Margin Top')}
-            value={marginTop}
-            onChange={(marginTop) => setAttributes({
-                mobileCustomization: {
-                    ...mobileCustomization,
-                    marginTop: marginTop
-                }
-            })}
-            min={0}
-            max={500}
+          label={__("Margin Right")}
+          value={marginRight}
+          onChange={(marginRight) =>
+            setAttributes({
+              mobileCustomization: {
+                ...mobileCustomization,
+                marginRight: marginRight,
+              },
+            })
+          }
+          min={0}
+          max={500}
         />
-    </PanelRow>
-</PanelBody>
-  )
-}
+      </PanelRow>
+      <PanelRow>
+        <RangeControl
+          label={__("Margin Top")}
+          value={marginTop}
+          onChange={(marginTop) =>
+            setAttributes({
+              mobileCustomization: {
+                ...mobileCustomization,
+                marginTop: marginTop,
+              },
+            })
+          }
+          min={0}
+          max={500}
+        />
+      </PanelRow>
+    </PanelBody>
+  );
+};
 
 function extractAxisValues(csvData) {
   const lines = csvData.split("\n");
@@ -144,9 +152,16 @@ const updateMeasureLabels = (data, measures, app) => {
 const MobileConfig = (props) => {
   const {
     setAttributes,
-    attributes: { type, mobileCustomization, csv, app, measures, dimension1 },
+    attributes: {
+      type,
+      mobileCustomization,
+      csv,
+      app,
+      measures,
+      dimension1,
+      yAxisTickValues,
+    },
   } = props;
-  const [showMobileCustomization, setShowMobileCustomization] = useState(false);
 
   let xAxisLabels = extractAxisValues(csv);
   if (app !== "csv") {
@@ -193,13 +208,12 @@ const MobileConfig = (props) => {
   };
 
   const onShowMobileCustomizationChange = (value) => {
-    setShowMobileCustomization(value);
     setAttributes({
       mobileCustomization: {
         ...mobileCustomization,
         showCustomization: value,
-      }
-     });
+      },
+    });
   };
 
   const setInitialTogle = (initialToggleState, label, axis) => {
@@ -218,6 +232,15 @@ const MobileConfig = (props) => {
     return true;
   };
 
+  const onIntervalChange = (value) => {
+    const newObject = Object.assign({}, mobileCustomization);
+    if (newObject) {
+      newObject.yAxisTickValues = value;
+      newObject.yAxisIntervalModified = true;
+    }
+    setAttributes({ mobileCustomization: newObject });
+  };
+
   const isBarOrLine = ["bar", "line"].includes(type);
 
   return (
@@ -225,13 +248,13 @@ const MobileConfig = (props) => {
       <PanelRow>
         <ToggleControl
           label={__("Show Mobile Customization Settings")}
-          checked={showMobileCustomization}
+          checked={mobileCustomization?.showCustomization}
           onChange={(isShowMobileCustomization) =>
             onShowMobileCustomizationChange(isShowMobileCustomization)
           }
         />
       </PanelRow>
-      {isBarOrLine && showMobileCustomization && (
+      {isBarOrLine && mobileCustomization?.showCustomization && (
         <>
           <PanelRow>
             <ToggleControl
@@ -278,17 +301,17 @@ const MobileConfig = (props) => {
             ))}
           </PanelBody>
 
+          {/** the number of intervals should default to the value set by yAxisTickValues */}
           <PanelRow>
             <RangeControl
               label={__("Number of Intervals")}
-              value={mobileCustomization.yAxisTickValues || 10}
-              onChange={(yAxisTickValues) =>
-                setAttributes({
-                  mobileCustomization: {
-                    ...mobileCustomization,
-                    yAxisTickValues: yAxisTickValues,
-                  },
-                })
+              value={
+                !mobileCustomization?.yAxisIntervalModified
+                  ? yAxisTickValues
+                  : mobileCustomization.yAxisTickValues
+              }
+              onChange={(newYAxisTickValue) =>
+                onIntervalChange(newYAxisTickValue)
               }
               min={0}
               max={50}
@@ -311,7 +334,6 @@ const MobileConfig = (props) => {
           </PanelRow>
           <MarginSection {...props} />
         </>
-
       )}
     </PanelBody>
   );
