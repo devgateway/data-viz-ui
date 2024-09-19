@@ -522,7 +522,7 @@ const Chart = ({
     );
 
     const renderTick = (rotation, rectX, textX = 0) => (
-      <g transform={`translate(${tick.x},${tick.y + 30})`}>
+      <g transform={`translate(${tick.x - 15},${tick.y + 30})`}>
         {showTickLine && (
           <line stroke={effectiveTickColor} strokeWidth={1.5} y1={-32} y2={-12} />
         )}
