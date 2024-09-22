@@ -2002,7 +2002,7 @@ componentWillUnmount() {
                 </div>
               )}
 
-              {(editing || zoomEnabled || isMobile) && (
+              {(editing || zoomEnabled) && !isMobile && (
                 <div className="control panel ignore">
                   <div className="zoom plus" onClick={this.onZoomIn}>
                     <Icon name="plus" size="large" />

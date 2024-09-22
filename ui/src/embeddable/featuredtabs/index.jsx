@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Grid, Icon, Label, Segment, Transition } from 'semantic-ui-react';
+import { Container, Grid, Icon, Label, Segment, Accordion } from 'semantic-ui-react';
 import {
     MediaConsumer,
     MediaProvider,
@@ -11,6 +11,9 @@ import {
 } from "@devgateway/wp-react-lib";
 import PostIntro from "../connected-templates/PostIntro";
 
+console.log('something nice...')
+
+// Desktop FeaturedPost Component
 const FeaturedPost = ({ post, onClick, active, moreLabel }) => {
     const media = post['_embedded'] ? post['_embedded']["wp:featuredmedia"] : null;
 
@@ -24,6 +27,21 @@ const FeaturedPost = ({ post, onClick, active, moreLabel }) => {
     );
 };
 
+const GetFigureFromPost = ({ post }) => {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(post.content.rendered, 'text/html');
+    const figureElement = doc.querySelector('figure');
+    if(!figureElement) {
+        return null;
+    }
+    return (
+        <div style={{
+            flex: '0 0 40px'
+        }}dangerouslySetInnerHTML={{ __html: figureElement.outerHTML }} />
+    );
+};
+
+// Desktop FeaturedTabs Component
 const FeaturedTabs = ({ posts, width, height, color, moreLabel }) => {
     const [active, setActive] = useState(null);
     const [visible, setVisible] = useState(false);
@@ -101,8 +119,75 @@ const FeaturedTabs = ({ posts, width, height, color, moreLabel }) => {
     );
 };
 
-const Root = (props) => {
-    const [random, setRandomStore] = useState(Math.random() * (99999 - 1) + 1);
+// Mobile AccordionContent Component
+const AccordionContent = ({ posts, activeItem, setActive, color }) => {
+    const [activeIndex, setActiveIndex] = useState(posts.findIndex(p => p.slug === activeItem));
+    const [scrollTarget, setScrollTarget] = useState(null);
+    const arrayColors = color.split(',');
+
+    useEffect(() => {
+        if (scrollTarget) {
+            const offsetTop = scrollTarget.getBoundingClientRect().top + window.scrollY;
+            window.scrollTo({
+                top: offsetTop,
+                behavior: 'smooth',
+            });
+        }
+    }, [scrollTarget]);
+
+    const handleClick = (e, titleProps) => {
+        const { index } = titleProps;
+        const newIndex = activeIndex === index ? -1 : index;
+        setActiveIndex(newIndex);
+        setActive(posts[index].slug);
+
+        // Set the scroll target after updating the activeIndex
+        if (newIndex !== -1) {
+            setScrollTarget(e.currentTarget);
+        }
+    };
+
+    return (
+        <Accordion fluid styled>
+            {posts.map((post, index) => {
+                const iconUrl = post.meta_fields && post.meta_fields.icon ? post.meta_fields.icon[0] : null;
+
+                return (
+                    <React.Fragment key={post.id}>
+                        <Accordion.Title
+                            active={activeIndex === index}
+                            index={index}
+                            onClick={handleClick}
+                            style={{ backgroundColor: arrayColors[index]  }}
+                        >
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+
+                                <div style={{ display: 'flex', alignItems: 'center' }}>
+                                    {iconUrl && (
+                                        <MediaProvider id={iconUrl}>
+                                            <MediaConsumer>
+                                                <PostIcon className="icon" />
+                                            </MediaConsumer>
+                                        </MediaProvider>
+                                    )}
+                                    {!iconUrl && <GetFigureFromPost post={post} />}
+                                    <PostTitle post={post} className="accordion-post-ft-title"/>
+                                </div>
+                                <Icon name="chevron down" />
+                            </div>
+                        </Accordion.Title>
+                        <Accordion.Content className={"accordion-post-ft-content"} active={activeIndex === index}>
+                            <PostContent post={post} />
+                        </Accordion.Content>
+                    </React.Fragment>
+                );
+            })}
+        </Accordion>
+    );
+};
+
+// Wrapper Component for Handling Mobile and Desktop View
+const Wrapper = (props) => {
     const {
         "data-width": width,
         "data-height": height,
@@ -118,12 +203,24 @@ const Root = (props) => {
         unique
     } = props;
     const locale = props.intl.locale;
-
     const scrollable = useScrolls == 'true'
 
+    // Determine screen width and conditionally render components
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+    useEffect(() => {
+        const handleResize = () => {
+            setIsMobile(window.innerWidth <= 1250);
+        };
+
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
+
     return (
-        <Container className={`viz featured tabs ${editing ? 'editing' : ''} ${scrollable ? 'scrollable' : ''}`}
-                   fluid={true}>
+        <Container
+            className={`viz featured tabs ${editing ? 'editing' : ''} ${scrollable ? 'scrollable' : ''}`}
+            fluid={true}
+        >
             <PostProvider
                 locale={locale}
                 type={type}
@@ -134,11 +231,25 @@ const Root = (props) => {
                 perPage={items}
             >
                 <PostConsumer>
-                    <FeaturedTabs moreLabel={moreLabel} color={color} width={width} height={height} />
+                    {isMobile ? (
+                        <AccordionContent
+                            posts={items}
+                            activeItem={items[0]?.slug}
+                            color={color}
+                            setActive={() => {}}
+                        />
+                    ) : (
+                        <FeaturedTabs
+                            moreLabel={moreLabel}
+                            color={color}
+                            width={width}
+                            height={height}
+                        />
+                    ) }
                 </PostConsumer>
             </PostProvider>
         </Container>
     );
 };
 
-export default Root;
+export default Wrapper;
