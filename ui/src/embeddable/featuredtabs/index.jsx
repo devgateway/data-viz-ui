@@ -11,8 +11,6 @@ import {
 } from "@devgateway/wp-react-lib";
 import PostIntro from "../connected-templates/PostIntro";
 
-console.log('something nice...')
-
 // Desktop FeaturedPost Component
 const FeaturedPost = ({ post, onClick, active, moreLabel }) => {
     const media = post['_embedded'] ? post['_embedded']["wp:featuredmedia"] : null;
