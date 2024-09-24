@@ -252,8 +252,9 @@ const MobileConfig = (props) => {
     setAttributes({ mobileCustomization: newObject });
   };
 
-  const isBarOrLine = ["bar", "line"].includes(type);
+  const isBarOrLineOrPie = ["bar", "line", "pie"].includes(type);
 
+  const isBarOrLine = ["bar", "line"].includes(type);
   return (
     <PanelBody initialOpen={false} title={__("Mobile Customization Settings")}>
       <PanelRow>
@@ -265,9 +266,11 @@ const MobileConfig = (props) => {
           }
         />
       </PanelRow>
-      {isBarOrLine && mobileCustomization?.showCustomization && (
+      {isBarOrLineOrPie && mobileCustomization?.showCustomization && (
         <>
-          <PanelRow>
+          {
+            isBarOrLine && <>
+            <PanelRow>
             <ToggleControl
               label={__("Disable X Axis Labels")}
               checked={mobileCustomization.xAxisDisabled}
@@ -343,6 +346,8 @@ const MobileConfig = (props) => {
               }
             />
           </PanelRow>
+            </>
+          }
           <MarginSection {...props} />
         </>
       )}
