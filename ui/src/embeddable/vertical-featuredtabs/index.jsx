@@ -64,7 +64,7 @@ const AccordionContent = ({ posts, activeItem, setActive, colors }) => {
                                 <Icon name="chevron down" />
                             </div>
                         </Accordion.Title>
-                        <Accordion.Content className={"accordion-post-content"} active={activeIndex === index}>
+                        <Accordion.Content className={"accordion-post-content accordion-post-vft-content"} active={activeIndex === index}>
                             <PostContent post={post} />
                         </Accordion.Content>
                     </React.Fragment>
