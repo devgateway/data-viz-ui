@@ -968,7 +968,9 @@ const Chart = ({
   }
 
   if (barLabelPosition === POSITION_TOP) {
-    layers.push(addTopBarLabel);
+    if(!isMobile) {
+      layers.push(addTopBarLabel);
+    }
   }
 
   if (highlightXAxisLine) {
