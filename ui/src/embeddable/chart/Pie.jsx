@@ -211,14 +211,14 @@ const Chart = ({
                   }
                   style={{
                     backgroundColor:
-                      legendCheckBack == true ? legend.color : "none",
+                      legendCheckBack == true ? legend.color : "transparent",
                   }}
                 ></span>
 
                 <label
                   style={{
                     backgroundColor:
-                      legendLabelBack == true ? legend.color : "none",
+                      legendLabelBack == true ? legend.color : "transparent",
                     color: legendLabelColor,
                   }}
                 >
