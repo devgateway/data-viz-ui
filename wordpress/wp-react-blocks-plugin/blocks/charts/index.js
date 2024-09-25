@@ -497,6 +497,9 @@ registerBlockType(process.env.BLOCKS_NS + '/chart',
                     marginTop: 25,
                     marginBottom: 25,
                     marginRight: 25,
+                    showXAxisTitle: true,
+                    showYAxisTitle: true,
+                    showRightAxisTitle: true
                 }
             },
             reverseLegend: {

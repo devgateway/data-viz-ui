@@ -6,7 +6,7 @@ import {
   RangeControl,
 } from "@wordpress/components";
 import { __ } from "@wordpress/i18n";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { getTranslatedOptions } from ".././commons/APIutils";
 
 const MarginSection = ({
@@ -91,6 +91,60 @@ const MarginSection = ({
   );
 };
 
+const TitleSection = ({
+  setAttributes,
+  attributes: { mobileCustomization },
+}) => {
+  return (
+    <PanelBody initialOpen={false} title={__("Axis Titles")}>
+      <PanelRow>
+        <ToggleControl
+          label={__("Show X Axis Title")}
+          checked={mobileCustomization?.showXAxisTitle ?? true}
+          onChange={(isShowXAxisTitle) =>
+            setAttributes({
+              mobileCustomization: {
+                ...mobileCustomization,
+                showXAxisTitle: isShowXAxisTitle,
+              },
+            })
+          }
+        />
+      </PanelRow>
+      <PanelRow>
+        <ToggleControl
+          label={__("Show Y Axis Title")}
+          checked={mobileCustomization?.showYAxisTitle ?? true}
+          onChange={(isShowYAxisTitle) =>
+            setAttributes({
+              mobileCustomization: {
+                ...mobileCustomization,
+                showYAxisTitle: isShowYAxisTitle,
+              },
+            })
+          }
+        />
+      </PanelRow>
+
+      <PanelRow>
+        <ToggleControl
+          label={__("Show Right Axis Title")}
+          checked={mobileCustomization?.showRightAxisTitle ?? true}
+          onChange={(isShowRightAxisTitle) =>
+            setAttributes({
+              mobileCustomization: {
+                ...mobileCustomization,
+                showRightAxisTitle: isShowRightAxisTitle,
+              },
+            })
+          }
+        />
+      </PanelRow>
+
+    </PanelBody>
+  );
+};
+
 function extractAxisValues(csvData) {
   const lines = csvData.split("\n");
   const firstColumnValues = lines?.slice(1)?.map((row) => {
@@ -164,7 +218,7 @@ const MobileConfig = (props) => {
   } = props;
 
   useEffect(() => {
-    if(!mobileCustomization.yAxisIntervalUserModified) {
+    if (!mobileCustomization.yAxisIntervalUserModified) {
       setAttributes({
         mobileCustomization: {
           ...mobileCustomization,
@@ -268,90 +322,92 @@ const MobileConfig = (props) => {
       </PanelRow>
       {isBarOrLineOrPie && mobileCustomization?.showCustomization && (
         <>
-          {
-            isBarOrLine && <>
-            <PanelRow>
-            <ToggleControl
-              label={__("Disable X Axis Labels")}
-              checked={mobileCustomization.xAxisDisabled}
-              onChange={(isXAxisEnabled) =>
-                setAttributes({
-                  mobileCustomization: {
-                    ...mobileCustomization,
-                    xAxisDisabled: isXAxisEnabled,
-                  },
-                })
-              }
-            />
-          </PanelRow>
-
-          <PanelRow>
-            <AnglePickerControl
-              label={__("X Axis Text Rotation")}
-              value={mobileCustomization.tickRotation}
-              onChange={(value) =>
-                setAttributes({
-                  mobileCustomization: {
-                    ...mobileCustomization,
-                    tickRotation: value,
-                  },
-                })
-              }
-            />
-          </PanelRow>
-
-          <PanelBody initialOpen={false} title={__("All Labels")}>
-            {xAxisLabels.map((label, index) => (
-              <PanelRow key={`____${index}${label}`}>
+          {isBarOrLine && (
+            <>
+              <PanelRow>
                 <ToggleControl
-                  key={`_____${index}${label}`}
-                  label={__(label)}
-                  checked={setInitialTogle(true, label, "xAxis")}
-                  onChange={(value) => {
-                    onXAxisLabelChange(label, value);
-                  }}
+                  label={__("Disable X Axis Labels")}
+                  checked={mobileCustomization.xAxisDisabled}
+                  onChange={(isXAxisEnabled) =>
+                    setAttributes({
+                      mobileCustomization: {
+                        ...mobileCustomization,
+                        xAxisDisabled: isXAxisEnabled,
+                      },
+                    })
+                  }
                 />
               </PanelRow>
-            ))}
-          </PanelBody>
+              <PanelRow>
+                <ToggleControl
+                  label={__("Override Chart Layout")}
+                  checked={mobileCustomization.chartLayoutOverride}
+                  onChange={(isChartLayoutToggle) =>
+                    setAttributes({
+                      mobileCustomization: {
+                        ...mobileCustomization,
+                        chartLayoutOverride: isChartLayoutToggle,
+                      },
+                    })
+                  }
+                />
+              </PanelRow>
 
-          {/** the number of intervals should default to the value set by yAxisTickValues */}
-          <PanelRow>
-            <RangeControl
-              label={__("Number of Intervals")}
-              value={
-                !mobileCustomization?.yAxisIntervalUserModified
-                  ? yAxisTickValues
-                  : mobileCustomization.yAxisTickValues
-              }
-              onChange={(newYAxisTickValue) =>
-                onIntervalChange(newYAxisTickValue)
-              }
-              min={0}
-              max={50}
-            />
-          </PanelRow>
+              <PanelRow>
+                <AnglePickerControl
+                  label={__("X Axis Text Rotation")}
+                  value={mobileCustomization.tickRotation}
+                  onChange={(value) =>
+                    setAttributes({
+                      mobileCustomization: {
+                        ...mobileCustomization,
+                        tickRotation: value,
+                      },
+                    })
+                  }
+                />
+              </PanelRow>
 
-          <PanelRow>
-            <ToggleControl
-              label={__("Override Chart Layout")}
-              checked={mobileCustomization.chartLayoutOverride}
-              onChange={(isChartLayoutToggle) =>
-                setAttributes({
-                  mobileCustomization: {
-                    ...mobileCustomization,
-                    chartLayoutOverride: isChartLayoutToggle,
-                  },
-                })
-              }
-            />
-          </PanelRow>
+              {/** the number of intervals should default to the value set by yAxisTickValues */}
+              <PanelRow>
+                <RangeControl
+                  label={__("Number of Intervals")}
+                  value={
+                    !mobileCustomization?.yAxisIntervalUserModified
+                      ? yAxisTickValues
+                      : mobileCustomization.yAxisTickValues
+                  }
+                  onChange={(newYAxisTickValue) =>
+                    onIntervalChange(newYAxisTickValue)
+                  }
+                  min={0}
+                  max={50}
+                />
+              </PanelRow>
+
+              <PanelBody initialOpen={false} title={__("All Labels")}>
+                {xAxisLabels.map((label, index) => (
+                  <PanelRow key={`____${index}${label}`}>
+                    <ToggleControl
+                      key={`_____${index}${label}`}
+                      label={__(label)}
+                      checked={setInitialTogle(true, label, "xAxis")}
+                      onChange={(value) => {
+                        onXAxisLabelChange(label, value);
+                      }}
+                    />
+                  </PanelRow>
+                ))}
+              </PanelBody>
+
+              <TitleSection {...props} />
             </>
-          }
+          )}
           <MarginSection {...props} />
         </>
       )}
     </PanelBody>
   );
 };
+
 export default MobileConfig;
