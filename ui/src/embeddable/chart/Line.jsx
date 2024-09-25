@@ -216,7 +216,7 @@ const Chart = ({
           )}
 
           <g transform={`translate(0, ${tick.y + offsetText})`}>
-            <rect
+            {/* <rect
               transform={`rotate(${tickRotation})`}
               x={-12}
               y={-12}
@@ -225,7 +225,7 @@ const Chart = ({
               width={width + 12}
               height={22}
               fill={overrideTickColor ? tickColor : DEFAULT_TICK_BG_COLOR}
-            />
+            /> */}
 
             <text
               transform={`rotate(${tickRotation})`}
@@ -236,6 +236,7 @@ const Chart = ({
                 fill: xLabelColor,
                 fontSize: "12px",
               }}
+
             >
               {tickObject.value}
             </text>
@@ -255,7 +256,7 @@ const Chart = ({
           )}
 
           <g transform={`translate(0, ${tick.y + offsetText})`}>
-            <rect
+            {/* <rect
               transform={`rotate(${tickRotation - 180})`}
               x={-12}
               y={-10}
@@ -264,7 +265,7 @@ const Chart = ({
               width={width + 12}
               height={22}
               fill={overrideTickColor ? tickColor : DEFAULT_TICK_BG_COLOR}
-            />
+            /> */}
 
             <text
               transform={`rotate(${tickRotation})`}
@@ -294,7 +295,7 @@ const Chart = ({
           )}
 
           <g transform={`translate(0, ${tick.y + offsetText})`}>
-            <rect
+            {/* <rect
               transform={`rotate(${tickRotation})`}
               x={(-1 * width) / 2}
               y={-12}
@@ -303,7 +304,7 @@ const Chart = ({
               width={width}
               height={22}
               fill={overrideTickColor ? tickColor : DEFAULT_TICK_BG_COLOR}
-            />
+            /> */}
 
             <text
               transform={`rotate(${tickRotation})`}
@@ -314,6 +315,8 @@ const Chart = ({
                 fill: xLabelColor,
                 fontSize: "12px",
               }}
+              // dx={5}
+              // dy={15}
             >
               {tickObject.value}
             </text>
