@@ -280,8 +280,6 @@ const Chart = (props) => {
     return [];
   };
 
-  console.log('left...', left);
-
   let measuresObject = getMeasuresObject();
   let selectedMeasures = getSelectedMeasures();
 
@@ -292,9 +290,6 @@ const Chart = (props) => {
 
   /*Decoding tooltip string*/
   let tooltipForSelectedMeasure = decode(tooltip);
-  console.log('leftLegendForSelectedMeasure', left)
-
-  console.log('injectedMeasures...', injectedMeasures)
 
   if (injectedMeasures) {
     const selected = Object.keys(injectedMeasures[app].measures)
@@ -381,8 +376,6 @@ const Chart = (props) => {
   }
 
   const showRightAxisTitle = () => {
-    console.log('rightlegends...', rightLegendForSelectedMeasure)
-    console.log('mobile config..', mobileConfigSettings)
     if(isMobileConfigEnabled) {
       if(mobileConfigSettings?.showRightAxisTitle) {
         return rightLegendForSelectedMeasure;
@@ -398,10 +391,6 @@ const Chart = (props) => {
     bottom: showXAxisTitle(),
     right: showRightAxisTitle(),
   };
-
-  console.log('mobileConfigSettings', mobileConfigSettings)
-
-  console.log('legends...', legends)
 
   const mobileLayout = () => {
     if(mobileConfigSettings?.chartLayoutOverride) {
