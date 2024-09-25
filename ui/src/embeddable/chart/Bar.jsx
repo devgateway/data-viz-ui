@@ -517,7 +517,7 @@ const Chart = ({
           )}
 
           <g transform={`translate(0, ${tick.y + offsetText})`}>
-            <rect
+            {/* <rect
               transform={`rotate(${tickRotation})`}
               x={-12}
               y={-12}
@@ -526,7 +526,7 @@ const Chart = ({
               width={width}
               height={22}
               fill={"#FFFFFF"}
-            />
+            /> */}
 
             <text
               transform={`rotate(${tickRotation})`}
@@ -556,7 +556,7 @@ const Chart = ({
           )}
 
           <g transform={`translate(0, ${tick.y + offsetText})`}>
-            <rect
+            {/* <rect
               transform={`rotate(${tickRotation - 180})`}
               x={-12}
               y={-10}
@@ -565,7 +565,7 @@ const Chart = ({
               width={width}
               height={22}
               fill={"#FFFFFF"}
-            />
+            /> */}
 
             <text
               transform={`rotate(${tickRotation})`}
@@ -595,7 +595,7 @@ const Chart = ({
           )}
 
           <g transform={`translate(0, ${tick.y + offsetText})`}>
-            <rect
+            {/* <rect
               transform={`rotate(${tickRotation})`}
               x={(-1 * width) / 2}
               y={-12}
@@ -604,7 +604,7 @@ const Chart = ({
               width={width}
               height={22}
               fill={"#FFFFFF"}
-            />
+            /> */}
 
             <text
               transform={`rotate(${tickRotation})`}

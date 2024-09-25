@@ -18,6 +18,7 @@ export default function asyncComponent(importComponent) {
                     component: component
                 })
             } catch (err) {
+                console.error('err...', err);
                 const c= () => <div>Component not found</div>
                 this.setState({
                     component:c
