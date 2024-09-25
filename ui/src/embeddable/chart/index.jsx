@@ -173,6 +173,8 @@ const Chart = (props) => {
     "data-radar-dot-label-offset": radarDotLabelOffset = -12,
     "data-mobile-customization": mobileCustomization = "{}",
   } = props;
+  const mobileConfigSettings = JSON.parse(decodeURIComponent(mobileCustomization));
+  const isMobileConfigEnabled = isMobile && (mobileConfigSettings?.showCustomization ?? false);
 
   const locale = props.intl.locale;
   const ref = useRef(null);
@@ -278,6 +280,8 @@ const Chart = (props) => {
     return [];
   };
 
+  console.log('left...', left);
+
   let measuresObject = getMeasuresObject();
   let selectedMeasures = getSelectedMeasures();
 
@@ -288,6 +292,9 @@ const Chart = (props) => {
 
   /*Decoding tooltip string*/
   let tooltipForSelectedMeasure = decode(tooltip);
+  console.log('leftLegendForSelectedMeasure', left)
+
+  console.log('injectedMeasures...', injectedMeasures)
 
   if (injectedMeasures) {
     const selected = Object.keys(injectedMeasures[app].measures)
@@ -350,13 +357,51 @@ const Chart = (props) => {
   };
   let child = null;
   const contentHeight = editing ? height - 80 : height - 40;
+
+  const showXAxisTitle = () => {
+    if(isMobileConfigEnabled) {
+      if(mobileConfigSettings?.showXAxisTitle) {
+        return bottom;
+      } else {
+        return '';
+      }
+    }
+    return bottom;
+  }
+
+  const showYAxisTitle = () => {
+    if(isMobileConfigEnabled) {
+      if(mobileConfigSettings?.showYAxisTitle) {
+        return leftLegendForSelectedMeasure;
+      } else {
+        return '';
+      }
+    }
+    return leftLegendForSelectedMeasure;
+  }
+
+  const showRightAxisTitle = () => {
+    console.log('rightlegends...', rightLegendForSelectedMeasure)
+    console.log('mobile config..', mobileConfigSettings)
+    if(isMobileConfigEnabled) {
+      if(mobileConfigSettings?.showRightAxisTitle) {
+        return rightLegendForSelectedMeasure;
+      } else {
+        return '';
+      }
+    }
+    return rightLegendForSelectedMeasure;
+  }
+
   const legends = {
-    left: leftLegendForSelectedMeasure,
-    bottom: bottom,
-    right: rightLegendForSelectedMeasure,
+    left: showYAxisTitle(),
+    bottom: showXAxisTitle(),
+    right: showRightAxisTitle(),
   };
 
-  const mobileConfigSettings = JSON.parse(decodeURIComponent(mobileCustomization));
+  console.log('mobileConfigSettings', mobileConfigSettings)
+
+  console.log('legends...', legends)
 
   const mobileLayout = () => {
     if(mobileConfigSettings?.chartLayoutOverride) {
@@ -372,8 +417,6 @@ const Chart = (props) => {
   const getMarginValue = (mobileEnabled, mobileSetting, defaultValue) => {
     return mobileEnabled ? parseInt(mobileSetting) ?? defaultValue : defaultValue;
   }
-
-  const isMobileConfigEnabled = isMobile && (mobileConfigSettings?.showCustomization ?? false);
 
   const chartProps = {
     app,
