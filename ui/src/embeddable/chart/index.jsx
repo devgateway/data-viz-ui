@@ -50,7 +50,7 @@ const Diverging = (props) => {
   );
 };
 const Chart = (props) => {
-  const {
+  let {
     parent,
     editing = false,
     unique,
@@ -392,16 +392,41 @@ const Chart = (props) => {
     right: showRightAxisTitle(),
   };
 
+  const parseBoolean = (str) => {
+    if (str === "true" || str === true) {
+      return true;
+    } else if (str === "false" || str === false) {
+      return false;
+    }
+  };
+
+  const switchGridLines = () => {
+    if (parseBoolean(enableGridX) && !parseBoolean(enableGridY)) {
+      enableGridX = false;
+      enableGridY = true;
+    } else if (!parseBoolean(enableGridX) && parseBoolean(enableGridY)) {
+      enableGridX = true;
+      enableGridY = false;
+    }
+  };
+
+  const switchLayout = () => {
+    if (layout === "horizontal") {
+      switchGridLines();
+      return "vertical";
+    } else {
+      switchGridLines();
+      return "horizontal";
+    }
+  };
+
   const mobileLayout = () => {
-    if(mobileConfigSettings?.chartLayoutOverride) {
-      if(layout === 'horizontal') {
-        return 'vertical';
-      } else {
-        return 'horizontal';
-      }
+    if (mobileConfigSettings?.chartLayoutOverride) {
+      switchLayout();
     }
     return layout;
-  }
+  };
+
 
   const getMarginValue = (mobileEnabled, mobileSetting, defaultValue) => {
     return mobileEnabled ? parseInt(mobileSetting) ?? defaultValue : defaultValue;
