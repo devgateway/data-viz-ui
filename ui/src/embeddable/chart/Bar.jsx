@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState, useRef } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import Tooltip from "./Tooltip";
 import { ResponsiveBar } from "@nivo/bar";
 import { injectIntl } from "react-intl";
