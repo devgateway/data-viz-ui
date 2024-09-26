@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from "react";
+import React, { Fragment, useEffect, useState, useRef } from "react";
 import Tooltip from "./Tooltip";
 import { ResponsiveBar } from "@nivo/bar";
 import { injectIntl } from "react-intl";
@@ -80,8 +80,10 @@ const Chart = ({
   customAxisFormat
 }) => {
   const isMobile = deviceType() === "mobile";
+  const LABEL_SKIP_WIDTH = 30; // important for vertical layout
+  const LABEL_SKIP_HEIGHT = 15; // important for horizontal layout
   const mobileConfigSettings = JSON.parse(decodeURIComponent(mobileCustomization));
-  const isMobileCustomizationEnabled = isMobile && (mobileConfigSettings?.showCustomization ?? false)
+  const isMobileCustomizationEnabled = isMobile && (mobileConfigSettings?.showCustomization ?? false);
   const normalizeLabelColor = () => {
     if (barLabelColor === "null" || barLabelColor === null || !barLabelColor) {
       return "#000000";
@@ -623,6 +625,7 @@ const Chart = ({
       );
     }
   };
+
   const toggle = (id) => {
     const newFilter = filter.slice();
     if (newFilter.indexOf(id) > -1) {
@@ -645,6 +648,12 @@ const Chart = ({
       <g>
         {bars.map((bar) => {
           const { width, height, y, x, data } = bar;
+          if (layout === "horizontal" && height <= LABEL_SKIP_HEIGHT) {
+            return;
+          }
+          if (layout === "vertical" && width <= LABEL_SKIP_WIDTH) {
+            return;
+          }
           const value = data.value
             ? intl.formatNumber(
                 format.style === "percent" ? data.value / 100 : data.value,
@@ -968,9 +977,7 @@ const Chart = ({
   }
 
   if (barLabelPosition === POSITION_TOP) {
-    if(!isMobile) {
-      layers.push(addTopBarLabel);
-    }
+    layers.push(addTopBarLabel);
   }
 
   if (highlightXAxisLine) {
@@ -1131,8 +1138,8 @@ if(isMobileCustomizationEnabled) {
             enableGridY={enableGridY}
             enableGridX={enableGridX}
             layout={layout}
-            labelSkipWidth={30}
-            labelSkipHeight={15}
+            labelSkipWidth={LABEL_SKIP_WIDTH}
+            labelSkipHeight={LABEL_SKIP_HEIGHT}
             padding={barPadding}
             labelTextColor={normalizeLabelColor()}
             label={(l) =>
