@@ -422,7 +422,7 @@ const Chart = (props) => {
 
   const mobileLayout = () => {
     if (mobileConfigSettings?.chartLayoutOverride) {
-      switchLayout();
+      return switchLayout();
     }
     return layout;
   };
