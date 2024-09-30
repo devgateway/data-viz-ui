@@ -434,36 +434,39 @@ componentWillUnmount() {
   resizeLabels() {
     const { labelFontSize, mapLabelField } = this.props;
     // Invert the font size and label box width and height
+
+
     const labels = d3
       .select(this.getMapId())
       .select("svg")
       .select("g")
       .selectAll(".map-labels-container");
 
-    labels.each((d, i, nodes) => {
-      const label = d3.select(nodes[i]);
-      const transform = d3.zoomTransform(label.node());
+      labels.each((d, i, nodes) => {
+        const label = d3.select(nodes[i]);
+        const transform = d3.zoomTransform(label.node());
 
-      const position = this.getLabelPosition(d);
-      let boxWidth = this.getLabelBoxWidth(d);
-      let boxHeight = this.getLabelBoxHeight(d);
+        const position = this.getLabelPosition(d);
+        let boxWidth = this.getLabelBoxWidth(d);
+        let boxHeight = this.getLabelBoxHeight(d);
 
-      if (d.properties[mapLabelField]) {
-        boxWidth = transform.k > 1 ? boxWidth / transform.k : boxWidth;
-        boxHeight = transform.k > 1 ? boxHeight / transform.k : boxHeight;
-      }
+        if (d.properties[mapLabelField]) {
+          boxWidth = transform.k > 1 ? boxWidth / transform.k : boxWidth;
+          boxHeight = transform.k > 1 ? boxHeight / transform.k : boxHeight;
+        }
 
-      label
-        .attr("x", position[0] - boxWidth / 2)
-        .attr("y", position[1] - (transform.k > 1 ? 10 / transform.k : 10))
-        .attr("width", boxWidth)
-        .attr("height", boxHeight)
-        .attr(
-          "font-size",
-          (transform.k > 1 ? labelFontSize / transform.k : labelFontSize) +
-            "px",
-        );
-    });
+        const scalingFactor = Math.pow(transform.k, 0.5);
+
+        label
+          .attr("x", position[0] - boxWidth / 2)
+          .attr("y", position[1] - (transform.k > 1 ? 10 / transform.k : 10))
+          .attr("width", boxWidth)
+          .attr("height", boxHeight)
+          .attr(
+            "font-size",
+            (transform.k > 1 ? labelFontSize / scalingFactor : labelFontSize) + "px"
+          );
+      });
   }
 
   resizePointLabels() {
