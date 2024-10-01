@@ -1,0 +1,186 @@
+@import '../vars';
+
+.desktop {
+  margin: 0 !important;
+  width: 100%;
+  //background-color: #FAF6EC !important;
+}
+
+.ui.container {
+  width: 100%;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+.entry-content {
+  width: 100%;
+}
+
+.breadcrumbs {
+  display: none;
+}
+
+.wp-block-image.aligncenter {
+  text-align: center;
+  margin:auto;
+}
+
+// Apply this custom CSS class in the WP editor if you want to use Merriweather font for titles
+
+.font-title {
+  font-family: $font-titles !important;
+}
+
+//Title and subtitle styles for different resolutions (in intro Banner of Home page only):
+
+@media (min-width: 1750px) {
+  .dc-title {
+    font-family: $font-titles !important;
+    padding: 70px 0 0 0 !important;
+    font-size: 95px !important; /* Increase font size for screens with width 768px and above */
+  }
+  .dc-cover-subtitle {
+    font-size: 39.5px !important;
+  }
+  .dc-spacer-cover{
+    height: 820px !important;
+  }
+}
+
+@media (min-width: 1500px) and (max-width: 1750px) {
+  .dc-title {
+    font-family: $font-titles !important;
+    padding: 25px 0 0 0 !important;
+    font-size: 75px !important; /* Increase font size for screens with width 768px and above */
+  }
+  .dc-cover-subtitle {
+    font-size: 32px !important;
+  }
+  .dc-spacer-cover{
+    height: 700px !important;
+  }
+}
+
+//
+
+// Styles for CTA buttons
+
+.cta-buttons {
+  display: flex;
+  justify-content: center; /* Center the buttons horizontally */
+  align-items: center; /* Center the buttons vertically */
+  .cta-primary-button .wp-block-button__link {
+    border: 1px solid $dc-green;
+    border-radius: 3px;
+    color: white;
+    width: 255px;
+    margin: 0 50px 0 0;
+    background-color: $dc-green;
+    box-shadow: 2px 2px 1px rgba(0, 0, 0, 0.3);
+    height: 58px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+  .cta-primary-button:hover .wp-block-button__link {
+    transition : 471ms;
+    transform : translateY(-5px);
+    background-color: darken($dc-green, 8%);
+    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
+  }
+
+  .cta-secondary-button .wp-block-button__link {
+    border: 1px solid $dc-green;
+    border-radius: 3px;
+    color: $dc-green;
+    width: 255px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    height: 58px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+  .cta-secondary-button:hover .wp-block-button__link {
+    transition : 471ms;
+    transform : translateY(-5px);
+    color: darken($dc-green, 8%);
+    border: 1px solid darken($dc-green, 8%);
+    background-color: rgba(255, 255, 255, 0.5);
+    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
+  }
+}
+
+//styles for the buttons that are NOT inside the intro banner:
+
+.cta-buttons-internal {
+  position: absolute;
+  width: 100vw;
+  left: 0;
+  .cta-secondary-button .wp-block-button__link {
+    color: white;
+  }
+  .cta-secondary-button:hover .wp-block-button__link {
+    color: white;
+    border: 1px solid darken($dc-green, 8%);
+    background-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
+  }
+}
+
+//
+
+
+//styles for covers:
+
+.wp-block-cover {
+  padding: 150px 0 0 18vw;
+  margin: 0;
+  display: flex;
+
+  .wp-block-cover__inner-container{
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: start;
+    align-self: start;
+  }
+
+  .wp-block-separator {
+    width: 537px;
+    margin: 0;
+  }
+
+  .dc-cover-rotate {
+    transform: rotate(-90deg) translateX(-20px);
+    margin: 0 0 -120px -60px;
+    height: 300px;
+
+
+    .wp-block-separator {
+      width: 189px;
+    }
+  }
+
+  .dc-cover-paragraph{
+    margin-left: -150px;
+    padding: 0 18vw 0 0;
+  }
+
+}
+
+//
+
+//styles for "who" section in home page:
+
+.dc-who-section {
+  padding: 0 18vw 0 18vw;
+  .wp-block-separator {
+  width: 537px;
+  margin: 0;
+}
+
+}
+
+//
