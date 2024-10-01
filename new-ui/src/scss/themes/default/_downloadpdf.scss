@@ -1,0 +1,16 @@
+.downloadPdf {
+
+    margin-bottom: 40px;
+    text-align: center;
+    .download {
+        border: 1px solid blue;
+        font-weight: 700 !important;
+        height: 50px;
+    }
+}
+
+@media print {
+    .downloadPdf{
+        display: none;
+    }
+}
