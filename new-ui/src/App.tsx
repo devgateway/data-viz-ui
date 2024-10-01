@@ -1,14 +1,14 @@
 // noinspection TypeScriptCheckImport
 
-import React, {Component, useEffect, useRef, useState} from 'react';
-import {Provider} from 'react-redux'
-import { Route, Routes, BrowserRouter, Navigate } from 'react-router-dom';
-import {  store } from './redux/store'
+import React, { Component, useEffect, useRef, useState, Suspense } from 'react';
+import { Provider } from 'react-redux'
+import { Route, Routes, BrowserRouter, Navigate, useNavigate, useLocation, useParams, Outlet } from 'react-router-dom';
+import { store } from './redux/store'
 import messages_en from "./translations/en.json";
-// import {updateIntl} from 'react-intl-redux'
-import {injectIntl, IntlProvider} from "react-intl";
+import { updateIntl } from '@/lib/react-intl-redux'
+import { injectIntl, IntlProvider } from "react-intl";
 import ResponsiveContainer from './layout'
-import {getComponentByNameIgnoreCase} from "@devgateway/customizer";
+import { getComponentByNameIgnoreCase } from "./embeddable";
 import Helmet from './Helmet'
 import WithTracker from "./withTracker";
 import {
@@ -25,7 +25,7 @@ import {
 } from "@devgateway/wp-react-lib";
 import queryString from "query-string";
 import ScrollToTop from "./ScrollTop";
-import {Container, Segment} from "semantic-ui-react";
+import { Container, Dimmer, Loader, Segment } from "semantic-ui-react";
 import CustomizerWrapper from "./layout/Customizer";
 import * as process from "node:process";
 
@@ -36,20 +36,21 @@ const messages = {
 
 
 const PreviewComponentParameterParser = (props) => {
+    const urlParams = useParams();
+    const location = useLocation();
 
-
-    const componentRef = useRef(getComponentByNameIgnoreCase(props.match.params.name))
+    const componentRef = useRef(getComponentByNameIgnoreCase(urlParams.name ? urlParams.name : ''));
 
     const UIComponent = componentRef.current
 
 
-    const [params, setParams] = useState(queryString.parse(props.location.search))
+    const [params, setParams] = useState(queryString.parse(location.search))
     const readMessage = (event) => {
         console.log("-------------------------------reading message ----------------------------------------")
         const data = event.data
         if (data.messageType && data.messageType == 'component-attributes') {
 
-            const newPrams = {...params}
+            const newPrams = { ...params }
             Object.keys(data).forEach(k => {
                 newPrams["data-" + k.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()] = typeof data[k] == 'object' ? JSON.stringify(data[k]) : data[k]
             })
@@ -63,7 +64,7 @@ const PreviewComponentParameterParser = (props) => {
         window.addEventListener("message", readMessage, false);
 
         if (window.parent) {
-            window.parent.postMessage({type: "componentReady", value: true}, "*")
+            window.parent.postMessage({ type: "componentReady", value: true }, "*")
         }
         return () => {
             window.removeEventListener('message', readMessage);
@@ -73,258 +74,152 @@ const PreviewComponentParameterParser = (props) => {
     }, [])
 
 
-    return (<Container fluid={true} className={"editing"}>
-        {UIComponent ? <UIComponent  {...params} editing={true}></UIComponent> :
-            <Segment color={"red"} textAlign={"center"}><h1>Wrong Component Name</h1></Segment>}
-    </Container>)
+    return (
+        <Suspense fallback={
+            <Dimmer active>
+                <Loader>Loading</Loader>
+            </Dimmer>
+        }>
+            <Container fluid={true} className={"editing"}>
+                {/* @ts-ignore */}
+                {UIComponent ? <UIComponent  {...params} editing={true}></UIComponent> :
+                    <Segment.Group color={"red"} textAlign={"center"}><h1>Wrong Component Name</h1></Segment.Group>}
+            </Container>
+        </Suspense>
+
+    )
 
 }
 
 const InjectTitle = injectIntl((props) => {
 
-    //description
+    // @ts-expect-error description
     document.title = props.settings.description
-    console.log(props.settings)
+    console.log(props)
     return <></>
 })
 
-class IntlRoutes extends Component {
+const IntlRoutes = ({ match }) => {
+    const pathParams = useParams();
 
-    constructor(props) {
-        super(props);
-    }
+    const locale = pathParams.lan;
+    console.log("locale", locale)
 
-    componentDidMount() {
-        console.log("----------.env-----------")
-        console.log(process.env)
-        console.log("----------.env-----------")
+
+
+    useEffect(() => {
+        if (process.env) {
+            console.log("----------.env-----------");
+            console.log(process.env);
+            console.log("----------.env-----------");
+        }
+
+
         window.setTimeout(() => {
-                if (window.location.hash) {
-                    const element = document.getElementById(window.location.hash.substr(1));
-                    if (element) {
-                        element.scrollIntoView({behavior: "auto", block: "start"});
-                    }
+            if (window.location.hash) {
+                const element = document.getElementById(window.location.hash.substr(1));
+                if (element) {
+                    element.scrollIntoView({ behavior: "auto", block: "start" });
                 }
-            }, 2000
-        )
+            }
+        }, 2000);
+    }, []);
 
-        const locale = this.props.match.params.lan
-        // store.dispatch(updateIntl({locale, messages: messages[this.props.match.params.lan]}))
-        console.log("Mounted===>")
+    useEffect(() => {
+        // This effect runs on every update, equivalent to componentDidUpdate
+        store.dispatch(updateIntl({ locale, formats: {}, messages: messages[locale ? locale : 'en'] }));
+    });
 
+    const urlParams = new URLSearchParams(window.location.search);
+    const customize_changeset_uuid = urlParams.get('customize_changeset_uuid');
+    // @ts-ignore
+    window.isCustomizedPreview = customize_changeset_uuid != null;
+
+    console.log("locale", locale)
+
+    if (!locale) {
+        return <Navigate to={"/en"}></Navigate>
     }
 
-    componentDidUpdate() {
-        const locale = this.props.match.params.lan
-        // store.dispatch(updateIntl({locale, messages: messages[locale]}))
-    }
+    return (
+        <IntlProvider key={locale} locale={locale} messages={messages[locale]}>
+            {/* @ts-expect-error Has no types */}
+            <AppContextProvider getComponent={getComponentByNameIgnoreCase} store={store} locale={locale}>
+                <SettingProvider locale={locale} changeUUID={customize_changeset_uuid}>
+                    <ScrollToTop />
+                    <SettingsConsumer>
+                        <CustomizerWrapper>
+                            <InjectTitle />
+                        </CustomizerWrapper>
+                    </SettingsConsumer>
+                    <Routes>
+                        {/* <Route path="/" element={<Outlet />} /> */}
+                        {
+                            //Category Route
+                        }
+                        {/* <Route path="/:lan/category/:slug/" element={
+                            <ResponsiveContainer>
+                                <Category />
+                            </ResponsiveContainer>
+                        }>
+                        </Route> */}
+                        {
+                            //default route (home)
+                        }
 
-    render() {
-        const self = this;
-        const props = this.props;
-        const locale = this.props.match.params.lan
-
-        const urlParams = new URLSearchParams(window.location.search);
-        const customize_changeset_uuid = urlParams.get('customize_changeset_uuid');
-        window.isCustomizedPreview = customize_changeset_uuid != null
-        return (
-            <IntlProvider key={locale} locale={locale} messages={messages[locale]}>
-                {/* @ts-expect-error Has no types */}
-                <AppContextProvider getComponent={getComponentByNameIgnoreCase} store={store} locale={locale}>
-                    <SettingProvider locale={locale} changeUUID={customize_changeset_uuid}>
-                        <ScrollToTop/>
-                        <SettingsConsumer>
-                            <CustomizerWrapper>
-                                <InjectTitle/>
-                            </CustomizerWrapper>
-                        </SettingsConsumer>
-                        <Routes>
-                            {
-                                //Category Route
-                            }
-                            <Route path="/:lan/category/:slug/">
-                                <ResponsiveContainer>
-                                    <Category/>
-                                </ResponsiveContainer>
-                            </Route>
-                            {
-                                //default route (home)
-                            }
-                            <Route path="/:lan" exact render={props => (
-                                <PageProvider
-                                    slug={"home"}
-                                    locale={locale}
-                                    store={"home"}>
-                                    <PageConsumer>
-                                        <ResponsiveContainer>
-                                            <PageConsumer>
-                                                <Helmet></Helmet>
-                                                <Page></Page>
-                                            </PageConsumer>
-                                        </ResponsiveContainer>
-                                    </PageConsumer>
-                                </PageProvider>
-
-                            )}>
-                            </Route>
-                            <Route exact={true} path="/:lan/embeddable/:name" render={(props) =>
-                                <SettingsConsumer>
-                                    <PreviewComponentParameterParser  {...props}></PreviewComponentParameterParser>
-                                </SettingsConsumer>}>
-                            </Route>
-
-
-                            <Route path={"/:lan/preview/page/:id"} exact render={props => {
-
-                                const searchParams = new URLSearchParams(props.location.search)
-                                const preview = searchParams.get("preview")
-                                const previewNonce = searchParams.get("_wpnonce")
-                                return (
-                                    <ResponsiveContainer>
-                                        <PageProvider store={"preview"} perPage={1} view={preview}
-                                                      previewNonce={previewNonce} previewId={props.match.params.id}>
-                                            <PageConsumer>
-
-                                                <Page preview={true}/>
-                                            </PageConsumer>
-
-                                        </PageProvider>
-                                    </ResponsiveContainer>
-                                )
-                            }}>
-                            </Route>
-
-                            <Route path={"/:lan/preview/:type/:id"} exact render={props => {
-
-                                const searchParams = new URLSearchParams(props.location.search)
-                                const preview = searchParams.get("preview")
-                                const type = props.match.params.type == 'post' ? 'posts' : props.match.params.type
-                                const previewNonce = searchParams.get("_wpnonce")
-                                return (
-                                    <ResponsiveContainer>
-                                        <PostProvider type={type}
-                                                      store={"preview"}
-                                                      perPage={1}
-                                                      view={preview}
-                                                      locale={props.match.params.lan}
-                                                      previewNonce={previewNonce}
-                                                      previewId={props.match.params.id}>
-                                            <PostConsumer>
-                                                <Post preview={true} showIntro={true}/>
-                                            </PostConsumer>
-
-                                        </PostProvider>
-                                    </ResponsiveContainer>
-                                )
-                            }}>
-                            </Route>
-                            {
-                                //page route
-                            }
-                            <Route path="/:lan/:slug/" exact render={props => {
-
-                                return (
-
-                                    <PageProvider
-                                        locale={locale}
-                                        slug={props.match.params.slug}
-                                        store={props.match.params.slug}>
-                                        <ResponsiveContainer>
-                                            <PageConsumer>
-                                                <Helmet></Helmet>
-                                                <Page></Page>
-                                            </PageConsumer>
-                                        </ResponsiveContainer>
-                                    </PageProvider>
-                                )
-                            }}>
-                            </Route>
-                            {
-                                //child route
-                            }
-                            <Route path="/:lan/:parent/:slug/" exact render={props => (
-                                <PageProvider
-                                    locale={locale}
-                                    slug={props.match.params.slug}
-                                    store={props.match.params.slug}>
+                        <Route path="/" element={(
+                            <PageProvider
+                                slug={"home"}
+                                locale={locale}
+                                store={"home"}>
+                                <PageConsumer>
                                     <ResponsiveContainer>
                                         <PageConsumer>
-
-                                            <Helmet></Helmet>
+                                            {/* @ts-ignore */}
+                                            <Helmet locale={locale}></Helmet>
                                             <Page></Page>
+                                            <Outlet />
                                         </PageConsumer>
                                     </ResponsiveContainer>
-                                </PageProvider>
-
-                            )}>
-
-
-                            </Route>
-
-
-                            <Route path="/:lan/:year/:month/:day/:slug/" exact render={props => (
-                                <ResponsiveContainer>
-                                    <PostProvider
-                                        slug={props.match.params.slug}
-                                        store={props.match.params.slug}
-                                        locale={locale}
-                                    >
-                                        <PostConsumer>
-                                            <Post></Post>
-                                        </PostConsumer>
-                                    </PostProvider>
-                                </ResponsiveContainer>
-                            )}>
-                            </Route>
-                            <Route path="/:lan/:parent/:year/:month/:day/:slug/" render={props => (
-
-                                <ResponsiveContainer>
-
-                                    <PostProvider
-                                        type={props.match.params.parent}
-                                        slug={props.match.params.slug}
-                                        store={props.match.params.slug}
-                                        locale={locale}>
-                                        <PostConsumer>
-                                            <Post></Post>
-                                        </PostConsumer>
-                                    </PostProvider>
-                                </ResponsiveContainer>
-                            )}>
-                            </Route>
-
-                        </Routes>
-                    </SettingProvider>
-                </AppContextProvider>
-
-            </IntlProvider>)
-    }
-}
+                                </PageConsumer>
+                            </PageProvider>
+                        )}>
+                        </Route>
+                        <Route path="/embeddable/:name" element={
+                            <SettingsConsumer>
+                                <PreviewComponentParameterParser match={match} />
+                            </SettingsConsumer>}>
+                        </Route>
+                    </Routes>
+                </SettingProvider>
+            </AppContextProvider>
+        </IntlProvider>
+    );
+};
 
 
 const WithTrackerRoutes = WithTracker(IntlRoutes)
 
 
 const MainRoutes = (props) => {
-    return (<BrowserRouter>
+    return (
+        <BrowserRouter future={{
+            v7_startTransition: true
+        }}>
 
-        {/*<Routes>*/}
-        {/*    <Route path="/:lan" element={<WithTrackerRoutes {...props}/>}/>*/}
-        {/*    <Route path={"/"}>*/}
-        {/*        <Navigate*/}
-        {/*            to={import.meta.env.VITE_REACT_APP_DEFAULT_LOCALE ? import.meta.env.VITE_REACT_APP_DEFAULT_LOCALE : "en"}></Navigate>*/}
-        {/*    </Route>*/}
-
-        {/*</Routes>*/}
-
-    </BrowserRouter>)
+            <Routes>
+                <Route path="/:lan/*" element={<WithTrackerRoutes {...props} />} />
+                <Route path={"/"} element={<WithTrackerRoutes {...props} />} />
+            </Routes>
+        </BrowserRouter>
+    )
 }
 
 class AppWrapper
     extends Component {
     render() {
         return (<Provider store={store}>
-            <MainRoutes/>
+            <MainRoutes />
         </Provider>);
     }
 }
