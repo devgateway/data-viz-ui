@@ -12,7 +12,7 @@
     "isolatedModules": true,
     "moduleDetection": "force",
     "noEmit": true,
-    "jsx": "react-jsx",
+    "jsx": "react",
 
     /* Linting */
     "strict": true,
@@ -21,7 +21,14 @@
     "noFallthroughCasesInSwitch": true,
 
     /* Type checking */
-    "allowJs": true
+    "allowJs": true,
+    "noImplicitAny": false,
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": ["node_modules"]
 }
