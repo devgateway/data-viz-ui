@@ -32,8 +32,8 @@
 
     if (typeof module !== 'undefined')
         module.exports = domtoimage;
-    else
-        global.domtoimage = domtoimage;
+    // else
+    //     global.domtoimage = domtoimage;
 
 
     /**
