@@ -5,6 +5,7 @@ import {injectIntl} from "react-intl";
 import {withRouter} from "@/withRouter"
 import SearchControl from "./SearchControl.jsx";
 import LangSwitcher from "./LangSwitcher.jsx";
+import { useParams } from "react-router-dom";
 
 const getPath = (menu, match) => {
     let path = [];
@@ -160,7 +161,7 @@ const MenuItems = injectIntl(withRouter(({
 const Header = ({intl, match, settings}) => {
 
     const [selected, setSelected] = useState()
-    const {slug} = match.params
+    const {slug} = useParams();
 
 
     const Logo = ({media}) => {
