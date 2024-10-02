@@ -16,7 +16,7 @@ const SlugContainer = () => {
             <ResponsiveContainer>
                 <PageConsumer>
 
-                    <Helmet locale={locale} pages={<Page/>}></Helmet>
+                    {/* <Helmet locale={locale}></Helmet> */}
                     <Page></Page>
                 </PageConsumer>
             </ResponsiveContainer>
