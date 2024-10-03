@@ -55,7 +55,6 @@ const ListOfPost: React.FC<ListOfPostProps> =(props)=>{
     return (
             <Container fluid className="inline list">
                 {posts && posts.map(p => (
-                    // @ts-ignore Semantic UI React has not updated to support React 18
                     <Grid>
                         {showIcons && <Grid.Column textAlign={"center"} width={1}>
                             <a id={p.slug}></a>
