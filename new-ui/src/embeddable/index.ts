@@ -22,6 +22,8 @@ const DataFiltersReset = lazy(() => import("./datafiltersreset"));
 const Tooltip = lazy(() => import("./tooltip"));
 const ReferencesList = lazy(() => import("./references/ReferencesList"));
 const Reference = lazy(() => import("./references/Reference"));
+const TimeLine = lazy(() => import("./time-line"));
+const NewTimeLine = lazy(() => import("./new-time-line"));
 
 let reducerList = {data, embeddable};
 
@@ -50,8 +52,8 @@ const components = {
     tooltip: Tooltip,
     references: ReferencesList,
     reference: Reference,
-    // timeLine: TimeLine,
-    // newTimeLine: NewTimeLine,
+    timeLine: TimeLine,
+    newTimeLine: NewTimeLine,
     // measures: Measures,
     // menu: Menu,
     // childPagesMenu: ChildPagesMenu,
