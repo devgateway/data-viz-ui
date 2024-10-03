@@ -28,6 +28,8 @@ const Measures = lazy(() => import("./measures"));
 const Menu = lazy(() => import("./menu"));
 const ChildPagesMenu = lazy(() => import("./child-page-menu"));
 const ParallaxContainer = lazy(() => import("./parallax"));
+const Wrapped = lazy(() => import("./wrapped"));
+const DataLabel = lazy(() => import("./datalabel"));
 
 let reducerList = {data, embeddable};
 
@@ -63,9 +65,9 @@ const components = {
     childPagesMenu: ChildPagesMenu,
     // newMap: NewMap,
     parallaxContainer: ParallaxContainer,
-    // wrapped: Wrapped,
+    wrapped: Wrapped,
     // sankeyChart: SankeyChart,
-    // dataLabel: DataLabel,
+    dataLabel: DataLabel,
     redirect: () => null
 }
 
