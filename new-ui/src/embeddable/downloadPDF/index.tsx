@@ -44,7 +44,6 @@ const DownloadPdf = (props) => {
         <Container className={`viz download ${editing ? 'editing' : ''}`} fluid={true}>
             <React.Fragment>
                 <div className='downloadPdf'>
-                    {/* @ts-ignore Semantic UI React Types currently does not support React 18 */}
                    <Button loading={loading} className={"download"} onClick={download}>{buttonLabel}</Button>
                 </div>
             </React.Fragment>
