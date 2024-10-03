@@ -29,6 +29,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["src", "../ui/map"],
+  "include": ["src", "src/embeddable/map"],
   "exclude": ["node_modules"]
 }
