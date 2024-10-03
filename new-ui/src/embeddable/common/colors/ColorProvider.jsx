@@ -8,58 +8,46 @@ import CategoricalColors from "./CategoricalColors";
 
 const COLOR_VARIABLE = "_Color"
 
-class ColorProvider extends React.Component {
+const ColorProvider = ({
+    app,
+    type,
+    colorBy,
+    scheme,
+    barColor,
+    manualColors,
+    locale,
+    overallLabel,
+    customLabels,
+    options: {data, keys, indexBy, dimensionsMetadata, measuresMetadata},
+    children
+}) => {
+    let colorManager;
 
-    constructor(props) {
-        super(props);
-
-    }
-
-
-    render() {
-        const {
-            app,
-            type,
-            colorBy,
-            scheme,
-            barColor,
-            manualColors,
-            locale,
-            overallLabel,
-            customLabels,
-            options: {data, keys, indexBy, dimensionsMetadata, measuresMetadata}
-        } = this.props
-        let colorManager;
-
-           if (data) {
-            if (scheme === "system") {
-                colorManager = new SystemColors(app,type,colorBy, scheme, data, keys, indexBy, dimensionsMetadata, measuresMetadata, locale)
-            } else if (scheme === "plain_color") {
-                colorManager = new PlainColor(barColor)
-            } else if (scheme == "manual") {
-                colorManager = new ManualColors(app,type,colorBy, scheme, data, dimensionsMetadata, measuresMetadata, keys, indexBy, manualColors, locale,overallLabel, customLabels)
-            } else {
-
-                if (isSequentialColorScheme(scheme)) {
-                    colorManager = new SequentialColors(colorBy, scheme, data, keys, indexBy)
-                }
-                if (isCategoricalColorScheme(scheme)) {
-                    colorManager = new CategoricalColors(colorBy, scheme, data, keys, indexBy)
-                }
+    if (data) {
+        if (scheme === "system") {
+            colorManager = new SystemColors(app, type, colorBy, scheme, data, keys, indexBy, dimensionsMetadata, measuresMetadata, locale);
+        } else if (scheme === "plain_color") {
+            colorManager = new PlainColor(barColor);
+        } else if (scheme === "manual") {
+            colorManager = new ManualColors(app, type, colorBy, scheme, data, dimensionsMetadata, measuresMetadata, keys, indexBy, manualColors, locale, overallLabel, customLabels);
+        } else {
+            if (isSequentialColorScheme(scheme)) {
+                colorManager = new SequentialColors(colorBy, scheme, data, keys, indexBy);
             }
-
-            return (
-                <div>
-                    {React.Children.map(this.props.children, (child => React.cloneElement(child, {
-                        ...this.props,
-                        colorGenerator: colorManager
-                    })))}
-                </div>
-            );
-        }else{
-            return null
+            if (isCategoricalColorScheme(scheme)) {
+                colorManager = new CategoricalColors(colorBy, scheme, data, keys, indexBy);
+            }
         }
 
+        return (
+            <div>
+                {React.Children.map(children, (child => React.cloneElement(child, {
+                    colorGenerator: colorManager
+                })))}
+            </div>
+        );
+    } else {
+        return null;
     }
 }
 
