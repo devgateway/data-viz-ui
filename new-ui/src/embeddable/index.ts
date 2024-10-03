@@ -19,7 +19,9 @@ const InlineList = lazy(() => import("./inlinelist"));
 const DownloadPdf = lazy(() => import("./downloadPDF"));
 const Map = lazy(() => import("./map"));
 const DataFiltersReset = lazy(() => import("./datafiltersreset"));
-
+const Tooltip = lazy(() => import("./tooltip"));
+const ReferencesList = lazy(() => import("./references/ReferencesList"));
+const Reference = lazy(() => import("./references/Reference"));
 
 let reducerList = {data, embeddable};
 
@@ -45,9 +47,9 @@ const components = {
     downloadPdf: DownloadPdf,
     map: Map,
     dataFiltersReset: DataFiltersReset,
-    // tooltip: Tooltip,
-    // references: ReferencesList,
-    // reference: Reference,
+    tooltip: Tooltip,
+    references: ReferencesList,
+    reference: Reference,
     // timeLine: TimeLine,
     // newTimeLine: NewTimeLine,
     // measures: Measures,
