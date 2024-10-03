@@ -8,6 +8,7 @@ import * as customizer from "@devgateway/customizer";
 const PageGallery = lazy(() => import("./pagegallery"));
 const Download = lazy(() => import("./download"));
 const PostsCarousel = lazy(() => import("./postscarousel"));
+const Filter = lazy(() => import("./filter"));
 const ShowcaseForm = lazy(() => import("./showcase"));
 const NewsLetter = lazy(() => import("./newsletter"));
 const TabbedPosts = lazy(() => import("./tabbedposts"));
@@ -17,6 +18,7 @@ const VerticalFeaturedTabs = lazy(() => import("./vertical-featuredtabs"));
 const InlineList = lazy(() => import("./inlinelist"));
 const DownloadPdf = lazy(() => import("./downloadPDF"));
 const Map = lazy(() => import("./map"));
+
 
 let reducerList = {data, embeddable};
 
@@ -30,7 +32,7 @@ const components = {
     pageGallery: PageGallery,
     postsCarousel: PostsCarousel,
     // chart: Chart,
-    // filter: Filter,
+    filter: Filter,
     showCaseForm: ShowcaseForm,
     newsLetter: NewsLetter,
     tabbedPosts: TabbedPosts,
