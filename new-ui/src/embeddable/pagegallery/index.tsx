@@ -6,7 +6,6 @@ import { injectIntl } from "react-intl";
 const VerticalDashboardGallery = ({ pages, width }) => {
     const childPages = pages ? pages.sort((a, b) => a.menu_order - b.menu_order) : []
     return (
-        // @ts-ignore Semantic UI React has not updated to support React 18
         <Grid columns={3} stackable={true}>
             {childPages.map(p =>
                 <Grid.Column className={"item"}>
@@ -86,7 +85,6 @@ const Root = (props: PageGalleryProps) => {
 
                 </PageConsumer>
             </PageProvider>}
-        {/* @ts-ignore Semantic UI  */}
         {!parent && <Segment color={"red"}>No child pages here</Segment>}
     </Container>
     )
