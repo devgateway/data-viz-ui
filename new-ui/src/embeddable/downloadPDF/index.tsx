@@ -6,6 +6,7 @@ interface DownloadableContentProps {
     children: React.ReactNode;
 }
 
+
 const DownloadableContent = React.forwardRef<HTMLDivElement, DownloadableContentProps>((props, ref) => (
     <div id="divIdToPrint" ref={ref as LegacyRef<HTMLDivElement>}>{props.children as any}</div>
 ));
