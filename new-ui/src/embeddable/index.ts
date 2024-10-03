@@ -25,6 +25,7 @@ const Reference = lazy(() => import("./references/Reference"));
 const TimeLine = lazy(() => import("./time-line"));
 const NewTimeLine = lazy(() => import("./new-time-line"));
 const Measures = lazy(() => import("./measures"));
+const Menu = lazy(() => import("./menu"));
 
 let reducerList = {data, embeddable};
 
@@ -56,7 +57,7 @@ const components = {
     timeLine: TimeLine,
     newTimeLine: NewTimeLine,
     measures: Measures,
-    // menu: Menu,
+    menu: Menu,
     // childPagesMenu: ChildPagesMenu,
     // newMap: NewMap,
     // parallaxContainer: ParallaxContainer,
