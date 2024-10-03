@@ -15,7 +15,7 @@ const PageModules = lazy(() => import("./pagemodules"));
 const FeaturedTabs = lazy(() => import("./featuredtabs"));
 const VerticalFeaturedTabs = lazy(() => import("./vertical-featuredtabs"));
 const InlineList = lazy(() => import("./inlinelist"));
-
+const DownloadPdf = lazy(() => import("./downloadPDF"));
 
 let reducerList = {data, embeddable};
 
@@ -38,7 +38,7 @@ const components = {
     verticalTabs: VerticalFeaturedTabs,
     inlineList: InlineList,
     download: Download,
-    // downloadPdf: DownloadPdf,
+    downloadPdf: DownloadPdf,
     // map: Map,
     // dataFiltersReset: DataFiltersReset,
     // tooltip: Tooltip,
