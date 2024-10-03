@@ -16,9 +16,7 @@ const FeaturedPost = ({post, onClick, active, moreLabel}) => {
 
     return (<div className="cover" style={{"backgroundImage": 'url(' + (media ? media[0].source_url : '') + ')'}}>
         <PostIntro post={post}/> {!active ?
-        // @ts-ignore Semantic UI React has not updated to support React 18
         <Label onClick={onClick}><Icon name='search' size="large"/> {moreLabel}</Label> :
-        // @ts-ignore Semantic UI React has not updated to support React 18
         <Label onClick={onClick}><Icon name='arrow alternate circle left outline' size="large"/> Back </Label>}
     </div>)
 }
@@ -77,7 +75,7 @@ const FeaturedTabs: React.FC<FeaturedTabsProps> = ({posts, height, color, moreLa
 
     return (
         <Container fluid={true} className="featured tabs" style={{ "min-height": height + 'px' }}>
-            {/* @ts-ignore  Semantic UI React types has not updated to support React 18 */}
+            {/* @ts-ignore */}
             <Grid stackable columns={active != null ? 1 : posts.length} className="desktop">
                 {posts && posts.map((post, i) => {
                     return <React.Fragment>
@@ -92,7 +90,6 @@ const FeaturedTabs: React.FC<FeaturedTabsProps> = ({posts, height, color, moreLa
 
                         <Grid.Column className="expanded"
                                      style={active != post.slug ? { display: 'none', visibility: 'hidden' } : { display: 'block', visibility: 'visible'}}>
-                            {/*  @ts-ignore  Semantic UI React types has not updated to support React 18 */}
                             <Segment style={{ "backgroundColor": arrayColors[i] }}>
                                 {post.meta_fields && post.meta_fields.icon &&
                                     <MediaProvider id={post.meta_fields ? post.meta_fields.icon[0] : null}>
@@ -102,12 +99,10 @@ const FeaturedTabs: React.FC<FeaturedTabsProps> = ({posts, height, color, moreLa
                                     </MediaProvider>
                                 }
                                 <PostTitle as={"h2"} post={post} className={"has-standard-36-font-size has-white-color"} />
-                                {/*  @ts-ignore  Semantic UI React types has not updated to support React 18 */}
                                 <Label className={"closeIcon"} onClick={e => setActive(null)}><Icon name='times circle outline' size="large"/></Label>
 
                             </Segment>
                             <PostContent as={"div"} fluid={true} post={post} />
-                            {/*  @ts-ignore  Semantic UI React types has not updated to support React 18 */}
                             <Label className={"closeIconText"} onClick={e => setActive(null)}><Icon name='times circle outline' size="large" /> Close </Label>
                         </Grid.Column>
                     </React.Fragment>
