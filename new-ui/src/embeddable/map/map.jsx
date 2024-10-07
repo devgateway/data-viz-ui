@@ -218,8 +218,8 @@ class Map extends React.Component {
     }
 
     boundingExtent(features) {
-        var x0, x1, y0, y1;
-        for (var x in features) {
+        let x0, x1, y0, y1;
+        for (const x in features) {
             const [
                 [xx0, yy0],
                 [xx1, yy1]
@@ -325,10 +325,10 @@ class Map extends React.Component {
 
     zoomEnd() {
         const {editing} = this.props;
-        let t = d3.event.transform;
+        const t = d3.event.transform;
         this.mapPosition = {k: t.k, x: t.x, y: t.y}
         if (editing) {
-            var parentWindow = window.parent;
+            const parentWindow = window.parent;
             parentWindow.postMessage({type: 'map', value: JSON.stringify({k: t.k, x: t.x, y: t.y})}, "*");
         }
     }
@@ -346,15 +346,15 @@ class Map extends React.Component {
         const {autoGenerateBreaks, numberOfBreaks, colorScheme} = this.props;
         const generatedBreaks = [];
         if (autoGenerateBreaks && data && data.length > 0) {
-            let parsedData = data.filter(d => d.properties && d.properties.value!=null).map(d => {
+            const parsedData = data.filter(d => d.properties && d.properties.value!=null).map(d => {
                 return d.properties.value.toFixed(2);
             });
 
-            let values = [];
+            const values = [];
             parsedData.forEach(item => {
                 if (item > 0) {
-                    let floor = item * 0.99;
-                    let ceil = item * 1.01;
+                    const floor = item * 0.99;
+                    const ceil = item * 1.01;
                     if (values.indexOf(floor) === -1) {
                         values.push(floor);
                     }
@@ -368,11 +368,11 @@ class Map extends React.Component {
             if (values.length > 0) {
                 const serie = new geoStats(values);
                 serie.setPrecision(2);
-                let numberOfRanges = values.length > 1 ? values.length - 1 : values.length;
+                const numberOfRanges = values.length > 1 ? values.length - 1 : values.length;
                 serie.getJenks(Math.min(numberOfBreaks, numberOfRanges));
                 serie.ranges.forEach((range, i) => {
                     const legendBreak = {};
-                    let adjustment = 0.01;
+                    const adjustment = 0.01;
                     legendBreak.min = parseFloat(range.substr(0, range.indexOf('-') - 1)) + (i > 0 ? adjustment : 0);
                     legendBreak.max = parseFloat(range.substr(range.indexOf('-') + 2, range.length));
                     legendBreak.color = colors[i]
@@ -397,11 +397,11 @@ class Map extends React.Component {
                 filteredBreaks = legendBreaks
                     .filter(b => b.measure === this.getSelectedMeasure())
                     .filter(f => {
-                        let result = true;
+                        const result = true;
                         if (f.filters && f.filters.length > 0) {
                             if (this.props.appliedFilters && JSON.stringify(this.props.appliedFilters) !== '{}') {
                                 const keys = Object.keys(this.props.appliedFilters);
-                                let found = f.filters.filter(filter => {
+                                const found = f.filters.filter(filter => {
                                     if (keys.indexOf(filter.field) != -1) {
                                         const appliedFieldValues = this.props.appliedFilters[filter.field]
                                         const breaksFilterValues = filter.values
@@ -424,7 +424,7 @@ class Map extends React.Component {
         const {mapNoDataColor, mainLayerId} = this.props
         let overrideColor
         if (d.properties && d.properties.variables && this.state.selectedMeasure && d.properties.value != null) {
-            let key = COLOR_VARIABLE + this.state.selectedMeasure
+            const key = COLOR_VARIABLE + this.state.selectedMeasure
             overrideColor = d.properties.variables[key.trim()]
             if (overrideColor) {
                 return overrideColor
@@ -586,7 +586,7 @@ class Map extends React.Component {
         let label = ""
         if (showAdminUnitLabel == SHOW_ALL || (showAdminUnitLabel == SHOW_IF_HAS_DATA && d.properties.hasDataRow)) {
             label = d.properties[mapLabelField];
-            let abbrev = d.properties["abbrev"]
+            const abbrev = d.properties["abbrev"]
             if (label && label.length > MAX_LABEL_LEN && abbrev) {
                 label = abbrev;
             }
@@ -757,19 +757,19 @@ class Map extends React.Component {
         const group = d3.select(this.getMapId()).select('svg').select("g")
         symbols.forEach(symbol => {
             if (symbol.field && symbol.image && symbol.values) {
-                let filteredFeaturesWithGpsCoords = features.filter(f => {
-                    let fieldName = LOCATION == symbol.field ? mappingField : "value"
-                    let fiedValue = (f.properties[fieldName] || (f.properties.variables ? f.properties.variables[fieldName] : "")) + ""
-                    let valuesToMatch = symbol.values + ""
-                    let valuesToMatchArr = valuesToMatch.split(",")
+                const filteredFeaturesWithGpsCoords = features.filter(f => {
+                    const fieldName = LOCATION == symbol.field ? mappingField : "value"
+                    const fiedValue = (f.properties[fieldName] || (f.properties.variables ? f.properties.variables[fieldName] : "")) + ""
+                    const valuesToMatch = symbol.values + ""
+                    const valuesToMatchArr = valuesToMatch.split(",")
                     return f.properties.LATITUDE && f.properties.LONGITUDE && valuesToMatchArr.filter(v => v.trim().toLowerCase() == fiedValue.trim().toLowerCase()).length > 0
                 })
 
-                let filteredFeaturesNoCoords = features.filter(f => {
-                    let fieldName = LOCATION == symbol.field ? mappingField : "value"
-                    let fiedValue = (f.properties[fieldName] || (f.properties.variables ? f.properties.variables[fieldName] : "")) + ""
-                    let valuesToMatch = symbol.values + ""
-                    let valuesToMatchArr = valuesToMatch.split(",")
+                const filteredFeaturesNoCoords = features.filter(f => {
+                    const fieldName = LOCATION == symbol.field ? mappingField : "value"
+                    const fiedValue = (f.properties[fieldName] || (f.properties.variables ? f.properties.variables[fieldName] : "")) + ""
+                    const valuesToMatch = symbol.values + ""
+                    const valuesToMatchArr = valuesToMatch.split(",")
                     return !f.properties.LATITUDE && !f.properties.LONGITUDE && valuesToMatchArr.filter(v => v.trim().toLowerCase() == fiedValue.trim().toLowerCase()).length > 0
                 })
 
@@ -843,7 +843,7 @@ class Map extends React.Component {
         const svg = d3.select(this.getMapId()).select('svg')
         const g = svg.select("g")
         const paths = svg.select("g").selectAll(".active")
-        var bounds = this.boundingExtent(fs);
+        const bounds = this.boundingExtent(fs);
         const [
             [x0, y0],
             [x1, y1]
@@ -942,8 +942,8 @@ class Map extends React.Component {
                     if (d.properties.value!=null) {
 
                         const lines = format.split('\n')
-                        let headerFormat = lines[0];
-                        let overallFormat = lines.length > 1 ? lines[1] : null
+                        const headerFormat = lines[0];
+                        const overallFormat = lines.length > 1 ? lines[1] : null
                         let breakdownLineIndex = 1
                         let breakdownFormat
                         if (fields.length > 1 && mapType != 'POINTS_MAP') {
@@ -1002,8 +1002,8 @@ class Map extends React.Component {
                             html += t.tooltip
                         })
                     } else {
-                        let format = tooltipFormat || '{locationName} %({value},2) \n {label}: %({value},2)'
-                        let variables = {
+                        const format = tooltipFormat || '{locationName} %({value},2) \n {label}: %({value},2)'
+                        const variables = {
                             value: null,
                             measure: this.getSelectedMeasure(),
                             measureLabel: d.properties.measureLabel,
@@ -1085,7 +1085,7 @@ class Map extends React.Component {
         const {topoJSONField} = this.props;
         if (mainLayer && mainLayer.objects) {
             const fields = Object.keys(mainLayer.objects)
-            for (let index in fields) {
+            for (const index in fields) {
                 const field = fields[index]
                 if (mainLayer.objects[field].type == 'GeometryCollection') {
                     return field
@@ -1248,8 +1248,8 @@ class Map extends React.Component {
     }
 
     area(poly) {
-        var s = 0.0;
-        var coordinates = poly.coordinates.length > 1 ? poly.coordinates[0][0] : poly.coordinates[0];
+        let s = 0.0;
+        const coordinates = poly.coordinates.length > 1 ? poly.coordinates[0][0] : poly.coordinates[0];
         for (let i = 0; i < (coordinates.length - 1); i++) {
             s += (coordinates[i][0] * coordinates[i + 1][1] - coordinates[i + 1][0] * coordinates[i][1]);
         }
@@ -1257,13 +1257,13 @@ class Map extends React.Component {
     }
 
     centroid(poly) {
-        var c = [0, 0];
-        var coordinates = poly.coordinates.length > 1 ? poly.coordinates[0][0] : poly.coordinates[0];
+        const c = [0, 0];
+        const coordinates = poly.coordinates.length > 1 ? poly.coordinates[0][0] : poly.coordinates[0];
         for (let i = 0; i < (coordinates.length - 1); i++) {
             c[0] += (coordinates[i][0] + coordinates[i + 1][0]) * (coordinates[i][0] * coordinates[i + 1][1] - coordinates[i + 1][0] * coordinates[i][1]);
             c[1] += (coordinates[i][1] + coordinates[i + 1][1]) * (coordinates[i][0] * coordinates[i + 1][1] - coordinates[i + 1][0] * coordinates[i][1]);
         }
-        var a = this.area(poly);
+        const a = this.area(poly);
         c[0] /= a * 6;
         c[1] /= a * 6;
         return c;
@@ -1321,9 +1321,9 @@ class Map extends React.Component {
 
         const center = this.getCenter(features, filterUpdated)
         if (center) {
-            var bounds = this.path.bounds(center);
+            const bounds = this.path.bounds(center);
             // Calculate the center of the bounding box
-            var centerx = [(bounds[0][0] + bounds[1][0]) / 2, (bounds[0][1] + bounds[1][1]) / 2];
+            const centerx = [(bounds[0][0] + bounds[1][0]) / 2, (bounds[0][1] + bounds[1][1]) / 2];
             svg.transition()
                 .duration(750)
                 .call(this.zoom.transform, d3.zoomIdentity
