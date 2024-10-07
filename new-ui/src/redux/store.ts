@@ -16,7 +16,10 @@ const getRootReducer = () => {
 export const store  = configureStore({
     reducer: getRootReducer(),
     preloadedState: initialState,
-    middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(routerMiddleware)
+    middleware: (getDefaultMiddleware) => getDefaultMiddleware({
+        serializableCheck: false,
+        immutableCheck: false
+    }).concat(routerMiddleware)
 });
 
 export const reduxHistory = createReduxHistory(store);
