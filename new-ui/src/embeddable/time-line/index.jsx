@@ -162,7 +162,7 @@ const TimeLine = ({
                 const x = rect.left - parentDiv.left
                 const y =  rect.top - parentDiv.top
                 position = [x + xOffset, y + yOffset]
-                let tooltipWidth =  600
+                const tooltipWidth =  600
                 if ((rect.left + x + tooltipWidth + xOffset) > window.innerWidth) {
                     position[0] = x - tooltipWidth * 0.6                
                 }
@@ -333,7 +333,7 @@ const TimeLine = ({
     return (
         <div className={"time line"}
         onMouseLeave={(event) => {
-            let classes = event.target.getAttribute("class")   
+            const classes = event.target.getAttribute("class")   
             //if event is from link in tooltip, dont hide the tooltip
              if (classes !== 'ui fluid container excerpt') {
                setDisplayTooltip(false)

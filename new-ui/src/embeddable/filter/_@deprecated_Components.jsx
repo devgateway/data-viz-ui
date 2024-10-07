@@ -91,9 +91,9 @@ export const PngExport = ({id, icon, name, filters = [], includes = [], size}) =
 
     return (<Icon name={icon} size={size} onClick={e => {
 
-        var node = document.getElementById(id);
+        const node = document.getElementById(id);
 
-        var exportable = id ? node.getElementsByClassName("png exportable")[0] : node
+        const exportable = id ? node.getElementsByClassName("png exportable")[0] : node
 
         const doFilter = (node) => {
             node.srcset = ''
@@ -103,8 +103,8 @@ export const PngExport = ({id, icon, name, filters = [], includes = [], size}) =
             return true
         }
         //  exportable=exportable.cloneNode()
-        var imgs = exportable.getElementsByTagName('img')
-        for (let item of imgs) {
+        const imgs = exportable.getElementsByTagName('img')
+        for (const item of imgs) {
             item.srcset_back = item.srcset
             item.srcset = ''
         }
@@ -113,7 +113,7 @@ export const PngExport = ({id, icon, name, filters = [], includes = [], size}) =
             .then(delay(1))
             .then(function (dataUrl) {
                 download(dataUrl, name + '.png');
-                for (let item of imgs) {
+                for (const item of imgs) {
                     item.srcset = item.srcset_back
                 }
             })

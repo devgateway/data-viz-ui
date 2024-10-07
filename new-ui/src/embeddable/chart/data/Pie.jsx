@@ -74,7 +74,7 @@ export const PieData = (props) => {
         
 
         selectedMeasures.forEach(m => {            
-            let row = {}            
+            const row = {}            
             row.type = "measure"
             row["measureFieldName"] = m.value
             row["id"] =  customLabels[m.value] || getTranslatedValue(mMap[m.value], locale)
