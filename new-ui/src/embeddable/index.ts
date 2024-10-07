@@ -8,6 +8,7 @@ import * as customizer from "@devgateway/customizer";
 const PageGallery = lazy(() => import("./pagegallery"));
 const Download = lazy(() => import("./download"));
 const PostsCarousel = lazy(() => import("./postscarousel"));
+const Chart = lazy(() => import("./chart"));
 const Filter = lazy(() => import("./filter"));
 const ShowcaseForm = lazy(() => import("./showcase"));
 const NewsLetter = lazy(() => import("./newsletter"));
@@ -44,7 +45,7 @@ export const reducers = reducerList;
 const components = {
     pageGallery: PageGallery,
     postsCarousel: PostsCarousel,
-    // chart: Chart,
+    chart: Chart,
     filter: Filter,
     showCaseForm: ShowcaseForm,
     newsLetter: NewsLetter,
