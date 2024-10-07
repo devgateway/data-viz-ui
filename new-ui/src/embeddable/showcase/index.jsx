@@ -173,7 +173,7 @@ const Index = (props) => {
 
     const submitForm = (e) => {
         const elements = Object.keys(inputs.current).map(k => inputs.current[k]);
-        let hasErrors = elements.map(e => e.hasErrors()).reduce((a, b) => a || b);
+        const hasErrors = elements.map(e => e.hasErrors()).reduce((a, b) => a || b);
         const files = state.files;
         if (hasErrors) {
             setState(prevState => ({...prevState, showValidation: true}));
