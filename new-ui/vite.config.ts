@@ -43,5 +43,8 @@ export default defineConfig(() => {
             chunkSizeWarningLimit: 2000,
 
         },
+        server: {
+            cors: false
+        }
     }
 })
