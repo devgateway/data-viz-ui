@@ -39,7 +39,7 @@ const messages = {
 };
 
 
-const PreviewComponentParameterParser = (props) => {
+const PreviewComponentParameterParser = () => {
     const urlParams = useParams();
     const location = useLocation();
 
@@ -79,7 +79,8 @@ const PreviewComponentParameterParser = (props) => {
 
 
     return (
-        <Suspense fallback={
+        <div>
+            <Suspense fallback={
             // @ts-ignore
             <Dimmer active>
                 <Loader>Loading</Loader>
@@ -92,6 +93,8 @@ const PreviewComponentParameterParser = (props) => {
             </Container>
         </Suspense>
 
+        </div>
+        
     )
 
 }
@@ -180,10 +183,9 @@ const IntlRoutes = ({ match }) => {
                                 <PageConsumer>
                                     <ResponsiveContainer>
                                         <PageConsumer>
+                                            <Page/>
                                             {/* @ts-ignore */}
-                                            <Helmet locale={locale}></Helmet>
-                                            <Page></Page>
-                                            <Outlet />
+                                            <Helmet locale={locale}/>
                                         </PageConsumer>
                                     </ResponsiveContainer>
                                 </PageConsumer>
@@ -192,14 +194,14 @@ const IntlRoutes = ({ match }) => {
                         </Route>
                         <Route path="/embeddable/:name" element={
                             <SettingsConsumer>
-                                <PreviewComponentParameterParser match={match} />
+                                <PreviewComponentParameterParser />
                             </SettingsConsumer>}>
                         </Route>
 
                         <Route path={"/preview/page/:id"} element={<PreviewPageContainer/>}/>
                         <Route path={"/preview/:type/:id"} element={<PreviewTypeContainer/>}/>
-                        <Route path="/:slug/" element={<SlugContainer />}/>
-                        <Route path="/:parent/:slug/" element={<SlugContainer />}/>
+                        <Route path="/:slug" element={<SlugContainer />}/>
+                        <Route path="/:parent/:slug" element={<SlugContainer />}/>
                         <Route path="/:year/:month/:day/:slug/" element={<SlugPostContainer />}/>
                         <Route path="/:parent/:year/:month/:day/:slug/" element={<SlugPostContainer />}/>
                     </Routes>
@@ -211,7 +213,6 @@ const IntlRoutes = ({ match }) => {
 
 
 const WithTrackerRoutes = WithTracker(IntlRoutes)
-
 
 const MainRoutes = (props) => {
     return (
@@ -227,13 +228,12 @@ const MainRoutes = (props) => {
     )
 }
 
-class AppWrapper
-    extends Component {
-    render() {
-        return (<Provider store={store}>
+const AppWrapper = () => {
+    return (
+        <Provider store={store}>
             <MainRoutes />
-        </Provider>);
-    }
-}
+        </Provider>
+    );
+};
 
 export default AppWrapper;
