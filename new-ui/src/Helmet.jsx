@@ -10,14 +10,14 @@ export const replaceHTMLinks = (html, locale) => {
 
     const replacementTarget = process.env.REACT_APP_WP_HOSTS.split(",");
 
-    let all = new RegExp("^(http|https)://(" + replacementTarget.join('|') + ")", "ig");
+    const all = new RegExp("^(http|https)://(" + replacementTarget.join('|') + ")", "ig");
     let link;
-    let regex = /(['"])(https?:\/\/.+?)\1/ig;
+    const regex = /(['"])(https?:\/\/.+?)\1/ig;
     let newHtml = html;
 
     while ((link = regex.exec(html)) !== null) {
 
-        let href = link[2];
+        const href = link[2];
         let newLink;
 
         if (href.indexOf("wp-content") === -1) {
@@ -42,10 +42,11 @@ const HelmetMetadata = ({pages, locale}) => {
 
     const {yoast_head_json} = pages[0];
 
+
     return (
         <HelmetProvider context={helmetContext}>
             <Helmet>
-                {ReactHtmlParser(pages[0].yoast_head)}
+                {/* {ReactHtmlParser(pages[0].yoast_head)} */}
             </Helmet>
         </HelmetProvider>
 

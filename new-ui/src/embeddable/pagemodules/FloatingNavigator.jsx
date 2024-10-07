@@ -4,7 +4,7 @@ import {Image, Label, Menu} from 'semantic-ui-react'
 
 function smoothscroll(idx) {
     const offsetTop = 0
-    let offset = () => 10
+    const offset = () => 10
 
     const $anchor = idx ? document.getElementById(idx) : null
     if ($anchor) {

@@ -78,7 +78,7 @@ const Chart = ({
         return null
     }
 
-    let margins = {top: marginTop, right: marginRight, bottom: marginBottom, left: marginLeft}
+    const margins = {top: marginTop, right: marginRight, bottom: marginBottom, left: marginLeft}
 
 
 
@@ -137,7 +137,7 @@ const Chart = ({
         }
         return 0
     }).map((d, index) => {
-        let theColor = colorGenerator.getColor(d.id, d)
+        const theColor = colorGenerator.getColor(d.id, d)
         return {
             color: theColor,
             id: d.id,
@@ -172,7 +172,7 @@ const Chart = ({
 
     const CenterText = (layerProps) => {
         const { centerX, centerY } = layerProps;
-        let centerText = centerLabel.split(/[\r\n]/g)
+        const centerText = centerLabel.split(/[\r\n]/g)
         let totalValue = 0
         if (layerProps.dataWithArc) {
             totalValue = layerProps.dataWithArc.reduce(function (previousValue, currentValue) {
