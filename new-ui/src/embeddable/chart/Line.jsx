@@ -10,30 +10,30 @@ const DEFAULT_TICK_BG_COLOR ='#f0f0f1'
 
 const getTextWidth = (text, font) => {
     // re-use canvas object for better performance
-    var canvas = document.createElement("canvas");
-    var context = canvas.getContext("2d");
+    const canvas = document.createElement("canvas");
+    const context = canvas.getContext("2d");
     context.font = font;
-    var metrics = context.measureText(text);
+    const metrics = context.measureText(text);
     return metrics.width;
 }
 
 const lightenDarkenColor = (col, amt) => {
-    var usePound = false;
+    let usePound = false;
     if (col[0] == "#") {
         col = col.slice(1);
         usePound = true;
     }
-    var num = parseInt(col, 16);
-    var r = (num >> 16) + amt;
+    const num = parseInt(col, 16);
+    let r = (num >> 16) + amt;
     if (r > 255) r = 255;
     else if (r < 0) r = 0;
 
-    var b = ((num >> 8) & 0x00FF) + amt;
+    let b = ((num >> 8) & 0x00FF) + amt;
 
     if (b > 255) b = 255;
     else if (b < 0) b = 0;
 
-    var g = (num & 0x0000FF) + amt;
+    let g = (num & 0x0000FF) + amt;
 
     if (g > 255) g = 255;
     else if (g < 0) g = 0;
@@ -212,7 +212,7 @@ const Chart = ({app,
 
 
     const AreaLayer = ({series, xScale, yScale, innerHeight}) => {
-        let color = series && series.length > 0 ? series[0].color : "#3daff7";
+        const color = series && series.length > 0 ? series[0].color : "#3daff7";
          const measureMinValues = []
          if (series[0]) {
             series[0].data.forEach(d => {
@@ -232,8 +232,8 @@ const Chart = ({app,
             return a.min - b.min
         })
         
-         let lower = areaShadingCriteria == 'CUSTOM_BETWEEN_TWO_LINES' && areaLowerBound ? areaLowerBound : sortedData[0].measure
-         let upper = areaShadingCriteria == 'CUSTOM_BETWEEN_TWO_LINES' && areaUpperBound ? areaUpperBound : sortedData[sortedData.length - 1].measure
+         const lower = areaShadingCriteria == 'CUSTOM_BETWEEN_TWO_LINES' && areaLowerBound ? areaLowerBound : sortedData[0].measure
+         const upper = areaShadingCriteria == 'CUSTOM_BETWEEN_TWO_LINES' && areaUpperBound ? areaUpperBound : sortedData[sortedData.length - 1].measure
         
          const areaGenerator = area()
             .x(d => xScale(d.data.x))
@@ -383,10 +383,10 @@ const Chart = ({app,
     }
 
     const chartLegends = options.data.map(d => ({id: d.id, label: d.id, color: colorGenerator.getColor(d.id, d)}))
-    let margins = {top: marginTop, right: marginRight, bottom: marginBottom, left: marginLeft}    
+    const margins = {top: marginTop, right: marginRight, bottom: marginBottom, left: marginLeft}    
     
          
-    let ticks = parseInt(yAxisTickValues)    
+    const ticks = parseInt(yAxisTickValues)    
     const hasData = options.data && options.data.filter(d =>
         d.data.length > 0).length
     if (options && options.data && hasData > 0) {

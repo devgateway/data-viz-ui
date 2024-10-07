@@ -121,7 +121,7 @@ const TimeLine = ({
         const onMouseOver = (d, i) => {
             const offset = 30
             const position = [d3.event.pageX + offset, d3.event.pageY - offset]
-            let tooltipWidth =  600
+            const tooltipWidth =  600
             if ((d3.event.pageX + tooltipWidth + offset) > window.innerWidth) {
                 position[0] = d3.event.pageX - tooltipWidth - offset
             }

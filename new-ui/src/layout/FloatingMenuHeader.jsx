@@ -7,7 +7,7 @@ import SearchControl from "./SearchControl.jsx";
 import LangSwitcher from "./LangSwitcher.jsx";
 
 const getPath = (menu, match) => {
-    let path = [];
+    const path = [];
     menu.items.forEach(item => {
         if (item.child_items) {
             item.child_items.forEach(ch => {
