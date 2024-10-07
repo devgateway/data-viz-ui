@@ -57,7 +57,7 @@ const DownloadComponent = (props) => {
         const attributes = node.attributes;
         const attributeNames = []
         if (attributes) {
-            for (var i = 0; i < attributes.length; i++) {
+            for (let i = 0; i < attributes.length; i++) {
                 attributeNames.push(attributes[i].nodeName);
             }
         }
