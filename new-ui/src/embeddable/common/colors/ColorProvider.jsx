@@ -41,9 +41,14 @@ const ColorProvider = ({
 
         return (
             <div>
-                {React.Children.map(children, (child => React.cloneElement(child, {
-                    colorGenerator: colorManager
-                })))}
+                {React.Children.map(children, (child) => {
+                    if (React.isValidElement(child)) {
+                        return React.cloneElement(child, {
+                            colorGenerator: colorManager
+                        });
+                    }
+                    return child;
+                })}
             </div>
         );
     } else {
