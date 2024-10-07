@@ -95,7 +95,7 @@ const Chart = (props) => {
     }
 
     const formatObject = parse(format)
-    let numberFormat = formatObject ? {
+    const numberFormat = formatObject ? {
         style: (formatObject.style === 'compacted') ? 'decimal' : formatObject.style,
         notation: (formatObject.style === 'compacted') ? 'compact' : "standard",
         currency: formatObject.currency,
@@ -114,7 +114,7 @@ const Chart = (props) => {
     const colors = {
         scheme: scheme,
    }
-    let child = null
+    const child = null
     const contentHeight = (editing ? height - 80 : height - 40)
     const legends = {
     }
@@ -164,7 +164,7 @@ const Chart = (props) => {
     }
 
 
-    let params = {}
+    const params = {}
     const ff = parse(filters) || {}
 
     if (ff && ff.forEach) {
