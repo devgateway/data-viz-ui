@@ -28,7 +28,7 @@ export const post = (url : string, params : Record<string, unknown>, isBlob = fa
             })
     })
 }
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+ 
 // @ts-expect-error
 export const get = (url: string, params = {}) => {
     return new Promise((resolve, reject) => {

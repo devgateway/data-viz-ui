@@ -13,7 +13,7 @@ export default tseslint.config(
         js.configs.recommended,
         ...tseslint.configs.recommended
     ],
-    files: ['**/*.{ts,tsx}'],
+    files: ['**/*.{ts,tsx,jsx}'],
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
@@ -33,7 +33,11 @@ export default tseslint.config(
         "@typescript-eslint/no-explicit-any": "off",
         "@typescript-eslint/no-var-requires": "off",
         "@typescript-eslint/no-this-alias": "off",
+        "no-empty": "warn",
         "@typescript-eslint/no-unused-expressions": "off",
+        "no-useless-escape": "off",
+        "no-unused-vars": "off",
+        "prefer-const": "warn",
         '@typescript-eslint/no-unused-vars': [
             'warn',
             {
