@@ -107,7 +107,7 @@ const InjectTitle = injectIntl((props) => {
     return <></>
 })
 
-const IntlRoutes = ({ match }) => {
+const IntlRoutes = () => {
     const pathParams = useParams();
 
     const locale = pathParams.lan;
