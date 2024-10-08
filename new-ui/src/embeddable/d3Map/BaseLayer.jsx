@@ -1,10 +1,5 @@
 import React, {useEffect} from 'react';
-import * as ReactDOM from 'react-dom';
-import {connect} from "react-redux";
 import * as d3 from 'd3' // d3 plugin
-import * as topojson from "topojson-client";
-import Tooltip from "./Tooltip";
-import {injectIntl} from "react-intl";
 import Layer from "./Layer";
 
 class BaseLayer extends Layer {
