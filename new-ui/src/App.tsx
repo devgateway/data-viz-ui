@@ -38,7 +38,6 @@ const messages = {
     'en': messages_en
 };
 
-
 const PreviewComponentParameterParser = () => {
     const urlParams = useParams();
     const location = useLocation();
@@ -81,20 +80,19 @@ const PreviewComponentParameterParser = () => {
     return (
         <div>
             <Suspense fallback={
-            // @ts-ignore
-            <Dimmer active>
-                <Loader>Loading</Loader>
-            </Dimmer>
-        }>
-            <Container fluid={true} className={"editing"}>
-                {/* @ts-ignore */}
-                {UIComponent ? <UIComponent  {...params} editing={true}></UIComponent> :
-                    <Segment.Group color={"red"} textAlign={"center"}><h1>Wrong Component Name</h1></Segment.Group>}
-            </Container>
-        </Suspense>
+                <Dimmer active>
+                    <Loader>Loading</Loader>
+                </Dimmer>
+            }>
+                <Container fluid={true} className={"editing"}>
+                    {/* @ts-ignore */}
+                    {UIComponent ? <UIComponent  {...params} editing={true}></UIComponent> :
+                        <Segment.Group color={"red"} textAlign={"center"}><h1>Wrong Component Name</h1></Segment.Group>}
+                </Container>
+            </Suspense>
 
         </div>
-        
+
     )
 
 }
@@ -183,9 +181,9 @@ const IntlRoutes = () => {
                                 <PageConsumer>
                                     <ResponsiveContainer>
                                         <PageConsumer>
-                                            <Page/>
+                                            <Page />
                                             {/* @ts-ignore */}
-                                            <Helmet locale={locale}/>
+                                            <Helmet locale={locale} />
                                         </PageConsumer>
                                     </ResponsiveContainer>
                                 </PageConsumer>
@@ -198,12 +196,12 @@ const IntlRoutes = () => {
                             </SettingsConsumer>}>
                         </Route>
 
-                        <Route path={"/preview/page/:id"} element={<PreviewPageContainer/>}/>
-                        <Route path={"/preview/:type/:id"} element={<PreviewTypeContainer/>}/>
-                        <Route path="/:slug" element={<SlugContainer />}/>
-                        <Route path="/:parent/:slug" element={<SlugContainer />}/>
-                        <Route path="/:year/:month/:day/:slug/" element={<SlugPostContainer />}/>
-                        <Route path="/:parent/:year/:month/:day/:slug/" element={<SlugPostContainer />}/>
+                        <Route path={"/preview/page/:id"} element={<PreviewPageContainer />} />
+                        <Route path={"/preview/:type/:id"} element={<PreviewTypeContainer />} />
+                        <Route path="/:slug" element={<SlugContainer />} />
+                        <Route path="/:parent/:slug" element={<SlugContainer />} />
+                        <Route path="/:year/:month/:day/:slug/" element={<SlugPostContainer />} />
+                        <Route path="/:parent/:year/:month/:day/:slug/" element={<SlugPostContainer />} />
                     </Routes>
                 </SettingProvider>
             </AppContextProvider>
