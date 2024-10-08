@@ -154,6 +154,7 @@ const colorSchemes = {
 };
 
 const isMobile = ['mobile', 'tablet', 'midTablet'].includes(getDeviceCategory());
+const isMobileOrTablet = ['mobile', 'tablet'].includes(getDeviceCategory());
 
 
 class Map extends React.Component {
@@ -1904,82 +1905,86 @@ componentWillUnmount() {
       highlightedLocStyle.marginTop = "25px";
     }
 
+    const MapLegendComponent = () => (
+      <Container fluid className={"footnote "}>
+      {
+        <Grid columns={2}>
+          {app !== "csv" && showOverallValue && (
+            <Grid.Column textAlign={"left"} width={4}>
+              <div className="national-average-div">
+                <span className="national-avg-label">
+                  {nationalAverageLabel}
+                </span>
+                <span className="national-avg-value">
+                  {formatContent(
+                    valueFormat,
+                    { value: nationalAverage },
+                    intl,
+                    noDataText,
+                  )}
+                </span>
+              </div>
+            </Grid.Column>
+          )}
+          <Grid.Column
+            textAlign={"right"}
+            width={app !== "csv" && showOverallValue ? 12 : 16}
+          >
+            <Legend
+              filteredBreaks={this.getBreaks()}
+              formattedLegendTitle={formatContent(
+                legendTitle,
+                { ...filters },
+                intl,
+                noDataText,
+              )}
+              selectedMeasure={this.state.selectedMeasure}
+              {...this.props}
+            />
+          </Grid.Column>
+        </Grid>
+      }
+      <div className="measure-selector">
+        <ul>
+          {measureSelectorLabel && (
+            <li>
+              <span className="label">{measureSelectorLabel}</span>
+            </li>
+          )}
+          {transformedData &&
+            transformedData.measures &&
+            transformedData.measures.length > 1 &&
+            transformedData.measures.map((measure) => {
+              return (
+                <li
+                  onClick={this.selectedMeasureChanged.bind(
+                    this,
+                    measure,
+                  )}
+                >
+                  <input
+                    checked={this.getSelectedMeasure() === measure}
+                    type="radio"
+                    value={measure}
+                  />
+                  <label>
+                    {transformedData.measureLabelMap[measure] ||
+                      measure}
+                  </label>
+                </li>
+              );
+            })}
+        </ul>
+      </div>
+    </Container>
+    )
+
     return (
       <div className="map component wp-data-viz-map" ref={this.mapContainer}>
         {this.state.layersLoading && this.renderLoader()}
         {!this.state.layersLoading && (
           <>
-            <Container fluid className={"footnote "}>
-              {
-                <Grid columns={2}>
-                  {app !== "csv" && showOverallValue && (
-                    <Grid.Column textAlign={"left"} width={4}>
-                      <div className="national-average-div">
-                        <span className="national-avg-label">
-                          {nationalAverageLabel}
-                        </span>
-                        <span className="national-avg-value">
-                          {formatContent(
-                            valueFormat,
-                            { value: nationalAverage },
-                            intl,
-                            noDataText,
-                          )}
-                        </span>
-                      </div>
-                    </Grid.Column>
-                  )}
-                  <Grid.Column
-                    textAlign={"right"}
-                    width={app !== "csv" && showOverallValue ? 12 : 16}
-                  >
-                    <Legend
-                      filteredBreaks={this.getBreaks()}
-                      formattedLegendTitle={formatContent(
-                        legendTitle,
-                        { ...filters },
-                        intl,
-                        noDataText,
-                      )}
-                      selectedMeasure={this.state.selectedMeasure}
-                      {...this.props}
-                    />
-                  </Grid.Column>
-                </Grid>
-              }
-              <div className="measure-selector">
-                <ul>
-                  {measureSelectorLabel && (
-                    <li>
-                      <span className="label">{measureSelectorLabel}</span>
-                    </li>
-                  )}
-                  {transformedData &&
-                    transformedData.measures &&
-                    transformedData.measures.length > 1 &&
-                    transformedData.measures.map((measure) => {
-                      return (
-                        <li
-                          onClick={this.selectedMeasureChanged.bind(
-                            this,
-                            measure,
-                          )}
-                        >
-                          <input
-                            checked={this.getSelectedMeasure() === measure}
-                            type="radio"
-                            value={measure}
-                          />
-                          <label>
-                            {transformedData.measureLabelMap[measure] ||
-                              measure}
-                          </label>
-                        </li>
-                      );
-                    })}
-                </ul>
-              </div>
-            </Container>
+           { !isMobileOrTablet && <MapLegendComponent />}
             <div
               className={"map wrapper scaling-svg-container " + unique}
               style={{ height: this.props.height - deviceMapHeight[getDeviceCategory()] + "px" }}
@@ -2029,6 +2034,7 @@ componentWillUnmount() {
                 </div>
               )}
             </div>
+            {isMobileOrTablet && <MapLegendComponent />}
           </>
         )}
       </div>
