@@ -1,6 +1,4 @@
 import React, {createRef, useEffect, useState} from 'react';
-import {connect} from "react-redux";
-import * as topojson from "topojson-client";
 import * as d3 from 'd3' // d3 plugin
 
 
@@ -13,14 +11,14 @@ class Map extends React.Component {
 
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        
+
         if (prevProps.projection !== this.props.projection) {
             const path = d3.geoPath().projection(this.props.projection);
             this.setState({projection: this.props.projection, path})
         }
 
         const {rotationEnabled} = this.props
-        const group = d3.select(this.svgRef.current).datum({
+        var group = d3.select(this.svgRef.current).datum({
             x: 0,
             y: 0
         })
@@ -36,9 +34,9 @@ class Map extends React.Component {
     }
 
     componentDidMount() {
-        
+
         const {rotationEnabled} = this.props
-        const group = d3.select(this.svgRef.current).datum({
+        var group = d3.select(this.svgRef.current).datum({
             x: 0,
             y: 0
         })
@@ -48,22 +46,22 @@ class Map extends React.Component {
 
     }
 
-    dragged(d) {
+    dragged(event, d) {
         const origin = {
             x: 0,
             y: 0
         };
         const {projection, width, height} = this.props
-        const λ = d3.scaleLinear()
+        var λ = d3.scaleLinear()
             .domain([-width, width])
             .range([-180, 180])
-        const φ = d3.scaleLinear()
+        var φ = d3.scaleLinear()
             .domain([-height, height])
             .range([90, -90]);
 
         const r = {
-            x: λ((d.x = d3.event.x)),
-            y: φ((d.y = d3.event.y))
+            x: λ((d.x = event.x)),
+            y: φ((d.y = event.y))
         };
         projection.rotate([origin.x + r.x, origin.y + r.y]);
         const path = d3.geoPath().projection(projection);
