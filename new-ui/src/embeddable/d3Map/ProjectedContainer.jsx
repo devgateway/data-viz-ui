@@ -1,8 +1,5 @@
 import React, {Children, createRef, useEffect, useState} from 'react';
-import {connect} from "react-redux";
-import * as topojson from "topojson-client";
 import * as d3 from 'd3'
-import {decode} from "../utils/parseUtils"; // d3 plugin
 
 
 class ProjectedContainer extends React.Component {
