@@ -90,7 +90,7 @@ const Selector = (props) => {
     const [settings, setSettings] = useState(null);
 
 
-    useEffect(async () => {
+    useEffect(() => {
         async function fetchData() {
             const response = await fetch(
                 process.env.REACT_APP_WP_API + '/dg/v1/settings', {
