@@ -1,22 +1,18 @@
-import React from 'react';
-import {withRouter} from "./withRouter";
+import React, { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 
+const ScrollToTopOnMount = () => {
+    const { pathname } = useLocation();
 
-class ScrollToTopOnMount extends React.Component {
-    componentDidMount() {
+    useEffect(() => {
         window.scrollTo(0, 0);
-    }
+    }, []);
 
-    componentDidUpdate(prevProps) {
-        if (this.props.location.pathname !== prevProps.location.pathname) {
-            window.setTimeout(e => window.scrollTo(0, 0), 200)
-        }
-    }
+    useEffect(() => {
+        window.setTimeout(() => window.scrollTo(0, 0), 200);
+    }, [pathname]);
 
+    return null;
+};
 
-    render() {
-        return null;
-    }
-}
-
-export default withRouter(ScrollToTopOnMount);
+export default ScrollToTopOnMount;

@@ -1,10 +1,8 @@
 import React from 'react';
-import { DataFrameProps } from './types';
 
-
-const MapDataFrame: React.FC<DataFrameProps> = ({children, data, measures, customMeasureLabels }) => {
+const MapDataFrame = ({children, data, measures, customMeasureLabels}) => {
     
-    const transformedData: any  = {
+    const transformedData = {
         locationsData: [],
         nationalData: {},
         measureLabelMap: {}
@@ -48,13 +46,8 @@ const MapDataFrame: React.FC<DataFrameProps> = ({children, data, measures, custo
         transformedData.measures = measuresArray.length > 1 ? measuresArray : null;
         transformedData.nationalData.value = data[measures];
     }
-
-    return React.Children.map(children, child => {
-        if (React.isValidElement(child)) {
-            return React.cloneElement(child as React.ReactElement<{ transformedData?: any }>, { transformedData: transformedData });
-        }
-        return child; // Return unchanged if not a valid React element
-    });
+    
+    return React.Children.map(children, child => React.cloneElement(child, {transformedData: transformedData}))
 }
 
 export default MapDataFrame;

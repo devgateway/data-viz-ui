@@ -36,14 +36,14 @@ class DataLayer extends React.Component {
     }
 
 
-    showToolTip(content, data, color) {
+    showToolTip(content, data, color, event) {
         const tip = d3.select("body").append("div")
             .attr("class", "d3MapTooltip")
             .style("position", "absolute")
             //.style("background-color", color)
             .html("")
-            .style("left", (d3.event.pageX + 15) + "px")
-            .style("top", (d3.event.pageY - 50) + "px")
+            .style("left", (event.pageX + 15) + "px")
+            .style("top", (event.pageY - 50) + "px")
 
         ReactDOM.render(<Tooltip intl={this.props.intl} tooltip={content} data={data}
                                  tooltipEnableMarkdown={false}/>, tip._groups[0][0])
@@ -51,13 +51,13 @@ class DataLayer extends React.Component {
     }
 
 
-    moveToolTip() {
+    moveToolTip(event) {
         const tip = d3.select(".d3MapTooltip")
-            .style("left", (d3.event.pageX + 15) + "px")
-            .style("top", (d3.event.pageY - 50) + "px")
+            .style("left", (event.pageX + 15) + "px")
+            .style("top", (event.pageY - 50) + "px")
     }
 
-    hiddenToolTip() {
+    hiddenToolTip(event) {
         d3.selectAll(".d3MapTooltip").remove();
 
     }
@@ -163,12 +163,12 @@ class DataLayer extends React.Component {
             .style("vector-effect", "non-scaling-stroke")
             .attr("stroke", e => e.pointStyle.border)
             .attr("fill", e => e.pointStyle.color)
-            .on("mouseenter", (d) => {
-                this.showToolTip(tooltip, getTooltipVariables(d), d.pointStyle.color)
-            }).on("mousemove", (d) => {
-            this.moveToolTip()
-        }).on("mouseleave", (d) => {
-            this.hiddenToolTip()
+            .on("mouseenter", (event, d) => {
+                this.showToolTip(tooltip, getTooltipVariables(d), d.pointStyle.color, event)
+            }).on("mousemove", (event, d) => {
+            this.moveToolTip(event)
+        }).on("mouseleave", (event, d) => {
+            this.hiddenToolTip(event)
         })
 
 
@@ -207,7 +207,7 @@ const DataWrapper = (props) => {
     } = props
 
     const secondDimension = pointStyleBy === "dimension" && dimension2 != 'none' ? "/" + dimension2 : ''
-    const params = {}
+    let params = {}
     const ff = filters || {}
     if (ff && ff.forEach) {
         ff.forEach(f => {
@@ -215,7 +215,7 @@ const DataWrapper = (props) => {
                 params[f.param] = f.value
         })
     }
-    
+
 
     return (<DataProvider
         editing={editing}
@@ -223,7 +223,6 @@ const DataWrapper = (props) => {
         app={app}
         csv={decodeURIComponent(csv)}
         group={group}
-        editing={editing}
         ignoreErrors={true}
         isSvg={true}
         store={[app, unique, id]}
