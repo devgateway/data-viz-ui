@@ -39,8 +39,18 @@ export default defineConfig(() => {
             },
         },
         build: {
+            cssMinify: true,
+            cssCodeSplit: true,
+            minify: 'esbuild',
             sourcemap: false,
             chunkSizeWarningLimit: 2000,
+            rollupOptions:{
+                external: [
+                    'immutable',
+                    'react',
+                    'react-intl',
+                ]
+            }
 
         },
         server: {
