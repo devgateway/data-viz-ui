@@ -94,7 +94,7 @@ class DataLayer extends BaseLayer {
 
         if (this.gRef && this.gRef.current) {
             this.g = d3.select(this.gRef.current)
-            const numberFormat = {
+            let numberFormat = {
                 style: (format.style === 'compacted') ? 'decimal' : format.style,
                 notation: (format.style === 'compacted') ? 'compact' : "standard",
                 currency: format.currency,
@@ -553,7 +553,7 @@ const DataWrapper = (props) => {
         id, unique, filters, csv, app, group = "default", apiJoinAttribute, editing, patternDiscriminator, intl
     } = props
 
-    const params = {}
+    let params = {}
 
     const ff = filters || {}
 
@@ -571,7 +571,6 @@ const DataWrapper = (props) => {
         app={app}
         csv={decodeURIComponent(csv)}
         group={group}
-        editing={editing}
         ignoreErrors={true}
         isSvg={true}
         store={[app, unique, id]}
