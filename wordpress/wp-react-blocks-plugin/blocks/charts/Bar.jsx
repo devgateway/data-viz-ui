@@ -9,6 +9,7 @@ import ConfidenceIntervalConfig from "./ConfidenceIntervalConfig.jsx"
 import Papa from 'papaparse'
 import GroupTotalSetting from "./GroupTotalSetting.jsx";
 import Sort from "./Sort.jsx";
+import { useEffect, useState  } from 'react';
 
 const BarOptions = (props) => {
     const {
@@ -82,13 +83,18 @@ const BarOptions = (props) => {
                 if (ds.length > 0) {
                     const {type} = ds[0]
                     const cat = allCategories.filter(a => a.type === type)
-                    if (cat && cat.length > 0) {
+                    if (cat && cat.length > 0 ) {
+                        const catItem = cat[0];
 
-                        return cat[0].items.sort((a, b) => b.position - a.position).map(d => ({
-                            value: d.value,
-                            id: d.id,
-                            code: d.code
-                        }))
+                        if (catItem.items) {
+                            return catItem.items.sort((a, b) => b.position - a.position).map(d => ({
+                                value: d.value,
+                                id: d.id,
+                                code: d.code
+                            }))
+                        } else {
+                            return null
+                        }
                     }
                 }
             } else {
@@ -126,7 +132,12 @@ const BarOptions = (props) => {
             }
         })
     }
-    const series = app == 'csv' ? getCSVSeries() : getSeries();
+
+    const [series, setSeries] = useState(getCSVSeries());
+
+    useEffect(() => {
+        setSeries(app == 'csv' ? getCSVSeries() : getSeries())
+    }, [app, csv]);
 
     return [<PanelBody initialOpen={false} title={__("Bar Options")}>
 
@@ -283,8 +294,6 @@ const BarOptions = (props) => {
             </PanelRow>
             {lineLayerEnabled && <LineOverlay allMeasures={allMeasures} apps={apps} {...props}></LineOverlay>}
         </PanelBody>
-
-
     </PanelBody>]
 }
 
