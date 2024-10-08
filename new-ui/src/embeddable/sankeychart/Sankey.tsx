@@ -128,6 +128,8 @@ const Chart = (props) => {
 
   let filteredData = { nodes: [], links: [] }
 
+  console.log("sankey props ===>", props)
+
   if (props.options.data && props.options.data.nodes && props.options.data.nodes.length) {
     const { links, nodes } = props.options.data
     nodes.forEach(node => {
