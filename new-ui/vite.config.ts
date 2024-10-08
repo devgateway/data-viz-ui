@@ -11,9 +11,9 @@ export default defineConfig(() => {
     return {
         plugins: [
             react(),
-            eslintPlugin({
-                exclude: ['/virtual:/**', 'node_modules/**', "dist/**"],
-            }),
+            // eslintPlugin({
+            //     exclude: ['/virtual:/**', 'node_modules/**', "dist/**"],
+            // }),
             EnvironmentPlugin({
                 API_URL: 'http://localhost:8000',
                 NODE_ENV: process.env.NODE_ENV,
@@ -41,7 +41,6 @@ export default defineConfig(() => {
         build: {
             cssMinify: true,
             cssCodeSplit: true,
-            minify: 'esbuild',
             sourcemap: false,
             chunkSizeWarningLimit: 2000,
             rollupOptions:{
@@ -55,6 +54,13 @@ export default defineConfig(() => {
         },
         server: {
             cors: false
+        },
+        css: {
+            preprocessorOptions: {
+                scss : {
+                    api: 'modern'
+                }
+            }
         }
     }
 })
