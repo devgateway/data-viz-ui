@@ -44,7 +44,7 @@ class DataLayer extends BaseLayer {
             defaultSize: markSizeScale2
         })
 
-        const numberFormat = {
+        let numberFormat = {
             style: (format.style === 'compacted') ? 'decimal' : format.style,
             notation: (format.style === 'compacted') ? 'compact' : "standard",
             currency: format.currency,
@@ -99,7 +99,7 @@ class DataLayer extends BaseLayer {
                         const originID = d1.properties[featureJoinAttribute]
                         const id = d1.properties[featureJoinAttribute] + "--" + d2.properties[featureJoinAttribute];
 
-                        const link = {
+                        var link = {
                             type: "LineString", coordinates: [
                                 [projection.invert(path.centroid(d1))[0],
                                     projection.invert(path.centroid(d1))[1]
@@ -109,7 +109,7 @@ class DataLayer extends BaseLayer {
                         } // Change these data to see ho the great circle reacts
                         //d1 is origin
                         //d2 is destination
-                        
+
                         this.g.select("defs")
                             .append("marker")
                             .attr("id", "arrow" + id)
@@ -138,28 +138,28 @@ class DataLayer extends BaseLayer {
                             .style("cursor", "pointer")
                             .style("stroke-dasharray", "0")
                             .style("stroke", d => {
-                                
+
                                 return brStyles.getColor(value)
                             })
                             .style("stroke-width", d => {
-                                
+
                                 return brStyles.getSize(value)
                             })
                             .attr("marker-end", "url(#arrow" + id + ")")
 
-                            .on("mouseenter", d => {
+                            .on("mouseenter", (event, d) => {
                                 g.selectAll("marker").transition().duration("200").style("opacity", 0)
                                 g.selectAll(".start-point").transition().duration("200").style("opacity", 0)
                                 g.selectAll(".flow-line").transition().duration("200")
                                     .style("opacity", 0)
 
-                                d3.select(d3.event.target).transition().duration("200").style("opacity", 1)
+                                d3.select(event.target).transition().duration("200").style("opacity", 1)
 
                                 g.selectAll("#arrow" + id).transition().duration("200").style("opacity", 1)
 
 
                                 g.selectAll(".start-point.circle_" + originID).transition().duration("200").style("opacity", 1)
-                                
+
                                 if (value) {
                                     const origin = {}
                                     const target = {}
@@ -298,7 +298,7 @@ class DataLayer extends BaseLayer {
 const DataWrapper = (props) => {
     const {id, unique, filters, csv, app, group = "default", flowOrigin, editing, flowDestination} = props
 
-    const params = {}
+    let params = {}
 
     const ff = filters || {}
 
@@ -316,7 +316,6 @@ const DataWrapper = (props) => {
         app={app}
         csv={decodeURIComponent(csv)}
         group={group}
-        editing={editing}
         ignoreErrors={true}
         isSvg={true}
         store={[app, unique, id]}
