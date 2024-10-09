@@ -16,8 +16,7 @@ import CSVDataFrame from "./CSVDataFrame";
 import ColorProvider from "./colors/ColorProvider";
 import Messages from "./Messages";
 import { connect } from "react-redux";
-import deviceType from '../../utils/deviceType'
-import { get, is } from "immutable";
+import deviceType from '../../utils/deviceType';
 
 
 const isMobile = deviceType() === 'mobile';
