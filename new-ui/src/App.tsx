@@ -72,24 +72,15 @@ const PreviewComponentParameterParser = () => {
         return () => {
             window.removeEventListener('message', readMessage);
         };
-
-
-    }, [])
-
+    }, []);
 
     return (
         <div>
-            <Suspense fallback={
-                <Dimmer active>
-                    <Loader>Loading</Loader>
-                </Dimmer>
-            }>
-                <Container fluid={true} className={"editing"}>
+           <Container fluid={true} className={"editing"}>
                     {/* @ts-ignore */}
                     {UIComponent ? <UIComponent  {...params} editing={true}></UIComponent> :
                         <Segment.Group color={"red"} textAlign={"center"}><h1>Wrong Component Name</h1></Segment.Group>}
                 </Container>
-            </Suspense>
 
         </div>
 
