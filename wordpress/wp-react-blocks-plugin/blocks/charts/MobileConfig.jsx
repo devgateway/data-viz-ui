@@ -91,6 +91,54 @@ const MarginSection = ({
   );
 };
 
+const PaddingSection = ({
+  setAttributes,
+  attributes: { mobileCustomization, barPadding, barInnerPadding },
+}) => {
+  return (
+    <PanelBody initialOpen={false} title={__("Padding")}>
+      <PanelRow>
+        <RangeControl
+          label={__(
+            "Bar Padding (Space between bars that are not in the same group)"
+          )}
+          value={mobileCustomization?.barPadding ?? barPadding}
+          initialPosition={0.15}
+          onChange={(newBarPadding) => setAttributes({
+            mobileCustomization: {
+              ...mobileCustomization,
+              barPadding: newBarPadding,
+            },
+           })}
+          step={0.05}
+          min={0}
+          max={1}
+        />
+      </PanelRow>
+
+      <PanelRow>
+        <RangeControl
+          label={__("Bar Inner Padding (Space between bars in the same group)")}
+          value={
+            mobileCustomization?.barInnerPadding ?? barInnerPadding
+          }
+          initialPosition={0.75}
+          onChange={(barInnerPadding) => setAttributes({
+            mobileCustomization: {
+              ...mobileCustomization,
+              barInnerPadding: barInnerPadding,
+            },
+           })}
+          step={0.25}
+          min={0}
+          max={50}
+        />
+      </PanelRow>
+    </PanelBody>
+  );
+};
+
+
 const TitleSection = ({
   setAttributes,
   attributes: { mobileCustomization },
@@ -404,6 +452,7 @@ const MobileConfig = (props) => {
             </>
           )}
           <MarginSection {...props} />
+          { type === "bar" && <PaddingSection {...props} /> }
         </>
       )}
     </PanelBody>
