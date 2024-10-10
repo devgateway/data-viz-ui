@@ -1,9 +1,11 @@
-import PageConsumer from '@devgateway/wp-react-lib/dist/consumers/PageConsumer';
-import PageProvider from '@devgateway/wp-react-lib/dist/providers/PageProvider';
+import {
+    PageProvider,
+    PageConsumer,
+    Page
+} from "@devgateway/wp-react-lib"
 import React from 'react'
 import { useParams } from 'react-router-dom';
 import ResponsiveContainer from '../ResponsiveContainer';
-import Page from '@devgateway/wp-react-lib/dist/templates/Page';
 import Helmet from '@/Helmet';
 
 const SlugContainer = () => {
