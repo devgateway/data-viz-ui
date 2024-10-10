@@ -36,6 +36,7 @@ export default defineConfig(() => {
         resolve: {
             alias: {
                 "@": path.resolve(__dirname, "./src"),
+                "@devgateway/wp-react-lib": path.resolve(__dirname, "../react-lib/wp-react-lib/dist"),
             },
         },
         build: {
@@ -48,6 +49,8 @@ export default defineConfig(() => {
                     'immutable',
                     'react',
                     'react-intl',
+                    "@devgateway/wp-react-lib",
+
                 ]
             }
 

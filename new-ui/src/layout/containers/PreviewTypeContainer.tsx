@@ -1,8 +1,10 @@
 import React from 'react'
 import ResponsiveContainer from '../ResponsiveContainer'
-import PostProvider from '@devgateway/wp-react-lib/dist/providers/PostProvider'
-import PostConsumer from '@devgateway/wp-react-lib/dist/consumers/PostConsumer'
-import Post from '@devgateway/wp-react-lib/dist/templates/Post'
+import {
+    PostProvider,
+    PostConsumer,
+    Post
+} from "@devgateway/wp-react-lib"
 import { useParams, useLocation } from 'react-router-dom'
 
 const PreviewTypeContainer = () => {
