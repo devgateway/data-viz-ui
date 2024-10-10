@@ -1,7 +1,9 @@
 import React, {useEffect, useState} from "react";
-import CustomSearch from './CustomSemanticSearch.jsx'
-import SearchProvider from "@devgateway/wp-react-lib/dist/providers/SearchProvider";
-import SearchConsumer from "@devgateway/wp-react-lib/dist/consumers/SearchConsumer";
+import CustomSearch from './CustomSemanticSearch.jsx';
+import {
+    SearchProvider,
+    SearchConsumer
+} from "@devgateway/wp-react-lib";
 import {injectIntl} from "react-intl";
 import {utils} from "@devgateway/wp-react-lib";
 import CustomSemanticSearch from "./CustomSemanticSearch.jsx";
