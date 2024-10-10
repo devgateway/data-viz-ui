@@ -1,9 +1,11 @@
 import React from 'react'
 import { useParams } from 'react-router-dom';
 import ResponsiveContainer from '../ResponsiveContainer';
-import PostProvider from '@devgateway/wp-react-lib/dist/providers/PostProvider';
-import PostConsumer from '@devgateway/wp-react-lib/dist/consumers/PostConsumer';
-import Post from '@devgateway/wp-react-lib/dist/templates/Post';
+import {
+    PostProvider,
+    PostConsumer,
+    Post
+} from "@devgateway/wp-react-lib"
 
 
 const SlugPostContainer = () => {
