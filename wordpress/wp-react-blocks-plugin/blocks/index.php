@@ -45,11 +45,11 @@ function wp_react_lib_init() {
 
 
           wp_enqueue_script( 'wp-lib-block-editor');
-
-        $types= get_post_types( [], 'names' );
+          $types= get_post_types( [], 'names' );
           foreach ($types as &$type) {
                 register_post_meta($type,'redirect_url',array( 'show_in_rest' => true, 'single' => true, 'type' => 'string', ));
           }
+
 
 }
 
