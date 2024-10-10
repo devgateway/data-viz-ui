@@ -48,7 +48,7 @@ export const formatContent = (
   return str;
 };
 
-const Tooltip = ({ tooltip, d, intl, tooltipEnableMarkdown }) => {
+const Tooltip = ({ tooltip, d, intl, tooltipEnableMarkdown, format }) => {
   const { color, data } = d.datum || d.point || d;
   const current =
     d.value ||
