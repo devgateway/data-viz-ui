@@ -1,8 +1,10 @@
 import React from 'react'
-import ResponsiveContainer from '../ResponsiveContainer'
-import PageProvider from '@devgateway/wp-react-lib/dist/providers/PageProvider'
-import PageConsumer from '@devgateway/wp-react-lib/dist/consumers/PageConsumer'
-import Page from '@devgateway/wp-react-lib/dist/templates/Page'
+import ResponsiveContainer from '../ResponsiveContainer';
+import {
+    PageProvider,
+    PageConsumer,
+    Page
+} from "@devgateway/wp-react-lib"
 import { useLocation, useParams } from 'react-router-dom'
 
 const PreviewPageContainer = () => {
