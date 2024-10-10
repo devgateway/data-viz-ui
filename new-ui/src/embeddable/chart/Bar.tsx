@@ -1,6 +1,6 @@
 import React, { Fragment, useEffect, useState } from "react";
 import Tooltip from "./Tooltip";
-import { ResponsiveBar } from "@nivo/bar";
+import { BarDatum, BarLayer, LegendData, ResponsiveBar } from "@nivo/bar";
 import { injectIntl } from "react-intl";
 import { useTheme } from "@nivo/core";
 import { line } from "d3-shape";
@@ -16,6 +16,69 @@ const GRID_LINE_COLOR = "#dddddd";
 const DEFAULT_COLOR = "none";
 const LABEL_SKIP_HEIGHT = 0;
 const COLOR_VARIABLE = "_Color";
+
+export interface BarChartProps {
+  legends?: Record<string, any>;
+  marginLeft: number;
+  marginTop: number;
+  marginRight: number;
+  marginBottom: number;
+  options: Record<string, any>;
+  intl: any;
+  format?: any;
+  colors: any;
+  groupMode: any;
+  height: number;
+  showLegends: boolean;
+  legendPosition: string;
+  tickRotation: number;
+  offsetText: number | string;
+  tickColor: string;
+  layout?: "horizontal" | "vertical";
+  reverse: boolean;
+  offsetY: number | string;
+  csvLineLayerData: string;
+  tooltip: string;
+  lineLayerEnabled: boolean;
+  overlays: any[];
+  maxValue: string;
+  valueScale: "linear" | "log" | "symlog" | "point" | "band" | "time";
+  colorGenerator: any;
+  legendLabel: string;
+  overrideTickColor: boolean;
+  fixedMinValue: number;
+  fixedMaxValue: number;
+  barPadding: number;
+  barLabelPosition: string;
+  barInnerPadding: number;
+  tooltipEnabled: boolean;
+  xLabelColor: string;
+  barLabelColor: string;
+  legendCheckBack: boolean;
+  legendLabelBack: boolean;
+  legendLabelColor: string;
+  highlightXAxisLine: boolean;
+  showTickLine: boolean;
+  showRightAxis: boolean;
+  offsetRight: number | string;
+  offsetBottom: number | string;
+  confidenceIntervals: any[];
+  showGroupTotal: boolean;
+  groupTotalLabel: string;
+  groupTotalFormat: any;
+  groupTotalMeasure: string;
+  groupTotalOffset: number | string;
+  groupTotalFixedPosition: boolean;
+  tooltipEnableMarkdown: boolean;
+  xAxisTickValues: number;
+  yAxisTickValues: number;
+  mobileCustomization: string;
+  minMaxClamp: boolean;
+  reverseLegend: boolean;
+  enableGridY: boolean;
+  enableGridX: boolean;
+  customAxisFormat: any;
+}
 
 const Chart = ({
   legends,
@@ -78,7 +141,7 @@ const Chart = ({
   enableGridY,
   enableGridX,
   customAxisFormat
-}) => {
+}: BarChartProps) => {
   const isMobile = deviceType() === "mobile";
   const LABEL_SKIP_WIDTH = 30; // important for vertical layout
   const LABEL_SKIP_HEIGHT = 15; // important for horizontal layout
@@ -91,7 +154,7 @@ const Chart = ({
     return barLabelColor;
   };
 
-  const [filter, setFilter] = useState([]);
+  const [filter, setFilter] = useState<any>([]);
   const { colorBy } = colors;
   const lineVisibility = {};
   overlays.forEach((o, idx) => {
@@ -111,7 +174,14 @@ const Chart = ({
     DEFAULT_COLOR,
     colorGenerator
   ) => {
-    let chartLegends = [];
+    type ChartLegends = {
+      enabled: boolean;
+      color: string;
+      id: string;
+      label: string;
+    }
+
+    let chartLegends: ChartLegends [] = [];
 
     if (options.data) {
       chartLegends =
@@ -437,6 +507,7 @@ const Chart = ({
     if (axis == "X") {
       points = [0, innerWidth];
       lineGenerator = line()
+      // @ts-ignore Investigate why it is returning a tuple instead of a number
         .x((xPoint, index) => {
           if (index === 0) {
             return -10;
@@ -449,6 +520,7 @@ const Chart = ({
       points = [0, innerHeight];
       lineGenerator = line()
         .x(() => 0)
+        // @ts-ignore Investigate why it is returning a tuple instead of a number
         .y((point) => {
           return point;
         });
@@ -470,6 +542,11 @@ const Chart = ({
     // re-use canvas object for better performance
     const canvas = document.createElement("canvas");
     const context = canvas.getContext("2d");
+
+    if (!context) {
+      return 0;
+    }
+
     context.font = font;
     const metrics = context.measureText(text);
     return metrics.width;
@@ -494,6 +571,7 @@ const Chart = ({
 
   const CustomTick = (tick) => {
     const tickObject = Object.assign({}, tick);
+    // @ts-ignore
     if(isMobileCustomizationEnabled && hiddenLabels.includes(String(tickObject.value))) {
       tickObject.value = "";
     }
@@ -627,7 +705,7 @@ const Chart = ({
   };
 
   const toggle = (id) => {
-    const newFilter = filter.slice();
+    const newFilter: any [] = filter.slice();
     if (newFilter.indexOf(id) > -1) {
       const index = newFilter.indexOf(id);
       newFilter.splice(index, 1);
@@ -734,23 +812,23 @@ const Chart = ({
                   props.yScale(key) +
                   barsInGroup.map((b) => b.height).reduce((a, b) => a + b) / 2;
               }
-              x = x + parseInt(groupTotalOffset) + 5;
+              x = x + parseInt(String(groupTotalOffset)) + 5;
             } else {
               anchor = "middle";
               if (groupMode === "stacked") {
                 x = props.xScale(key) + barsInGroup[0].width / 2;
                 if (groupTotalFixedPosition) {
-                  y = y - parseInt(groupTotalOffset);
+                  y = y - parseInt(String(groupTotalOffset));
                 } else {
                   if (reverse) {
                     y =
-                      parseInt(groupTotalOffset) +
+                      parseInt(String(groupTotalOffset)) +
                       barsInGroup.map((b) => b.height).reduce((a, b) => a + b) +
                       14;
                   } else {
                     y =
                       props.innerHeight -
-                      parseInt(groupTotalOffset) -
+                      parseInt(String(groupTotalOffset)) -
                       barsInGroup.map((b) => b.height).reduce((a, b) => a + b) -
                       5;
                   }
@@ -763,7 +841,7 @@ const Chart = ({
                   y = props.innerHeight;
                 }
                 if (groupTotalFixedPosition) {
-                  y = y - parseInt(groupTotalOffset);
+                  y = y - parseInt(String(groupTotalOffset));
                 } else {
                   if (barsInGroup.length % 2 == 1) {
                     const index = Math.floor(barsInGroup.length / 2);
@@ -776,9 +854,9 @@ const Chart = ({
                     );
                   }
                   if (reverse) {
-                    y = y + 14 + groupTotalOffset;
+                    y = y + 14 + parseInt(String(groupTotalOffset));
                   } else {
-                    y = props.innerHeight - y - groupTotalOffset - 5;
+                    y = props.innerHeight - y - parseInt(String(groupTotalOffset)) - 5;
                   }
                 }
               }
@@ -834,7 +912,7 @@ const Chart = ({
   }
 
   const getValuesFromData = () => {
-    const values = [];
+    const values: number [] = [];
     if (confidenceIntervals) {
       confidenceIntervals.forEach((c) => {
         if (c.low) {
@@ -866,7 +944,8 @@ const Chart = ({
     if (
       (groupMode === "stacked" && maxValue !== "fixed") ||
       (maxValue === "fixed" && fixedMaxValue === null) ||
-      fixedMaxValue === ""
+      // @ts-ignore
+      (maxValue === "fixed" && fixedMaxValue === "")
     ) {
       return (
         Math.max(
@@ -886,6 +965,7 @@ const Chart = ({
 
     return maxValue === "fixed" &&
       fixedMaxValue !== null &&
+      // @ts-ignore
       fixedMaxValue !== ""
       ? fixedMaxValue
       : Math.max(overLayMax, dataMax) * 1.05;
@@ -895,6 +975,7 @@ const Chart = ({
     const minVal = Math.min(overLayMin, dataMin);
     return maxValue === "fixed" &&
       fixedMinValue !== null &&
+      // @ts-ignore
       fixedMinValue !== ""
       ? fixedMinValue
       : minVal > 0
@@ -905,7 +986,7 @@ const Chart = ({
   const maxValueFromData = getMaxValueFromData();
   const minValueFromData = getMinValueFromData();
 
-  const layers = ["grid", "axes", "bars"];
+  const layers: BarLayer<BarDatum>[] = ["grid", "axes", "bars"];
   if (showGroupTotal) {
     layers.push(groupTotalLayer);
   }
@@ -933,9 +1014,9 @@ const Chart = ({
           });
           if (
             overlayData.data &&
-            overlayData.data.filter((d) => d[1] !== null).length > 0
+            overlayData.data.filter((d: any) => d[1] !== null).length > 0
           ) {
-            overlayData.data = overlayData.data.filter((d) => d[1] !== null);
+            overlayData.data = overlayData.data.filter((d: any) => d[1] !== null);
             const line = LineLayer(
               overlayData,
               lineColor,
@@ -946,11 +1027,11 @@ const Chart = ({
               o.title,
               ""
             );
-            layers.push(line);
+            layers.push(line as any);
           }
         } else {
           if (o.measure[0]) {
-            const overlayData = {};
+            const overlayData: Record<string, any> = {};
             const data = options.data.map((d) => [
               d[options.indexBy],
               d.variables[o.measure[0]],
@@ -969,7 +1050,7 @@ const Chart = ({
               o.title,
               measure.length > 0 ? measure[0].label : ""
             );
-            layers.push(line);
+            layers.push(line as any);
           }
         }
       }
@@ -986,7 +1067,7 @@ const Chart = ({
 
   layers.push(createHighLowLine);
 
-  let ticks = parseInt(yAxisTickValues);
+  let ticks = parseInt(String(yAxisTickValues));
   const legendTitle = () => {
     return (
       <>
@@ -999,7 +1080,7 @@ const Chart = ({
     );
   };
 
-const hiddenLabels = [];
+const hiddenLabels: string [] = [];
 if(isMobileCustomizationEnabled) {
     ticks = parseInt(mobileConfigSettings.yAxisTickValues);
     const labels = new Map(Object.entries(mobileConfigSettings?.labels?.xAxis ?? {}));
@@ -1051,9 +1132,9 @@ if(isMobileCustomizationEnabled) {
                     tickPadding: 5,
                     tickRotation: 0,
                     tickValues: ticks,
-                    legend: legends.right,
+                    legend: legends && legends.right,
                     legendPosition: "middle",
-                    legendOffset: parseInt(offsetRight),
+                    legendOffset: parseInt(String(offsetRight)),
                     format: (value) => {
                       if (layout == "vertical") {
                         const effectiveFormat = customAxisFormat
@@ -1078,12 +1159,12 @@ if(isMobileCustomizationEnabled) {
               isMobileCustomizationEnabled && mobileConfigSettings?.xAxisDisabled === true ? null :
               layout == "horizontal"
                 ? {
-                    legend: legends.bottom,
+                    legend: legends && legends.bottom,
                     legendPosition: "middle",
-                    legendOffset: parseInt(offsetBottom),
+                    legendOffset: parseInt(String(offsetBottom)),
                     tickPadding: 5,
                     tickRotation: 0,
-                    tickValues: parseInt(xAxisTickValues),
+                    tickValues: parseInt(String(xAxisTickValues)),
                     format: (value) => {
                       if (layout == "horizontal") {
                         const effectiveFormat = customAxisFormat
@@ -1102,9 +1183,9 @@ if(isMobileCustomizationEnabled) {
                     },
                   }
                 : {
-                    legend: legends.bottom,
+                    legend: legends && legends.bottom,
                     legendPosition: "middle",
-                    legendOffset: parseInt(offsetBottom),
+                    legendOffset: parseInt(String(offsetBottom)),
                     renderTick: CustomTick,
                   }
             }
@@ -1117,9 +1198,9 @@ if(isMobileCustomizationEnabled) {
               tickPadding: 5,
               tickRotation: 0,
               tickValues: ticks,
-              legend: legends.left,
+              legend: legends && legends.left,
               legendPosition: "middle",
-              legendOffset: parseInt(offsetY),
+              legendOffset: parseInt(String(offsetY)),
               format: (value) => {
                 if (layout == "vertical") {
                   const effectiveFormat = customAxisFormat
@@ -1144,21 +1225,19 @@ if(isMobileCustomizationEnabled) {
             labelTextColor={normalizeLabelColor()}
             label={(l) =>
               intl.formatNumber(
-                format.style === "percent" ? l.value / 100 : l.value,
+                format.style === "percent" ? (l.value ?? 0) / 100 : l.value ?? 0,
                 format
               )
             }
             layers={layers}
             onMouseEnter={(_data) => {}}
             onMouseLeave={(_data) => {}}
-            motionStiffness={130}
-            motionDamping={15}
             tooltip={(d) => {
               if (tooltipEnabled && tooltip && tooltip.trim().length > 0) {
                 return (
                   <Tooltip
                     intl={intl}
-                    format={format}
+                    format={format as any}
                     d={d}
                     tooltip={tooltip}
                     tooltipEnableMarkdown={tooltipEnableMarkdown}
