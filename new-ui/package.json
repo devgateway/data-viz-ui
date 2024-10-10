@@ -26,6 +26,7 @@
     "@react-spring/parallax": "^9.7.4",
     "@reduxjs/toolkit": "^2.2.7",
     "d3": "^7.9.0",
+    "d3-shape": "^3.2.0",
     "file-saver": "^2.0.5",
     "geostats": "^2.1.0",
     "history": "^5.3.0",
@@ -83,11 +84,11 @@
   },
   "optionalDependencies": {
     "@swc/core-darwin-arm64": "^1.7.28",
+    "@swc/core-darwin-x64": "^1.7.28",
     "@swc/core-linux-arm64": "^1.7.28",
     "@swc/core-linux-x64": "^1.7.28",
-    "@swc/core-win-x64": "^1.7.28",
     "@swc/core-linux-x64-musl": "^1.7.28",
-    "@swc/core-darwin-x64": "^1.7.28"
+    "@swc/core-win-x64": "^1.7.28"
   },
   "browserslist": {
     "production": [
