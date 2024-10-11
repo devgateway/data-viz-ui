@@ -44,26 +44,35 @@ class Body extends React.Component {
 
   handleTextClick(e) {
     if (!this.state.isMobile) return;
+
     const svg = e.target.closest("svg");
     const titleText = e.target.closest(".title");
     const btn = e.target.closest(".title-rect");
 
     if (titleText || btn) {
-      [...svg.querySelectorAll(".title, .title-rect")].forEach((node) =>
-        node.classList.remove("on")
+      // Remove the 'on' class from all .title, .title-rect, and .title-line elements
+      [...svg.querySelectorAll(".title, .title-rect, .title-line")].forEach((node) =>
+          node.classList.remove("on")
       );
 
       const selectedElement = titleText || btn;
-      selectedElement.classList.add("on");
-      (titleText ? titleText.previousSibling : btn.nextSibling)?.classList.add(
-        "on"
-      );
 
+      // Add the 'on' class to the clicked title and title-rect
+      selectedElement.classList.add("on");
+
+      // Add the 'on' class to the corresponding title-line
+      const titleLine = selectedElement.closest("g").querySelector(".title-line");
+      if (titleLine) {
+        titleLine.classList.add("on");
+      }
+
+      // Update the selected option state
       this.setState({
-        selectedOption: (titleText ? titleText : btn.nextSibling).innerHTML,
+        selectedOption: (titleText ? titleText.innerHTML : btn.nextSibling.innerHTML),
       });
     }
   }
+
 
   onMouseOut() {
     d3.select(".body.parts")
@@ -145,7 +154,35 @@ class Body extends React.Component {
     window.addEventListener("resize", this.updateLayout);
     this.updateLayout();
     this.updateSvgLabels();
+
+    // Add the "on" class on page refresh based on the selected option
+    this.addOnClassToSelectedElements();
   }
+
+  addOnClassToSelectedElements() {
+    const { selectedOption } = this.state;
+    const svg = document.querySelector("svg");
+
+    // Find the text element and the corresponding line for the selected option
+    let selectedTitleText, selectedTitleLine;
+
+    if (selectedOption === "Cancers") {
+      selectedTitleText = svg.querySelector(".title");
+      selectedTitleLine = svg.querySelector(".title-line");
+    } else if (selectedOption === "OtherConditions") {
+      // Assuming the second text and line refer to "Other conditions"
+      selectedTitleText = svg.querySelectorAll(".title")[1];
+      selectedTitleLine = svg.querySelectorAll(".title-line")[1];
+    }
+
+    // Add the 'on' class if the elements exist
+    if (selectedTitleText && selectedTitleLine) {
+      selectedTitleText.classList.add("on");
+      selectedTitleLine.classList.add("on");
+    }
+  }
+
+
 
   updateSvgLabels() {
     const root = d3.select(".body.parts");
@@ -534,6 +571,7 @@ class Body extends React.Component {
   componentDidUpdate(prevProps, prevState) {
     if (prevState.selectedOption !== this.state.selectedOption) {
       this.updateSvgLabels();
+      this.addOnClassToSelectedElements(); // Apply "on" class after updates
     }
   }
 
@@ -577,72 +615,62 @@ class Body extends React.Component {
           <Ectopic className="system Ectopic" />
           <g onClick={this.handleTextClick}>
             <rect
-              className="title-rect"
-              x={
-                this.state.isMobile
-                  ? this.mobileOptions["Cancers"]["x"] - 20
-                  : ""
-              }
-              y={
-                this.state.isMobile
-                  ? this.mobileOptions["Cancers"]["y"] - 20
-                  : "60"
-              }
-              rx="5"
-              ry="5"
-              width="100"
-              height="30"
+                className="title-rect"
+                x={this.state.isMobile ? this.mobileOptions["Cancers"]["x"] - 20 : ""}
+                y={this.state.isMobile ? this.mobileOptions["Cancers"]["y"] - 20 : "60"}
+                rx="5"
+                ry="5"
+                width="100"
+                height="30"
             />
             <text
-              x={
-                this.state.isMobile
-                  ? this.mobileOptions["Cancers"]["x"]
-                  : "-250"
-              }
-              y={
-                this.state.isMobile ? this.mobileOptions["Cancers"]["y"] : "60"
-              }
-              className="title"
+                x={this.state.isMobile ? this.mobileOptions["Cancers"]["x"] : "-250"}
+                y={this.state.isMobile ? this.mobileOptions["Cancers"]["y"] : "60"}
+                className="title"
             >
               <FormattedMessage id="ailments.title" defaultMessage="Cancers" />
             </text>
+            {this.state.isMobile && (
+                <rect
+                    className="title-line"
+                    x={this.state.isMobile ? this.mobileOptions["Cancers"]["x"] -18 : "-250"}
+                    y={this.state.isMobile ? this.mobileOptions["Cancers"]["y"] + 7 : ""}
+                    width="58"
+                    height="3"
+                    fill="#E5EBED"
+                />
+            )}
           </g>
           <g onClick={this.handleTextClick}>
             <rect
-              className="title-rect"
-              x={
-                this.state.isMobile
-                  ? this.mobileOptions["OtherConditions"]["x"] - 15
-                  : ""
-              }
-              y={
-                this.state.isMobile
-                  ? this.mobileOptions["OtherConditions"]["y"] - 20
-                  : ""
-              }
-              rx="5"
-              ry="5"
-              width="155"
-              height="30"
+                className="title-rect"
+                x={this.state.isMobile ? this.mobileOptions["OtherConditions"]["x"] - 65 : ""}
+                y={this.state.isMobile ? this.mobileOptions["OtherConditions"]["y"] - 20 : "60"} // Ensure the default desktop y-position
+                rx="5"
+                ry="5"
+                width="155"
+                height="30"
             />
             <text
-              x={
-                this.state.isMobile
-                  ? this.mobileOptions["OtherConditions"]["x"]
-                  : "200"
-              }
-              y={
-                this.state.isMobile
-                  ? this.mobileOptions["OtherConditions"]["y"]
-                  : "60"
-              }
-              className="title"
+                x={this.state.isMobile ? this.mobileOptions["OtherConditions"]["x"] - 50 : "200"} // Desktop remains "200"
+                y={this.state.isMobile ? this.mobileOptions["OtherConditions"]["y"] : "60"} // Ensure the default desktop y-position
+                className="title"
             >
               <FormattedMessage
-                id="ailments.otherConditions"
-                defaultMessage="Other conditions"
+                  id="ailments.otherConditions"
+                  defaultMessage="Other conditions"
               />
             </text>
+            {this.state.isMobile && (
+                <rect
+                    className="title-line"
+                    x={this.state.isMobile ? this.mobileOptions["OtherConditions"]["x"] - 68 : "200"} // Keep desktop x-position as "200"
+                    y={this.state.isMobile ? this.mobileOptions["OtherConditions"]["y"] + 7 : "60"} // Default desktop y-position
+                    width="118"
+                    height="3"
+                    fill="#E5EBED"
+                />
+            )}
           </g>
         </svg>
       </Container>
