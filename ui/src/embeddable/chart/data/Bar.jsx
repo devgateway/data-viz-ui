@@ -75,8 +75,9 @@ const getOptionsNoDimension = (props) => {
 const includeOverallData = (props) => {
   const { data, measures, dimensions, overallLabel } = props;
   if (dimensions.length == 1 && data.children) {
+    console.log('data.children...', data.children)
     let overallAdded =
-      data.children.filter((c) => c.value == overallLabel).length > 0;
+      data.children.filter((c) => c?.value == overallLabel).length > 0;
     if (!overallAdded) {
       const overallData = {};
       overallData.type = dimensions[0];
@@ -92,13 +93,13 @@ const includeOverallData = (props) => {
     }
   } else if (dimensions.length == 2 && data.children) {
     data.children.forEach((d) => {
-      let overallAdded =
-        d.children.filter((c) => c.value == overallLabel).length > 0;
+      const overallAdded = d.children?.some((c) => c?.value == overallLabel);
       if (!overallAdded) {
-        const overallData = {};
-        overallData.type = dimensions[1];
-        overallData.value = overallLabel;
-        overallData.label = overallLabel;
+        const overallData = {
+          type: dimensions[1],
+          value: overallLabel,
+          label: overallLabel,
+        };
 
         Object.keys(d).forEach((k) => {
           if (!["children", "metadata", "type", "value"].includes(k)) {
@@ -106,7 +107,7 @@ const includeOverallData = (props) => {
           }
         });
 
-        d.children = [overallData, ...d.children];
+        d.children = d.children ? [overallData, ...d.children] : [overallData];
       }
     });
   }
