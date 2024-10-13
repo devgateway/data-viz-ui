@@ -75,7 +75,6 @@ const getOptionsNoDimension = (props) => {
 const includeOverallData = (props) => {
   const { data, measures, dimensions, overallLabel } = props;
   if (dimensions.length == 1 && data.children) {
-    console.log('data.children...', data.children)
     let overallAdded =
       data.children.filter((c) => c?.value == overallLabel).length > 0;
     if (!overallAdded) {
