@@ -292,7 +292,7 @@ const MobileConfig = (props) => {
           (category) =>
             category.type?.toLowerCase() === dimension1?.toLowerCase()
         )[0]
-        .items?.map((item) => item.value);
+        ?.items?.map((item) => item.value);
     } else {
       const storedMeasures = JSON.parse(
         sessionStorage.getItem(`measures_${app}`)

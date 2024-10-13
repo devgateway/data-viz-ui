@@ -1,4 +1,5 @@
 import {PanelBody, PanelRow, SelectControl, ToggleControl} from '@wordpress/components';
+import React, {useEffect} from 'react'
 import {__} from '@wordpress/i18n';
 import ChartColors from "../commons/ChartColors.jsx"
 import ChartLegends from '../commons/ChartLegends.jsx'
@@ -45,6 +46,12 @@ const LineOptions = (props) => {
             enableGridX
         }
     } = props;
+
+    useEffect(() => {
+      if (dimension2 !== "none") {
+        setAttributes({ dimension2: "none" });
+      }
+    }, [dimension2]);
 
     let measuresOptions = []
     if (app == 'csv') {
