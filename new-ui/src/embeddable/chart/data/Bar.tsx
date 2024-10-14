@@ -399,7 +399,7 @@ const Bar2Dimensions = (props) => {
                                 ...allKeys.filter((k) => k === sortVal).map((k: any) => a[k])
                             );
                             const vb = Math.max(
-                                ...allKeys.filter((k) => k === sortVal).map((k:) => b[k])
+                                ...allKeys.filter((k) => k === sortVal).map((k:any) => b[k])
                             );
                             return numericSort(props.sortreverse, va ? va : 0, vb ? vb : 0);
                         }
