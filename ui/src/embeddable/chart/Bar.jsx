@@ -350,7 +350,7 @@ const Chart = ({
   const leftLegendDynamicStyle = {
     bottom: `-${bottomSpacing}px`,
     gap: "0px",
-    top: "0px",
+    // top: "0px",
   };
 
   const createYAxisLine = (data) => {
