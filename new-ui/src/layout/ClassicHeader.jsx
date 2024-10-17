@@ -43,7 +43,7 @@ const BreadCrumbs = withRouter(injectIntl(({ menu, intl }) => {
         {path.filter((i) => i.url !== "#wpm-languages").map((i, idx) => !i.child_items ?
             <a key={idx} className={i.slug === params.slug ? 'active' : ''}
                 href={utils.replaceLink(i.url, intl.locale)}> {i.post_title}</a> :
-            <span>{i.post_title} </span>)}
+            <span key={idx}>{i.post_title} </span>)}
     </React.Fragment>
 
 }))
@@ -51,111 +51,191 @@ const BreadCrumbs = withRouter(injectIntl(({ menu, intl }) => {
 /*
 Setting objects will inject customization preview
 * */
-const MenuItems = injectIntl(({
-    settings,
-    withIcons,
-    active,
-    menu,
-    onSetSelected,
-    selected,
-    intl: { locale }
-}) => {
-    const params = useParams();
-
-    useEffect(() => {
-        if (!selected) {
-            const pathSelected = getPath(menu, params)
-            const items = pathSelected.filter(i => i.menu_item_parent == 0)
-            if (items) {
-                onSetSelected(items[0])
-            }
-        }
-
-    }, [params, menu, onSetSelected, selected])
-
-    /*Original menu mixed with customization changes*/
-    const [mixedMenu, setMixedMenu] = useState(null)
-    //const [removedItems, setRemoved] = useState(null)
-
-    useEffect(() => {
-        setMixedMenu(menu)
-    }, [menu])
-
-
-    useEffect(() => {
-        if (settings && settings.menu_settings && mixedMenu) {
-
-            const removed = []
-            const newItems = menu.items.map(item => {
-
-                //if menu exists in partial settgins
-                //if item  deleted
-                if (settings.menu_settings && settings.menu_settings["nav_menu_item[" + item.ID + "]"] === false) {
-                    removed.push(item.ID)
-                }
-                //if item  removed
-                if (settings.menu_settings && settings.menu_settings["nav_menu_item[" + item.ID + "]"]) {
-                    const updatedItem = settings.menu_settings["nav_menu_item[" + item.ID + "]"];
-                    return { ...item, ...settings.menu_settings["nav_menu_item[" + item.ID + "]"] }
-
-                } else {
-                    return item;
-                }
-            })
-            //if item is new
-            Object.keys(settings.menu_settings).map((mk) => {
-                const value = settings.menu_settings[mk];
-                if (value.type === 'nav_menu_item') {
-                    const re = /(-)?[0-9]+/g;
-                    const results = re.exec(mk)
-                    const id = parseInt(results[0])
-                    const exists = newItems.find(m => m.ID === id)
-                    if (!exists) {
-                        newItems.push(value.value)
+const MenuItems = injectIntl(
+    ({
+        settings,
+        withIcons,
+        active,
+        menu,
+        onSetSelected,
+        selected,
+        intl: { locale },
+        isSmallScreen,
+    }) => {
+        const params = useParams();
+        useEffect(
+            (e) => {
+                if (!selected) {
+                    const pathSelected = getPath(menu, params);
+                    const items = pathSelected.filter((i) => i.menu_item_parent == 0);
+                    if (items) {
+                        onSetSelected(items[0]);
                     }
-
                 }
+            },
+            [params, menu, onSetSelected, selected]
+        );
 
+        /*Original menu mixed with customization changes*/
+        const [mixedMenu, setMixedMenu] = useState(null);
+        //const [removedItems, setRemoved] = useState(null)
 
-            })
-            setMixedMenu({ ...menu, items: newItems.filter((i) => removed.indexOf(i.ID) === -1) })
+        useEffect(() => {
+            setMixedMenu(menu);
+        }, [menu]);
 
-            /*
-            const items = menu.items.map(item => {
-                if (settings.menu_settings && settings.menu_settings["nav_menu_item[" + item.ID + "]"]) {
-                    return {...item, ...settings.menu_settings["nav_menu_item[" + item.ID + "]"]}
-                } else {
-                    return item;
-                }
-            })*/
+        useEffect(() => {
+            if (settings && settings.menu_settings && mixedMenu) {
+                const removed = [];
+                const newItems = menu.items.map((item) => {
+                    //if menu exists in partial settings
+                    //if item  deleted
+                    if (
+                        settings.menu_settings &&
+                        settings.menu_settings["nav_menu_item[" + item.ID + "]"] === false
+                    ) {
+                        removed.push(item.ID);
+                    }
+                    //if item  removed
+                    if (
+                        settings.menu_settings &&
+                        settings.menu_settings["nav_menu_item[" + item.ID + "]"]
+                    ) {
+                        const updatedItem =
+                            settings.menu_settings["nav_menu_item[" + item.ID + "]"];
+                        return {
+                            ...item,
+                            ...settings.menu_settings["nav_menu_item[" + item.ID + "]"],
+                        };
+                    } else {
+                        return item;
+                    }
+                });
+                //if item is new
+                Object.keys(settings.menu_settings).map((mk) => {
+                    const value = settings.menu_settings[mk];
+                    if (value.type == "nav_menu_item") {
+                        const re = /(-)?[0-9]+/g;
+                        const results = re.exec(mk);
+                        const id = parseInt(results[0]);
+                        const exists = newItems.find((m) => m.ID == id);
+                        if (!exists) {
+                            newItems.push(value.value);
+                        }
+                    }
+                });
+                setMixedMenu({
+                    ...menu,
+                    items: newItems.filter((i) => removed.indexOf(i.ID) === -1),
+                });
 
-            //  setMixedMenu({...menu, items:newItems})
-        }
+                /*
+                  const items = menu.items.map(item => {
+                      if (settings.menu_settings && settings.menu_settings["nav_menu_item[" + item.ID + "]"]) {
+                          return {...item, ...settings.menu_settings["nav_menu_item[" + item.ID + "]"]}
+                      } else {
+                          return item;
+                      }
+                  })*/
 
-    }, [settings])
+                //  setMixedMenu({...menu, items:newItems})
+            }
+        }, [settings]);
 
+        const [isMobileResolution, setIsMobileResolution] = useState(false);
 
-    return mixedMenu && <React.Fragment>
+        useEffect(() => {
+            const handleResize = () => {
+                setIsMobileResolution(window.innerWidth <= 1024);
+            };
 
-        {mixedMenu.items.filter(i => i.url !== "#wpm-languages").map((i, idx) => {
-            return (<Menu.Item
-                key={idx}
-                className={`divided ${i.child_items ? 'has-child-items' : ''} ${selected && selected.ID === i.ID ? 'selected' : ''}  ${active === i.slug ? "active" : ""}`}>
+            // Initial check and event listener
+            handleResize();
+            window.addEventListener("resize", handleResize);
 
-                {i.child_items ?
+            // Cleanup on unmount
+            return () => window.removeEventListener("resize", handleResize);
+        }, []);
 
-                    <span onClick={e => onSetSelected(i)}>{i.title}</span> :
-
-                    <a onClick={e => onSetSelected(i)}
-                        href={i.type === 'custom' ? utils.replaceLink(i.url, locale) : localReplaceLink(i.url, locale)}>{i.title}</a>}
-
-
-            </Menu.Item>)
-
-        })}
-
-    </React.Fragment>
-})
+        return (
+            mixedMenu && (
+                <React.Fragment>
+                    {mixedMenu.items
+                        .filter((i) => i.url !== "#wpm-languages")
+                        .map((item, index) => (
+                            <React.Fragment key={item.ID}>
+                                {/* Render parent menu item */}
+                                <Menu.Item
+                                    className={`divided ${item.child_items ? "has-child-items" : ""
+                                        }
+                              ${selected && selected.ID === item.ID
+                                            ? "selected"
+                                            : ""
+                                        }
+                              ${active === item.slug ? "active" : ""}`}
+                                >
+                                    {withIcons && (
+                                        <a href={localReplaceLink(item.url, locale)}>
+                                            <div className={"mark"}>
+                                                <span className="sr-only">{item.title}</span>
+                                            </div>
+                                        </a>
+                                    )}
+                                    {isSmallScreen ? (
+                                        item.child_items ? (
+                                            <span
+                                                onClick={() =>
+                                                    onSetSelected(selected === item ? null : item)
+                                                }
+                                            >
+                                                {item.title}
+                                            </span>
+                                        ) : (
+                                            <a href={localReplaceLink(item.url, locale)}>
+                                                {item.title}
+                                            </a>
+                                        )
+                                    ) : item.child_items ? (
+                                        <span onMouseOver={(e) => onSetSelected(item)}>
+                                            {item.title}
+                                        </span>
+                                    ) : (
+                                        <a
+                                            onMouseOut={(e) => onSetSelected(null)}
+                                            onMouseOver={(e) => onSetSelected(item)}
+                                            href={localReplaceLink(item.url, locale)}
+                                        >
+                                            {item.title}
+                                        </a>
+                                    )}
+                                </Menu.Item>
+                                {/* Render child items below the parent if mobile resolution */}
+                                {isMobileResolution &&
+                                    selected &&
+                                    selected.ID === item.ID &&
+                                    selected.child_items && (
+                                        <React.Fragment>
+                                            {selected.child_items.map((childItem) => (
+                                                <Menu.Item
+                                                    key={childItem.ID}
+                                                    className={`divided child-item ${active === childItem.slug ? "active" : ""
+                                                        }`}
+                                                >
+                                                    <div className={"mark"}></div>
+                                                    <a href={localReplaceLink(childItem.url, locale)}>
+                                                        {childItem.title}
+                                                    </a>
+                                                </Menu.Item>
+                                            ))}
+                                        </React.Fragment>
+                                    )}
+                            </React.Fragment>
+                        ))}
+                </React.Fragment>
+            )
+        );
+    }
+);
 
 const Header = ({ intl, settings }) => {
 

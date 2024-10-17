@@ -197,7 +197,7 @@
           height: 16px;
           background-size: 15px 15px;
           margin-right: 10px;
-          //background-image: url("/header_arrow_green.png");
+          background-image: url("/header_arrow_green.png");
           background-repeat: no-repeat;
         }
       }
@@ -209,7 +209,7 @@
       .item.active {
         .mark {
           @extend .mark;
-          //background-image: url("/child-menu-arrow-active.svg");
+          // background-image: url("/child-menu-arrow-active.svg");
         }
 
         a {
