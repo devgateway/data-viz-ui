@@ -5,18 +5,19 @@ import {injectIntl} from "react-intl";
 import {withRouter} from "@/withRouter";
 import SearchControl from "./SearchControl.jsx";
 import LangSwitcher from "./LangSwitcher.jsx";
+import { useParams } from "react-router-dom";
 
-const getPath = (menu, match) => {
+const getPath = (menu, locationParams) => {
     const path = [];
     menu.items.forEach(item => {
         if (item.child_items) {
             item.child_items.forEach(ch => {
-                if (ch.slug === match.params.slug) {
+                if (ch.slug === locationParams.slug) {
                     path.push(item)
                     path.push(ch)
                 }
             })
-        } else if (item.slug === match.params.slug && item.url !== '/') {
+        } else if (item.slug === locationParams.slug && item.url !== '/') {
             path.push(item)
         }
     })
@@ -65,10 +66,10 @@ const FloatingMenu = (props) => {
 }
 
 const HeaderFloatingMenu = ({
-                                intl: {locale}, match, settings
+                                intl: {locale}, settings
                             }) => {
     const [selected, setSelected] = useState()
-    const {slug} = match.params
+    const {slug} = useParams();
 
     const Logo = ({media}) => {
         return media ? <Image src={media.guid.rendered}/> :
