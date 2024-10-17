@@ -68,7 +68,7 @@ const References = ({
         {editing &&
             <div className="edit-mode-message"><p>No preview available. The full list of references will be displayed in the live page.</p></div>
         }
-        <Grid fluid={true} stretched columns={cols as SemanticWIDTHS} style={style}>
+        <Grid fluid stretched columns={cols as SemanticWIDTHS} style={style}>
             {unique.sort((a, b) => {
                 const indexA = a.getAttribute("data-index") !== null ? parseInt(a.getAttribute("data-index")!) : Number.POSITIVE_INFINITY
                 const indexB = b.getAttribute("data-index") !== null ? parseInt(b.getAttribute("data-index")!) : Number.POSITIVE_INFINITY
