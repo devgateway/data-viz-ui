@@ -261,7 +261,7 @@ const ListFilterDropDown = connect(mapStateToProps, mapActionCreators)((props: L
             text={getSelected()}
             scrolling={false}
             button
-            icon={"angle down ignore"}
+            icon={"angle down"}
             multiple={true}
             search
             floating={false}
@@ -366,7 +366,7 @@ const RangeFilterDropDown = connect(mapStateToProps, mapActionCreators)(({
         multiple={true}
         search
         floating={false}
-        icon={"angle down ignore"}
+        icon="angle down"
         className={`${current && current.length > 0 ? 'applied ' : ''} range`}
 
     >

@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite'
+import { defineConfig, searchForWorkspaceRoot } from 'vite'
 import react from '@vitejs/plugin-react-swc';
 // @ts-ignore
 import eslintPlugin from 'vite-plugin-eslint';
@@ -56,7 +56,13 @@ export default defineConfig(() => {
 
         },
         server: {
-            cors: false
+            cors: false,
+            fs: {
+                allow: [
+                    searchForWorkspaceRoot(process.cwd()),
+                    '../../custom/ui-customizer'
+                ]
+            }
         },
         css: {
             preprocessorOptions: {
