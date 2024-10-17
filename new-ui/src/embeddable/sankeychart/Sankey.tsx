@@ -97,6 +97,7 @@ const Chart = (props) => {
           <div className={`legend item ${legendEnabled ? "" : "ignore"}`} onClick={() => toggle(legend.id)}>
             {useCheckBoxBackground && <input className={legendEnabled ? "" : "ignore"} type='checkbox'
               checked={legendEnabled}
+              readOnly
               style={{
                 backgroundColor: legend.color,
                 color: "#000"
@@ -104,6 +105,7 @@ const Chart = (props) => {
             }
             {!useCheckBoxBackground && <input type='checkbox'
               checked={legendEnabled}
+              readOnly
               style={{
                 color: "#000"
               }} />}
