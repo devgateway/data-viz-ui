@@ -123,6 +123,15 @@ const AccordionContent = ({ posts, activeItem, setActive, color }) => {
     const [scrollTarget, setScrollTarget] = useState(null);
     const arrayColors = color.split(',');
 
+    const findElementAndAddStyles = (elementClass, containerClass, hasContainerClass) => {
+        const elements = document.querySelectorAll(elementClass);
+        elements.forEach((element) => {
+            if(element.querySelector(containerClass)) {
+                element.classList.add(hasContainerClass);
+            }
+        });
+    }
+
     useEffect(() => {
         if (scrollTarget) {
             const offsetTop = scrollTarget.getBoundingClientRect().top + window.scrollY;
@@ -131,6 +140,14 @@ const AccordionContent = ({ posts, activeItem, setActive, color }) => {
                 behavior: 'smooth',
             });
         }
+
+        //  handles issues with older browsers that don't support the has() css selector
+        // adds classes to the container to allow for styling
+        findElementAndAddStyles('.ui.fluid.container.viz.featured.tabs', '.accordion .accordion-post-ft-title', 'has-accordion-title');
+        findElementAndAddStyles('.ui.fluid.container.viz.featured.tabs', '.accordion .accordion-post-vft-content', 'has-accordion-content')
+        findElementAndAddStyles('.ui.fluid.container.viz.featured.tabs', 'blockquote', 'has-blockquote');
+        findElementAndAddStyles('.ui.fluid.container.viz.featured.tabs', '.vt-accordion-post-intro figure', 'has-vt-accordion-figure');
+        findElementAndAddStyles('.ui.fluid.container.viz.featured.tabs', '.content.active.accordion-post-content .wp-block-columns', 'has-wp-block-columns');
     }, [scrollTarget]);
 
     const handleClick = (e, titleProps) => {
