@@ -15,6 +15,15 @@ const AccordionContent = ({ posts, activeItem, setActive, colors }) => {
     const [activeIndex, setActiveIndex] = useState(posts.findIndex(p => p.slug === activeItem));
     const [scrollTarget, setScrollTarget] = useState(null);
 
+    const findElementAndAddStyles = (elementClass, containerClass, hasContainerClass) => {
+        const elements = document.querySelectorAll(elementClass);
+        elements.forEach((element) => {
+            if(element.querySelector(containerClass)) {
+                element.classList.add(hasContainerClass);
+            }
+        });
+    }
+
     useEffect(() => {
         if (scrollTarget) {
             const offsetTop = scrollTarget.getBoundingClientRect().top + window.scrollY;
@@ -23,6 +32,18 @@ const AccordionContent = ({ posts, activeItem, setActive, colors }) => {
                 behavior: 'smooth',
             });
         }
+
+        //  handles issues with older browsers that don't support the has() css selector
+        findElementAndAddStyles('.ui.fluid.container.viz.featured.tabs', '.accordion', 'has-accordion');
+        findElementAndAddStyles('.ui.fluid.container.viz.featured.tabs', 'blockquote', 'has-blockquote');
+        findElementAndAddStyles('.ui.fluid.container.viz.featured.tabs', '.accordion .accordion-post-ft-title', 'has-accordion-title');
+        findElementAndAddStyles('.ui.fluid.container.viz.featured.tabs', '.accordion .accordion-post-vft-content', 'has-accordion-content');
+        // Check if .vt-accordion-post-intro contains figure and add 'has-vt-accordion-figure' class
+        findElementAndAddStyles('.ui.fluid.container.viz.featured.tabs', '.vt-accordion-post-intro figure', 'has-vt-accordion-figure');
+
+        // Check if .content.active.accordion-post-content contains .wp-block-columns and add 'has-wp-block-columns' class
+        findElementAndAddStyles('.ui.fluid.container.viz.featured.tabs', '.content.active.accordion-post-content .wp-block-columns', 'has-wp-block-columns');
+
     }, [scrollTarget]);
 
     const handleClick = (e, titleProps) => {
