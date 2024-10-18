@@ -3,7 +3,7 @@ import PostIntro from "../connected-templates/PostIntro";
 import 'pure-react-carousel/dist/react-carousel.es.css';
 import React, {useEffect, useRef, useState} from "react";
 import {Container} from "semantic-ui-react";
-import * as d3 from 'd3'
+import * as d3 from 'd3';
 
 const visibleStyle  = {
     visibility: 'visible',
@@ -155,7 +155,8 @@ const TimeLine = ({
         const onMouseOver = (d, i) => {            
             const xOffset = 30
             const yOffset = 50
-            let position = [0, 0]            
+            let position = [0, 0]    
+             
             if (d3.event) {
                 const rect = d3.event.target.getBoundingClientRect()
                 const parentDiv = d3.event.target.closest('.time').getBoundingClientRect()             
@@ -351,7 +352,7 @@ const TimeLine = ({
             style={{position: 'relative'}}>
             {posts.map((p, i) => {
                 const isVisible = tooltipData && tooltipData.index == i
-               return (<div className={"tooltip"} 
+               return (<div className={"tooltip"} key={i}
                    onMouseOver={() => 
                     highlightCircle(i)
                    }
