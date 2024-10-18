@@ -28,19 +28,19 @@ const HorizontalDashboardGallery: React.FC<HorizontalDashboardGalleryProps> = ({
     const rows = childPages.length / parseInt(columns) + ((childPages.length % parseInt(columns)) > 0 ? 1 : 0)
     let index = -1
 
-    console.log("columns", columns)
+    console.log("columns", rows)
 
     return (
         <div>
             {/* @ts-ignore */}
             <Grid columns={columns}>
-                {[...Array(rows)]
-                    .map(r => {
+                {Array.from({ length: Math.max(0, Math.floor(rows)) })
+                    .map((r, idx) => {
 
-                        return (<Grid.Row>
-                            {[...Array(parseInt(columns)).keys()].map(c => {
+                        return (<Grid.Row key={idx}>
+                            {[...Array(parseInt(columns)).keys()].map((c, index) => {
                                 index++
-                                return (<Grid.Column>
+                                return (<Grid.Column key={index}>
                                     <PostIntro as={"div"} post={childPages[index]}></PostIntro>
                                 </Grid.Column>)
                             })}
