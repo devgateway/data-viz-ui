@@ -3,14 +3,15 @@ import react from '@vitejs/plugin-react-swc';
 // @ts-ignore
 import eslintPlugin from 'vite-plugin-eslint';
 import path from "path";
-import EnvironmentPlugin from 'vite-plugin-environment'
+import EnvironmentPlugin from 'vite-plugin-environment';
+import injectHtml from 'vite-plugin-html';
 
 // https://vitejs.dev/config/
-export default defineConfig(() => {
+export default defineConfig(({ mode }) => {
 
     return {
         plugins: [
-            react(),
+            react({}),
             // eslintPlugin({
             //     exclude: ['/virtual:/**', 'node_modules/**', "dist/**"],
             // }),
@@ -31,29 +32,30 @@ export default defineConfig(() => {
                 REACT_APP_THEME: 'cash',
                 REACT_APP_WP_SEARCH_END_POINT: '/dg/v1/search',
                 REACT_APP_API_ROOT: 'http://localhost',
+            }, {
+                loadEnvFiles: true,
+                
             })
         ],
         resolve: {
             alias: {
                 "@": path.resolve(__dirname, "./src"),
-                "@devgateway/wp-react-lib": path.resolve(__dirname, "../react-lib/wp-react-lib/dist"),
+                // "@devgateway/wp-react-lib": path.resolve(__dirname, "../react-lib/wp-react-lib/dist"),
             },
         },
         build: {
             cssMinify: true,
             cssCodeSplit: true,
             sourcemap: false,
+            manifest: true,
             chunkSizeWarningLimit: 2000,
-            rollupOptions:{
-                external: [
-                    'immutable',
-                    'react',
-                    'react-intl',
-                    "@devgateway/wp-react-lib",
-
-                ]
+            rollupOptions: {
+                // treeshake: true,
             }
-
+        },
+        appType: 'spa',
+        experimental: {
+            
         },
         server: {
             cors: false,
