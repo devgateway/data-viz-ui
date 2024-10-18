@@ -5,7 +5,7 @@ import { injectIntl } from "react-intl";
 import { withRouter } from "@/withRouter"
 import SearchControl from "./SearchControl.jsx";
 import LangSwitcher from "./LangSwitcher.jsx";
-import { useParams } from "react-router-dom";
+import { Link, NavLink, useParams } from "react-router-dom";
 
 const getPath = (menu, locationParams) => {
     const path = [];
@@ -238,7 +238,6 @@ const MenuItems = injectIntl(
 );
 
 const Header = ({ intl, settings }) => {
-
     const [selected, setSelected] = useState()
     const { slug } = useParams();
 
@@ -255,8 +254,7 @@ const Header = ({ intl, settings }) => {
 
                     <Menu className={"branding"} text>
                         <Menu.Item>
-                            <a href="/new-ui/public">
-
+                            <NavLink to={`/${intl.locale}`}>
                                 {settings.site_logo !== 0 && <MediaProvider id={settings.site_logo}>
                                     <MediaConsumer>
                                         <Logo></Logo>
@@ -265,7 +263,8 @@ const Header = ({ intl, settings }) => {
                                 </MediaProvider>}
                                 {!window.isCustomizedPreview && settings.site_logo === 0 &&
                                     <img className="brand logo" size="large" src='/dc-logo_01.png' />}
-                            </a>
+                            </NavLink>
+
                         </Menu.Item>
 
                         <Menu.Item className={"divider"}>
