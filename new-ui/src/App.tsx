@@ -29,7 +29,6 @@ import PreviewPageContainer from './layout/containers/PreviewPageContainer';
 import PreviewTypeContainer from './layout/containers/PreviewTypeContainer';
 import SlugContainer from './layout/containers/SlugContainer';
 import SlugPostContainer from './layout/containers/SlugPostContainer';
-import Router from './router';
 
 
 const messages = {
@@ -168,7 +167,6 @@ const IntlRoutes = () => {
                                     <ResponsiveContainer>
                                         <PageConsumer>
                                             <Page />
-                                            {/* @ts-ignore */}
                                             <Helmet locale={locale} />
                                         </PageConsumer>
                                     </ResponsiveContainer>
