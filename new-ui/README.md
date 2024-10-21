@@ -48,3 +48,6 @@ export default tseslint.config({
   },
 })
 ```
+
+<!-- Sass breaking changes -->
+<!-- https://sass-lang.com/documentation/breaking-changes/ -->
