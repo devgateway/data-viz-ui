@@ -1,4 +1,4 @@
-import { Container, Grid, Segment } from "semantic-ui-react";
+import { Container, Grid, Segment, SemanticWIDTHS } from "semantic-ui-react";
 import { PageConsumer, PageProvider, PostIntro } from "@devgateway/wp-react-lib";
 import React from "react";
 import { injectIntl } from "react-intl";
@@ -23,33 +23,28 @@ interface HorizontalDashboardGalleryProps {
     columns: string
 }
 
-const HorizontalDashboardGallery: React.FC<HorizontalDashboardGalleryProps> = ({ pages, columns }) => {
+const HorizontalDashboardGallery: React.FC<HorizontalDashboardGalleryProps> = ({pages, columns}) => {
     const childPages = pages ? pages.sort((a, b) => a.menu_order - b.menu_order) : []
     const rows = childPages.length / parseInt(columns) + ((childPages.length % parseInt(columns)) > 0 ? 1 : 0)
     let index = -1
 
-    console.log("columns", rows)
-
-    return (
-        <div>
+    return (<div>
+        <Grid columns={columns as SemanticWIDTHS}>
             {/* @ts-ignore */}
-            <Grid columns={columns}>
-                {Array.from({ length: Math.max(0, Math.floor(rows)) })
-                    .map((r, idx) => {
+            {[...Array(parseInt(rows)).keys()]
+                .map(r => {
 
-                        return (<Grid.Row key={idx}>
-                            {[...Array(parseInt(columns)).keys()].map((c, index) => {
-                                index++
-                                return (<Grid.Column key={index}>
-                                    <PostIntro as={"div"} post={childPages[index]}></PostIntro>
-                                </Grid.Column>)
-                            })}
-                        </Grid.Row>)
-                    })}
+                    return (<Grid.Row>
+                        {[...Array(parseInt(columns)).keys()].map(c => {
+                            index++
+                            return (<Grid.Column>
+                                <PostIntro as={"div"} post={childPages[index]}></PostIntro>
+                            </Grid.Column>)
+                        })}
+                    </Grid.Row>)
+                })}
 
-            </Grid>
-        </div>
-    )
+        </Grid></div>)
 }
 
 export interface PageGalleryProps {
