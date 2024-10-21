@@ -38,7 +38,7 @@ export const replaceHTMLinks = (html, locale) => {
 const helmetContext = {}
 
 
-const HelmetMetadata = ({pages, locale}) => {
+const HelmetMetadata = ({pages = {}, locale}) => {
 
     const {yoast_head_json} = pages[0];
 
