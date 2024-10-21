@@ -266,7 +266,7 @@ componentWillUnmount() {
       enabledLayers.forEach((l) => {
         metadataFuncs.push(
           new Promise((resolve, reject) => {
-            d3.json(process.env.REACT_APP_WP_API + "/wp/v2/media/" + l.id)
+            d3.json(process.env.VITE_REACT_APP_WP_API + "/wp/v2/media/" + l.id)
               .then((data) => {
                 resolve({ id: l.id, url: data.source_url, index: l.index });
               })
