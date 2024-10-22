@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Container } from "semantic-ui-react";
 import DataProvider from "../data/DataProvider";
 import DataConsumer from "../data/DataConsumer";
@@ -614,12 +614,23 @@ const Chart = (props) => {
   if (dimension2 != "none") {
     dimensions.push(dimension2);
   }
+  const [legendsContainerHeight, setLegendsContainerHeight] = useState(0);
+
+  useEffect(() => {
+    if (isMobileOrTablet) {
+      setTimeout(() => {
+        const legendsContainer = document.querySelector(".legends.container.items-section") ||
+                                 document.querySelector('.legends.container.has-standard-12-font-size.bottom');
+        setLegendsContainerHeight(legendsContainer?.clientHeight || 0);
+      }, 0);
+    }
+  }, []);
 
   return (
     <div ref={ref}>
       <Container
         className={"chart container"}
-        style={{ minHeight: height + "px" }}
+        style={{ minHeight: parseInt(height) + parseInt(legendsContainerHeight, 10) + "px" }}
         fluid={true}
       >
         <DataProvider
