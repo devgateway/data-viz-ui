@@ -3,7 +3,7 @@ import Immutable from 'immutable'
 import createRootReducer, { routerMiddleware, createReduxHistory } from "./reducer";
 import { configureStore } from '@reduxjs/toolkit';
 
-const useHash = process.env.REACT_APP_USE_HASH_LINKS as unknown as boolean;
+const useHash = process.env.VITE_REACT_APP_USE_HASH_LINKS as unknown as boolean;
 export const history = useHash? createHashHistory():createBrowserHistory()
 
 const initialState = Immutable.Map()
