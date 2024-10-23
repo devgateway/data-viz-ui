@@ -1,6 +1,6 @@
 import {post} from '../../api/commons'
 
-const API_ROOT = process.env.REACT_APP_API_ROOT
+const API_ROOT = process.env.VITE_REACT_APP_API_ROOT
 
 export const sendShowCase = (params) => {
     const data = new FormData();
