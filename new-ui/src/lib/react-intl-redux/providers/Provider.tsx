@@ -6,7 +6,7 @@ import IntlProvider from './IntlProvider'
 
 const Provider = ({ store, children }) =>
   <ReduxProvider store={store}>
-    <IntlProvider locale={process.env.REACT_APP_DEFAULT_LOCALE as string}>
+    <IntlProvider locale={process.env.VITE_REACT_APP_DEFAULT_LOCALE as string}>
       {children}
     </IntlProvider>
   </ReduxProvider>
