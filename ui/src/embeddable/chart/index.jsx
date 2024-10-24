@@ -616,21 +616,104 @@ const Chart = (props) => {
   }
   const [legendsContainerHeight, setLegendsContainerHeight] = useState(0);
 
+
   useEffect(() => {
-    if (isMobileOrTablet) {
-      setTimeout(() => {
-        const legendsContainer = document.querySelector(".legends.container.items-section") ||
-                                 document.querySelector('.legends.container.has-standard-12-font-size.bottom');
-        setLegendsContainerHeight(legendsContainer?.clientHeight || 0);
-      }, 0);
-    }
-  }, []);
+    const timeoutId = setTimeout(() => {
+      if (isMobileOrTablet) {
+        // Function to handle margin adjustment for all charts
+        const adjustDataSourceMargin = () => {
+          const legendsContainer =
+            ref.current.querySelector(
+              ".legends.container.has-standard-12-font-size.bottom"
+            ) || ref.current.querySelector(".legends.container.items-section");
+
+          if (!legendsContainer) return;
+
+          // Get computed style and dimensions of the legends container
+          const { clientHeight: height } = legendsContainer;
+          const styles = window.getComputedStyle(legendsContainer);
+          const marginTop = parseInt(styles.marginTop);
+          const marginBottom = parseInt(styles.marginBottom);
+          const paddingTop = parseInt(styles.paddingTop);
+          const paddingBottom = parseInt(styles.paddingBottom);
+          const totalHeight =
+            height + marginTop + marginBottom + paddingTop + paddingBottom;
+
+          // Find the closest '.ui.fluid.container.content' ancestor from the legends container
+          const container = legendsContainer.closest(".ui.fluid.container.content");
+
+          if (container) {
+            const dataSourceParagraph = container.querySelector(".data-source");
+            if (dataSourceParagraph) {
+              const dataSourceRect = dataSourceParagraph.getBoundingClientRect();
+              const legendsRect = legendsContainer.getBoundingClientRect();
+
+              // Ensure elements are visible before adjusting margins
+              if (legendsRect.bottom !== 0 && dataSourceRect.top !== 0) {
+                if (legendsContainer.textContent.trim() === "") return;
+
+                const legendsMarginBottom = marginBottom; // Legend margin-bottom is already computed
+                const adjustedLegendsBottom = legendsRect.bottom + legendsMarginBottom;
+                const dataSourceStyles = window.getComputedStyle(dataSourceParagraph);
+                const dataSourceMarginTop = parseFloat(dataSourceStyles.marginTop) || 0;
+                const adjustedDataSourceTop = dataSourceRect.top - dataSourceMarginTop;
+
+                if (adjustedLegendsBottom > adjustedDataSourceTop) {
+                  let overlap = adjustedLegendsBottom - adjustedDataSourceTop;
+                  if (overlap < 5) overlap += 30;
+                  dataSourceParagraph.style.marginTop = `${overlap + 20}px`; // Add padding
+                }
+              } else {
+                // Delay adjustment if elements are not fully visible yet
+                setTimeout(() => {
+                  if (dataSourceRect.top < legendsRect.bottom) {
+                    dataSourceParagraph.style.marginTop = `${
+                      legendsRect.bottom - dataSourceRect.top + 20
+                    }px`;
+                  }
+                }, 1000);
+              }
+            }
+          }
+
+          // Check for overlap with the chart container above
+          const chartContainer = legendsContainer.closest(".chart.container");
+          if (chartContainer) {
+            const chartContainerRect = chartContainer.getBoundingClientRect();
+            const chartContainerStyles = window.getComputedStyle(chartContainer);
+            const chartContainerMarginBottom =
+              parseFloat(chartContainerStyles.marginBottom) || 0;
+            const adjustedChartContainerBottom =
+              chartContainerRect.bottom + chartContainerMarginBottom;
+
+            const legendsRect = legendsContainer.getBoundingClientRect();
+            const legendsMarginTop = parseFloat(styles.marginTop) || 0;
+            const adjustedLegendsTop = legendsRect.top - legendsMarginTop;
+
+            if (adjustedLegendsTop < adjustedChartContainerBottom) {
+              const overlap = adjustedChartContainerBottom - adjustedLegendsTop;
+              legendsContainer.style.marginTop = `${overlap + 20}px`; // Add padding
+            }
+          }
+
+          setLegendsContainerHeight(totalHeight);
+        };
+
+        adjustDataSourceMargin();
+      }
+    }, 0);
+
+    // Cleanup observer and timeout
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [isMobileOrTablet, ref]);
 
   return (
     <div ref={ref}>
       <Container
         className={"chart container"}
-        style={{ minHeight: parseInt(height) + parseInt(legendsContainerHeight, 10) + "px" }}
+        style={{ minHeight: parseInt(height) + parseInt(legendsContainerHeight) + "px" }}
         fluid={true}
       >
         <DataProvider
