@@ -138,11 +138,11 @@ const IntlRoutes = () => {
             <AppContextProvider getComponent={getComponentByNameIgnoreCase} store={store} locale={locale}>
                 <SettingProvider locale={locale} changeUUID={customize_changeset_uuid}>
                     <ScrollToTop />
-                    <SettingsConsumer>
+                    {/* <SettingsConsumer>
                         <CustomizerWrapper>
                             <InjectTitle />
                         </CustomizerWrapper>
-                    </SettingsConsumer>
+                    </SettingsConsumer> */}
                     <Routes>
                         {/* <Route path="/" element={<Outlet />} /> */}
                         {
@@ -158,7 +158,7 @@ const IntlRoutes = () => {
                             //default route (home)
                         }
 
-                        <Route path="/" element={(
+                        {/* <Route path="/" element={(
                             <PageProvider
                                 slug={"home"}
                                 locale={locale}
@@ -173,12 +173,12 @@ const IntlRoutes = () => {
                                 </PageConsumer>
                             </PageProvider>
                         )}>
-                        </Route>
-                        <Route path="embeddable/:name" element={
+                        </Route> */}
+                        {/* <Route path="embeddable/:name" element={
                             <SettingsConsumer>
                                 <PreviewComponentParameterParser />
                             </SettingsConsumer>}>
-                        </Route>
+                        </Route> */}
 
                         <Route path={"/preview/page/:id"} element={<PreviewPageContainer />} />
                         <Route path={"/preview/:type/:id"} element={<PreviewTypeContainer />} />
@@ -194,7 +194,7 @@ const IntlRoutes = () => {
 };
 
 
-const WithTrackerRoutes = WithTracker(IntlRoutes)
+const WithTrackerRoutes = WithTracker(IntlRoutes);
 
 const MainRoutes = (props) => {
     return (
