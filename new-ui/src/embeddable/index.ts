@@ -1,7 +1,7 @@
 import React, { lazy } from 'react'
 import data from './reducers/data'
 import embeddable from './reducers/embeddable'
-import {injectIntl} from "react-intl";
+import { injectIntl } from "react-intl";
 import * as customizer from "@devgateway/customizer";
 
 // components
@@ -34,10 +34,10 @@ const Wrapped = lazy(() => import("./wrapped"));
 const SankeyChart = lazy(() => import("./sankeychart"));
 const DataLabel = lazy(() => import("./datalabel"));
 
-let reducerList = {data, embeddable};
+let reducerList = { data, embeddable };
 
 if (customizer.Reducers) {
-    reducerList = {...reducerList, ...customizer.Reducers}
+    reducerList = { ...reducerList, ...customizer.Reducers }
 }
 
 export const reducers = reducerList;
@@ -79,7 +79,8 @@ export const getComponentByNameIgnoreCase = (name: string) => {
     const k = Object.keys(components).find(value => value.toLowerCase() === name.toLowerCase())
     if (k) {
         return injectIntl(components[k])
-    } else {
+    }
+    else {
         const customComponent = customizer.getComponentByNameIgnoreCase(name)
         if (customComponent) {
             return injectIntl(customComponent)
