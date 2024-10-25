@@ -18,7 +18,7 @@ class Map extends React.Component {
         }
 
         const {rotationEnabled} = this.props
-        var group = d3.select(this.svgRef.current).datum({
+        const group = d3.select(this.svgRef.current).datum({
             x: 0,
             y: 0
         })
@@ -36,7 +36,7 @@ class Map extends React.Component {
     componentDidMount() {
 
         const {rotationEnabled} = this.props
-        var group = d3.select(this.svgRef.current).datum({
+        const group = d3.select(this.svgRef.current).datum({
             x: 0,
             y: 0
         })
@@ -52,10 +52,10 @@ class Map extends React.Component {
             y: 0
         };
         const {projection, width, height} = this.props
-        var λ = d3.scaleLinear()
+        const λ = d3.scaleLinear()
             .domain([-width, width])
             .range([-180, 180])
-        var φ = d3.scaleLinear()
+        const φ = d3.scaleLinear()
             .domain([-height, height])
             .range([90, -90]);
 
