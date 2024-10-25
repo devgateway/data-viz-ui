@@ -129,7 +129,11 @@ const DownloadComponent = (props) => {
     return (
 
         <Container
-            className={`viz download ${style}  ${useTitle ? 'has-title' : ''}  ${isCheckPNG ||  isCheckJPG ? 'has-formats' : ''} ${editing ? 'editing' : ''}`}
+            className={`viz download ${style} ${useTitle ? 'has-title' : ''} 
+                ${(isCheckPNG || isCheckJPG) ? 'has-formats' : ''} 
+                ${editing ? 'editing' : ''} 
+                ${(isCheckPNG && isCheckJPG) ? 'multi-format' : ''} 
+                ${(isCheckPNG && !isCheckJPG) || (!isCheckPNG && isCheckJPG) ? 'single-format' : ''}`}
             fluid={true}>
 
             <DownloadableContent ref={componentRef}>
