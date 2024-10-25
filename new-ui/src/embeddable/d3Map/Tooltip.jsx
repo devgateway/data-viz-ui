@@ -1,7 +1,5 @@
 import React from "react";
-
-
-const template = require("string-template")
+import template from "string-template";
 
 const percentExpresion = /(\+?\%)[\(]([A-z0-9,.,-]+)\)/gi
 const numericExpresion = /(\+?\#)[\(]([A-z0-9,.,-]+)\)/gi
