@@ -44,7 +44,7 @@ class DataLayer extends BaseLayer {
             defaultSize: markSizeScale2
         })
 
-        let numberFormat = {
+        const numberFormat = {
             style: (format.style === 'compacted') ? 'decimal' : format.style,
             notation: (format.style === 'compacted') ? 'compact' : "standard",
             currency: format.currency,
@@ -99,7 +99,7 @@ class DataLayer extends BaseLayer {
                         const originID = d1.properties[featureJoinAttribute]
                         const id = d1.properties[featureJoinAttribute] + "--" + d2.properties[featureJoinAttribute];
 
-                        var link = {
+                        const link = {
                             type: "LineString", coordinates: [
                                 [projection.invert(path.centroid(d1))[0],
                                     projection.invert(path.centroid(d1))[1]
@@ -298,7 +298,7 @@ class DataLayer extends BaseLayer {
 const DataWrapper = (props) => {
     const {id, unique, filters, csv, app, group = "default", flowOrigin, editing, flowDestination} = props
 
-    let params = {}
+    const params = {}
 
     const ff = filters || {}
 
