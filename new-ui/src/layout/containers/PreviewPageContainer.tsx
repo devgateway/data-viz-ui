@@ -1,5 +1,5 @@
 import React from 'react'
-import ResponsiveContainer from '../ResponsiveContainer';
+import ResponsiveContainer from '@/layout/ResponsiveContainer';
 import {
     PageProvider,
     PageConsumer,
