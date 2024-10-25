@@ -4,9 +4,9 @@ import React, {Component} from 'react'
  * @deprecated This Async component wrapper is deprecated. Please use React.lazy() for component lazy loading instead.
  * 
  * Example usage with React.lazy():
- * const MyComponent = React.lazy(() => import('./MyComponent'));
+ * @example  const MyComponent = React.lazy(() => import('./MyComponent'));
  * 
- * Then use it with a Suspense component:
+ * // Then use it with a Suspense component:
  * <Suspense fallback={<div>Loading...</div>}>
  *   <MyComponent />
  * </Suspense>
