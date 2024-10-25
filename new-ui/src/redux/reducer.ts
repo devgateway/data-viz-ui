@@ -18,7 +18,7 @@ const createRootReducer = () => combineReducers({
     router: routerReducer,
     wordpress,
     ...reducers,
-    intl: intlReducer
+    // intl: intlReducer
 });
 
 export { createReduxHistory, routerMiddleware };
