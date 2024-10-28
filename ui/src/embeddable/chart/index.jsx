@@ -712,9 +712,14 @@ const Chart = (props) => {
   return (
     <div ref={ref}>
       <Container
-        className={"chart container"}
-        style={{ minHeight: parseInt(height) + parseInt(legendsContainerHeight) + "px" }}
-        fluid={true}
+          className={"chart container"}
+          style={{
+            minHeight:
+                type === "pie" && window.innerWidth <= 480
+                    ? `${parseInt(height) + parseInt(legendsContainerHeight) * 0.5}px`
+                    : `${parseInt(height) + parseInt(legendsContainerHeight)}px`,
+          }}
+          fluid={true}
       >
         <DataProvider
           editing={editing}
