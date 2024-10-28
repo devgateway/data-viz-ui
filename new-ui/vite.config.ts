@@ -28,6 +28,7 @@ export default defineConfig(({ mode }) => {
             alias: {
                 "@": path.resolve(__dirname, "./src"),
                 // "@devgateway/wp-react-lib": path.resolve(__dirname, "../react-lib/wp-react-lib/dist"),
+                // "@devgateway/ui-customizer": path.resolve(__dirname, "../../custom/ui-customizer/dist"),
             },
         },
         build: {
@@ -38,13 +39,18 @@ export default defineConfig(({ mode }) => {
             minify: false,
             chunkSizeWarningLimit: 2000,
             rollupOptions: {
-                // treeshake: true,
+                treeshake: true,
             },
             commonjsOptions: {
                 transformMixedEsModules: true,
                 
-            }
+            },
             
+        },
+        optimizeDeps: {
+            include: [
+                "@devgateway/ui-customizer"
+            ]
         },
         appType: 'spa',
         experimental: {
@@ -57,7 +63,7 @@ export default defineConfig(({ mode }) => {
                     searchForWorkspaceRoot(process.cwd()),
                     '../../custom/ui-customizer'
                 ]
-            }
+            },
         },
         css: {
             preprocessorOptions: {
