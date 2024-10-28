@@ -273,7 +273,7 @@ const Chart = ({
   };
 
   return (
-    <div style={{ height: height }}>
+    <div style={{ height: height }} className={"pie-chart"}>
       {optionsVal && optionsVal.data && optionsVal.data.length > 0 && (
         <>
           <ResponsivePie
