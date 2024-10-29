@@ -1,4 +1,4 @@
-FROM node:12.22.12
+FROM node:20-slim
 WORKDIR /tmp/work
 
 COPY blocks ./blocks

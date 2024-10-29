@@ -20,8 +20,6 @@ const Reference = ({
 
                    }) => {
 
-    console.log("add references "+index)
-
     return <Popup className="reference-popup" hoverable size={"mini"} offset={[-16, 0]} content={<div>
 
         <p>{decodeContent(description)}</p>
