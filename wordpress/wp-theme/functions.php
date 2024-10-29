@@ -126,13 +126,16 @@ if (is_admin()) {
     }
     session_write_close();
 }
+
 include '_admin_styles.php';
 include '_mime_types.php';
+include '_custom_fields.php';
 include '_metadata.php';
+
 include '_customization.php';
 include '_wpm_config.php';
 include '_settings.php';
 include '_search.php';
-
 include '_functions.php';
 
+//  require get_template_directory() . '/inc/customizer.php';

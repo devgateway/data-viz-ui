@@ -1,4 +1,4 @@
-FROM node:12.22.10 AS compiler
+FROM node:20-slim AS compiler
 WORKDIR /tmp/blocks
 COPY blocks ./
 RUN npm install
