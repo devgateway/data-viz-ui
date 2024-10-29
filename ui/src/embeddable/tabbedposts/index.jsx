@@ -88,7 +88,7 @@ const AccordionContent = ({ posts, activeItem, setActive }) => {
     }
   }, [scrollTarget]);
 
-  /*useEffect(() => {
+  useEffect(() => {
     let timeoutId;
     let observers = []; // Array to store observers for each accordion
 
@@ -96,7 +96,7 @@ const AccordionContent = ({ posts, activeItem, setActive }) => {
       requestAnimationFrame(() => {
         // Find all legend containers
         const legendsContainers = ref.querySelectorAll(
-          ".legends.container.has-standard-12-font-size.bottom, .legends.container.items-section"
+          ".accordion .legends.container.has-standard-12-font-size.bottom, .legends.container.items-section"
         );
 
         if (legendsContainers.length === 0) {
@@ -215,7 +215,7 @@ const AccordionContent = ({ posts, activeItem, setActive }) => {
       clearTimeout(timeoutId);
       observers.forEach((observer) => observer.disconnect());
     };
-  }, [activeIndex, isMobileOrTablet]);*/
+  }, [activeIndex, isMobileOrTablet]);
 
   const handleClick = (e, titleProps) => {
     const { index } = titleProps;
