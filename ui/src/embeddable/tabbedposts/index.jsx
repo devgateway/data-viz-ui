@@ -99,7 +99,7 @@ const SingleTabbedView = ({posts, showLabels}) => {
 
     return (
         <React.Fragment>
-            {posts.map(p => <anchor id={p.slug}></anchor>)}
+            {posts.map(p => <a id={p.slug}></a>)}
 
             <Menu className="tabbed posts" text>
                 <ItemMenu showLabels={showLabels} posts={posts} setActive={setActive}

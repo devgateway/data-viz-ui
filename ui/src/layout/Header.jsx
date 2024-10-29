@@ -1,9 +1,9 @@
 import React from "react";
 
-import ClassicHeader from "./ClassicHeader";
-import FloatingHeader from "./FloatingMenuHeader";
+import ClassicHeader from "./ClassicHeader.jsx";
+import FloatingHeader from "./FloatingMenuHeader.jsx";
 import {injectIntl} from "react-intl";
-import {withRouter} from "react-router";
+import {withRouter} from "@/withRouter";
 
 const Header = (props) => {
     const {settings} = props;

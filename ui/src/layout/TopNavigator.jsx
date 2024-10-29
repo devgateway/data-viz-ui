@@ -1,5 +1,4 @@
 import React, {Component, useEffect, useState } from "react";
-import ScrollToTopOnMount from "../ScrollTop";
 import {Menu} from 'semantic-ui-react'
 
 
