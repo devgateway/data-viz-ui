@@ -8,7 +8,7 @@ const Connected = (props) => {
 }
 
 const mapStateToProps = (state, ownProps) => {
-
+    return {}
 }
 
 const mapActionCreators = {
