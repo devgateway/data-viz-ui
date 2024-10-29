@@ -1,7 +1,5 @@
 import React, {useEffect} from 'react';
-import {connect} from "react-redux";
 import * as d3 from 'd3' // d3 plugin
-import * as topojson from "topojson-client";
 import {Icon, Popup} from "semantic-ui-react";
 import {FormattedMessage} from "react-intl";
 
@@ -32,7 +30,7 @@ class ZoomControl extends React.Component {
     componentDidMount() {
         const {zoomEnabled = true, rotationEnabled} = this.props
         const selection = this.getSelection()
-        
+
         if (selection) {
 
             if (zoomEnabled) {
@@ -96,9 +94,9 @@ class ZoomControl extends React.Component {
 
     }
 
-    zoomed() {
+    zoomed(event) {
         //selection.selectAll("g").attr("transform", d3.event.transform)
-        this.props.onZoomed(d3.event.transform)
+        this.props.onZoomed(event.transform)
 
     }
 
@@ -151,10 +149,10 @@ class ZoomControl extends React.Component {
         this._fullView(false)
     }
 
-    zoomEnd() {
+    zoomEnd(event) {
         const {group, editing, width, height} = this.props
         if (editing) {
-            const {x, y, k} = d3.event.transform
+            const {x, y, k} = event.transform
             window.parent.postMessage({type: `d3_map_${group}`, value: ({k, x, y, width, height})}, "*");
         }
     }

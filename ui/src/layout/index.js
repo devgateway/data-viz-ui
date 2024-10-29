@@ -1,3 +1,3 @@
-import ResponsiveContainer from './ResponsiveContainer.jsx'
+import ResponsiveContainer from './ResponsiveContainer'
 
 export default ResponsiveContainer
