@@ -351,7 +351,7 @@ const Chart = (props) => {
     colorBy: colorBy,
   };
   let child = null;
-  const contentHeight = editing ? height - 80 : height - 40;
+  const contentHeight = editing ? height - 80 : height;
 
   const showXAxisTitle = () => {
     if(isMobileConfigEnabled) {
