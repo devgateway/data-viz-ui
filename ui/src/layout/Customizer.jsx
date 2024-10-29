@@ -11,7 +11,7 @@ const settingMappings = {
   const readCustomizationMessage = (event) => {
             console.log("-------------------------------reading customizer message ----------------------------------------")
             const data = JSON.parse(event.data);
-            
+
             const newSettings = {...customization}
 
             if (settingMappings[data.property]) {
@@ -38,7 +38,7 @@ const CustomizerWrapper = (props) => {
     const setValue = (event) => {
         //const data = JSON.parse(event.data);
         const data = event.data;
-        if (data.messageType && data.messageType == 'partial-update') {
+        if (data.messageType && data.messageType === 'partial-update') {
             const partialSettings = ref.current
             if (settingMappings[data.property]) {
                 partialSettings[settingMappings[data.property]] = data.value;
@@ -64,7 +64,7 @@ const CustomizerWrapper = (props) => {
         };
     }, [])
 
-    
+
     return React.Children.map(props.children, (child => React.cloneElement(child, {
         ...props,
         settings: {...customization}
