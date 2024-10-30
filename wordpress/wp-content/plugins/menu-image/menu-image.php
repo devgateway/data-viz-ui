@@ -3,7 +3,7 @@
 /**
  * Plugin Name: Menu Image
  * Description: Improve your navigation menu items with images, logos, icons, buttons.
- * Version: 3.10
+ * Version: 3.11
  * Plugin URI: https://www.freshlightlab.com/menu-image-wordpress-plugin/?utm_source=wprepo-menu-image&utm_medium=wprepo_readme&utm_campaign=Plugin+URI
  * Author: Freshlight Lab
  * Author URI: https://www.freshlightlab.com/?utm_source=wprepo-menu-image&utm_medium=wprepo_readme&utm_campaign=Author+URI
@@ -15,7 +15,7 @@
 if ( !defined( 'ABSPATH' ) ) {
     die;
 }
-define( 'MENU_IMAGE_VERSION', '3.10' );
+define( 'MENU_IMAGE_VERSION', '3.11' );
 define( 'MENU_IMAGE_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
 define( 'MENU_IMAGE_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 /**
@@ -214,9 +214,9 @@ class WP_Menu_Image
      */
     public function add_image_sizes()
     {
-        $this->image_size_1 = get_option( 'menu_image_size_1', '24x24' );
-        $this->image_size_2 = get_option( 'menu_image_size_2', '36x36' );
-        $this->image_size_3 = get_option( 'menu_image_size_3', '48x48' );
+        $this->image_size_1 = esc_attr( get_option( 'menu_image_size_1', '24x24' ));
+        $this->image_size_2 = esc_attr( get_option( 'menu_image_size_2', '36x36' ));
+        $this->image_size_3 = esc_attr( get_option( 'menu_image_size_3', '48x48' ));
         $image_parts_1 = explode( 'x', $this->image_size_1 );
         $image_parts_2 = explode( 'x', $this->image_size_2 );
         $image_parts_3 = explode( 'x', $this->image_size_3 );
@@ -329,9 +329,9 @@ class WP_Menu_Image
             if ( isset( $_POST['menu_image_disable_mobile'] ) ) {
                 $disable_in_mobile = $_POST['menu_image_disable_mobile'];
             }
-            $menu_image_size_1 = $_POST['menu_image_size_1'];
-            $menu_image_size_2 = $_POST['menu_image_size_2'];
-            $menu_image_size_3 = $_POST['menu_image_size_3'];
+            $menu_image_size_1 = esc_attr( $_POST['menu_image_size_1'] );
+            $menu_image_size_2 = esc_attr( $_POST['menu_image_size_2'] );
+            $menu_image_size_3 = esc_attr( $_POST['menu_image_size_3'] );
             $image_parts_1 = explode( 'x', $menu_image_size_1 );
             $image_parts_2 = explode( 'x', $menu_image_size_2 );
             $image_parts_3 = explode( 'x', $menu_image_size_3 );
@@ -488,7 +488,7 @@ class WP_Menu_Image
     {
         ?>
 		<input name="menu_image_size_1" type="text" value="<?php 
-        echo  get_option( 'menu_image_size_1', '24x24' ) ;
+        echo  esc_attr( get_option( 'menu_image_size_1', '24x24' ) ) ;
         ?>" /><span class="helper"><?php 
         _e( 'Use this format (24x24), width and height.', 'menu-image' );
         ?></span>
@@ -502,7 +502,7 @@ class WP_Menu_Image
     {
         ?>
 		<input name="menu_image_size_2" type="text" value="<?php 
-        echo  get_option( 'menu_image_size_2', '36x36' ) ;
+        echo  esc_attr( get_option( 'menu_image_size_2', '36x36' ) );
         ?>" /><span class="helper"><?php 
         _e( 'Use this format (36x36), width and height.', 'menu-image' );
         ?></span>
@@ -516,7 +516,7 @@ class WP_Menu_Image
     {
         ?>
 		<input name="menu_image_size_3" type="text" value="<?php 
-        echo  get_option( 'menu_image_size_3', '48x48' ) ;
+        echo  esc_attr( get_option( 'menu_image_size_3', '48x48' ) );
         ?>" /><span class="helper"><?php 
         _e( 'Use this format (48x48), width and height.', 'menu-image' );
         ?></span>

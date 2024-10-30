@@ -124,7 +124,7 @@ class WPM_WooCommerce {
 	}
 
 	/**
-	 * Translate methods for zone
+	 * Translate methods for currentZone
 	 *
 	 * @param array $methods
 	 *

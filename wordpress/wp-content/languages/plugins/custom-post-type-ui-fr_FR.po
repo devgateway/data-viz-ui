@@ -57,7 +57,7 @@ msgstr "Divers nettoyages et séparations du code."
 
 #: inc/about.php:97
 msgid "We have updated a number of details around the post type description field. First we addressed issues with the Tools area when descriptions included quotes. Second we fixed an issue around stripping HTML from the field from previous security updates."
-msgstr "Nous avons mis à jour un certain nombre de détails autour du champ de description du type de publication.  Premièrement nous avons adressé les problèmes avec la zone « Outils » lorsque les descriptions incluent des guillemets. Deuxièmement nous avons corrigé une erreur autour de la suppression de HTML du champ venant de précédentes mises à jour de sécurité."
+msgstr "Nous avons mis à jour un certain nombre de détails autour du champ de description du type de publication.  Premièrement nous avons adressé les problèmes avec la currentZone « Outils » lorsque les descriptions incluent des guillemets. Deuxièmement nous avons corrigé une erreur autour de la suppression de HTML du champ venant de précédentes mises à jour de sécurité."
 
 #: inc/about.php:96
 msgid "Post type descriptions"

@@ -23,17 +23,24 @@ class WPDBBackupLog {
 
 		$options    = get_option( 'wp_db_backup_backups' );
 		$newoptions = array();
-		foreach ( $options as $option ) {
-			if ( $option['filename'] === $args[0] ) {
-				$option['destination'] = $args[4];
-				$option['log']         = $args[2];
-				$newoptions[]          = $option;
-			} else {
-				$newoptions[] = $option;
-			}
-		}
 
-		update_option( 'wp_db_backup_backups', $newoptions );
+		if(!empty($options) && is_array($options)){
+
+			foreach ( $options as $option ) {
+				if(!is_array($option )){
+					continue;
+				}
+				if (isset($args[0]) && $option['filename'] === $args[0]) {
+					$option['destination'] = wp_kses_post($args[4]);
+					$option['log']         = wp_kses_post($args[2]);
+					$newoptions[]          = $option;
+				} else {
+					$newoptions[] = $option;
+				}
+			}
+		}		
+		$newoptions = wpdbbkp_filter_unique_filenames( $newoptions );
+		update_option( 'wp_db_backup_backups', $newoptions ,false);
 	}
 
 }

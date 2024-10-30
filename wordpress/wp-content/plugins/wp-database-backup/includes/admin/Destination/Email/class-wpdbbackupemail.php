@@ -24,8 +24,10 @@ class WPDBBackupEmail {
 	 * @param array $args - backup details.
 	 */
 	public static function wp_db_backup_completed( &$args ) {
+		
 		$destination_email = get_option( 'wp_db_backup_destination_Email' );
 		if ( isset( $destination_email ) && 1 === (int) $destination_email && get_option( 'wp_db_backup_email_id' ) ) {
+			update_option('wpdbbkp_backupcron_current','Processing Email Backup', false);
 			$to                     = sanitize_email( get_option( 'wp_db_backup_email_id' ) );
 			$subject                = 'Database Backup (' . get_bloginfo( 'name' ) . ')';
 			$filename               = $args[0];
@@ -45,7 +47,7 @@ class WPDBBackupEmail {
 				$attachments = '';
 			}
 			if ( wp_mail( $to, $subject, $message, $headers, $attachments ) ) {
-				$args[4] = $args[4] .= 'Email, ';
+				$args[4] .= 'Email, ';
 			}
 			$log_message               = '<b>Send Backup Mail to</b>:' . $to;
 			$log_message              .= $log_message_attachment;
