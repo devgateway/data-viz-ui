@@ -178,7 +178,7 @@ class DataLayer extends BaseLayer {
                                             value,
                                         }
                                     }
-                                    this.showToolTip(tooltip, variables, brStyles.getColor(d2.properties._value))
+                                    this.showToolTip(tooltip, variables, brStyles.getColor(d2.properties._value),event)
                                 }
                             })
                             .on("mouseout", d => {
