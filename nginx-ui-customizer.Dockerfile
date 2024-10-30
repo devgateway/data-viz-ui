@@ -22,7 +22,7 @@ COPY --from=reactlib /tmp/work/package.json ../react-lib/wp-react-lib/
 COPY --from=reactlib /tmp/work/dist ../react-lib/wp-react-lib/dist
 COPY --from=customizer /tmp/work/package.json ../../custom/ui-customizer/
 COPY --from=customizer /tmp/work/dist ../../custom/ui-customizer/dist
-COPY --from=customizer /tmp/work/dist/public public
+#COPY --from=customizer /tmp/work/dist/public public
 RUN npm install --legacy-peer-deps
 
 # Copy source files
