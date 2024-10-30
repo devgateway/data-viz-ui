@@ -106,11 +106,11 @@ class DataLayer extends BaseLayer {
 
 
             const getTooltipVariables = (d) => {
-                if (d.properties._value) {
+                if (d.properties ) {
                     const variables = {
                         ...d.properties, meta: {
                             [apiJoinAttribute]: d.properties.meta ? d.properties.meta.value : '', ...d.properties.meta,
-                            value: d.properties._value
+                            value: d.properties._value? d.properties._value:null
                         }
                     }
                     return variables
@@ -223,9 +223,9 @@ class DataLayer extends BaseLayer {
                     })
                     .attr("stroke", borderColor)
                     .attr("id", "state-borders")
-                    .attr("d", path).on("mouseenter", (d) => {
-                    if (d.properties._value) {
-                        this.showToolTip(tooltip, getTooltipVariables(d), brStyles.getColor(d.properties._value))
+                    .attr("d", path).on("mouseenter", (event, d) => {
+                    if (d.properties && d.properties._value) {
+                        this.showToolTip(tooltip, getTooltipVariables(d), brStyles.getColor(d.properties._value), event)
                     }
                 })
                     .on("mouseleave", (d) => {
@@ -262,8 +262,9 @@ class DataLayer extends BaseLayer {
                                     .attr("style", () => {
                                         return "none;fill:url(#" + toId(p) + ");"
                                     })
-                                    .on("mouseenter", () => {
-                                        this.showToolTip(tooltip, getTooltipVariables(d), brStyles.getColor(d.properties._value))
+                                    .on("mouseenter", (event, e) => {
+                                        debugger;
+                                        this.showToolTip(tooltip, getTooltipVariables(d), brStyles.getColor(d.properties._value),event)
                                     }).on("mousemove", (d) => {
                                     this.moveToolTip()
                                 }).on("mouseleave", (d) => {
@@ -396,9 +397,9 @@ class DataLayer extends BaseLayer {
                         return brStyles.getSize(d.properties._value) * 1 / k
                     })
                     //.attr("transform", this.props.transform)
-                    .on("mouseenter", (d) => {
+                    .on("mouseenter", (d,event) => {
                         
-                        if (d.properties._value) {
+                        if (d.properties && d.properties._value) {
 
                             const variables = {
                                 ...d.properties, meta: {
@@ -406,7 +407,7 @@ class DataLayer extends BaseLayer {
                                     value: d.properties._value
                                 }
                             }
-                            this.showToolTip(tooltip, variables, brStyles.getColor(d.properties._value))
+                            this.showToolTip(tooltip, variables, brStyles.getColor(d.properties._value),event)
                         }
                     })
                     .on("mouseleave", (d) => {
