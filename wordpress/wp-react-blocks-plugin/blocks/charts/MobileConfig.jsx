@@ -358,10 +358,10 @@ const MobileConfig = (props) => {
 
   const isBarOrLine = ["bar", "line"].includes(type);
   return (
-    <PanelBody initialOpen={false} title={__("Mobile Customization Settings")}>
+    <PanelBody initialOpen={false} title={__("Mobile & Tablet Customization Settings")}>
       <PanelRow>
         <ToggleControl
-          label={__("Show Mobile Customization Settings")}
+          label={__("Show Mobile & Tablet Customization Settings")}
           checked={mobileCustomization?.showCustomization}
           onChange={(isShowMobileCustomization) =>
             onShowMobileCustomizationChange(isShowMobileCustomization)
