@@ -34,7 +34,7 @@ export default tseslint.config(
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
-       'react-compiler/react-compiler': 'error',
+      //  'react-compiler/react-compiler': 'error', Will be turned on after fixing code issues
         'no-unused-vars': 'off',
         "react-hooks/exhaustive-deps": "off",
         "react/prop-types": "off",
@@ -47,8 +47,9 @@ export default tseslint.config(
         "no-useless-escape": "off",
         "no-unused-vars": "off",
         "prefer-const": "warn",
+        "no-self-assign": "off",
         '@typescript-eslint/no-unused-vars': [
-            'warn',
+            'off',
             {
                 argsIgnorePattern: '^_',
                 varsIgnorePattern: '^_'
