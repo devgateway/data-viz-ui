@@ -39,7 +39,6 @@ export default defineConfig(({ mode }) => {
             cssCodeSplit: true,
             sourcemap: false,
             manifest: true,
-            minify: false,
             chunkSizeWarningLimit: 2000,
             rollupOptions: {
                 treeshake: true,
