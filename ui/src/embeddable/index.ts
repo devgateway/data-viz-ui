@@ -33,6 +33,7 @@ const ParallaxContainer = lazy(() => import("./parallax"));
 const Wrapped = lazy(() => import("./wrapped"));
 const SankeyChart = lazy(() => import("./sankeychart"));
 const DataLabel = lazy(() => import("./datalabel"));
+const Body = lazy(() => import("./body"));
 
 let reducerList = { data, embeddable };
 
