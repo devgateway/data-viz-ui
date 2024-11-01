@@ -50,7 +50,7 @@ const Diverging = (props) => {
   );
 };
 const Chart = (props) => {
-  let {
+  const{
     parent,
     editing = false,
     unique,

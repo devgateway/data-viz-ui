@@ -37,9 +37,9 @@ class ZoomControl extends React.Component {
                 selection.call(this.zoom)
                 this.transition2fullView()
             }
-            if (rotationEnabled) {
+            // if (rotationEnabled) {
 
-            }
+            // }
         }
     }
 

@@ -90,7 +90,9 @@ const DownloadComponent = (props) => {
                 urlNode.innerHTML = window.location.href
                 node.appendChild(urlNode)
             }
-
+            
+            // TODO: Fix react compiler issue
+             
             options.height = componentRef.current.offsetHeight + 100
             options.width = componentRef.current.offsetWidth + 100
             node.style.padding = "20px"
