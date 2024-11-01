@@ -1228,7 +1228,7 @@ componentWillUnmount() {
   showTooltip(event, d) {
     const {
       showTooltip,
-      zoomEnabled,
+      
       tooltipTheme,
       customTooltips,
       tooltipFontSize,
@@ -1240,6 +1240,8 @@ componentWillUnmount() {
       mapType,
       noDataText,
     } = this.props;
+
+    let { zoomEnabled } = this.props;
 
     zoomEnabled = ['mobile', 'tablet', 'midTablet'].includes(getDeviceCategory()) ? true: false;
 
@@ -1665,8 +1667,9 @@ componentWillUnmount() {
   }
 
   d3Map(features, filterUpdated) {
-    const { zoomEnabled, mapContainerBgColor, mapPosition, editing, mapType } =
+    const { mapContainerBgColor, mapPosition, editing, mapType } =
       this.props;
+      let zoomEnabled = this.props.zoomEnabled;
       if(!zoomEnabled) {
         zoomEnabled = ['mobile', 'tablet'].includes(getDeviceCategory()) ? true: false;
       }
@@ -1874,7 +1877,6 @@ componentWillUnmount() {
       legendTitle,
       nationalAverageLabel,
       intl,
-      zoomEnabled,
       transformedData,
       measureSelectorLabel,
       valueFormat,
@@ -1886,6 +1888,10 @@ componentWillUnmount() {
       editing,
       highlightedLocLabelFormat,
       noDataText,
+    } = this.props;
+
+    let {
+      zoomEnabled
     } = this.props;
 
     if(!zoomEnabled) {
