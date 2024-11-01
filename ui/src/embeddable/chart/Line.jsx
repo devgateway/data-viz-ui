@@ -98,8 +98,6 @@ const Chart = ({
   customAxisFormat,
   mobileCustomization
 }) => {
-  const theme = useTheme();
-
   const mobileConfigSettings = JSON.parse(decodeURIComponent(mobileCustomization));
   const isMobileConfigEnabled = isMobile && (mobileConfigSettings?.showCustomization ?? false);
   const [bottomSpacing, setBottomSpacing] = useState(50);
@@ -122,9 +120,9 @@ const Chart = ({
     return (
       <>
         {showLegends &&
-          chartLegends.map((legend) => {
+          chartLegends.map((legend, idx) => {
             return (
-              <div className={"legend item"} onClick={() => toggle(legend.id)}>
+              <div key={idx} className={"legend item"} onClick={() => toggle(legend.id)}>
                 <input
                   className={"ignore"}
                   type="checkbox"
@@ -200,6 +198,8 @@ const Chart = ({
 
   const CustomTick = (tick) => {
     const tickObject = Object.assign({}, tick);
+    const theme = useTheme();
+
     if(isMobileConfigEnabled && hiddenLabels.includes(String(tickObject.value))) {
       tickObject.value = "";
     }
