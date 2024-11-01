@@ -40,9 +40,8 @@ const PreviewComponentParameterParser = () => {
     const location = useLocation();
 
     const componentRef = useRef(getComponentByNameIgnoreCase(urlParams.name ? urlParams.name : ''));
-    
-    // TODO: Fix this react compiler issue
-     
+
+    // TODO: Fix this react compiler issue 
     const UIComponent = componentRef.current
 
 
