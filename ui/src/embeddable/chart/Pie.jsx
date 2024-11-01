@@ -10,7 +10,7 @@ import {
 } from "@nivo/colors";
 import * as d3 from "d3";
 import { v4 as uuidv4 } from "uuid";
-import FlexWrapDetector from "@/layout/FlexWrapDetector";
+import FlexWrapDetector from "../../layout/FlexWrapDetector";
 
 const Chart = ({
   legends,
@@ -95,8 +95,7 @@ const Chart = ({
 
   const leftLegendDynamicStyle = {
     bottom: `-${bottomSpacing}px`,
-    gap: "0px",
-    top: "0px",
+    gap: "0px"
   };
 
   const toggle = (id) => {
@@ -204,7 +203,6 @@ const Chart = ({
                   className={"ignore"}
                   type="checkbox"
                   checked={filter.length == 0 || !filter.includes(legend.id)}
-                  readOnly
                 />
                 <span
                   className={
@@ -273,7 +271,7 @@ const Chart = ({
   };
 
   return (
-    <div style={{ height: height }}>
+    <div style={{ height: height }} className={"pie-chart"}>
       {optionsVal && optionsVal.data && optionsVal.data.length > 0 && (
         <>
           <ResponsivePie

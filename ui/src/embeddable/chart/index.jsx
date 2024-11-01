@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Container } from "semantic-ui-react";
 import DataProvider from "../data/DataProvider";
 import DataConsumer from "../data/DataConsumer";
@@ -16,11 +16,13 @@ import CSVDataFrame from "./CSVDataFrame";
 import ColorProvider from "./colors/ColorProvider";
 import Messages from "./Messages";
 import { connect } from "react-redux";
-import deviceType from '@/utils/deviceType'
-import { is } from "immutable";
+import deviceType from '@/utils/deviceType';
 
 
 const isMobile = deviceType() === 'mobile';
+const isTablet = deviceType() === 'tablet';
+const isMidTablet = deviceType() === 'midTablet';
+const isMobileOrTablet = deviceType() === 'mobile' || deviceType() === 'tablet' || deviceType() === 'midTablet';
 
 const PieChart = (props) => {
   const { data, legends, colors, height } = props;
@@ -172,12 +174,12 @@ const Chart = (props) => {
     "data-mobile-customization": mobileCustomization = "{}",
   } = props;
 
-  let {   
+  let {
     "data-enable-grid-y": enableGridY = "true",
-    "data-enable-grid-x": enableGridX = "false"
+    "data-enable-grid-x": enableGridX = "false",
   } = props;
   const mobileConfigSettings = JSON.parse(decodeURIComponent(mobileCustomization));
-  const isMobileConfigEnabled = isMobile && (mobileConfigSettings?.showCustomization ?? false);
+  const isMobileConfigEnabled = (isMobile || isTablet || isMidTablet) && (mobileConfigSettings?.  showCustomization ?? false);
 
   const locale = props.intl.locale;
   const ref = useRef(null);
@@ -287,7 +289,7 @@ const Chart = (props) => {
   let selectedMeasures = getSelectedMeasures();
 
   let selectedFormat = getSelectedFormat();
-  const userMeasures = getUserMeasures();
+  let userMeasures = getUserMeasures();
   let leftLegendForSelectedMeasure = left;
   let rightLegendForSelectedMeasure = rightLegend;
 
@@ -310,7 +312,7 @@ const Chart = (props) => {
     }
   }
 
-  const numberFormat = selectedFormat
+  let numberFormat = selectedFormat
     ? {
         style:
           selectedFormat.style === "compacted"
@@ -332,7 +334,7 @@ const Chart = (props) => {
 
   const groupTotalFormatObject = parse(groupTotalFormat);
 
-  const groupTotalFormatParsed = {
+  let groupTotalFormatParsed = {
     style:
       groupTotalFormatObject.style === "compacted"
         ? "decimal"
@@ -353,8 +355,8 @@ const Chart = (props) => {
     scheme: scheme,
     colorBy: colorBy,
   };
-  const child = null;
-  const contentHeight = editing ? height - 80 : height - 40;
+  let child = null;
+  const contentHeight = editing ? height - 80 : height;
 
   const showXAxisTitle = () => {
     if(isMobileConfigEnabled) {
@@ -435,6 +437,10 @@ const Chart = (props) => {
     return mobileEnabled ? parseInt(mobileSetting) ?? defaultValue : defaultValue;
   }
 
+  const getBarPadValueOuterOrInner = (mobileEnabled, mobileSetting, defaultValue) => {
+    return mobileEnabled ? mobileSetting ?? defaultValue: defaultValue;
+  }
+
   const chartProps = {
     app,
     tickColor: decodeURIComponent(tickColor),
@@ -451,7 +457,7 @@ const Chart = (props) => {
     marginRight: getMarginValue(isMobileConfigEnabled, parseInt(mobileConfigSettings?.marginRight), parseInt(marginRight)),
     marginBottom: getMarginValue(isMobileConfigEnabled, parseInt(mobileConfigSettings?.marginBottom), parseInt(marginBottom)),
     height: `${contentHeight}px`,
-    legendPosition: legendPosition,
+    legendPosition: isMobileOrTablet ? "bottom" : legendPosition,
     legends,
     tooltip:
       tooltipEnableMarkdown == true || tooltipEnableMarkdown == "true"
@@ -477,9 +483,9 @@ const Chart = (props) => {
     overrideTickColor: overrideTickColor == true || overrideTickColor == "true",
     fixedMinValue,
     fixedMaxValue,
-    barPadding,
+    barPadding: getBarPadValueOuterOrInner(isMobileConfigEnabled, mobileConfigSettings?.barPadding, barPadding),
     barLabelPosition,
-    barInnerPadding,
+    barInnerPadding: getBarPadValueOuterOrInner(isMobileConfigEnabled, mobileConfigSettings?.barInnerPadding, barInnerPadding),
     xLabelColor: decodeURIComponent(xLabelColor),
     barLabelColor: decodeURIComponent(barLabelColor),
     legendLabelColor: decodeURIComponent(legendLabelColor),
@@ -544,7 +550,7 @@ const Chart = (props) => {
     dimension1
   };
 
-  const params = {};
+  let params = {};
   const ff = parse(filters) || {};
 
   if (ff && ff.forEach) {
@@ -613,13 +619,112 @@ const Chart = (props) => {
   if (dimension2 != "none") {
     dimensions.push(dimension2);
   }
+  const [legendsContainerHeight, setLegendsContainerHeight] = useState(0);
+
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (isMobileOrTablet) {
+        // Function to handle margin adjustment for all charts
+        const adjustDataSourceMargin = () => {
+          const legendsContainer =
+            ref.current.querySelector(
+              ".legends.container.has-standard-12-font-size.bottom"
+            ) || ref.current.querySelector(".legends.container.items-section");
+
+          if (!legendsContainer) return;
+
+          // Get computed style and dimensions of the legends container
+          const { clientHeight: height } = legendsContainer;
+          const styles = window.getComputedStyle(legendsContainer);
+          const marginTop = parseInt(styles.marginTop);
+          const marginBottom = parseInt(styles.marginBottom);
+          const paddingTop = parseInt(styles.paddingTop);
+          const paddingBottom = parseInt(styles.paddingBottom);
+          const totalHeight =
+            height + marginTop + marginBottom + paddingTop + paddingBottom;
+
+          // Find the closest '.ui.fluid.container.content' ancestor from the legends container
+          const container = legendsContainer.closest(".ui.fluid.container.content");
+
+          if (container) {
+            const dataSourceParagraph = container.querySelector(".data-source");
+            if (dataSourceParagraph) {
+              const dataSourceRect = dataSourceParagraph.getBoundingClientRect();
+              const legendsRect = legendsContainer.getBoundingClientRect();
+
+              // Ensure elements are visible before adjusting margins
+              if (legendsRect.bottom !== 0 && dataSourceRect.top !== 0) {
+                if (legendsContainer.textContent.trim() === "") return;
+
+                const legendsMarginBottom = marginBottom; // Legend margin-bottom is already computed
+                const adjustedLegendsBottom = legendsRect.bottom + legendsMarginBottom;
+                const dataSourceStyles = window.getComputedStyle(dataSourceParagraph);
+                const dataSourceMarginTop = parseFloat(dataSourceStyles.marginTop) || 0;
+                const adjustedDataSourceTop = dataSourceRect.top - dataSourceMarginTop;
+
+                if (adjustedLegendsBottom > adjustedDataSourceTop) {
+                  let overlap = adjustedLegendsBottom - adjustedDataSourceTop;
+                  if (overlap < 5) overlap += 1;
+                  dataSourceParagraph.style.marginTop = `${overlap + 1}px`; // Add padding
+                }
+              } else {
+                // Delay adjustment if elements are not fully visible yet
+                setTimeout(() => {
+                  if (dataSourceRect.top < legendsRect.bottom) {
+                    dataSourceParagraph.style.marginTop = `${
+                      legendsRect.bottom - dataSourceRect.top + 1
+                    }px`;
+                  }
+                }, 1000);
+              }
+            }
+          }
+
+          // Check for overlap with the chart container above
+          const chartContainer = legendsContainer.closest(".chart.container");
+          if (chartContainer) {
+            const chartContainerRect = chartContainer.getBoundingClientRect();
+            const chartContainerStyles = window.getComputedStyle(chartContainer);
+            const chartContainerMarginBottom =
+              parseFloat(chartContainerStyles.marginBottom) || 0;
+            const adjustedChartContainerBottom =
+              chartContainerRect.bottom + chartContainerMarginBottom;
+
+            const legendsRect = legendsContainer.getBoundingClientRect();
+            const legendsMarginTop = parseFloat(styles.marginTop) || 0;
+            const adjustedLegendsTop = legendsRect.top - legendsMarginTop;
+
+            if (adjustedLegendsTop < adjustedChartContainerBottom) {
+              const overlap = adjustedChartContainerBottom - adjustedLegendsTop;
+              legendsContainer.style.marginTop = `${overlap + 1}px`; // Add padding
+            }
+          }
+
+          setLegendsContainerHeight(totalHeight);
+        };
+
+        adjustDataSourceMargin();
+      }
+    }, 100);
+
+    // Cleanup observer and timeout
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [isMobileOrTablet, ref]);
 
   return (
     <div ref={ref}>
       <Container
-        className={"chart container"}
-        style={{ minHeight: height + "px" }}
-        fluid={true}
+          className={"chart container"}
+          style={{
+            minHeight:
+                type === "pie" && window.innerWidth <= 480
+                    ? `${parseInt(height) + parseInt(legendsContainerHeight) * 0.5}px`
+                    : `${parseInt(height) + parseInt(legendsContainerHeight)}px`,
+          }}
+          fluid={true}
       >
         <DataProvider
           editing={editing}
@@ -708,4 +813,5 @@ const mapStateToProps = (state, ownProps) => {
   }
 };
 const mapActionCreators = {};
+
 export default connect(mapStateToProps, mapActionCreators)(Chart);
