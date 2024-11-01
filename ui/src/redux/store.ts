@@ -1,6 +1,6 @@
 import {createBrowserHistory, createHashHistory} from 'history'
 import Immutable from 'immutable'
-import createRootReducer, { routerMiddleware, createReduxHistory } from "./reducer";
+import createRootReducer from "./reducer";
 import { configureStore } from '@reduxjs/toolkit';
 
 const useHash = process.env.VITE_REACT_APP_USE_HASH_LINKS as unknown as boolean;
@@ -19,7 +19,5 @@ export const store  = configureStore({
     middleware: (getDefaultMiddleware) => getDefaultMiddleware({
         serializableCheck: false,
         immutableCheck: false
-    }).concat(routerMiddleware)
+    })
 });
-
-export const reduxHistory = createReduxHistory(store);
