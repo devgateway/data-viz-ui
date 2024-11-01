@@ -281,7 +281,8 @@ const Header = ({ intl, match, settings }) => {
       if (
           menuRef.current &&
           !menuRef.current.contains(event.target) ||
-          event.target.closest(".desktop")
+          event.target.closest(".desktop") ||
+          event.target.closest(".breadcrumbs")
       ) {
         setMenuVisible(false);
       }
