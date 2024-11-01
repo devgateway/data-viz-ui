@@ -98,6 +98,8 @@ const Chart = ({
   customAxisFormat,
   mobileCustomization
 }) => {
+  const theme = useTheme();
+
   const mobileConfigSettings = JSON.parse(decodeURIComponent(mobileCustomization));
   const isMobileConfigEnabled = isMobile && (mobileConfigSettings?.showCustomization ?? false);
   const [bottomSpacing, setBottomSpacing] = useState(50);
@@ -201,7 +203,7 @@ const Chart = ({
     if(isMobileConfigEnabled && hiddenLabels.includes(String(tickObject.value))) {
       tickObject.value = "";
     }
-    const theme = useTheme();
+    
     const width = getTextWidth(tickObject.value, "12px Roboto") + 15;
 
     if (tickRotation > 0 && tickRotation < 180) {
