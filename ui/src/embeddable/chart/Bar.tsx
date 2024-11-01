@@ -181,45 +181,45 @@ const Chart = ({
       label: string;
     }
 
-    let chartLegends: ChartLegends [] = [];
+    let chartLegends: ChartLegends[] = [];
 
     if (options.data) {
       chartLegends =
         colors.colorBy === "index"
           ? options.data.map((d) => {
-              let theColor;
-              let enabled = true;
-              if (filter.indexOf(d[options.indexBy]) > -1) {
-                enabled = false;
-                theColor = DEFAULT_COLOR;
-              } else {
-                theColor = d[COLOR_VARIABLE]
-                  ? d[COLOR_VARIABLE]
-                  : colorGenerator.getColor(d.id, d);
-              }
-              return {
-                enabled: enabled,
-                color: theColor,
-                id: d[options.indexBy],
-                label: d[options.indexBy],
-              };
-            })
+            let theColor;
+            let enabled = true;
+            if (filter.indexOf(d[options.indexBy]) > -1) {
+              enabled = false;
+              theColor = DEFAULT_COLOR;
+            } else {
+              theColor = d[COLOR_VARIABLE]
+                ? d[COLOR_VARIABLE]
+                : colorGenerator.getColor(d.id, d);
+            }
+            return {
+              enabled: enabled,
+              color: theColor,
+              id: d[options.indexBy],
+              label: d[options.indexBy],
+            };
+          })
           : options.keys.map((k) => {
-              let theColor;
-              let enabled = true;
-              if (filter.indexOf(k) > -1) {
-                enabled = false;
-                theColor = DEFAULT_COLOR;
-              } else {
-                theColor = colorGenerator.getColorByKey(k);
-              }
-              return {
-                enabled: enabled,
-                color: theColor,
-                id: k,
-                label: k,
-              };
-            });
+            let theColor;
+            let enabled = true;
+            if (filter.indexOf(k) > -1) {
+              enabled = false;
+              theColor = DEFAULT_COLOR;
+            } else {
+              theColor = colorGenerator.getColorByKey(k);
+            }
+            return {
+              enabled: enabled,
+              color: theColor,
+              id: k,
+              label: k,
+            };
+          });
     }
 
     return chartLegends;
@@ -239,9 +239,10 @@ const Chart = ({
     return (
       <>
         {showLegends &&
-          chartLegends.map((legend) => {
+          chartLegends.map((legend, index) => {
             return (
               <div
+                key={index}
                 className={`legend item ${legend.enabled ? "" : "ignore"}`}
                 onClick={() => toggle(legend.id)}
               >
@@ -363,7 +364,7 @@ const Chart = ({
           lineLayerEnabled &&
           overlays.map((o, idx) => {
             return (
-              <div className={"legend item"} onClick={() => toggleLine(idx)}>
+              <div key={idx} className={"legend item"} onClick={() => toggleLine(idx)}>
                 <input
                   className={legendCheckBack && showLine[idx] ? "" : "ignore"}
                   type="checkbox"
@@ -510,7 +511,7 @@ const Chart = ({
     if (axis == "X") {
       points = [0, innerWidth];
       lineGenerator = line()
-      // @ts-ignore Investigate why it is returning a tuple instead of a number
+        // @ts-ignore Investigate why it is returning a tuple instead of a number
         .x((xPoint, index) => {
           if (index === 0) {
             return -10;
@@ -575,12 +576,12 @@ const Chart = ({
   const CustomTick = (tick) => {
     const tickObject = Object.assign({}, tick);
     const theme = useTheme();
-   
+
     // @ts-ignore
-    if(isMobileCustomizationEnabled && hiddenLabels.includes(String(tickObject.value))) {
+    if (isMobileCustomizationEnabled && hiddenLabels.includes(String(tickObject.value))) {
       tickObject.value = "";
     }
-    
+
     let effectiveTickColor;
     if (overrideTickColor) {
       effectiveTickColor = tickColor;
@@ -710,7 +711,7 @@ const Chart = ({
   };
 
   const toggle = (id) => {
-    const newFilter: any [] = filter.slice();
+    const newFilter: any[] = filter.slice();
     if (newFilter.indexOf(id) > -1) {
       const index = newFilter.indexOf(id);
       newFilter.splice(index, 1);
@@ -739,9 +740,9 @@ const Chart = ({
           }
           const value = data.value
             ? intl.formatNumber(
-                format.style === "percent" ? data.value / 100 : data.value,
-                format
-              )
+              format.style === "percent" ? data.value / 100 : data.value,
+              format
+            )
             : "";
           const valueLength = value.length;
           let yPos;
@@ -785,7 +786,7 @@ const Chart = ({
           .filter(
             (key) => bars.filter((b) => b.data.indexValue == key).length > 0
           )
-          .map((key) => {
+          .map((key, idx) => {
             const barsInGroup = bars.filter((b) => b.data.indexValue == key);
 
             let anchor = "right";
@@ -877,13 +878,13 @@ const Chart = ({
             const sumOfVariablesToFilterOut =
               colorBy !== "index"
                 ? filter
-                    ?.map((item) => group[item])
-                    ?.reduce((acc, curr) => acc + curr, 0)
+                  ?.map((item) => group[item])
+                  ?.reduce((acc, curr) => acc + curr, 0)
                 : 0;
             total -= sumOfVariablesToFilterOut;
 
             return (
-              <text y={y} x={x} style={{ fill: normalizeLabelColor() }}>
+              <text key={idx} y={y} x={x} style={{ fill: normalizeLabelColor() }}>
                 <tspan textAnchor={anchor}>
                   {groupTotalLabel ? groupTotalLabel + " " : ""}
                   {intl.formatNumber(
@@ -918,7 +919,7 @@ const Chart = ({
   }
 
   const getValuesFromData = () => {
-    const values: number [] = [];
+    const values: number[] = [];
     if (confidenceIntervals) {
       confidenceIntervals.forEach((c) => {
         if (c.low) {
@@ -985,8 +986,8 @@ const Chart = ({
       fixedMinValue !== ""
       ? fixedMinValue
       : minVal > 0
-      ? minVal * 0.9
-      : minVal * 1.1;
+        ? minVal * 0.9
+        : minVal * 1.1;
   };
 
   const maxValueFromData = getMaxValueFromData();
@@ -1086,8 +1087,8 @@ const Chart = ({
     );
   };
 
-const hiddenLabels: string [] = [];
-if(isMobileCustomizationEnabled) {
+  const hiddenLabels: string[] = [];
+  if (isMobileCustomizationEnabled) {
     ticks = parseInt(mobileConfigSettings.yAxisTickValues);
     const labels = new Map(Object.entries(mobileConfigSettings?.labels?.xAxis ?? {}));
     for (const [key, value] of labels) {
@@ -1095,7 +1096,7 @@ if(isMobileCustomizationEnabled) {
         hiddenLabels.push(key);
       }
     }
-}
+  }
 
   return (
     <div style={{ height: height }}>
@@ -1130,41 +1131,41 @@ if(isMobileCustomizationEnabled) {
             axisRight={
               showRightAxis
                 ? {
-                    tickSize:
-                      (layout == "horizontal" && showTickLine) ||
+                  tickSize:
+                    (layout == "horizontal" && showTickLine) ||
                       layout === "vertical"
-                        ? 5
-                        : 0,
-                    tickPadding: 5,
-                    tickRotation: 0,
-                    tickValues: ticks,
-                    legend: legends && legends.right,
-                    legendPosition: "middle",
-                    legendOffset: parseInt(String(offsetRight)),
-                    format: (value) => {
-                      if (layout == "vertical") {
-                        const effectiveFormat = customAxisFormat
-                          ? customAxisFormat
-                          : format;
-                        return intl.formatNumber(
-                          effectiveFormat.style === "percent"
-                            ? value / 100
-                            : value,
-                          {
-                            ...effectiveFormat,
-                          }
-                        );
-                      }
+                      ? 5
+                      : 0,
+                  tickPadding: 5,
+                  tickRotation: 0,
+                  tickValues: ticks,
+                  legend: legends && legends.right,
+                  legendPosition: "middle",
+                  legendOffset: parseInt(String(offsetRight)),
+                  format: (value) => {
+                    if (layout == "vertical") {
+                      const effectiveFormat = customAxisFormat
+                        ? customAxisFormat
+                        : format;
+                      return intl.formatNumber(
+                        effectiveFormat.style === "percent"
+                          ? value / 100
+                          : value,
+                        {
+                          ...effectiveFormat,
+                        }
+                      );
+                    }
 
-                      return value;
-                    },
-                  }
+                    return value;
+                  },
+                }
                 : null
             }
             axisBottom={
               isMobileCustomizationEnabled && mobileConfigSettings?.xAxisDisabled === true ? null :
-              layout == "horizontal"
-                ? {
+                layout == "horizontal"
+                  ? {
                     legend: legends && legends.bottom,
                     legendPosition: "middle",
                     legendOffset: parseInt(String(offsetBottom)),
@@ -1188,7 +1189,7 @@ if(isMobileCustomizationEnabled) {
                       return value;
                     },
                   }
-                : {
+                  : {
                     legend: legends && legends.bottom,
                     legendPosition: "middle",
                     legendOffset: parseInt(String(offsetBottom)),
@@ -1198,7 +1199,7 @@ if(isMobileCustomizationEnabled) {
             axisLeft={{
               tickSize:
                 (layout == "horizontal" && showTickLine) ||
-                layout === "vertical"
+                  layout === "vertical"
                   ? 5
                   : 0,
               tickPadding: 5,
@@ -1236,8 +1237,8 @@ if(isMobileCustomizationEnabled) {
               )
             }
             layers={layers}
-            onMouseEnter={(_data) => {}}
-            onMouseLeave={(_data) => {}}
+            onMouseEnter={(_data) => { }}
+            onMouseLeave={(_data) => { }}
             tooltip={(d) => {
               if (tooltipEnabled && tooltip && tooltip.trim().length > 0) {
                 return (
