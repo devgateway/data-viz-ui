@@ -1,6 +1,6 @@
 import React, { Fragment, useEffect, useState } from "react";
 import Tooltip from "./Tooltip";
-import { BarDatum, BarLayer, LegendData, ResponsiveBar } from "@nivo/bar";
+import { BarDatum, BarLayer, ResponsiveBar } from "@nivo/bar";
 import { injectIntl } from "react-intl";
 import { useTheme } from "@nivo/core";
 import { line } from "d3-shape";
