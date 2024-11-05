@@ -1,5 +1,5 @@
-import React, { LegacyRef, MutableRefObject, useEffect, useRef, useState } from "react";
-import { Checkbox, Container, Divider, Dropdown, DropdownProps, ForwardRefComponent, Icon, Input, Label, Radio, Segment } from "semantic-ui-react";
+import React, { LegacyRef, useEffect, useRef, useState } from "react";
+import { Checkbox, Container, Divider, Dropdown, DropdownProps, Icon, Input, Label, Radio, Segment } from "semantic-ui-react";
 import CategoriesConsumer from '../data/CategoriesConsumer'
 import CategoriesProvider from '../data/CategoriesProvider'
 import { connect } from "react-redux";

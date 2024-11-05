@@ -1,5 +1,4 @@
 import React, {useEffect, useRef, useState} from "react";
-import {Container, Flag, Image, Menu} from "semantic-ui-react";
 
 const settingMappings = {
     'blogname': 'name',
