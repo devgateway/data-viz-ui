@@ -1,6 +1,6 @@
 import { Container, Image, Menu } from "semantic-ui-react";
 import { InView } from "react-intersection-observer";
-import React, { createRef, useState, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import { MediaConsumer, MediaProvider, PageConsumer, PageProvider, PostContent } from "@devgateway/wp-react-lib";
 
 import { injectIntl } from "react-intl";

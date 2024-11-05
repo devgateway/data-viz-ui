@@ -3,7 +3,6 @@ import {Container} from "semantic-ui-react";
 import DataProvider from "../data/DataProvider";
 import DataConsumer from "../data/DataConsumer";
 import {PostContent} from "@devgateway/wp-react-lib";
-import Messages from "../common/Messages";
 import {connect} from "react-redux";
 
 const Chart = (props) => {
