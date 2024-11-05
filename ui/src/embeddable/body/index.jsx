@@ -444,7 +444,7 @@ const Body = ({ intl }) => {
     // Clear existing labels
     root.select("svg").selectAll("text.label").remove();
 
-    let data = selectedOption === "Cancers" ? left : right;
+    const data = selectedOption === "Cancers" ? left : right;
     let sy = 60;
 
     const calculateX = (d, i) => {

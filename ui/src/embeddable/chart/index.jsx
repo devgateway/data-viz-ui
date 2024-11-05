@@ -289,7 +289,7 @@ const Chart = (props) => {
   let selectedMeasures = getSelectedMeasures();
 
   let selectedFormat = getSelectedFormat();
-  let userMeasures = getUserMeasures();
+  const userMeasures = getUserMeasures();
   let leftLegendForSelectedMeasure = left;
   let rightLegendForSelectedMeasure = rightLegend;
 
@@ -312,7 +312,7 @@ const Chart = (props) => {
     }
   }
 
-  let numberFormat = selectedFormat
+  const numberFormat = selectedFormat
     ? {
         style:
           selectedFormat.style === "compacted"
@@ -334,7 +334,7 @@ const Chart = (props) => {
 
   const groupTotalFormatObject = parse(groupTotalFormat);
 
-  let groupTotalFormatParsed = {
+  const groupTotalFormatParsed = {
     style:
       groupTotalFormatObject.style === "compacted"
         ? "decimal"
@@ -355,7 +355,7 @@ const Chart = (props) => {
     scheme: scheme,
     colorBy: colorBy,
   };
-  let child = null;
+  const child = null;
   const contentHeight = editing ? height - 80 : height;
 
   const showXAxisTitle = () => {
@@ -550,7 +550,7 @@ const Chart = (props) => {
     dimension1
   };
 
-  let params = {};
+  const params = {};
   const ff = parse(filters) || {};
 
   if (ff && ff.forEach) {

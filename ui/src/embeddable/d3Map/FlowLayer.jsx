@@ -1,9 +1,7 @@
-import React, {useEffect} from 'react';
-import {connect} from "react-redux";
+import React from 'react';
 import BaseLayer from "./BaseLayer.jsx";
 import DataProvider from "../data/DataProvider.jsx";
 import DataConsumer from "../data/DataConsumer.jsx";
-import {parse} from "../utils/parseUtils.js";
 import * as d3 from "d3";
 import {injectIntl} from "react-intl";
 

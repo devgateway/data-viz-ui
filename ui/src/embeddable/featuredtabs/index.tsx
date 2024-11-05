@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react'
-import {Container, Grid, Icon, Label, Segment, Transition} from 'semantic-ui-react'
+import {Container, Grid, Icon, Label, Segment} from 'semantic-ui-react'
 import {
     MediaConsumer,
     MediaProvider,

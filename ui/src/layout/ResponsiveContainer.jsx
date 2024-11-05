@@ -1,6 +1,6 @@
-import React, {Component, useEffect, useState} from 'react'
+import React from 'react'
 
-import {Container, Icon, Menu, Sidebar,} from 'semantic-ui-react'
+import {Container,} from 'semantic-ui-react'
 import PropTypes from 'prop-types'
 import {SettingsConsumer} from '@devgateway/wp-react-lib'
 import {Media} from "../AppMedia.js"
