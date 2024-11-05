@@ -34,6 +34,11 @@ export const formatContent = (
   intl,
   tooltipEnableMarkdown
 ) => {
+  // if variables have a property called "field" and another property with the value being _${field},
+  // add _value to the variables object with the value of the _${field} property
+  if (variables.field && variables[`_${variables.field}`]) {
+    variables._value = variables[`_${variables.field}`];
+  }
   let str = tooltipEnableMarkdown
     ? template(tooltip, variables)
     : template(tooltip, variables).replace(/(?:\r\n|\r|\n)/g, "<br>");
