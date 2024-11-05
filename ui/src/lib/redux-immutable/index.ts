@@ -8,13 +8,13 @@ export const combineReducers = <S extends Immutable.Map<string, any>>(
 ): ((inputState: S | undefined, action: Action) => S) => {
   const reducerKeys = Object.keys(reducers);
 
-  // eslint-disable-next-line space-infix-ops
+   
   return (inputState: S | undefined, action: Action): S => {
     if (typeof inputState === "undefined") {
       inputState = getDefaultState();
     }
 
-    // eslint-disable-next-line no-process-env
+     
     if (process.env.NODE_ENV !== "production") {
       const warningMessage = getUnexpectedInvocationParameterMessage(
         inputState,
@@ -23,7 +23,7 @@ export const combineReducers = <S extends Immutable.Map<string, any>>(
       );
 
       if (warningMessage) {
-        // eslint-disable-next-line no-console
+         
         console.error(warningMessage);
       }
     }
