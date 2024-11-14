@@ -1,7 +1,7 @@
 ARG REPO
 ARG TAG
 FROM ${REPO}/ui-customizer:${TAG}  AS customizer
-FROM node:20-slim AS reactlib
+FROM node:22-slim AS reactlib
 WORKDIR /tmp/work
 COPY react-lib/wp-react-lib/package.json .
 RUN npm install
@@ -10,7 +10,7 @@ COPY react-lib/wp-react-lib/src src
 RUN npm run dist
 
 
-FROM node:20-slim AS ui
+FROM node:22-slim AS ui
 WORKDIR /tmp/work
 COPY ui/package*.json ./
 COPY --from=reactlib /tmp/work/package.json ../react-lib/wp-react-lib/
