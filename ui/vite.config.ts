@@ -4,7 +4,7 @@ import react from '@vitejs/plugin-react-swc';
 import eslintPlugin from 'vite-plugin-eslint';
 import path from "path";
 import Environment from 'vite-plugin-env-compatible';
-
+import autoprefixer from 'autoprefixer';
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
@@ -74,6 +74,11 @@ export default defineConfig(({ mode }) => {
             },
         },
         css: {
+            postcss: {
+                plugins: [
+                    autoprefixer(),
+                ]
+            },
             preprocessorOptions: {
                 scss: {
                     api: 'modern'
