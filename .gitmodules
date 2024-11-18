@@ -1,5 +1,4 @@
 [submodule "react-lib"]
 	path = react-lib
-	url = https://github.com/devgateway/wp-react-lib.git
-	branch = main
+	url = git@github.com:devgateway/wp-react-lib.git
 
