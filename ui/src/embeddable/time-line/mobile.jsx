@@ -237,10 +237,14 @@ const TimeLine = (props) => {
       [0, yScale(posts.length - 1)],
     ];
     const pathString = lineGenerator(data);
-
+    let translationVal = `translate(${transformMap[deviceType]},0)`;
+    const isEthiopia =  process.env.REACT_APP_API_ROOT?.includes("cd.tcdi") || process.env.REACT_APP_API_ROOT?.startsWith("drc.tobaccocontroldata");
+    if (isEthiopia) {
+      translationVal = `translate(${transformMap[deviceType]},20)`;
+    }
     const g = svgElement
       .append("g")
-      .attr("transform", `translate(${transformMap[deviceType]},0)`);
+      .attr("transform", translationVal);
     lineColor = "#E4E5EA";
     lineWidth = 6;
 
@@ -276,61 +280,66 @@ const TimeLine = (props) => {
 
     // titles (Post Title)
     g.selectAll(".title")
-      .data(posts)
-      .enter()
-      .append("foreignObject")
-      .attr("x", titleXAxis[deviceType]) // Move the label to the right of the timeline
-      .attr("y", (d, i) => yScale(i) - parseInt(subtitleHeight) / 2)
-      .attr("width", parseInt(subtitleWidthDeviceMap[deviceType]))
-      .attr("height", parseInt(subtitleHeight))
-      .append("xhtml:div")
-      .attr("id", (d, i) => {
-        return getTitleId(i);
-      })
-      .style("font-size", parseInt(fontSize) + 1 + "px")
-      .style("color", (d, i) => titleColor(i))
-      .style("font-weight", () => "bold")
-      .style("line-height", "1.2rem")
-      .style("text-align", "left")
-      .style("cursor", enableTitlePopup ? "pointer" : "default")
-      .html((d, i) => {
-        const readmore = readMoreLabel(i);
-        let title = d.title.rendered;
-        if (readmore) {
-          title += `<br><span style="font-size:${
-            parseInt(fontSize) - 3
-          }px;color:${titleColor(
-            i
-          )};text-decoration:underline;text-underline-offset:3px">${readmore}</span>`;
-        }
-        return title;
-      })
-      .each(function (d, i) {
-        const foreignObject = d3.select(this.parentNode); // Select the foreignObject
+    .data(posts)
+    .enter()
+    .append("foreignObject")
+    .attr("x", titleXAxis[deviceType]) // Move the label to the right of the timeline
+    .attr("y", (d, i) => yScale(i) - parseInt(subtitleHeight) / 2)
+    .attr("width", parseInt(subtitleWidthDeviceMap[deviceType]))
+    .attr("height", parseInt(subtitleHeight))
+    .append("xhtml:div")
+    .attr("id", (d, i) => getTitleId(i))
+    .style("font-size", parseInt(fontSize) + 1 + "px")
+    .style("color", (d, i) => titleColor(i))
+    .style("font-weight", "bold")
+    .style("line-height", "1.2rem")
+    .style("text-align", "left")
+    .style("cursor", enableTitlePopup ? "pointer" : "default")
+    .style("overflow", "hidden")
+    .style("display", "-webkit-box")
+    .style("-webkit-line-clamp", "2") // Limit to 2 lines
+    .style("-webkit-box-orient", "vertical") // Required for line-clamp
+    .style("text-overflow", "ellipsis") // Add ellipsis
+    .html((d, i) => {
+      const readmore = readMoreLabel(i);
+      let title = d.title.rendered;
+      if (readmore) {
+        title += `<br><span style="font-size:${
+          parseInt(fontSize) - 3
+        }px;color:${titleColor(
+          i
+        )};text-decoration:underline;text-underline-offset:3px">${readmore}</span>`;
+      }
+      return title;
+    })
+    .each(function (d, i) {
+      const foreignObject = d3.select(this.parentNode); // Select the foreignObject
 
-        // Wait for the DOM to be updated before calculating the height
-        setTimeout(() => {
-          const bbox = this.getBoundingClientRect(); // Get the actual bounding box of the rendered content
-          foreignObject.attr("height", bbox.height); // Update the height based on actual content
+      // Wait for the DOM to be updated before calculating the height
+      setTimeout(() => {
+        const bbox = this.getBoundingClientRect(); // Get the actual bounding box of the rendered content
+        const contentHeight = Math.min(bbox.height, parseInt(subtitleHeight) * 2); // Ensure height doesn't exceed two lines
+        foreignObject.attr("height", contentHeight); // Update the height based on actual content
 
-          // Update y position to vertically center the content
-          foreignObject.attr("y", yScale(i) - bbox.height / 2);
-        }, 0); // Timeout ensures the DOM is rendered first before measuring
-      })
-      .on(isTouchDevice() ? "touchstart" : "mouseover", (event, d, i) => {
-        event.preventDefault();
-        if (enableTitlePopup) {
-          isTouchDevice() ? onTouchStart(event, d) : onMouseOver(event, d);
+        // Update y position to vertically center the content
+        foreignObject.attr("y", yScale(i) - contentHeight / 2);
+      }, 0); // Timeout ensures the DOM is rendered first before measuring
+    })
+    .on(isTouchDevice() ? "touchstart" : "mouseover", (event, d, i) => {
+      event.preventDefault();
+      if (enableTitlePopup) {
+        isTouchDevice() ? onTouchStart(event, d) : onMouseOver(event, d);
+      }
+    })
+    .on("mouseout", (event, d, i) => {
+      event.preventDefault();
+      if (enableTitlePopup) {
+        onMouseOut(event, d, d.id);
+        if (closePopupOnMouseOut) {
+          // Additional logic if needed
         }
-      })
-      .on("mouseout", (event, d, i, e) => {
-        event.preventDefault();
-        if (enableTitlePopup) {
-          onMouseOut(event, d, d.id);
-          if (closePopupOnMouseOut) {
-          }
-        }
-      });
+      }
+    });
 
     g.selectAll(".year")
       .data(posts)
@@ -340,7 +349,7 @@ const TimeLine = (props) => {
       .attr("y", (d, i) => yScale(i))
       .attr("dy", "0.35em")
       .style("text-anchor", "end")
-      .style("font-size", `${parseInt(fontSize) + 2}px`)
+      .style("font-size", `${parseInt(fontSize) + 1}px`)
       .style("font-weight", "400")
       .style("fill", "#4C4D50")
       .text((d) => {
