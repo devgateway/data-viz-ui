@@ -1,4 +1,4 @@
-import React, { lazy } from 'react'
+import { lazy } from 'react'
 import data from './reducers/data'
 import embeddable from './reducers/embeddable'
 import { injectIntl } from "react-intl";
@@ -33,6 +33,7 @@ const ParallaxContainer = lazy(() => import("./parallax"));
 const Wrapped = lazy(() => import("./wrapped"));
 const SankeyChart = lazy(() => import("./sankeychart"));
 const DataLabel = lazy(() => import("./datalabel"));
+const Body = lazy(() => import("./body"));
 
 let reducerList = { data, embeddable };
 
