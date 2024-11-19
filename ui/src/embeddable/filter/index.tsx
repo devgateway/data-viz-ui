@@ -1,5 +1,5 @@
-import React, { LegacyRef, MutableRefObject, useEffect, useRef, useState } from "react";
-import { Checkbox, Container, Divider, Dropdown, DropdownProps, ForwardRefComponent, Icon, Input, Label, Radio, Segment } from "semantic-ui-react";
+import React, { LegacyRef, useEffect, useRef, useState } from "react";
+import { Checkbox, Container, Divider, Dropdown, DropdownProps, Icon, Input, Label, Radio, Segment } from "semantic-ui-react";
 import CategoriesConsumer from '../data/CategoriesConsumer'
 import CategoriesProvider from '../data/CategoriesProvider'
 import { connect } from "react-redux";
@@ -304,8 +304,8 @@ const ListFilterDropDown = connect(mapStateToProps, mapActionCreators)((props: L
                             return o.text.toLowerCase().includes(searchText.toLowerCase())
                         }
                         return true;
-                    }).map(({ value, text }) => (
-                        <Dropdown.Item className={useSingleColumn ? "dropdown-item-single-column" : ""}>
+                    }).map(({ value, text }, index) => (
+                        <Dropdown.Item key={index} className={useSingleColumn ? "dropdown-item-single-column" : ""}>
                             {filterType == FILTER_TYPE_SINGLE_SELECT && <Radio
                                 checked={current && current.indexOf(value) > -1 ? true : false}
                                 onChange={e => changeFilter(value)}
