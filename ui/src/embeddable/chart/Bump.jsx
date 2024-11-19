@@ -63,7 +63,8 @@ const Chart = ({
                }) => {
 
 
-    const [filter, setFilter] = useState([])
+    const [filter, setFilter] = useState([]);
+    const theme = useTheme();
 
     const applyFilter = (values) => {
         if (filter) {
@@ -85,8 +86,6 @@ const Chart = ({
 
 
     const CustomTick = tick => {
-        const theme = useTheme()
-
         const width = getTextWidth(tick.value, "12px Roboto") + 15
         return (<g transform={`translate(${tick.x},${tick.y + 30})`}>
             <line stroke={tickColor} strokeWidth={1.5} y1={-32} y2={-12}/>
