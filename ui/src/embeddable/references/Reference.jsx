@@ -1,5 +1,5 @@
 import React from "react";
-import {Icon, Label, Popup} from 'semantic-ui-react'
+import { Popup} from 'semantic-ui-react'
 import {connect} from "react-redux";
 
 const decodeContent=(content) => {

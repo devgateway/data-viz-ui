@@ -1,8 +1,8 @@
-import {Container, Grid, Image, Label, Menu, Segment} from "semantic-ui-react";
+import {Container, Grid, Image, Menu, Segment} from "semantic-ui-react";
 import {PageConsumer, PageProvider, PostIntro} from "@devgateway/wp-react-lib";
 import React, {useEffect, useState} from "react";
 import {injectIntl} from "react-intl";
-import {MediaConsumer, MediaProvider, Page} from "@devgateway/wp-react-lib";
+import {MediaConsumer, MediaProvider} from "@devgateway/wp-react-lib";
 import PostContent from "../connected-templates/PostContent";
 
 const VerticalDashboardGallery = ({pages, width}) => {

@@ -120,9 +120,9 @@ const Chart = ({
     return (
       <>
         {showLegends &&
-          chartLegends.map((legend) => {
+          chartLegends.map((legend, idx) => {
             return (
-              <div className={"legend item"} onClick={() => toggle(legend.id)}>
+              <div key={idx} className={"legend item"} onClick={() => toggle(legend.id)}>
                 <input
                   className={"ignore"}
                   type="checkbox"
@@ -198,10 +198,12 @@ const Chart = ({
 
   const CustomTick = (tick) => {
     const tickObject = Object.assign({}, tick);
+    const theme = useTheme();
+
     if(isMobileConfigEnabled && hiddenLabels.includes(String(tickObject.value))) {
       tickObject.value = "";
     }
-    const theme = useTheme();
+    
     const width = getTextWidth(tickObject.value, "12px Roboto") + 15;
 
     if (tickRotation > 0 && tickRotation < 180) {

@@ -1,6 +1,5 @@
 import React from 'react';
 import { Helmet, HelmetProvider } from "react-helmet-async";
-import ReactHtmlParser from 'html-react-parser';
 
 console.log("env==>",process.env)
 
