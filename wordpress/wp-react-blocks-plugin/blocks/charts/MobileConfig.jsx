@@ -6,7 +6,7 @@ import {
   RangeControl,
 } from "@wordpress/components";
 import { __ } from "@wordpress/i18n";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { getTranslatedOptions } from ".././commons/APIutils";
 
 const MarginSection = ({
@@ -90,6 +90,54 @@ const MarginSection = ({
     </PanelBody>
   );
 };
+
+const PaddingSection = ({
+  setAttributes,
+  attributes: { mobileCustomization, barPadding, barInnerPadding },
+}) => {
+  return (
+    <PanelBody initialOpen={false} title={__("Padding")}>
+      <PanelRow>
+        <RangeControl
+          label={__(
+            "Bar Padding (Space between bars that are not in the same group)"
+          )}
+          value={mobileCustomization?.barPadding ?? barPadding}
+          initialPosition={0.15}
+          onChange={(newBarPadding) => setAttributes({
+            mobileCustomization: {
+              ...mobileCustomization,
+              barPadding: newBarPadding,
+            },
+           })}
+          step={0.05}
+          min={0}
+          max={1}
+        />
+      </PanelRow>
+
+      <PanelRow>
+        <RangeControl
+          label={__("Bar Inner Padding (Space between bars in the same group)")}
+          value={
+            mobileCustomization?.barInnerPadding ?? barInnerPadding
+          }
+          initialPosition={0.75}
+          onChange={(barInnerPadding) => setAttributes({
+            mobileCustomization: {
+              ...mobileCustomization,
+              barInnerPadding: barInnerPadding,
+            },
+           })}
+          step={0.25}
+          min={0}
+          max={50}
+        />
+      </PanelRow>
+    </PanelBody>
+  );
+};
+
 
 const TitleSection = ({
   setAttributes,
@@ -228,57 +276,41 @@ const MobileConfig = (props) => {
     }
   }, [yAxisTickValues]);
 
-  const [xAxisLabels, setXAxisLabels] = useState(extractAxisValues(csv));
-
-
-  const extractLabels = async () => {
-    if (app !== "csv") {
-      if (dimension1 !== "none") {
-        const storedCategories = JSON.parse(
-          sessionStorage.getItem(`categories_${app}`)
-        );
-        const categories =
-          storedCategories ??
-          await fetch(`/api/${app}/categories`)
-            .then((response) => response.json())
-            .then((data) => getTranslatedOptions(data));
-
-        console.log("categories===>", categories);
-
-        if (categories) {
-          const tempXAxisLabels = categories.filter(
-            (category) =>
-              category.type?.toLowerCase() === dimension1?.toLowerCase()
-          )[0].items?.map((item) => item.value);
-          setXAxisLabels(tempXAxisLabels);
-        }
-
+  let xAxisLabels = extractAxisValues(csv);
+  if (app !== "csv") {
+    if (dimension1 !== "none") {
+      const storedCategories = JSON.parse(
+        sessionStorage.getItem(`categories_${app}`)
+      );
+      const categories =
+        storedCategories ??
+        fetch(`/api/${app}/categories`)
+          .then((response) => response.json())
+          .then((data) => getTranslatedOptions(data));
+      xAxisLabels = categories
+        .filter(
+          (category) =>
+            category.type?.toLowerCase() === dimension1?.toLowerCase()
+        )[0]
+        ?.items?.map((item) => item.value);
+    } else {
+      const storedMeasures = JSON.parse(
+        sessionStorage.getItem(`measures_${app}`)
+      );
+      // if measures are not present in session storage, fetch them from the API
+      if (!storedMeasures) {
+        fetch(`/api/${app}/measures`)
+          .then((response) => response.json())
+          .then((data) => {
+            sessionStorage.setItem(`measures_${app}`, JSON.stringify(data));
+            updateMeasureLabels(data, measures, app);
+          });
       } else {
-        const storedMeasures = JSON.parse(
-          sessionStorage.getItem(`measures_${app}`)
-        );
-        // if measures are not present in session storage, fetch them from the API
-        if (!storedMeasures) {
-          fetch(`/api/${app}/measures`)
-            .then((response) => response.json())
-            .then((data) => {
-              sessionStorage.setItem(`measures_${app}`, JSON.stringify(data));
-              updateMeasureLabels(data, measures, app);
-            });
-        } else {
-          updateMeasureLabels(storedMeasures, measures, app);
-        }
-
-        if (measures && measures[app]) {
-          setXAxisLabels(getSelectedLabelsForApp(measures, app));
-        }
+        updateMeasureLabels(storedMeasures, measures, app);
       }
+      xAxisLabels = getSelectedLabelsForApp(measures, app);
     }
   }
-
-  useEffect(() => {
-    extractLabels();
-  }, [app]);
 
   const onXAxisLabelChange = (label, value) => {
     const newObject = Object.assign({}, mobileCustomization);
@@ -326,10 +358,10 @@ const MobileConfig = (props) => {
 
   const isBarOrLine = ["bar", "line"].includes(type);
   return (
-    <PanelBody initialOpen={false} title={__("Mobile Customization Settings")}>
+    <PanelBody initialOpen={false} title={__("Mobile & Tablet Customization Settings")}>
       <PanelRow>
         <ToggleControl
-          label={__("Show Mobile Customization Settings")}
+          label={__("Show Mobile & Tablet Customization Settings")}
           checked={mobileCustomization?.showCustomization}
           onChange={(isShowMobileCustomization) =>
             onShowMobileCustomizationChange(isShowMobileCustomization)
@@ -420,6 +452,7 @@ const MobileConfig = (props) => {
             </>
           )}
           <MarginSection {...props} />
+          { type === "bar" && <PaddingSection {...props} /> }
         </>
       )}
     </PanelBody>
