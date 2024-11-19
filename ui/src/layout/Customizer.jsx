@@ -1,5 +1,4 @@
 import React, {useEffect, useRef, useState} from "react";
-import {Container, Flag, Image, Menu} from "semantic-ui-react";
 
 const settingMappings = {
     'blogname': 'name',
@@ -65,9 +64,10 @@ const CustomizerWrapper = (props) => {
     }, [])
 
 
-    return React.Children.map(props.children, (child => React.cloneElement(child, {
+    return React.Children.map(props.children, ((child, index) => React.cloneElement(child, {
         ...props,
-        settings: {...customization}
+        settings: {...customization},
+        key: `customizer-child-${index}`
     })))
 }
 
