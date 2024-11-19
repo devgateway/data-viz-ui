@@ -1,7 +1,6 @@
-import React, {useEffect, useRef, useState} from 'react'
-import {Container, Grid, Label} from 'semantic-ui-react'
-import {MediaConsumer, MediaProvider, PostConsumer, PostIcon, PostProvider, utils} from "@devgateway/wp-react-lib";
-import PostIntro from "../connected-templates/PostIntro";
+import React, { useRef, useState} from 'react'
+import {Container} from 'semantic-ui-react'
+import { PostConsumer, PostProvider} from "@devgateway/wp-react-lib";
 import {Parallax, ParallaxLayer} from '@react-spring/parallax'
 import PostContent from "../connected-templates/PostContent";
 import {parse} from "../utils/parseUtils";
