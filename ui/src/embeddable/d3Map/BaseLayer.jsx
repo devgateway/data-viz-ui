@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import * as d3 from 'd3' // d3 plugin
 import Layer from "./Layer";
 

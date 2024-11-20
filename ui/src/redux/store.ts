@@ -1,12 +1,8 @@
-import {createBrowserHistory, createHashHistory} from 'history'
-import Immutable from 'immutable'
-import createRootReducer, { routerMiddleware, createReduxHistory } from "./reducer";
-import { configureStore } from '@reduxjs/toolkit';
+import Immutable, { Record } from 'immutable'
+import createRootReducer from "./reducer";
+import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit';
 
-const useHash = process.env.VITE_REACT_APP_USE_HASH_LINKS as unknown as boolean;
-export const history = useHash? createHashHistory():createBrowserHistory()
-
-const initialState = Immutable.Map()
+const initialState: Immutable.Map<string, any> = Immutable.Map()
 
 const getRootReducer = () => {
     return createRootReducer()
@@ -14,12 +10,19 @@ const getRootReducer = () => {
 
 
 export const store  = configureStore({
-    reducer: getRootReducer(),
+    reducer: getRootReducer() ,
     preloadedState: initialState,
     middleware: (getDefaultMiddleware) => getDefaultMiddleware({
         serializableCheck: false,
         immutableCheck: false
-    }).concat(routerMiddleware)
+    })
 });
 
-export const reduxHistory = createReduxHistory(store);
+export type AppDispatch = typeof store.dispatch;
+export type RootState = Record<ReturnType<typeof store.getState>>;
+export type AppThunk<ReturnType = void> = ThunkAction<
+    ReturnType,
+    RootState,
+    unknown,
+    Action<string>
+>;
