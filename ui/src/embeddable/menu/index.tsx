@@ -1,7 +1,7 @@
-import React, {useEffect, useState} from "react";
+import React, { useState} from "react";
 import {MenuProvider, MenuConsumer} from "@devgateway/wp-react-lib";
 import {injectIntl} from "react-intl";
-import {Container, Grid, Menu} from "semantic-ui-react";
+import {Container, Menu} from "semantic-ui-react";
 import {decode} from "../utils/parseUtils";
 
 const localReplaceLink = (url, locale) => {
