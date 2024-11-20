@@ -28,6 +28,7 @@ export default defineConfig(({ mode }) => {
             alias: {
                 "@": path.resolve(__dirname, "./src"),
                 react: path.resolve('./node_modules/react'),
+               "inmutable": path.resolve('./node_modules/inmutable'),
                 "react-dom": path.resolve('./node_modules/react-dom'),
                 "react-router-dom": path.resolve('./node_modules/react-router-dom'),
                 "react-redux": path.resolve('./node_modules/react-redux'),
