@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, Header, Icon, Segment, Image } from "semantic-ui-react";
+import { Button, Header, Segment } from "semantic-ui-react";
 import { cleanFilter } from "../reducers/data";
 import { connect } from "react-redux";
 

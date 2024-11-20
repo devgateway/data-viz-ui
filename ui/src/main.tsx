@@ -1,7 +1,6 @@
 import React from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App'
-import * as serviceWorker from './tools/serviceWorker';
 
 import './scss/common.scss';
 import '@devgateway/customizer/dist/index.css';

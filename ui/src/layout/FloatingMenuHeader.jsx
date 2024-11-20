@@ -1,6 +1,6 @@
-import {Button, Container, Flag, Grid, Header, Image, Menu, Popup} from "semantic-ui-react";
-import React, {useEffect, useState} from "react";
-import {MediaConsumer, MediaProvider, MenuConsumer, MenuProvider, utils} from "@devgateway/wp-react-lib";
+import { Image, Menu, Popup} from "semantic-ui-react";
+import React, { useState} from "react";
+import {MediaConsumer, MediaProvider, MenuConsumer, MenuProvider} from "@devgateway/wp-react-lib";
 import {injectIntl} from "react-intl";
 import {withRouter} from "@/withRouter";
 import SearchControl from "./SearchControl.jsx";

@@ -193,14 +193,14 @@ async function cloneNode(node, filter, root) {
     }
 
     async function cloneChildren(original, clone, filter) {
-        var children = original.childNodes;
+        const children = original.childNodes;
         if (children.length === 0) return Promise.resolve(clone);
 
         await cloneChildrenInOrder(clone, util.asArray(children), filter);
         return clone;
 
         function cloneChildrenInOrder(parent, children, filter) {
-            var done = Promise.resolve();
+            let done = Promise.resolve();
             children.forEach(function (child) {
                 done = done
                     .then(function () {
@@ -251,8 +251,8 @@ async function cloneNode(node, filter, root) {
             });
 
             function clonePseudoElement(element) {
-                var style = window.getComputedStyle(original, element);
-                var content = style.getPropertyValue('content');
+                const style = window.getComputedStyle(original, element);
+                const content = style.getPropertyValue('content');
 
                 if (content === '' || content === 'none') return;
 
@@ -496,9 +496,9 @@ function newUtil() {
                     return;
                 }
 
-                var encoder = new FileReader();
+                const encoder = new FileReader();
                 encoder.onloadend = function () {
-                    var content = encoder.result.split(/,/)[1];
+                    const content = encoder.result.split(/,/)[1];
                     resolve(content);
                 };
                 encoder.readAsDataURL(request.response);
@@ -538,9 +538,9 @@ function newUtil() {
     }
 
     function asArray(arrayLike) {
-        var array = [];
-        var length = arrayLike.length;
-        for (var i = 0; i < length; i++) array.push(arrayLike[i]);
+        const array = [];
+        const length = arrayLike.length;
+        for (let i = 0; i < length; i++) array.push(arrayLike[i]);
         return array;
     }
 
@@ -549,25 +549,25 @@ function newUtil() {
     }
 
     function width(node) {
-        var leftBorder = px(node, 'border-left-width');
-        var rightBorder = px(node, 'border-right-width');
+        const leftBorder = px(node, 'border-left-width');
+        const rightBorder = px(node, 'border-right-width');
         return node.scrollWidth + leftBorder + rightBorder;
     }
 
     function height(node) {
-        var topBorder = px(node, 'border-top-width');
-        var bottomBorder = px(node, 'border-bottom-width');
+        const topBorder = px(node, 'border-top-width');
+        const bottomBorder = px(node, 'border-bottom-width');
         return node.scrollHeight + topBorder + bottomBorder;
     }
 
     function px(node, styleProperty) {
-        var value = window.getComputedStyle(node).getPropertyValue(styleProperty);
+        const value = window.getComputedStyle(node).getPropertyValue(styleProperty);
         return parseFloat(value.replace('px', ''));
     }
 }
 
 function newInliner() {
-    var URL_REGEX = /url\(['"]?([^'"]+?)['"]?\)/g;
+    const URL_REGEX = /url\(['"]?([^'"]+?)['"]?\)/g;
 
     return {
         inlineAll: inlineAll,
@@ -583,8 +583,8 @@ function newInliner() {
     }
 
     function readUrls(string) {
-        var result = [];
-        var match;
+        const result = [];
+        let match;
         while ((match = URL_REGEX.exec(string)) !== null) {
             result.push(match[1]);
         }
@@ -617,7 +617,7 @@ function newInliner() {
         return Promise.resolve(string)
             .then(readUrls)
             .then(function (urls) {
-                var done = Promise.resolve(string);
+                let done = Promise.resolve(string);
                 urls.forEach(function (url) {
                     done = done.then(function (string) {
                         return inline(string, url, baseUrl, get);
@@ -673,9 +673,9 @@ function newFontFaces() {
         }
 
         function getCssRules(styleSheets) {
-            var cssRules = [];
+            const cssRules = [];
             styleSheets.forEach(function (sheet) {
-                if (sheet.hasOwnProperty("cssRules")) {
+                if (Object.prototype.hasOwnProperty.call(sheet, "cssRules")) {
                     try {
                         util.asArray(sheet.cssRules || []).forEach(cssRules.push.bind(cssRules));
                     } catch (e) {
@@ -689,7 +689,7 @@ function newFontFaces() {
         function newWebFont(webFontRule) {
             return {
                 resolve: function resolve() {
-                    var baseUrl = (webFontRule.parentStyleSheet || {}).href;
+                    const baseUrl = (webFontRule.parentStyleSheet || {}).href;
                     return inliner.inlineAll(webFontRule.cssText, baseUrl);
                 },
                 src: function () {
@@ -748,7 +748,7 @@ function newImages() {
             });
 
         function inlineBackground(node) {
-            var background = node.style.getPropertyValue('background');
+            const background = node.style.getPropertyValue('background');
 
             if (!background) return Promise.resolve(node);
 

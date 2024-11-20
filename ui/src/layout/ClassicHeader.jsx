@@ -1,11 +1,11 @@
-import { Container, Flag, Image, Menu } from "semantic-ui-react";
+import { Container, Image, Menu } from "semantic-ui-react";
 import React, { useEffect, useState } from "react";
 import { MediaConsumer, MediaProvider, MenuConsumer, MenuProvider, utils } from "@devgateway/wp-react-lib";
 import { injectIntl } from "react-intl";
 import { withRouter } from "@/withRouter"
 import SearchControl from "./SearchControl.jsx";
 import LangSwitcher from "./LangSwitcher.jsx";
-import { Link, NavLink, useParams } from "react-router-dom";
+import { NavLink, useParams } from "react-router-dom";
 
 const getPath = (menu, locationParams) => {
     const path = [];
