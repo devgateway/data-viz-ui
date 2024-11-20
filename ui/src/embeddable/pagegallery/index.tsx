@@ -32,12 +32,13 @@ const HorizontalDashboardGallery: React.FC<HorizontalDashboardGalleryProps> = ({
         <Grid columns={columns as SemanticWIDTHS}>
             {/* @ts-ignore */}
             {[...Array(parseInt(rows)).keys()]
-                .map(r => {
+                .map((r, idx) => {
 
-                    return (<Grid.Row>
-                        {[...Array(parseInt(columns)).keys()].map(c => {
+
+                    return (<Grid.Row key={idx}>
+                        {[...Array(parseInt(columns)).keys()].map((c, _) => {
                             index++
-                            return (<Grid.Column>
+                            return (<Grid.Column key={_}>
                                 <PostIntro as={"div"} post={childPages[index]}></PostIntro>
                             </Grid.Column>)
                         })}

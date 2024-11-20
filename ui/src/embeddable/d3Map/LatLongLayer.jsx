@@ -1,9 +1,6 @@
-import React, {useEffect} from 'react';
-import {connect} from "react-redux";
-import BaseLayer from "./BaseLayer";
+import React from 'react';
 import DataProvider from "../data/DataProvider";
 import DataConsumer from "../data/DataConsumer";
-import Map from "../map/map";
 import {parse} from "../utils/parseUtils";
 import * as d3 from "d3";
 import {injectIntl} from "react-intl";
