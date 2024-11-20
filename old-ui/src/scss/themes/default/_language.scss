@@ -1,0 +1,51 @@
+.language.selector {
+  .ui.image {
+    margin-top: 0px !important;
+  }
+
+  .selected.item {
+    font-weight: bold !important;
+  }
+}
+
+.inline.language.selector {
+
+  a {
+    font-size: 15px;
+    margin-right: 7px;
+  }
+
+  .ui.image {
+    display: inline-block;
+    margin-right: 5px;
+
+  }
+
+  .selected {
+    font-weight: bold !important;
+  }
+}
+
+.single.language.selector {
+
+  a:after {
+    margin-left: 5px;
+    content: '|';
+  }
+
+  a {
+    font-size: 15px;
+  }
+
+
+  a:last-child:after {
+    display: none;
+    border: 1px solid red;
+  }
+
+
+  .selected {
+    font-weight: bold !important;
+  }
+
+}
