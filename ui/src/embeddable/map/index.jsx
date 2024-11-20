@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { connect } from "react-redux";
 import DataProvider from "../data/DataProvider";
@@ -141,7 +142,7 @@ const MapWrapper = (props) => {
         return params
     }
 
-    let numberFormat = {
+    const numberFormat = {
         style: (style === 'compacted') ? 'decimal' : style,
         notation: (style === 'compacted') ? 'compact' : "standard",
         currency: currency,
@@ -156,9 +157,9 @@ const MapWrapper = (props) => {
         return l
     })
     
-    let country = countries.find(c => c.value === mapCenter)   
+    const country = countries.find(c => c.value === mapCenter)   
 
-    let multipleMeasures = hasMultipleMeasures == true || hasMultipleMeasures == "true"    
+    const multipleMeasures = hasMultipleMeasures == true || hasMultipleMeasures == "true"    
 
     const levels = [dimension1, dimension2]
     const source = levels.filter(l => l != 'none' && l != null).join('/')
@@ -232,7 +233,7 @@ const MapWrapper = (props) => {
       
     const measureLabels = parse(customMeasureLabels) || {}
     const DataFrame = app === "csv" ? MapCSVDataFrame : MapDataFrame;   
-    let measuresCSV = editing ? (parse(measures) || []).join(',') : measures    
+    const measuresCSV = editing ? (parse(measures) || []).join(',') : measures    
     return (<DataProvider 
         params={getFilters(filters)}
         app={app}
