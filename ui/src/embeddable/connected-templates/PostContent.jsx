@@ -1,5 +1,5 @@
 import {connect} from "react-redux";
-import React, {useEffect, useState} from 'react'
+import React from 'react'
 import {PostContent} from "@devgateway/wp-react-lib";
 import {postLoaded} from '../reducers/embeddable'
 

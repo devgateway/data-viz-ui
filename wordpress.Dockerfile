@@ -2,12 +2,15 @@ ARG REPO
 ARG TAG
 FROM ${REPO}/wp-customizer:${TAG}  AS customizer
 
-FROM node:20-slim  AS dist
+FROM node:22-slim  AS dist
 WORKDIR /tmp/work
 COPY wordpress/wp-react-blocks-plugin/blocks/package.json ./
+COPY wordpress/wp-react-blocks-plugin/blocks/package-lock.json ./
 #Copy custom plugins
-RUN npm install
+RUN --mount=type=cache,target=node_modules,id=wp_react_blocks_node_modules \
+npm install --package-lock-only
 COPY wordpress/wp-react-blocks-plugin/blocks/ ./
+
 COPY --from=customizer /tmp/work/blocks/ ../../../../custom/wp-customizer/blocks/
 RUN find ../../../../custom/wp-customizer/blocks/ -exec sed -i 's|../../../../front/wordpress/wp-react-blocks-plugin/blocks/|/tmp/work/|g' {} \;
 
@@ -26,7 +29,7 @@ COPY wordpress/wp-theme wp-content/themes/dg-semantic
 
 
 #Copy custom function file
-COPY --from=customizer /tmp/work/wp-theme/_functions.php  wp-content/themes/dg-semantic/_functions.php
+#COPY --from=customizer /tmp/work/wp-theme/_functions.php  wp-content/themes/dg-semantic/_functions.php
 #Copy custom editor.html
 COPY --from=customizer /tmp/work/wp-theme/css/*  wp-content/themes/dg-semantic/css/
 
