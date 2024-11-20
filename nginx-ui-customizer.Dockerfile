@@ -18,7 +18,7 @@ COPY --from=reactlib /tmp/work/dist ../react-lib/wp-react-lib/dist
 COPY --from=customizer /tmp/work/package.json ../../custom/ui-customizer/
 COPY --from=customizer /tmp/work/dist ../../custom/ui-customizer/dist
 
-RUN npm install
+RUN npm install && npm install react-compiler-runtime
 COPY ui/public public
 COPY ui .
 
