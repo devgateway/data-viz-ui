@@ -12,7 +12,6 @@ COPY react-lib/wp-react-lib/src src
 RUN npm run dist
 
 
-
 FROM node:22-slim AS install
 
 WORKDIR /tmp/work
