@@ -1,5 +1,5 @@
 {
-  "amp.chart.dashboard:inunits": "In units",
-  "amp.chart.dashboard:inthousands": "In thousands",
-  "amp.chart.dashboard:inmillions": "In millions"
+  "viz.chart.dashboard:inunits": "In units",
+  "viz.chart.dashboard:inthousands": "In thousands",
+  "viz.chart.dashboard:inmillions": "In millions"
 }
