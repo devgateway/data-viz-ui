@@ -5,7 +5,8 @@ WORKDIR /tmp/work
 FROM node:22-slim AS reactlib
 WORKDIR /tmp/work
 COPY react-lib/wp-react-lib/package.json .
-RUN --mount=type=cache,target=node_modules,id=reactlib_node_modules npm install
+RUN npm install
+RUN #--mount=type=cache,target=node_modules,id=reactlib_node_modules npm install
 COPY react-lib/wp-react-lib/public public
 COPY react-lib/wp-react-lib/src src
 RUN npm run dist
