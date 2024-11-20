@@ -22,6 +22,7 @@ RUN --mount=type=cache,target=node_modules,id=ui_node_modules npm install
 FROM node:22-slim AS ui
 WORKDIR /tmp/work
 COPY --from=install /tmp/work/ /tmp/work/
+RUN npm install && npm install react-compiler-runtime
 COPY ui/public public
 COPY ui .
 
