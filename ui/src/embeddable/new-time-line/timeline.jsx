@@ -1,8 +1,5 @@
-import {PostConsumer, PostProvider} from "@devgateway/wp-react-lib";
-import PostIntro from "../connected-templates/PostIntro";
 import 'pure-react-carousel/dist/react-carousel.es.css';
 import React, {useEffect, useRef, useState} from "react";
-import {Container} from "semantic-ui-react";
 import * as d3 from 'd3'
 
 const visibleStyle  = {
@@ -121,7 +118,7 @@ const TimeLine = ({
         const onMouseOver = (d, i) => {
             const offset = 30
             const position = [d3.event.pageX + offset, d3.event.pageY - offset]
-            let tooltipWidth =  600
+            const tooltipWidth =  600
             if ((d3.event.pageX + tooltipWidth + offset) > window.innerWidth) {
                 position[0] = d3.event.pageX - tooltipWidth - offset
             }

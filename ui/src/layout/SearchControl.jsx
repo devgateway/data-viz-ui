@@ -1,10 +1,11 @@
 import React, {useEffect, useState} from "react";
-import CustomSearch from './CustomSemanticSearch'
-import SearchProvider from "@devgateway/wp-react-lib/dist/providers/SearchProvider";
-import SearchConsumer from "@devgateway/wp-react-lib/dist/consumers/SearchConsumer";
+import {
+    SearchProvider,
+    SearchConsumer
+} from "@devgateway/wp-react-lib";
 import {injectIntl} from "react-intl";
 import {utils} from "@devgateway/wp-react-lib";
-import CustomSemanticSearch from "./CustomSemanticSearch";
+import CustomSemanticSearch from "./CustomSemanticSearch.jsx";
 
 
 const resultRenderer = injectIntl(({
@@ -28,7 +29,7 @@ const resultRenderer = injectIntl(({
     let target = parent_link ? utils.replaceLink(parent_link, locale) + `#${slug}` : utils.replaceLink(link, locale)
     target = redirect_url ? redirect_url + `#${slug}` : target
 
-    
+
 
     return (
         <div className={"has-standard-12-font-size"} onClick={e => document.location.href = target}>
@@ -41,34 +42,34 @@ const resultRenderer = injectIntl(({
 })
 
 const replaceString = (content, words) => {
-    let regex = RegExp(words, 'gi')  
+    const regex = RegExp(words, 'gi')
     let newHTML = content
-    let instances = [...(newHTML.matchAll(regex))]
+    const instances = [...(newHTML.matchAll(regex))]
     let shift = 0
-    let lengthBeforeChange = newHTML.length
-    instances.forEach(instance => {                             
-        let replacement = '<b>' + newHTML.substring(instance.index + shift, instance.index + shift + words.length) + '</b>';
+    const lengthBeforeChange = newHTML.length
+    instances.forEach(instance => {
+        const replacement = '<b>' + newHTML.substring(instance.index + shift, instance.index + shift + words.length) + '</b>';
         newHTML = newHTML.substring(0, instance.index + shift) + replacement + newHTML.substring(instance.index + words.length + shift);
-        shift = newHTML.length - lengthBeforeChange;              
-    }) 
+        shift = newHTML.length - lengthBeforeChange;
+    })
 
     return newHTML;
 }
 
 const searchTextHandler = (words) => {
     let searchedPara = document.querySelector('.results');
-    let searchResultHeading = searchedPara = searchedPara = document.querySelectorAll('H5')
-    let searchResult = searchedPara = searchedPara = document.querySelectorAll('.search-content')
+    const searchResultHeading = searchedPara = searchedPara = document.querySelectorAll('H5')
+    const searchResult = searchedPara = searchedPara = document.querySelectorAll('.search-content')
     for (let i = 0; i < searchResult.length; i++) {
-        if (searchResult[i]) {          
+        if (searchResult[i]) {
             searchResult[i].innerHTML = replaceString(searchResult[i].textContent, words);
-        }      
+        }
     }
-    
+
     for (let i = 0; i < searchResultHeading.length; i++) {
        if (searchResultHeading[i]) {
             searchResultHeading[i].innerHTML = replaceString(searchResultHeading[i].textContent, words);
-      }        
+      }
     }
 }
 
