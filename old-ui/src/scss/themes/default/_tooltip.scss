@@ -1,0 +1,15 @@
+
+.wp-info-tooltip.wp-info {
+  display: inline;
+
+
+}
+.popup{
+  border: 1px solid red;
+}
+
+@media print {
+  .wp-info-tooltip {
+    display: none !important;
+  }
+}
