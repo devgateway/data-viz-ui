@@ -23,6 +23,7 @@ FROM node:22-slim AS ui
 WORKDIR /tmp/work
 COPY --from=install /tmp/work/ /tmp/work/
 RUN npm install && npm install react-compiler-runtime
+
 COPY ui/public public
 COPY ui .
 
