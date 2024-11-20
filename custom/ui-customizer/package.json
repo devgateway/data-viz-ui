@@ -11,15 +11,18 @@
     "README.md"
   ],
   "license": "MIT",
-  "dependencies": {
-    "react-scripts": "^5.0.0",
+  "dependencies": { 
     "watch": "^1.0.2"
   },
   "devDependencies": {
-    "@babel/cli": "^7.14.3",
+    "@babel/cli": "^7.25.9",
+    "@babel/preset-env": "^7.25.9",
+    "@babel/plugin-transform-runtime": "^7.25.9",
+    "@babel/plugin-external-helpers": "^7.25.9",
     "@babel/preset-react": "^7.13.13",
-    "node-sass": "^4.14.1"
-
+    "babel-plugin-react-compiler": "^19.0.0-beta-a7bf2bd-20241110",
+    "react-compiler-runtime": "^19.0.0-beta-a7bf2bd-20241110",
+    "sass": "^1.79.4"
   },
   "peerDependencies": {
     "react": "*",
@@ -29,8 +32,8 @@
     "immutable": "*"
   },
   "scripts": {
-    "dist": "node-sass ./src/scss -o ./dist/css &&  babel src/ -d dist --copy-files  && npm link",
-    "css_dist": "node-sass ./src/scss -o ./dist/css",
+    "dist": "rm -rf dist && sass ./src/scss:./dist/css &&  babel src/ -d dist --copy-files  && npm link",
+    "css_dist": "sass ./src/scss:./dist/css",
     "watch": "watch 'npm run dist ' ./src",
     "css": "watch 'npm run css_dist ' ./src"
   },
@@ -54,7 +57,28 @@
   },
   "babel": {
     "presets": [
-      "@babel/preset-react"
+      [
+        "@babel/preset-env",
+        {
+          "modules": false
+        }
+      ],
+      [
+        "@babel/preset-react",
+        {
+          "runtime": "automatic"
+        }
+      ]
+    ],
+    "plugins": [
+      [
+        "babel-plugin-react-compiler",
+        {
+          "target": "18"
+        }
+      ],
+      "@babel/plugin-transform-runtime",
+      "@babel/plugin-external-helpers"
     ]
   },
   "repository": {

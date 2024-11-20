@@ -1,9 +1,4 @@
-import React, {useEffect, useLayoutEffect, useRef} from 'react';
-import {connect} from "react-redux";
-import * as d3 from 'd3' // d3 plugin
-import * as topojson from "topojson-client";
-import {Icon, Popup} from "semantic-ui-react";
-import {FormattedMessage} from "react-intl";
+import React, { useRef} from 'react';
 import {symbol} from "prop-types";
 import Papa from "papaparse";
 

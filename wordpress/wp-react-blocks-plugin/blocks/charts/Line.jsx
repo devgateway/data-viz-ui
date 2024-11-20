@@ -58,7 +58,7 @@ const LineOptions = (props) => {
     } else {
         if (allMeasures && measures && measures[app]) {
             const list = allMeasures.filter(measure => {
-                return (measures[app][measure.value] && measures[app][measure.value].selected)               
+                return (measures[app][measure.value] && measures[app][measure.value].selected)
             }).map(m => {
                 return {value: m.value, label: m.group + ' - ' + m.label}
             }).sort((a, b) => {
@@ -88,7 +88,7 @@ const LineOptions = (props) => {
                 label={__("Enable Y Grid Lines")}
                 checked={enableGridY}
                 onChange={() => setAttributes({enableGridY: !enableGridY})}/>
-        </PanelRow>		
+        </PanelRow>
 		<PanelRow>
             <ToggleControl
                 label={__("Enable X Grid Lines")}

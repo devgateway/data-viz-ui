@@ -172,6 +172,10 @@ registerBlockType(process.env.BLOCKS_NS + '/chart',
                 type: 'Numeric',
                 default: 10
             },
+            xAxisTickValues: {
+                type: 'Numeric',
+                default: 10
+            },
             xLabelColor: {
                 type: "String",
                 default: encodeURIComponent("#000000")
@@ -326,7 +330,9 @@ registerBlockType(process.env.BLOCKS_NS + '/chart',
                 default: [
                     {label: 'Bar', value: 'bar', supports: {singleMeasure: false, singleDimension: false}},
                     {label: 'Pie', value: 'pie', supports: {singleMeasure: false, singleDimension: false}},
-                    {label: 'Line', value: 'line', supports: {singleMeasure: false, singleDimension: true}}]
+                    {label: 'Line', value: 'line', supports: {singleMeasure: false, singleDimension: true}},
+                    {label: 'Radar', value: 'radar', supports: {singleMeasure: true, singleDimension: true}}
+                ]
             },
             barColor: {
                 type: "String",
@@ -474,6 +480,28 @@ registerBlockType(process.env.BLOCKS_NS + '/chart',
                 type: 'Boolean',
                 default: false
             },
+            mobileCustomization: {
+                type: 'Object',
+                default: {
+                    showCustomization: false,
+                    labels: {
+                        xAxis: {},
+                        yAxis: {}
+                    },
+                    xAxisDisabled: false,
+                    tickRotation: 0,
+                    yAxisTickValues: 0,
+                    yAxisIntervalUserModified: false,
+                    chartLayoutOverride: false,
+                    marginLeft: 50,
+                    marginTop: 25,
+                    marginBottom: 25,
+                    marginRight: 25,
+                    showXAxisTitle: true,
+                    showYAxisTitle: true,
+                    showRightAxisTitle: true
+                }
+            },
             reverseLegend: {
                 type: 'Boolean',
                 default: false
@@ -482,14 +510,57 @@ registerBlockType(process.env.BLOCKS_NS + '/chart',
                 type: 'string',
                 default: '',
             },
+            sort2Dimension: {
+                type: 'string',
+                default: 'none',
+            },
             sortReverse: {
                 type: 'Boolean',
                 default: false
+            },
+            radarCurve: {
+                type: 'string',
+                default: 'linearClosed'
+            },
+            radarFillOpacity: {
+                type: 'Numeric',
+                default: 0.25
+            },
+            radarBorderWidth: {
+                type: 'Numeric',
+                default: 1
+            },
+            radarGridLevels: {
+                type: 'Numeric',
+                default: 7
+            },
+            radarGridShape: {
+                type: 'string',
+                default: 'circular'
+            },
+            radarGridLabelOffset: {
+                type: 'Numeric',
+                default: 36
+            },
+            radarEnableDots: {
+                type: 'Boolean',
+                default: true
+            },
+            radarDotSize: {
+                type: 'Numeric',
+                default: 6
+            },
+            radarEnableDotLabel: {
+                type: 'Boolean',
+                default: false
+
+            },
+            radarDotLabelOffset: {
+                type: 'Numeric',
+                default: -12
             }
         },
-
         edit: BlockEdit,
         save: BlockSave,
     }
 );
-
