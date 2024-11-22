@@ -14,7 +14,7 @@ COPY wordpress/wp-react-blocks-plugin/blocks/ ./
 COPY --from=customizer /tmp/work/blocks/ ../../../../custom/wp-customizer/blocks/
 RUN find ../../../../custom/wp-customizer/blocks/ -exec sed -i 's|../../../../front/wordpress/wp-react-blocks-plugin/blocks/|/tmp/work/|g' {} \;
 
-
+RUN npm install -g @wordpress/scripts
 RUN npm run build
 
 RUN mkdir -p wp-content/plugins/wp-react-blocks-plugin/blocks
