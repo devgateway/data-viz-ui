@@ -16,8 +16,7 @@ COPY --from=reactlib /tmp/work/package.json ../react-lib/wp-react-lib/
 COPY --from=reactlib /tmp/work/dist ../react-lib/wp-react-lib/dist
 COPY --from=customizer /tmp/work/package.json ../../custom/ui-customizer/
 COPY --from=customizer /tmp/work/dist ../../custom/ui-customizer/dist
-
-RUN --mount=type=cache,target=node_modules,id=ui_node_modules npm install
+RUN rm -rf package-lock.json  &&  --mount=type=cache,target=node_modules,id=ui_node_modules npm install
 
 FROM node:22-slim AS ui
 WORKDIR /tmp/work
