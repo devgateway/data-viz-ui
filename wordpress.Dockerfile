@@ -2,7 +2,7 @@ ARG REPO
 ARG TAG
 FROM ${REPO}/wp-customizer:${TAG}  AS customizer
 
-FROM node:22-slim  AS dist
+FROM node:20-slim  AS dist
 WORKDIR /tmp/work
 COPY wordpress/wp-react-blocks-plugin/blocks/package.json ./
 COPY wordpress/wp-react-blocks-plugin/blocks/package-lock.json ./
