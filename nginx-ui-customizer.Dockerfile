@@ -11,6 +11,7 @@ COPY react-lib/wp-react-lib/src src
 RUN npm run dist
 
 FROM node:22-slim AS install
+WORKDIR /tmp/work
 COPY ui/package*.json ./
 COPY --from=reactlib /tmp/work/package.json ../react-lib/wp-react-lib/
 COPY --from=reactlib /tmp/work/dist ../react-lib/wp-react-lib/dist
