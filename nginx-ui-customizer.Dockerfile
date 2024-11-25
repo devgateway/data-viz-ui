@@ -11,25 +11,27 @@ COPY react-lib/wp-react-lib/src src
 RUN npm run dist
 
 FROM node:22-slim AS install
-WORKDIR /tmp/work
-COPY ui/package*.json ./
+WORKDIR /tmp/work1/work2
+COPY ui/package.json ./
 COPY --from=reactlib /tmp/work/package.json ../react-lib/wp-react-lib/
 COPY --from=reactlib /tmp/work/dist ../react-lib/wp-react-lib/dist
 COPY --from=customizer /tmp/work/package.json ../../custom/ui-customizer/
 COPY --from=customizer /tmp/work/dist ../../custom/ui-customizer/dist
-RUN rm package-lock.json
-RUN --mount=type=cache,target=node_modules,id=ui_node_modules npm install
+#RUN --mount=type=cache,target=node_modules,id=ui_node_modules npm install
 
 FROM node:22-slim AS ui
-WORKDIR /tmp/work
-COPY --from=install /tmp/work/ /tmp/work/
-RUN npm install && npm install react-compiler-runtime
+WORKDIR /tmp/
+COPY --from=install /tmp/ /tmp/
 
+RUN cd /tmp/work1/work2
+#RUN --mount=type=cache,target=node_modules,id=ui_node_modules npm install
+RUN npm install react-compiler-runtime &&  npm install -f
 COPY ui/public public
-COPY ui .
+COPY ui /tmp/work1/work2
+RUN rm -rf /tmp/work1/work2/package-lock.json
 
 ARG REACT_APP_THEME
-RUN \
+RUN cd /tmp/work1/work2 && npm install @rollup/rollup-linux-arm64-gnu && \
   VITE_REACT_APP_GA_CODE='#REACT_APP_GA_CODE#' \
   VITE_REACT_APP_DEFAULT_LOCALE='#REACT_APP_DEFAULT_LOCALE#' \
   VITE_REACT_APP_THEME="$REACT_APP_THEME" \
@@ -40,12 +42,12 @@ RUN \
   VITE_REACT_APP_WP_HOSTS='#REACT_APP_WP_HOSTS#' \
   VITE_REACT_APP_WP_SEARCH_END_POINT='#REACT_APP_WP_SEARCH_END_POINT#' \
   VITE_REACT_APP_WP_STYLES='/wp/wp-admin/load-styles.php?c=1&dir=ltr&load%5Bchunk_0%5D=dashicons,admin-bar,buttons,media-views,editor-buttons,wp-components,wp-block-editor,wp-nux,wp-editor,wp-block-library,wp-block-&load%5Bchunk_1%5D=library-theme,wp-edit-blocks,wp-edit-post,wp-format-library,wp-block-directory,common,forms,admin-menu,dashboard,list-tables,edi&load%5Bchunk_2%5D=t,revisions,media,themes,about,nav-menus,wp-pointer,widgets,site-icon,l10n,wp-auth-check&ver=5.5.6' \
-   npm run build
+    npm run build
+
 CMD ["/bin/bash"]
 
-
 FROM nginx:stable-alpine
-COPY --from=ui /tmp/work/dist /var/www/static
+COPY --from=ui  /tmp/work1/work2/dist /var/www/static
 COPY nginx.sh /usr/local/sbin/
 
 WORKDIR /var/www/static
