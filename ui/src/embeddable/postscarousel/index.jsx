@@ -10,7 +10,7 @@ import { Container } from "semantic-ui-react";
 import { CarouselProvider, DotGroup, Slide, Slider } from "pure-react-carousel";
 
 const Carousel = (props) => {
-  const { posts, interval, autoSwitch } = props;
+  const { posts, interval, autoSwitch, height } = props;
   const [slideHeight, setSlideHeight] = useState(0); // Store the calculated height
   const contentRef = useRef(null); // Ref for the rendered content
 
@@ -27,7 +27,7 @@ const Carousel = (props) => {
       isPlaying={autoSwitch}
       totalSlides={posts.length}
       naturalSlideWidth={100} // Fixed width ratio
-      naturalSlideHeight={slideHeight || 125} // Dynamically calculated height or fallback
+      naturalSlideHeight={slideHeight || height} // Dynamically calculated height or fallback
     >
       <Slider
         style={{
@@ -63,6 +63,7 @@ const PostCarousel = (props) => {
     "data-taxonomy": taxonomy,
     "data-categories": categories,
     "data-items": items,
+    "data-height": height,
     "data-auto-switch": autoSwitch = "false",
     "data-interval": interval = 10000,
     editing,
@@ -85,6 +86,7 @@ const PostCarousel = (props) => {
       >
         <PostConsumer>
           <Carousel
+            height={height}
             interval={interval}
             autoSwitch={autoSwitch === "true"}
             posts={props.posts} // Pass the posts array
