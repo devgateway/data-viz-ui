@@ -22,7 +22,7 @@ const hiddenStyle = {
 
 const DEFAULT_HIGHLIGHTED_POST = 0;
 const TimeLine = (props) => {
-  let {
+  const{
     posts,
     position,
     lineWidth,
@@ -501,4 +501,3 @@ if(['mobile', 'tablet', 'midTablet'].includes(getDeviceType())) {
 }
 
 export default carousel;
-
