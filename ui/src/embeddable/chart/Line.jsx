@@ -4,8 +4,8 @@ import { ResponsiveLine } from "@nivo/line";
 import Tooltip from "./Tooltip";
 import { area, line } from "d3-shape";
 import { useTheme } from "@nivo/core";
-import FlexWrapDetector from "../../layout/FlexWrapDetector";
-import deviceType from '../../utils/deviceType'
+import FlexWrapDetector from "@/layout/FlexWrapDetector";
+import deviceType from '@/utils/deviceType'
 
 const ZERO_LINE_COLOR = "#66676d";
 const DEFAULT_TICK_BG_COLOR = "#f0f0f1";
@@ -14,30 +14,30 @@ const isMobile = deviceType() === "mobile";
 
 const getTextWidth = (text, font) => {
   // re-use canvas object for better performance
-  var canvas = document.createElement("canvas");
-  var context = canvas.getContext("2d");
+  const canvas = document.createElement("canvas");
+  const context = canvas.getContext("2d");
   context.font = font;
-  var metrics = context.measureText(text);
+  const metrics = context.measureText(text);
   return metrics.width;
 };
 
 const lightenDarkenColor = (col, amt) => {
-  var usePound = false;
+  let usePound = false;
   if (col[0] == "#") {
     col = col.slice(1);
     usePound = true;
   }
-  var num = parseInt(col, 16);
-  var r = (num >> 16) + amt;
+  const num = parseInt(col, 16);
+  let r = (num >> 16) + amt;
   if (r > 255) r = 255;
   else if (r < 0) r = 0;
 
-  var b = ((num >> 8) & 0x00ff) + amt;
+  let b = ((num >> 8) & 0x00ff) + amt;
 
   if (b > 255) b = 255;
   else if (b < 0) b = 0;
 
-  var g = (num & 0x0000ff) + amt;
+  let g = (num & 0x0000ff) + amt;
 
   if (g > 255) g = 255;
   else if (g < 0) g = 0;
@@ -120,13 +120,14 @@ const Chart = ({
     return (
       <>
         {showLegends &&
-          chartLegends.map((legend) => {
+          chartLegends.map((legend, idx) => {
             return (
-              <div className={"legend item"} onClick={() => toggle(legend.id)}>
+              <div key={idx} className={"legend item"} onClick={() => toggle(legend.id)}>
                 <input
                   className={"ignore"}
                   type="checkbox"
                   checked={filter.length === 0 || !filter.includes(legend.id)}
+                  readOnly
                   style={{
                     backgroundColor:
                       legendCheckBack === true ? legend.color : "none",
@@ -175,7 +176,7 @@ const Chart = ({
   const leftLegendDynamicStyle = {
     bottom: `-${bottomSpacing}px`,
     gap: "0px",
-    // top: "0px",
+    top: "0px",
   };
 
   const applyFilter = (values) => {
@@ -197,10 +198,12 @@ const Chart = ({
 
   const CustomTick = (tick) => {
     const tickObject = Object.assign({}, tick);
+    const theme = useTheme();
+
     if(isMobileConfigEnabled && hiddenLabels.includes(String(tickObject.value))) {
       tickObject.value = "";
     }
-    const theme = useTheme();
+    
     const width = getTextWidth(tickObject.value, "12px Roboto") + 15;
 
     if (tickRotation > 0 && tickRotation < 180) {
@@ -327,7 +330,7 @@ const Chart = ({
   };
 
   const AreaLayer = ({ series, xScale, yScale, innerHeight }) => {
-    let color = series && series.length > 0 ? series[0].color : "#3daff7";
+    const color = series && series.length > 0 ? series[0].color : "#3daff7";
     const measureMinValues = [];
     if (series[0]) {
       series[0].data.forEach((d) => {
@@ -347,11 +350,11 @@ const Chart = ({
       return a.min - b.min;
     });
 
-    let lower =
+    const lower =
       areaShadingCriteria == "CUSTOM_BETWEEN_TWO_LINES" && areaLowerBound
         ? areaLowerBound
         : sortedData[0].measure;
-    let upper =
+    const upper =
       areaShadingCriteria == "CUSTOM_BETWEEN_TWO_LINES" && areaUpperBound
         ? areaUpperBound
         : sortedData[sortedData.length - 1].measure;
@@ -490,7 +493,7 @@ const Chart = ({
     );
   };
 
-  let margins = {
+  const margins = {
     top: newMarginTop,
     right: marginRight,
     bottom: newMarginBottom,
@@ -502,11 +505,11 @@ const Chart = ({
   const hasData =
     options.data && options.data?.filter((d) => d?.data?.length > 0)?.length;
 
-  let hiddenLabels = [];
+  const hiddenLabels = [];
   if(isMobileConfigEnabled) {
       ticks = parseInt(mobileConfigSettings.yAxisTickValues);
       const labels = new Map(Object.entries(mobileConfigSettings?.labels?.xAxis ?? {}));
-      for (let [key, value] of labels) {
+      for (const [key, value] of labels) {
         if (!value) {
           hiddenLabels.push(key);
         }

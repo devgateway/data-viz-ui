@@ -1,10 +1,10 @@
-import React, {Component} from 'react'
+import React from 'react'
 import {Image, Label, Menu} from 'semantic-ui-react'
 
 
 function smoothscroll(idx) {
     const offsetTop = 0
-    let offset = () => 10
+    const offset = () => 10
 
     const $anchor = idx ? document.getElementById(idx) : null
     if ($anchor) {
@@ -27,28 +27,22 @@ const decodeHtmlEntity = function(str) {
     return ''
   };
 
-export default class Navigator extends Component {
-
-    constructor(props) {
-        super(props);
-    }
-
-    componentDidMount() {
-    }
-
-    render() {
-        const {contextRef, sections = [], navTitle, toTopLabel} = this.props
-        const activeItem = ''
-        return (<div className="left navigator">
+const Navigator = (props) => {
+    const { contextRef, sections = [], navTitle, toTopLabel } = props;
+    return (
+        <div className="left navigator">
             <Menu vertical>
                 <Menu.Item header>{navTitle}</Menu.Item>
 
-                {sections.map(s => <Menu.Item key={s.label} active={s.active} onClick={e => smoothscroll(s.id)}>
-                    {s.iconComponent ? s.iconComponent : <Image src={s.icon}/>}
-                    <Label basic>{decodeHtmlEntity(s.label)}</Label>
-                </Menu.Item>)}
+                {sections.map(s => (
+                    <Menu.Item key={s.label} active={s.active} onClick={() => smoothscroll(s.id)}>
+                        {s.iconComponent ? s.iconComponent : <Image src={s.icon} />}
+                        <Label basic>{decodeHtmlEntity(s.label)}</Label>
+                    </Menu.Item>
+                ))}
             </Menu>
+        </div>
+    );
+};
 
-        </div>)
-    }
-}
+export default Navigator;

@@ -16,10 +16,12 @@ import CSVDataFrame from "./CSVDataFrame";
 import ColorProvider from "./colors/ColorProvider";
 import Messages from "./Messages";
 import { connect } from "react-redux";
-import deviceType from '../../utils/deviceType';
+import deviceType from '@/utils/deviceType';
 
 
 const isMobile = deviceType() === 'mobile';
+const isTablet = deviceType() === 'tablet';
+const isMidTablet = deviceType() === 'midTablet';
 const isMobileOrTablet = deviceType() === 'mobile' || deviceType() === 'tablet' || deviceType() === 'midTablet';
 
 const PieChart = (props) => {
@@ -50,7 +52,7 @@ const Diverging = (props) => {
   );
 };
 const Chart = (props) => {
-  let {
+  const {
     parent,
     editing = false,
     unique,
@@ -152,8 +154,6 @@ const Chart = (props) => {
     "data-tooltip-enable-markdown": tooltipEnableMarkdown = "false",
     "data-y-axis-tick-values": yAxisTickValues = "10",
     "data-x-axis-tick-values": xAxisTickValues = "10",
-    "data-enable-grid-y": enableGridY = "true",
-    "data-enable-grid-x": enableGridX = "false",
     "data-offset-text": offsetText = 0,
     "data-overall-label": overallLabel = "Overall",
     "data-min-max-clamp": minMaxClamp = "false",
@@ -173,8 +173,13 @@ const Chart = (props) => {
     "data-radar-dot-label-offset": radarDotLabelOffset = -12,
     "data-mobile-customization": mobileCustomization = "{}",
   } = props;
+
+  let {
+    "data-enable-grid-y": enableGridY = "true",
+    "data-enable-grid-x": enableGridX = "false",
+  } = props;
   const mobileConfigSettings = JSON.parse(decodeURIComponent(mobileCustomization));
-  const isMobileConfigEnabled = isMobile && (mobileConfigSettings?.showCustomization ?? false);
+  const isMobileConfigEnabled = (isMobile || isTablet || isMidTablet) && (mobileConfigSettings?.  showCustomization ?? false);
 
   const locale = props.intl.locale;
   const ref = useRef(null);
@@ -284,7 +289,7 @@ const Chart = (props) => {
   let selectedMeasures = getSelectedMeasures();
 
   let selectedFormat = getSelectedFormat();
-  let userMeasures = getUserMeasures();
+  const userMeasures = getUserMeasures();
   let leftLegendForSelectedMeasure = left;
   let rightLegendForSelectedMeasure = rightLegend;
 
@@ -307,7 +312,7 @@ const Chart = (props) => {
     }
   }
 
-  let numberFormat = selectedFormat
+  const numberFormat = selectedFormat
     ? {
         style:
           selectedFormat.style === "compacted"
@@ -329,7 +334,7 @@ const Chart = (props) => {
 
   const groupTotalFormatObject = parse(groupTotalFormat);
 
-  let groupTotalFormatParsed = {
+  const groupTotalFormatParsed = {
     style:
       groupTotalFormatObject.style === "compacted"
         ? "decimal"
@@ -350,8 +355,8 @@ const Chart = (props) => {
     scheme: scheme,
     colorBy: colorBy,
   };
-  let child = null;
-  const contentHeight = editing ? height - 80 : height - 40;
+  const child = null;
+  const contentHeight = editing ? height - 80 : height;
 
   const showXAxisTitle = () => {
     if(isMobileConfigEnabled) {
@@ -545,7 +550,7 @@ const Chart = (props) => {
     dimension1
   };
 
-  let params = {};
+  const params = {};
   const ff = parse(filters) || {};
 
   if (ff && ff.forEach) {
@@ -616,22 +621,110 @@ const Chart = (props) => {
   }
   const [legendsContainerHeight, setLegendsContainerHeight] = useState(0);
 
+
   useEffect(() => {
-    if (isMobileOrTablet) {
-      setTimeout(() => {
-        const legendsContainer = document.querySelector(".legends.container.items-section") ||
-                                 document.querySelector('.legends.container.has-standard-12-font-size.bottom');
-        setLegendsContainerHeight(legendsContainer?.clientHeight || 0);
-      }, 0);
-    }
-  }, []);
+    const timeoutId = setTimeout(() => {
+      if (isMobileOrTablet) {
+        // Function to handle margin adjustment for all charts
+        const adjustDataSourceMargin = () => {
+          const legendsContainer =
+            ref.current.querySelector(
+              ".legends.container.has-standard-12-font-size.bottom"
+            ) || ref.current.querySelector(".legends.container.items-section");
+
+          if (!legendsContainer) return;
+
+          // Get computed style and dimensions of the legends container
+          const { clientHeight: height } = legendsContainer;
+          const styles = window.getComputedStyle(legendsContainer);
+          const marginTop = parseInt(styles.marginTop);
+          const marginBottom = parseInt(styles.marginBottom);
+          const paddingTop = parseInt(styles.paddingTop);
+          const paddingBottom = parseInt(styles.paddingBottom);
+          const totalHeight =
+            height + marginTop + marginBottom + paddingTop + paddingBottom;
+
+          // Find the closest '.ui.fluid.container.content' ancestor from the legends container
+          const container = legendsContainer.closest(".ui.fluid.container.content");
+
+          if (container) {
+            const dataSourceParagraph = container.querySelector(".data-source");
+            if (dataSourceParagraph) {
+              const dataSourceRect = dataSourceParagraph.getBoundingClientRect();
+              const legendsRect = legendsContainer.getBoundingClientRect();
+
+              // Ensure elements are visible before adjusting margins
+              if (legendsRect.bottom !== 0 && dataSourceRect.top !== 0) {
+                if (legendsContainer.textContent.trim() === "") return;
+
+                const legendsMarginBottom = marginBottom; // Legend margin-bottom is already computed
+                const adjustedLegendsBottom = legendsRect.bottom + legendsMarginBottom;
+                const dataSourceStyles = window.getComputedStyle(dataSourceParagraph);
+                const dataSourceMarginTop = parseFloat(dataSourceStyles.marginTop) || 0;
+                const adjustedDataSourceTop = dataSourceRect.top - dataSourceMarginTop;
+
+                if (adjustedLegendsBottom > adjustedDataSourceTop) {
+                  let overlap = adjustedLegendsBottom - adjustedDataSourceTop;
+                  if (overlap < 5) overlap += 1;
+                  dataSourceParagraph.style.marginTop = `${overlap + 1}px`; // Add padding
+                }
+              } else {
+                // Delay adjustment if elements are not fully visible yet
+                setTimeout(() => {
+                  if (dataSourceRect.top < legendsRect.bottom) {
+                    dataSourceParagraph.style.marginTop = `${
+                      legendsRect.bottom - dataSourceRect.top + 1
+                    }px`;
+                  }
+                }, 1000);
+              }
+            }
+          }
+
+          // Check for overlap with the chart container above
+          const chartContainer = legendsContainer.closest(".chart.container");
+          if (chartContainer) {
+            const chartContainerRect = chartContainer.getBoundingClientRect();
+            const chartContainerStyles = window.getComputedStyle(chartContainer);
+            const chartContainerMarginBottom =
+              parseFloat(chartContainerStyles.marginBottom) || 0;
+            const adjustedChartContainerBottom =
+              chartContainerRect.bottom + chartContainerMarginBottom;
+
+            const legendsRect = legendsContainer.getBoundingClientRect();
+            const legendsMarginTop = parseFloat(styles.marginTop) || 0;
+            const adjustedLegendsTop = legendsRect.top - legendsMarginTop;
+
+            if (adjustedLegendsTop < adjustedChartContainerBottom) {
+              const overlap = adjustedChartContainerBottom - adjustedLegendsTop;
+              legendsContainer.style.marginTop = `${overlap + 1}px`; // Add padding
+            }
+          }
+
+          setLegendsContainerHeight(totalHeight);
+        };
+
+        adjustDataSourceMargin();
+      }
+    }, 100);
+
+    // Cleanup observer and timeout
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [isMobileOrTablet, ref]);
 
   return (
     <div ref={ref}>
       <Container
-        className={"chart container"}
-        style={{ minHeight: parseInt(height) + parseInt(legendsContainerHeight, 10) + "px" }}
-        fluid={true}
+          className={"chart container"}
+          style={{
+            minHeight:
+                type === "pie" && window.innerWidth <= 480
+                    ? `${parseInt(height) + parseInt(legendsContainerHeight) * 0.5}px`
+                    : `${parseInt(height) + parseInt(legendsContainerHeight)}px`,
+          }}
+          fluid={true}
       >
         <DataProvider
           editing={editing}
@@ -720,4 +813,5 @@ const mapStateToProps = (state, ownProps) => {
   }
 };
 const mapActionCreators = {};
+
 export default connect(mapStateToProps, mapActionCreators)(Chart);

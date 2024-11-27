@@ -17,18 +17,14 @@ const visibleStyle = {
 const DEFAULT_HIGHLIGHTED_POST = 0;
 
 const TimeLine = (props) => {
-  let {
+  const {
     posts,
-    lineWidth,
-    lineColor,
-    height,
     config,
     marginLeft,
     marginTop,
     marginRight,
     marginBottom,
     fontSize,
-    subtitleWidth,
     subtitleHeight,
     enableTitlePopup,
     enableCirclePopup,
@@ -37,7 +33,15 @@ const TimeLine = (props) => {
     unique,
   } = props;
 
+  let {
+    height,
+    lineWidth,
+    lineColor,
+    subtitleWidth
+  } = props;
+
   height = window.innerHeight;
+  // eslint-disable-next-line unused-imports/no-unused-vars
   subtitleWidth = 250;
 
   const ref = useRef();

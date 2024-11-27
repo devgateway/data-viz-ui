@@ -1,15 +1,6 @@
-import React, {useState} from 'react'
-import {injectIntl} from 'react-intl';
-import {ResponsivePie} from '@nivo/pie'
-import Tooltip from "../common/ChartTooltip"
-import {formatContent} from '../common/ChartTooltip'
-import {
-    colorSchemes,
-    isCategoricalColorScheme,
-    isSequentialColorScheme,
-    sequentialColorInterpolators
-} from "@nivo/colors";
-import * as d3 from "d3";
+import React from 'react'
+
+
 
 
 const data=[

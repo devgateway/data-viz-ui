@@ -53,7 +53,6 @@ class BaseLayer extends React.Component {
 
 
     showToolTip(content, data, color, event) {
-        debugger;
         if (data) {
 
             const tip = d3.select("body").append("div")
@@ -71,11 +70,9 @@ class BaseLayer extends React.Component {
 
 
     moveToolTip(event) {
-        if (event) {
-            const tip = d3.select(".d3MapTooltip")
-                .style("left", (event.pageX + 15) + "px")
-                .style("top", (event.pageY - 50) + "px")
-        }
+        const tip = d3.select(".d3MapTooltip")
+            .style("left", (event.pageX + 15) + "px")
+            .style("top", (event.pageY - 50) + "px")
     }
 
     hiddenToolTip(event) {

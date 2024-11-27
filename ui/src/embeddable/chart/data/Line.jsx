@@ -20,7 +20,7 @@ const getOptionsNoDimension = (props) => {
   if (selectedDimensions.length == 0 && data) {
     const mMap = measuresMap(data);
     const categories = new Set();
-    let keys = new Set();
+    const keys = new Set();
     let series = [];
     let indexBy;
     if (data.metadata && data.metadata.measures) {
@@ -47,7 +47,7 @@ const getOptionsNoDimension = (props) => {
       });
 
       selectedMeasures.forEach((m) => {
-        let row = {};
+        const row = {};
         const label =
           customLabels[m.value] || getTranslatedValue(mMap[m.value], locale);
         row.type = "measure";
@@ -75,7 +75,7 @@ const getOptionsNoDimension = (props) => {
 const includeOverallData = (props) => {
   const { data, measures, dimensions, overallLabel } = props;
   if (dimensions.length == 1 && data.children) {
-    let overallAdded =
+    const overallAdded =
       data.children.filter((c) => c.value == overallLabel).length > 0;
     if (!overallAdded) {
       const overallData = {};
@@ -92,13 +92,13 @@ const includeOverallData = (props) => {
     }
   } else if (dimensions.length == 2 && data.children) {
     data.children.forEach((d) => {
-      const overallAdded = d.children?.some((c) => c?.value == overallLabel);
+      const overallAdded =
+        d.children.filter((c) => c.value == overallLabel).length > 0;
       if (!overallAdded) {
-        const overallData = {
-          type: dimensions[1],
-          value: overallLabel,
-          label: overallLabel,
-        };
+        const overallData = {};
+        overallData.type = dimensions[1];
+        overallData.value = overallLabel;
+        overallData.label = overallLabel;
 
         Object.keys(d).forEach((k) => {
           if (!["children", "metadata", "type", "value"].includes(k)) {
@@ -106,7 +106,7 @@ const includeOverallData = (props) => {
           }
         });
 
-        d.children = d.children ? [overallData, ...d.children] : [overallData];
+        d.children = [overallData, ...d.children];
       }
     });
   }
@@ -153,8 +153,8 @@ const BarOneDimension = (props) => {
     const categories = new Set();
     const dimensionsMetadata = new Set();
     const measuresMetadata = new Set();
-    let keys = new Set();
-    let series = [];
+    const keys = new Set();
+    const series = [];
     let indexBy;
 
     if (swap && selectedDimensions.length == 1 && measures.length > 0) {
@@ -277,7 +277,7 @@ const Bar2Dimensions = (props) => {
     const field = measures[0];
     const dimensionsMetadata = new Set();
     // const measuresMetadata = new Set()
-    let keys = new Set();
+    const keys = new Set();
     const series = [];
     const vals = [];
     const indexBy = data.children[0].type;

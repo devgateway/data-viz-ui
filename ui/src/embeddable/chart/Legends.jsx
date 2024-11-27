@@ -40,6 +40,7 @@ const Legends = ({
                   className={"ignore"}
                   type="checkbox"
                   checked={filter.length == 0 || !filter.includes(legend.id)}
+                  readOnly
                 />
 
                 <span
