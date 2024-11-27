@@ -1,6 +1,8 @@
 import React from "react";
+// TODO: TO BE REMOVED
+import template from "string-template";
 
-const template = require("string-template")
+
 
 const percentExpresion = /(\%)[\(]([A-z0-9,.]+)\)/gi
 const numericExpresion = /(\#)[\(]([A-z0-9,.]+)\)/gi

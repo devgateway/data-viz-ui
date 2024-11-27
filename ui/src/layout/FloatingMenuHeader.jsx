@@ -1,22 +1,23 @@
-import {Button, Container, Flag, Grid, Header, Image, Menu, Popup} from "semantic-ui-react";
-import React, {useEffect, useState} from "react";
-import {MediaConsumer, MediaProvider, MenuConsumer, MenuProvider, utils} from "@devgateway/wp-react-lib";
+import { Image, Menu, Popup} from "semantic-ui-react";
+import React, { useState} from "react";
+import {MediaConsumer, MediaProvider, MenuConsumer, MenuProvider} from "@devgateway/wp-react-lib";
 import {injectIntl} from "react-intl";
-import {withRouter} from "react-router";
-import SearchControl from "./SearchControl";
-import LangSwitcher from "./LangSwitcher";
+import {withRouter} from "@/withRouter";
+import SearchControl from "./SearchControl.jsx";
+import LangSwitcher from "./LangSwitcher.jsx";
+import { useParams } from "react-router-dom";
 
-const getPath = (menu, match) => {
-    let path = [];
+const getPath = (menu, locationParams) => {
+    const path = [];
     menu.items.forEach(item => {
         if (item.child_items) {
             item.child_items.forEach(ch => {
-                if (ch.slug == match.params.slug) {
+                if (ch.slug === locationParams.slug) {
                     path.push(item)
                     path.push(ch)
                 }
             })
-        } else if (item.slug == match.params.slug && item.url != '/') {
+        } else if (item.slug === locationParams.slug && item.url !== '/') {
             path.push(item)
         }
     })
@@ -40,11 +41,11 @@ const FloatingMenu = (props) => {
         settings, withIcons, active, menu, onSetSelected, selected, match, locale
     } = props;
 
-    return menu.items.filter(i => i.url != "#wpm-languages")
+    return menu.items.filter(i => i.url !== "#wpm-languages")
         .map((i) => {
-            
+
             return (<Menu.Item
-                className={`divided ${i.child_items ? 'has-child-items' : ''} ${selected && selected.ID == i.ID ? 'selected' : ''}  ${active == i.slug ? "active" : ""}`}>
+                className={`divided ${i.child_items ? 'has-child-items' : ''} ${selected && selected.ID === i.ID ? 'selected' : ''}  ${active === i.slug ? "active" : ""}`}>
                 {!i.child_items &&
                     <a onClick={e => onSetSelected(i)} href={localReplaceLink(i.url, locale)}>{i.title}</a>}
                 {i.child_items &&
@@ -65,10 +66,10 @@ const FloatingMenu = (props) => {
 }
 
 const HeaderFloatingMenu = ({
-                                intl: {locale}, match, settings
+                                intl: {locale}, settings
                             }) => {
     const [selected, setSelected] = useState()
-    const {slug} = match.params
+    const {slug} = useParams();
 
     const Logo = ({media}) => {
         return media ? <Image src={media.guid.rendered}/> :
@@ -80,13 +81,13 @@ const HeaderFloatingMenu = ({
             <Menu.Item className={"logo"}>
                 <a href={`/${locale}`}>
 
-                    {settings.site_logo != 0 && <MediaProvider id={settings.site_logo}>
+                    {settings.site_logo !== 0 && <MediaProvider id={settings.site_logo}>
                         <MediaConsumer>
                             <Logo></Logo>
                         </MediaConsumer>
 
                     </MediaProvider>}
-                    {!window.isCustomizedPreview && settings.site_logo == 0 &&
+                    {!window.isCustomizedPreview && settings.site_logo === 0 &&
                         <img className="brand logo" size="large" src='/dc-logo_01.png'/>}
                 </a>
             </Menu.Item>
