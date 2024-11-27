@@ -1,0 +1,120 @@
+$font-family: 'Open Sans', sans-serif;
+$font-titles: 'Merriweather', serif;
+
+$mbd-dark-grey: #333333;
+$mbd-light-grey: #FCFCFC;
+$mbd-dark-teal: #06494B;
+$mbd-medium-teal: #075A5C;
+$mbd-light-teal: #63A1A1;
+$mbd-accent-green: #9EB944;
+
+$dc-main-blue: #03579D;
+$dc-green: #76a234;
+$dc-red: #A90000;
+$dc-dark-grey: #2B2F31;
+$dc-define: #355966;
+$dc-design: #3B8E8E;
+$dc-analysis: #88AE3F;
+$dc-monitor: #F1592D;
+
+
+:root {
+  --header-height: 90px; /* Update this value to change header's height */
+  --footer-height: 227px !important; /* Update this value to change footer's height */
+}
+
+$header-background:$mbd-dark-grey;
+$menu-background:#085255;
+$menu-link-color: #FFF;
+$footer-background:#158384;
+
+$blue: #3e53a6;
+$light-blue: #5089a6;
+$dark-gray: #5c5d63;
+$breadcrumb-grey: #535454;
+$gray: #66676d;
+$light-gray: #dadada;
+$separator-grey: #ececec;
+$red: #ba5555;
+
+$tab-bg: #f4f4f4;
+$tab-text-color: #a6a6a6;
+$tab-bg-active: #4d843f;
+$popup-bg: #f7f7f7;
+$body-text-color: #4c4d50;
+$blue: #3e53a6;
+$green: #5baf95;
+$orange: #ecb040;
+
+$highlight-box-text: #535454;
+$highlight-box-border: #cccccc;
+
+$health-color: #5baf95;
+$light-green: #31ba1a;
+
+$charts-options-height: 66px;
+$charts-options-font-size: 1.02rem;
+
+$extend: 100%;
+
+@mixin gray-raleway-font {
+  font-size: $charts-options-font-size;
+  color: $gray;
+  font-weight: 500;
+  font-family: "Raleway";
+}
+
+@mixin border-radius($radius) {
+	border-radius: $radius;
+	-webkit-border-radius: $radius;
+	-moz-border-radius: $radius;
+}
+
+@mixin border-radii($topleft, $topright, $bottomright, $bottomleft) {
+	border-top-left-radius: $topleft;
+	border-top-right-radius: $topright;
+	border-bottom-right-radius: $bottomright;
+	border-bottom-left-radius: $bottomleft;
+	-webkit-border-top-left-radius: $topleft;
+	-webkit-border-top-right-radius: $topright;
+	-webkit-border-bottom-right-radius: $bottomright;
+	-webkit-border-bottom-left-radius: $bottomleft;
+	-moz-border-radius-topleft: $topleft;
+	-moz-border-radius-topright: $topright;
+	-moz-border-radius-bottomright: $bottomright;
+	-moz-border-radius-bottomleft: $bottomleft;
+}
+
+@mixin quote(){
+  @include border-radius($base-unit * 4);
+  background-color: #fff6e1;
+  background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDI1LjQuMSwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDYuMDAgQnVpbGQgMCkgIC0tPgo8c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkxheWVyXzEiIGZvY3VzYWJsZT0iZmFsc2UiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiCgkgeD0iMHB4IiB5PSIwcHgiIHZpZXdCb3g9IjAgMCAzMjAgMjAyIiBzdHlsZT0iZW5hYmxlLWJhY2tncm91bmQ6bmV3IDAgMCAzMjAgMjAyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+CjxzdHlsZSB0eXBlPSJ0ZXh0L2NzcyI+Cgkuc3Qwe2ZpbGw6I0ZGQjQwMDt9Cjwvc3R5bGU+CjxnPgoJPHBhdGggY2xhc3M9InN0MCIgZD0iTTE0MS40LDM3LjljLTE2LjgsNy40LTQxLDMwLjUtNDcuOCw1MC40YzIuNi0xLjEsNy45LTIuMSwxMy43LTIuMWMyNS4yLDAsNDUuNywxOS40LDQ1LjcsNDguOAoJCWMwLDMwLjUtMjUuMiw1NS4xLTU0LjYsNTUuMWMtMzIsMC02MC45LTI0LjctNjAuOS02Ny44QzM3LjQsNzYuMiw2MiwzNS44LDEwMyw2LjlMMTQxLjQsMzcuOXogTTI3MS4xLDM3LjkKCQljLTE2LjgsNy40LTQxLDMwLjUtNDcuOCw1MC40YzIuNi0xLjEsNy45LTIuMSwxMy43LTIuMWMyNS4yLDAsNDUuNywxOS40LDQ1LjcsNDguOGMwLDMwLjUtMjUuMiw1NS4xLTU0LjYsNTUuMQoJCWMtMzIsMC02MC45LTI0LjctNjAuOS02Ny44YzAtNDYuMiwyNC43LTg2LjcsNjUuNy0xMTUuNUwyNzEuMSwzNy45eiIvPgo8L2c+Cjwvc3ZnPgo=");
+  background-repeat: no-repeat;
+  background-size: $base-unit * 9 $base-unit * 9;
+  background-position: $base-unit * 2 $base-unit * 1.4;
+  border-left: none;
+  padding: $base-unit * 3 $base-unit * 4.5 $base-unit * 3 $base-unit * 3;
+  padding-left: 120px;
+}
+
+@mixin opacity-transition(){
+  -webkit-transition: opacity 1s ease-out;
+  -moz-transition: opacity 1s ease-in-out;
+}
+
+$base-unit: 10px;
+
+@mixin no-outline{
+  outline: 0;
+  border: none;
+  box-shadow: none;
+  -moz-outline-style: none;
+}
+
+@mixin word-wrap{
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  -ms-word-break: break-all;
+  word-break: break-all;
+  word-break: break-word;
+}

@@ -7,7 +7,7 @@ export const buildBarOptions = (data, includeTotal) => {
         const totalSum = data.sum;
         const indexBy = data.children[0].type
         const keys = new Set();
-        var total = 0;
+        let total = 0;
 
         data.children.forEach(d => {
             const row = {}
