@@ -1,9 +1,8 @@
-import React, {useEffect} from 'react';
-import {connect} from "react-redux";
-import BaseLayer from "./BaseLayer";
-import DataProvider from "../data/DataProvider";
-import DataConsumer from "../data/DataConsumer";
-import {parse} from "../utils/parseUtils";
+import React from 'react';
+import BaseLayer from "./BaseLayer.jsx";
+import DataProvider from "../data/DataProvider.jsx";
+import DataConsumer from "../data/DataConsumer.jsx";
+import {parse} from "../utils/parseUtils.js";
 import * as d3 from "d3";
 import {injectIntl} from "react-intl";
 
@@ -94,7 +93,7 @@ class DataLayer extends BaseLayer {
 
         if (this.gRef && this.gRef.current) {
             this.g = d3.select(this.gRef.current)
-            let numberFormat = {
+            const numberFormat = {
                 style: (format.style === 'compacted') ? 'decimal' : format.style,
                 notation: (format.style === 'compacted') ? 'compact' : "standard",
                 currency: format.currency,
@@ -106,11 +105,11 @@ class DataLayer extends BaseLayer {
 
 
             const getTooltipVariables = (d) => {
-                if (d.properties ) {
+                if (d.properties._value) {
                     const variables = {
                         ...d.properties, meta: {
                             [apiJoinAttribute]: d.properties.meta ? d.properties.meta.value : '', ...d.properties.meta,
-                            value: d.properties._value? d.properties._value:null
+                            value: d.properties._value
                         }
                     }
                     return variables
@@ -223,9 +222,9 @@ class DataLayer extends BaseLayer {
                     })
                     .attr("stroke", borderColor)
                     .attr("id", "state-borders")
-                    .attr("d", path).on("mouseenter", (event, d) => {
-                    if (d.properties && d.properties._value) {
-                        this.showToolTip(tooltip, getTooltipVariables(d), brStyles.getColor(d.properties._value), event)
+                    .attr("d", path).on("mouseenter", (d) => {
+                    if (d.properties._value) {
+                        this.showToolTip(tooltip, getTooltipVariables(d), brStyles.getColor(d.properties._value))
                     }
                 })
                     .on("mouseleave", (d) => {
@@ -262,9 +261,8 @@ class DataLayer extends BaseLayer {
                                     .attr("style", () => {
                                         return "none;fill:url(#" + toId(p) + ");"
                                     })
-                                    .on("mouseenter", (event, e) => {
-                                        debugger;
-                                        this.showToolTip(tooltip, getTooltipVariables(d), brStyles.getColor(d.properties._value),event)
+                                    .on("mouseenter", () => {
+                                        this.showToolTip(tooltip, getTooltipVariables(d), brStyles.getColor(d.properties._value))
                                     }).on("mousemove", (d) => {
                                     this.moveToolTip()
                                 }).on("mouseleave", (d) => {
@@ -397,9 +395,9 @@ class DataLayer extends BaseLayer {
                         return brStyles.getSize(d.properties._value) * 1 / k
                     })
                     //.attr("transform", this.props.transform)
-                    .on("mouseenter", (d,event) => {
+                    .on("mouseenter", (d) => {
                         
-                        if (d.properties && d.properties._value) {
+                        if (d.properties._value) {
 
                             const variables = {
                                 ...d.properties, meta: {
@@ -407,7 +405,7 @@ class DataLayer extends BaseLayer {
                                     value: d.properties._value
                                 }
                             }
-                            this.showToolTip(tooltip, variables, brStyles.getColor(d.properties._value),event)
+                            this.showToolTip(tooltip, variables, brStyles.getColor(d.properties._value))
                         }
                     })
                     .on("mouseleave", (d) => {
@@ -554,7 +552,7 @@ const DataWrapper = (props) => {
         id, unique, filters, csv, app, group = "default", apiJoinAttribute, editing, patternDiscriminator, intl
     } = props
 
-    let params = {}
+    const params = {}
 
     const ff = filters || {}
 
@@ -572,7 +570,6 @@ const DataWrapper = (props) => {
         app={app}
         csv={decodeURIComponent(csv)}
         group={group}
-        editing={editing}
         ignoreErrors={true}
         isSvg={true}
         store={[app, unique, id]}

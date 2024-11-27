@@ -1,0 +1,21 @@
+.footer {
+  background-color: $dc-dark-grey !important;
+  height: var(--footer-height);
+  padding: 0px;
+  margin: 0px;
+  width: 100%;
+  position: absolute;
+}
+
+.footer-menu {
+  position: absolute;
+  right: 50px !important;
+  max-width: 550px !important;
+  padding-top: 16px;
+  a {
+    color: white !important;
+  }
+  a:hover {
+    color: $dc-green !important;
+  }
+}
