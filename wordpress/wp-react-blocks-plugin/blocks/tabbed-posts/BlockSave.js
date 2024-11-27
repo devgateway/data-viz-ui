@@ -10,9 +10,7 @@ const SaveComponent = (props) => {
             width,
             showLabels,
             showIcons,
-            useScrolls,
             theme,
-
         },
     } = props;
 
@@ -31,7 +29,6 @@ const SaveComponent = (props) => {
                 data-categories={categories.toString()}
                 data-show-labels={showLabels}
                 data-show-icons={showIcons}
-                data-use-scrolls={useScrolls}
                 data-theme={theme}
                 className={"viz-component"}
                 data-component={"tabbedPosts"}>

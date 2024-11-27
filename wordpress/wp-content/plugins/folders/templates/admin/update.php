@@ -9,7 +9,6 @@
 if (defined('ABSPATH') === false) {
     exit;
 }
-$email = (isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] == "playground.wordpress.net")?"":get_option('admin_email');
 ?>
 <style>
     body {
@@ -19,7 +18,7 @@ $email = (isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] == "playground.w
 <div class="starts-testimonials-updates-form">
     <div class="updates-form-form-left">
         <div class="updates-form-form-left-text">premio</div>
-        <img src="<?php echo esc_url(WCP_FOLDER_URL."assets/images/wcupdate_email.svg") ?>" style="width: 230px;margin: 60px 0px 20px 0px;" />
+        <img src="<?php echo WCP_FOLDER_URL ?>assets/images/wcupdate_email.svg" style="width: 230px;margin: 60px 0px 20px 0px;" />
         <p><?php esc_html_e('Grow your WordPress or Shopify websites with our plugins', 'stars-testimonials'); ?></p>
     </div>
     <div class="updates-form-form-right">
@@ -37,9 +36,8 @@ $email = (isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] == "playground.w
                         </g>
                     </svg>
                 </div>
-                <input id="folder_update_status" autocomplete="off" value="<?php echo esc_attr($email) ?>" placeholder="Email address">
+                <input id="folder_update_status" autocomplete="off" value="<?php echo get_option('admin_email') ?>" placeholder="Email address">
                 <button href="javascript:;" class="button button-primary form-submit-btn yes befirst-btn"><?php esc_html_e('Sign Up', 'stars-testimonials'); ?></button>
-                <p id="suggestion"></p>
             </div>
             <!--div class="update-form-skip-button">
                 <button href="javascript:;" class="button button-secondary form-cancel-btn no">Skip</button>
@@ -58,11 +56,11 @@ $email = (isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] == "playground.w
 
     @font-face {
         font-family: 'Lato';
-        src: url('<?php echo esc_url(WCP_FOLDER_URL."assets/fonts/Lato-Regular.woff");?>');
+        src: url('<?php echo WCP_FOLDER_URL."assets/fonts/Lato-Regular.woff";?>');
     }
 
     #wpwrap{
-        background: url('<?php echo esc_url(WCP_FOLDER_URL."assets/images/update-bg.jpg") ?>');
+        background: url('<?php echo WCP_FOLDER_URL;?>assets/images/update-bg.jpg');
         background-position: bottom center;
         background-size: cover;
     }
@@ -226,7 +224,6 @@ $email = (isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] == "playground.w
         position: absolute;
         top: 8px;
         left: 10px;
-        z-index: 1;
     }
 
     .update-notice {
@@ -251,24 +248,6 @@ $email = (isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] == "playground.w
         cursor: pointer;
         color:#28375A;
     }
-    #suggestion {
-        margin: 10px 0 0;
-        padding: 0;
-        font-size: 14px;
-        color: #970029;
-    }
-    #suggestion i {
-        color: #2596be;
-        font-weight: bold;
-        cursor: pointer;
-    }
-    .eac-sugg{
-        color:#c1c1c1;
-        margin-left: -4px;
-    }
-    .wp-core-ui .button-primary:disabled, .wp-core-ui .button-primary[disabled] {
-        background: #e7e7e7!important;
-    }
 </style>
 
 <script>
@@ -284,7 +263,7 @@ $email = (isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] == "playground.w
                 data: {
                     action: "folder_update_status",
                     status: updateStatus,
-                    nonce: '<?php echo esc_attr(wp_create_nonce("folder_update_status")) ?>',
+                    nonce: '<?php echo wp_create_nonce("folder_update_status") ?>',
                     email: jQuery("#folder_update_status").val()
                 },
                 type: 'post',
@@ -294,52 +273,5 @@ $email = (isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] == "playground.w
                 }
             })
         });
-
-        jQuery("#folder_update_status").emailautocomplete({
-            domains: ['example.com'],
-            caseSensitive: false
-        });
-
-        jQuery(document).on("click", "#suggestion i", function (){
-            $("#folder_update_status").val($(this).text()).focus();
-            $("#suggestion").html('');
-        });
-
-        jQuery(document).on("change", "#folder_update_status", function (){
-            isValidEmailAddress();
-        });
-        jQuery(document).on("keyup", "#folder_update_status", function (){
-            if(isValidEmailAddress()) {
-                jQuery(this).mailcheck({
-                    suggested: function(element, suggestion) {
-                        // callback code
-                        jQuery('#suggestion').html("Did you mean <b><i>" + suggestion.full + "</b></i>?");
-                    },
-                    empty: function(element) {
-                        // callback code
-                        jQuery('#suggestion').html('');
-                    }
-                });
-            } else {
-                jQuery('#suggestion').html('');
-            }
-        });
     });
-    function isValidEmailAddress() {
-        if(jQuery.trim(jQuery("#folder_update_status").val()) == "") {
-            jQuery(".form-submit-btn").prop("disabled", true);
-            return false;
-        } else if(!isValidEmail(jQuery("#folder_update_status").val())) {
-            jQuery(".form-submit-btn").prop("disabled", true);
-            return false;
-        } else {
-            jQuery(".form-submit-btn").prop("disabled", false);
-        }
-        return true;
-    }
-
-    function isValidEmail(email) {
-        var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
-        return regex.test(email);
-    }
 </script>

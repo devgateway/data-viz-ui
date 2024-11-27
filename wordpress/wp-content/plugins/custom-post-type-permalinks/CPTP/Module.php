@@ -27,7 +27,7 @@ abstract class CPTP_Module {
 	/**
 	 * Module hook point.
 	 */
-	abstract public function add_hook();
+	abstract function add_hook();
 
 	/**
 	 * Uninstall hooks

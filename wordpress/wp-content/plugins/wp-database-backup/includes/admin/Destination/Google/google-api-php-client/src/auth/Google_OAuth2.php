@@ -88,9 +88,7 @@ class Google_OAuth2 extends Google_Auth {
    * @return string
    */
   public function authenticate($service, $code = null) {
-    //phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nonce verification is not required here.
     if (!$code && isset($_GET['code'])) {
-      //phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nonce verification is not required here.
       $code = $_GET['code'];
     }
 
@@ -114,7 +112,7 @@ class Google_OAuth2 extends Google_Auth {
         if ($decodedResponse != null && $decodedResponse['error']) {
           $response = $decodedResponse['error'];
         }
-        throw new Google_AuthException("Error fetching OAuth2 access token, message:".esc_html($response), esc_html($request->getResponseHttpCode()));
+        throw new Google_AuthException("Error fetching OAuth2 access token, message: '$response'", $request->getResponseHttpCode());
       }
     }
 
@@ -170,7 +168,7 @@ class Google_OAuth2 extends Google_Auth {
   }
 
   public function getAccessToken() {
-    return wp_json_encode($this->token);
+    return json_encode($this->token);
   }
 
   public function setDeveloperKey($developerKey) {
@@ -287,7 +285,7 @@ class Google_OAuth2 extends Google_Auth {
       $this->token['expires_in'] = $token['expires_in'];
       $this->token['created'] = time();
     } else {
-      throw new Google_AuthException("Error refreshing the OAuth2 token, message: ".esc_html($body), esc_html($code));
+      throw new Google_AuthException("Error refreshing the OAuth2 token, message: '$body'", $code);
     }
   }
 
@@ -344,8 +342,8 @@ class Google_OAuth2 extends Google_Auth {
     }
     throw new Google_AuthException(
         "Failed to retrieve verification certificates: '" .
-            esc_html($request->getResponseBody()) . "'.",
-        esc_html($request->getResponseHttpCode()));
+            $request->getResponseBody() . "'.",
+        $request->getResponseHttpCode());
   }
 
   /**
@@ -375,7 +373,7 @@ class Google_OAuth2 extends Google_Auth {
   function verifySignedJwtWithCerts($jwt, $certs, $required_audience) {
     $segments = explode(".", $jwt);
     if (count($segments) != 3) {
-      throw new Google_AuthException("Wrong number of segments in token:". esc_html($jwt));
+      throw new Google_AuthException("Wrong number of segments in token: $jwt");
     }
     $signed = $segments[0] . "." . $segments[1];
     $signature = Google_Utils::urlSafeB64Decode($segments[2]);
@@ -383,14 +381,14 @@ class Google_OAuth2 extends Google_Auth {
     // Parse envelope.
     $envelope = json_decode(Google_Utils::urlSafeB64Decode($segments[0]), true);
     if (!$envelope) {
-      throw new Google_AuthException("Can't parse token envelope: " . esc_html($segments[0]));
+      throw new Google_AuthException("Can't parse token envelope: " . $segments[0]);
     }
 
     // Parse token
     $json_body = Google_Utils::urlSafeB64Decode($segments[1]);
     $payload = json_decode($json_body, true);
     if (!$payload) {
-      throw new Google_AuthException("Can't parse token payload: " . esc_html($segments[1]));
+      throw new Google_AuthException("Can't parse token payload: " . $segments[1]);
     }
 
     // Check signature
@@ -404,7 +402,7 @@ class Google_OAuth2 extends Google_Auth {
     }
 
     if (!$verified) {
-      throw new Google_AuthException("Invalid token signature: ".esc_html($jwt));
+      throw new Google_AuthException("Invalid token signature: $jwt");
     }
 
     // Check issued-at timestamp
@@ -413,7 +411,7 @@ class Google_OAuth2 extends Google_Auth {
       $iat = $payload["iat"];
     }
     if (!$iat) {
-      throw new Google_AuthException("No issue time in token: ".esc_html($json_body));
+      throw new Google_AuthException("No issue time in token: $json_body");
     }
     $earliest = $iat - self::CLOCK_SKEW_SECS;
 
@@ -424,21 +422,21 @@ class Google_OAuth2 extends Google_Auth {
       $exp = $payload["exp"];
     }
     if (!$exp) {
-      throw new Google_AuthException("No expiration time in token:".esc_html($json_body));
+      throw new Google_AuthException("No expiration time in token: $json_body");
     }
     if ($exp >= $now + self::MAX_TOKEN_LIFETIME_SECS) {
       throw new Google_AuthException(
-          "Expiration time too far in future:".esc_html($json_body));
+          "Expiration time too far in future: $json_body");
     }
 
     $latest = $exp + self::CLOCK_SKEW_SECS;
     if ($now < $earliest) {
       throw new Google_AuthException(
-          "Token used too early,".esc_html($now) ." < " .esc_html($earliest)." : ".esc_html($json_body));
+          "Token used too early, $now < $earliest: $json_body");
     }
     if ($now > $latest) {
       throw new Google_AuthException(
-          "Token used too late,".esc_html($now) ." > " .esc_html($earliest)." : ".esc_html($json_body));
+          "Token used too late, $now > $latest: $json_body");
     }
 
     // TODO(beaton): check issuer field?
@@ -446,7 +444,7 @@ class Google_OAuth2 extends Google_Auth {
     // Check audience
     $aud = $payload["aud"];
     if ($aud != $required_audience) {
-      throw new Google_AuthException("Wrong recipient, ".esc_html($aud) ." != ". esc_html($required_audience).' : '.esc_html($json_body));
+      throw new Google_AuthException("Wrong recipient, $aud != $required_audience: $json_body");
     }
 
     // All good.

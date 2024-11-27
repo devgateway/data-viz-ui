@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import * as d3 from 'd3' // d3 plugin
 import {Icon, Popup} from "semantic-ui-react";
 import {FormattedMessage} from "react-intl";
@@ -37,9 +37,9 @@ class ZoomControl extends React.Component {
                 selection.call(this.zoom)
                 this.transition2fullView()
             }
-            if (rotationEnabled) {
+            // if (rotationEnabled) {
 
-            }
+            // }
         }
     }
 

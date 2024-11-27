@@ -1,5 +1,4 @@
 <?php
-
 // Prevent direct access.
 if ( ! defined( 'BSR_PATH' ) ) exit;
 

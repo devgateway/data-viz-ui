@@ -97,34 +97,3 @@ function customtaxorder_orderslug() {
 function customtaxorder_slug_sort(a, b) {
 	return jQuery(a).attr('data-slug').localeCompare(jQuery(b).attr('data-slug'), undefined, {numeric: true, sensitivity: 'base'});
 }
-
-
-/* Keep menu for Tools.php open on our pages. */
-jQuery(document).ready(function($) {
-
-	if ( jQuery( "div.customtaxorder" ).hasClass( 'wrap-customtaxorder' ) ) {
-		jQuery( 'li#menu-tools' ).removeClass( 'wp-not-current-submenu' );
-		jQuery( 'li#menu-tools' ).addClass( 'wp-has-current-submenu' );
-		jQuery( 'li#menu-tools' ).addClass( 'wp-menu-open' );
-	}
-
-});
-
-
-/*
- * Show slug of term as well.
- *
- * @since 4.0.1
- */
-jQuery(document).ready(function($) {
-	jQuery( '#customtaxorder-toggle-slug' ).on( 'click', function() {
-
-		var height = jQuery( '.customtaxorder li.lineitem' ).first().css( 'height' );
-		if ( height == '24px' ) {
-			jQuery( '.customtaxorder li.lineitem' ).css( 'height', '48px' );
-		} else if ( height == '48px' ) {
-			jQuery( '.customtaxorder li.lineitem' ).css( 'height', '24px' );
-		}
-
-	});
-});

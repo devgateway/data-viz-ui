@@ -109,7 +109,7 @@ msgstr "Veuillez définir les paramètres par défaut sous forme d’un tableau.
 
 #: inc/customizer.php:143
 msgid "Select pages to feature in each area from the dropdowns. Add an image to a section by setting a featured image in the page editor. Empty sections will not be displayed."
-msgstr "Sélectionnez les pages à mettre en avant dans chaque currentZone depuis la liste déroulante. Ajoutez une image à la section en définissant une image mise en avant dans l’éditeur de page. Les sections vides ne s’afficheront pas."
+msgstr "Sélectionnez les pages à mettre en avant dans chaque zone depuis la liste déroulante. Ajoutez une image à la section en définissant une image mise en avant dans l’éditeur de page. Les sections vides ne s’afficheront pas."
 
 #. translators: %d: The front page section number.
 #: inc/customizer.php:142

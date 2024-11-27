@@ -18,7 +18,7 @@ if ( ! current_user_can( 'manage_options' ) ) {
 }
 
 ?>
-<p><strong><?php esc_html_e('Here\'s a list of BackupBreeze in your repository:' , 'wpdbbkp');?> </strong></p>
+<p><strong>Here's a list of BackupBreeze in your repository:</strong></p>
 <?php
 /**
  * Set up variables
@@ -51,18 +51,15 @@ $contents = ftp_nlist( $conn_id, "$subdir/*.tar" );
 <ol></em>
 
 <?php
-if(!empty($contents) && is_array($contents)){
-	foreach ( $contents as $key => $value ) {
-		echo '<li>' . esc_attr( substr( $value, ( strlen( $subdir ) ) ) ) . '</li>';
-	}
+foreach ( $contents as $key => $value ) {
+	echo '<li>' . esc_attr( substr( $value, ( strlen( $subdir ) ) ) ) . '</li>';
 }
-
 ?>
 </ol>
 <p><br />
-<em><?php echo esc_html__('This section shows a list of Backup in your repository. ', 'wpdbbkp') ?></em></p>
-<p><em><?php echo esc_html__("If you're using the Auto-Delete option under Automation: ", 'wpdbbkp') ?> <br />
-</em><em><?php echo esc_html__('the files at the bottom of this list will be deleted, the ones at the top will stay in place. ', 'wpdbbkp') ?></em>
+<em>This section shows a list of Backup in your repository. </em></p>
+<p><em>If you're using the Auto-Delete option under Automation: <br />
+</em><em>the files at the bottom of this list will be deleted, the ones at the top will stay in place. </em>
 <?php
 	ftp_close( $conn_id );
 ?>

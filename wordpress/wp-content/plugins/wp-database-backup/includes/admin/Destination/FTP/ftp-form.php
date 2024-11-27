@@ -61,10 +61,10 @@ $wp_db_backup_destination_ftp = wp_db_filter_data( get_option( 'wp_db_backup_des
 if ( true === isset( $_POST[ $hidden_field_name3 ] ) && 'Y' === $_POST[ $hidden_field_name3 ] ) {
 	// Validate that the contents of the form request came from the current site and not somewhere else added 21-08-15 V.3.4.
 	if ( ! isset( $_POST['wpdbbackup_update_setting'] ) ) {
-		wp_die( esc_html__('Invalid form data. form request came from the somewhere else not current site!','wpdbbkp') );
+		die( '<br><br>Invalid form data. form request came from the somewhere else not current site!' );
 	}
-	if ( ! wp_verify_nonce( $_POST['wpdbbackup_update_setting'] , 'wpdbbackup-update-setting' ) ) {
-		wp_die( esc_html__('Invalid form data. form request came from the somewhere else not current site!','wpdbbkp') );
+	if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['wpdbbackup_update_setting'] ) ), 'wpdbbackup-update-setting' ) ) {
+		die( '<br><br>Invalid form data. form request came from the somewhere else not current site! ' );
 	}
 	// Read their posted value.
 	if ( true === isset( $_POST[ $data_field_name6 ] ) ) {
@@ -72,11 +72,11 @@ if ( true === isset( $_POST[ $hidden_field_name3 ] ) && 'Y' === $_POST[ $hidden_
 	}
 	// Save the posted value in the database.
 	if ( true === isset( $_POST[ $opt_val6 ] ) ) {
-		update_option( $opt_name6, wp_db_filter_data( sanitize_text_field( $opt_val6 ) ) , false);
+		update_option( $opt_name6, wp_db_filter_data( sanitize_text_field( $opt_val6 ) ) );
 	}
 	// Put a "settings updated" message on the screen.
 	?>
-	<div class="updated"><p><strong><?php echo esc_html__('Your additional directory has been saved.','wpdbbkp'); ?></strong></p></div>
+	<div class="updated"><p><strong><?php echo 'Your additional directory has been saved.'; ?></strong></p></div>
 	<?php
 }
 
@@ -84,10 +84,10 @@ if ( true === isset( $_POST[ $hidden_field_name3 ] ) && 'Y' === $_POST[ $hidden_
 if ( isset( $_POST[ $hidden_field_name ] ) && 'Y' === $_POST[ $hidden_field_name ] ) {
 	// Validate that the contents of the form request came from the current site and not somewhere else added 21-08-15 V.3.4.
 	if ( ! isset( $_POST['wpdbbackup_update_setting'] ) ) {
-		wp_die( esc_html__('Invalid form data. form request came from the somewhere else not current site!','wpdbbkp') );
+		die( '<br><br>Invalid form data. form request came from the somewhere else not current site! ' );
 	}
-	if ( ! wp_verify_nonce(  $_POST['wpdbbackup_update_setting'] , 'wpdbbackup-update-setting' ) ) {
-		wp_die( esc_html__('Invalid form data. form request came from the somewhere else not current site!','wpdbbkp') );
+	if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['wpdbbackup_update_setting'] ) ), 'wpdbbackup-update-setting' ) ) {
+		die( '<br><br>Invalid form data. form request came from the somewhere else not current site! ' );
 	}
 	// Read their posted value.
 	if ( isset( $_POST[ $data_field_name ] ) ) {
@@ -110,24 +110,24 @@ if ( isset( $_POST[ $hidden_field_name ] ) && 'Y' === $_POST[ $hidden_field_name
 	}
 
 	// Save the posted value in the database.
-	update_option( $opt_name, wp_db_filter_data( sanitize_text_field( $opt_val ) ) , false);
-	update_option( $opt_name2, wp_db_filter_data( sanitize_text_field( $opt_val2 ) ) , false);
-	update_option( $opt_name3, wp_db_filter_data( sanitize_text_field( $opt_val3 ) ), false );
-	update_option( $opt_name4, wp_db_filter_data( sanitize_text_field( $opt_val4 ) ) , false);
+	update_option( $opt_name, wp_db_filter_data( sanitize_text_field( $opt_val ) ) );
+	update_option( $opt_name2, wp_db_filter_data( sanitize_text_field( $opt_val2 ) ) );
+	update_option( $opt_name3, wp_db_filter_data( sanitize_text_field( $opt_val3 ) ) );
+	update_option( $opt_name4, wp_db_filter_data( sanitize_text_field( $opt_val4 ) ) );
 	if ( isset( $_POST['wp_db_backup_destination_FTP'] ) ) {
-		update_option( 'wp_db_backup_destination_FTP', 1 , false);
+		update_option( 'wp_db_backup_destination_FTP', 1 );
 	} else {
-		update_option( 'wp_db_backup_destination_FTP', 0, false );
+		update_option( 'wp_db_backup_destination_FTP', 0 );
 	}
 	$wp_db_backup_destination_ftp = wp_db_filter_data( get_option( 'wp_db_backup_destination_FTP' ) );
 	if ( isset( $_POST[ $data_field_name5 ] ) ) {
-		update_option( $opt_name5, wp_db_filter_data( sanitize_text_field( $opt_val5 ) ) , false);
+		update_option( $opt_name5, wp_db_filter_data( sanitize_text_field( $opt_val5 ) ) );
 	}
-	update_option( $opt_name9, wp_db_filter_data( sanitize_text_field( $opt_val9 ) ) , false);
+	update_option( $opt_name9, wp_db_filter_data( sanitize_text_field( $opt_val9 ) ) );
 
 	// Put a "settings updated" message on the screen.
 	?>
-	<div class="updated"><p><strong><?php esc_html_e( 'Your FTP details have been saved.', 'wpdbbkp'  ); ?></strong></p></div>
+	<div class="updated"><p><strong><?php esc_attr_e( 'Your FTP details have been saved.', 'backupbreeze-menu' ); ?></strong></p></div>
 	<?php
 } // end if.
 
@@ -135,10 +135,10 @@ if ( isset( $_POST[ $hidden_field_name ] ) && 'Y' === $_POST[ $hidden_field_name
 if ( isset( $_POST[ $hidden_field_name ] ) && 'Test Connection' === $_POST[ $hidden_field_name ] ) {
 	// Validate that the contents of the form request came from the current site and not somewhere else added 21-08-15 V.3.4.
 	if ( ! isset( $_POST['wpdbbackup_update_setting'] ) ) {
-		wp_die( esc_html__('Invalid form data. form request came from the somewhere else not current site!','wpdbbkp') );
+		die( '<br><br>Invalid form data. form request came from the somewhere else not current site! ' );
 	}
-	if ( ! wp_verify_nonce( $_POST['wpdbbackup_update_setting'] , 'wpdbbackup-update-setting' ) ) {
-		wp_die( esc_html__('Invalid form data. form request came from the somewhere else not current site!','wpdbbkp') );
+	if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['wpdbbackup_update_setting'] ) ), 'wpdbbackup-update-setting' ) ) {
+		die( '<br><br>Invalid form data. form request came from the somewhere else not current site! ' );
 	}
 	include plugin_dir_path( __FILE__ ) . 'test-ftp.php';
 	// update all options while we're at it.
@@ -152,24 +152,24 @@ if ( isset( $_POST[ $hidden_field_name ] ) && 'Test Connection' === $_POST[ $hid
 	$opt_val9 = sanitize_text_field( wp_unslash( $_POST[ $data_field_name9 ] ) );
 
 	// Save the posted value in the database.
-	update_option( $opt_name, wp_db_filter_data( sanitize_text_field( $opt_val ) ) , false);
-	update_option( $opt_name2, wp_db_filter_data( sanitize_text_field( $opt_val2 ) ), false );
-	update_option( $opt_name3, wp_db_filter_data( sanitize_text_field( $opt_val3 ) ) , false);
-	update_option( $opt_name4, wp_db_filter_data( sanitize_text_field( $opt_val4 ) ) , false);
+	update_option( $opt_name, wp_db_filter_data( sanitize_text_field( $opt_val ) ) );
+	update_option( $opt_name2, wp_db_filter_data( sanitize_text_field( $opt_val2 ) ) );
+	update_option( $opt_name3, wp_db_filter_data( sanitize_text_field( $opt_val3 ) ) );
+	update_option( $opt_name4, wp_db_filter_data( sanitize_text_field( $opt_val4 ) ) );
 	if ( isset( $_POST[ $data_field_name5 ] ) ) {
-		update_option( $opt_name5, wp_db_filter_data( sanitize_text_field( $opt_val5 ) ) , false);
+		update_option( $opt_name5, wp_db_filter_data( sanitize_text_field( $opt_val5 ) ) );
 	}
-	update_option( $opt_name9, wp_db_filter_data( sanitize_text_field( $opt_val9 ) ) , false);
+	update_option( $opt_name9, wp_db_filter_data( sanitize_text_field( $opt_val9 ) ) );
 	$result = backupbreeze_test_ftp();
 
 	if ( 'OK' !== $result ) {
 		?>
-		<div class="error"><p><strong><?php echo esc_html__('connection has failed!', 'wpdbbkp') ?><br /></strong></p>
+		<div class="error"><p><strong>connection has failed!<br /></strong></p>
 			<?php echo esc_html( $result ) . '<br /><br />'; ?>
 		</div>
 	<?php } else { ?>
 
-		<div class="updated"><p><strong><?php echo esc_html__('Connected to ', 'wpdbbkp') ?><?php echo esc_attr( $opt_val ); ?>, <?php echo esc_html__('for user', 'wpdbbkp') ?> <?php echo esc_attr( $opt_val2 ); ?></strong></p></div>
+		<div class="updated"><p><strong>Connected to <?php echo esc_attr( $opt_val ); ?>, for user <?php echo esc_attr( $opt_val2 ); ?></strong></p></div>
 		<?php
 	} // end if.
 } // end if.
@@ -177,61 +177,61 @@ if ( isset( $_POST[ $hidden_field_name ] ) && 'Test Connection' === $_POST[ $hid
 <style>td, th {
 		padding: 5px;
 	}</style>
-<p><?php echo esc_html__('Enter your FTP details for your offsite backup repository. Leave these blank for local backups or Disable FTP Destination.', 'wpdbbkp') ?></p>		
+<p>Enter your FTP details for your offsite backup repository. Leave these blank for local backups or Disable FTP Destination.</p>		
 <form  class="form-group" name="form1" method="post" action="">
 	<input type="hidden" name="<?php echo esc_attr( $hidden_field_name ); ?>" value="Y">
 	<input name="wpdbbackup_update_setting" type="hidden" value="<?php echo esc_attr( wp_create_nonce( 'wpdbbackup-update-setting' ) ); ?>" />
 <?php wp_nonce_field( 'wp-database-backup' ); ?>
 
 	<div class="row form-group">
-		<label class="col-sm-2" for="wp_db_backup_destination_FTP"><?php echo esc_html__('Enable FTP Destination', 'wpdbbkp') ?></label>
+		<label class="col-sm-2" for="wp_db_backup_destination_FTP">Enable FTP Destination:</label>
 		<div class="col-sm-6">
 			<input type="checkbox" id="wp_db_backup_destination_FTP" <?php echo ( isset( $wp_db_backup_destination_ftp ) && 1 === (int) $wp_db_backup_destination_ftp ) ? 'checked' : ''; ?> name="wp_db_backup_destination_FTP">
 		</div>
 	</div>
 
 	<div class="row form-group">
-		<label class="col-sm-2" for="FTP_host"><?php echo esc_html__('FTP Host', 'wpdbbkp') ?></label>
+		<label class="col-sm-2" for="FTP_host">FTP Host:</label>
 		<div class="col-sm-6">
-			<input type="text" id="FTP_host" class="form-control" name="<?php echo esc_html( $data_field_name ); ?>" value="<?php echo esc_html( $opt_val ); ?>" size="25" placeholder="<?php esc_attr_e('e.g. ftp.yoursite.com','wpdbbkp');?>">
+			<input type="text" id="FTP_host" class="form-control" name="<?php echo esc_html( $data_field_name ); ?>" value="<?php echo esc_html( $opt_val ); ?>" size="25" placeholder="e.g. ftp.yoursite.com">
 		</div>
 	</div>
 
 	<div class="row form-group">
-		<label class="col-sm-2" for="FTP_port"><?php echo esc_html__('FTP Port', 'wpdbbkp') ?></label>
+		<label class="col-sm-2" for="FTP_port">FTP Port:</label>
 		<div class="col-sm-2">
 			<input type="text" id="FTP_port" class="form-control" name="<?php echo esc_html( $data_field_name9 ); ?>" value="<?php echo esc_html( $opt_val9 ); ?>" size="4">
 		</div>
 		<div class="col-sm-4">
-			<em><?php echo esc_html__('defaults to 21 if left blank', 'wpdbbkp') ?> </em>
+			<em>defaults to 21 if left blank </em>
 		</div>
 	</div>
 
 	<div class="row form-group">
-		<label class="col-sm-2" for="FTP_user"><?php echo esc_html__('FTP User', 'wpdbbkp') ?></label>
+		<label class="col-sm-2" for="FTP_user">FTP User:</label>
 		<div class="col-sm-6">
 			<input type="text" id="FTP_user" class="form-control" name="<?php echo esc_html( $data_field_name2 ); ?>" value="<?php echo esc_html( $opt_val2 ); ?>" size="25">
 		</div>
 	</div>
 
 	<div class="row form-group">
-		<label class="col-sm-2" for="FTP_password"><?php echo esc_html__('FTP Password', 'wpdbbkp') ?></label>
+		<label class="col-sm-2" for="FTP_password">FTP Password:</label>
 		<div class="col-sm-6">
 			<input type="password" id="FTP_password" class="form-control" name="<?php echo esc_html( $data_field_name3 ); ?>" value="<?php echo esc_html( $opt_val3 ); ?>" size="25">
 		</div>
 	</div>
 
 	<div class="row form-group">
-		<label class="col-sm-2" for="FTP_dir"><?php echo esc_html__('Subdirectory', 'wpdbbkp') ?></label>
+		<label class="col-sm-2" for="FTP_dir">Subdirectory:</label>
 		<div class="col-sm-6">
-			<input type="text" id="FTP_dir" placeholder="<?php esc_attr_e('e.g. /httpdocs/backups','wpdbbkp');?>" class="form-control" name="<?php echo esc_html( $data_field_name4 ); ?>" value="<?php echo esc_html( $opt_val4 ); ?>" size="25">
+			<input type="text" id="FTP_dir" placeholder="e.g. /httpdocs/backups" class="form-control" name="<?php echo esc_html( $data_field_name4 ); ?>" value="<?php echo esc_html( $opt_val4 ); ?>" size="25">
 		</div>
 		<div class="col-sm-4"> 
-			<em><?php echo esc_html__('e.g. /httpdocs/backups or leave blank', 'wpdbbkp') ?></em> 
+			<em>e.g. /httpdocs/backups or leave blank</em> 
 		</div>
 	</div>
 
-	<p><input type="submit" name="Submit" class="btn btn-primary" value="<?php esc_attr_e( 'Save' , 'wpdbbkp' ); ?>" />&nbsp;
+	<p><input type="submit" name="Submit" class="btn btn-primary" value="<?php esc_attr_e( 'Save' ); ?>" />&nbsp;
 		<input type="submit" name="<?php echo esc_html( $hidden_field_name ); ?>" class="btn btn-secondary" value="Test Connection" />
 
 		<br />

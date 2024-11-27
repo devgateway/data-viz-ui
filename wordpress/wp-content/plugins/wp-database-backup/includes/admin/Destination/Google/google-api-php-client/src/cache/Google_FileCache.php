@@ -1,5 +1,4 @@
 <?php
-// phpcs:ignoreFile -- third party library
 /*
  * Copyright 2008 Google Inc.
  *
@@ -42,11 +41,10 @@ class Google_FileCache extends Google_Cache {
     $storageDir = dirname($storageFile);
     if (! is_dir($storageDir)) {
       // @codeCoverageIgnoreStart
-      //phpcs:ignore
       if (! @mkdir($storageDir, 0755, true)) {
         // make sure the failure isn't because of a concurrency issue
         if (! is_dir($storageDir)) {
-          throw new Google_CacheException("Could not create storage directory: ".esc_html($storageDir));
+          throw new Google_CacheException("Could not create storage directory: $storageDir");
         }
       }
       // @codeCoverageIgnoreEnd
@@ -116,7 +114,7 @@ class Google_FileCache extends Google_Cache {
     }
     if (! is_dir($storageDir)) {
       if (! @mkdir($storageDir, 0755, true)) {
-        throw new Google_CacheException("Could not create storage directory: ".esc_html($storageDir));
+        throw new Google_CacheException("Could not create storage directory: $storageDir");
       }
     }
     // we serialize the whole request object, since we don't only want the
