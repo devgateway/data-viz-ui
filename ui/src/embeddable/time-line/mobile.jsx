@@ -53,10 +53,14 @@ const TimeLine = (props) => {
 
   const TooltipModal = ({ content, isOpen, style }) => {
     const addInlineStylesToHTML = (html) => {
-      return html.replace(
+      // Add styles to ul tags
+      html = html.replace(
         /<ul(.*?)>/g,
         '<ul class="has-white-color has-text-color has-standard-14-font-size" style="list-style-type:disc !important; list-style: initial !important; padding-left:20px; color:#fefefe;">'
       );
+      // Add styles to anchor tags
+      html = html.replace(/<a(.*?)>/g, '<a$1 style="color:#fefefe;">');
+      return html;
     };
     return (
       <Modal
@@ -238,7 +242,7 @@ const TimeLine = (props) => {
     ];
     const pathString = lineGenerator(data);
     let translationVal = `translate(${transformMap[deviceType]},0)`;
-    const isEthiopia =  process.env.REACT_APP_THEME?.startsWith("cd");
+    const isEthiopia =  process.env.REACT_APP_API_ROOT?.includes("cd.tcdi") || process.env.REACT_APP_API_ROOT?.startsWith("drc.tobaccocontroldata");
     if (isEthiopia) {
       translationVal = `translate(${transformMap[deviceType]},20)`;
     }
