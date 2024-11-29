@@ -49,10 +49,11 @@ export class ComponentWithSettings extends Component {
     }
 
     componentDidMount() {
-        apiFetch({path: '/dg/v1/settings'}).then((data) => {
+        apiFetch({path: '/dg/v1/settings'}).then((data) => {           
             this.setState({
                 react_ui_url: data["react_ui_url"] + '/' + window._page_locale,
                 react_api_url: data["react_api_url"],
+                apache_superset_url: data["apache_superset_url"],
                 site_language: data["site_language"],
                 current_language: new URLSearchParams(document.location.search).get("edit_lang")
             });
@@ -304,6 +305,7 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
                   this.setState({
                       react_ui_url: settingsData["react_ui_url"] + '/' + window._page_locale,
                       react_api_url: settingsData["react_api_url"],
+                      apache_superset_url: settingsData["apache_superset_url"],
                       site_language: settingsData["site_language"],
                       current_language: new URLSearchParams(document.location.search).get("edit_lang"),
                       apps

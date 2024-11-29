@@ -34,6 +34,7 @@ const Wrapped = lazy(() => import("./wrapped"));
 const SankeyChart = lazy(() => import("./sankeychart"));
 const DataLabel = lazy(() => import("./datalabel"));
 const Body = lazy(() => import("./body"));
+const SupersetChart = lazy(() => import("./superset-chart"));
 
 let reducerList = { data, embeddable };
 
@@ -72,6 +73,7 @@ const components = {
     wrapped: Wrapped,
     sankeyChart: SankeyChart,
     dataLabel: DataLabel,
+    supersetChart: SupersetChart,
     redirect: () => null
 }
 
