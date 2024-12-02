@@ -478,6 +478,7 @@ class Body extends React.Component {
     const { selectedOption, isMobile } = this.state;
 
     let data = selectedOption === "Cancers" ? left : right;
+
     let sy = 60;
 
     const calculateX = (d, i) => {
@@ -527,7 +528,8 @@ class Body extends React.Component {
           .text((d) => d.label);
       }
     } else {
-      root
+      if(!isMobile) {
+        root
         .select("svg")
         .selectAll("text.left")
 
@@ -553,6 +555,19 @@ class Body extends React.Component {
           return sy + i * 25;
         })
         .text((d) => d.label);
+      } else {
+        root
+          .select("svg")
+          .selectAll("text.label")
+          .data(data)
+          .enter()
+          .append("text")
+          .attr("class", "label")
+          .attr("x", calculateX)
+          .attr("y", (d, i) => sy + i * 25)
+          .text((d) => d.label);
+      }
+
     }
     root
       .select("svg")
@@ -587,6 +602,16 @@ class Body extends React.Component {
     viewBoxDims: "0 0 500 520",
   };
 
+  localeYDims = {
+    'en': "60",
+    'fr': "40",
+  }
+
+  localeXdims = {
+    'en': "-250",
+    'fr': "-280",
+  }
+
   render() {
     return (
       <Container className="body parts">
@@ -617,15 +642,15 @@ class Body extends React.Component {
             <rect
                 className="title-rect"
                 x={this.state.isMobile ? this.mobileOptions["Cancers"]["x"] - 20 : ""}
-                y={this.state.isMobile ? this.mobileOptions["Cancers"]["y"] - 20 : "60"}
+                y={this.state.isMobile ? this.mobileOptions["Cancers"]["y"] - 20 : this.localeYDims[this.props.intl.locale]}
                 rx="5"
                 ry="5"
                 width="100"
                 height="30"
             />
             <text
-                x={this.state.isMobile ? this.mobileOptions["Cancers"]["x"] : "-250"}
-                y={this.state.isMobile ? this.mobileOptions["Cancers"]["y"] : "60"}
+                x={this.state.isMobile ? this.mobileOptions["Cancers"]["x"] : this.localeXdims[this.props.intl.locale]}
+                y={this.state.isMobile ? this.mobileOptions["Cancers"]["y"] : this.localeYDims[this.props.intl.locale]}
                 className="title"
             >
               <FormattedMessage id="ailments.title" defaultMessage="Cancers" />
@@ -645,7 +670,7 @@ class Body extends React.Component {
             <rect
                 className="title-rect"
                 x={this.state.isMobile ? this.mobileOptions["OtherConditions"]["x"] - 65 : ""}
-                y={this.state.isMobile ? this.mobileOptions["OtherConditions"]["y"] - 20 : "60"} // Ensure the default desktop y-position
+                y={this.state.isMobile ? this.mobileOptions["OtherConditions"]["y"] - 20 : this.localeYDims[this.props.intl.locale]} // Ensure the default desktop y-position
                 rx="5"
                 ry="5"
                 width="155"
@@ -653,7 +678,7 @@ class Body extends React.Component {
             />
             <text
                 x={this.state.isMobile ? this.mobileOptions["OtherConditions"]["x"] - 50 : "200"} // Desktop remains "200"
-                y={this.state.isMobile ? this.mobileOptions["OtherConditions"]["y"] : "60"} // Ensure the default desktop y-position
+                y={this.state.isMobile ? this.mobileOptions["OtherConditions"]["y"] : this.localeYDims[this.props.intl.locale]} // Ensure the default desktop y-position
                 className="title"
             >
               <FormattedMessage
