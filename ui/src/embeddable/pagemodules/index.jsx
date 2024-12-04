@@ -19,7 +19,9 @@ export const SectionHeader = ({title, subtitle, icon, media}) => {
     return <Menu className="header title" text>
         <Menu.Item>
 
-            <Image src={media && media.guid ? media.guid.rendered : icon}/>
+            <Image src={media && media.guid ? media.guid.rendered : icon}
+                   alt={media && media.alt_text ? media.alt_text : ""}
+            />
         </Menu.Item>
         <Menu.Header>
             <div>
