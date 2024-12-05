@@ -1,4 +1,3 @@
-import { useEffect  } from 'react';
 import {PanelBody, PanelRow, RangeControl, TextControl, ToggleControl} from '@wordpress/components';
 import {__} from '@wordpress/i18n';
 import ChartColors from "../commons/ChartColors.jsx"
@@ -58,11 +57,6 @@ const BarOptions = (props) => {
             sortReverse,
         }
     } = props;
-    useEffect(() => {
-        const currentLanguage = document.documentElement.lang;
-        const locale = currentLanguage.split('-')[0];
-        window._user_locale = locale;
-    }, []);
 
     const getSeries = () => {
         if (allCategories) {
@@ -255,41 +249,42 @@ const BarOptions = (props) => {
         {getSeries() && (
           <PanelBody initialOpen={false} title={__("Hidden Bars")}>
             {getSeries().map((p) => (
-              <PanelRow>
+              <PanelRow key={p.value}>
                 <ToggleControl
                   label={p.value}
                   checked={
                     hiddenBars.includes(p.value) ||
                     (p.labels &&
-                      hiddenBars.includes(
-                        p.labels[window._user_locale.toUpperCase()]
+                      Object.values(p.labels).some((label) =>
+                        hiddenBars.includes(label)
                       ))
                   }
                   onChange={() => {
-                    const localeKey = window._user_locale.toUpperCase();
-                    const labelByLocale = p.labels?.[localeKey]; // Safely access p.labels[localeKey]
+                    // Check if the bar or any of its labels is hidden
+                    const hiddenBarsHasLabel = p.labels
+                      ? Object.values(p.labels).some((label) =>
+                          hiddenBars.includes(label)
+                        )
+                      : false;
 
                     let updatedBars = [...hiddenBars];
 
-                    // If the bar is already hidden, remove it and its localized label (if applicable)
-                    if (
-                      hiddenBars.includes(p.value) ||
-                      (labelByLocale && hiddenBars.includes(labelByLocale))
-                    ) {
+                    if (hiddenBars.includes(p.value) || hiddenBarsHasLabel) {
+                      // Remove the bar and its associated labels
                       updatedBars = updatedBars.filter(
-                        (item) => item !== p.value
+                        (item) =>
+                          item !== p.value &&
+                          !(p.labels && Object.values(p.labels).includes(item))
                       );
-                      if (labelByLocale) {
-                        updatedBars = updatedBars.filter(
-                          (item) => item !== labelByLocale
-                        );
-                      }
                     } else {
-                      // Add the bar and its localized label (if applicable)
-                      updatedBars.push(p.value);
-                      if (labelByLocale) {
-                        updatedBars.push(labelByLocale);
-                      }
+                      // Add the bar and its associated labels (if applicable)
+                      updatedBars = [
+                        ...new Set([
+                          ...updatedBars,
+                          p.value,
+                          ...(p.labels ? Object.values(p.labels) : []),
+                        ]),
+                      ];
                     }
 
                     // Update the attributes
