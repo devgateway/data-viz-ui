@@ -8,13 +8,13 @@ COPY wordpress/wp-react-blocks-plugin/blocks/package.json ./
 #COPY wordpress/wp-react-blocks-plugin/blocks/package-lock.json ./
 #Copy custom plugins
 RUN --mount=type=cache,target=node_modules,id=wp_react_blocks_node_modules \
-npm install
+npm install --include=dev
 COPY wordpress/wp-react-blocks-plugin/blocks/ ./
 
 COPY --from=customizer /tmp/work/blocks/ ../../../../custom/wp-customizer/blocks/
 RUN find ../../../../custom/wp-customizer/blocks/ -exec sed -i 's|../../../../front/wordpress/wp-react-blocks-plugin/blocks/|/tmp/work/|g' {} \;
 
-RUN export NODE_ENV=production
+
 RUN npm run build
 
 RUN mkdir -p wp-content/plugins/wp-react-blocks-plugin/blocks
