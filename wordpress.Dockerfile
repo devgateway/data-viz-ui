@@ -7,8 +7,9 @@ WORKDIR /tmp/work
 COPY wordpress/wp-react-blocks-plugin/blocks/package.json ./
 #COPY wordpress/wp-react-blocks-plugin/blocks/package-lock.json ./
 #Copy custom plugins
+
 RUN --mount=type=cache,target=node_modules,id=wp_react_blocks_node_modules \
-npm install --include=dev
+npm install && npm install --only=dev
 COPY wordpress/wp-react-blocks-plugin/blocks/ ./
 
 COPY --from=customizer /tmp/work/blocks/ ../../../../custom/wp-customizer/blocks/
