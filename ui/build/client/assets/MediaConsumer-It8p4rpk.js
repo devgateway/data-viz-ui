@@ -1,0 +1,1 @@
+import{c as o,ap as m}from"./wordpress-DZPNJBHW.js";import{l as c,n as t}from"./chunk-7R3XDUXW-85qaCB-t.js";const x=r=>{const e=o(2);let n;return e[0]!==r.children?(n=c.jsx(m.Consumer,{children:i=>{const{media:a,locale:l}=i;return a&&c.jsx(t.Fragment,{children:t.Children.map(r.children,s=>t.cloneElement(s,{media:a,locale:l}))})}}),e[0]=r.children,e[1]=n):n=e[1],n};export{x as M};
