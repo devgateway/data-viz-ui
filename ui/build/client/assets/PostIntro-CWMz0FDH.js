@@ -1,0 +1,1 @@
+import{c as r,W as e}from"./wordpress-DZPNJBHW.js";import{l as n}from"./chunk-7R3XDUXW-85qaCB-t.js";const c=s=>{const t=r(2);let o;return t[0]!==s?(o=n.jsx(e,{...s,showIntro:!0}),t[0]=s,t[1]=o):o=t[1],o};export{c as P};
