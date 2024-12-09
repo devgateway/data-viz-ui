@@ -1,0 +1,1 @@
+import{l as t}from"./chunk-7R3XDUXW-85qaCB-t.js";import{J as r}from"./wordpress-DZPNJBHW.js";import{P as n}from"./PostIntro-CWMz0FDH.js";import{p as s}from"./index-JlEuLxAr.js";const a=o=>t.jsx(n,{onLoad:o.onLoad,...o}),e=(o,p)=>({}),m={onLoad:s},f=r(e,m)(a);export{f as P};
