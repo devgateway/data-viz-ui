@@ -1,0 +1,36 @@
+.ui.placeholder.segment.chartNoDataMessage {
+  background-color: white;
+}
+
+.chartNoDataMessage {
+
+  height: 100%;
+  .ui.icon.header {
+    align-self: center;
+    width: 260px;
+    margin: 30px;
+  }
+
+  .ui.header {
+    padding-top: 20px;
+    padding-bottom: 20px;
+  }
+
+  .noDataSVG {
+    fill: dimgrey;
+    width: 120px;
+  }
+
+  .WPnoDataMsg {
+    color: dimgrey;
+    padding-top: 30px;
+    font-family: "Roboto Light";
+    font-size: 24px;
+  }
+
+  .ui.button {
+    color: white;
+    background-color: dimgrey;
+    margin-bottom: 40px;
+  }
+}
