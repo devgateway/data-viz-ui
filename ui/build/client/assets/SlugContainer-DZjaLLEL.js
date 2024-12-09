@@ -1,1 +1,0 @@
-import{p as e,l as r}from"./chunk-7R3XDUXW-85qaCB-t.js";import{a}from"./wordpress-DZPNJBHW.js";import{P as n,a as t}from"./PageConsumer-DvW5y_yM.js";import{R as i}from"./ResponsiveContainer-WTCewJa8.js";const c=()=>{const{locale:o,slug:s}=e();return r.jsx(n,{locale:o,slug:s,store:s,children:r.jsx(i,{children:r.jsx(t,{children:r.jsx(a,{})})})})};export{c as S};
