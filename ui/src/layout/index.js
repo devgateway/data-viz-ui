@@ -1,3 +1,3 @@
-import ResponsiveContainer from './ResponsiveContainer';
+import ResponsiveContainer from './ResponsiveContainer'
 
-export default ResponsiveContainer;
+export default ResponsiveContainer

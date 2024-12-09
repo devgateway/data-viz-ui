@@ -1,5 +1,5 @@
 import {get} from '../../api/commons'
-const API_ROOT = process.env.REACT_APP_API_ROOT
+const API_ROOT = process.env.VITE_REACT_APP_API_ROOT
 
 function queryParams(params) {
     return Object.keys(params)
