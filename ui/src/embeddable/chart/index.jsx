@@ -16,7 +16,7 @@ import CSVDataFrame from "./CSVDataFrame";
 import ColorProvider from "./colors/ColorProvider";
 import Messages from "./Messages";
 import { connect } from "react-redux";
-import deviceType from '../../utils/deviceType';
+import deviceType from '@/utils/deviceType';
 
 
 const isMobile = deviceType() === 'mobile';
@@ -52,7 +52,7 @@ const Diverging = (props) => {
   );
 };
 const Chart = (props) => {
-  let {
+  const {
     parent,
     editing = false,
     unique,
@@ -154,8 +154,6 @@ const Chart = (props) => {
     "data-tooltip-enable-markdown": tooltipEnableMarkdown = "false",
     "data-y-axis-tick-values": yAxisTickValues = "10",
     "data-x-axis-tick-values": xAxisTickValues = "10",
-    "data-enable-grid-y": enableGridY = "true",
-    "data-enable-grid-x": enableGridX = "false",
     "data-offset-text": offsetText = 0,
     "data-overall-label": overallLabel = "Overall",
     "data-min-max-clamp": minMaxClamp = "false",
@@ -174,6 +172,11 @@ const Chart = (props) => {
     "data-radar-enable-dot-label": radarEnableDotLabel = "true",
     "data-radar-dot-label-offset": radarDotLabelOffset = -12,
     "data-mobile-customization": mobileCustomization = "{}",
+  } = props;
+
+  let {
+    "data-enable-grid-y": enableGridY = "true",
+    "data-enable-grid-x": enableGridX = "false",
   } = props;
   const mobileConfigSettings = JSON.parse(decodeURIComponent(mobileCustomization));
   const isMobileConfigEnabled = (isMobile || isTablet || isMidTablet) && (mobileConfigSettings?.  showCustomization ?? false);
@@ -286,7 +289,7 @@ const Chart = (props) => {
   let selectedMeasures = getSelectedMeasures();
 
   let selectedFormat = getSelectedFormat();
-  let userMeasures = getUserMeasures();
+  const userMeasures = getUserMeasures();
   let leftLegendForSelectedMeasure = left;
   let rightLegendForSelectedMeasure = rightLegend;
 
@@ -309,7 +312,7 @@ const Chart = (props) => {
     }
   }
 
-  let numberFormat = selectedFormat
+  const numberFormat = selectedFormat
     ? {
         style:
           selectedFormat.style === "compacted"
@@ -331,7 +334,7 @@ const Chart = (props) => {
 
   const groupTotalFormatObject = parse(groupTotalFormat);
 
-  let groupTotalFormatParsed = {
+  const groupTotalFormatParsed = {
     style:
       groupTotalFormatObject.style === "compacted"
         ? "decimal"
@@ -352,7 +355,7 @@ const Chart = (props) => {
     scheme: scheme,
     colorBy: colorBy,
   };
-  let child = null;
+  const child = null;
   const contentHeight = editing ? height - 80 : height;
 
   const showXAxisTitle = () => {
@@ -547,7 +550,7 @@ const Chart = (props) => {
     dimension1
   };
 
-  let params = {};
+  const params = {};
   const ff = parse(filters) || {};
 
   if (ff && ff.forEach) {
@@ -810,4 +813,5 @@ const mapStateToProps = (state, ownProps) => {
   }
 };
 const mapActionCreators = {};
+
 export default connect(mapStateToProps, mapActionCreators)(Chart);
