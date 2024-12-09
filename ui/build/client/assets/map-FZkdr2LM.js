@@ -1,0 +1,1 @@
+import{q as f,n as i,o as p,c as m,Q as y}from"./getUnhandledProps--j4lvtul.js";function b(a,r){var s=-1,e=f(a)?Array(a.length):[];return i(a,function(n,t,u){e[++s]=r(n,t,u)}),e}function h(a,r){var s=m(a)?y:b;return s(a,p(r))}export{h as m};
