@@ -1,0 +1,62 @@
+.vertical.featured.tabs {
+
+  .item {
+    overflow: hidden;
+    cursor: pointer;
+    flex-grow: 1;
+  }
+
+
+  .item.expanded {
+    flex-grow: 1;
+    transition: all .7s;
+  }
+
+  .item.collapsed {
+    flex-grow: 0;
+    transition: all .7s;
+  }
+
+
+  .content-area {
+    height: 100%;
+    display: block;
+    position: relative;
+
+    .cover {
+      padding: 0px;
+      left: 0px;
+      float: left;
+      position: absolute;
+      height: 100%;
+
+      .rotator {
+        position: absolute;
+        transform-origin: left;
+
+        * {
+          margin: 0px;
+          padding: 0px;
+        }
+
+      }
+    }
+
+    .collapsable-content {
+      .entry-content {
+        margin: auto;
+        padding: 0px;
+      }
+
+      height: 100%;
+      position: absolute;
+      display: block;
+      margin-right: 0px;
+
+    }
+
+  }
+
+
+}
+
