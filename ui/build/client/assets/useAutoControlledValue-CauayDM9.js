@@ -1,0 +1,1 @@
+import{r}from"./chunk-7R3XDUXW-85qaCB-t.js";function d(t){var f=typeof t.defaultState>"u"?t.initialState:t.defaultState,n=r.useState(f),c=n[0],l=n[1],a=typeof t.state>"u"?c:t.state,e=r.useRef(a);r.useEffect(function(){e.current=a},[a]);var s=r.useCallback(function(u){typeof u=="function"?e.current=u(e.current):e.current=u,l(e.current)},[]);return[a,s]}export{d as u};
