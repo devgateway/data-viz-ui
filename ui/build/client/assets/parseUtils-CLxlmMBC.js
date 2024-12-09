@@ -1,1 +1,0 @@
-const n=(r,e)=>e?r:decodeURIComponent(r.replace(/%(?![0-9a-fA-F][0-9a-fA-F]+)/g,"%25")),s=(r,e)=>{try{return JSON.parse(n(r,e))}catch{console.error("error parsing value:"+r)}return null},t=(r,e)=>JSON.stringify(r)===JSON.stringify(e);export{t as c,n as d,s as p};
