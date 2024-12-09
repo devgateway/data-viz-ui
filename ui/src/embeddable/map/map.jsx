@@ -10,12 +10,12 @@ import {
   Segment,
 } from "semantic-ui-react";
 import React from "react";
-import * as topojson from "topojson";
+import * as topojson from "topojson-client";
 import Legend from "./legend";
 import { formatContent } from "../common/MapTooltip";
 import getDeviceCategory from '../../utils/deviceType';
+import * as geoStats from 'geostats';
 
-const geoStats = require("geostats");
 const COLOR_VARIABLE = "_Color_";
 const LOCATION = "location";
 const SHOW_ALL = "showAll";
@@ -24,28 +24,28 @@ const MAX_LABEL_LEN = 10;
 
 const breakpoints = {
   mobile: {
-      min: 320,
-      max: 480
+    min: 320,
+    max: 480
   },
   tablet: {
-      min: 481,
-      max: 768
+    min: 481,
+    max: 768
   },
   midTablet: {
-      min: 769,
-      max: 852,
+    min: 769,
+    max: 852,
   },
   laptop: {
-      min: 852,
-      max: 1024
+    min: 852,
+    max: 1024
   },
   desktop: {
-      min: 1025,
-      max: 1365
+    min: 1025,
+    max: 1365
   },
   wide: {
-      min: 1366,
-      max: Infinity
+    min: 1366,
+    max: Infinity
   }
 };
 
@@ -212,8 +212,8 @@ class Map extends React.Component {
     this.state = {
       selectedMeasure:
         props.transformedData &&
-        props.transformedData.measures &&
-        props.transformedData.measures.length > 1
+          props.transformedData.measures &&
+          props.transformedData.measures.length > 1
           ? props.transformedData.measures[0]
           : null,
       generatedBreaks: [],
@@ -239,22 +239,22 @@ class Map extends React.Component {
   }
 
 
-handleScroll = () => {
-  // adds debounce to scroll to prevent event from rerendering the map too often
-  let scrollTimeout = null;
-  clearTimeout(scrollTimeout);
-  scrollTimeout = setTimeout(() => {
-    const labelsExist = d3.select(this.getMapId()).selectAll(".map-labels-container").size() > 0;
-    if (!labelsExist) {
-      this.updateFeatures(this.getFeatures(), false);
-    }
-  }, 300);
-}
+  handleScroll = () => {
+    // adds debounce to scroll to prevent event from rerendering the map too often
+    let scrollTimeout = null;
+    clearTimeout(scrollTimeout);
+    scrollTimeout = setTimeout(() => {
+      const labelsExist = d3.select(this.getMapId()).selectAll(".map-labels-container").size() > 0;
+      if (!labelsExist) {
+        this.updateFeatures(this.getFeatures(), false);
+      }
+    }, 300);
+  }
 
 
-componentWillUnmount() {
-  window.removeEventListener('scroll', this.handleScroll);
-}
+  componentWillUnmount() {
+    window.removeEventListener('scroll', this.handleScroll);
+  }
 
   loadLayers() {
     const { source, mainLayerId, enabledLayers } = this.props;
@@ -267,7 +267,7 @@ componentWillUnmount() {
       enabledLayers.forEach((l) => {
         metadataFuncs.push(
           new Promise((resolve, reject) => {
-            d3.json(process.env.REACT_APP_WP_API + "/wp/v2/media/" + l.id)
+            d3.json(process.env.VITE_REACT_APP_WP_API + "/wp/v2/media/" + l.id)
               .then((data) => {
                 resolve({ id: l.id, url: data.source_url, index: l.index });
               })
@@ -383,7 +383,7 @@ componentWillUnmount() {
         mainLayer != prevState.mainLayer ||
         prevProps.mainLayerId !== this.props.mainLayerId ||
         JSON.stringify(prevProps.enabledLayers) !=
-          JSON.stringify(this.props.enabledLayers))
+        JSON.stringify(this.props.enabledLayers))
     ) {
       this.updateFeatures(this.getFeatures(), filterUpdated);
     }
@@ -401,8 +401,8 @@ componentWillUnmount() {
   }
 
   boundingExtent(features) {
-    var x0, x1, y0, y1;
-    for (var x in features) {
+    let x0, x1, y0, y1;
+    for (const x in features) {
       const [[xx0, yy0], [xx1, yy1]] = this.path.bounds(features[x]);
       if (xx0 < x0 || x0 == null) {
         x0 = xx0;
@@ -443,31 +443,31 @@ componentWillUnmount() {
       .select("g")
       .selectAll(".map-labels-container");
 
-      labels.each((d, i, nodes) => {
-        const label = d3.select(nodes[i]);
-        const transform = d3.zoomTransform(label.node());
+    labels.each((d, i, nodes) => {
+      const label = d3.select(nodes[i]);
+      const transform = d3.zoomTransform(label.node());
 
-        const position = this.getLabelPosition(d);
-        let boxWidth = this.getLabelBoxWidth(d);
-        let boxHeight = this.getLabelBoxHeight(d);
+      const position = this.getLabelPosition(d);
+      let boxWidth = this.getLabelBoxWidth(d);
+      let boxHeight = this.getLabelBoxHeight(d);
 
-        if (d.properties[mapLabelField]) {
-          boxWidth = transform.k > 1 ? boxWidth / transform.k : boxWidth;
-          boxHeight = transform.k > 1 ? boxHeight / transform.k : boxHeight;
-        }
+      if (d.properties[mapLabelField]) {
+        boxWidth = transform.k > 1 ? boxWidth / transform.k : boxWidth;
+        boxHeight = transform.k > 1 ? boxHeight / transform.k : boxHeight;
+      }
 
-        const scalingFactor = Math.pow(transform.k, 0.5);
+      const scalingFactor = Math.pow(transform.k, 0.5);
 
-        label
-          .attr("x", position[0] - boxWidth / 2)
-          .attr("y", position[1] - (transform.k > 1 ? 10 / transform.k : 10))
-          .attr("width", boxWidth)
-          .attr("height", boxHeight)
-          .attr(
-            "font-size",
-            (transform.k > 1 ? labelFontSize / scalingFactor : labelFontSize) + "px"
-          );
-      });
+      label
+        .attr("x", position[0] - boxWidth / 2)
+        .attr("y", position[1] - (transform.k > 1 ? 10 / transform.k : 10))
+        .attr("width", boxWidth)
+        .attr("height", boxHeight)
+        .attr(
+          "font-size",
+          (transform.k > 1 ? labelFontSize / scalingFactor : labelFontSize) + "px"
+        );
+    });
   }
 
   resizePointLabels() {
@@ -532,7 +532,7 @@ componentWillUnmount() {
     const transform = event.transform;
     this.mapPosition = { k: transform.k, x: transform.x, y: transform.y };
     if (editing) {
-      var parentWindow = window.parent;
+      const parentWindow = window.parent;
       parentWindow.postMessage(
         { type: "map", value: JSON.stringify(this.mapPosition) },
         "*",
@@ -542,8 +542,8 @@ componentWillUnmount() {
 
   classColor(d) {
     let { zoomEnabled } = this.props;
-    if(!zoomEnabled) {
-      zoomEnabled = ['mobile', 'tablet', 'midTablet'].includes(getDeviceCategory()) ? true: false;
+    if (!zoomEnabled) {
+      zoomEnabled = ['mobile', 'tablet', 'midTablet'].includes(getDeviceCategory()) ? true : false;
     }
     if (zoomEnabled) {
       return "active zoom-enabled";
@@ -556,17 +556,17 @@ componentWillUnmount() {
     const { autoGenerateBreaks, numberOfBreaks, colorScheme } = this.props;
     const generatedBreaks = [];
     if (autoGenerateBreaks && data && data.length > 0) {
-      let parsedData = data
+      const parsedData = data
         .filter((d) => d.properties && d.properties.value != null)
         .map((d) => {
           return d.properties.value.toFixed(2);
         });
 
-      let values = [];
+      const values = [];
       parsedData.forEach((item) => {
         if (item > 0) {
-          let floor = item * 0.99;
-          let ceil = item * 1.01;
+          const floor = item * 0.99;
+          const ceil = item * 1.01;
           if (values.indexOf(floor) === -1) {
             values.push(floor);
           }
@@ -580,12 +580,12 @@ componentWillUnmount() {
       if (values.length > 0) {
         const serie = new geoStats(values);
         serie.setPrecision(2);
-        let numberOfRanges =
+        const numberOfRanges =
           values.length > 1 ? values.length - 1 : values.length;
         serie.getJenks(Math.min(numberOfBreaks, numberOfRanges));
         serie.ranges.forEach((range, i) => {
           const legendBreak = {};
-          let adjustment = 0.01;
+          const adjustment = 0.01;
           legendBreak.min =
             parseFloat(range.substr(0, range.indexOf("-") - 1)) +
             (i > 0 ? adjustment : 0);
@@ -614,14 +614,14 @@ componentWillUnmount() {
         filteredBreaks = legendBreaks
           .filter((b) => b.measure === this.getSelectedMeasure())
           .filter((f) => {
-            let result = true;
+            const result = true;
             if (f.filters && f.filters.length > 0) {
               if (
                 this.props.appliedFilters &&
                 JSON.stringify(this.props.appliedFilters) !== "{}"
               ) {
                 const keys = Object.keys(this.props.appliedFilters);
-                let found = f.filters.filter((filter) => {
+                const found = f.filters.filter((filter) => {
                   if (keys.indexOf(filter.field) != -1) {
                     const appliedFieldValues =
                       this.props.appliedFilters[filter.field];
@@ -654,7 +654,7 @@ componentWillUnmount() {
       this.state.selectedMeasure &&
       d.properties.value != null
     ) {
-      let key = COLOR_VARIABLE + this.state.selectedMeasure;
+      const key = COLOR_VARIABLE + this.state.selectedMeasure;
       overrideColor = d.properties.variables[key.trim()];
       if (overrideColor) {
         return overrideColor;
@@ -837,7 +837,7 @@ componentWillUnmount() {
       (showAdminUnitLabel == SHOW_IF_HAS_DATA && d.properties.hasDataRow)
     ) {
       label = d.properties[mapLabelField];
-      let abbrev = d.properties["abbrev"];
+      const abbrev = d.properties["abbrev"];
       if (label && label.length > MAX_LABEL_LEN && abbrev) {
         label = abbrev;
       }
@@ -1068,15 +1068,15 @@ componentWillUnmount() {
     const group = d3.select(this.getMapId()).select("svg").select("g");
     symbols.forEach((symbol) => {
       if (symbol.field && symbol.image && symbol.values) {
-        let filteredFeaturesWithGpsCoords = features.filter((f) => {
-          let fieldName = LOCATION == symbol.field ? mappingField : "value";
-          let fiedValue =
+        const filteredFeaturesWithGpsCoords = features.filter((f) => {
+          const fieldName = LOCATION == symbol.field ? mappingField : "value";
+          const fiedValue =
             (f.properties[fieldName] ||
               (f.properties.variables
                 ? f.properties.variables[fieldName]
                 : "")) + "";
-          let valuesToMatch = symbol.values + "";
-          let valuesToMatchArr = valuesToMatch.split(",");
+          const valuesToMatch = symbol.values + "";
+          const valuesToMatchArr = valuesToMatch.split(",");
           return (
             f.properties.LATITUDE &&
             f.properties.LONGITUDE &&
@@ -1086,15 +1086,15 @@ componentWillUnmount() {
           );
         });
 
-        let filteredFeaturesNoCoords = features.filter((f) => {
-          let fieldName = LOCATION == symbol.field ? mappingField : "value";
-          let fiedValue =
+        const filteredFeaturesNoCoords = features.filter((f) => {
+          const fieldName = LOCATION == symbol.field ? mappingField : "value";
+          const fiedValue =
             (f.properties[fieldName] ||
               (f.properties.variables
                 ? f.properties.variables[fieldName]
                 : "")) + "";
-          let valuesToMatch = symbol.values + "";
-          let valuesToMatchArr = valuesToMatch.split(",");
+          const valuesToMatch = symbol.values + "";
+          const valuesToMatchArr = valuesToMatch.split(",");
           return (
             !f.properties.LATITUDE &&
             !f.properties.LONGITUDE &&
@@ -1227,9 +1227,9 @@ componentWillUnmount() {
   }
 
   showTooltip(event, d) {
-    let {
+    const {
       showTooltip,
-      zoomEnabled,
+
       tooltipTheme,
       customTooltips,
       tooltipFontSize,
@@ -1242,7 +1242,9 @@ componentWillUnmount() {
       noDataText,
     } = this.props;
 
-    zoomEnabled = ['mobile', 'tablet', 'midTablet'].includes(getDeviceCategory()) ? true: false;
+    let { zoomEnabled } = this.props;
+
+    zoomEnabled = ['mobile', 'tablet', 'midTablet'].includes(getDeviceCategory()) ? true : false;
 
     if (
       (showTooltip && d.properties.value != null) ||
@@ -1279,8 +1281,8 @@ componentWillUnmount() {
           let html = `<div style='font-size:${tooltipFontSize}px;' class='tooltip-content' >`;
           if (d.properties.value != null) {
             const lines = format.split("\n");
-            let headerFormat = lines[0];
-            let overallFormat = lines.length > 1 ? lines[1] : null;
+            const headerFormat = lines[0];
+            const overallFormat = lines.length > 1 ? lines[1] : null;
             let breakdownLineIndex = 1;
             let breakdownFormat;
             if (fields.length > 1 && mapType != "POINTS_MAP") {
@@ -1346,10 +1348,10 @@ componentWillUnmount() {
               html += t.tooltip;
             });
           } else {
-            let format =
+            const format =
               tooltipFormat ||
               "{locationName} %({value},2) \n {label}: %({value},2)";
-            let variables = {
+            const variables = {
               value: null,
               measure: this.getSelectedMeasure(),
               measureLabel: d.properties.measureLabel,
@@ -1449,7 +1451,7 @@ componentWillUnmount() {
     const { topoJSONField } = this.props;
     if (mainLayer && mainLayer.objects) {
       const fields = Object.keys(mainLayer.objects);
-      for (let index in fields) {
+      for (const index in fields) {
         const field = fields[index];
         if (mainLayer.objects[field].type == "GeometryCollection") {
           return field;
@@ -1630,8 +1632,8 @@ componentWillUnmount() {
   }
 
   area(poly) {
-    var s = 0.0;
-    var coordinates =
+    let s = 0.0;
+    const coordinates =
       poly.coordinates.length > 1
         ? poly.coordinates[0][0]
         : poly.coordinates[0];
@@ -1644,8 +1646,8 @@ componentWillUnmount() {
   }
 
   centroid(poly) {
-    var c = [0, 0];
-    var coordinates =
+    const c = [0, 0];
+    const coordinates =
       poly.coordinates.length > 1
         ? poly.coordinates[0][0]
         : poly.coordinates[0];
@@ -1659,23 +1661,24 @@ componentWillUnmount() {
         (coordinates[i][0] * coordinates[i + 1][1] -
           coordinates[i + 1][0] * coordinates[i][1]);
     }
-    var a = this.area(poly);
+    const a = this.area(poly);
     c[0] /= a * 6;
     c[1] /= a * 6;
     return c;
   }
 
   d3Map(features, filterUpdated) {
-    let { zoomEnabled, mapContainerBgColor, mapPosition, editing, mapType } =
+    const { mapContainerBgColor, mapPosition, editing, mapType } =
       this.props;
-      if(!zoomEnabled) {
-        zoomEnabled = ['mobile', 'tablet'].includes(getDeviceCategory()) ? true: false;
-      }
+    let zoomEnabled = this.props.zoomEnabled;
+    if (!zoomEnabled) {
+      zoomEnabled = ['mobile', 'tablet'].includes(getDeviceCategory()) ? true : false;
+    }
     const breaks = this.getBreaks();
     const container = d3.select(this.getMapId());
     let svg = container.select("svg");
     let containerWidth = this.getWidth();
-    if(containerWidth === 0) {
+    if (containerWidth === 0) {
       containerWidth = window.innerWidth + deviceMapWidth[getDeviceCategory()];
     } else {
       containerWidth += deviceMapWidth[getDeviceCategory()];
@@ -1737,17 +1740,17 @@ componentWillUnmount() {
             .translate(mapPosition.x, mapPosition.y)
             .scale(mapPosition.k),
         );
-        if(mapType === 'POINTS_MAP') {
-          let deviceTranslates = {
-            'mobile': 100,
-            'tablet': 0,
-            'midTablet': 0,
-            'desktop': 0,
-            'laptop': 0,
-            'wide': 0
-          }
-          const translateVal = deviceTranslates[getDeviceCategory()];
-          svg
+      if (mapType === 'POINTS_MAP') {
+        const deviceTranslates = {
+          'mobile': 100,
+          'tablet': 0,
+          'midTablet': 0,
+          'desktop': 0,
+          'laptop': 0,
+          'wide': 0
+        }
+        const translateVal = deviceTranslates[getDeviceCategory()];
+        svg
           .transition()
           .duration(300)
           .call(
@@ -1756,7 +1759,7 @@ componentWillUnmount() {
               .translate(mapPosition.x + translateVal, mapPosition.y)
               .scale(mapPosition.k),
           );
-        }
+      }
     }
 
     if (zoomEnabled || editing) {
@@ -1765,10 +1768,10 @@ componentWillUnmount() {
       svg.on("dblclick.zoom", null);
     }
 
-    let center = this.getCenter(features, filterUpdated);
+    const center = this.getCenter(features, filterUpdated);
     if (center) {
-      var bounds = this.path.bounds(center);
-      var centerx = [
+      const bounds = this.path.bounds(center);
+      const centerx = [
         (bounds[0][0] + bounds[1][0]) / 2,
         (bounds[0][1] + bounds[1][1]) / 2,
       ];
@@ -1870,12 +1873,11 @@ componentWillUnmount() {
   }
 
   render() {
-    let {
+    const {
       app,
       legendTitle,
       nationalAverageLabel,
       intl,
-      zoomEnabled,
       transformedData,
       measureSelectorLabel,
       valueFormat,
@@ -1889,8 +1891,12 @@ componentWillUnmount() {
       noDataText,
     } = this.props;
 
-    if(!zoomEnabled) {
-      zoomEnabled = ['mobile', 'tablet', 'midTablet'].includes(getDeviceCategory()) ? true: false;
+    let {
+      zoomEnabled
+    } = this.props;
+
+    if (!zoomEnabled) {
+      zoomEnabled = ['mobile', 'tablet', 'midTablet'].includes(getDeviceCategory()) ? true : false;
     }
     const nationalAverage = this.getAvg();
     const filters = this.getFilters();
@@ -1907,76 +1913,77 @@ componentWillUnmount() {
 
     const MapLegendComponent = () => (
       <Container fluid className={"footnote "}>
-      {
-        <Grid columns={2}>
-          {app !== "csv" && showOverallValue && (
-            <Grid.Column textAlign={"left"} width={4}>
-              <div className="national-average-div">
-                <span className="national-avg-label">
-                  {nationalAverageLabel}
-                </span>
-                <span className="national-avg-value">
-                  {formatContent(
-                    valueFormat,
-                    { value: nationalAverage },
-                    intl,
-                    noDataText,
-                  )}
-                </span>
-              </div>
+        {
+          <Grid columns={2}>
+            {app !== "csv" && showOverallValue && (
+              <Grid.Column textAlign={"left"} width={4}>
+                <div className="national-average-div">
+                  <span className="national-avg-label">
+                    {nationalAverageLabel}
+                  </span>
+                  <span className="national-avg-value">
+                    {formatContent(
+                      valueFormat,
+                      { value: nationalAverage },
+                      intl,
+                      noDataText,
+                    )}
+                  </span>
+                </div>
+              </Grid.Column>
+            )}
+            <Grid.Column
+              textAlign={"right"}
+              width={app !== "csv" && showOverallValue ? 12 : 16}
+            >
+              <Legend
+                filteredBreaks={this.getBreaks()}
+                formattedLegendTitle={formatContent(
+                  legendTitle,
+                  { ...filters },
+                  intl,
+                  noDataText,
+                )}
+                selectedMeasure={this.state.selectedMeasure}
+                {...this.props}
+              />
             </Grid.Column>
-          )}
-          <Grid.Column
-            textAlign={"right"}
-            width={app !== "csv" && showOverallValue ? 12 : 16}
-          >
-            <Legend
-              filteredBreaks={this.getBreaks()}
-              formattedLegendTitle={formatContent(
-                legendTitle,
-                { ...filters },
-                intl,
-                noDataText,
-              )}
-              selectedMeasure={this.state.selectedMeasure}
-              {...this.props}
-            />
-          </Grid.Column>
-        </Grid>
-      }
-      <div className="measure-selector">
-        <ul>
-          {measureSelectorLabel && (
-            <li>
-              <span className="label">{measureSelectorLabel}</span>
-            </li>
-          )}
-          {transformedData &&
-            transformedData.measures &&
-            transformedData.measures.length > 1 &&
-            transformedData.measures.map((measure) => {
-              return (
-                <li
-                  onClick={this.selectedMeasureChanged.bind(
-                    this,
-                    measure,
-                  )}
-                >
-                  <input
-                    checked={this.getSelectedMeasure() === measure}
-                    type="radio"
-                    value={measure}
-                  />
-                  <label>
-                    {transformedData.measureLabelMap[measure] ||
-                      measure}
-                  </label>
-                </li>
-              );
-            })}
-        </ul>
-      </div>
-    </Container>
+          </Grid>
+        }
+        <div className="measure-selector">
+          <ul>
+            {measureSelectorLabel && (
+              <li>
+                <span className="label">{measureSelectorLabel}</span>
+              </li>
+            )}
+            {transformedData &&
+              transformedData.measures &&
+              transformedData.measures.length > 1 &&
+              transformedData.measures.map((measure) => {
+                return (
+                  <li
+                    onClick={this.selectedMeasureChanged.bind(
+                      this,
+                      measure,
+                    )}
+                  >
+                    <input
+                      checked={this.getSelectedMeasure() === measure}
+                      type="radio"
+                      readOnly
+                      value={measure}
+                    />
+                    <label>
+                      {transformedData.measureLabelMap[measure] ||
+                        measure}
+                    </label>
+                  </li>
+                );
+              })}
+          </ul>
+        </div>
+      </Container>
     )
 
     return (
@@ -1984,7 +1991,7 @@ componentWillUnmount() {
         {this.state.layersLoading && this.renderLoader()}
         {!this.state.layersLoading && (
           <>
-           { !isMobileOrTablet && <MapLegendComponent />}
+            {!isMobileOrTablet && <MapLegendComponent />}
             <div
               className={"map wrapper scaling-svg-container " + unique}
               style={{ height: this.props.height - deviceMapHeight[getDeviceCategory()] + "px" }}

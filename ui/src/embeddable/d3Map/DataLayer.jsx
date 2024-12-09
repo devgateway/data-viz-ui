@@ -1,9 +1,8 @@
-import React, {useEffect} from 'react';
-import {connect} from "react-redux";
-import BaseLayer from "./BaseLayer";
-import DataProvider from "../data/DataProvider";
-import DataConsumer from "../data/DataConsumer";
-import {parse} from "../utils/parseUtils";
+import React from 'react';
+import BaseLayer from "./BaseLayer.jsx";
+import DataProvider from "../data/DataProvider.jsx";
+import DataConsumer from "../data/DataConsumer.jsx";
+import {parse} from "../utils/parseUtils.js";
 import * as d3 from "d3";
 import {injectIntl} from "react-intl";
 
@@ -94,7 +93,7 @@ class DataLayer extends BaseLayer {
 
         if (this.gRef && this.gRef.current) {
             this.g = d3.select(this.gRef.current)
-            let numberFormat = {
+            const numberFormat = {
                 style: (format.style === 'compacted') ? 'decimal' : format.style,
                 notation: (format.style === 'compacted') ? 'compact' : "standard",
                 currency: format.currency,
@@ -553,7 +552,7 @@ const DataWrapper = (props) => {
         id, unique, filters, csv, app, group = "default", apiJoinAttribute, editing, patternDiscriminator, intl
     } = props
 
-    let params = {}
+    const params = {}
 
     const ff = filters || {}
 
@@ -571,7 +570,6 @@ const DataWrapper = (props) => {
         app={app}
         csv={decodeURIComponent(csv)}
         group={group}
-        editing={editing}
         ignoreErrors={true}
         isSvg={true}
         store={[app, unique, id]}

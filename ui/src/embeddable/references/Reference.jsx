@@ -1,5 +1,5 @@
 import React from "react";
-import {Icon, Label, Popup} from 'semantic-ui-react'
+import { Popup} from 'semantic-ui-react'
 import {connect} from "react-redux";
 
 const decodeContent=(content) => {
@@ -19,8 +19,6 @@ const Reference = ({
                        "data-link": link = ""
 
                    }) => {
-
-    console.log("add references "+index)
 
     return <Popup className="reference-popup" hoverable size={"mini"} offset={[-16, 0]} content={<div>
 
