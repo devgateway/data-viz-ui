@@ -1,8 +1,5 @@
-import {PostConsumer, PostProvider} from "@devgateway/wp-react-lib";
-import PostIntro from "../connected-templates/PostIntro";
 import 'pure-react-carousel/dist/react-carousel.es.css';
 import React, {useEffect, useRef, useState} from "react";
-import {Container} from "semantic-ui-react";
 import * as d3 from 'd3'
 
 const visibleStyle  = {
@@ -118,12 +115,12 @@ const TimeLine = ({
         /* tooltip*/
         const parent = svgElement.node().parentNode
 
-        const onMouseOver = (event, d, i) => {
+        const onMouseOver = (d, i) => {
             const offset = 30
-            const position = [event.pageX + offset, event.pageY - offset]
-            let tooltipWidth =  600
-            if ((event.pageX + tooltipWidth + offset) > window.innerWidth) {
-                position[0] = event.pageX - tooltipWidth - offset
+            const position = [d3.event.pageX + offset, d3.event.pageY - offset]
+            const tooltipWidth =  600
+            if ((d3.event.pageX + tooltipWidth + offset) > window.innerWidth) {
+                position[0] = d3.event.pageX - tooltipWidth - offset
             }
 
             setDisplayTooltip(true)
@@ -140,7 +137,7 @@ const TimeLine = ({
                  //.style("font-weight", (d) => "bold")
         }
 
-        const onMouseOut = (event, d, i) => {
+        const onMouseOut = (d, i) => {
             d3.selectAll("#circle" + i)
             .style("stroke", "none")
             .style("fill", circleColor(i));
@@ -195,11 +192,11 @@ const TimeLine = ({
             .html((d, i) => {
                 return d["meta_fields"]["subtitle"]
             })
-            .on("mouseover", (event, d, i) => {
-                onMouseOver(event, d, i)
+            .on("mouseover", (d, i) => {
+                onMouseOver(d, i)
             })
-            .on("mouseout", (event, d, i) => {
-                onMouseOut(event, d, i)
+            .on("mouseout", (d, i) => {
+                onMouseOut(d, i)
             })
 
 
@@ -231,11 +228,11 @@ const TimeLine = ({
                 }
                 return title
             })
-            .on("mouseover", (event, d, i) => {
-                onMouseOver(event, d, i)
+            .on("mouseover", (d, i) => {
+                onMouseOver(d, i)
             })
-            .on("mouseout", (event, d, i) => {
-                onMouseOut(event, d, i)
+            .on("mouseout", (d, i) => {
+                onMouseOut(d, i)
             })
 
 
@@ -264,13 +261,13 @@ const TimeLine = ({
             .style('fill', (d, i) => {
                 return circleColor(i)
             })
-            .on("mouseover", function (event, d, i) {
-                onMouseOver(event, d, i)
+            .on("mouseover", function (d, i) {
+                onMouseOver(d, i)
             })
-            .on("mouseout", function (event, d, i) {
-                onMouseOut(event, d, i)
-            }).on("click", function (event, d, i) {
-            onclick(event, i)
+            .on("mouseout", function (d, i) {
+                onMouseOut(d, i)
+            }).on("click", function (d, i) {
+            onclick(i)
         })
 
 

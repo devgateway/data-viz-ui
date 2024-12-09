@@ -26,7 +26,7 @@ p.wp-block.rich-text {
 
 
 .wp-block {
-    max-width: 1200px;
+    max-width: 90%;
     margin: auto !important;
 }
 
@@ -78,13 +78,4 @@ p.wp-block.rich-text {
     margin-right: 10px;
     flex-shrink: 0;
     max-width: 100%;
-}
-
-.wpm-language-fr, .wpm-language-en {
-    position: fixed !important;
-    background-color: #FFFFFF !important;
-    border: 1px solid #DCDCDC !important;
-}
-.interface-navigable-region.interface-interface-skeleton__secondary-sidebar {
-    z-index: 1 !important;
 }

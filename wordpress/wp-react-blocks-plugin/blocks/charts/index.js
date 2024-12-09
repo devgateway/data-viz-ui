@@ -499,9 +499,7 @@ registerBlockType(process.env.BLOCKS_NS + '/chart',
                     marginRight: 25,
                     showXAxisTitle: true,
                     showYAxisTitle: true,
-                    showRightAxisTitle: true,
-                    barPadding: 0.15,
-                    barInnerPadding: 0.7,
+                    showRightAxisTitle: true
                 }
             },
             reverseLegend: {

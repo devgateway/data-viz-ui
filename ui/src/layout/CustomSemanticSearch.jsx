@@ -1,81 +1,108 @@
-import {Search, Segment} from "semantic-ui-react";
+import { Search, Segment } from "semantic-ui-react";
 import React from "react";
 import clsx from "clsx";
+import {
+    getUnhandledProps,
+    partitionHTMLProps,
+    htmlInputAttrs
+} from 'semantic-ui-react/dist/commonjs/lib'
 
-import * as lib from 'semantic-ui-react/dist/commonjs/lib'
+const CustomSearch = (props) => {
+    const { results, resultRenderer, onSearchChange, value, showNoResults, onResultSelect, loading } = props;
+    const [searchClasses, setSearchClasses] = React.useState('');
+    const [focus, setFocus] = React.useState(false);
+    const [open, setOpen] = React.useState(false);
 
-class CustomSearch extends Search {
-    constructor(props) {
-        super(props);
-    }
-
-
-    renderHeader = () => {
-
-
-        const {perPage, total} = this.props
+    const renderHeader = () => {
+        const { perPage, total } = props;
 
         const classes = clsx(
             'results header',
-            total == 1 && 'single'
+            total === 1 && 'single'
+        );
 
-        )
-
-        return <Segment color={"blue"} textAlign={"left"} className={classes}>
-            <span> {total < perPage ? total : perPage} of {total} Results</span>
-        </Segment>
-    }
-
-    renderResults = () => {
-        const {results} = this.props
-        return <React.Fragment>
-                    {this.renderHeader()}
-                    {results&&<div>
-                        {results.map(this.renderResult)}
-                    </div>}
-             </React.Fragment>
-    }
-
-
-    render() {
-        const {searchClasses, focus, open} = this.state
-
-        const {aligned, category, className, fluid, loading, size} = this.props
-
-        // Classes
-        const classes = clsx(
-            'ui',
-            open && 'active visible',
-            size,
-            searchClasses,
-            lib.useKeyOnly(category, 'category'),
-            lib.useKeyOnly(focus, 'focus'),
-            lib.useKeyOnly(fluid, 'fluid'),
-            lib.useKeyOnly(loading, 'loading'),
-            lib.useValueAndKey(aligned, 'aligned'),
-            'search',
-            className,
-        )
-        const unhandled = lib.getUnhandledProps(Search, this.props)
-        const ElementType = lib.getElementType(Search, this.props)
-        const [htmlInputProps, rest] = lib.partitionHTMLProps(unhandled, {
-            htmlProps: lib.htmlInputAttrs,
-        })
-        
         return (
-            <ElementType
+            <Segment color="blue" textAlign="left" className={classes}>
+                <span>{total < perPage ? total : perPage} of {total} Results</span>
+            </Segment>
+        );
+    };
 
+    const renderResults = () => {
+        return (
+            <React.Fragment>
+                {renderHeader()}
+                <Search.Result key={index} {...result} />
+            </React.Fragment>
+        );
+    };
+
+    const handleBlur = (e, data) => {
+        setFocus(false);
+        if (props.onBlur) {
+            props.onBlur(e, data);
+        }
+    };
+
+    const handleFocus = (e, data) => {
+        setFocus(true);
+        if (props.onFocus) {
+            props.onFocus(e, data);
+        }
+    };
+
+    const handleMouseDown = (e) => {
+        setOpen(true);
+        if (props.onMouseDown) {
+            props.onMouseDown(e);
+        }
+    };
+
+    const { aligned, category, className, fluid, size } = props;
+
+
+    const classes = clsx(
+        'ui',
+        open && 'active visible',
+        size,
+        searchClasses,
+        // ...category ? 'category',
+        // ...focus && 'focus',
+        // ...fluid && 'fluid',
+        // ...loading && 'loading',
+        // ...aligned && aligned,
+        'search',
+        className
+    );
+
+
+    const unhandled = getUnhandledProps(Search, props);
+    // const ElementType = lib.getComponentType(Search, props);
+    const [htmlInputProps, rest] = partitionHTMLProps(unhandled, {
+        htmlProps: htmlInputAttrs,
+    });
+
+    return (
+        <div>
+            <Search
                 className={classes}
-                onBlur={this.handleBlur}
-                onFocus={this.handleFocus}
-                onMouseDown={this.handleMouseDown}
+                onBlur={handleBlur}
+                onFocus={handleFocus}
+                onMouseDown={handleMouseDown}
+                resultRenderer={resultRenderer}
+                onSearchChange={onSearchChange}
+                results={results}
+                value={value}
+                showNoResults={showNoResults}
+                onResultSelect={onResultSelect}
+                loading={loading}
 
-            >
-                {this.renderSearchInput(htmlInputProps)}
-                {this.renderResultsMenu()}
-            </ElementType>
-        )
-    }
-}
+            />
+            {/* <Search.Results>{renderResults()}</Search.Results> */}
 
-export default CustomSearch
+        </div>
+
+    );
+};
+
+export default CustomSearch;
