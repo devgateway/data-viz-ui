@@ -1,11 +1,29 @@
-import { Search, Segment } from "semantic-ui-react";
+import { Search, Segment, Input } from "semantic-ui-react";
 import React from "react";
 import clsx from "clsx";
 import {
     getUnhandledProps,
     partitionHTMLProps,
-    htmlInputAttrs
+    htmlInputAttrs,
+    useKeyOnly,
+    useValueAndKey,
+    getComponentType
 } from 'semantic-ui-react/dist/commonjs/lib'
+
+// type SearchProps = typeof Search;
+
+// type ExtendedSearchProps = SearchProps & React.HTMLProps<HTMLInputElement>;
+
+// interface CustomSearchProps extends ExtendedSearchProps {
+//     resultRenderer : React.ComponentType<any> | React.ReactNode | JSX.Element;
+//     onSearchChange : (event: React.SyntheticEvent, data: any) => void;
+//     value : string;
+//     showNoResults : boolean;
+//     onResultSelect : (event: React.SyntheticEvent, data: any) => void;
+//     loading : boolean;
+//     perPage : number;
+//     total : number;
+// }
 
 const CustomSearch = (props) => {
     const { results, resultRenderer, onSearchChange, value, showNoResults, onResultSelect, loading } = props;
@@ -32,9 +50,16 @@ const CustomSearch = (props) => {
         return (
             <React.Fragment>
                 {renderHeader()}
-                <Search.Result key={index} {...result} />
+                {results.map((result, index) => (
+                    <Search.Result key={index} {...result} />
+                ))}
             </React.Fragment>
         );
+    };
+
+    const renderSearchInput = (htmlInputProps) => {
+        // Assuming there is an existing renderSearchInput logic
+        return <Input {...htmlInputProps} />;
     };
 
     const handleBlur = (e, data) => {
@@ -58,7 +83,7 @@ const CustomSearch = (props) => {
         }
     };
 
-    const { aligned, category, className, fluid, size } = props;
+    const { aligned, category, className, fluid, size, searchTextHandler } = props;
 
 
     const classes = clsx(
@@ -66,27 +91,28 @@ const CustomSearch = (props) => {
         open && 'active visible',
         size,
         searchClasses,
-        // ...category ? 'category',
-        // ...focus && 'focus',
-        // ...fluid && 'fluid',
-        // ...loading && 'loading',
-        // ...aligned && aligned,
+        useKeyOnly(category, 'category'),
+        useKeyOnly(fluid, 'fluid'),
+        useKeyOnly(loading, 'loading'),
+        useValueAndKey(aligned, 'aligned'),
         'search',
         className
     );
 
 
     const unhandled = getUnhandledProps(Search, props);
-    // const ElementType = lib.getComponentType(Search, props);
+    // const ElementType = getComponentType(Search, props);
     const [htmlInputProps, rest] = partitionHTMLProps(unhandled, {
         htmlProps: htmlInputAttrs,
     });
 
     return (
-        <div>
+        <>
             <Search
+                {...rest}
                 className={classes}
                 onBlur={handleBlur}
+                size="tiny"
                 onFocus={handleFocus}
                 onMouseDown={handleMouseDown}
                 resultRenderer={resultRenderer}
@@ -98,9 +124,7 @@ const CustomSearch = (props) => {
                 loading={loading}
 
             />
-            {/* <Search.Results>{renderResults()}</Search.Results> */}
-
-        </div>
+        </>
 
     );
 };
