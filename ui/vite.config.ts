@@ -1,15 +1,16 @@
-import { defineConfig, searchForWorkspaceRoot, loadEnv } from 'vite'
+import {defineConfig, searchForWorkspaceRoot, loadEnv} from 'vite'
 import react from '@vitejs/plugin-react-swc';
 // @ts-ignore
 import eslintPlugin from 'vite-plugin-eslint';
 import path from "path";
 import Environment from 'vite-plugin-env-compatible';
 import autoprefixer from 'autoprefixer';
-
 // https://vitejs.dev/config/
-export default defineConfig(({ mode }) => {
+export default defineConfig(({mode}) => {
+
     const env = loadEnv(mode, process.cwd());
-    // console.log('env', env);
+
+    console.log('env', env);
 
     return {
         // define: {
@@ -27,11 +28,12 @@ export default defineConfig(({ mode }) => {
         resolve: {
             alias: {
                 "@": path.resolve(__dirname, "./src"),
-                react: path.resolve('./node_modules/react'),
-               "inmutable": path.resolve('./node_modules/inmutable'),
+                "react": path.resolve('./node_modules/react'),
+                "inmutable": path.resolve('./node_modules/inmutable'),
                 "react-dom": path.resolve('./node_modules/react-dom'),
                 "react-router-dom": path.resolve('./node_modules/react-router-dom'),
                 "react-redux": path.resolve('./node_modules/react-redux'),
+                '@devgateway/customizer': path.resolve('./node_modules/@devgateway/customizer'),
             },
             preserveSymlinks: true,
         },
@@ -47,11 +49,11 @@ export default defineConfig(({ mode }) => {
             },
             commonjsOptions: {
                 transformMixedEsModules: true,
-                
+
             },
 
         },
-        
+
         optimizeDeps: {
             include: [
                 "@devgateway/ui-customizer",
@@ -62,9 +64,7 @@ export default defineConfig(({ mode }) => {
             ]
         },
         appType: 'spa',
-        experimental: {
-
-        },
+        experimental: {},
         server: {
             cors: false,
             fs: {
