@@ -8,7 +8,7 @@ import { injectIntl, IntlProvider } from "react-intl";
 import ResponsiveContainer from './layout'
 import { getComponentByNameIgnoreCase } from "./embeddable";
 import Helmet from './Helmet'
-import WithTracker from "./withTracker";
+// import WithTracker from "./withTracker";
 import {
     AppContextProvider,
     Category,
@@ -195,8 +195,8 @@ const IntlRoutes = () => {
     );
 };
 
-
-const WithTrackerRoutes = WithTracker(IntlRoutes);
+// TODO: Return Tracker
+const WithTrackerRoutes = IntlRoutes;
 
 const MainRoutes = (props) => {
     return (
