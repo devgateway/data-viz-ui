@@ -4,7 +4,7 @@
 
 .edit-post-visual-editor > * {
     font-size: 18px !important;
-     font-family: Roboto !important;
+    font-family: Roboto !important;
 }
 
 
@@ -26,7 +26,7 @@ p.wp-block.rich-text {
 
 
 .wp-block {
-    max-width: 90%;
+    max-width: 1200px;
     margin: auto !important;
 }
 
@@ -58,8 +58,8 @@ p.wp-block.rich-text {
 
 
 .component-color-indicator {
-     font-size: 12px!important;
- }
+    font-size: 12px!important;
+}
 
 
 .hndle.ui-sortable-handle {
@@ -78,4 +78,10 @@ p.wp-block.rich-text {
     margin-right: 10px;
     flex-shrink: 0;
     max-width: 100%;
+}
+
+.wp-block-separator {
+    border: 1px solid #dadada !important;
+    opacity: 0.4 !important;
+    /* Add any other custom styles here */
 }
