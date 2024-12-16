@@ -304,6 +304,7 @@ const TimeLine = (props) => {
     .style("-webkit-line-clamp", "2") // Limit to 2 lines
     .style("-webkit-box-orient", "vertical") // Required for line-clamp
     .style("text-overflow", "ellipsis") // Add ellipsis
+    .style("overflow-wrap", "break-word")
     .html((d, i) => {
       const readmore = readMoreLabel(i);
       let title = d.title.rendered;
