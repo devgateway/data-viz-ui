@@ -312,6 +312,7 @@ const TimeLine = (props) => {
       .style("line-height", "100%")
       .style("text-align", "center")
       .style("cursor", enableTitlePopup ? "pointer" : "default")
+      .style("overflow-wrap", "break-word")
       .html((d, i) => {
         const readmore = readMoreLabel(i);
         let title = d.title.rendered;
