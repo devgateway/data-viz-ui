@@ -39,6 +39,10 @@ export const formatContent = (
   if (variables.field && variables[`_${variables.field}`]) {
     variables._value = variables[`_${variables.field}`];
   }
+  //if there is a category prop in the variables and field is not defined, set field to category
+  if(!variables.field && variables.category){
+    variables.field = variables.category
+  }
   let str = tooltipEnableMarkdown
     ? template(tooltip, variables)
     : template(tooltip, variables).replace(/(?:\r\n|\r|\n)/g, "<br>");
