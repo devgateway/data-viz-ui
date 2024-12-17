@@ -1,5 +1,5 @@
 import React from 'react';
-
+import {connect} from "react-redux";
 
 const Component = (props) => {
     const {
@@ -12,19 +12,28 @@ const Component = (props) => {
         "data-height": height,  
         "data-width": width = 100,   
         "data-margin": margin = 0
-    } = props
+    } = props;
 
-    const url = decodeURIComponent(apacheSupersetUrl);    
-    const iframeSrc = `${url}/superset/explore/?form_data=${selectedChartData}&standalone=1`;   
+    const url = decodeURIComponent(apacheSupersetUrl);  
+    const chartdata = decodeURIComponent(selectedChartData);  
+    const iframeSrc = `${url}/superset/explore/?form_data=${chartdata}&standalone=1`;   
+    
     return (
         <div id={`superset-chart-${unique}`}  >           
             <iframe
                 src={iframeSrc}                                        
                 seamless="seamless"
                 title="superset-chart"
-                style={{ border: 'none' , width: width + '%', height: height + 'px', margin: margin + 'px'}}  />          
-        </div>);    
+                style={{ border: 'none' , width: width + '%', height: height + 'px', margin: margin + 'px'}}  />
+                
+        </div>);  
 }
 
-export default Component;
+const mapStateToProps = (state, ownProps) => {
+   return {}    
+}
+const mapActionCreators = {};
+
+
+export default connect(mapStateToProps, mapActionCreators)(Component);
 
