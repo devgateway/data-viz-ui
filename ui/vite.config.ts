@@ -56,7 +56,7 @@ export default defineConfig(({mode}) => {
 
         optimizeDeps: {
             include: [
-                "@devgateway/ui-customizer",
+                "@devgateway/customizer",
                 "@devgateway/wp-react-lib",
                 "react",
                 "semantic-ui-react",
