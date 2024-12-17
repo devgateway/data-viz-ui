@@ -1,5 +1,6 @@
 require("./block-styles/index")
 require("./block-styles/columns")
+require("./agree-and-download")
 require("./tabbed-posts")
 require("./charts")
 require("./featured-tabs")
