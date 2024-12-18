@@ -286,6 +286,7 @@ const BarOptions = (props) => {
                         ]),
                       ];
                     }
+                    console.log('updatedBars....', updatedBars);
 
                     // Update the attributes
                     setAttributes({ hiddenBars: updatedBars });

@@ -355,6 +355,10 @@ registerBlockType(process.env.BLOCKS_NS + '/chart',
                 type: "String",
                 default: "middle"
             },
+            lineLabelPosition: {
+                type: "String",
+                default: "top"
+            },
             showGrid: {
                 type: 'Boolean',
                 default: true
