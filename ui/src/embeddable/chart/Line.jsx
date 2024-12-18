@@ -559,6 +559,13 @@ const Chart = ({
           enableGridY={enableGridY}
           enableGridX={enableGridX}
           enablePointLabel={lineLabelPosition === 'top'}
+          pointLabel={(l) => {
+            return intl.formatNumber(
+              format.style === "percent" ? l.yFormatted / 100 : l.yFormatted,
+              format
+            )
+          }
+          }
           lineWidth={3}
           colors={(d) => {
             return colorGenerator.getColor(d.id, d);
