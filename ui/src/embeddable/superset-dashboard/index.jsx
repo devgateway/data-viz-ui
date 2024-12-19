@@ -22,7 +22,7 @@ const Component = (props) => {
     const iframeSrc = `${url}/superset/dashboard/${selectedDashboardId}/?standalone=2`;   
     
     return (
-        <div id={`superset-dashboard-${unique}`}  >           
+        <div id={`superset-dashboard-${unique}`}>           
             <iframe
                 src={iframeSrc}                                        
                 seamless="seamless"
