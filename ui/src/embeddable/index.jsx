@@ -1,4 +1,3 @@
-import React from 'react'
 import asyncComponent from "../AsyncComponent";
 import data from './reducers/data'
 import embeddable from './reducers/embeddable'
@@ -12,6 +11,7 @@ const PageModules = asyncComponent(() => import("./pagemodules/"));
 const FeaturedTabs = asyncComponent(() => import("./featuredtabs/"));
 const VerticalFeaturedTabs = asyncComponent(() => import("./vertical-featuredtabs/"));
 const InlineList = asyncComponent(() => import("./inlinelist/"));
+const AgreeAndDownload = asyncComponent(() => import("./agree-and-download/"));
 const Chart = asyncComponent(() => import("./chart/"));
 const NewsLetter = asyncComponent(() => import("./newsletter/"));
 const ShowcaseForm = asyncComponent(() => import("./showcase/"));
@@ -75,6 +75,7 @@ const components = {
     sankeyChart: SankeyChart,
     dataLabel: DataLabel,
     body: Body,
+    agreeAndDownload: AgreeAndDownload,
     redirect: () => null
 
 }
