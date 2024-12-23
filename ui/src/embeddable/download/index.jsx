@@ -98,7 +98,7 @@ const DownloadComponent = (props) => {
                   node.appendChild(urlNode)
               }
 
-             options.height = componentRef.current.scrollHeight;
+             options.height = componentRef.current.scrollHeight + 90;
              options.width = componentRef.current.scrollWidth + 30;
               node.style.padding = "20px"
 
