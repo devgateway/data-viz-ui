@@ -17,8 +17,19 @@ const Component = (props) => {
     intl: { locale },
   } = props;
 
+  const RenderPostTitle = (props) => {
+    return (
+      <div class="ui container entry-content">
+        <span
+        dangerouslySetInnerHTML={{ __html: props?.posts?.[0]?.title.rendered }}
+        id="agreement-text"
+        class="title"
+      />
+      </div>
+    );
+  };
+
   const [open, setOpen] = useState(false);
-  let enabled = false;
 
   const TheDownload = ({ media }) => {
     return (
@@ -64,7 +75,7 @@ const Component = (props) => {
                     />
                     <circle cx="48.5" cy="48.5" r="48" stroke="white" />
                   </svg>
-                  <Post showContent={false} showTitle={true} />
+                  <RenderPostTitle {...props}/>
                 </PostConsumer>
               </Modal.Header>
               <Modal.Content className="agreement-body">
