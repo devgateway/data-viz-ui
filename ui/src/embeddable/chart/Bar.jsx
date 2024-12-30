@@ -1121,6 +1121,7 @@ if(isMobileCustomizationEnabled) {
               legendPosition: "middle",
               legendOffset: parseInt(offsetY),
               format: (value) => {
+                if(!value) return "";
                 if (layout == "vertical") {
                   const effectiveFormat = customAxisFormat
                     ? customAxisFormat
