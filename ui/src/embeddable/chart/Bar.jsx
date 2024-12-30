@@ -1055,6 +1055,7 @@ if(isMobileCustomizationEnabled) {
                     legendPosition: "middle",
                     legendOffset: parseInt(offsetRight),
                     format: (value) => {
+                      if(!value) return "";
                       if (layout == "vertical") {
                         const effectiveFormat = customAxisFormat
                           ? customAxisFormat
@@ -1085,6 +1086,7 @@ if(isMobileCustomizationEnabled) {
                     tickRotation: 0,
                     tickValues: parseInt(xAxisTickValues),
                     format: (value) => {
+                      if(!value) return "";
                       if (layout == "horizontal") {
                         const effectiveFormat = customAxisFormat
                           ? customAxisFormat
