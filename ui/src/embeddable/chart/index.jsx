@@ -60,6 +60,7 @@ const Chart = (props) => {
     categories,
     injectedMeasures,
     "data-app": app = "prevalence",
+    "data-dataset-id": datasetId,
     "data-group": group = "default",
     "data-height": height = 500,
     "data-type": type = "bar", //'data-source': source = 'gender/smoke',f
@@ -197,7 +198,9 @@ const Chart = (props) => {
 
   const parse = (value) => {
     try {
-      return JSON.parse(decode(value));
+      if (value) {
+        return JSON.parse(decode(value));
+      }      
     } catch (error) {
       console.error("error parsing value:" + value);
     }
@@ -563,6 +566,10 @@ const Chart = (props) => {
     });
   }
 
+  if (datasetId) {
+    params.datasetId = datasetId;
+  }
+
   let ChartDataFrame = null;
   let Chart = null;
 
@@ -768,6 +775,7 @@ const Chart = (props) => {
                   <ColorProvider
                     type={type}
                     app={app}
+                    datasetId={datasetId}
                     locale={locale}
                     overallLabel={overallLabel}
                     customLabels={getCustomLabels()}
