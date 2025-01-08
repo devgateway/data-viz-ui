@@ -161,7 +161,8 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                 overallLabel,
                 enableGridX,
                 minMaxClamp,
-                mobileCustomization
+                mobileCustomization,
+                datasetId
             }
         } = this.props;
 
@@ -206,6 +207,13 @@ class BlockEdit extends BlockEditWithAPIMetadata {
             if (f.value != null && f.value.filter(v => v != null && v.toString().trim() != "").length > 0)
                 params[f.param] = f.value
         })
+
+        const  datasets = [{label: 'Select Dataset', value: '0'}]
+        if (this.state.datasets) {
+            this.state.datasets.forEach(d => {
+                datasets.push({label: d.label, value: d.id})
+            })
+        }
 
         const divStyles = {height: height + 'px', width: '100%'}
         return ([isSelected && (
@@ -306,8 +314,26 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                                                 })
                                             }}
                                             options={this.state.apps}
-                                        />
+                                        />                                        
                                     </PanelRow>
+                                    <PanelRow>
+                                        <SelectControl
+                                            label={__('Datasets')}
+                                            value={[datasetId]} 
+                                            onChange={(newDatasetId)   => {
+                                                setAttributes({
+                                                    datasetId: newDatasetId,
+                                                    dimension1: 'none',
+                                                    dimension2: 'none'  
+
+                                          })
+                                                this.setState({dimensions: [], measures: [], filters: [], categories: []})
+                                                console.log(newDatasetId)
+                                                this.loadMetadata(newDatasetId)
+                                            }}
+                                            options={datasets}
+                                        />
+                                 </PanelRow>
                                 </PanelBody>
                                 {app != 'csv' && <APIConfig
                                     allDimensions={this.state.dimensions}

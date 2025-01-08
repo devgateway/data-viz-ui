@@ -117,7 +117,8 @@ const SaveComponent = (props) => {
             radarDotSize,
             radarEnableDotLabel,
             radarDotLabelOffset,
-            mobileCustomization
+            mobileCustomization,
+            datasetId
         }
     } = props;
     const blockProps = useBlockProps.save({
@@ -133,6 +134,7 @@ const SaveComponent = (props) => {
              data-height={height}
              data-type={type}
              data-source={source}
+             data-dataset-id={datasetId}
              data-dimension1={dimension1}
              data-dimension2={dimension2}
              data-dimension3={dimension3}

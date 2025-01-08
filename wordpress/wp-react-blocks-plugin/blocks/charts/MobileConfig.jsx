@@ -251,6 +251,16 @@ const updateMeasureLabels = (data, measures, app) => {
   });
 };
 
+const ALIVE_SUPERSET_PROXY_URL = 'http://localhost:3001'
+const ALIVE_SUPERSET_APP = 'alive-superset'
+
+const getBaseURL = (app) => {  
+  if (app === ALIVE_SUPERSET_APP) {
+    return ALIVE_SUPERSET_PROXY_URL
+  }
+  return ''
+};
+
 const MobileConfig = (props) => {
   const {
     setAttributes,
@@ -262,6 +272,7 @@ const MobileConfig = (props) => {
       measures,
       dimension1,
       yAxisTickValues,
+      datasetId,
     },
   } = props;
 
@@ -277,29 +288,47 @@ const MobileConfig = (props) => {
   }, [yAxisTickValues]);
 
   let xAxisLabels = extractAxisValues(csv);
+
   if (app !== "csv") {
     if (dimension1 !== "none") {
       const storedCategories = JSON.parse(
         sessionStorage.getItem(`categories_${app}`)
       );
-      const categories =
-        storedCategories ??
-        fetch(`/api/${app}/categories`)
-          .then((response) => response.json())
-          .then((data) => getTranslatedOptions(data));
-      xAxisLabels = categories
-        .filter(
-          (category) =>
-            category.type?.toLowerCase() === dimension1?.toLowerCase()
-        )[0]
-        ?.items?.map((item) => item.value);
+
+      
+       // const app = "alive-superset"
+
+      let categories = []
+      xAxisLabels = []
+
+      if (!storedCategories) {
+        console.log("fetching categories")
+        fetch(`${getBaseURL(app)}/api/${app}/categories?datasetId=${datasetId}`)
+        .then((response) => response.json())
+        .then((data) => {
+          categories = getTranslatedOptions(data)
+          xAxisLabels = categories
+          .filter(
+            (category) =>
+              category.type?.toLowerCase() === dimension1?.toLowerCase()
+          )[0]
+          ?.items?.map((item) => item.value);
+          
+        });
+
+      }         
+
+    
+  
+
+      
     } else {
       const storedMeasures = JSON.parse(
         sessionStorage.getItem(`measures_${app}`)
       );
       // if measures are not present in session storage, fetch them from the API
       if (!storedMeasures) {
-        fetch(`/api/${app}/measures`)
+        fetch(`${getBaseURL(app)}/api/${app}/measures?datasetId=${datasetId}`)
           .then((response) => response.json())
           .then((data) => {
             sessionStorage.setItem(`measures_${app}`, JSON.stringify(data));

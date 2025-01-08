@@ -6,6 +6,8 @@ import {togglePanel} from "./Util";
 
 import {getTranslatedOptions} from './APIutils'
 
+const ALIVE_SUPERSET_PROXY_URL = 'http://localhost:3001'
+const ALIVE_SUPERSET_APP = 'alive-superset'
 export const SizeConfig = ({height, setAttributes, panelStatus,initialOpen}) => {
     return (<PanelBody initialOpen={panelStatus?panelStatus["SIZE"]:initialOpen} onToggle={e => togglePanel("SIZE", panelStatus, setAttributes)}
                        title={__("Size")}>
@@ -301,7 +303,11 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
                         label: a.name,
                         value: a.instance[0].vipAddress,
                         settings: a.instance[0]
-                    })), {label: 'CSV', value: 'csv'}] : [{label: 'CSV', value: 'csv'}]
+                    })), 
+                    {label: 'CSV', value: 'csv'}] : [{label: 'CSV', value: 'csv'}]
+                    //add superset app
+                    apps.push({label: 'Superset', value: ALIVE_SUPERSET_APP})
+                    
                   this.setState({
                       react_ui_url: settingsData["react_ui_url"] + '/' + window._page_locale,
                       react_api_url: settingsData["react_api_url"],
@@ -333,11 +339,16 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
         }
     }
 
+    
+    getBaseURL(app) {
+        if (app == ALIVE_SUPERSET_APP) {
+            return  ALIVE_SUPERSET_PROXY_URL
+        };          
+    }
 
-    _loadMetadata(app) {
-
-        if (app != "csv") {
-            fetch(`/api/${app}/dimensions`)
+    _loadMetadata(app, datasetId) {
+         if (app != "csv") {
+            fetch(`${this.getBaseURL(app)}/api/${app}/dimensions?datasetId=${datasetId}`)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error("HTTP status " + response.status);
@@ -358,7 +369,7 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
                 })
 
 
-            fetch(`/api/${app}/filters`)
+            fetch(`${this.getBaseURL(app)}/api/${app}/filters?datasetId=${datasetId}`)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error("HTTP status " + response.status);
@@ -375,7 +386,7 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
                     console.log("Error when loading filters", response)
                 })
 
-            fetch(`/api/${app}/measures`)
+            fetch(`${this.getBaseURL(app)}/api/${app}/measures?datasetId=${datasetId}`)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error("HTTP status " + response.status);
@@ -390,7 +401,7 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
                     console.log("Error when loading measures")
                 })
 
-            fetch(`/api/${app}/categories`)
+            fetch(`${this.getBaseURL(app)}/api/${app}/categories?datasetId=${datasetId}`)
                 .then(response => {
                     console.log('loadCategories')
                     if (!response.ok) {
@@ -406,11 +417,31 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
                     console.log("Error when getting categories", response)
                 })
         }
+
+        if (app == ALIVE_SUPERSET_APP) {
+            this.loadDatasets(app)
+        }
     }
 
-    loadMetadata() {
+    loadMetadata(newDatasetId) {
        const {attributes: {app}} = this.props
-        this._loadMetadata(app)
+       this._loadMetadata(app, newDatasetId || this.props.attributes.datasetId)       
+    }   
+
+    loadDatasets(app) {
+        fetch(`${this.getBaseURL(app)}/api/${app}/datasets`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("HTTP status " + response.status);
+                }
+                return response.json()
+            })
+            .then(data => {
+                this.setState({...this.state, datasets: data})
+            })
+            .catch(function (response) {
+                console.log("Error when loading datasets")
+            })
     }
 }
 

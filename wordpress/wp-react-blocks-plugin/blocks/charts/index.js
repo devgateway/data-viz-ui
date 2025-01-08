@@ -124,7 +124,10 @@ registerBlockType(process.env.BLOCKS_NS + '/chart',
                 type: 'String',
                 default: "csv"
             },
-
+            datasetId: {
+                type: 'String',
+                default: ""
+            },
             params: {
                 type: Object,
                 default: {}
