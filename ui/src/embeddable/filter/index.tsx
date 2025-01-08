@@ -415,6 +415,7 @@ const CategoryFilter = (props) => {
         return true
     }) : []
     const options = filteredCategories ? toOptions(filteredCategories, props.locale) : []
+    
     return (
         <Container fluid={true} className={`filter`}>
             <FilterDropDown {...props} options={options}></FilterDropDown>

@@ -19,7 +19,7 @@ const Component = (props) => {
 
     const url = decodeURIComponent(apacheSupersetUrl);    
 
-    const iframeSrc = `${url}/superset/dashboard/${selectedDashboardId}/?standalone=2`;   
+    const iframeSrc = `${url}/superset/dashboard/${selectedDashboardId}/?standalone=3`;   
     
     return (
         <div id={`superset-dashboard-${unique}`}>           
