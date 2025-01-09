@@ -81,7 +81,10 @@ const DownloadComponent = (props) => {
 
          cloneNode(componentRef.current).then(function (node) {
 
-             [...node.getElementsByTagName("input")].forEach(e=>e.remove())
+             [...node.getElementsByTagName("input")].forEach(e=>e.remove());
+
+             // Remove all elements that are icons
+             [...node.querySelectorAll(".question.circle.icon")].forEach(e => e.remove());
 
               //add source url
               const addSourceURL = includeSourceURL == "true";
@@ -129,10 +132,10 @@ const DownloadComponent = (props) => {
     return (
 
         <Container
-            className={`viz download ${style} ${useTitle ? 'has-title' : ''} 
-                ${(isCheckPNG || isCheckJPG) ? 'has-formats' : ''} 
-                ${editing ? 'editing' : ''} 
-                ${(isCheckPNG && isCheckJPG) ? 'multi-format' : ''} 
+            className={`viz download ${style} ${useTitle ? 'has-title' : ''}
+                ${(isCheckPNG || isCheckJPG) ? 'has-formats' : ''}
+                ${editing ? 'editing' : ''}
+                ${(isCheckPNG && isCheckJPG) ? 'multi-format' : ''}
                 ${(isCheckPNG && !isCheckJPG) || (!isCheckPNG && isCheckJPG) ? 'single-format' : ''}`}
             fluid={true}>
 
