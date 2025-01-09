@@ -93,7 +93,7 @@ const Selector = (props) => {
     useEffect(() => {
         async function fetchData() {
             const response = await fetch(
-                process.env.REACT_APP_WP_API + '/dg/v1/settings', {
+                process.env.VITE_REACT_APP_WP_API + '/dg/v1/settings', {
                     headers: {
                         'Content-Type': 'application/json'
                         // 'Content-Type': 'application/x-www-form-urlencoded',
