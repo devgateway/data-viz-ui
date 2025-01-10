@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Provider } from 'react-redux'
-import { Route, Routes, BrowserRouter, Navigate, useLocation, useParams } from 'react-router-dom';
+import { Route, Routes, BrowserRouter, Navigate, useLocation, useParams, createBrowserRouter, createRoutesFromElements, RouterProvider } from 'react-router-dom';
 import { store } from './redux/store'
 import messages_en from "./translations/en.json";
 import { updateIntl } from '@/lib/react-intl-redux'
@@ -36,10 +36,7 @@ const PreviewComponentParameterParser = () => {
     const urlParams = useParams();
     const location = useLocation();
 
-    const componentRef = useRef(getComponentByNameIgnoreCase(urlParams.name ? urlParams.name : ''));
-
-    // TODO: Fix this react compiler issue 
-    const UIComponent = componentRef.current
+    const [UIComponent] = useState(() => getComponentByNameIgnoreCase(urlParams.name ? urlParams.name : ''));
 
 
     const [params, setParams] = useState(queryString.parse(location.search))
@@ -120,7 +117,7 @@ const IntlRoutes = () => {
     useEffect(() => {
         // This effect runs on every update, equivalent to componentDidUpdate
         store.dispatch(updateIntl({ locale, formats: {}, messages: messages[locale ? locale : 'en'] }));
-    });
+    }, []);
 
     const urlParams = new URLSearchParams(window.location.search);
     const customize_changeset_uuid = urlParams.get('customize_changeset_uuid');
@@ -182,8 +179,8 @@ const IntlRoutes = () => {
                             </SettingsConsumer>}>
                         </Route>
 
-                        <Route path={"/preview/page/:id"} element={<PreviewPageContainer />} />
-                        <Route path={"/preview/:type/:id"} element={<PreviewTypeContainer />} />
+                        <Route path={"preview/page/:id"} element={<PreviewPageContainer />} />
+                        <Route path={"preview/:type/:id"} element={<PreviewTypeContainer />} />
                         <Route path=":slug" element={<SlugContainer />} />
                         <Route path=":parent/:slug" element={<SlugContainer />} />
                         <Route path=":year/:month/:day/:slug" element={<SlugPostContainer />} />
@@ -195,20 +192,23 @@ const IntlRoutes = () => {
     );
 };
 
+
+
 // TODO: Return Tracker
 const WithTrackerRoutes = IntlRoutes;
 
-const MainRoutes = (props) => {
-    return (
-        <BrowserRouter future={{
-            v7_startTransition: true
-        }}>
+const router = createBrowserRouter(
+    createRoutesFromElements(
+        <Route>
+            <Route path="/:lan/*" element={<WithTrackerRoutes />} />
+            <Route path={"/"} element={<WithTrackerRoutes />} />
+        </Route>
+    )
+)
 
-            <Routes>
-                <Route path="/:lan/*" element={<WithTrackerRoutes {...props} />} />
-                <Route path={"/"} element={<WithTrackerRoutes {...props} />} />
-            </Routes>
-        </BrowserRouter>
+const MainRoutes = () => {
+    return (
+        <RouterProvider router={router}/>
     )
 }
 

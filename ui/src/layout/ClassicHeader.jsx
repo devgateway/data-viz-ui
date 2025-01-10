@@ -1,13 +1,13 @@
-import { Container, Flag, Image, Menu } from "semantic-ui-react";
+import { Container, Image, Menu } from "semantic-ui-react";
 import React, { useEffect, useState } from "react";
 import { MediaConsumer, MediaProvider, MenuConsumer, MenuProvider, utils } from "@devgateway/wp-react-lib";
 import { injectIntl } from "react-intl";
-import { useParams } from "react-router-dom";
+import { useParams, Link, NavLink } from "react-router-dom";
 import SearchControl from "./SearchControl";
 import LangSwitcher from "./LangSwitcher";
 
 const getPath = (menu, params) => {
-    let path = [];
+    const path = [];
     menu.items.forEach(item => {
         if (item.child_items) {
             item.child_items.forEach(ch => {
@@ -36,7 +36,7 @@ const localReplaceLink = (url, locale) => {
 
 const BreadCrumbs = injectIntl(({ menu, intl }) => {
     const params = useParams();
-    let path = getPath(menu, params);
+    const path = getPath(menu, params);
     return <React.Fragment>
 
         {path.filter(i => i.url != "#wpm-languages").map(i => !i.child_items ?
@@ -138,14 +138,14 @@ const MenuItems = injectIntl(({
 
         {mixedMenu.items.filter(i => i.url != "#wpm-languages").map(i => {
             return (<Menu.Item
+            as={Link}
                 className={`divided ${i.child_items ? 'has-child-items' : ''} ${selected && selected.ID == i.ID ? 'selected' : ''}  ${active == i.slug ? "active" : ""}`}>
-
                 {i.child_items ?
-
                     <span onClick={e => onSetSelected(i)}>{i.title}</span> :
-
-                    <a onClick={e => onSetSelected(i)}
-                        href={i.type === 'custom' ? utils.replaceLink(i.url, locale) : localReplaceLink(i.url, locale)}>{i.title}</a>}
+                    <Link onClick={e => onSetSelected(i)}
+                        to={i.type === 'custom' ? utils.replaceLink(i.url, locale) : localReplaceLink(i.url, locale)}>
+                        {i.title}
+                    </Link>}
 
 
             </Menu.Item>)
@@ -174,9 +174,8 @@ const Header = ({ intl,  settings }) => {
 
                     <Menu className={"branding"} text>
                         <Menu.Item>
-                            <a href="/">
-
-                                {settings.site_logo != 0 && <MediaProvider id={settings.site_logo}>
+                            <NavLink to="/">
+                            {settings.site_logo != 0 && <MediaProvider id={settings.site_logo}>
                                     <MediaConsumer>
                                         <Logo></Logo>
                                     </MediaConsumer>
@@ -184,14 +183,14 @@ const Header = ({ intl,  settings }) => {
                                 </MediaProvider>}
                                 {!window.isCustomizedPreview && settings.site_logo == 0 &&
                                     <img className="brand logo" size="large" src='/dc-logo_01.png' />}
-                            </a>
+                            </NavLink>
                         </Menu.Item>
 
                         <Menu.Item className={"divider"}>
                             <div></div>
                         </Menu.Item>
 
-                        <Menu.Item fitted href="/">
+                        <Menu.Item as={Link} fitted href="/">
                             <div className={"site name"}>{settings.name}</div>
                         </Menu.Item>
 
