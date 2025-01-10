@@ -18,7 +18,6 @@ const Chart = (props) => {
         childContent,
         categories,
         injectedMeasures,
-
         "data-csv": csv = "",
         "data-no-data-message": noDataMsg = "No data matches your selection",
         "data-view-mode": editMode = 'info',
@@ -131,7 +130,7 @@ const Chart = (props) => {
         height: `${contentHeight}px`,
         legendPosition: legendPosition,
         legends,
-        tooltip: (tooltipEnableMarkdown == true || tooltipEnableMarkdown == "true") ? decode(tooltipHTML) : decode(tooltipHTML).replace(/\r\n/g, '<hr/>').replace(/[\r\n]/g, '<hr/>'),
+        tooltip: tooltipHTML ? ((tooltipEnableMarkdown === true || tooltipEnableMarkdown === "true") ? decode(tooltipHTML) : decode(tooltipHTML).replace(/\r\n/g, '<hr/>').replace(/[\r\n]/g, '<hr/>')) : '',
         colors: colors,
         format: numberFormat,
         categories,
@@ -188,7 +187,7 @@ const Chart = (props) => {
     }
 
     if (app != 'csv') {
-        if (!dimensions.length || !parse(measures)[0]) {
+        if (!dimensions.length || !measures || !parse(measures) || !parse(measures)[0]) {
             showNotEnoughParameters = true
         }
     } else {
