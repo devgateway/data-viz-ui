@@ -127,7 +127,7 @@ const TimeLine = (props) => {
         const x = rect.left - parentDiv.left;
         const y = rect.top + parentDiv.top;
         position = [x + xOffset, y + yOffset];
-        let tooltipWidth = 400;
+        const tooltipWidth = 400;
         if (rect.left + x + tooltipWidth + xOffset > window.innerWidth) {
           position[0] = x - tooltipWidth * 0.6;
         }
@@ -150,7 +150,7 @@ const TimeLine = (props) => {
         const x = rect.left - parentDiv.left;
         const y = rect.top + parentDiv.top;
         position = [x + xOffset, y + yOffset];
-        let tooltipWidth = 400;
+        const tooltipWidth = 400;
         if (rect.left + x + tooltipWidth + xOffset > window.innerWidth) {
           position[0] = x - tooltipWidth * 0.6;
         }
