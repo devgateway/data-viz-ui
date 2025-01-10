@@ -5,8 +5,6 @@ import {
   Grid,
   Icon,
   Popup,
-  Dimmer,
-  Loader,
   Segment,
 } from "semantic-ui-react";
 import React from "react";
@@ -1988,7 +1986,7 @@ class Map extends React.Component {
 
     return (
       <div className="map component wp-data-viz-map" ref={this.mapContainer}>
-        {this.state.layersLoading && this.renderLoader()}
+        {/* {this.state.layersLoading && this.renderLoader()} */}
         {!this.state.layersLoading && (
           <>
             {!isMobileOrTablet && <MapLegendComponent />}

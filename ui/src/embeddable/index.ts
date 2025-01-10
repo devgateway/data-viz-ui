@@ -1,4 +1,4 @@
-import { lazy } from 'react'
+import React, { lazy } from 'react'
 import data from './reducers/data'
 import embeddable from './reducers/embeddable'
 import { injectIntl } from "react-intl";
@@ -72,6 +72,7 @@ const components = {
     wrapped: Wrapped,
     sankeyChart: SankeyChart,
     dataLabel: DataLabel,
+    body: Body,
     redirect: () => null
 }
 
@@ -79,7 +80,8 @@ export const getComponentByNameIgnoreCase = (name: string) => {
 
     const k = Object.keys(components).find(value => value.toLowerCase() === name.toLowerCase())
     if (k) {
-        return injectIntl(components[k])
+        const Component = components[k]
+        return React.memo(injectIntl(Component))
     }
     else {
         const customComponent = customizer.getComponentByNameIgnoreCase(name)

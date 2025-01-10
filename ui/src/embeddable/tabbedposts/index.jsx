@@ -90,7 +90,7 @@ const AccordionContent = ({ posts, activeItem, setActive }) => {
 
     useEffect(() => {
         let timeoutId;
-        let observers = []; // Array to store observers for each accordion
+        const observers = []; // Array to store observers for each accordion
 
         const adjustDataSourceMargin = (ref) => {
             requestAnimationFrame(() => {
