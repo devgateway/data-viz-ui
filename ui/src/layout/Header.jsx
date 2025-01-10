@@ -15,7 +15,7 @@ import LangSwitcher from "./LangSwitcher";
 const SITE_URL_WITH_LOCALE = process.env.VITE_REACT_APP_SITE_URL_WITH_LOCALE || "#";
 
 const getPath = (menu, params) => {
-    let path = [];
+    const path = [];
     menu.items.forEach((item) => {
         if (item.child_items) {
             item.child_items.forEach((ch) => {
@@ -43,7 +43,7 @@ const localReplaceLink = (url, locale) => {
 
 const BreadCrumbs = injectIntl(({ menu, intl }) => {
     const params = useParams();
-    let path = getPath(menu, params);
+    const path = getPath(menu, params);
     return (
         <React.Fragment>
             {path
