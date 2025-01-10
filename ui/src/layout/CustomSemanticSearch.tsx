@@ -6,8 +6,7 @@ import {
     partitionHTMLProps,
     htmlInputAttrs,
     useKeyOnly,
-    useValueAndKey,
-    getComponentType
+    useValueAndKey
 } from 'semantic-ui-react/dist/commonjs/lib'
 
 // type SearchProps = typeof Search;

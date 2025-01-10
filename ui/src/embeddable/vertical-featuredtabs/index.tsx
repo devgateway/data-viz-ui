@@ -1,4 +1,4 @@
-import React, { LegacyRef, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Accordion, Container, Icon } from 'semantic-ui-react'
 import {
     PostConsumer,
