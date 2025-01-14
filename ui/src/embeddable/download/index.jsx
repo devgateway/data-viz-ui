@@ -94,7 +94,11 @@ const DownloadComponent = (props) => {
                 urlNode.style.marginLeft = sourceURLLeftMargin + "px"
                 urlNode.style.marginTop = sourceURLMarginTop + "px"
                 urlNode.style.fontSize = sourceURLFontSize + "px"
-                urlNode.innerHTML = window.location.href
+
+                urlNode.innerHTML = window.location.href;
+                urlNode.style.maxWidth = "90%"; // Set a max width for the container
+                urlNode.style.wordWrap = "break-word"; // Break lines within words if necessary
+                urlNode.style.overflowWrap = "break-word"; // Ensure compatibility with other browsers
                 node.appendChild(urlNode)
             }
 
