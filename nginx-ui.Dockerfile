@@ -32,8 +32,7 @@ ARG REACT_APP_THEME
 RUN \
   VITE_REACT_APP_GA_CODE='#REACT_APP_GA_CODE#' \
   VITE_REACT_APP_DEFAULT_LOCALE='#REACT_APP_DEFAULT_LOCALE#' \
-  VITE_REACT_APP_USE_HASH_LINKS='#REACT_APP_USE_HASH_LINKS#' \
-  VITE_REACT_APP_WP_API='/wp/wp-json' \
+  VITE_REACT_APP_USE_HASH_LINKS='#REACT_APP_USE_HASH_LINKS#' \ 
   VITE_REACT_APP_WP_HOSTS='#REACT_APP_WP_HOSTS#' \
   VITE_REACT_APP_WP_SEARCH_END_POINT='#REACT_APP_WP_SEARCH_END_POINT#' \
   VITE_REACT_APP_WP_STYLES='/wp/wp-admin/load-styles.php?c=1&dir=ltr&load%5Bchunk_0%5D=dashicons,admin-bar,buttons,media-views,editor-buttons,wp-components,wp-block-editor,wp-nux,wp-editor,wp-block-library,wp-block-&load%5Bchunk_1%5D=library-theme,wp-edit-blocks,wp-edit-post,wp-format-library,wp-block-directory,common,forms,admin-menu,dashboard,list-tables,edi&load%5Bchunk_2%5D=t,revisions,media,themes,about,nav-menus,wp-pointer,widgets,site-icon,l10n,wp-auth-check&ver=5.5.6' \
