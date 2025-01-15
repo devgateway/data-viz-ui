@@ -9,8 +9,7 @@ interface ImportMetaEnv {
     readonly VITE_REACT_APP_DEFAULT_LOCALE: string;
     readonly VITE_REACT_APP_WP_HOSTS: string;
     readonly VITE_REACT_APP_USE_HASH_LINKS: boolean;
-    readonly VITE_REACT_APP_WP_SEARCH_END_POINT: string;
-    readonly VITE_REACT_APP_API_ROOT: string;
+    readonly VITE_REACT_APP_WP_SEARCH_END_POINT: string; 
 }
 
 interface ImportMeta {
