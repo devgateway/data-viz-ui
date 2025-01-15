@@ -193,8 +193,6 @@ const IntlRoutes = () => {
 };
 
 
-console.log("react-app", process.env.VITE_REACT_APP_WP_API);
-
 
 // TODO: Return Tracker
 const WithTrackerRoutes = IntlRoutes;
