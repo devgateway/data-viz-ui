@@ -132,7 +132,7 @@ const Chart = (props) => {
 
   console.log("sankey props ===>", props)
 
-  if (props.options.data && props.options.data.nodes && props.options.data.nodes.length) {
+  if (props.options?.data && props.options?.data?.nodes && props.options?.data?.nodes.length) {
     const { links, nodes } = props.options.data
     nodes.forEach(node => {
       node.color = colorGenerator.getColor(node.id)
