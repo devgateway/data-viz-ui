@@ -12,7 +12,7 @@ import { useParams } from "react-router-dom";
 import SearchComponent from "./SearchControl";
 import LangSwitcher from "./LangSwitcher";
 
-const SITE_URL_WITH_LOCALE = process.env.VITE_REACT_APP_SITE_URL_WITH_LOCALE || "#";
+const SITE_URL_WITH_LOCALE =  "#";
 
 const getPath = (menu, params) => {
     const path = [];
