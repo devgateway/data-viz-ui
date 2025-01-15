@@ -1,3 +1,4 @@
+import { Config } from "@/conf";
 import React, {useEffect, useState} from "react";
 import {Dropdown, Image} from 'semantic-ui-react'
 
@@ -93,7 +94,7 @@ const Selector = (props) => {
     useEffect(() => {
         async function fetchData() {
             const response = await fetch(
-                process.env.VITE_REACT_APP_WP_API + '/dg/v1/settings', {
+                Config.REACT_APP_WP_API + '/dg/v1/settings', {
                     headers: {
                         'Content-Type': 'application/json'
                         // 'Content-Type': 'application/x-www-form-urlencoded',
