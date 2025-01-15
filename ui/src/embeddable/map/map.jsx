@@ -13,6 +13,7 @@ import Legend from "./legend";
 import { formatContent } from "../common/MapTooltip";
 import getDeviceCategory from '../../utils/deviceType';
 import * as geoStats from 'geostats';
+import { Config } from "@/conf";
 
 const COLOR_VARIABLE = "_Color_";
 const LOCATION = "location";
@@ -265,7 +266,7 @@ class Map extends React.Component {
       enabledLayers.forEach((l) => {
         metadataFuncs.push(
           new Promise((resolve, reject) => {
-            d3.json(process.env.VITE_REACT_APP_WP_API + "/wp/v2/media/" + l.id)
+            d3.json(Config.REACT_APP_WP_API + "/wp/v2/media/" + l.id)
               .then((data) => {
                 resolve({ id: l.id, url: data.source_url, index: l.index });
               })
