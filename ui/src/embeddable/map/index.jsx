@@ -28,7 +28,7 @@ const MapWrapper = (props) => {
         "data-csv": csv = '',
         'data-dimension1': dimension1 = '',
         'data-dimension2': dimension2 = '',
-        "data-measures": measures = 'prevalenceSmokeAny',
+        "data-measures": measures = '[]',
         "data-height": height = 600,
           width = 960,
         "data-data-source-text": dataSourceText = 'NIDS',
@@ -103,11 +103,13 @@ const MapWrapper = (props) => {
 
     const parse = (value) => {
         try {
-            return JSON.parse(decode(value))
+            return JSON.parse(decode(value)); 
         } catch (error) {
-            console.error("error parsing value:" + value)
-        } 
+            console.error("Error parsing value:", value, error);
+            return null;
+        }
     }
+
 
     const getBreaks = (legendBreaks) => {
         let legendBreaksNew = parse(legendBreaks) || []
