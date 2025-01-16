@@ -3,10 +3,7 @@ import { Button, Container, Dropdown, Grid, Icon } from "semantic-ui-react";
 import { PostContent } from "@devgateway/wp-react-lib";
 import { domtoimage } from "./dom-to-image";
 import { saveAs } from 'file-saver';
-import getDeviceType from "../../utils/deviceType";
 
-
-const isMobile = getDeviceType() === 'mobile';
 
 const DownloadableContent = React.forwardRef((props, ref) => (
     <div ref={ref}>{props.children}</div>
@@ -32,7 +29,7 @@ const DownloadComponent = (props) => {
         "data-section-title": sectionTitle = "",
         "data-download-tooltip": tooltip = "",
         "data-include-source-url": includeSourceURL = "false",
-        "data-source-urlmargin-left": sourceURLMarginLeft = isMobile ? 0: 70,
+        "data-source-urlmargin-left": sourceURLMarginLeft = 70,
         "data-source-urlmargin-top": sourceURLMarginTop = 10,
         "data-source-urlfont-size": sourceURLFontSize = 18,
         parent,
@@ -85,16 +82,15 @@ const DownloadComponent = (props) => {
         domtoimage.cloneNode(componentRef.current).then(function (node) {
             //add source url
             const addSourceURL = includeSourceURL === "true";
-            let sourceURLLeftMargin = sourceURLMarginLeft;
-            if(sourceURLLeftMargin > 0 && isMobile) {
-                sourceURLLeftMargin = 0;
-            }
             if (addSourceURL) {
                 const urlNode = document.createElement('div')
-                urlNode.style.marginLeft = sourceURLLeftMargin + "px"
+                urlNode.style.marginLeft = sourceURLMarginLeft + "px"
                 urlNode.style.marginTop = sourceURLMarginTop + "px"
                 urlNode.style.fontSize = sourceURLFontSize + "px"
-
+                urlNode.style.fontFamily = 'Roboto, sans-serif';
+                urlNode.style.fontWeight = '400';
+                urlNode.style.color = '#66676d';
+                urlNode.style.opacity = '0.75';
                 urlNode.innerHTML = window.location.href;
                 urlNode.style.maxWidth = "90%"; // Set a max width for the container
                 urlNode.style.wordWrap = "break-word"; // Break lines within words if necessary
