@@ -26,7 +26,7 @@ import PreviewPageContainer from './layout/containers/PreviewPageContainer';
 import PreviewTypeContainer from './layout/containers/PreviewTypeContainer';
 import SlugContainer from './layout/containers/SlugContainer';
 import SlugPostContainer from './layout/containers/SlugPostContainer';
-
+import withTracker from './withTracker';
 
 const messages = {
     'en': messages_en
@@ -195,7 +195,7 @@ const IntlRoutes = () => {
 
 
 // TODO: Return Tracker
-const WithTrackerRoutes = IntlRoutes;
+const WithTrackerRoutes = withTracker(IntlRoutes);
 
 const router = createBrowserRouter(
     createRoutesFromElements(
