@@ -6,8 +6,7 @@ import {togglePanel} from "./Util";
 
 import {getTranslatedOptions} from './APIutils'
 
-const ALIVE_SUPERSET_PROXY_URL = 'http://localhost:3001'
-const ALIVE_SUPERSET_APP = 'alive-superset'
+const ALIVE_SUPERSET_APP = 'superset-proxy'
 export const SizeConfig = ({height, setAttributes, panelStatus,initialOpen}) => {
     return (<PanelBody initialOpen={panelStatus?panelStatus["SIZE"]:initialOpen} onToggle={e => togglePanel("SIZE", panelStatus, setAttributes)}
                        title={__("Size")}>
@@ -304,11 +303,9 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
                         value: a.instance[0].vipAddress,
                         settings: a.instance[0]
                     })), 
-                    {label: 'CSV', value: 'csv'}] : [{label: 'CSV', value: 'csv'}]
-                    //add superset app
-                    apps.push({label: 'Superset', value: ALIVE_SUPERSET_APP})
+                    {label: 'CSV', value: 'csv'}] : [{label: 'CSV', value: 'csv'}] 
                     
-                  this.setState({
+                    this.setState({
                       react_ui_url: settingsData["react_ui_url"] + '/' + window._page_locale,
                       react_api_url: settingsData["react_api_url"],
                       apache_superset_url: settingsData["apache_superset_url"],
@@ -339,16 +336,9 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
         }
     }
 
-    
-    getBaseURL(app) {
-        if (app == ALIVE_SUPERSET_APP) {
-            return  ALIVE_SUPERSET_PROXY_URL
-        };          
-    }
-
     _loadMetadata(app, datasetId) {
          if (app != "csv") {
-            fetch(`${this.getBaseURL(app)}/api/${app}/dimensions?datasetId=${datasetId}`)
+            fetch(`/api/${app}/dimensions?datasetId=${datasetId}`)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error("HTTP status " + response.status);
@@ -369,7 +359,7 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
                 })
 
 
-            fetch(`${this.getBaseURL(app)}/api/${app}/filters?datasetId=${datasetId}`)
+            fetch(`/api/${app}/filters?datasetId=${datasetId}`)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error("HTTP status " + response.status);
@@ -386,7 +376,7 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
                     console.log("Error when loading filters", response)
                 })
 
-            fetch(`${this.getBaseURL(app)}/api/${app}/measures?datasetId=${datasetId}`)
+            fetch(`/api/${app}/measures?datasetId=${datasetId}`)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error("HTTP status " + response.status);
@@ -401,7 +391,7 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
                     console.log("Error when loading measures")
                 })
 
-            fetch(`${this.getBaseURL(app)}/api/${app}/categories?datasetId=${datasetId}`)
+            fetch(`/api/${app}/categories?datasetId=${datasetId}`)
                 .then(response => {
                     console.log('loadCategories')
                     if (!response.ok) {
@@ -429,7 +419,7 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
     }   
 
     loadDatasets(app) {
-        fetch(`${this.getBaseURL(app)}/api/${app}/datasets`)
+        fetch(`/api/${app}/datasets`)
             .then(response => {
                 if (!response.ok) {
                     throw new Error("HTTP status " + response.status);

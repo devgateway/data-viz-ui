@@ -93,7 +93,8 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                 hiddenFilters,
                 allNoneSameBehaviour,
                 closeOnSelect,
-                useFilterItems
+                useFilterItems,
+                datasetId
             }
         } = this.props;
 
@@ -101,7 +102,12 @@ class BlockEdit extends BlockEditWithAPIMetadata {
         const selectedFilters = this.state.filters ? this.state.filters.filter(f => f.param == param && f.type != 'Boolean') : null
 
         const filter = selectedFilters && selectedFilters.length > 0 ? selectedFilters[0] : null
-
+        const  datasets = [{label: 'Select Dataset', value: '0'}]
+        if (this.state.datasets) {
+            this.state.datasets.forEach(d => {
+                datasets.push({label: d.label, value: d.id})
+            })
+        }
 
         return ([isSelected && (<InspectorControls>
                 <Panel header={__("Filter Configuration")}>
@@ -125,13 +131,31 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                                 options={this.state.apps}
                             />
                         </PanelRow>
+
+                        <PanelRow>
+                                        <SelectControl
+                                            label={__('Datasets')}
+                                            value={[datasetId]} 
+                                            onChange={(newDatasetId)   => {
+                                                setAttributes({
+                                                    datasetId: newDatasetId,
+                                                    dimension1: 'none',
+                                                    dimension2: 'none'  
+
+                                          })
+                                                this.setState({dimensions: [], measures: [], filters: [], categories: []})                                              
+                                                this.loadMetadata(newDatasetId)
+                                            }}
+                                            options={datasets}
+                                        />
+                                 </PanelRow>
                     </PanelBody>
 
                     {app != 'csv' && <PanelBody initialOpen={false} title={__("Select Filter")}>
                         <PanelRow>
                             <SelectControl
                                 value={param}
-                                options={this.state.filters}
+                                options={[{value:'', label: __("Select Filter")}, ...this.state.filters]}
                                 onChange={param => {
                                     const type = this.state.filters.filter(f => f.param === param)[0].type
                                     setAttributes({param, type, hiddenFilters: []})

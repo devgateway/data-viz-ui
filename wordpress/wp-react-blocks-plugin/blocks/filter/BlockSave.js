@@ -29,7 +29,8 @@ const SaveComponent = (props) => {
             closeOnSelect,
             alphabeticalSort,
             ascOrder,
-            useFilterItems
+            useFilterItems,
+            datasetId
         }
     } = props;
 
@@ -40,6 +41,7 @@ const SaveComponent = (props) => {
     return (<div className={"viz-component"}
                  data-component={"filter"}
                  data-app={app}
+                 data-dataset-id={datasetId}
                  data-icon={icon}
                  data-alphabetical-sort={alphabeticalSort}
                  data-asc-order={ascOrder}
