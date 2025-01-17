@@ -402,7 +402,6 @@ const RangeFilterDropDown = connect(mapStateToProps, mapActionCreators)(({
 
 
 const CategoryFilter = (props) => {
-
     const { data, type, showNoDataOption } = props
     const cat = data.filter(d => d.type === type)[0]
     const filteredCategories = cat ? cat.items.filter(f => {
@@ -456,6 +455,7 @@ const CSVFilter = (props) => {
 const Filter = ({
     "data-group": group,
     "data-app": app,
+    "data-dataset-id": datasetId,
     "data-param": param,
     "data-icon": icon,
     "data-type": type,
@@ -490,6 +490,10 @@ const Filter = ({
             if (f.value != null && f.value.filter(v => v != null && v.toString().trim() != "").length > 0)
                 params[f.param] = f.value
         })
+    }
+
+    if (datasetId) {
+        params["datasetId"] = datasetId;
     }
 
     const hiddenFiltersArr = parse(hiddenFilters)
