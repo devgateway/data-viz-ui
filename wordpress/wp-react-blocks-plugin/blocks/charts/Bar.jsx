@@ -79,7 +79,7 @@ const BarOptions = (props) => {
             }
 
             if (byDimension) {
-                const ds = allDimensions.filter(d => d.value == whichDimension)
+                const ds = allDimensions ? allDimensions.filter(d => d.value == whichDimension) : [];
                 if (ds.length > 0) {
                     const {type} = ds[0]
                     const cat = allCategories.filter(a => a.type === type)
