@@ -30,7 +30,6 @@ COPY ui/public public
 COPY ui /tmp/work1/work2
 RUN rm -rf /tmp/work1/work2/package-lock.json
 
-ARG REACT_APP_THEME
 RUN cd /tmp/work1/work2 && npm install @rollup/rollup-linux-arm64-gnu && \
   VITE_REACT_APP_GA_CODE='#REACT_APP_GA_CODE#' \
   VITE_REACT_APP_DEFAULT_LOCALE='#REACT_APP_DEFAULT_LOCALE#' \
