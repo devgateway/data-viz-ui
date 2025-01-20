@@ -195,7 +195,8 @@ const IntlRoutes = () => {
 
 
 // TODO: Return Tracker
-const WithTrackerRoutes = withTracker(IntlRoutes);
+// const WithTrackerRoutes = withTracker(IntlRoutes);
+const WithTrackerRoutes = IntlRoutes;
 
 const router = createBrowserRouter(
     createRoutesFromElements(
