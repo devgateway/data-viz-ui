@@ -28,7 +28,6 @@ COPY ui/public public
 COPY ui/src src
 COPY ui/index.html index.html
 
-ARG REACT_APP_THEME
 RUN \
   VITE_REACT_APP_GA_CODE='#REACT_APP_GA_CODE#' \
   VITE_REACT_APP_DEFAULT_LOCALE='#REACT_APP_DEFAULT_LOCALE#' \
