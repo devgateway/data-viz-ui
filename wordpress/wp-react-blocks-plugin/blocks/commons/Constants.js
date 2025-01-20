@@ -1,0 +1,1 @@
+export const ALIVE_SUPERSET_APP = 'superset-proxy'

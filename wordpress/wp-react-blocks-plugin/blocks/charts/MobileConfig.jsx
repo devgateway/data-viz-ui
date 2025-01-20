@@ -263,6 +263,7 @@ const MobileConfig = (props) => {
       dimension1,
       yAxisTickValues,
       datasetId,
+      apacheSupersetUrl
     },
   } = props;
 
@@ -289,8 +290,7 @@ const MobileConfig = (props) => {
       xAxisLabels = []
 
       if (!storedCategories) {
-        console.log("fetching categories")
-        fetch(`/api/${app}/categories?datasetId=${datasetId}`)
+         fetch(`/api/${app}/categories?datasetId=${datasetId}&apacheSupersetUrl=${apacheSupersetUrl}`)
         .then((response) => response.json())
         .then((data) => {
           categories = getTranslatedOptions(data)
@@ -315,7 +315,7 @@ const MobileConfig = (props) => {
       );
       // if measures are not present in session storage, fetch them from the API
       if (!storedMeasures) {
-        fetch(`/api/${app}/measures?datasetId=${datasetId}`)
+        fetch(`/api/${app}/measures?datasetId=${datasetId}&apacheSupersetUrl=${apacheSupersetUrl}`)
           .then((response) => response.json())
           .then((data) => {
             sessionStorage.setItem(`measures_${app}`, JSON.stringify(data));

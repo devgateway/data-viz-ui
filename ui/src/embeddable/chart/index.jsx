@@ -173,6 +173,7 @@ const Chart = (props) => {
     "data-radar-enable-dot-label": radarEnableDotLabel = "true",
     "data-radar-dot-label-offset": radarDotLabelOffset = -12,
     "data-mobile-customization": mobileCustomization = "{}",
+    "data-apache-superset-url": apacheSupersetUrl = ""
   } = props;
 
   let {
@@ -568,6 +569,10 @@ const Chart = (props) => {
 
   if (datasetId) {
     params.datasetId = datasetId;
+  }
+
+  if (apacheSupersetUrl) {
+    params.apacheSupersetUrl = decodeURIComponent(apacheSupersetUrl);
   }
 
   let ChartDataFrame = null;

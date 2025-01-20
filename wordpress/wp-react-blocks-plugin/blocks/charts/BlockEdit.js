@@ -24,6 +24,7 @@ import MobileConfig from './MobileConfig.jsx';
 import Tooltip from "../commons/Tooltip.jsx";
 import {togglePanel} from "../commons/Util";
 import Radar from './Radar.jsx';
+import {ALIVE_SUPERSET_APP} from '../commons/Constants';
 
 class BlockEdit extends BlockEditWithAPIMetadata {
     constructor(props) {
@@ -310,13 +311,14 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                                             value={[app]} // e.g: value = [ 'a', 'c' ]
                                             onChange={(app) => {
                                                 setAttributes({
-                                                    app: app
+                                                    app: app,
+                                                    apacheSupersetUrl: this.state.apache_superset_url
                                                 })
                                             }}
                                             options={this.state.apps}
                                         />                                        
                                     </PanelRow>
-                                    <PanelRow>
+                                    {app == ALIVE_SUPERSET_APP &&   <PanelRow>
                                         <SelectControl
                                             label={__('Datasets')}
                                             value={[datasetId]} 
@@ -328,12 +330,13 @@ class BlockEdit extends BlockEditWithAPIMetadata {
 
                                           })
                                                 this.setState({dimensions: [], measures: [], filters: [], categories: []})
-                                                console.log(newDatasetId)
                                                 this.loadMetadata(newDatasetId)
                                             }}
                                             options={datasets}
                                         />
-                                 </PanelRow>
+                                      </PanelRow>
+                                    }
+                                  
                                 </PanelBody>
                                 {app != 'csv' && <APIConfig
                                     allDimensions={this.state.dimensions}

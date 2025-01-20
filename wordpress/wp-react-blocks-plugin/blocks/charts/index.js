@@ -561,7 +561,11 @@ registerBlockType(process.env.BLOCKS_NS + '/chart',
             radarDotLabelOffset: {
                 type: 'Numeric',
                 default: -12
-            }
+            },
+            apacheSupersetUrl: {
+                type: 'string',
+                default: ''
+            }   
         },
         edit: BlockEdit,
         save: BlockSave,
