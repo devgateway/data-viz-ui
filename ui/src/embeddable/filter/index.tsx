@@ -40,14 +40,15 @@ const decode = (value) => {
 }
 
 const parse = (value) => {
+    if (!value || value == "") {
+        return null
+    }
     try {
         return JSON.parse(decode(value))
 
     } catch (error) {
         throw new Error("error parsing value:" + error);
-    }
-
-    return null
+    }    
 }
 
 const mapStateToProps = (state, ownProps) => {
@@ -478,6 +479,7 @@ const Filter = ({
     "data-close-on-select": closeOnSelect = "false",
     "data-alphabetical-sort": alphabeticalSort = "true",
     "data-asc-order": ascOrder = "true",
+    "data-apache-superset-url": apacheSupersetUrl,
     intl,
 }) => {
 
@@ -494,6 +496,11 @@ const Filter = ({
 
     if (datasetId) {
         params["datasetId"] = datasetId;
+    }
+
+    if (apacheSupersetUrl) {
+        params["apacheSupersetUrl"] = decodeURIComponent(apacheSupersetUrl);
+        console.log("apacheSupersetUrl", params["apacheSupersetUrl"])
     }
 
     const hiddenFiltersArr = parse(hiddenFilters)
