@@ -4,7 +4,7 @@ import {__} from '@wordpress/i18n';
 import {BlockEditWithAPIMetadata} from '../commons/index'
 import {useEffect} from "react";
 import DataFilters from "../commons/DataFilters";
-
+import {ALIVE_SUPERSET_APP} from '../commons/Constants';
 const DEFAULT_VALUE_INPUT = 'DEFAULT_VALUE_INPUT'
 const LOWEST_VALUE = 'LOWEST_VALUE'
 const HIGHEST_VALUE = 'HIGHEST_VALUE'
@@ -94,7 +94,8 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                 allNoneSameBehaviour,
                 closeOnSelect,
                 useFilterItems,
-                datasetId
+                datasetId,
+                apacheSupersetUrl
             }
         } = this.props;
 
@@ -125,14 +126,15 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                             <SelectControl
                                 value={app}
                                 onChange={(app) => {
-
-                                    setAttributes({app: app, hiddenFilters: []})
+                                    setAttributes({app: app, hiddenFilters: [], apacheSupersetUrl: this.state.apache_superset_url})
                                 }}
                                 options={this.state.apps}
                             />
                         </PanelRow>
 
+                  {app == ALIVE_SUPERSET_APP && 
                         <PanelRow>
+                            
                                         <SelectControl
                                             label={__('Datasets')}
                                             value={[datasetId]} 
@@ -149,9 +151,10 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                                             options={datasets}
                                         />
                                  </PanelRow>
+        }
                     </PanelBody>
 
-                    {app != 'csv' && <PanelBody initialOpen={false} title={__("Select Filter")}>
+                    {app != 'csv' && this.state.filters && <PanelBody initialOpen={false} title={__("Select Filter")}>
                         <PanelRow>
                             <SelectControl
                                 value={param}
@@ -163,7 +166,7 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                         </PanelRow>
 
                     </PanelBody>}
-                    {app == 'csv' && <PanelBody initialOpen={false} title={__("Select Filter")}>
+                    {app == 'csv' && this.state.filters && <PanelBody initialOpen={false} title={__("Select Filter")}>
                         <PanelRow>
                             <TextControl label={__("Field")} value={param}
                                          onChange={(param) => setAttributes({param})}></TextControl>
