@@ -312,6 +312,7 @@ const TimeLine = (props) => {
       .style("line-height", "100%")
       .style("text-align", "center")
       .style("cursor", enableTitlePopup ? "pointer" : "default")
+      .style("overflow-wrap", "break-word")
       .html((d, i) => {
         const readmore = readMoreLabel(i);
         let title = d.title.rendered;
@@ -357,7 +358,7 @@ const TimeLine = (props) => {
     <div
       className={"time line"}
       onMouseLeave={(event) => {
-        const classes = event.target.getAttribute("class");
+        let classes = event.target.getAttribute("class");
         //if event is from link in tooltip, dont hide the tooltip
         if (classes !== "ui fluid container excerpt") {
           setDisplayTooltip(false);
