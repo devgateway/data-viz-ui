@@ -26,12 +26,17 @@ interface SectionHeaderProps {
 export const SectionHeader: React.FC<SectionHeaderProps> = ({ title, subtitle, icon, media }) => {
     return <Menu className="header title" text>
         <Menu.Item>
-            <Image src={media && media.guid ? media.guid.rendered : icon} />
+
+            <Image src={media && media.guid ? media.guid.rendered : icon}
+                alt={media && media.alt_text ? media.alt_text : ""}
+            />
         </Menu.Item>
         <Menu.Header>
             <div>
-                <h1 className="has-light-blue-color">{title}</h1>
-                <h2 className="has-gray-color">{subtitle}</h2>
+                <h2 className="page-module-title">
+                    {title}
+                    <span style={{ display: 'block' }} className="page-module-subtitle">{subtitle}</span>
+                </h2>
             </div>
         </Menu.Header>
     </Menu>
@@ -51,10 +56,7 @@ const Module: React.FC<ModuleProps> = ({ page, locale }) => {
             <div id={`${page.slug}`}></div>
             <MediaProvider id={page.meta_fields && page.meta_fields.icon ? page.meta_fields.icon[0] : null}>
                 <MediaConsumer>
-                    <SectionHeader
-                        title={decodeHtmlEntity(page.title.rendered)}
-                        subtitle={decodeHtmlEntity(page.meta_fields.subtitle)}
-                    />
+                    <SectionHeader title={decodeHtmlEntity(page.title.rendered)} subtitle={decodeHtmlEntity(page.meta_fields.subtitle)} />
                 </MediaConsumer>
             </MediaProvider>
             {page && <PostContent as={Container} fluid={true} post={page} />}
@@ -74,27 +76,34 @@ const PageIterator: React.FC<PageIteratorProps> = ({ pages, locale, editing, nav
     const [modules, setModules] = useState<any>([]);
 
     const onVisibilityUpdate = useCallback((id, {
-        onScreen,
         direction,
+        onScreen,
     }) => {
+        let active = false;
         const bboxScreen = document.body.getBoundingClientRect();
         const bbox = document.getElementById(id)?.getBoundingClientRect();
 
-        let active = false;
-
         if (onScreen && bbox) {
-            if ((direction === 'down' || direction === 'up') && bbox.y / bboxScreen.height < 0.7) {
+            if (direction === 'down') {
+                if (bbox.y / bboxScreen.height < 0.7) {
+                    active = true;
+                }
+            }
+            if (direction == 'up' && bbox.y / bboxScreen.height < .7) {
                 active = true;
             }
         }
 
         setModules(prevModules => {
-            if (active && !prevModules.includes(id)) {
-                return [...prevModules, id];
-            } else if (!active) {
-                return prevModules.filter(d => d !== id);
+            let modules = prevModules.slice();
+            if (active) {
+                if (modules.indexOf(id) == -1) {
+                    modules.push(id);
+                }
+            } else {
+                modules = modules.filter(d => d != id);
             }
-            return prevModules;
+            return modules;
         });
     }, []);
 
@@ -176,8 +185,7 @@ const Root = (props: PageModuleProps) => {
                 </PageConsumer>
             </PageProvider>}
 
-    </Container>
-    )
+    </Container>)
 }
 
 
