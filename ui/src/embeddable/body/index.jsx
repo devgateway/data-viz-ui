@@ -21,18 +21,29 @@ import messages_fr from "../../translations/fr.json";
 
 import getDeviceType from "../../utils/deviceType";
 
-const Body = ({ intl }) => {
-  const [counter, setCounter] = React.useState(0);
-  const [isMobile, setIsMobile] = React.useState(["mobile", "tablet"].includes(getDeviceType()));
-  const [isClicked, setIsClicked] = React.useState(false);
-  const [selectedOption, setSelectedOption] = React.useState("Cancers");
+class Body extends React.Component {
+  constructor(props) {
+    super(props);
+    // No llames this.setState() aquí!
+    this.state = {
+      counter: 0,
+      isMobile: ["mobile", "tablet"].includes(getDeviceType()),
+      isClicked: false,
+      selectedOption: "Cancers",
+    };
+    this.onMouseOut = this.onMouseOut.bind(this);
+    this.onMouseOver = this.onMouseOver.bind(this);
+    this.updateLayout = this.updateLayout.bind(this);
+    this.updateSvgLabels = this.updateSvgLabels.bind(this);
+    this.handleTextClick = this.handleTextClick.bind(this);
+  }
 
-  const updateLayout = () => {
-    setIsMobile(["mobile", "tablet"].includes(getDeviceType()));
-  };
+  updateLayout() {
+    this.setState({ isMobile: ["mobile", "tablet"].includes(getDeviceType()) });
+  }
 
-  const handleTextClick = (e) => {
-    if (!isMobile) return;
+  handleTextClick(e) {
+    if (!this.state.isMobile) return;
 
     const svg = e.target.closest("svg");
     const titleText = e.target.closest(".title");
@@ -41,7 +52,7 @@ const Body = ({ intl }) => {
     if (titleText || btn) {
       // Remove the 'on' class from all .title, .title-rect, and .title-line elements
       [...svg.querySelectorAll(".title, .title-rect, .title-line")].forEach((node) =>
-        node.classList.remove("on")
+          node.classList.remove("on")
       );
 
       const selectedElement = titleText || btn;
@@ -56,11 +67,14 @@ const Body = ({ intl }) => {
       }
 
       // Update the selected option state
-      setSelectedOption(titleText ? titleText.innerHTML : btn.nextSibling.innerHTML);
+      this.setState({
+        selectedOption: (titleText ? titleText.innerHTML : btn.nextSibling.innerHTML),
+      });
     }
-  };
+  }
 
-  const onMouseOut = () => {
+
+  onMouseOut() {
     d3.select(".body.parts")
       .selectAll("g.system")
       .transition()
@@ -69,9 +83,9 @@ const Body = ({ intl }) => {
       .style("opacity", 1);
     d3.select(".body.parts").selectAll("circle").remove();
     d3.select(".body.parts").selectAll("line").remove();
-  };
+  }
 
-  const onMouseOver = (selector, source, target) => {
+  onMouseOver(selector, source, target) {
     const root = d3.select(".body.parts");
 
     const element = root.select(selector);
@@ -132,9 +146,21 @@ const Body = ({ intl }) => {
       .delay(200)
       .duration(30)
       .attr("r", 6);
-  };
 
-  const addOnClassToSelectedElements = () => {
+    //  <line stroke="#000" x1="" y1="153.25657745748686" x2="-57.0522107618267" y2="110.24777579617485"/>
+  }
+
+  componentDidMount() {
+    window.addEventListener("resize", this.updateLayout);
+    this.updateLayout();
+    this.updateSvgLabels();
+
+    // Add the "on" class on page refresh based on the selected option
+    this.addOnClassToSelectedElements();
+  }
+
+  addOnClassToSelectedElements() {
+    const { selectedOption } = this.state;
     const svg = document.querySelector("svg");
 
     // Find the text element and the corresponding line for the selected option
@@ -154,14 +180,17 @@ const Body = ({ intl }) => {
       selectedTitleText.classList.add("on");
       selectedTitleLine.classList.add("on");
     }
-  };
+  }
 
-  const updateSvgLabels = () => {
+
+
+  updateSvgLabels() {
     const root = d3.select(".body.parts");
     let messages = {
       en: messages_en,
       fr: messages_fr,
     };
+    const intl = this.props.intl;
     messages = messages[intl.locale];
 
     const left = [
@@ -192,6 +221,7 @@ const Body = ({ intl }) => {
         tx: 77,
         ty: 95,
       },
+
       {
         label: intl.formatMessage({
           id: "tracheal.bronchial.lung.cancer",
@@ -201,6 +231,7 @@ const Body = ({ intl }) => {
         tx: intl.locale === "en" ? 80 : 90,
         ty: 120,
       },
+
       {
         label: intl.formatMessage({
           id: "acute.myeloid.leukaemia",
@@ -444,7 +475,10 @@ const Body = ({ intl }) => {
     // Clear existing labels
     root.select("svg").selectAll("text.label").remove();
 
-    const data = selectedOption === "Cancers" ? left : right;
+    const { selectedOption, isMobile } = this.state;
+
+    let data = selectedOption === "Cancers" ? left : right;
+
     let sy = 60;
 
     const calculateX = (d, i) => {
@@ -458,6 +492,7 @@ const Body = ({ intl }) => {
         root
           .select("svg")
           .selectAll("text.left")
+
           .data(left)
           .enter()
           .append("text")
@@ -493,9 +528,11 @@ const Body = ({ intl }) => {
           .text((d) => d.label);
       }
     } else {
-      root
+      if(!isMobile) {
+        root
         .select("svg")
         .selectAll("text.left")
+
         .data(left)
         .enter()
         .append("text")
@@ -518,39 +555,42 @@ const Body = ({ intl }) => {
           return sy + i * 25;
         })
         .text((d) => d.label);
-    }
+      } else {
+        root
+          .select("svg")
+          .selectAll("text.label")
+          .data(data)
+          .enter()
+          .append("text")
+          .attr("class", "label")
+          .attr("x", calculateX)
+          .attr("y", (d, i) => sy + i * 25)
+          .text((d) => d.label);
+      }
 
+    }
     root
       .select("svg")
       .selectAll("text.label")
       .on("mouseover", (event, d) => {
-        onMouseOver(d.selector, d3.select(event.currentTarget), d, {
+        this.onMouseOver(d.selector, d3.select(event.currentTarget), d, {
           tx: d.tx,
           ty: d.ty,
         });
       })
       .on("mouseout", (event, d) => {
-        onMouseOut();
+        this.onMouseOut();
       });
-  };
+  }
 
-  React.useEffect(() => {
-    window.addEventListener("resize", updateLayout);
-    updateLayout();
-    updateSvgLabels();
-    addOnClassToSelectedElements();
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.selectedOption !== this.state.selectedOption) {
+      this.updateSvgLabels();
+      this.addOnClassToSelectedElements(); // Apply "on" class after updates
+    }
+  }
 
-    return () => {
-      window.removeEventListener("resize", updateLayout);
-    };
-  }, []);
-
-  React.useEffect(() => {
-    updateSvgLabels();
-    addOnClassToSelectedElements();
-  }, [selectedOption]);
-
-  const mobileOptions = {
+  mobileOptions = {
     Cancers: {
       x: 180,
       y: 25,
@@ -562,92 +602,105 @@ const Body = ({ intl }) => {
     viewBoxDims: "0 0 500 520",
   };
 
-  return (
-    <Container className="body parts">
-      <svg
-        className="body root"
-        viewBox={
-          isMobile
-            ? mobileOptions["viewBoxDims"]
-            : "-300 0 900 520"
-        }
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <Background className="backGround" />
-        <Bounds className="system bounds" />
-        <Head className="system head" />
-        <Lungs className="system larynx" />
-        <Lungs className="system lungs" />
-        <Stomach className="system stomach" />
-        <Liver className="system liver" />
-        <Brain className="system brain" />
-        <Eyes className="system eyes" />
-        <Blood className="system blood" />
-        <Heart className="system heart" />
-        <Erectile className="system erectile" />
-        <Ectopic className="system Ectopic" />
-        <g onClick={handleTextClick}>
-          <rect
-            className="title-rect"
-            x={isMobile ? mobileOptions["Cancers"]["x"] - 20 : ""}
-            y={isMobile ? mobileOptions["Cancers"]["y"] - 20 : "60"}
-            rx="5"
-            ry="5"
-            width="100"
-            height="30"
-          />
-          <text
-            x={isMobile ? mobileOptions["Cancers"]["x"] : "-250"}
-            y={isMobile ? mobileOptions["Cancers"]["y"] : "60"}
-            className="title"
-          >
-            <FormattedMessage id="ailments.title" defaultMessage="Cancers" />
-          </text>
-          {isMobile && (
+  localeYDims = {
+    'en': "60",
+    'fr': "40",
+  }
+
+  localeXdims = {
+    'en': "-250",
+    'fr': "-280",
+  }
+
+  render() {
+    return (
+      <Container className="body parts">
+        <svg
+          className="body root"
+          viewBox={
+            this.state.isMobile
+              ? this.mobileOptions["viewBoxDims"]
+              : "-300 0 900 520"
+          }
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <Background className="backGround" />
+          <Bounds className="system bounds" />
+          <Head className="system head" />
+
+          <Lungs className="system larynx" />
+          <Lungs className="system lungs" />
+          <Stomach className="system stomach" />
+          <Liver className="system liver" />
+          <Brain className="system brain" />
+          <Eyes className="system eyes" />
+          <Blood className="system blood" />
+          <Heart className="system heart" />
+          <Erectile className="system erectile" />
+          <Ectopic className="system Ectopic" />
+          <g onClick={this.handleTextClick}>
             <rect
-              className="title-line"
-              x={isMobile ? mobileOptions["Cancers"]["x"] -18 : "-250"}
-              y={isMobile ? mobileOptions["Cancers"]["y"] + 7 : ""}
-              width="58"
-              height="3"
-              fill="#E5EBED"
+                className="title-rect"
+                x={this.state.isMobile ? this.mobileOptions["Cancers"]["x"] - 20 : ""}
+                y={this.state.isMobile ? this.mobileOptions["Cancers"]["y"] - 20 : this.localeYDims[this.props.intl.locale]}
+                rx="5"
+                ry="5"
+                width="100"
+                height="30"
             />
-          )}
-        </g>
-        <g onClick={handleTextClick}>
-          <rect
-            className="title-rect"
-            x={isMobile ? mobileOptions["OtherConditions"]["x"] - 65 : ""}
-            y={isMobile ? mobileOptions["OtherConditions"]["y"] - 20 : "60"}
-            rx="5"
-            ry="5"
-            width="155"
-            height="30"
-          />
-          <text
-            x={isMobile ? mobileOptions["OtherConditions"]["x"] - 50 : "200"}
-            y={isMobile ? mobileOptions["OtherConditions"]["y"] : "60"}
-            className="title"
-          >
-            <FormattedMessage
-              id="ailments.otherConditions"
-              defaultMessage="Other conditions"
-            />
-          </text>
-          {isMobile && (
+            <text
+                x={this.state.isMobile ? this.mobileOptions["Cancers"]["x"] : this.localeXdims[this.props.intl.locale]}
+                y={this.state.isMobile ? this.mobileOptions["Cancers"]["y"] : this.localeYDims[this.props.intl.locale]}
+                className="title"
+            >
+              <FormattedMessage id="ailments.title" defaultMessage="Cancers" />
+            </text>
+            {this.state.isMobile && (
+                <rect
+                    className="title-line"
+                    x={this.state.isMobile ? this.mobileOptions["Cancers"]["x"] -18 : "-250"}
+                    y={this.state.isMobile ? this.mobileOptions["Cancers"]["y"] + 7 : ""}
+                    width="58"
+                    height="3"
+                    fill="#E5EBED"
+                />
+            )}
+          </g>
+          <g onClick={this.handleTextClick}>
             <rect
-              className="title-line"
-              x={isMobile ? mobileOptions["OtherConditions"]["x"] - 68 : "200"}
-              y={isMobile ? mobileOptions["OtherConditions"]["y"] + 7 : "60"}
-              width="118"
-              height="3"
-              fill="#E5EBED"
+                className="title-rect"
+                x={this.state.isMobile ? this.mobileOptions["OtherConditions"]["x"] - 65 : ""}
+                y={this.state.isMobile ? this.mobileOptions["OtherConditions"]["y"] - 20 : this.localeYDims[this.props.intl.locale]} // Ensure the default desktop y-position
+                rx="5"
+                ry="5"
+                width="155"
+                height="30"
             />
-          )}
-        </g>
-      </svg>
-    </Container>
-  );
-};
+            <text
+                x={this.state.isMobile ? this.mobileOptions["OtherConditions"]["x"] - 50 : "200"} // Desktop remains "200"
+                y={this.state.isMobile ? this.mobileOptions["OtherConditions"]["y"] : this.localeYDims[this.props.intl.locale]} // Ensure the default desktop y-position
+                className="title"
+            >
+              <FormattedMessage
+                  id="ailments.otherConditions"
+                  defaultMessage="Other conditions"
+              />
+            </text>
+            {this.state.isMobile && (
+                <rect
+                    className="title-line"
+                    x={this.state.isMobile ? this.mobileOptions["OtherConditions"]["x"] - 68 : "200"} // Keep desktop x-position as "200"
+                    y={this.state.isMobile ? this.mobileOptions["OtherConditions"]["y"] + 7 : "60"} // Default desktop y-position
+                    width="118"
+                    height="3"
+                    fill="#E5EBED"
+                />
+            )}
+          </g>
+        </svg>
+      </Container>
+    );
+  }
+}
 
 export default injectIntl(Body);
