@@ -287,12 +287,18 @@ const MobileConfig = (props) => {
         fetch(`/api/${app}/categories`)
           .then((response) => response.json())
           .then((data) => getTranslatedOptions(data));
-      xAxisLabels = categories
-        .filter(
-          (category) =>
-            category.type?.toLowerCase() === dimension1?.toLowerCase()
-        )[0]
-        ?.items?.map((item) => item.value);
+      xAxisLabels =
+        categories
+          .filter(
+            (category) =>
+              category.type?.toLowerCase() === dimension1?.toLowerCase()
+          )[0]
+          ?.items?.map((item) => item.value) ??
+        categories
+          .filter((category) =>
+            dimension1?.toLowerCase().includes(category?.type?.toLowerCase())
+          )[0]
+          ?.items?.map((item) => item.value);
     } else {
       const storedMeasures = JSON.parse(
         sessionStorage.getItem(`measures_${app}`)
@@ -434,7 +440,7 @@ const MobileConfig = (props) => {
               </PanelRow>
 
               <PanelBody initialOpen={false} title={__("All Labels")}>
-                {xAxisLabels.map((label, index) => (
+                {xAxisLabels?.map((label, index) => (
                   <PanelRow key={`____${index}${label}`}>
                     <ToggleControl
                       key={`_____${index}${label}`}

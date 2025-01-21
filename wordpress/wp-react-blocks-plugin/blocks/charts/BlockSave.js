@@ -58,6 +58,7 @@ const SaveComponent = (props) => {
             fixedMinValue,
             barPadding,
             barLabelPosition,
+            lineLabelPosition,
             showGrid,
             includeOverall,
             tooltipEnabled,
@@ -185,6 +186,7 @@ const SaveComponent = (props) => {
              data-fixed-max-value={fixedMaxValue}
              data-bar-padding={barPadding}
              data-bar-label-position={barLabelPosition}
+             data-line-label-position={lineLabelPosition}
              data-show-grid={showGrid}
              data-include-overall={includeOverall}
              data-tooltip-enabled={tooltipEnabled}

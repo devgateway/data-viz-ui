@@ -9,7 +9,6 @@ import ConfidenceIntervalConfig from "./ConfidenceIntervalConfig.jsx"
 import Papa from 'papaparse'
 import GroupTotalSetting from "./GroupTotalSetting.jsx";
 import Sort from "./Sort.jsx";
-import { useEffect, useState  } from 'react';
 
 const BarOptions = (props) => {
     const {
@@ -59,7 +58,6 @@ const BarOptions = (props) => {
         }
     } = props;
 
-
     const getSeries = () => {
         if (allCategories) {
 
@@ -83,18 +81,13 @@ const BarOptions = (props) => {
                 if (ds.length > 0) {
                     const {type} = ds[0]
                     const cat = allCategories.filter(a => a.type === type)
-                    if (cat && cat.length > 0 ) {
-                        const catItem = cat[0];
-
-                        if (catItem.items) {
-                            return catItem.items.sort((a, b) => b.position - a.position).map(d => ({
-                                value: d.value,
-                                id: d.id,
-                                code: d.code
-                            }))
-                        } else {
-                            return null
-                        }
+                    if (cat && cat.length > 0) {
+                        return cat[0].items.sort((a, b) => b.position - a.position).map(d => ({
+                            value: d.value,
+                            id: d.id,
+                            code: d.code,
+                            labels: d.labels
+                        }))
                     }
                 }
             } else {
@@ -132,169 +125,233 @@ const BarOptions = (props) => {
             }
         })
     }
+    const series = app == 'csv' ? getCSVSeries() : getSeries();
 
-    const [series, setSeries] = useState(getCSVSeries());
-
-    useEffect(() => {
-        setSeries(app == 'csv' ? getCSVSeries() : getSeries())
-    }, [app, csv]);
-
-    return [<PanelBody initialOpen={false} title={__("Bar Options")}>
-
+    return [
+      <PanelBody initialOpen={false} title={__("Bar Options")}>
         <PanelBody initialOpen={false} title={__("Colors")}>
-            <ChartColors  {...props}></ChartColors>
-
+          <ChartColors {...props}></ChartColors>
         </PanelBody>
         <PanelBody initialOpen={false} title={"Layout"}>
-            <PanelRow>
+          <PanelRow>
+            <ToggleControl
+              label={__("Grouped")}
+              checked={groupMode === "grouped"}
+              onChange={() =>
+                setAttributes({
+                  groupMode: groupMode === "grouped" ? "stacked" : "grouped",
+                })
+              }
+            />
+          </PanelRow>
+          <PanelRow>
+            <ToggleControl
+              label={__("Symlog Scale")}
+              checked={valueScale === "symlog"}
+              onChange={() =>
+                setAttributes({
+                  valueScale: valueScale === "linear" ? "symlog" : "linear",
+                })
+              }
+            />
+          </PanelRow>
+          <PanelRow>
+            <ToggleControl
+              label={__("Horizontal")}
+              checked={layout === "horizontal"}
+              onChange={(value) =>
+                setAttributes({
+                  layout: layout === "horizontal" ? "vertical" : "horizontal",
+                })
+              }
+            />
+          </PanelRow>
+          <PanelRow>
+            <ToggleControl
+              label={__("Reverse")}
+              checked={reverse}
+              onChange={(value) => setAttributes({ reverse: !reverse })}
+            />
+          </PanelRow>
+
+          {app !== "csv" && <Sort {...props}></Sort>}
+
+          {app !== "csv" &&
+            dimension1 != "none" &&
+            dimension2 == "none" &&
+            selectedMeasures.length > 0 && (
+              <PanelRow>
                 <ToggleControl
-                    label={__("Grouped")}
-                    checked={groupMode === "grouped"}
-                    onChange={() => setAttributes({groupMode: (groupMode === "grouped" ? "stacked" : "grouped")})}/>
-
-            </PanelRow>
-            <PanelRow>
+                  label={__("Swap Values")}
+                  checked={swap}
+                  onChange={(swap) => setAttributes({ swap })}
+                />
+              </PanelRow>
+            )}
+          <PanelRow>
+            <ToggleControl
+              label={__("Enable Y Grid Lines")}
+              checked={enableGridY}
+              onChange={() => setAttributes({ enableGridY: !enableGridY })}
+            />
+          </PanelRow>
+          <PanelRow>
+            <ToggleControl
+              label={__("Enable X Grid Lines")}
+              checked={enableGridX}
+              onChange={() => setAttributes({ enableGridX: !enableGridX })}
+            />
+          </PanelRow>
+          {app !== "csv" && (
+            <>
+              <PanelRow>
                 <ToggleControl
-                    label={__("Symlog Scale")}
-                    checked={valueScale === "symlog"}
-                    onChange={() => setAttributes({valueScale: (valueScale === "linear" ? "symlog" : "linear")})}/>
-            </PanelRow>
-            <PanelRow>
-                <ToggleControl
-                    label={__("Horizontal")}
-                    checked={layout === "horizontal"}
-                    onChange={(value) => setAttributes({layout: (layout === "horizontal" ? "vertical" : "horizontal")})}/>
-
-            </PanelRow>
-            <PanelRow>
-                <ToggleControl
-                    label={__("Reverse")}
-                    checked={reverse}
-                    onChange={(value) => setAttributes({reverse: (!reverse)})}/>
-
-            </PanelRow>
-
-            {(app !== 'csv' && <Sort {...props}></Sort>)}
-
-            {(app !== 'csv' && dimension1 != "none" && dimension2 == "none" && selectedMeasures.length > 0) &&
+                  label={__("Include Overall")}
+                  checked={includeOverall}
+                  onChange={(includeOverall) =>
+                    setAttributes({ includeOverall })
+                  }
+                />
+              </PanelRow>
+              {includeOverall && (
                 <PanelRow>
-                    <ToggleControl
-                        label={__("Swap Values")}
-                        checked={swap}
-                        onChange={(swap) => setAttributes({swap})}/>
+                  <TextControl
+                    label={__("Overall Label")}
+                    value={overallLabel}
+                    onChange={(overallLabel) => setAttributes({ overallLabel })}
+                  />
                 </PanelRow>
-            }
-            <PanelRow>
-                <ToggleControl
-                    label={__("Enable Y Grid Lines")}
-                    checked={enableGridY}
-                    onChange={() => setAttributes({enableGridY: !enableGridY})}/>
-            </PanelRow>
-            <PanelRow>
-                <ToggleControl
-                    label={__("Enable X Grid Lines")}
-                    checked={enableGridX}
-                    onChange={() => setAttributes({enableGridX: !enableGridX})}/>
-            </PanelRow>
-            {app !== 'csv' &&
-                <>
-                    <PanelRow>
-                        <ToggleControl
-                            label={__("Include Overall")}
-                            checked={includeOverall}
-                            onChange={(includeOverall) => setAttributes({includeOverall})}/>
-                    </PanelRow>
-                    {includeOverall &&
-                        <PanelRow>
-                            <TextControl
-                                label={__('Overall Label')}
-                                value={overallLabel}
-                                onChange={(overallLabel) => setAttributes({overallLabel})}
-                            />
-                        </PanelRow>
-                    }
-                </>
-            }
-            <PanelRow>
-                <ToggleControl
-                    label={__("Display Group Total")}
-                    checked={showGroupTotal}
-                    onChange={(showGroupTotal) => {
-                        if (!groupTotalMeasure || groupTotalMeasure == "") {
-                            setAttributes({showGroupTotal, groupTotalMeasure: allMeasures ? allMeasures[0].value : ""})
-                        } else {
-                            setAttributes({showGroupTotal})
-                        }
-                    }}/>
-            </PanelRow>
+              )}
+            </>
+          )}
+          <PanelRow>
+            <ToggleControl
+              label={__("Display Group Total")}
+              checked={showGroupTotal}
+              onChange={(showGroupTotal) => {
+                if (!groupTotalMeasure || groupTotalMeasure == "") {
+                  setAttributes({
+                    showGroupTotal,
+                    groupTotalMeasure: allMeasures ? allMeasures[0].value : "",
+                  });
+                } else {
+                  setAttributes({ showGroupTotal });
+                }
+              }}
+            />
+          </PanelRow>
 
-            <Labels {...props}></Labels>
+          <Labels {...props}></Labels>
         </PanelBody>
 
         {showGroupTotal && <GroupTotalSetting {...props}></GroupTotalSetting>}
 
-        {getSeries() && <PanelBody initialOpen={false} title={__("Hidden Bars")}>
-            {getSeries().map(p => <PanelRow>
-
+        {getSeries() && (
+          <PanelBody initialOpen={false} title={__("Hidden Bars")}>
+            {getSeries().map((p) => (
+              <PanelRow key={p.value}>
                 <ToggleControl
-                    label={p.value}
-                    checked={hiddenBars.indexOf(p.value) > -1}
-                    onChange={(value) => {
-                        if (hiddenBars.indexOf(p.value) > -1) {
+                  label={p.value}
+                  checked={
+                    hiddenBars.includes(p.value) ||
+                    (p.labels &&
+                      Object.values(p.labels).some((label) =>
+                        hiddenBars.includes(label)
+                      ))
+                  }
+                  onChange={() => {
+                    // Check if the bar or any of its labels is hidden
+                    const hiddenBarsHasLabel = p.labels
+                      ? Object.values(p.labels).some((label) =>
+                          hiddenBars.includes(label)
+                        )
+                      : false;
 
-                            setAttributes({hiddenBars: hiddenBars.filter(item => item !== p.value)})
-                        } else {
-                            setAttributes({hiddenBars: [...hiddenBars, p.value]})
-                        }
+                    let updatedBars = [...hiddenBars];
 
-                    }}/>
+                    if (hiddenBars.includes(p.value) || hiddenBarsHasLabel) {
+                      // Remove the bar and its associated labels
+                      updatedBars = updatedBars.filter(
+                        (item) =>
+                          item !== p.value &&
+                          !(p.labels && Object.values(p.labels).includes(item))
+                      );
+                    } else {
+                      // Add the bar and its associated labels (if applicable)
+                      updatedBars = [
+                        ...new Set([
+                          ...updatedBars,
+                          p.value,
+                          ...(p.labels ? Object.values(p.labels) : []),
+                        ]),
+                      ];
+                    }
+                    console.log('updatedBars....', updatedBars);
 
-            </PanelRow>)
-            }
-
-
-        </PanelBody>}
+                    // Update the attributes
+                    setAttributes({ hiddenBars: updatedBars });
+                  }}
+                />
+              </PanelRow>
+            ))}
+          </PanelBody>
+        )}
         {series && <ConfidenceIntervalConfig series={series} {...props} />}
-
 
         <AxisConfig {...props}></AxisConfig>
 
         <PanelBody initialOpen={false} title={__("Padding")}>
-            <PanelRow>
-                <RangeControl
-                    label={__('Bar Padding (Space between bars that are not in the same group)')}
-                    value={barPadding}
-                    initialPosition={0.15}
-                    onChange={(barPadding) => setAttributes({barPadding})}
-                    step={0.05}
-                    min={0}
-                    max={1}/>
-            </PanelRow>
+          <PanelRow>
+            <RangeControl
+              label={__(
+                "Bar Padding (Space between bars that are not in the same group)"
+              )}
+              value={barPadding}
+              initialPosition={0.15}
+              onChange={(barPadding) => setAttributes({ barPadding })}
+              step={0.05}
+              min={0}
+              max={1}
+            />
+          </PanelRow>
 
-            <PanelRow>
-                <RangeControl
-                    label={__('Bar Inner Padding (Space between bars in the same group)')}
-                    value={barInnerPadding}
-                    initialPosition={0.75}
-                    onChange={(barInnerPadding) => setAttributes({barInnerPadding})}
-                    step={0.25}
-                    min={0}
-                    max={50}/>
-            </PanelRow>
+          <PanelRow>
+            <RangeControl
+              label={__(
+                "Bar Inner Padding (Space between bars in the same group)"
+              )}
+              value={barInnerPadding}
+              initialPosition={0.75}
+              onChange={(barInnerPadding) => setAttributes({ barInnerPadding })}
+              step={0.25}
+              min={0}
+              max={50}
+            />
+          </PanelRow>
         </PanelBody>
 
         <ChartLegends {...props}></ChartLegends>
 
         <PanelBody initialOpen={false} title={__("Line Overlay")}>
-            <PanelRow>
-                <ToggleControl
-                    label={__("Enable Overlay")}
-                    checked={lineLayerEnabled === true}
-                    onChange={(value) => setAttributes({lineLayerEnabled: !lineLayerEnabled})}/>
-            </PanelRow>
-            {lineLayerEnabled && <LineOverlay allMeasures={allMeasures} apps={apps} {...props}></LineOverlay>}
+          <PanelRow>
+            <ToggleControl
+              label={__("Enable Overlay")}
+              checked={lineLayerEnabled === true}
+              onChange={(value) =>
+                setAttributes({ lineLayerEnabled: !lineLayerEnabled })
+              }
+            />
+          </PanelRow>
+          {lineLayerEnabled && (
+            <LineOverlay
+              allMeasures={allMeasures}
+              apps={apps}
+              {...props}
+            ></LineOverlay>
+          )}
         </PanelBody>
-    </PanelBody>]
+      </PanelBody>,
+    ];
 }
 
 export default BarOptions
