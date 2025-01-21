@@ -24,7 +24,7 @@ import MobileConfig from './MobileConfig.jsx';
 import Tooltip from "../commons/Tooltip.jsx";
 import {togglePanel} from "../commons/Util";
 import Radar from './Radar.jsx';
-import {ALIVE_SUPERSET_APP} from '../commons/Constants';
+import {ALIVE_SUPERSET_APP, DEFAULT_FORMAT_SETTINGS} from '../commons/Constants';
 
 class BlockEdit extends BlockEditWithAPIMetadata {
     constructor(props) {
@@ -326,9 +326,10 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                                                 setAttributes({
                                                     datasetId: newDatasetId,
                                                     dimension1: 'none',
-                                                    dimension2: 'none'  
-
-                                          })
+                                                    dimension2: 'none',
+                                                    dimension3: 'none',	
+                                                    measures: Object.assign({}, DEFAULT_FORMAT_SETTINGS)
+                                                })
                                                 this.setState({dimensions: [], measures: [], filters: [], categories: []})
                                                 this.loadMetadata(newDatasetId)
                                             }}
