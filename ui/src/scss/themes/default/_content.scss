@@ -226,7 +226,9 @@ Alternative compacted style for columns
 
 // Removes extra white space
 .wp-block-spacer {
-  clear: none;
+  display: none !important;
+  clear: none !important;
+
 }
 
 // Facsheet references
