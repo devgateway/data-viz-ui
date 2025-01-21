@@ -1,4 +1,4 @@
-import React, {useLayoutEffect, useEffect, useRef, useState} from 'react'
+import React, {useLayoutEffect, useEffect, useRef, useState, LegacyRef} from 'react'
 import {Container, Accordion, Icon} from 'semantic-ui-react'
 import {
     PostConsumer,
@@ -29,7 +29,7 @@ export interface VerticalFeaturedTabsProps {
 
 const AccordionContent = ({ posts, activeItem, setActive, colors }) => {
     const [activeIndex, setActiveIndex] = useState(posts.findIndex(p => p.slug === activeItem));
-    const [scrollTarget, setScrollTarget] = useState(null);
+    const [scrollTarget, setScrollTarget] = useState<any>(null);
 
     const findElementAndAddStyles = (elementClass, containerClass, hasContainerClass) => {
         const elements = document.querySelectorAll(elementClass);
@@ -42,7 +42,6 @@ const AccordionContent = ({ posts, activeItem, setActive, colors }) => {
 
     useEffect(() => {
         if (scrollTarget) {
-            // @ts-ignore
             const offsetTop = scrollTarget.getBoundingClientRect().top + window.scrollY;
             window.scrollTo({
                 top: offsetTop,
@@ -154,7 +153,7 @@ const FeaturedTabs = ({editing, posts, height, colors, coverWidth}) => {
 
     const [active, setActive] = useState(null)
 
-    const targetRef = useRef();
+    const targetRef = useRef<HTMLDivElement>();
     const [dimensions, setDimensions] = useState({width: 0, height: 0});
 
 
@@ -162,11 +161,9 @@ const FeaturedTabs = ({editing, posts, height, colors, coverWidth}) => {
         setActive(k)
     }
     useLayoutEffect(() => {
-        if (targetRef.current) {
+        if (targetRef.current && targetRef.current.parentElement) {
             setDimensions({
-                // @ts-ignore
                 width: targetRef.current.parentElement.offsetWidth,
-                // @ts-ignore
                 height: targetRef.current.offsetHeight
             });
         }
@@ -178,15 +175,14 @@ const FeaturedTabs = ({editing, posts, height, colors, coverWidth}) => {
                 const isActive = active ? post.slug === active : i === 0
                 return <div
                     key={post.slug}
-                    // @ts-ignore
-                    ref={targetRef}
+                    ref={targetRef as LegacyRef<HTMLDivElement>}
                     onClick={e => toggleAnimation(post.slug)}
                     className={isActive ? "item expanded" : "item collapsed"}
                     style={{"minHeight": height + 'px', "minWidth": `${coverWidth}px`}}>
                     <a id={post.slug}></a>
                     <IntroWithFeaturedImage coverWidth={coverWidth}
                                             height={height}
-                                            backgroundColor={colors ? colors['color_' + i]: 'transparent'} count={posts.length}
+                                            backgroundColor={colors['color_' + i]} count={posts.length}
                                              dimensions={dimensions} active={isActive} post={post}/>
                 </div>
 
@@ -250,7 +246,7 @@ const Wrapper = (props) => {
         type={type}
         locale={locale}
         taxonomy={taxonomy}
-        categories={categories ? parse(categories).join(","): null}
+        categories={parse(categories).join(",")}
         store={"vertical_tabs" + parent + "_" + unique}
         page={1}
         perPage={items}
@@ -260,7 +256,7 @@ const Wrapper = (props) => {
             <AccordionContent
               posts={items}
               activeItem={items[0]?.slug}
-              colors={colors ? parse(colors): null}
+              colors={parse(colors)}
               setActive={() => {}}
             />
           ):  (
@@ -268,7 +264,7 @@ const Wrapper = (props) => {
               editing={editing}
               coverWidth={coverWidth}
               // @ts-ignore
-              moreLabel={moreLabel}
+              moreLabel={moreLabel as any}
               colors={colors ? parse(colors): null}
               height={height}
             ></FeaturedTabs>
@@ -281,4 +277,3 @@ const Wrapper = (props) => {
 
 
 export default Wrapper
-
