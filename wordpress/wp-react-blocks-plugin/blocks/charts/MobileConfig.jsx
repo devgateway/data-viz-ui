@@ -7,7 +7,11 @@ import {
 } from "@wordpress/components";
 import { __ } from "@wordpress/i18n";
 import { useEffect } from "react";
-import { getTranslatedOptions } from ".././commons/APIutils";
+import {
+  extractAxisValues,
+  getSelectedLabelsForApp,
+  updateMeasureLabels,
+} from "../commons/MobileConfigUtils";
 
 const MarginSection = ({
   setAttributes,
@@ -32,7 +36,7 @@ const MarginSection = ({
               },
             })
           }
-          min={0}
+          min={-500}
           max={500}
         />
       </PanelRow>
@@ -51,7 +55,7 @@ const MarginSection = ({
             })
           }
           step={1}
-          min={0}
+          min={-500}
           max={500}
         />
       </PanelRow>
@@ -67,7 +71,7 @@ const MarginSection = ({
               },
             })
           }
-          min={0}
+          min={-500}
           max={500}
         />
       </PanelRow>
@@ -83,7 +87,7 @@ const MarginSection = ({
               },
             })
           }
-          min={0}
+          min={-500}
           max={500}
         />
       </PanelRow>
@@ -104,12 +108,14 @@ const PaddingSection = ({
           )}
           value={mobileCustomization?.barPadding ?? barPadding}
           initialPosition={0.15}
-          onChange={(newBarPadding) => setAttributes({
-            mobileCustomization: {
-              ...mobileCustomization,
-              barPadding: newBarPadding,
-            },
-           })}
+          onChange={(newBarPadding) =>
+            setAttributes({
+              mobileCustomization: {
+                ...mobileCustomization,
+                barPadding: newBarPadding,
+              },
+            })
+          }
           step={0.05}
           min={0}
           max={1}
@@ -119,16 +125,16 @@ const PaddingSection = ({
       <PanelRow>
         <RangeControl
           label={__("Bar Inner Padding (Space between bars in the same group)")}
-          value={
-            mobileCustomization?.barInnerPadding ?? barInnerPadding
-          }
+          value={mobileCustomization?.barInnerPadding ?? barInnerPadding}
           initialPosition={0.75}
-          onChange={(barInnerPadding) => setAttributes({
-            mobileCustomization: {
-              ...mobileCustomization,
-              barInnerPadding: barInnerPadding,
-            },
-           })}
+          onChange={(barInnerPadding) =>
+            setAttributes({
+              mobileCustomization: {
+                ...mobileCustomization,
+                barInnerPadding: barInnerPadding,
+              },
+            })
+          }
           step={0.25}
           min={0}
           max={50}
@@ -137,7 +143,6 @@ const PaddingSection = ({
     </PanelBody>
   );
 };
-
 
 const TitleSection = ({
   setAttributes,
@@ -188,67 +193,93 @@ const TitleSection = ({
           }
         />
       </PanelRow>
-
     </PanelBody>
   );
 };
 
-function extractAxisValues(csvData) {
-  const lines = csvData.split("\n");
-  const firstColumnValues = lines?.slice(1)?.map((row) => {
-    return row.split(",")[0];
-  });
-  return firstColumnValues;
-}
+const IntervalsSection = ({
+  setAttributes,
+  attributes: { mobileCustomization, yAxisTickValues, xAxisTickValues, layout },
+}) => {
+  const isHorizontal =
+    (layout === "horizontal" &&
+      mobileCustomization.chartLayoutOverride === false) ||
+    (layout === "vertical" && mobileCustomization.chartLayoutOverride === true);
 
-function transformDataToAppObject(data, appName, existingObject = {}) {
-  if (existingObject[appName] !== undefined) {
-    return existingObject;
-  }
-  existingObject[appName] = {};
-  data.forEach((item) => {
-    const key = item.value;
-    existingObject[appName][key] = {
-      selected: false,
-      format: {
-        style: "percent",
-        minimumFractionDigits: 1,
-        maximumFractionDigits: 1,
-        currency: "USD",
-      },
-      hasCustomLabel: false,
-      customLabel: item.label || key,
-    };
-  });
+  const isVertical =
+    (layout === "vertical" &&
+      mobileCustomization.chartLayoutOverride === false) ||
+    (layout === "horizontal" &&
+      mobileCustomization.chartLayoutOverride === true);
 
-  return existingObject;
-}
-
-function getSelectedLabelsForApp(data, appName) {
-  const appData = data[appName];
-  if (!appData) {
-    return [];
-  }
-  return Object.keys(appData)
-    .filter((key) => appData[key].selected) // Filter out the selected items
-    .map((key) => {
-      return appData[key].hasCustomLabel
-        ? appData[key].customLabel
-        : appData[key].label;
-    });
-}
-
-const updateMeasureLabels = (data, measures, app) => {
-  transformDataToAppObject(data, app, measures);
-  const apiMeasures = getTranslatedOptions(data);
-  // for each api measure, find the corresponding measure in the measures array
-  // and add a label property to the measure in the measures array
-  apiMeasures.forEach((apiMeasure) => {
-    const measure = measures[app][apiMeasure.value];
-    if (measure) {
-      measure.label = apiMeasure.label;
+  const onIntervalChange = (value, prop, intervalProp) => {
+    const newObject = Object.assign({}, mobileCustomization);
+    if (newObject) {
+      newObject[prop] = value;
+      newObject[intervalProp] = true;
     }
-  });
+    setAttributes({ mobileCustomization: newObject });
+  };
+
+  return (
+    <PanelBody initialOpen={false} title={__("Intervals")}>
+      {
+        /**
+         * the number of intervals should default to the value set by yAxisTickValues
+         * this should only be displayed when the layout is vertical and the mobileCustomization.chartLayoutOverride is false
+         */
+        isVertical && (
+          <PanelRow>
+            <RangeControl
+              label={__("Number of Y Axis Intervals")}
+              value={
+                !mobileCustomization?.yAxisIntervalUserModified
+                  ? yAxisTickValues
+                  : mobileCustomization.yAxisTickValues
+              }
+              onChange={(newYAxisTickValue) =>
+                onIntervalChange(
+                  newYAxisTickValue,
+                  "yAxisTickValues",
+                  "yAxisIntervalUserModified"
+                )
+              }
+              min={0}
+              max={50}
+            />
+          </PanelRow>
+        )
+      }
+
+      {
+        /**
+         * the number of intervals should default to the value set by xAxisTickValues
+         * this should only be displayed when the layout is horizontal and the mobileCustomization.chartLayoutOverride is false
+         * */
+        isHorizontal && (
+          <PanelRow>
+            <RangeControl
+              label={__("Number of X Axis Intervals")}
+              value={
+                !mobileCustomization?.xAxisIntervalUserModified
+                  ? xAxisTickValues
+                  : mobileCustomization.xAxisTickValues
+              }
+              onChange={(newXAxisTickValue) =>
+                onIntervalChange(
+                  newXAxisTickValue,
+                  "xAxisTickValues",
+                  "xAxisIntervalUserModified"
+                )
+              }
+              min={0}
+              max={50}
+            />
+          </PanelRow>
+        )
+      }
+    </PanelBody>
+  );
 };
 
 const MobileConfig = (props) => {
@@ -262,6 +293,7 @@ const MobileConfig = (props) => {
       measures,
       dimension1,
       yAxisTickValues,
+      xAxisTickValues,
     },
   } = props;
 
@@ -274,7 +306,15 @@ const MobileConfig = (props) => {
         },
       });
     }
-  }, [yAxisTickValues]);
+    if (!mobileCustomization.xAxisIntervalUserModified) {
+      setAttributes({
+        mobileCustomization: {
+          ...mobileCustomization,
+          xAxisTickValues: xAxisTickValues,
+        },
+      });
+    }
+  }, [yAxisTickValues, xAxisTickValues]);
 
   let xAxisLabels = extractAxisValues(csv);
   if (app !== "csv") {
@@ -351,20 +391,14 @@ const MobileConfig = (props) => {
     return true;
   };
 
-  const onIntervalChange = (value) => {
-    const newObject = Object.assign({}, mobileCustomization);
-    if (newObject) {
-      newObject.yAxisTickValues = value;
-      newObject.yAxisIntervalUserModified = true;
-    }
-    setAttributes({ mobileCustomization: newObject });
-  };
-
   const isBarOrLineOrPie = ["bar", "line", "pie"].includes(type);
 
   const isBarOrLine = ["bar", "line"].includes(type);
   return (
-    <PanelBody initialOpen={false} title={__("Mobile & Tablet Customization Settings")}>
+    <PanelBody
+      initialOpen={false}
+      title={__("Mobile & Tablet Customization Settings")}
+    >
       <PanelRow>
         <ToggleControl
           label={__("Show Mobile & Tablet Customization Settings")}
@@ -421,24 +455,47 @@ const MobileConfig = (props) => {
                   }
                 />
               </PanelRow>
-
-              {/** the number of intervals should default to the value set by yAxisTickValues */}
               <PanelRow>
                 <RangeControl
-                  label={__("Number of Intervals")}
+                  label={__("Y Axis Line Height")}
                   value={
-                    !mobileCustomization?.yAxisIntervalUserModified
-                      ? yAxisTickValues
-                      : mobileCustomization.yAxisTickValues
+                    !mobileCustomization?.yAxisLineHeight
+                      ? 12
+                      : mobileCustomization.yAxisLineHeight
                   }
-                  onChange={(newYAxisTickValue) =>
-                    onIntervalChange(newYAxisTickValue)
+                  onChange={(value) =>
+                    setAttributes({
+                      mobileCustomization: {
+                        ...mobileCustomization,
+                        yAxisLineHeight: value,
+                      },
+                    })
                   }
                   min={0}
-                  max={50}
+                  max={30}
                 />
               </PanelRow>
-
+              <PanelRow>
+                <RangeControl
+                  label={__("Max Tick Word Length")}
+                  value={
+                    !mobileCustomization?.maxTickLength
+                      ? 25
+                      : mobileCustomization.maxTickLength
+                  }
+                  onChange={(value) =>
+                    setAttributes({
+                      mobileCustomization: {
+                        ...mobileCustomization,
+                        maxTickLength: value,
+                      },
+                    })
+                  }
+                  min={0}
+                  max={30}
+                />
+              </PanelRow>
+              <IntervalsSection {...props} />
               <PanelBody initialOpen={false} title={__("All Labels")}>
                 {xAxisLabels?.map((label, index) => (
                   <PanelRow key={`____${index}${label}`}>
@@ -458,7 +515,7 @@ const MobileConfig = (props) => {
             </>
           )}
           <MarginSection {...props} />
-          { type === "bar" && <PaddingSection {...props} /> }
+          {type === "bar" && <PaddingSection {...props} />}
         </>
       )}
     </PanelBody>

@@ -494,6 +494,8 @@ registerBlockType(process.env.BLOCKS_NS + '/chart',
                     },
                     xAxisDisabled: false,
                     tickRotation: 0,
+                    xAxisTickValues: 0,
+                    xAxisIntervalUserModified: false,
                     yAxisTickValues: 0,
                     yAxisIntervalUserModified: false,
                     chartLayoutOverride: false,
@@ -506,6 +508,8 @@ registerBlockType(process.env.BLOCKS_NS + '/chart',
                     showRightAxisTitle: true,
                     barPadding: 0.15,
                     barInnerPadding: 0.7,
+                    yAxisLineHeight: 12,
+                    maxTickLength: 25
                 }
             },
             reverseLegend: {
