@@ -494,7 +494,10 @@ const Chart = ({
 
   const CustomTick = (tick) => {
     const tickObject = Object.assign({}, tick);
-    if(isMobileCustomizationEnabled && hiddenLabels.includes(String(tickObject.value))) {
+    if (
+      isMobileCustomizationEnabled &&
+      hiddenLabels.includes(String(tickObject.value))
+    ) {
       tickObject.value = "";
     }
     const theme = useTheme();
@@ -504,7 +507,26 @@ const Chart = ({
     } else {
       effectiveTickColor = legendColor(tick);
     }
-    const width = getTextWidth(tickObject.value, "12px Roboto") + 30;
+    let lines = [];
+    let currentLine = "";
+    if(isMobileCustomizationEnabled) {
+      const words = String(tickObject.value).split(" ");
+      const maxLineLength = mobileConfigSettings?.maxTickLength ?? 25;
+      words.forEach((word) => {
+        if (currentLine.length + String(word).length <= maxLineLength) {
+          currentLine += (currentLine ? " " : "") + word;
+        } else {
+          lines.push(currentLine);
+          currentLine = word;
+        }
+      });
+      if (currentLine) {
+        lines.push(currentLine);
+      }
+    } else {
+      lines = [tickObject.value];
+    }
+    const lineHeight = mobileConfigSettings?.yAxisLineHeight ?? 12;
 
     if (tickRotation > 0 && tickRotation < 180) {
       return (
@@ -519,29 +541,23 @@ const Chart = ({
           )}
 
           <g transform={`translate(0, ${tick.y + offsetText})`}>
-            {/* <rect
-              transform={`rotate(${tickRotation})`}
-              x={-12}
-              y={-12}
-              rx={2}
-              ry={2}
-              width={width}
-              height={22}
-              fill={"#FFFFFF"}
-            /> */}
-
-            <text
-              transform={`rotate(${tickRotation})`}
-              textAnchor="start"
-              dominantBaseline="middle"
-              style={{
-                ...theme.axis.ticks.text,
-                fill: xLabelColor === "null" ? "black" : xLabelColor,
-                fontSize: "12px",
-              }}
-            >
-              {tickObject.value}
-            </text>
+            {lines.map((line, i) => (
+              <text
+                key={i}
+                transform={`rotate(${tickRotation})`}
+                textAnchor="start"
+                y={typeof tick.value === "number" ? 0 : i * lineHeight}
+                dominantBaseline="middle"
+                style={{
+                  ...theme.axis.ticks.text,
+                  fill: xLabelColor === "null" ? "black" : xLabelColor,
+                  fontSize: "12px",
+                  fontFamily: "Roboto",
+                }}
+              >
+                {line}
+              </text>
+            ))}
           </g>
         </g>
       );
@@ -558,29 +574,23 @@ const Chart = ({
           )}
 
           <g transform={`translate(0, ${tick.y + offsetText})`}>
-            {/* <rect
-              transform={`rotate(${tickRotation - 180})`}
-              x={-12}
-              y={-10}
-              rx={2}
-              ry={2}
-              width={width}
-              height={22}
-              fill={"#FFFFFF"}
-            /> */}
-
-            <text
-              transform={`rotate(${tickRotation})`}
-              textAnchor="end"
-              dominantBaseline="middle"
-              style={{
-                ...theme.axis.ticks.text,
-                fill: xLabelColor === "null" ? "black" : xLabelColor,
-                fontSize: "12px",
-              }}
-            >
-              {tickObject.value}
-            </text>
+            {lines.map((line, i) => (
+              <text
+                key={i}
+                transform={`rotate(${tickRotation})`}
+                textAnchor="start"
+                y={typeof tick.value === "number" ? 0 : i * lineHeight}
+                dominantBaseline="middle"
+                style={{
+                  ...theme.axis.ticks.text,
+                  fill: xLabelColor === "null" ? "black" : xLabelColor,
+                  fontSize: "12px",
+                  fontFamily: "Roboto",
+                }}
+              >
+                {line}
+              </text>
+            ))}
           </g>
         </g>
       );
@@ -597,29 +607,23 @@ const Chart = ({
           )}
 
           <g transform={`translate(0, ${tick.y + offsetText})`}>
-            {/* <rect
-              transform={`rotate(${tickRotation})`}
-              x={(-1 * width) / 2}
-              y={-12}
-              rx={2}
-              ry={2}
-              width={width}
-              height={22}
-              fill={"#FFFFFF"}
-            /> */}
-
-            <text
-              transform={`rotate(${tickRotation})`}
-              textAnchor="middle"
-              dominantBaseline="middle"
-              style={{
-                ...theme.axis.ticks.text,
-                fill: xLabelColor === "null" ? "black" : xLabelColor,
-                fontSize: "12px",
-              }}
-            >
-              {tickObject.value}
-            </text>
+            {lines.map((line, i) => (
+              <text
+                key={i}
+                transform={`rotate(${tickRotation})`}
+                textAnchor="start"
+                y={typeof tick.value === "number" ? 0 : i * lineHeight}
+                dominantBaseline="middle"
+                style={{
+                  ...theme.axis.ticks.text,
+                  fill: xLabelColor === "null" ? "black" : xLabelColor,
+                  fontSize: "12px",
+                  fontFamily: "Roboto",
+                }}
+              >
+                {line}
+              </text>
+            ))}
           </g>
         </g>
       );
@@ -1010,6 +1014,58 @@ if(isMobileCustomizationEnabled) {
     }
 }
 
+
+const AxisLeftCustomTick = (tick) => {
+  if (
+    isMobileCustomizationEnabled &&
+    hiddenLabels.includes(String(tick.value))
+  ) {
+    return "";
+  }
+  const maxLineLength = mobileConfigSettings?.maxTickLength ?? 25;
+  const words =
+    typeof tick.value === "string" ? tick.value.split(" ") : [tick.value];
+  let lines = [];
+  let currentLine = "";
+
+  words.forEach((word) => {
+    if (currentLine.length + String(word).length <= maxLineLength) {
+      currentLine += (currentLine ? " " : "") + word;
+    } else {
+      lines.push(currentLine);
+      currentLine = word;
+    }
+  });
+
+  if (currentLine) {
+    lines.push(currentLine);
+  }
+  const lineHeight = mobileConfigSettings?.yAxisLineHeight ?? 12;
+  return (
+    <g transform={`translate(${tick.x},${tick.y})`}>
+      <line x1={-5} x2={0} y1={0} y2={0} stroke={"#000"} strokeWidth={1} />
+      {lines
+        .map((line, i) => (
+          <text
+            key={i}
+            x={-10}
+            y={typeof tick.value === "number" ? 0: i * lineHeight}
+            textAnchor="end"
+            dominantBaseline="middle"
+            style={{
+              fill: xLabelColor === "null" ? "black" : xLabelColor,
+              fontSize: "12px",
+              fontFamily: "Roboto",
+            }}
+          >
+            {line}
+          </text>
+        ))}
+    </g>
+  );
+};
+
+
   return (
     <div style={{ height: height }}>
       {options && options.data && options.data.length > 0 && (
@@ -1122,21 +1178,25 @@ if(isMobileCustomizationEnabled) {
               legend: legends.left,
               legendPosition: "middle",
               legendOffset: parseInt(offsetY),
-              format: (value) => {
-                if(!value) return "";
-                if (layout == "vertical") {
-                  const effectiveFormat = customAxisFormat
-                    ? customAxisFormat
-                    : format;
-                  return intl.formatNumber(
-                    effectiveFormat.style === "percent" ? value / 100 : value,
-                    {
-                      ...effectiveFormat,
+              ...(
+                isMobileCustomizationEnabled ? { renderTick: AxisLeftCustomTick }
+                : {
+                  format: (value) => {
+                    if(!value) return "";
+                    if (layout === "vertical") {
+                      const effectiveFormat = customAxisFormat
+                        ? customAxisFormat
+                        : format;
+                      return intl.formatNumber(
+                        effectiveFormat.style === "percent" ? value / 100 : value,
+                        {
+                          ...effectiveFormat,
+                        }
+                      );
                     }
-                  );
-                }
-                return value;
-              },
+                    return value;
+                  },
+                  }),
             }}
             enableGridY={enableGridY}
             enableGridX={enableGridX}
