@@ -21,20 +21,23 @@ const TimeLine = (props) => {
     posts,
     lineWidth,
     lineColor,
-    height,
     config,
     marginLeft,
     marginTop,
     marginRight,
     marginBottom,
     fontSize,
-    subtitleWidth,
     subtitleHeight,
     enableTitlePopup,
     enableCirclePopup,
     enableDefaultPopup,
     closePopupOnMouseOut,
     unique,
+  } = props;
+
+  let {
+    height,
+    subtitleWidth
   } = props;
 
   height = window.innerHeight;
@@ -422,8 +425,7 @@ const PostCarousel = (props) => {
     "data-margin-bottom": marginBottom = 25,
     "data-font-size": fontSize = 14,
     "data-title-width": titleWidth = 100,
-    "data-title-height": titleHeight = 50,
-    "data-subtitle-width": subtitleWidth = 250,
+    "data-title-height": titleHeight = 50, 
     "data-subtitle-height": subtitleHeight = 60,
     "data-enable-title-popup": enableTitlePopup = "false",
     "data-enable-circle-popup": enableCirclePopup = "true",
@@ -432,6 +434,10 @@ const PostCarousel = (props) => {
     editing,
     parent,
     unique,
+  } = props;
+
+  let {
+    "data-subtitle-width": subtitleWidth = 250,
   } = props;
 
   const locale = props.intl.locale;
