@@ -476,7 +476,7 @@ const Chart = (props) => {
     valueScale,
     categories,
     lineLayerEnabled: lineLayerEnabled == true || lineLayerEnabled == "true",
-    overlays: parse(overlays) || [],
+    overlays: overlays ? parse(overlays) : [],
     barColor: decodeURIComponent(barColor),
     overrideTickColor: overrideTickColor == true || overrideTickColor == "true",
     fixedMinValue,
