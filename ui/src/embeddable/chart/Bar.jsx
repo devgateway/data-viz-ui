@@ -578,7 +578,7 @@ const Chart = ({
               <text
                 key={i}
                 transform={`rotate(${tickRotation})`}
-                textAnchor="start"
+                textAnchor="end"
                 y={typeof tick.value === "number" ? 0 : i * lineHeight}
                 dominantBaseline="middle"
                 style={{
@@ -611,7 +611,7 @@ const Chart = ({
               <text
                 key={i}
                 transform={`rotate(${tickRotation})`}
-                textAnchor="start"
+                textAnchor="middle"
                 y={typeof tick.value === "number" ? 0 : i * lineHeight}
                 dominantBaseline="middle"
                 style={{
