@@ -455,46 +455,90 @@ const MobileConfig = (props) => {
                   }
                 />
               </PanelRow>
-              <PanelRow>
-                <RangeControl
-                  label={__("Y Axis Line Height")}
-                  value={
-                    !mobileCustomization?.yAxisLineHeight
-                      ? 12
-                      : mobileCustomization.yAxisLineHeight
-                  }
-                  onChange={(value) =>
-                    setAttributes({
-                      mobileCustomization: {
-                        ...mobileCustomization,
-                        yAxisLineHeight: value,
-                      },
-                    })
-                  }
-                  min={0}
-                  max={30}
-                />
-              </PanelRow>
-              <PanelRow>
-                <RangeControl
-                  label={__("Max Tick Word Length")}
-                  value={
-                    !mobileCustomization?.maxTickLength
-                      ? 25
-                      : mobileCustomization.maxTickLength
-                  }
-                  onChange={(value) =>
-                    setAttributes({
-                      mobileCustomization: {
-                        ...mobileCustomization,
-                        maxTickLength: value,
-                      },
-                    })
-                  }
-                  min={0}
-                  max={30}
-                />
-              </PanelRow>
+              <PanelBody initialOpen={false} title={__("Tablet Settings")}>
+                <PanelRow>
+                  <RangeControl
+                    label={__("Tablet Y Axis Line Height")}
+                    value={
+                      !mobileCustomization?.tabletYAxisLineHeight
+                        ? 12
+                        : mobileCustomization.tabletYAxisLineHeight
+                    }
+                    onChange={(value) =>
+                      setAttributes({
+                        mobileCustomization: {
+                          ...mobileCustomization,
+                          tabletYAxisLineHeight: value,
+                        },
+                      })
+                    }
+                    min={0}
+                    max={30}
+                  />
+                </PanelRow>
+                <PanelRow>
+                  <RangeControl
+                    label={__("Tablet Max Tick Word Length")}
+                    value={
+                      !mobileCustomization?.tabletMaxTickLength
+                        ? 25
+                        : mobileCustomization.tabletMaxTickLength
+                    }
+                    onChange={(value) =>
+                      setAttributes({
+                        mobileCustomization: {
+                          ...mobileCustomization,
+                          tabletMaxTickLength: value,
+                        },
+                      })
+                    }
+                    min={0}
+                    max={30}
+                  />
+                </PanelRow>
+              </PanelBody>
+              <PanelBody initialOpen={false} title={__("Mobile Settings")}>
+                <PanelRow>
+                  <RangeControl
+                    label={__("Mobile Y Axis Line Height")}
+                    value={
+                      !mobileCustomization?.mobileYAxisLineHeight
+                        ? 12
+                        : mobileCustomization.mobileYAxisLineHeight
+                    }
+                    onChange={(value) =>
+                      setAttributes({
+                        mobileCustomization: {
+                          ...mobileCustomization,
+                          mobileYAxisLineHeight: value,
+                        },
+                      })
+                    }
+                    min={0}
+                    max={30}
+                  />
+                </PanelRow>
+                <PanelRow>
+                  <RangeControl
+                    label={__("Mobile Max Tick Word Length")}
+                    value={
+                      !mobileCustomization?.mobileMaxTickLength
+                        ? 25
+                        : mobileCustomization.mobileMaxTickLength
+                    }
+                    onChange={(value) =>
+                      setAttributes({
+                        mobileCustomization: {
+                          ...mobileCustomization,
+                          mobileMaxTickLength: value,
+                        },
+                      })
+                    }
+                    min={0}
+                    max={30}
+                  />
+                </PanelRow>
+              </PanelBody>
               <IntervalsSection {...props} />
               <PanelBody initialOpen={false} title={__("All Labels")}>
                 {xAxisLabels?.map((label, index) => (

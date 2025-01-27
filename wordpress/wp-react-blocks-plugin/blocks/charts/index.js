@@ -508,8 +508,10 @@ registerBlockType(process.env.BLOCKS_NS + '/chart',
                     showRightAxisTitle: true,
                     barPadding: 0.15,
                     barInnerPadding: 0.7,
-                    yAxisLineHeight: 12,
-                    maxTickLength: 25
+                    mobileYAxisLineHeight: 12,
+                    mobileMaxTickLength: 25,
+                    tabletYAxisLineHeight: 12,
+                    tabletMaxTickLength: 25,
                 }
             },
             reverseLegend: {

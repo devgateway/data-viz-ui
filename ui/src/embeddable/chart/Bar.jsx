@@ -79,11 +79,13 @@ const Chart = ({
   enableGridX,
   customAxisFormat
 }) => {
-  const isMobile = deviceType() === "mobile";
+  const isMobileOrTablet = ['mobile', 'tablet', 'midTablet'].includes(deviceType());
+  const isTabletDevice = ['tablet', 'midTablet'].includes(deviceType())
+  const isMobileDevice = deviceType() === 'mobile';
   const LABEL_SKIP_WIDTH = 30; // important for vertical layout
   const LABEL_SKIP_HEIGHT = 15; // important for horizontal layout
   const mobileConfigSettings = JSON.parse(decodeURIComponent(mobileCustomization));
-  const isMobileCustomizationEnabled = isMobile && (mobileConfigSettings?.showCustomization ?? false);
+  const isMobileCustomizationEnabled = isMobileOrTablet && (mobileConfigSettings?.showCustomization ?? false);
   const normalizeLabelColor = () => {
     if (barLabelColor === "null" || barLabelColor === null || !barLabelColor) {
       return "#000000";
@@ -511,7 +513,13 @@ const Chart = ({
     let currentLine = "";
     if(isMobileCustomizationEnabled) {
       const words = String(tickObject.value).split(" ");
-      const maxLineLength = mobileConfigSettings?.maxTickLength ?? 25;
+      let maxLineLength = 25;
+      if(isMobileDevice) {
+        maxLineLength = mobileConfigSettings?.mobileMaxTickLength ?? 25;
+      } else if(isTabletDevice) {
+        maxLineLength = mobileConfigSettings?.tabletMaxTickLength ?? 25;
+      }
+
       words.forEach((word) => {
         if (currentLine.length + String(word).length <= maxLineLength) {
           currentLine += (currentLine ? " " : "") + word;
@@ -526,8 +534,12 @@ const Chart = ({
     } else {
       lines = [tickObject.value];
     }
-    const lineHeight = mobileConfigSettings?.yAxisLineHeight ?? 12;
-
+    let lineHeight = 12;
+    if(isMobileDevice) {
+      lineHeight = mobileConfigSettings?.mobileYAxisLineHeight ?? 12;
+    } else if(isTabletDevice) {
+      lineHeight = mobileConfigSettings?.tabletYAxisLineHeight ?? 12;
+    }
     if (tickRotation > 0 && tickRotation < 180) {
       return (
         <g transform={`translate(${tick.x},${tick.y + 30})`}>
@@ -1022,7 +1034,12 @@ const AxisLeftCustomTick = (tick) => {
   ) {
     return "";
   }
-  const maxLineLength = mobileConfigSettings?.maxTickLength ?? 25;
+  let maxLineLength = 25;
+  if(isMobileDevice) {
+    maxLineLength = mobileConfigSettings?.mobileMaxTickLength ?? 25;
+  } else if(isTabletDevice) {
+    maxLineLength = mobileConfigSettings?.tabletMaxTickLength ?? 25;
+  }
   const words =
     typeof tick.value === "string" ? tick.value.split(" ") : [tick.value];
   let lines = [];
@@ -1040,7 +1057,12 @@ const AxisLeftCustomTick = (tick) => {
   if (currentLine) {
     lines.push(currentLine);
   }
-  const lineHeight = mobileConfigSettings?.yAxisLineHeight ?? 12;
+  let lineHeight = 12;
+  if(isMobileDevice) {
+    lineHeight = mobileConfigSettings?.mobileYAxisLineHeight ?? 12;
+  } else if(isTabletDevice) {
+    lineHeight = mobileConfigSettings?.tabletYAxisLineHeight ?? 12;
+  }
   return (
     <g transform={`translate(${tick.x},${tick.y})`}>
       <line x1={-5} x2={0} y1={0} y2={0} stroke={"#000"} strokeWidth={1} />
