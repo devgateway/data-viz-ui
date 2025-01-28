@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { connect } from "react-redux";
 import DataProvider from "../data/DataProvider";
@@ -28,7 +27,7 @@ const MapWrapper = (props) => {
         "data-csv": csv = '',
         'data-dimension1': dimension1 = '',
         'data-dimension2': dimension2 = '',
-        "data-measures": measures = '[]',
+        "data-measures": measures = '["prevalenceSmokeAny"]',
         "data-height": height = 600,
           width = 960,
         "data-data-source-text": dataSourceText = 'NIDS',
@@ -76,7 +75,7 @@ const MapWrapper = (props) => {
         'data-map-container-bg-color': mapContainerBgColor = '#fff',
         'data-map-position': mapPosition = '{}',
         "data-main-layer-id": mainLayerId = '',
-        'data-enabled-layers': enabledLayers = '[]',
+        'data-enabled-layers': enabledLayers,
         'data-point-label-color': pointLabelColor = '#fff',
         'data-point-label-format': pointLabelFormat = '{locationName} %({value},2)',
         'data-show-no-data-legend-item': showNoDataLegendItem = false,
@@ -103,13 +102,11 @@ const MapWrapper = (props) => {
 
     const parse = (value) => {
         try {
-            return JSON.parse(decode(value)); 
+            return JSON.parse(decode(value))
         } catch (error) {
-            console.error("Error parsing value:", value, error);
-            return null;
-        }
+            console.error("error parsing value:" + value)
+        } 
     }
-
 
     const getBreaks = (legendBreaks) => {
         let legendBreaksNew = parse(legendBreaks) || []
