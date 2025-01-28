@@ -103,7 +103,7 @@ const Chart = (props) => {
     //"data-csv-line-tooltip": lineTooltip = "",
     //"data-csv-line-title": lineTitle = "",
 
-    "data-overlays": overlays,
+    "data-overlays": overlays = "[]",
     "data-max-value": maxValue = "auto",
     "data-value-scale": valueScale = "linear",
     "data-swap": swap = "false",
