@@ -16,6 +16,7 @@ import { formatContent } from "../common/MapTooltip";
 import getDeviceCategory from '../../utils/deviceType';
 
 import * as geoStats from "geostats";
+import { Config } from "@/conf";
 const COLOR_VARIABLE = "_Color_";
 const LOCATION = "location";
 const SHOW_ALL = "showAll";
@@ -262,12 +263,14 @@ componentWillUnmount() {
       layers: [],
       layersLoading: true,
     });
+
+    console.log("enabledLayers", enabledLayers)
     if (enabledLayers && enabledLayers.length > 0) {
       const metadataFuncs = [];
       enabledLayers.forEach((l) => {
         metadataFuncs.push(
           new Promise((resolve, reject) => {
-            d3.json(process.env.REACT_APP_WP_API + "/wp/v2/media/" + l.id)
+            d3.json(Config.REACT_APP_WP_API + "/wp/v2/media/" + l.id)
               .then((data) => {
                 resolve({ id: l.id, url: data.source_url, index: l.index });
               })
