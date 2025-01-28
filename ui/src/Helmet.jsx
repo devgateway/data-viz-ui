@@ -7,7 +7,7 @@ const useHash = process.env.VITE_REACT_APP_USE_HASH_LINKS === true;
 
 export const replaceHTMLinks = (html, locale) => {
 
-    const replacementTarget = process.env.VITE_REACT_APP_WP_HOSTS.split(",");
+    const replacementTarget = process.env.VITE_REACT_APP_WP_HOSTS?.split(",") || [];
 
     const all = new RegExp("^(http|https)://(" + replacementTarget.join('|') + ")", "ig");
     let link;
