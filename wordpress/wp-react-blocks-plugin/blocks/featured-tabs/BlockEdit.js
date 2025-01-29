@@ -73,7 +73,7 @@ class BlockEdit extends BlockEditWithFilters {
                                     label={__("Height", "dg")}
                                     value={height}
                                     onChange={(newHeight) => setAttributes({ height: newHeight })}
-                                    min={500} // set a minimum height value
+                                    min={1} // set a minimum height value
                                     max={2500} // set a maximum height value
                                 />
                             </PanelRow>
