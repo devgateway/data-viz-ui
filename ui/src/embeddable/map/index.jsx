@@ -92,6 +92,8 @@ const MapWrapper = (props) => {
         'data-labels-exclusion-list': labelsExclusionList = "",
         'data-custom-measure-labels': customMeasureLabels = "{}",
         'data-show-shading-layer-labels': showShadingLayerLabels = "ifUnitHasData",
+        "data-dataset-id": datasetId,
+        "data-apache-superset-url": apacheSupersetUrl = ""
     } = props  
 
     const decode = (value) => {
@@ -103,10 +105,14 @@ const MapWrapper = (props) => {
 
     const parse = (value) => {
         try {
-            return JSON.parse(decode(value))
+          if (value) {
+            return JSON.parse(decode(value));
+          }      
         } catch (error) {
-            console.error("error parsing value:" + value)
-        } 
+          console.error("error parsing value:" + value);
+        }
+    
+        return null;
     }
 
     const getBreaks = (legendBreaks) => {
@@ -228,14 +234,26 @@ const MapWrapper = (props) => {
         zoomOnFilterField: zoomOnFilterField,
         noDataText,
         labelsExclusionList: labelsExclusionList.split(',').map(l => l.trim()),
-        showShadingLayerLabels
+        showShadingLayerLabels,
+        datasetId,
+        apacheSupersetUrl
     } 
       
     const measureLabels = parse(customMeasureLabels) || {}
     const DataFrame = app === "csv" ? MapCSVDataFrame : MapDataFrame;   
-    const measuresCSV = editing ? (parse(measures) || []).join(',') : measures    
+    const measuresCSV = editing ? (parse(measures) || []).join(',') : measures  
+    
+    const params = getFilters(filters)
+    if (datasetId) {
+        params.datasetId = datasetId;
+      }
+    
+      if (apacheSupersetUrl) {
+        params.apacheSupersetUrl = decodeURIComponent(apacheSupersetUrl);
+      }
+
     return (<DataProvider 
-        params={getFilters(filters)}
+        params={params}
         app={app}
         csv={decodeURIComponent(csv)}
         group={group}
