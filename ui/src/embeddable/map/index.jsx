@@ -37,7 +37,7 @@ const MapWrapper = (props) => {
         "data-legend-breaks": legendBreaks = '[]',
         "data-zoom-enabled": zoomEnabled = false, 
         "data-show-legend-labels": showLegendLabels = false,
-        "data-map-file": mapFile = 'NG_Zones_topoJSON.json',
+        "data-map-file": mapFile = 'africa-geojson-tanzania-others-en-v2.json',
         "data-mapping-field": mappingField = 'zone',
         "data-map-label-field": mapLabelField = "admin",
         "data-has-multiple-measures": hasMultipleMeasures = "false",         
