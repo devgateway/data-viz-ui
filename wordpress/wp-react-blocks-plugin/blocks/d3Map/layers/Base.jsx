@@ -296,7 +296,7 @@ class LayerWithMetadata extends BlockEditWithAPIMetadata {
             .then(response => response.json())
             .then(data => {
                 const apps = data.applications ? [...data.applications.application
-                    .filter(a => a.instance[0].metadata.type === 'starter')
+                    .filter(a => a.instance[0].metadata.type === 'data')
                     .map(a => ({
                         label: a.name, value: a.instance[0].vipAddress, settings: a.instance[0]
                     })), {label: 'CSV', value: 'csv'}] : [{label: 'CSV', value: 'csv'}]
