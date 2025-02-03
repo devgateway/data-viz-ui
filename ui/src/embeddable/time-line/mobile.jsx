@@ -19,8 +19,6 @@ const DEFAULT_HIGHLIGHTED_POST = 0;
 const TimeLine = (props) => {
   const {
     posts,
-    lineWidth,
-    lineColor,
     config,
     marginLeft,
     marginTop,
@@ -33,6 +31,11 @@ const TimeLine = (props) => {
     enableDefaultPopup,
     closePopupOnMouseOut,
     unique,
+  } = props;
+
+  let {
+    lineWidth,
+    lineColor
   } = props;
 
   let {
