@@ -3,6 +3,8 @@ import { Provider } from 'react-redux'
 import { Route, Routes, BrowserRouter, Navigate, useLocation, useParams, createBrowserRouter, createRoutesFromElements, RouterProvider } from 'react-router-dom';
 import { store } from './redux/store'
 import messages_en from "./translations/en.json";
+import messages_fr from "./translations/fr.json";
+import messages_am from './translations/af.json';
 import { updateIntl } from '@/lib/react-intl-redux'
 import { injectIntl, IntlProvider } from "react-intl";
 import ResponsiveContainer from './layout'
@@ -29,7 +31,9 @@ import SlugPostContainer from './layout/containers/SlugPostContainer';
 import withTracker from './withTracker';
 
 const messages = {
-    'en': messages_en
+    'en': messages_en,
+    'fr' : messages_fr,
+    'am' : messages_am
 };
 
 const PreviewComponentParameterParser = () => {
@@ -92,7 +96,6 @@ const IntlRoutes = () => {
     const pathParams = useParams();
 
     const locale = pathParams.lan;
-    console.log("locale", locale)
 
 
 
