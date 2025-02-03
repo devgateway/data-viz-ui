@@ -24,6 +24,12 @@
   }
 }
 
+@media screen and (max-width: 767px) {
+  .viz.tabbed.posts.container {
+    min-height: unset;
+  } 
+}
+
 
 .ui.grid.tabbed.posts {
   background-color: transparent !important;
