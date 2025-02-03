@@ -18,7 +18,7 @@ const SlugPostContainer = () => {
                 locale={locale}
             >
                 <PostConsumer>
-                    <Post></Post>
+                    <Post/>
                 </PostConsumer>
             </PostProvider>
         </ResponsiveContainer>
