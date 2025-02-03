@@ -2,22 +2,21 @@ import { Container, Image, Menu } from "semantic-ui-react";
 import React, { useEffect, useState } from "react";
 import { MediaConsumer, MediaProvider, MenuConsumer, MenuProvider, utils } from "@devgateway/wp-react-lib";
 import { injectIntl } from "react-intl";
-import { withRouter } from "@/withRouter"
-import SearchControl from "./SearchControl.jsx";
-import LangSwitcher from "./LangSwitcher.jsx";
-import { NavLink, useParams } from "react-router-dom";
+import { useParams, Link, NavLink } from "react-router-dom";
+import SearchControl from "./SearchControl";
+import LangSwitcher from "./LangSwitcher";
 
-const getPath = (menu, locationParams) => {
+const getPath = (menu, params) => {
     const path = [];
     menu.items.forEach(item => {
         if (item.child_items) {
             item.child_items.forEach(ch => {
-                if (ch.slug === locationParams.slug) {
+                if (ch.slug == params.slug) {
                     path.push(item)
                     path.push(ch)
                 }
             })
-        } else if (item.slug === locationParams.slug && item.url !== '/') {
+        } else if (item.slug == params.slug && item.url != '/') {
             path.push(item)
         }
     })
@@ -35,211 +34,132 @@ const localReplaceLink = (url, locale) => {
     return ""
 }
 
-const BreadCrumbs = withRouter(injectIntl(({ menu, intl }) => {
+const BreadCrumbs = injectIntl(({ menu, intl }) => {
     const params = useParams();
-    const path = getPath(menu, params)
+    const path = getPath(menu, params);
     return <React.Fragment>
 
-        {path.filter((i) => i.url !== "#wpm-languages").map((i, idx) => !i.child_items ?
-            <a key={idx} className={i.slug === params.slug ? 'active' : ''}
+        {path.filter(i => i.url != "#wpm-languages").map(i => !i.child_items ?
+            <a className={i.slug == params.slug ? 'active' : ''}
                 href={utils.replaceLink(i.url, intl.locale)}> {i.post_title}</a> :
-            <span key={idx}>{i.post_title} </span>)}
+            <span>{i.post_title} </span>)}
     </React.Fragment>
 
-}))
+});
 
 /*
 Setting objects will inject customization preview
 * */
-const MenuItems = injectIntl(
-    ({
-        settings,
-        withIcons,
-        active,
-        menu,
-        onSetSelected,
-        selected,
-        intl: { locale },
-        isSmallScreen,
-    }) => {
-        const params = useParams();
-        useEffect(
-            (e) => {
-                if (!selected) {
-                    const pathSelected = getPath(menu, params);
-                    const items = pathSelected.filter((i) => i.menu_item_parent == 0);
-                    if (items) {
-                        onSetSelected(items[0]);
-                    }
-                }
-            },
-            [params, menu, onSetSelected, selected]
-        );
+const MenuItems = injectIntl(({
+    settings,
+    withIcons,
+    active,
+    menu,
+    onSetSelected,
+    selected,
+    intl: { locale }
+}) => {
 
-        /*Original menu mixed with customization changes*/
-        const [mixedMenu, setMixedMenu] = useState(null);
-        //const [removedItems, setRemoved] = useState(null)
-
-        useEffect(() => {
-            setMixedMenu(menu);
-        }, [menu]);
-
-        useEffect(() => {
-            if (settings && settings.menu_settings && mixedMenu) {
-                const removed = [];
-                const newItems = menu.items.map((item) => {
-                    //if menu exists in partial settings
-                    //if item  deleted
-                    if (
-                        settings.menu_settings &&
-                        settings.menu_settings["nav_menu_item[" + item.ID + "]"] === false
-                    ) {
-                        removed.push(item.ID);
-                    }
-                    //if item  removed
-                    if (
-                        settings.menu_settings &&
-                        settings.menu_settings["nav_menu_item[" + item.ID + "]"]
-                    ) {
-                        const updatedItem =
-                            settings.menu_settings["nav_menu_item[" + item.ID + "]"];
-                        return {
-                            ...item,
-                            ...settings.menu_settings["nav_menu_item[" + item.ID + "]"],
-                        };
-                    } else {
-                        return item;
-                    }
-                });
-                //if item is new
-                Object.keys(settings.menu_settings).map((mk) => {
-                    const value = settings.menu_settings[mk];
-                    if (value.type == "nav_menu_item") {
-                        const re = /(-)?[0-9]+/g;
-                        const results = re.exec(mk);
-                        const id = parseInt(results[0]);
-                        const exists = newItems.find((m) => m.ID == id);
-                        if (!exists) {
-                            newItems.push(value.value);
-                        }
-                    }
-                });
-                setMixedMenu({
-                    ...menu,
-                    items: newItems.filter((i) => removed.indexOf(i.ID) === -1),
-                });
-
-                /*
-                  const items = menu.items.map(item => {
-                      if (settings.menu_settings && settings.menu_settings["nav_menu_item[" + item.ID + "]"]) {
-                          return {...item, ...settings.menu_settings["nav_menu_item[" + item.ID + "]"]}
-                      } else {
-                          return item;
-                      }
-                  })*/
-
-                //  setMixedMenu({...menu, items:newItems})
+    const params = useParams()
+    useEffect((e) => {
+        if (!selected) {
+            const pathSelected = getPath(menu, params)
+            const items = pathSelected.filter(i => i.menu_item_parent == 0)
+            if (items) {
+                onSetSelected(items[0])
             }
-        }, [settings]);
+        }
 
-        const [isMobileResolution, setIsMobileResolution] = useState(false);
+    }, [menu, onSetSelected, selected])
 
-        useEffect(() => {
-            const handleResize = () => {
-                setIsMobileResolution(window.innerWidth <= 1024);
-            };
+    /*Original menu mixed with customization changes*/
+    const [mixedMenu, setMixedMenu] = useState(null)
+    //const [removedItems, setRemoved] = useState(null)
 
-            // Initial check and event listener
-            handleResize();
-            window.addEventListener("resize", handleResize);
+    useEffect(() => {
+        setMixedMenu(menu)
+    }, [menu])
 
-            // Cleanup on unmount
-            return () => window.removeEventListener("resize", handleResize);
-        }, []);
 
-        return (
-            mixedMenu && (
-                <React.Fragment>
-                    {mixedMenu.items
-                        .filter((i) => i.url !== "#wpm-languages")
-                        .map((item, index) => (
-                            <React.Fragment key={item.ID}>
-                                {/* Render parent menu item */}
-                                <Menu.Item
-                                    className={`divided ${item.child_items ? "has-child-items" : ""
-                                        }
-                              ${selected && selected.ID === item.ID
-                                            ? "selected"
-                                            : ""
-                                        }
-                              ${active === item.slug ? "active" : ""}`}
-                                >
-                                    {withIcons && (
-                                        <a href={localReplaceLink(item.url, locale)}>
-                                            <div className={"mark"}>
-                                                <span className="sr-only">{item.title}</span>
-                                            </div>
-                                        </a>
-                                    )}
-                                    {isSmallScreen ? (
-                                        item.child_items ? (
-                                            <span
-                                                onClick={() =>
-                                                    onSetSelected(selected === item ? null : item)
-                                                }
-                                            >
-                                                {item.title}
-                                            </span>
-                                        ) : (
-                                            <a href={localReplaceLink(item.url, locale)}>
-                                                {item.title}
-                                            </a>
-                                        )
-                                    ) : item.child_items ? (
-                                        <span onMouseOver={(e) => onSetSelected(item)}>
-                                            {item.title}
-                                        </span>
-                                    ) : (
-                                        <a
-                                            onMouseOut={(e) => onSetSelected(null)}
-                                            onMouseOver={(e) => onSetSelected(item)}
-                                            href={localReplaceLink(item.url, locale)}
-                                        >
-                                            {item.title}
-                                        </a>
-                                    )}
-                                </Menu.Item>
-                                {/* Render child items below the parent if mobile resolution */}
-                                {isMobileResolution &&
-                                    selected &&
-                                    selected.ID === item.ID &&
-                                    selected.child_items && (
-                                        <React.Fragment>
-                                            {selected.child_items.map((childItem) => (
-                                                <Menu.Item
-                                                    key={childItem.ID}
-                                                    className={`divided child-item ${active === childItem.slug ? "active" : ""
-                                                        }`}
-                                                >
-                                                    <div className={"mark"}></div>
-                                                    <a href={localReplaceLink(childItem.url, locale)}>
-                                                        {childItem.title}
-                                                    </a>
-                                                </Menu.Item>
-                                            ))}
-                                        </React.Fragment>
-                                    )}
-                            </React.Fragment>
-                        ))}
-                </React.Fragment>
-            )
-        );
-    }
-);
+    useEffect(() => {
+        if (settings && settings.menu_settings && mixedMenu) {
 
-const Header = ({ intl, settings }) => {
+            const removed = []
+            const newItems = menu.items.map(item => {
+
+                //if menu exists in partial settgins
+                //if item  deleted
+                if (settings.menu_settings && settings.menu_settings["nav_menu_item[" + item.ID + "]"] === false) {
+                    removed.push(item.ID)
+                }
+                //if item  removed
+                if (settings.menu_settings && settings.menu_settings["nav_menu_item[" + item.ID + "]"]) {
+                    const updatedItem = settings.menu_settings["nav_menu_item[" + item.ID + "]"];
+                    return { ...item, ...settings.menu_settings["nav_menu_item[" + item.ID + "]"] }
+
+                } else {
+                    return item;
+                }
+            })
+            //if item is new
+            Object.keys(settings.menu_settings).map((mk) => {
+                const value = settings.menu_settings[mk];
+                if (value.type == 'nav_menu_item') {
+                    const re = /(-)?[0-9]+/g;
+                    const results = re.exec(mk)
+                    const id = parseInt(results[0])
+                    const exists = newItems.find(m => m.ID == id)
+                    if (!exists) {
+                        newItems.push(value.value)
+                    }
+
+                }
+
+
+            })
+            setMixedMenu({ ...menu, items: newItems.filter((i) => removed.indexOf(i.ID) === -1) })
+
+            /*
+            const items = menu.items.map(item => {
+                if (settings.menu_settings && settings.menu_settings["nav_menu_item[" + item.ID + "]"]) {
+                    return {...item, ...settings.menu_settings["nav_menu_item[" + item.ID + "]"]}
+                } else {
+                    return item;
+                }
+            })*/
+
+            //  setMixedMenu({...menu, items:newItems})
+        }
+
+    }, [settings])
+
+
+    return mixedMenu && <React.Fragment>
+
+        {mixedMenu.items.filter(i => i.url != "#wpm-languages").map(i => {
+            return (<Menu.Item
+            as={Link}
+                className={`divided ${i.child_items ? 'has-child-items' : ''} ${selected && selected.ID == i.ID ? 'selected' : ''}  ${active == i.slug ? "active" : ""}`}>
+                {i.child_items ?
+                    <span onClick={e => onSetSelected(i)}>{i.title}</span> :
+                    <Link onClick={e => onSetSelected(i)}
+                        to={i.type === 'custom' ? utils.replaceLink(i.url, locale) : localReplaceLink(i.url, locale)}>
+                        {i.title}
+                    </Link>}
+
+
+            </Menu.Item>)
+
+        })}
+
+    </React.Fragment>
+})
+
+const Header = ({ intl,  settings }) => {
+
     const [selected, setSelected] = useState()
     const { slug } = useParams();
+
 
     const Logo = ({ media }) => {
         return media ? <Image src={media.guid.rendered} /> :
@@ -254,24 +174,23 @@ const Header = ({ intl, settings }) => {
 
                     <Menu className={"branding"} text>
                         <Menu.Item>
-                            <NavLink to={`/${intl.locale}`}>
-                                {settings.site_logo !== 0 && <MediaProvider id={settings.site_logo}>
+                            <NavLink to="/">
+                            {settings.site_logo != 0 && <MediaProvider id={settings.site_logo}>
                                     <MediaConsumer>
                                         <Logo></Logo>
                                     </MediaConsumer>
 
                                 </MediaProvider>}
-                                {!window.isCustomizedPreview && settings.site_logo === 0 &&
+                                {!window.isCustomizedPreview && settings.site_logo == 0 &&
                                     <img className="brand logo" size="large" src='/dc-logo_01.png' />}
                             </NavLink>
-
                         </Menu.Item>
 
                         <Menu.Item className={"divider"}>
                             <div></div>
                         </Menu.Item>
 
-                        <Menu.Item fitted href="/">
+                        <Menu.Item as={Link} fitted href="/">
                             <div className={"site name"}>{settings.name}</div>
                         </Menu.Item>
 
@@ -309,7 +228,7 @@ const Header = ({ intl, settings }) => {
 
             <Container className={"url breadcrumbs"}>
                 <MenuConsumer>
-                    <BreadCrumbs key={slug}></BreadCrumbs>
+                    <BreadCrumbs></BreadCrumbs>
                 </MenuConsumer>
 
             </Container>
@@ -319,4 +238,4 @@ const Header = ({ intl, settings }) => {
 }
 
 
-export default injectIntl(withRouter(Header))
+export default injectIntl(Header);
