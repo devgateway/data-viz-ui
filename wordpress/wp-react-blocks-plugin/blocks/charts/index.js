@@ -355,6 +355,10 @@ registerBlockType(process.env.BLOCKS_NS + '/chart',
                 type: "String",
                 default: "middle"
             },
+            lineLabelPosition: {
+                type: "String",
+                default: "none"
+            },
             showGrid: {
                 type: 'Boolean',
                 default: true
@@ -499,7 +503,9 @@ registerBlockType(process.env.BLOCKS_NS + '/chart',
                     marginRight: 25,
                     showXAxisTitle: true,
                     showYAxisTitle: true,
-                    showRightAxisTitle: true
+                    showRightAxisTitle: true,
+                    barPadding: 0.15,
+                    barInnerPadding: 0.7,
                 }
             },
             reverseLegend: {
