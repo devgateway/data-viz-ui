@@ -30,6 +30,25 @@ a.wp-reference {
   margin-top: 0;
 }
 
+.white-reference {
+  a.wp-reference {
+    color: white;
+  }
+}
+
+.references {
+  .header.title.menu {
+    @media only screen and (min-width: 769px) and (max-width: 1024px) {
+      margin-top: 50px !important;
+    }
+    @media screen and (max-width: 768px) {
+      min-height: 2rem;
+    }
+
+  }
+}
+
+
 .references.list {
   color: #66676d;
   margin: 20px !important;
@@ -40,10 +59,36 @@ a.wp-reference {
     border-radius: 2px;
     margin-left:-10px;
   }
+  .ui.stretched.column.grid {
+    @media screen and (max-width: 768px) {
+      display: flex !important;
+      flex-direction: row !important;
+    }
+    @media only screen and (min-width: 769px) and (max-width: 1024px) {
+      display: flex !important;
+      flex-direction: row !important;
+    }
+    @media only screen and (min-width: 1024px) and (max-width: 1280px) {
+      display: flex !important;
+      flex-direction: column !important;
+      flex-shrink: 0 !important;
+      height: 2000px !important;
+      overflow: hidden; /* Hides any overflowing content */
+      overflow-x: auto; /* Adds horizontal scroll if needed */
+    }
+
+  }
   .column {
     padding-top: 0 !important;
     padding-bottom: 1rem !important;
     padding-left: 0 !important;
+
+
+    @media screen and (max-width: 1024px) {
+      width: 100%;
+      padding-left: 10px !important;
+      padding-top: 5px !important;
+    }
   }
   .reference {
     font-size: 14px;
@@ -70,4 +115,25 @@ a.wp-reference {
     }
   }
 
+}
+
+@media (max-width: 1024px) {
+
+  .references.list {
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .references.list::-webkit-scrollbar {
+    display: none; /* Safari and Chrome */
+  }
+
+  /* For Firefox */
+  .references.list {
+    scrollbar-width: none; /* Firefox */
+  }
+
+  /* For Internet Explorer and Edge (legacy versions) */
+  .reference.list {
+    -ms-overflow-style: none; /* IE and Edge */
+  }
 }
