@@ -11,29 +11,31 @@ COPY react-lib/wp-react-lib/src src
 RUN npm run dist
 
 FROM node:22-slim AS install
-WORKDIR /tmp/work1/work2
+WORKDIR /example/front/ui
+
 COPY ui/package.json ./
 COPY --from=reactlib /tmp/work/package.json ../react-lib/wp-react-lib/
 COPY --from=reactlib /tmp/work/dist ../react-lib/wp-react-lib/dist
+
 COPY --from=customizer /tmp/work/package.json ../../custom/ui-customizer/
 COPY --from=customizer /tmp/work/dist ../../custom/ui-customizer/dist
 #RUN --mount=type=cache,target=node_modules,id=ui_node_modules npm install
 
 FROM node:22-slim AS ui
 WORKDIR /tmp/
-COPY --from=install /tmp/ /tmp/
+COPY --from=install /example/ /example/
 
-RUN cd /tmp/work1/work2
+RUN cd /example/front/ui
 #RUN --mount=type=cache,target=node_modules,id=ui_node_modules npm install
 RUN npm install react-compiler-runtime &&  npm install -f
 COPY ui/public public
-COPY ui /tmp/work1/work2
-RUN rm -rf /tmp/work1/work2/package-lock.json
+COPY ui /example/front/ui
+RUN rm -rf /example/front/ui/package-lock.json
 
-RUN cd /tmp/work1/work2 && npm install @rollup/rollup-linux-arm64-gnu && \
+RUN cd /example/front/ui && npm install @rollup/rollup-linux-arm64-gnu && \
   # VITE_REACT_APP_GA_CODE='#VITE_REACT_APP_GA_CODE#' \
   # VITE_REACT_APP_DEFAULT_LOCALE='#VITE_REACT_APP_DEFAULT_LOCALE#' \
-  VITE_REACT_APP_USE_HASH_LINKS='#VITE_REACT_APP_USE_HASH_LINKS#' \ 
+  VITE_REACT_APP_USE_HASH_LINKS='#VITE_REACT_APP_USE_HASH_LINKS#' \
   VITE_REACT_APP_WP_HOSTS='#VITE_REACT_APP_WP_HOSTS#' \
   # VITE_REACT_APP_API_ROOT='#VITE_REACT_APP_API_ROOT#' \
   # VITE_REACT_APP_WP_SEARCH_END_POINT='#VITE_REACT_APP_WP_SEARCH_END_POINT#' \
@@ -43,7 +45,7 @@ RUN cd /tmp/work1/work2 && npm install @rollup/rollup-linux-arm64-gnu && \
 CMD ["/bin/bash"]
 
 FROM nginx:stable-alpine
-COPY --from=ui  /tmp/work1/work2/dist /var/www/static
+COPY --from=ui  /example/front/ui/dist /var/www/static
 COPY nginx.sh /usr/local/sbin/
 
 WORKDIR /var/www/static
