@@ -88,17 +88,17 @@ class WPM_Masterslider {
 			}
 		}
 
-		if ( isset( $params['MSPanel.Layer'] ) ) {
+		if ( isset( $params['MSPanel.Base'] ) ) {
 
 			$layer_config = array(
 				'title'   => array(),
 				'content' => array()
 			);
 
-			foreach ( $params['MSPanel.Layer'] as $key => $layer ) {
+			foreach ( $params['MSPanel.Base'] as $key => $layer ) {
 				$layer = json_decode( $layer, true );
-				if ( $old_params && is_array( $old_params ) && $old_params['MSPanel.Layer'] ) {
-					foreach ( $old_params['MSPanel.Layer'] as $old_layer ) {
+				if ( $old_params && is_array( $old_params ) && $old_params['MSPanel.Base'] ) {
+					foreach ( $old_params['MSPanel.Base'] as $old_layer ) {
 						$old_layer = json_decode( $old_layer, true );
 						if ( $layer['id'] === $old_layer['id'] ) {
 							$layer = wpm_set_new_value( $old_layer, $layer, $layer_config );
@@ -109,7 +109,7 @@ class WPM_Masterslider {
 						$layer = wpm_set_new_value( array(), $layer, $layer_config );
 					}
 				}
-				$params['MSPanel.Layer'][ $key ] = wp_json_encode( $layer );
+				$params['MSPanel.Base'][ $key ] = wp_json_encode( $layer );
 			}
 		}
 
@@ -147,11 +147,11 @@ class WPM_Masterslider {
 					}
 				}
 
-				if ( isset( $slider_data['MSPanel.Layer'] ) ) {
-					foreach ( $slider_data['MSPanel.Layer'] as $key => $layer ) {
+				if ( isset( $slider_data['MSPanel.Base'] ) ) {
+					foreach ( $slider_data['MSPanel.Base'] as $key => $layer ) {
 						$layer                                = json_decode( $layer, true );
 						$layer                                = wpm_translate_value( $layer );
-						$slider_data['MSPanel.Layer'][ $key ] = wp_json_encode( $layer );
+						$slider_data['MSPanel.Base'][ $key ] = wp_json_encode( $layer );
 					}
 				}
 			}

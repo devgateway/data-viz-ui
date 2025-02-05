@@ -287,11 +287,11 @@ class WPM_Admin_Assets {
 					if (query.search(/edit_lang=/i) !== -1) {
 						href = url + query.replace(/edit_lang=[a-z]{2,4}((-[a-z]{2,4})?)*/i, 'edit_lang=' + lang) + document.location.hash;
 					} else {
-						if(query.length == 0){
-							href = url + '?edit_lang=' + lang + document.location.hash;
-						}else{
-							href = url + query + '&edit_lang=' + lang + document.location.hash;
+						if(query.indexOf('?')==-1){
+							query = '?';
 						}
+
+						href = url + query + '&edit_lang=' + lang + document.location.hash;
 					}
 					$(this).attr('href', href);
 				});
