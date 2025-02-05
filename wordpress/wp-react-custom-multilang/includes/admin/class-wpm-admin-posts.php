@@ -77,7 +77,7 @@ class WPM_Admin_Posts {
 			return $columns;
 		}
 
-		$language = array( 'languages' => __( 'Languages', 'wp-multilang' ) );
+		$language = array( 'languages' => esc_html__( 'Languages', 'wp-multilang' ) );
 
 		if ( isset( $columns['title'] ) ) {
 			return wpm_array_insert_after( $columns, 'title', $language );
@@ -110,12 +110,14 @@ class WPM_Admin_Posts {
 
 			foreach ( $languages as $code => $language ) {
 				if ( isset( $strings[ $code ] ) && ! empty( $strings[ $code ] ) ) {
+					// phpcs:ignore PluginCheck.CodeAnalysis.ImageFunctions.NonEnqueuedImage -- Reason Using built in function doesn't work in our case, so created custom function
 					$output[] = '<img src="' . esc_url( wpm_get_flag_url( $language['flag'] ) ) . '" alt="' . esc_attr( $language['name'] ) . '" title="' . $language['name'] . '">';
 				}
 			}
 
 			if ( ! empty( $output ) ) {
-				echo implode( ' ', $output );
+				$implode_output = implode( ' ', $output );
+				echo wp_kses( $implode_output, wp_kses_allowed_html('post') );
 			}
 		}
 	}
@@ -137,7 +139,7 @@ class WPM_Admin_Posts {
 			<div class="misc-pub-section language">
 				<?php esc_html_e( 'Current edit language:', 'wp-multilang' ); ?>
 				<?php if ( $languages[ $language ]['flag'] ) { ?>
-					<img src="<?php echo esc_url( wpm_get_flag_url( $languages[ $language ]['flag'] ) ); ?>" alt="<?php echo esc_attr( $languages[ $language ]['name'] ) ; ?>">
+					<img src="<?php echo esc_url( wpm_get_flag_url( $languages[ $language ]['flag'] ) ); // phpcs:ignore PluginCheck.CodeAnalysis.ImageFunctions.NonEnqueuedImage -- Reason Using built in function doesn't work in our case, so created custom function ?>" alt="<?php echo esc_attr( $languages[ $language ]['name'] ) ; ?>">
 				<?php } else { ?>
 					<b><?php echo esc_html( $languages[ $language ]['name'] ) ; ?></b>
 				<?php } ?>

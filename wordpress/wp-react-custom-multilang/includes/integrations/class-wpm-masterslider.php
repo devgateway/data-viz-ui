@@ -33,7 +33,7 @@ class WPM_Masterslider {
 	 * Save slider
 	 */
 	public function save_slider() {
-		// verify nonce
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized,WordPress.Security.ValidatedSanitizedInput.MissingUnslash -- Reason unslash not needed because data is not getting stored in database, it's just being used.
 		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( $_POST['nonce'], 'msp_panel' ) ) {
 			return;
 		}
@@ -43,14 +43,14 @@ class WPM_Masterslider {
 			return;
 		}
 
-		// Get the slider id
-		$slider_id = isset( $_REQUEST['slider_id'] ) ? $_REQUEST['slider_id'] : '';
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash -- Reason unslash not needed because data is not getting stored in database, it's just being used.
+		$slider_id = isset( $_REQUEST['slider_id'] ) ? intval( $_REQUEST['slider_id'] ) : '';
 
 		if ( empty( $slider_id ) ) {
 			return;
 		}
 
-		// get panel data
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Reason unslash not needed because data is not getting stored in database, it's just being used.
 		$msp_data = isset( $_REQUEST['msp_data'] ) ? $_REQUEST['msp_data'] : null;
 
 		// get parse and database tools
@@ -88,17 +88,17 @@ class WPM_Masterslider {
 			}
 		}
 
-		if ( isset( $params['MSPanel.Base'] ) ) {
+		if ( isset( $params['MSPanel.Layer'] ) ) {
 
 			$layer_config = array(
 				'title'   => array(),
 				'content' => array()
 			);
 
-			foreach ( $params['MSPanel.Base'] as $key => $layer ) {
+			foreach ( $params['MSPanel.Layer'] as $key => $layer ) {
 				$layer = json_decode( $layer, true );
-				if ( $old_params && is_array( $old_params ) && $old_params['MSPanel.Base'] ) {
-					foreach ( $old_params['MSPanel.Base'] as $old_layer ) {
+				if ( $old_params && is_array( $old_params ) && $old_params['MSPanel.Layer'] ) {
+					foreach ( $old_params['MSPanel.Layer'] as $old_layer ) {
 						$old_layer = json_decode( $old_layer, true );
 						if ( $layer['id'] === $old_layer['id'] ) {
 							$layer = wpm_set_new_value( $old_layer, $layer, $layer_config );
@@ -109,7 +109,7 @@ class WPM_Masterslider {
 						$layer = wpm_set_new_value( array(), $layer, $layer_config );
 					}
 				}
-				$params['MSPanel.Base'][ $key ] = wp_json_encode( $layer );
+				$params['MSPanel.Layer'][ $key ] = wp_json_encode( $layer );
 			}
 		}
 
@@ -147,11 +147,11 @@ class WPM_Masterslider {
 					}
 				}
 
-				if ( isset( $slider_data['MSPanel.Base'] ) ) {
-					foreach ( $slider_data['MSPanel.Base'] as $key => $layer ) {
+				if ( isset( $slider_data['MSPanel.Layer'] ) ) {
+					foreach ( $slider_data['MSPanel.Layer'] as $key => $layer ) {
 						$layer                                = json_decode( $layer, true );
 						$layer                                = wpm_translate_value( $layer );
-						$slider_data['MSPanel.Base'][ $key ] = wp_json_encode( $layer );
+						$slider_data['MSPanel.Layer'][ $key ] = wp_json_encode( $layer );
 					}
 				}
 			}
@@ -173,6 +173,7 @@ class WPM_Masterslider {
 	public function add_language_switcher( $config ) {
 		$screen    = get_current_screen();
 		$screen_id = $screen ? $screen->id : '';
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		if ( $screen_id === 'toplevel_page_masterslider' && isset( $_GET['slider_id'] ) ) {
 			$config[] = 'toplevel_page_masterslider';
 		}

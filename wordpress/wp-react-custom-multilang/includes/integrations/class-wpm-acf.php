@@ -34,6 +34,7 @@ class WPM_Acf {
 		add_filter( 'wpm_acf_text_config', '__return_empty_array' );
 		add_filter( 'wpm_acf_textarea_config', '__return_empty_array' );
 		add_filter( 'wpm_acf_wysiwyg_config', '__return_empty_array' );
+		add_filter( 'wpm_acf_image_config', '__return_empty_array' );
 	}
 
 
@@ -46,6 +47,7 @@ class WPM_Acf {
 	 */
 	public function add_config( $config ) {
 
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		if ( ! isset( $_GET['page'] ) ) {
 			$config = array(
 				'post_content' => null,
@@ -143,7 +145,7 @@ class WPM_Acf {
 
 		$acf_field_config = apply_filters( "wpm_acf_{$info['type']}_config", null, $value, $post_id, $field );
 		$acf_field_config = apply_filters( "wpm_acf_{$field['type']}_config", $acf_field_config, $value, $post_id, $field );
-		$acf_field_config = apply_filters( "wpm_acf_name_{$field['name']}_config", $acf_field_config, $value, $post_id, $field );
+		$acf_field_config = apply_filters( "wpm_acf_name_{$field['_name']}_config", $acf_field_config, $value, $post_id, $field );
 
 		if ( null === $acf_field_config ) {
 			return $value;

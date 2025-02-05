@@ -43,6 +43,7 @@ class WPM_Posts extends WPM_Object {
 		add_filter( 'the_title', 'wpm_translate_string', 5 );
 		add_filter( 'the_content', 'wpm_translate_string', 5 );
 		add_filter( 'the_excerpt', 'wpm_translate_string', 5 );
+        add_filter( 'get_the_excerpt', 'wpm_translate_string', 5 );
 		add_filter( 'the_editor_content', 'wpm_translate_string', 5 );
 		add_action( 'parse_query', array( $this, 'filter_posts_by_language' ) );
 		add_filter( "get_{$this->object_type}_metadata", array( $this, 'get_meta_field' ), 5, 3 );
@@ -53,6 +54,11 @@ class WPM_Posts extends WPM_Object {
 		add_filter( 'wp_insert_post_data', array( $this, 'save_post' ), 99, 2 );
 		add_filter( 'wp_insert_attachment_data', array( $this, 'save_post' ), 99, 2 );
 		add_filter( 'wp_get_attachment_link', array( $this, 'translate_attachment_link' ), 5 );
+		add_filter( 'render_block', array( $this, 'wpm_render_post_block' ), 10, 2);
+		add_filter( 'rest_post_dispatch', array( $this, 'wpm_rest_post_dispatch' ), 10, 3);
+		
+		// Block editor filter for saving the post data
+		add_filter( 'wpm_filter_block_editor_post_data', array( $this, 'wpm_filter_block_editor_post_data_clbk' ), 10, 2 );
 	}
 
 
@@ -164,12 +170,15 @@ class WPM_Posts extends WPM_Object {
 				return $data;
 			}
 
+			// phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.NonceVerification.Recommended -- this is a dependent function and its all security measurament is done wherever it has been used.
 			if ( isset( $_GET['action'] ) && 'untrash' === $_GET['action'] ) {
 				return $data;
 			}
 		}
 
 		$post_id = isset( $data['ID'] ) ? wpm_clean( $data['ID'] ) : ( isset( $postarr['ID'] ) ? wpm_clean( $postarr['ID'] ) : 0 );
+	
+		$post_content = isset($data['post_content'])?$data['post_content']:'';
 
 		foreach ( $data as $key => $content ) {
 			if ( isset( $post_config[ $key ] ) ) {
@@ -178,7 +187,7 @@ class WPM_Posts extends WPM_Object {
 				$post_field_config = apply_filters( "wpm_post_field_{$key}_config", $post_field_config, $content );
 
 				if ( $post_id ) {
-					$old_value = get_post_field( $key, $post_id, 'edit' );
+					$old_value = apply_filters( 'wpm_filter_block_editor_post_data', $key, $post_id );
 				} else {
 					$old_value = '';
 				}
@@ -192,7 +201,8 @@ class WPM_Posts extends WPM_Object {
 		if ( 'nav_menu_item' === $data['post_type'] ) {
 			$screen = get_current_screen();
 
-			if ( 'POST' === $_SERVER['REQUEST_METHOD'] && 'update' === $_POST['action'] && ( $screen && 'nav-menus' === $screen->id ) ) {
+			// phpcs:ignore WordPress.Security.NonceVerification.Missing -- this is a dependent function and its all security measurament is done wherever it has been used.
+			if ( isset( $_SERVER['REQUEST_METHOD'] ) && 'POST' === $_SERVER['REQUEST_METHOD'] && isset( $_POST['action'] ) && 'update' === $_POST['action'] && ( $screen && 'nav-menus' === $screen->id ) ) {
 				// hack to get wp to create a post object when too many properties are empty
 				if ( '' === $data['post_title'] && '' === $data['post_content'] ) {
 					$data['post_content'] = ' ';
@@ -200,6 +210,23 @@ class WPM_Posts extends WPM_Object {
 			}
 		}
 
+		if('wp_global_styles' === $data['post_type']){
+
+			$pcontent = $data['post_content'];
+			if(!empty($pcontent) && is_string($pcontent)){
+				$pos = strpos($pcontent, '[:]');
+				if($pos === false){
+					$decode_pcontent = json_decode($pcontent);
+					if(is_object($decode_pcontent) && (isset($decode_pcontent->settings) || isset($decode_pcontent->styles) || isset($decode_pcontent->isGlobalStylesUserThemeJSON))){
+						if(!empty($post_content)){
+							$current_language = wpm_get_language();
+							$data['post_content'] = '[:'.$current_language.']'.$post_content.'[:]';
+						}	
+					}
+				}
+			}
+		}
+		
 		if ( empty( $data['post_name'] ) ) {
 			$data['post_name'] = sanitize_title( wpm_translate_value( $data['post_title'] ) );
 		}
@@ -216,9 +243,120 @@ class WPM_Posts extends WPM_Object {
 	 * @return string
 	 */
 	public function translate_attachment_link( $link ) {
-		$text            = strip_tags( $link );
+		$text            = wp_strip_all_tags( $link );
 		$translated_text = wpm_translate_string( $text );
 
 		return str_replace( $text, $translated_text, $link );
+	}
+
+	/**
+	 * Translate block content
+	 *
+	 * @param string $context
+	 * @param array $block
+	 *
+	 * @return string $context
+	 * @since 2.4.4
+	 */
+	public function wpm_render_post_block($context, $block)
+	{
+		if(isset($block['blockName'])){
+			if ( $block['blockName'] === 'core/block' && ! empty( $block['attrs']['ref'] ) ) {
+				if(!empty($context) && is_string($context)){
+					$context = wpm_translate_string($context);
+				}
+			}
+		}
+		return $context;
+	}
+	
+	/**
+	 * Translate global style post content for full site editor
+	 * @since 2.4.9
+	 * */
+	public function wpm_rest_post_dispatch( $result, $server, $request ) {
+		if( ! empty( $result->data ) && is_array( $result->data ) ) {
+
+			if( isset( $result->data['settings'] ) && $result->data['styles'] ) {
+
+				if( ! empty( $result->data['id'] ) ) {
+
+					$style_id = $result->data['id'];
+
+					if( $style_id > 0 ) {
+
+						$get_style = get_post( $style_id );
+
+						if( ! empty( $get_style ) && is_object( $get_style ) ) {
+
+							if( ! empty( $get_style->post_content ) ) {
+
+								if( $get_style->post_type == 'wp_global_styles' ) {
+
+									$translate_object = wpm_translate_object( $get_style );
+									$raw_config = json_decode( $translate_object->post_content, true );
+									$is_global_styles_user_theme_json = isset( $raw_config['isGlobalStylesUserThemeJSON'] ) && true === $raw_config['isGlobalStylesUserThemeJSON'];
+
+									if ( $is_global_styles_user_theme_json ) {
+
+										$config = ( new \WP_Theme_JSON( $raw_config, 'custom' ) )->get_raw_data();
+										if( ! empty( $config['settings'] ) ) {
+
+											$result->data['settings'] = $config['settings'];
+										}
+
+										if( ! empty( $config['styles'] ) ) {
+
+											$result->data['styles'] = $config['styles'];
+
+										}
+
+									}
+
+								}
+
+							}
+
+						}
+
+					}
+
+				}
+
+			}
+
+		}
+		
+		return $result;
+	}
+	
+	/**
+	 * post_title & post_excerpt and not getting translated in gutenberg editor if more than two languages are added
+	 * this filter helps to get raw data for post_title and post_excerpt keys to solve the gutenberg editor issue
+	 * https://github.com/ahmedkaludi/wp-multilang/issues/78
+	 * @param 	$key 		String
+	 * @param 	$post_id 	Integer
+	 * @return 	$old_value 	String
+	 * @since 	2.4.13
+	 * */
+	public function wpm_filter_block_editor_post_data_clbk( $key, $post_id ) {
+		
+		if ( ! function_exists( 'use_block_editor_for_post' ) ) {
+			require_once ABSPATH . 'wp-includes/post.php';
+		}	
+
+		// Check if current post is being edited in gutenberg block editor
+		$is_block_editor 	=	use_block_editor_for_post( $post_id );
+		
+		$raw_keys 			=	array( 'post_title', 'post_excerpt' );
+		$old_value 			= 	get_post_field( $key, $post_id, 'edit' );
+
+		if ( $is_block_editor ) {
+			if ( in_array( $key, $raw_keys ) ) {
+				$old_value 			= 	get_post_field( $key, $post_id, 'raw' );
+			}
+		}
+
+		return $old_value;
 	}
 }
