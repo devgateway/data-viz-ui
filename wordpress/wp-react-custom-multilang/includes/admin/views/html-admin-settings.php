@@ -49,10 +49,10 @@ if ( ! $tab_exists ) {
 					<?php submit_button(); ?>
 				</div>
 				<?php
-				if(!defined('WP_MULTILANG_PRO_VERSION')){
+				// if(!defined('WP_MULTILANG_PRO_VERSION')){
 
-					echo '<a class="button wpm-upgrade-pro-btn" style="background: #0099E7;color: #fff; border-color: #0099E7; font-weight: 500; margin: 30px 0px 0px 25px;" href="https://wp-multilang.com/pricing/" target="_blank">'.esc_html__( 'Upgrade to PRO', 'wp-multilang').'</a>';
-				}
+				// 	echo '<a class="button wpm-upgrade-pro-btn" style="background: #0099E7;color: #fff; border-color: #0099E7; font-weight: 500; margin: 30px 0px 0px 25px;" href="https://wp-multilang.com/pricing/" target="_blank">'.esc_html__( 'Upgrade to PRO', 'wp-multilang').'</a>';
+				// }
 				?>
 			<?php endif; ?>
 			<?php wp_nonce_field( 'wpm-settings' ); ?>
@@ -73,7 +73,7 @@ function wpm_newsletter_form(){
 	$hide_form = get_option('wpm_hide_newsletter');
 
 	// Newsletter marker. Set this to false once newsletter subscription is displayed.
-		$multilang_newsletter = true;
+		$multilang_newsletter = false;
 
 	if ( $multilang_newsletter === true && $hide_form !== 'yes') { ?>
 	  <div class="wpm-newsletter-wrapper">
