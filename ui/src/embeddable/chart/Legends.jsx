@@ -1,4 +1,5 @@
 import React from "react";
+import { injectIntl } from "react-intl";
 
 const Legends = ({
   filter,
@@ -99,4 +100,4 @@ const Legends = ({
   );
 };
 
-export default Legends;
+export default injectIntl(Legends);

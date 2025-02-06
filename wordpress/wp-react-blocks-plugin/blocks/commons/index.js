@@ -294,23 +294,24 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
               .then(response => response.json())
               .then(data => {
 
-                  const apps = data.applications ? [...data.applications.application
-                    .filter(a => a.instance[0].metadata.type === 'data')
-                    .map(a => ({
-                        label: a.name,
-                        value: a.instance[0].vipAddress,
-                        settings: a.instance[0]
-                    })), {label: 'CSV', value: 'csv'}] : [{label: 'CSV', value: 'csv'}]
-                  this.setState({
-                      react_ui_url: settingsData["react_ui_url"] + '/' + window._page_locale,
-                      react_api_url: settingsData["react_api_url"],
-                      site_language: settingsData["site_language"],
-                      current_language: new URLSearchParams(document.location.search).get("edit_lang"),
-                      apps
-                  });
-                  this.loadMetadata()
-              })
-              .catch(function (response) {
+                    const apps = data.applications ? [...data.applications.application
+                        // .filter(a => a.instance[0].metadata.type === 'starter')
+                        .filter(a => a.instance[0].metadata.type === 'data')
+                        .map(a => ({
+                            label: a.name,
+                            value: a.instance[0].vipAddress,
+                            settings: a.instance[0]
+                        })), {label: 'CSV', value: 'csv'}] : [{label: 'CSV', value: 'csv'}]
+                    this.setState({
+                        react_ui_url: settingsData["react_ui_url"] + '/' + window._page_locale,
+                        react_api_url: settingsData["react_api_url"],
+                        site_language: settingsData["site_language"],
+                        current_language: new URLSearchParams(document.location.search).get("edit_lang"),
+                        apps
+                    });
+                    this.loadMetadata()
+                })
+                .catch(function (response) {
 
               })
 

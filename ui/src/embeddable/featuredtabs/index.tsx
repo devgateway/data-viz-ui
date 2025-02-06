@@ -11,6 +11,31 @@ import {
 } from "@devgateway/wp-react-lib";
 import PostIntro from "../connected-templates/PostIntro";
 
+interface FeaturedTabsProps {
+    posts?: any[],
+    width: number,
+    height: number,
+    color: string,
+    moreLabel: string
+}
+
+export interface FeatureTabsProps {
+    "data-width": number,
+    "data-height": number,
+    "data-type": string,
+    "data-taxonomy": string,
+    "data-categories": string,
+    "data-items": number,
+    "data-color": string,
+    "data-read-more-label": string,
+    "data-use-scrolls": string,
+    editing: boolean,
+    parent: number,
+    unique: number,
+    intl: any
+}
+
+// Desktop FeaturedPost Component
 const FeaturedPost = ({ post, onClick, active, moreLabel }) => {
     const media = post['_embedded'] ? post['_embedded']["wp:featuredmedia"] : null;
 
@@ -28,120 +53,106 @@ const GetFigureFromPost = ({ post }) => {
     const parser = new DOMParser();
     const doc = parser.parseFromString(post.content.rendered, 'text/html');
     const figureElement = doc.querySelector('figure');
-    if (!figureElement) {
+    if(!figureElement) {
         return null;
     }
     return (
         <div style={{
             flex: '0 0 40px'
-        }} dangerouslySetInnerHTML={{ __html: figureElement.outerHTML }} />
+        }}dangerouslySetInnerHTML={{ __html: figureElement.outerHTML }} />
     );
 };
 
-interface FeaturedTabsProps {
-    posts?: any[],
-    width: number,
-    height: number,
-    color: string,
-    moreLabel: string
-}
+// Desktop FeaturedTabs Component
+const FeaturedTabs: React.FC<FeaturedTabsProps> = ({ posts, width, height, color, moreLabel }) => {
+    const [active, setActive] = useState<string | null>(null);
+    const [visible, setVisible] = useState(false);
+    const [scrollPos, setScrollPos] = useState<any>([]);
+    const arrayColors = color.split(',');
 
-const FeaturedTabs: React.FC<FeaturedTabsProps> = ({ posts, height, color, moreLabel }) => {
-    const [active, setActive] = useState<string | null>(null)
-    const [visible, setVisible] = useState(false)
-    const [scrollPos, setScrollPos] = useState<[number, number]>([0, 0])
-    const arrayColors = color.split(',')
-
-
-    const toggleAnimation = (k: string) => {
+    const toggleAnimation = (k) => {
         if (!visible) {
-            setActive(k)
-            setVisible(true)
+            setActive(k);
+            setVisible(true);
         } else {
-            setVisible(false)
-            setActive(k)
+            setVisible(false);
+            setActive(k);
         }
-    }
+    };
 
     useEffect(() => {
         if (active) {
-            setScrollPos([window.scrollX, window.scrollY])
+            setScrollPos([window.scrollX, window.scrollY]);
         }
         if (active == null) {
-            window.scrollTo(scrollPos[0], scrollPos[1])
-
+            window.scrollTo(scrollPos[0], scrollPos[1]);
         }
-    }, [active])
-
+    }, [active]);
 
     useEffect(() => {
         window.setTimeout(() => {
             if (window.location.hash) {
-                const slug = window.location.hash.substr(1)
+                const slug = window.location.hash.substr(1);
                 const element = document.getElementById(slug);
 
                 if (element && posts && posts.map(p => p.slug).indexOf(slug) > -1) {
-                    setActive(slug)
+                    setActive(slug);
                     element.scrollIntoView({ behavior: "auto", block: "start" });
                 }
-
             }
-        }, 0
-        )
-    }, posts)
+        }, 0);
+    }, [posts]);
 
     return (
-        <Container fluid={true} className="featured tabs" style={{ "min-height": height + 'px' }}>
-            {/* @ts-ignore */}
-            <Grid stackable columns={active != null ? 1 : posts.length} className="desktop">
-                {posts && posts.map((post, i) => {
-                    return <React.Fragment>
+        <Container fluid={true} className="featured tabs" style={{ minHeight: `${height}px` }}>
+            {/*  @ts-expect-error */}
+            <Grid stackable columns={active != null ? 1 : posts?.length} className="desktop">
+                {posts && posts.map((post, i) => (
+                    <React.Fragment key={post.slug}>
                         <Grid.Column
-                            style={active == null ? { display: 'block', visibility: 'visible', "backgroundColor": arrayColors[i] } : { display: 'none', visibility: 'hidden' }}>
-
+                            style={active == null ? { display: 'block', visibility: 'visible', backgroundColor: arrayColors[i] } : { display: 'none', visibility: 'hidden' }}
+                        >
                             <a id={post.slug} />
-                            <FeaturedPost post={post} moreLabel={moreLabel}
-                                active={active}
-                                onClick={e => toggleAnimation(post.slug)} />
+                            {/* @ts-ignore */}
+                            <FeaturedPost post={post} moreLabel={moreLabel} onClick={() => toggleAnimation(post.slug)} />
                         </Grid.Column>
 
-                        <Grid.Column className="expanded"
-                            style={active != post.slug ? { display: 'none', visibility: 'hidden' } : { display: 'block', visibility: 'visible' }}>
+                        <Grid.Column
+                            className="expanded"
+                            style={active != post.slug ? { display: 'none', visibility: 'hidden' } : { display: 'block', visibility: 'visible' }}
+                        >
                             <Segment style={{ "backgroundColor": arrayColors[i] }}>
                                 {post.meta_fields && post.meta_fields.icon &&
                                     <MediaProvider id={post.meta_fields ? post.meta_fields.icon[0] : null}>
                                         <MediaConsumer>
-                                            <PostIcon></PostIcon>
+                                            <PostIcon />
                                         </MediaConsumer>
                                     </MediaProvider>
                                 }
                                 <PostTitle as={"h2"} post={post} className={"has-standard-36-font-size has-white-color"} />
-                                <Label className={"closeIcon"} onClick={e => setActive(null)}><Icon name='times circle outline' size="large" /></Label>
-
+                                <Label className={"closeIcon"} onClick={() => setActive(null)}><Icon name='times circle outline' size="large" /></Label>
                             </Segment>
-                            <PostContent as={"div"} fluid={true} post={post} />
-                            <Label className={"closeIconText"} onClick={e => setActive(null)}><Icon name='times circle outline' size="large" /> Close </Label>
+                            <PostContent as={"div"} fluid={true} post={post} style={{ maxHeight: `calc(${height}px - 150px)` }}
+                            />
+                            <Label className={"closeIconText"} style={{ backgroundColor: `${arrayColors[i]}` }} onClick={() => setActive(null)}><Icon name='times circle outline' size="large" /> Close </Label>
                         </Grid.Column>
                     </React.Fragment>
-                })}
-
+                ))}
             </Grid>
-
-
         </Container>
-    )
-}
+    );
+};
 
 // Mobile AccordionContent Component
 const AccordionContent = ({ posts, activeItem, setActive, color }) => {
     const [activeIndex, setActiveIndex] = useState(posts.findIndex(p => p.slug === activeItem));
-    const [scrollTarget, setScrollTarget] = useState(null);
+    const [scrollTarget, setScrollTarget] = useState<any>(null);
     const arrayColors = color.split(',');
 
     const findElementAndAddStyles = (elementClass, containerClass, hasContainerClass) => {
         const elements = document.querySelectorAll(elementClass);
         elements.forEach((element) => {
-            if (element.querySelector(containerClass)) {
+            if(element.querySelector(containerClass)) {
                 element.classList.add(hasContainerClass);
             }
         });
@@ -149,7 +160,7 @@ const AccordionContent = ({ posts, activeItem, setActive, color }) => {
 
     useEffect(() => {
         if (scrollTarget) {
-            const offsetTop = (scrollTarget as HTMLElement).getBoundingClientRect().top + window.scrollY;
+            const offsetTop = scrollTarget.getBoundingClientRect().top + window.scrollY;
             window.scrollTo({
                 top: offsetTop,
                 behavior: 'smooth',
@@ -188,7 +199,7 @@ const AccordionContent = ({ posts, activeItem, setActive, color }) => {
                             active={activeIndex === index}
                             index={index}
                             onClick={handleClick}
-                            style={{ backgroundColor: arrayColors[index] }}
+                            style={{ backgroundColor: arrayColors[index]  }}
                         >
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
 
@@ -216,25 +227,8 @@ const AccordionContent = ({ posts, activeItem, setActive, color }) => {
     );
 };
 
-export interface FeatureTabsProps {
-    "data-width": number,
-    "data-height": number,
-    "data-type": string,
-    "data-taxonomy": string,
-    "data-categories": string,
-    "data-items": number,
-    "data-color": string,
-    "data-read-more-label": string,
-    "data-use-scrolls": string,
-    editing: boolean,
-    parent: number,
-    unique: number,
-    intl: any
-}
-
-
-const Root = (props: FeatureTabsProps) => {
-    const [random, setRandomStore] = useState(Math.random() * (99999 - 1) + 1);
+// Wrapper Component for Handling Mobile and Desktop View
+const Wrapper = (props: FeatureTabsProps) => {
     const {
         "data-width": width,
         "data-height": height,
@@ -248,8 +242,7 @@ const Root = (props: FeatureTabsProps) => {
         editing,
         parent,
         unique
-    } = props
-
+    } = props;
     const locale = props.intl.locale;
     const scrollable = useScrolls == 'true'
 
@@ -282,9 +275,9 @@ const Root = (props: FeatureTabsProps) => {
                     {isMobile ? (
                         <AccordionContent
                             posts={items}
-                            activeItem={items[0]?.slug}
+                            activeItem={items?.[0]?.slug}
                             color={color}
-                            setActive={() => { }}
+                            setActive={() => {}}
                         />
                     ) : (
                         <FeaturedTabs
@@ -293,12 +286,11 @@ const Root = (props: FeatureTabsProps) => {
                             width={width}
                             height={height}
                         />
-                    )}
+                    ) }
                 </PostConsumer>
             </PostProvider>
         </Container>
-    )
-}
+    );
+};
 
-
-export default Root
+export default Wrapper;

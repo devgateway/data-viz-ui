@@ -1,6 +1,6 @@
 import React, { Fragment, useEffect, useState } from "react";
 import Tooltip from "./Tooltip";
-import { BarDatum, BarLayer, ResponsiveBar } from "@nivo/bar";
+import { ResponsiveBar } from "@nivo/bar";
 import { injectIntl } from "react-intl";
 import { useTheme } from "@nivo/core";
 import { line } from "d3-shape";
@@ -18,7 +18,7 @@ const LABEL_SKIP_HEIGHT = 0;
 const COLOR_VARIABLE = "_Color";
 
 export interface BarChartProps {
-  legends?: Record<string, any>;
+  legends: Record<string, any>;
   marginLeft: number;
   marginTop: number;
   marginRight: number;
@@ -32,11 +32,11 @@ export interface BarChartProps {
   showLegends: boolean;
   legendPosition: string;
   tickRotation: number;
-  offsetText: number | string;
+  offsetText: string;
   tickColor: string;
   layout?: "horizontal" | "vertical";
   reverse: boolean;
-  offsetY: number | string;
+  offsetY: string;
   csvLineLayerData: string;
   tooltip: string;
   lineLayerEnabled: boolean;
@@ -47,7 +47,7 @@ export interface BarChartProps {
   legendLabel: string;
   overrideTickColor: boolean;
   fixedMinValue: number;
-  fixedMaxValue: number;
+  fixedMaxValue: string;
   barPadding: number;
   barLabelPosition: string;
   barInnerPadding: number;
@@ -60,18 +60,18 @@ export interface BarChartProps {
   highlightXAxisLine: boolean;
   showTickLine: boolean;
   showRightAxis: boolean;
-  offsetRight: number | string;
-  offsetBottom: number | string;
+  offsetRight: string;
+  offsetBottom: string;
   confidenceIntervals: any[];
   showGroupTotal: boolean;
   groupTotalLabel: string;
   groupTotalFormat: any;
   groupTotalMeasure: string;
-  groupTotalOffset: number | string;
+  groupTotalOffset: string;
   groupTotalFixedPosition: boolean;
   tooltipEnableMarkdown: boolean;
-  xAxisTickValues: number;
-  yAxisTickValues: number;
+  xAxisTickValues: string;
+  yAxisTickValues: string;
   mobileCustomization: string;
   minMaxClamp: boolean;
   reverseLegend: boolean;
@@ -180,7 +180,6 @@ const Chart = ({
       id: string;
       label: string;
     }
-
     let chartLegends: ChartLegends[] = [];
 
     if (options.data) {
@@ -239,10 +238,9 @@ const Chart = ({
     return (
       <>
         {showLegends &&
-          chartLegends.map((legend, index) => {
+          chartLegends.map((legend) => {
             return (
               <div
-                key={index}
                 className={`legend item ${legend.enabled ? "" : "ignore"}`}
                 onClick={() => toggle(legend.id)}
               >
@@ -251,7 +249,6 @@ const Chart = ({
                     className={legend.enabled ? "" : "ignore"}
                     type="checkbox"
                     checked={legend.enabled}
-                    readOnly
                     style={{
                       backgroundColor: legendCheckBack
                         ? colorBy === "values"
@@ -266,7 +263,6 @@ const Chart = ({
                   <input
                     type="checkbox"
                     checked={legend.enabled}
-                    readOnly
                     style={{
                       color: "#000",
                     }}
@@ -364,12 +360,11 @@ const Chart = ({
           lineLayerEnabled &&
           overlays.map((o, idx) => {
             return (
-              <div key={idx} className={"legend item"} onClick={() => toggleLine(idx)}>
+              <div className={"legend item"} onClick={() => toggleLine(idx)}>
                 <input
                   className={legendCheckBack && showLine[idx] ? "" : "ignore"}
                   type="checkbox"
                   checked={showLine[idx]}
-                  readOnly
                   style={{
                     backgroundColor:
                       showLine[idx] && legendCheckBack === true
@@ -424,7 +419,7 @@ const Chart = ({
   const leftLegendDynamicStyle = {
     bottom: `-${bottomSpacing}px`,
     gap: "0px",
-    top: "0px",
+    // top: "0px",
   };
 
   const createYAxisLine = (data) => {
@@ -451,7 +446,7 @@ const Chart = ({
       <Fragment>
         {bars
           .filter((b) => b.data.value != null)
-          .map((bar, idx) => {
+          .map((bar) => {
             let seriedId = bar.data.indexValue;
             if (
               options.dimensionsMetadata &&
@@ -471,7 +466,7 @@ const Chart = ({
               const low = yScale(parseFloat(confidenceInterval.low));
               const high = yScale(parseFloat(confidenceInterval.high));
               return (
-                <g key={idx}>
+                <g>
                   <line
                     y1={low}
                     y2={high}
@@ -511,7 +506,7 @@ const Chart = ({
     if (axis == "X") {
       points = [0, innerWidth];
       lineGenerator = line()
-        // @ts-ignore Investigate why it is returning a tuple instead of a number
+      // @ts-ignore
         .x((xPoint, index) => {
           if (index === 0) {
             return -10;
@@ -524,7 +519,7 @@ const Chart = ({
       points = [0, innerHeight];
       lineGenerator = line()
         .x(() => 0)
-        // @ts-ignore Investigate why it is returning a tuple instead of a number
+        // @ts-ignore
         .y((point) => {
           return point;
         });
@@ -546,11 +541,9 @@ const Chart = ({
     // re-use canvas object for better performance
     const canvas = document.createElement("canvas");
     const context = canvas.getContext("2d");
-
     if (!context) {
       return 0;
     }
-
     context.font = font;
     const metrics = context.measureText(text);
     return metrics.width;
@@ -564,9 +557,10 @@ const Chart = ({
           colors.colorBy === "values") &&
         !filterKeys
       ) {
+        //  @ts-ignore
         return values.filter((d) => filter.indexOf(d[options.indexBy]) === -1);
       } else {
-        return values ? values.filter((d) => filter.indexOf(d) === -1) : [];
+        return values ? values.filter((d: any) => filter.indexOf(d) === -1) : [];
       }
     } else {
       return values;
@@ -574,14 +568,11 @@ const Chart = ({
   };
 
   const CustomTick = (tick) => {
-    const tickObject = Object.assign({}, tick);
-    const theme = useTheme();
-
-    // @ts-ignore
+    const tickObject: any = Object.assign({}, tick);
     if (isMobileCustomizationEnabled && hiddenLabels.includes(String(tickObject.value))) {
       tickObject.value = "";
     }
-
+    const theme = useTheme();
     let effectiveTickColor;
     if (overrideTickColor) {
       effectiveTickColor = tickColor;
@@ -710,7 +701,7 @@ const Chart = ({
     }
   };
 
-  const toggle = (id) => {
+  const toggle = (id: any) => {
     const newFilter: any[] = filter.slice();
     if (newFilter.indexOf(id) > -1) {
       const index = newFilter.indexOf(id);
@@ -730,7 +721,7 @@ const Chart = ({
   const addTopBarLabel = ({ bars }) => {
     return (
       <g>
-        {bars.map((bar, idx) => {
+        {bars.map((bar) => {
           const { width, height, y, x, data } = bar;
           if (layout === "horizontal" && height <= LABEL_SKIP_HEIGHT) {
             return;
@@ -763,7 +754,6 @@ const Chart = ({
 
             return (
               <text
-                key={idx}
                 y={yPos}
                 x={xPos}
                 style={{ fill: normalizeLabelColor() }}
@@ -777,8 +767,8 @@ const Chart = ({
 
   const groupTotalLayer = (props) => {
     const indexes = options.data
-      .filter((d) => filter.indexOf(d[options.indexBy]) == -1)
-      .map((d) => d[options.indexBy]);
+      .filter((d: any) => filter.indexOf(d[options.indexBy]) == -1)
+      .map((d: any) => d[options.indexBy]);
     const { bars } = props;
     return (
       <g>
@@ -786,7 +776,7 @@ const Chart = ({
           .filter(
             (key) => bars.filter((b) => b.data.indexValue == key).length > 0
           )
-          .map((key, idx) => {
+          .map((key) => {
             const barsInGroup = bars.filter((b) => b.data.indexValue == key);
 
             let anchor = "right";
@@ -819,23 +809,23 @@ const Chart = ({
                   props.yScale(key) +
                   barsInGroup.map((b) => b.height).reduce((a, b) => a + b) / 2;
               }
-              x = x + parseInt(String(groupTotalOffset)) + 5;
+              x = x + parseInt(groupTotalOffset) + 5;
             } else {
               anchor = "middle";
               if (groupMode === "stacked") {
                 x = props.xScale(key) + barsInGroup[0].width / 2;
                 if (groupTotalFixedPosition) {
-                  y = y - parseInt(String(groupTotalOffset));
+                  y = y - parseInt(groupTotalOffset);
                 } else {
                   if (reverse) {
                     y =
-                      parseInt(String(groupTotalOffset)) +
+                      parseInt(groupTotalOffset) +
                       barsInGroup.map((b) => b.height).reduce((a, b) => a + b) +
                       14;
                   } else {
                     y =
                       props.innerHeight -
-                      parseInt(String(groupTotalOffset)) -
+                      parseInt(groupTotalOffset) -
                       barsInGroup.map((b) => b.height).reduce((a, b) => a + b) -
                       5;
                   }
@@ -848,7 +838,7 @@ const Chart = ({
                   y = props.innerHeight;
                 }
                 if (groupTotalFixedPosition) {
-                  y = y - parseInt(String(groupTotalOffset));
+                  y = y - parseInt(groupTotalOffset);
                 } else {
                   if (barsInGroup.length % 2 == 1) {
                     const index = Math.floor(barsInGroup.length / 2);
@@ -861,9 +851,9 @@ const Chart = ({
                     );
                   }
                   if (reverse) {
-                    y = y + 14 + parseInt(String(groupTotalOffset));
+                    y = y + 14 + parseInt(groupTotalOffset);
                   } else {
-                    y = props.innerHeight - y - parseInt(String(groupTotalOffset)) - 5;
+                    y = props.innerHeight - y - parseInt(groupTotalOffset) - 5;
                   }
                 }
               }
@@ -884,7 +874,7 @@ const Chart = ({
             total -= sumOfVariablesToFilterOut;
 
             return (
-              <text key={idx} y={y} x={x} style={{ fill: normalizeLabelColor() }}>
+              <text y={y} x={x} style={{ fill: normalizeLabelColor() }}>
                 <tspan textAnchor={anchor}>
                   {groupTotalLabel ? groupTotalLabel + " " : ""}
                   {intl.formatNumber(
@@ -919,7 +909,7 @@ const Chart = ({
   }
 
   const getValuesFromData = () => {
-    const values: number[] = [];
+    const values: number [] = [];
     if (confidenceIntervals) {
       confidenceIntervals.forEach((c) => {
         if (c.low) {
@@ -952,7 +942,7 @@ const Chart = ({
       (groupMode === "stacked" && maxValue !== "fixed") ||
       (maxValue === "fixed" && fixedMaxValue === null) ||
       // @ts-ignore
-      (maxValue === "fixed" && fixedMaxValue === "")
+      fixedMaxValue === ""
     ) {
       return (
         Math.max(
@@ -993,7 +983,7 @@ const Chart = ({
   const maxValueFromData = getMaxValueFromData();
   const minValueFromData = getMinValueFromData();
 
-  const layers: BarLayer<BarDatum>[] = ["grid", "axes", "bars"];
+  const layers: any [] = ["grid", "axes", "bars"];
   if (showGroupTotal) {
     layers.push(groupTotalLayer);
   }
@@ -1034,11 +1024,11 @@ const Chart = ({
               o.title,
               ""
             );
-            layers.push(line as any);
+            layers.push(line);
           }
         } else {
           if (o.measure[0]) {
-            const overlayData: Record<string, any> = {};
+            const overlayData: any = {};
             const data = options.data.map((d) => [
               d[options.indexBy],
               d.variables[o.measure[0]],
@@ -1057,7 +1047,7 @@ const Chart = ({
               o.title,
               measure.length > 0 ? measure[0].label : ""
             );
-            layers.push(line as any);
+            layers.push(line);
           }
         }
       }
@@ -1074,7 +1064,7 @@ const Chart = ({
 
   layers.push(createHighLowLine);
 
-  let ticks = parseInt(String(yAxisTickValues));
+  let ticks = parseInt(yAxisTickValues);
   const legendTitle = () => {
     return (
       <>
@@ -1087,7 +1077,7 @@ const Chart = ({
     );
   };
 
-  const hiddenLabels: string[] = [];
+  const hiddenLabels: any [] = [];
   if (isMobileCustomizationEnabled) {
     ticks = parseInt(mobileConfigSettings.yAxisTickValues);
     const labels = new Map(Object.entries(mobileConfigSettings?.labels?.xAxis ?? {}));
@@ -1107,7 +1097,7 @@ const Chart = ({
             animate={true}
             enableLabel={barLabelPosition == POSITION_MIDDLE}
             {...options}
-            maxValue={maxValueFromData}
+            maxValue={maxValueFromData as number}
             minValue={minValueFromData}
             keys={applyFilter(options.keys, true)}
             data={applyFilter(options.data, false)}
@@ -1139,10 +1129,11 @@ const Chart = ({
                   tickPadding: 5,
                   tickRotation: 0,
                   tickValues: ticks,
-                  legend: legends && legends.right,
+                  legend: legends.right,
                   legendPosition: "middle",
-                  legendOffset: parseInt(String(offsetRight)),
+                  legendOffset: parseInt(offsetRight),
                   format: (value) => {
+                    if (!value) return "";
                     if (layout == "vertical") {
                       const effectiveFormat = customAxisFormat
                         ? customAxisFormat
@@ -1166,13 +1157,14 @@ const Chart = ({
               isMobileCustomizationEnabled && mobileConfigSettings?.xAxisDisabled === true ? null :
                 layout == "horizontal"
                   ? {
-                    legend: legends && legends.bottom,
+                    legend: legends.bottom,
                     legendPosition: "middle",
-                    legendOffset: parseInt(String(offsetBottom)),
+                    legendOffset: parseInt(offsetBottom),
                     tickPadding: 5,
                     tickRotation: 0,
-                    tickValues: parseInt(String(xAxisTickValues)),
+                    tickValues: parseInt(xAxisTickValues),
                     format: (value) => {
+                      if (!value) return "";
                       if (layout == "horizontal") {
                         const effectiveFormat = customAxisFormat
                           ? customAxisFormat
@@ -1190,9 +1182,9 @@ const Chart = ({
                     },
                   }
                   : {
-                    legend: legends && legends.bottom,
+                    legend: legends.bottom,
                     legendPosition: "middle",
-                    legendOffset: parseInt(String(offsetBottom)),
+                    legendOffset: parseInt(offsetBottom),
                     renderTick: CustomTick,
                   }
             }
@@ -1205,10 +1197,11 @@ const Chart = ({
               tickPadding: 5,
               tickRotation: 0,
               tickValues: ticks,
-              legend: legends && legends.left,
+              legend: legends.left,
               legendPosition: "middle",
-              legendOffset: parseInt(String(offsetY)),
+              legendOffset: parseInt(offsetY),
               format: (value) => {
+                if (!value) return "";
                 if (layout == "vertical") {
                   const effectiveFormat = customAxisFormat
                     ? customAxisFormat
@@ -1232,19 +1225,22 @@ const Chart = ({
             labelTextColor={normalizeLabelColor()}
             label={(l) =>
               intl.formatNumber(
-                format.style === "percent" ? (l.value ?? 0) / 100 : l.value ?? 0,
+              (format.style === "percent" && l.value) ? l.value / 100 : l.value,
                 format
               )
             }
-            layers={layers}
+            layers={layers as any}
             onMouseEnter={(_data) => { }}
             onMouseLeave={(_data) => { }}
+            // @ts-ignore
+            motionStiffness={130 as any}
+            motionDamping={15}
             tooltip={(d) => {
               if (tooltipEnabled && tooltip && tooltip.trim().length > 0) {
                 return (
                   <Tooltip
                     intl={intl}
-                    format={format as any}
+                    format={format}
                     d={d}
                     tooltip={tooltip}
                     tooltipEnableMarkdown={tooltipEnableMarkdown}
