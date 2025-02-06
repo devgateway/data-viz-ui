@@ -1,13 +1,13 @@
 #!/bin/sh -e
 
-SED_EXPR="$(env | grep '^REACT_APP_' | while IFS='=' read NAME VALUE; do
+SED_EXPR="$(env | grep '^VITE_REACT_APP_' | while IFS='=' read NAME VALUE; do
   echo "s!#$NAME#!$VALUE!g;"
 done | tr '\n' ' ')"
 if [ -n "$SED_EXPR" ]; then
   echo "Replacing variables..."
   find . -name '*.js' -print0 | xargs -rt0 sed -i -e "$SED_EXPR"
 else
-  echo 'No REACT_APP_* variables set'
+  echo 'No VITE_REACT_APP_* variables set'
 fi
 echo Clearing Nginx caches...
 (

@@ -34,9 +34,12 @@ const TimeLine = (props) => {
   } = props;
 
   let {
-    height,
     lineWidth,
-    lineColor,
+    lineColor
+  } = props;
+
+  let {
+    height,
     subtitleWidth
   } = props;
 
@@ -57,10 +60,14 @@ const TimeLine = (props) => {
 
   const TooltipModal = ({ content, isOpen, style }) => {
     const addInlineStylesToHTML = (html) => {
-      return html.replace(
+      // Add styles to ul tags
+      html = html.replace(
         /<ul(.*?)>/g,
         '<ul class="has-white-color has-text-color has-standard-14-font-size" style="list-style-type:disc !important; list-style: initial !important; padding-left:20px; color:#fefefe;">'
       );
+      // Add styles to anchor tags
+      html = html.replace(/<a(.*?)>/g, '<a$1 style="color:#fefefe;">');
+      return html;
     };
     return (
       <Modal
@@ -127,7 +134,7 @@ const TimeLine = (props) => {
         const x = rect.left - parentDiv.left;
         const y = rect.top + parentDiv.top;
         position = [x + xOffset, y + yOffset];
-        let tooltipWidth = 400;
+        const tooltipWidth = 400;
         if (rect.left + x + tooltipWidth + xOffset > window.innerWidth) {
           position[0] = x - tooltipWidth * 0.6;
         }
@@ -197,7 +204,7 @@ const TimeLine = (props) => {
 
     const svgWidth = ref.current.clientWidth;
     const parentWidth = parentRef.current.clientWidth;
-    if(parentWidth > 0) {
+    if (parentWidth > 0) {
       setParentWidth(parentWidth);
     }
     const svgHeight = height;
@@ -241,10 +248,14 @@ const TimeLine = (props) => {
       [0, yScale(posts.length - 1)],
     ];
     const pathString = lineGenerator(data);
-
+    let translationVal = `translate(${transformMap[deviceType]},0)`;
+    const isEthiopia = process.env.REACT_APP_THEME?.startsWith("cd");
+    if (isEthiopia) {
+      translationVal = `translate(${transformMap[deviceType]},20)`;
+    }
     const g = svgElement
       .append("g")
-      .attr("transform", `translate(${transformMap[deviceType]},0)`);
+      .attr("transform", translationVal);
     lineColor = "#E4E5EA";
     lineWidth = 6;
 
@@ -288,24 +299,27 @@ const TimeLine = (props) => {
       .attr("width", parseInt(subtitleWidthDeviceMap[deviceType]))
       .attr("height", parseInt(subtitleHeight))
       .append("xhtml:div")
-      .attr("id", (d, i) => {
-        return getTitleId(i);
-      })
+      .attr("id", (d, i) => getTitleId(i))
       .style("font-size", parseInt(fontSize) + 1 + "px")
       .style("color", (d, i) => titleColor(i))
-      .style("font-weight", () => "bold")
+      .style("font-weight", "bold")
       .style("line-height", "1.2rem")
       .style("text-align", "left")
       .style("cursor", enableTitlePopup ? "pointer" : "default")
+      .style("overflow", "hidden")
+      .style("display", "-webkit-box")
+      .style("-webkit-line-clamp", "2") // Limit to 2 lines
+      .style("-webkit-box-orient", "vertical") // Required for line-clamp
+      .style("text-overflow", "ellipsis") // Add ellipsis
+      .style("overflow-wrap", "break-word")
       .html((d, i) => {
         const readmore = readMoreLabel(i);
         let title = d.title.rendered;
         if (readmore) {
-          title += `<br><span style="font-size:${
-            parseInt(fontSize) - 3
-          }px;color:${titleColor(
-            i
-          )};text-decoration:underline;text-underline-offset:3px">${readmore}</span>`;
+          title += `<br><span style="font-size:${parseInt(fontSize) - 3
+            }px;color:${titleColor(
+              i
+            )};text-decoration:underline;text-underline-offset:3px">${readmore}</span>`;
         }
         return title;
       })
@@ -315,10 +329,11 @@ const TimeLine = (props) => {
         // Wait for the DOM to be updated before calculating the height
         setTimeout(() => {
           const bbox = this.getBoundingClientRect(); // Get the actual bounding box of the rendered content
-          foreignObject.attr("height", bbox.height); // Update the height based on actual content
+          const contentHeight = Math.min(bbox.height, parseInt(subtitleHeight) * 2); // Ensure height doesn't exceed two lines
+          foreignObject.attr("height", contentHeight); // Update the height based on actual content
 
           // Update y position to vertically center the content
-          foreignObject.attr("y", yScale(i) - bbox.height / 2);
+          foreignObject.attr("y", yScale(i) - contentHeight / 2);
         }, 0); // Timeout ensures the DOM is rendered first before measuring
       })
       .on(isTouchDevice() ? "touchstart" : "mouseover", (event, d, i) => {
@@ -327,11 +342,12 @@ const TimeLine = (props) => {
           isTouchDevice() ? onTouchStart(event, d) : onMouseOver(event, d);
         }
       })
-      .on("mouseout", (event, d, i, e) => {
+      .on("mouseout", (event, d, i) => {
         event.preventDefault();
         if (enableTitlePopup) {
           onMouseOut(event, d, d.id);
           if (closePopupOnMouseOut) {
+            // Additional logic if needed
           }
         }
       });
@@ -344,7 +360,7 @@ const TimeLine = (props) => {
       .attr("y", (d, i) => yScale(i))
       .attr("dy", "0.35em")
       .style("text-anchor", "end")
-      .style("font-size", `${parseInt(fontSize) + 2}px`)
+      .style("font-size", `${parseInt(fontSize) + 1}px`)
       .style("font-weight", "400")
       .style("fill", "#4C4D50")
       .text((d) => {
@@ -413,8 +429,7 @@ const PostCarousel = (props) => {
     "data-margin-bottom": marginBottom = 25,
     "data-font-size": fontSize = 14,
     "data-title-width": titleWidth = 100,
-    "data-title-height": titleHeight = 50,
-    "data-subtitle-width": subtitleWidth = 250,
+    "data-title-height": titleHeight = 50, 
     "data-subtitle-height": subtitleHeight = 60,
     "data-enable-title-popup": enableTitlePopup = "false",
     "data-enable-circle-popup": enableCirclePopup = "true",
@@ -423,6 +438,10 @@ const PostCarousel = (props) => {
     editing,
     parent,
     unique,
+  } = props;
+
+  let {
+    "data-subtitle-width": subtitleWidth = 250,
   } = props;
 
   const locale = props.intl.locale;
