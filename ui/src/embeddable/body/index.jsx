@@ -30,16 +30,36 @@ class Body extends React.Component {
       isMobile: ["mobile", "tablet"].includes(getDeviceType()),
       isClicked: false,
       selectedOption: "Cancers",
+      orientation: this.getScreenOrientation(),
     };
     this.onMouseOut = this.onMouseOut.bind(this);
     this.onMouseOver = this.onMouseOver.bind(this);
     this.updateLayout = this.updateLayout.bind(this);
     this.updateSvgLabels = this.updateSvgLabels.bind(this);
     this.handleTextClick = this.handleTextClick.bind(this);
+    this.handleOrientationChange = this.handleOrientationChange.bind(this);
   }
 
   updateLayout() {
     this.setState({ isMobile: ["mobile", "tablet"].includes(getDeviceType()) });
+  }
+
+  getScreenOrientation() {
+    return (
+      window.screen.orientation?.type ||
+      (window.innerWidth > window.innerHeight
+        ? "landscape-primary"
+        : "portrait-primary")
+    );
+  }
+
+  handleOrientationChange() {
+    setTimeout(() => {
+      this.setState({ orientation: this.getScreenOrientation() }, () => {
+        this.updateLayout();
+        this.updateSvgLabels();
+      });
+    }, 100);
   }
 
   handleTextClick(e) {
@@ -51,8 +71,8 @@ class Body extends React.Component {
 
     if (titleText || btn) {
       // Remove the 'on' class from all .title, .title-rect, and .title-line elements
-      [...svg.querySelectorAll(".title, .title-rect, .title-line")].forEach((node) =>
-          node.classList.remove("on")
+      [...svg.querySelectorAll(".title, .title-rect, .title-line")].forEach(
+        (node) => node.classList.remove("on")
       );
 
       const selectedElement = titleText || btn;
@@ -61,18 +81,21 @@ class Body extends React.Component {
       selectedElement.classList.add("on");
 
       // Add the 'on' class to the corresponding title-line
-      const titleLine = selectedElement.closest("g").querySelector(".title-line");
+      const titleLine = selectedElement
+        .closest("g")
+        .querySelector(".title-line");
       if (titleLine) {
         titleLine.classList.add("on");
       }
 
       // Update the selected option state
       this.setState({
-        selectedOption: (titleText ? titleText.innerHTML : btn.nextSibling.innerHTML),
+        selectedOption: titleText
+          ? titleText.innerHTML
+          : btn.nextSibling.innerHTML,
       });
     }
   }
-
 
   onMouseOut() {
     d3.select(".body.parts")
@@ -152,6 +175,14 @@ class Body extends React.Component {
 
   componentDidMount() {
     window.addEventListener("resize", this.updateLayout);
+    if (window.screen.orientation) {
+      window.screen.orientation.addEventListener(
+        "change",
+        this.handleOrientationChange
+      );
+    } else {
+      window.addEventListener("resize", this.handleOrientationChange);
+    }
     this.updateLayout();
     this.updateSvgLabels();
 
@@ -181,8 +212,6 @@ class Body extends React.Component {
       selectedTitleLine.classList.add("on");
     }
   }
-
-
 
   updateSvgLabels() {
     const root = d3.select(".body.parts");
@@ -528,33 +557,33 @@ class Body extends React.Component {
           .text((d) => d.label);
       }
     } else {
-      if(!isMobile) {
+      if (!isMobile) {
         root
-        .select("svg")
-        .selectAll("text.left")
+          .select("svg")
+          .selectAll("text.left")
 
-        .data(left)
-        .enter()
-        .append("text")
-        .attr("class", "label")
-        .attr("x", (d, i) => -280)
-        .attr("y", (d, i) => {
-          return sy + i * 25;
-        })
-        .text((d) => d.label);
+          .data(left)
+          .enter()
+          .append("text")
+          .attr("class", "label")
+          .attr("x", (d, i) => -280)
+          .attr("y", (d, i) => {
+            return sy + i * 25;
+          })
+          .text((d) => d.label);
 
-      root
-        .select("svg")
-        .selectAll("text.right")
-        .data(right)
-        .enter()
-        .append("text")
-        .attr("class", "label")
-        .attr("x", (d, i) => 200)
-        .attr("y", (d, i) => {
-          return sy + i * 25;
-        })
-        .text((d) => d.label);
+        root
+          .select("svg")
+          .selectAll("text.right")
+          .data(right)
+          .enter()
+          .append("text")
+          .attr("class", "label")
+          .attr("x", (d, i) => 200)
+          .attr("y", (d, i) => {
+            return sy + i * 25;
+          })
+          .text((d) => d.label);
       } else {
         root
           .select("svg")
@@ -567,7 +596,6 @@ class Body extends React.Component {
           .attr("y", (d, i) => sy + i * 25)
           .text((d) => d.label);
       }
-
     }
     root
       .select("svg")
@@ -584,9 +612,24 @@ class Body extends React.Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (prevState.selectedOption !== this.state.selectedOption) {
+    if (
+      prevState.selectedOption !== this.state.selectedOption ||
+      prevState.orientation !== this.state.orientation
+    ) {
       this.updateSvgLabels();
       this.addOnClassToSelectedElements(); // Apply "on" class after updates
+    }
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener("resize", this.updateLayout);
+    if (window.screen.orientation) {
+      window.screen.orientation.removeEventListener(
+        "change",
+        this.handleOrientationChange
+      );
+    } else {
+      window.removeEventListener("resize", this.handleOrientationChange);
     }
   }
 
@@ -603,14 +646,14 @@ class Body extends React.Component {
   };
 
   localeYDims = {
-    'en': "60",
-    'fr': "40",
-  }
+    en: "60",
+    fr: "40",
+  };
 
   localeXdims = {
-    'en': "-250",
-    'fr': "-280",
-  }
+    en: "-250",
+    fr: "-280",
+  };
 
   render() {
     return (
@@ -640,61 +683,109 @@ class Body extends React.Component {
           <Ectopic className="system Ectopic" />
           <g onClick={this.handleTextClick}>
             <rect
-                className="title-rect"
-                x={this.state.isMobile ? this.mobileOptions["Cancers"]["x"] - 20 : ""}
-                y={this.state.isMobile ? this.mobileOptions["Cancers"]["y"] - 20 : this.localeYDims[this.props.intl.locale]}
-                rx="5"
-                ry="5"
-                width="100"
-                height="30"
+              className="title-rect"
+              x={
+                this.state.isMobile
+                  ? this.mobileOptions["Cancers"]["x"] - 20
+                  : ""
+              }
+              y={
+                this.state.isMobile
+                  ? this.mobileOptions["Cancers"]["y"] - 20
+                  : this.localeYDims[this.props.intl.locale]
+              }
+              rx="5"
+              ry="5"
+              width="100"
+              height="30"
             />
             <text
-                x={this.state.isMobile ? this.mobileOptions["Cancers"]["x"] : this.localeXdims[this.props.intl.locale]}
-                y={this.state.isMobile ? this.mobileOptions["Cancers"]["y"] : this.localeYDims[this.props.intl.locale]}
-                className="title"
+              x={
+                this.state.isMobile
+                  ? this.mobileOptions["Cancers"]["x"]
+                  : this.localeXdims[this.props.intl.locale]
+              }
+              y={
+                this.state.isMobile
+                  ? this.mobileOptions["Cancers"]["y"]
+                  : this.localeYDims[this.props.intl.locale]
+              }
+              className="title"
             >
               <FormattedMessage id="ailments.title" defaultMessage="Cancers" />
             </text>
             {this.state.isMobile && (
-                <rect
-                    className="title-line"
-                    x={this.state.isMobile ? this.mobileOptions["Cancers"]["x"] -18 : "-250"}
-                    y={this.state.isMobile ? this.mobileOptions["Cancers"]["y"] + 7 : ""}
-                    width="58"
-                    height="3"
-                    fill="#E5EBED"
-                />
+              <rect
+                className="title-line"
+                x={
+                  this.state.isMobile
+                    ? this.mobileOptions["Cancers"]["x"] - 18
+                    : "-250"
+                }
+                y={
+                  this.state.isMobile
+                    ? this.mobileOptions["Cancers"]["y"] + 7
+                    : ""
+                }
+                width="58"
+                height="3"
+                fill="#E5EBED"
+              />
             )}
           </g>
           <g onClick={this.handleTextClick}>
             <rect
-                className="title-rect"
-                x={this.state.isMobile ? this.mobileOptions["OtherConditions"]["x"] - 65 : ""}
-                y={this.state.isMobile ? this.mobileOptions["OtherConditions"]["y"] - 20 : this.localeYDims[this.props.intl.locale]} // Ensure the default desktop y-position
-                rx="5"
-                ry="5"
-                width="155"
-                height="30"
+              className="title-rect"
+              x={
+                this.state.isMobile
+                  ? this.mobileOptions["OtherConditions"]["x"] - 65
+                  : ""
+              }
+              y={
+                this.state.isMobile
+                  ? this.mobileOptions["OtherConditions"]["y"] - 20
+                  : this.localeYDims[this.props.intl.locale]
+              } // Ensure the default desktop y-position
+              rx="5"
+              ry="5"
+              width="155"
+              height="30"
             />
             <text
-                x={this.state.isMobile ? this.mobileOptions["OtherConditions"]["x"] - 50 : "200"} // Desktop remains "200"
-                y={this.state.isMobile ? this.mobileOptions["OtherConditions"]["y"] : this.localeYDims[this.props.intl.locale]} // Ensure the default desktop y-position
-                className="title"
+              x={
+                this.state.isMobile
+                  ? this.mobileOptions["OtherConditions"]["x"] - 50
+                  : "200"
+              } // Desktop remains "200"
+              y={
+                this.state.isMobile
+                  ? this.mobileOptions["OtherConditions"]["y"]
+                  : this.localeYDims[this.props.intl.locale]
+              } // Ensure the default desktop y-position
+              className="title"
             >
               <FormattedMessage
-                  id="ailments.otherConditions"
-                  defaultMessage="Other conditions"
+                id="ailments.otherConditions"
+                defaultMessage="Other conditions"
               />
             </text>
             {this.state.isMobile && (
-                <rect
-                    className="title-line"
-                    x={this.state.isMobile ? this.mobileOptions["OtherConditions"]["x"] - 68 : "200"} // Keep desktop x-position as "200"
-                    y={this.state.isMobile ? this.mobileOptions["OtherConditions"]["y"] + 7 : "60"} // Default desktop y-position
-                    width="118"
-                    height="3"
-                    fill="#E5EBED"
-                />
+              <rect
+                className="title-line"
+                x={
+                  this.state.isMobile
+                    ? this.mobileOptions["OtherConditions"]["x"] - 68
+                    : "200"
+                } // Keep desktop x-position as "200"
+                y={
+                  this.state.isMobile
+                    ? this.mobileOptions["OtherConditions"]["y"] + 7
+                    : "60"
+                } // Default desktop y-position
+                width="118"
+                height="3"
+                fill="#E5EBED"
+              />
             )}
           </g>
         </svg>
