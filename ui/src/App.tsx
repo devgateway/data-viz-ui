@@ -6,7 +6,7 @@ import messages_en from "./translations/en.json";
 import messages_fr from "./translations/fr.json";
 import messages_am from './translations/af.json';
 import { updateIntl } from '@/lib/react-intl-redux'
-import { injectIntl, IntlProvider } from "react-intl";
+import { injectIntl, IntlProvider, useIntl } from "react-intl";
 import ResponsiveContainer from './layout'
 import { getComponentByNameIgnoreCase } from "./embeddable";
 import Helmet from './Helmet'
@@ -29,11 +29,12 @@ import PreviewTypeContainer from './layout/containers/PreviewTypeContainer';
 import SlugContainer from './layout/containers/SlugContainer';
 import SlugPostContainer from './layout/containers/SlugPostContainer';
 import withTracker from './withTracker';
+import { Config } from './conf';
 
 const messages = {
     'en': messages_en,
-    'fr' : messages_fr,
-    'am' : messages_am
+    'fr': messages_fr,
+    'am': messages_am
 };
 
 const PreviewComponentParameterParser = () => {
@@ -72,11 +73,11 @@ const PreviewComponentParameterParser = () => {
 
     return (
         <div>
-           <Container fluid={true} className={"editing"}>
-                    {/* @ts-ignore */}
-                    {UIComponent ? <UIComponent  {...params} editing={true}></UIComponent> :
-                        <Segment.Group color={"red"} textAlign={"center"}><h1>Wrong Component Name</h1></Segment.Group>}
-                </Container>
+            <Container fluid={true} className={"editing"}>
+                {/* @ts-ignore */}
+                {UIComponent ? <UIComponent  {...params} editing={true}></UIComponent> :
+                    <Segment.Group color={"red"} textAlign={"center"}><h1>Wrong Component Name</h1></Segment.Group>}
+            </Container>
 
         </div>
 
@@ -94,10 +95,8 @@ const InjectTitle = injectIntl((props) => {
 
 const IntlRoutes = () => {
     const pathParams = useParams();
-
+    const defaultLocale = Config.DEFAULT_LOCALE;
     const locale = pathParams.lan;
-
-
 
     useEffect(() => {
         if (process.env) {
@@ -124,15 +123,16 @@ const IntlRoutes = () => {
 
     const urlParams = new URLSearchParams(window.location.search);
     const customize_changeset_uuid = urlParams.get('customize_changeset_uuid');
- 
+
 
     useEffect(() => {
         // @ts-ignore
         window.isCustomizedPreview = customize_changeset_uuid != null;
     }, [customize_changeset_uuid]);
 
+
     if (!locale) {
-        return <Navigate to={"/en"}></Navigate>
+        return <Navigate to={defaultLocale}></Navigate>
     }
 
     console.log("locale", locale)
@@ -213,8 +213,9 @@ const router = createBrowserRouter(
 )
 
 const MainRoutes = () => {
+
     return (
-        <RouterProvider router={router}/>
+        <RouterProvider router={router} />
     )
 }
 
