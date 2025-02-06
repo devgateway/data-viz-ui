@@ -1,14 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Provider } from 'react-redux'
-import { Route, Routes, BrowserRouter, Navigate, useLocation, useParams } from 'react-router-dom';
+import { Route, Routes, BrowserRouter, Navigate, useLocation, useParams, createBrowserRouter, createRoutesFromElements, RouterProvider } from 'react-router-dom';
 import { store } from './redux/store'
 import messages_en from "./translations/en.json";
+import messages_fr from "./translations/fr.json";
+import messages_am from './translations/af.json';
 import { updateIntl } from '@/lib/react-intl-redux'
 import { injectIntl, IntlProvider } from "react-intl";
 import ResponsiveContainer from './layout'
 import { getComponentByNameIgnoreCase } from "./embeddable";
 import Helmet from './Helmet'
-import WithTracker from "./withTracker";
+// import WithTracker from "./withTracker";
 import {
     AppContextProvider,
     Category,
@@ -26,20 +28,19 @@ import PreviewPageContainer from './layout/containers/PreviewPageContainer';
 import PreviewTypeContainer from './layout/containers/PreviewTypeContainer';
 import SlugContainer from './layout/containers/SlugContainer';
 import SlugPostContainer from './layout/containers/SlugPostContainer';
-
+import withTracker from './withTracker';
 
 const messages = {
-    'en': messages_en
+    'en': messages_en,
+    'fr' : messages_fr,
+    'am' : messages_am
 };
 
 const PreviewComponentParameterParser = () => {
     const urlParams = useParams();
     const location = useLocation();
 
-    const componentRef = useRef(getComponentByNameIgnoreCase(urlParams.name ? urlParams.name : ''));
-
-    // TODO: Fix this react compiler issue 
-    const UIComponent = componentRef.current
+    const [UIComponent] = useState(() => getComponentByNameIgnoreCase(urlParams.name ? urlParams.name : ''));
 
 
     const [params, setParams] = useState(queryString.parse(location.search))
@@ -95,7 +96,6 @@ const IntlRoutes = () => {
     const pathParams = useParams();
 
     const locale = pathParams.lan;
-    console.log("locale", locale)
 
 
 
@@ -120,7 +120,7 @@ const IntlRoutes = () => {
     useEffect(() => {
         // This effect runs on every update, equivalent to componentDidUpdate
         store.dispatch(updateIntl({ locale, formats: {}, messages: messages[locale ? locale : 'en'] }));
-    });
+    }, []);
 
     const urlParams = new URLSearchParams(window.location.search);
     const customize_changeset_uuid = urlParams.get('customize_changeset_uuid');
@@ -182,8 +182,8 @@ const IntlRoutes = () => {
                             </SettingsConsumer>}>
                         </Route>
 
-                        <Route path={"/preview/page/:id"} element={<PreviewPageContainer />} />
-                        <Route path={"/preview/:type/:id"} element={<PreviewTypeContainer />} />
+                        <Route path={"preview/page/:id"} element={<PreviewPageContainer />} />
+                        <Route path={"preview/:type/:id"} element={<PreviewTypeContainer />} />
                         <Route path=":slug" element={<SlugContainer />} />
                         <Route path=":parent/:slug" element={<SlugContainer />} />
                         <Route path=":year/:month/:day/:slug" element={<SlugPostContainer />} />
@@ -196,19 +196,23 @@ const IntlRoutes = () => {
 };
 
 
-const WithTrackerRoutes = WithTracker(IntlRoutes);
 
-const MainRoutes = (props) => {
+// TODO: Return Tracker
+const WithTrackerRoutes = withTracker(IntlRoutes);
+// const WithTrackerRoutes = IntlRoutes;
+
+const router = createBrowserRouter(
+    createRoutesFromElements(
+        <Route>
+            <Route path="/:lan/*" element={<WithTrackerRoutes />} />
+            <Route path={"/"} element={<WithTrackerRoutes />} />
+        </Route>
+    )
+)
+
+const MainRoutes = () => {
     return (
-        <BrowserRouter future={{
-            v7_startTransition: true
-        }}>
-
-            <Routes>
-                <Route path="/:lan/*" element={<WithTrackerRoutes {...props} />} />
-                <Route path={"/"} element={<WithTrackerRoutes {...props} />} />
-            </Routes>
-        </BrowserRouter>
+        <RouterProvider router={router}/>
     )
 }
 
