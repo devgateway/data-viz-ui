@@ -14,8 +14,8 @@ import * as topojson from "topojson-client";
 import Legend from "./legend";
 import { formatContent } from "../common/MapTooltip";
 import getDeviceCategory from '../../utils/deviceType';
-import * as geoStats from 'geostats';
-
+import * as geoStats from "geostats";
+import { Config } from "@/conf";
 const COLOR_VARIABLE = "_Color_";
 const LOCATION = "location";
 const SHOW_ALL = "showAll";
@@ -262,12 +262,14 @@ class Map extends React.Component {
       layers: [],
       layersLoading: true,
     });
+
+    console.log("enabledLayers", enabledLayers)
     if (enabledLayers && enabledLayers.length > 0) {
       const metadataFuncs = [];
       enabledLayers.forEach((l) => {
         metadataFuncs.push(
           new Promise((resolve, reject) => {
-            d3.json(process.env.VITE_REACT_APP_WP_API + "/wp/v2/media/" + l.id)
+            d3.json(Config.REACT_APP_WP_API + "/wp/v2/media/" + l.id)
               .then((data) => {
                 resolve({ id: l.id, url: data.source_url, index: l.index });
               })
@@ -1740,17 +1742,17 @@ class Map extends React.Component {
             .translate(mapPosition.x, mapPosition.y)
             .scale(mapPosition.k),
         );
-      if (mapType === 'POINTS_MAP') {
-        const deviceTranslates = {
-          'mobile': 100,
-          'tablet': 0,
-          'midTablet': 0,
-          'desktop': 0,
-          'laptop': 0,
-          'wide': 0
-        }
-        const translateVal = deviceTranslates[getDeviceCategory()];
-        svg
+        if(mapType === 'POINTS_MAP') {
+          const deviceTranslates = {
+            'mobile': 100,
+            'tablet': 0,
+            'midTablet': 0,
+            'desktop': 0,
+            'laptop': 0,
+            'wide': 0
+          }
+          const translateVal = deviceTranslates[getDeviceCategory()];
+          svg
           .transition()
           .duration(300)
           .call(

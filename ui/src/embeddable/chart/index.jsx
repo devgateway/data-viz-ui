@@ -16,7 +16,8 @@ import CSVDataFrame from "./CSVDataFrame";
 import ColorProvider from "./colors/ColorProvider";
 import Messages from "./Messages";
 import { connect } from "react-redux";
-import deviceType from '@/utils/deviceType';
+import deviceType from '../../utils/deviceType';
+import { injectIntl } from 'react-intl';
 
 
 const isMobile = deviceType() === 'mobile';
@@ -103,7 +104,7 @@ const Chart = (props) => {
     //"data-csv-line-tooltip": lineTooltip = "",
     //"data-csv-line-title": lineTitle = "",
 
-    "data-overlays": overlays,
+    "data-overlays": overlays = "[]",
     "data-max-value": maxValue = "auto",
     "data-value-scale": valueScale = "linear",
     "data-swap": swap = "false",
@@ -114,6 +115,7 @@ const Chart = (props) => {
     "data-fixed-max-value": fixedMaxValue = 0,
     "data-bar-padding": barPadding = 0.15,
     "data-bar-label-position": barLabelPosition = "middle",
+    "data-line-label-position": lineLabelPosition = "none",
     "data-show-grid": showGrid = "true",
     "data-include-overall": includeOverall = "false",
     "data-bar-inner-padding": barInnerPadding = 0.7,
@@ -355,7 +357,7 @@ const Chart = (props) => {
     scheme: scheme,
     colorBy: colorBy,
   };
-  const child = null;
+  let child = null;
   const contentHeight = editing ? height - 80 : height;
 
   const showXAxisTitle = () => {
@@ -478,13 +480,14 @@ const Chart = (props) => {
     valueScale,
     categories,
     lineLayerEnabled: lineLayerEnabled == true || lineLayerEnabled == "true",
-    overlays: parse(overlays) || [],
+    overlays: overlays ? parse(overlays) : [],
     barColor: decodeURIComponent(barColor),
     overrideTickColor: overrideTickColor == true || overrideTickColor == "true",
     fixedMinValue,
     fixedMaxValue,
     barPadding: getBarPadValueOuterOrInner(isMobileConfigEnabled, mobileConfigSettings?.barPadding, barPadding),
     barLabelPosition,
+    lineLabelPosition,
     barInnerPadding: getBarPadValueOuterOrInner(isMobileConfigEnabled, mobileConfigSettings?.barInnerPadding, barInnerPadding),
     xLabelColor: decodeURIComponent(xLabelColor),
     barLabelColor: decodeURIComponent(barLabelColor),
@@ -550,7 +553,9 @@ const Chart = (props) => {
     dimension1
   };
 
-  const params = {};
+  console.log("chartProps", chartProps)
+
+  let params = {};
   const ff = parse(filters) || {};
 
   if (ff && ff.forEach) {
@@ -813,5 +818,4 @@ const mapStateToProps = (state, ownProps) => {
   }
 };
 const mapActionCreators = {};
-
-export default connect(mapStateToProps, mapActionCreators)(Chart);
+export default connect(mapStateToProps, mapActionCreators)(injectIntl(Chart));
