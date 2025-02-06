@@ -2,7 +2,6 @@ import { Image, Menu, Popup} from "semantic-ui-react";
 import React, { useState} from "react";
 import {MediaConsumer, MediaProvider, MenuConsumer, MenuProvider} from "@devgateway/wp-react-lib";
 import {injectIntl} from "react-intl";
-import {withRouter} from "@/withRouter";
 import SearchControl from "./SearchControl.jsx";
 import LangSwitcher from "./LangSwitcher.jsx";
 import { useParams } from "react-router-dom";
@@ -38,7 +37,7 @@ const localReplaceLink = (url, locale) => {
 
 const FloatingMenu = (props) => {
     const {
-        settings, withIcons, active, menu, onSetSelected, selected, match, locale
+        settings, withIcons, active, menu, onSetSelected, selected, locale
     } = props;
 
     return menu.items.filter(i => i.url !== "#wpm-languages")
@@ -116,6 +115,4 @@ const HeaderFloatingMenu = ({
 
 
 }
-
-
-export default injectIntl(withRouter(HeaderFloatingMenu))
+export default injectIntl(HeaderFloatingMenu)
