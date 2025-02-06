@@ -79,38 +79,49 @@ const DownloadComponent = (props) => {
     const options = { filter, bgcolor: "#FFF" }
     const save = (type) => {
 
-        domtoimage.cloneNode(componentRef.current).then(function (node) {
-            //add source url
-            const addSourceURL = includeSourceURL === "true";
-            if (addSourceURL) {
-                const urlNode = document.createElement('div')
-                urlNode.style.marginLeft = sourceURLMarginLeft + "px"
-                urlNode.style.marginTop = sourceURLMarginTop + "px"
-                urlNode.style.fontSize = sourceURLFontSize + "px"
-                urlNode.innerHTML = window.location.href
-                node.appendChild(urlNode)
-            }
-            
-            // TODO: Fix react compiler issue
-             
-            options.height = componentRef.current.offsetHeight + 100
-            options.width = componentRef.current.offsetWidth + 100
-            node.style.padding = "20px"
+         domtoimage.cloneNode(componentRef.current).then(function (node) {
 
-            if (type == "PNG") {
-                domtoimage.toPng(node, options)
-                    .then(function (blob) {
-                        saveAs(blob, pngLabel)
-                    });
-            }
+             [...node.getElementsByTagName("input")].forEach(e=>e.remove());
 
-            if (type == "JPG") {
-                domtoimage.toJpeg(node, options)
-                    .then(function (blob) {
-                        saveAs(blob, jpgLabel)
-                    });
-            }
-        })
+             // Remove all elements that are icons
+             [...node.querySelectorAll(".question.circle.icon")].forEach(e => e.remove());
+
+              //add source url
+              const addSourceURL = includeSourceURL == "true";
+              if (addSourceURL) {
+                  const urlNode = document.createElement('div')
+                  urlNode.style.marginLeft = sourceURLMarginLeft + "px"
+                  urlNode.style.marginTop = sourceURLMarginTop + "px"
+                  urlNode.style.fontSize = sourceURLFontSize + "px"
+                  urlNode.style.fontFamily = 'Roboto, sans-serif';
+                  urlNode.style.fontWeight = '400';
+                  urlNode.style.color = '#66676d';
+                  urlNode.style.opacity = '0.75';
+                  urlNode.innerHTML = window.location.href
+                  urlNode.style.maxWidth = "90%"; // Set a max width for the container
+                  urlNode.style.wordWrap = "break-word"; // Break lines within words if necessary
+                  urlNode.style.overflowWrap = "break-word"; // Ensure compatibility with other browsers
+                  node.appendChild(urlNode)
+              }
+
+             options.height = componentRef.current.scrollHeight + 90;
+             options.width = componentRef.current.scrollWidth + 30;
+              node.style.padding = "20px"
+
+              if (type == "PNG") {
+                  domtoimage.toPng(node, options)
+                      .then(function (blob) {
+                          saveAs(blob, pngLabel)
+                      });
+              }
+
+              if (type == "JPG") {
+                  domtoimage.toJpeg(node, options)
+                      .then(function (blob) {
+                          saveAs(blob, jpgLabel)
+                      });
+              }
+          })
     }
 
     const onClickHandler = (type) => {
@@ -124,7 +135,11 @@ const DownloadComponent = (props) => {
     return (
 
         <Container
-            className={`viz download ${style}  ${useTitle ? 'has-title' : ''}  ${isCheckPNG || isCheckJPG ? 'has-formats' : ''} ${editing ? 'editing' : ''}`}
+            className={`viz download ${style} ${useTitle ? 'has-title' : ''}
+                ${(isCheckPNG || isCheckJPG) ? 'has-formats' : ''}
+                ${editing ? 'editing' : ''}
+                ${(isCheckPNG && isCheckJPG) ? 'multi-format' : ''}
+                ${(isCheckPNG && !isCheckJPG) || (!isCheckPNG && isCheckJPG) ? 'single-format' : ''}`}
             fluid={true}>
 
             <DownloadableContent ref={componentRef}>
