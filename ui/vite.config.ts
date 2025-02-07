@@ -72,6 +72,7 @@ export default defineConfig(({ mode }) => {
                 allow: [
                     searchForWorkspaceRoot(process.cwd()),
                     '../react-lib/wp-react-lib',
+                    '../../custom/ui-customizer',
                 ]
             },
         },
