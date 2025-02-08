@@ -174,7 +174,7 @@ const TimeLine = (props) => {
         const x = rect.left - parentDiv.left;
         const y = rect.top - parentDiv.top;
         position = [x + xOffset, y + yOffset];
-        let tooltipWidth = 600;
+        const tooltipWidth = 600;
         if (rect.left + x + tooltipWidth + xOffset > window.innerWidth) {
           position[0] = x - tooltipWidth * 0.6;
         }
@@ -312,6 +312,7 @@ const TimeLine = (props) => {
       .style("line-height", "100%")
       .style("text-align", "center")
       .style("cursor", enableTitlePopup ? "pointer" : "default")
+      .style("overflow-wrap", "break-word")
       .html((d, i) => {
         const readmore = readMoreLabel(i);
         let title = d.title.rendered;
