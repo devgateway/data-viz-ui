@@ -83,6 +83,7 @@ const LineOptions = (props) => {
                 checked={showPoints}
                 onChange={() => setAttributes({showPoints: !showPoints})}/>
         </PanelRow>
+        { showPoints && <Labels {...props}></Labels>}
         <PanelRow>
             <ToggleControl
                 label={__("Enable Y Grid Lines")}
@@ -149,7 +150,6 @@ const LineOptions = (props) => {
         <ChartColors {...props}></ChartColors>
         </PanelBody>
         <AxisConfig {...props}></AxisConfig>
-        <Labels {...props}></Labels>
         <ChartLegends {...props}></ChartLegends>
     </PanelBody>]
 }

@@ -295,7 +295,6 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
             })
               .then(response => response.json())
               .then(data => {
-
                   const apps = data.applications ? [...data.applications.application
                     .filter(a => a.instance[0].metadata.type === 'data')
                     .map(a => ({

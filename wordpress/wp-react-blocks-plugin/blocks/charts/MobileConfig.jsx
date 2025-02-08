@@ -450,7 +450,7 @@ const MobileConfig = (props) => {
               </PanelRow>
 
               <PanelBody initialOpen={false} title={__("All Labels")}>
-                {xAxisLabels.map((label, index) => (
+                {xAxisLabels?.map((label, index) => (
                   <PanelRow key={`____${index}${label}`}>
                     <ToggleControl
                       key={`_____${index}${label}`}
