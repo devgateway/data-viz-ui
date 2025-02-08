@@ -33,7 +33,7 @@ export default defineConfig(({mode}) => {
                 "react-dom": path.resolve('./node_modules/react-dom'),
                 "react-router-dom": path.resolve('./node_modules/react-router-dom'),
                 "react-redux": path.resolve('./node_modules/react-redux'),
-                '@devgateway/customizer': path.resolve('./node_modules/@devgateway/customizer'),
+                '@devgateway/customizer' : path.resolve(__dirname, '../../custom/ui-customizer/')
             },
             preserveSymlinks: true,
         },
@@ -70,7 +70,6 @@ export default defineConfig(({mode}) => {
             fs: {
                 allow: [
                     searchForWorkspaceRoot(process.cwd()),
-                    '../../custom/ui-customizer',
                     '../react-lib/wp-react-lib',
                 ]
             },
