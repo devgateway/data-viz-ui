@@ -19,12 +19,16 @@ export const SectionHeader = ({title, subtitle, icon, media}) => {
     return <Menu className="header title" text>
         <Menu.Item>
 
-            <Image src={media && media.guid ? media.guid.rendered : icon}/>
+            <Image src={media && media.guid ? media.guid.rendered : icon}
+                   alt={media && media.alt_text ? media.alt_text : ""}
+            />
         </Menu.Item>
         <Menu.Header>
             <div>
-                <h1 className="has-light-blue-color">{title}</h1>
-                <h2 className="has-gray-color">{subtitle}</h2>
+                <h2 className="page-module-title">
+                    {title}
+                    <span style={{ display: 'block' }} className="page-module-subtitle">{subtitle}</span>
+                </h2>
             </div>
         </Menu.Header>
     </Menu>
