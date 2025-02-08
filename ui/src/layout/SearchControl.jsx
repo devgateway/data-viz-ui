@@ -1,35 +1,31 @@
-import React, {useEffect, useState} from "react";
-import {
-    SearchProvider,
-    SearchConsumer
-} from "@devgateway/wp-react-lib";
-import {injectIntl} from "react-intl";
-import {utils} from "@devgateway/wp-react-lib";
-import CustomSemanticSearch from "./CustomSemanticSearch.jsx";
+import React, { useEffect, useState } from "react";
+import * as ReactDOM from "react-dom";
+import { utils, SearchProvider, SearchConsumer } from "@devgateway/wp-react-lib";
+import CustomSemanticSearch from "./CustomSemanticSearch";
+import { Icon } from "semantic-ui-react";
+import { IntlProvider, injectIntl } from "react-intl";
 
-
-const resultRenderer = injectIntl(({
-                                       ID,
-                                       title,
-                                       slug,
-                                       parent_title,
-                                       parent_slug,
-                                       parent_link,
-                                       extract,
-                                       type,
-                                       link,
-                                       terms,
-                                       subtype,
-                                       bread_crumbs = [],
-                                       metadata: {redirect_url},
-                                       intl: {locale}
-                                   }) => {
-
-
-    let target = parent_link ? utils.replaceLink(parent_link, locale) + `#${slug}` : utils.replaceLink(link, locale)
-    target = redirect_url ? redirect_url + `#${slug}` : target
-
-
+const ResultRenderer = injectIntl(
+  ({
+    ID,
+    title,
+    slug,
+    parent_title,
+    parent_slug,
+    parent_link,
+    extract,
+    type,
+    link,
+    terms,
+    subtype,
+    bread_crumbs = [],
+    metadata: { redirect_url },
+    intl: { locale },
+  }) => {
+    let target = parent_link
+      ? utils.replaceLink(parent_link, locale) + `#${slug}`
+      : utils.replaceLink(link, locale);
+    target = redirect_url ? redirect_url + `#${slug}` : target;
 
     return (
         <div className={"has-standard-12-font-size"} onClick={e => document.location.href = target}>
@@ -42,29 +38,47 @@ const resultRenderer = injectIntl(({
 })
 
 const replaceString = (content, words) => {
-    const regex = RegExp(words, 'gi')
-    let newHTML = content
-    const instances = [...(newHTML.matchAll(regex))]
-    let shift = 0
-    const lengthBeforeChange = newHTML.length
-    instances.forEach(instance => {
-        const replacement = '<b>' + newHTML.substring(instance.index + shift, instance.index + shift + words.length) + '</b>';
-        newHTML = newHTML.substring(0, instance.index + shift) + replacement + newHTML.substring(instance.index + words.length + shift);
-        shift = newHTML.length - lengthBeforeChange;
-    })
+  const regex = RegExp(words, "gi");
+  let newHTML = content;
+  const instances = [...newHTML.matchAll(regex)];
+  let shift = 0;
+  const lengthBeforeChange = newHTML.length;
+  instances.forEach((instance) => {
+    const replacement =
+      "<b>" +
+      newHTML.substring(
+        instance.index + shift,
+        instance.index + shift + words.length
+      ) +
+      "</b>";
+    newHTML =
+      newHTML.substring(0, instance.index + shift) +
+      replacement +
+      newHTML.substring(instance.index + words.length + shift);
+    shift = newHTML.length - lengthBeforeChange;
+  });
 
     return newHTML;
 }
 
 const searchTextHandler = (words) => {
-    let searchedPara = document.querySelector('.results');
-    const searchResultHeading = searchedPara = searchedPara = document.querySelectorAll('H5')
-    const searchResult = searchedPara = searchedPara = document.querySelectorAll('.search-content')
-    for (let i = 0; i < searchResult.length; i++) {
-        if (searchResult[i]) {
-            searchResult[i].innerHTML = replaceString(searchResult[i].textContent, words);
-        }
+  let searchedPara = document.querySelector(".results");
+  const searchResultHeading =
+    (searchedPara =
+    searchedPara =
+      document.querySelectorAll("H5"));
+  const searchResult =
+    (searchedPara =
+    searchedPara =
+      document.querySelectorAll(".search-content"));
+  for (let i = 0; i < searchResult.length; i++) {
+    if (searchResult[i]) {
+      searchResult[i].innerHTML = replaceString(
+        searchResult[i].textContent,
+        words
+      );
     }
+  }
 
     for (let i = 0; i < searchResultHeading.length; i++) {
        if (searchResultHeading[i]) {
@@ -113,14 +127,47 @@ const SearchControl = ({onSearch,perPage, loading, results, meta, locale}) => {
 }
 
 const SearchComponent = injectIntl((props) => {
-    const {intl} = props
-    const [query, setQuery] = useState("")
-    return (<SearchProvider search={query} perPage={5} locale={intl.locale}>
-        <SearchConsumer>
-            <SearchControl  onSearch={setQuery}  perPage={5}></SearchControl>
-        </SearchConsumer>
-    </SearchProvider>)
-})
+  const { intl, onSetSelected } = props;
+  const [query, setQuery] = useState("");
 
+  const [isSmallScreen, setIsSmallScreen] = useState(false); // State to track small screen
+  useEffect(() => {
+    // Function to update isSmallScreen state
+    const updateScreenSize = () => {
+      setIsSmallScreen(window.innerWidth <= 1365); // Check if width is 1365px or lower
+    };
 
-export default SearchComponent
+    // Initial check
+    updateScreenSize();
+
+    // Event listener for window resize
+    window.addEventListener("resize", updateScreenSize);
+
+    // Cleanup
+    return () => window.removeEventListener("resize", updateScreenSize);
+  }, []);
+
+  const component =
+    props.settings.react_search_type === "floating" || isSmallScreen ? (
+      <FloatingSearchController
+        onSetSelected={onSetSelected}
+        onSearch={setQuery}
+        perPage={5}
+        {...props}
+      />
+    ) : (
+      <SearchControl
+        onSetSelected={onSetSelected}
+        onSearch={setQuery}
+        perPage={5}
+        {...props}
+      ></SearchControl>
+    );
+  return (
+    <SearchProvider search={query} perPage={5} locale={intl.locale}>
+      <SearchConsumer>{component}</SearchConsumer>
+    </SearchProvider>
+  );
+});
+
+export default SearchComponent;
