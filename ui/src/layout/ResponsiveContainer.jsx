@@ -12,7 +12,7 @@ import CustomizerWrapper from "./Customizer.jsx";
 
 const DesktopContainer = ({ children, fixed }) => {
     return (
-        <Container fluid>
+        <Container fluid="true">
             <SettingsConsumer>
                 <CustomizerWrapper>
                     <Header></Header>

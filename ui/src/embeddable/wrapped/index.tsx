@@ -19,9 +19,9 @@ const Root = (props) => {
     }
     return (<div style={{width: '100%', height: height + "px"}} className={"parallax-container"}>
 
-        <React.Suspense fallback={<div>Loading...</div>}>
+        {/* <React.Suspense> */}
             <C2 {...props} />
-        </React.Suspense>
+        {/* </React.Suspense> */}
     </div>)
 
 }
