@@ -103,7 +103,7 @@ const Chart = ({
   const [showLine, setShowLine] = useState(lineVisibility);
   const [bottomSpacing, setBottomSpacing] = useState(50);
   const [newMarginTop, setNewMarginTop] = useState(marginTop);
-  const [wrapCount, setWrapCount] = useState(0);
+  const [_wrapCount, setWrapCount] = useState(0);
   const [newMarginBottom, setNewMarginBottom] = useState(marginBottom);
 
   const generateChartLegends = (
@@ -1026,7 +1026,6 @@ if(isMobileCustomizationEnabled) {
     }
 }
 
-
 const AxisLeftCustomTick = (tick) => {
   if (
     isMobileCustomizationEnabled &&
@@ -1063,6 +1062,7 @@ const AxisLeftCustomTick = (tick) => {
   } else if(isTabletDevice) {
     lineHeight = mobileConfigSettings?.tabletYAxisLineHeight ?? 12;
   }
+
   return (
     <g transform={`translate(${tick.x},${tick.y})`}>
       <line x1={-5} x2={0} y1={0} y2={0} stroke={"#000"} strokeWidth={1} />
