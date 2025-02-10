@@ -619,6 +619,16 @@ const Chart = (props) => {
     dimensions.push(dimension2);
   }
   const [legendsContainerHeight, setLegendsContainerHeight] = useState(0);
+  const [, setOrientation] = useState(getScreenOrientation());
+
+  function getScreenOrientation() {
+    return (
+      window.screen.orientation?.type ||
+      (window.innerWidth > window.innerHeight
+        ? "landscape-primary"
+        : "portrait-primary")
+    );
+  };
 
 
   useEffect(() => {
@@ -712,6 +722,20 @@ const Chart = (props) => {
       clearTimeout(timeoutId);
     };
   }, [isMobileOrTablet, ref]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setTimeout(() => {
+        setOrientation(getScreenOrientation());
+      }, 100);
+    };
+    if(window.screen.orientation) {
+      window.screen.orientation.addEventListener("change", handleResize);
+    } else {
+      window.addEventListener("resize", handleResize);
+    }
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   return (
     <div ref={ref}>
