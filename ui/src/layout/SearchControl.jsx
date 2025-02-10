@@ -118,7 +118,7 @@ const SearchControl = ({onSearch,perPage, loading, results, meta, locale}) => {
                 setSearchTerm(b.value)
             }}
             searchTextHandler={searchTextHandler}
-            resultRenderer={resultRenderer}
+            resultRenderer={ResultRenderer}
             results={results}
             showNoResults={false}
 
