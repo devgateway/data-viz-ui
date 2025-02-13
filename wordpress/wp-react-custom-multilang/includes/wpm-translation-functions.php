@@ -33,6 +33,7 @@ function wpm_translate_url( $url, $language = '' ) {
 	$options       = wpm_get_lang_option();
 
 	if ( $language ) {
+		//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		if ( ( ( $language === $user_language ) && ( ! is_admin() || is_front_ajax() ) && ! isset( $_GET['lang'] ) ) || ! isset( $options[ $language ] ) ) {
 			return $url;
 		}
@@ -158,7 +159,7 @@ function wpm_string_to_ml_array( $string ) {
 		return $string;
 	}
 
-	$string = htmlspecialchars_decode( $string );
+	$string = apply_filters( 'wpm_filter_string_to_ml_array', $string );
 	$blocks = preg_split( '#\[:([a-z-]*)\]#im', $string, - 1, PREG_SPLIT_DELIM_CAPTURE );
 
 	if ( empty( $blocks ) ) {
@@ -196,13 +197,6 @@ function wpm_value_to_ml_array( $value ) {
 	return wpm_string_to_ml_array( $value );
 }
 
-/**
- * Transform multilingual array to multilingual string
- *
- * @param $strings
- *
- * @return string
- */
 function wpm_ml_array_to_string( $strings ) {
 
 	$string = '';
@@ -220,11 +214,17 @@ function wpm_ml_array_to_string( $strings ) {
 			$string .= '[:' . $key . ']' . trim( $value );
 		}
 	}
-
+	
+	/* foreach ($languages as $key => $value) {
+		if(isset($strings[$key]) && $strings[$key]=="" && isset($strings['en']) && $strings['en']!=""){
+			$trans_content =  trim( $strings['en'] );
+			$trans_content = wpm_ml_auto_translate_content($trans_content,'en',$key);
+			$string .= '[:' . $key . ']' . $trans_content;
+		}
+	} */
 	if ( $string ) {
 		$string .= '[:]';
 	}
-
 	return $string;
 }
 
@@ -409,7 +409,13 @@ function wpm_translate_term( $term, $taxonomy, $lang = '' ) {
 function wpm_untranslate_post( $post ) {
 	if ( $post instanceof WP_Post ) {
 		global $wpdb;
-		$orig_post = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->posts} WHERE ID = %d;", $post->ID ) );
+		$cache_key 	= 'wpm_posts_by_id_key';
+		$orig_post 		= wp_cache_get($cache_key);
+		if( false === $orig_post ){
+			//phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+			$orig_post = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->posts} WHERE ID = %d;", $post->ID ) );
+			wp_cache_set( $cache_key, $orig_post );
+		}
 		foreach ( get_object_vars( $post ) as $key => $content ) {
 			switch ( $key ) {
 				case 'post_title':
@@ -519,4 +525,30 @@ function wpm_set_new_value( $old_value, $new_value, $config = array(), $lang = '
 	$value = wpm_ml_value_to_string( $value );
 
 	return $value;
+}
+
+/**
+ * Filter content if WP Githun MD plugin is active and string contains any <code> tags
+ * https://github.com/ahmedkaludi/wp-multilang/issues/99
+ * @param	$string 	string
+ * @return	$string 	string
+ * @since 	2.4.14
+ * */
+add_filter( 'wpm_filter_string_to_ml_array', 'wpm_filter_string_for_github_md_plugin' );
+function wpm_filter_string_for_github_md_plugin( $string ) {
+
+	$flag 	=	0;
+
+	if ( in_array( 'githuber-md/githuber-md.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ), true )  ) ) {
+		// Check if string contains <code> tag and it's post markdown option is enabled
+		if ( strpos( $string, '<code>' ) !== false ) {
+			$flag 	=	1;
+		}
+	}
+	
+	if ( $flag == 0 ) {
+		$string = htmlspecialchars_decode( $string );
+	}
+
+	return $string;
 }

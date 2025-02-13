@@ -125,8 +125,10 @@ class WPM_Taxonomies extends WPM_Object {
 			);
 
 			if ( isset( $args['meta_query'] ) ) {
+				//phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
 				$args['meta_query'] = wp_parse_args( $args['meta_query'], $lang_meta_query );
 			} else {
+				//phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
 				$args['meta_query'] = $lang_meta_query;
 			}
 		}
@@ -153,12 +155,13 @@ class WPM_Taxonomies extends WPM_Object {
 		$name    = wp_unslash( $term );
 		$slug    = sanitize_title( $name );
 		$like    = '%' . $wpdb->esc_like( esc_sql( '[:' . wpm_get_language() . ']' . $name . '[:' ) ) . '%';
+		//phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$results = $wpdb->get_results( $wpdb->prepare( "SELECT t.term_id, t.name, t.slug FROM {$wpdb->terms} AS t INNER JOIN {$wpdb->term_taxonomy} AS tt ON t.term_id = tt.term_id WHERE tt.taxonomy = %s AND ( t.name LIKE %s OR t.slug = %s );", $taxonomy, $like, $slug ) );
 
 		foreach ( $results as $result ) {
 			$ml_term = wpm_translate_string( $result->name );
 			if ( ( $ml_term === $name || $result->slug === $slug ) && ! is_taxonomy_hierarchical( $taxonomy ) ) {
-				return new \WP_Error( 'term_exists', __( 'A term with the name provided already exists in this taxonomy.' ), $result->term_id );
+				return new \WP_Error( 'term_exists', esc_html__( 'A term with the name provided already exists in this taxonomy.', 'wp-multilang' ), $result->term_id );
 			}
 		}
 
@@ -219,6 +222,7 @@ class WPM_Taxonomies extends WPM_Object {
 		$description = wpm_set_new_value( array(), $value, $taxonomy_config['description'] );
 
 		global $wpdb;
+		//phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->update( $wpdb->term_taxonomy, compact( 'description' ), array( 'term_taxonomy_id' => $tt_id ) );
 	}
 
@@ -282,6 +286,7 @@ class WPM_Taxonomies extends WPM_Object {
 		$description = wpm_set_new_value( $this->description['old'], $value, $taxonomy_config['description'] );
 
 		global $wpdb;
+		//phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Reason: using WP bulit in function updates the data of term_taxonomy of current language which does not work for our plugin in this case
 		$wpdb->update( $wpdb->term_taxonomy, compact( 'description' ), array( 'term_taxonomy_id' => $tt_id ) );
 	}
 

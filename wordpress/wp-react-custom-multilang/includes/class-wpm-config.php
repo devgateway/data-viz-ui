@@ -81,6 +81,8 @@ class WPM_Config {
 		if ( file_exists( $theme_config_file ) ) {
 			self::$config_files[ 'theme_' . $theme_name ] = $theme_config_file;
 		}
+		
+		self::$config_files = apply_filters('wpmpro_load_core_configs', self::$config_files, self::$active_plugins);
 	}
 
 	/**
@@ -113,6 +115,8 @@ class WPM_Config {
 			$file = apply_filters( "wpm_{$name}_json_file", $file );
 
 			if ( $file && is_readable( $file ) ) {
+				
+				// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents --Reason We are just loading the plugin static file to get the contents.
 				$config = json_decode( file_get_contents( $file ), true );
 
 				if ( is_array( $config ) && ! empty( $config ) ) {

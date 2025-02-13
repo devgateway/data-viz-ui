@@ -2,9 +2,9 @@
 	<div id="wpm-language-switcher" class="wpm-language-switcher">
 		<div class="lang-main">
 			<?php if ( $languages[ $lang ]['flag'] ) { ?>
-				<img src="<?php echo esc_url( wpm_get_flag_url( $languages[ $lang ]['flag'] ) ); ?>">
+				<img src="<?php echo esc_url( wpm_get_flag_url( $languages[ $lang ]['flag'] ) ); // phpcs:ignore PluginCheck.CodeAnalysis.ImageFunctions.NonEnqueuedImage -- Reason Using built in function doesn't work in our case, so created custom function ?>">
 			<?php } else { ?>
-				<?php esc_html_e( $languages[ $lang ]['name'] ); ?>
+				<?php echo esc_html( $languages[ $lang ]['name'] ); ?>
 			<?php } ?>
 		</div>
 		<div class="lang-dropdown">
@@ -16,7 +16,7 @@
 					<li class="wpm-language-<?php echo esc_attr( $code ); ?>">
 						<a href="<?php echo esc_url( add_query_arg( 'edit_lang', $code, wpm_get_current_url() ) ); ?>" data-lang="<?php echo esc_attr( $code ); ?>">
 							<?php if ( $language['flag'] ) { ?>
-								<img src="<?php echo esc_url( wpm_get_flag_url( $language['flag'] ) ); ?>" alt="<?php echo esc_attr( $language['name'] ); ?>">
+								<img src="<?php echo esc_url( wpm_get_flag_url( $language['flag'] ) ); ?>" alt="<?php echo esc_attr( $language['name'] ); // phpcs:ignore PluginCheck.CodeAnalysis.ImageFunctions.NonEnqueuedImage -- Reason Using built in function doesn't work in our case, so created custom function ?>">
 							<?php } else { ?>
 								<?php echo esc_html( $language['name'] ); ?>
 							<?php } ?>
