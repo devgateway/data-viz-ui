@@ -520,7 +520,7 @@ const MobileConfig = (props) => {
                 </PanelRow>
                 <PanelRow>
                   <RangeControl
-                    label={__("Mobile Max Tick Word Length")}
+                    label={__("Mobile Max Tick Word Length.")}
                     value={
                       !mobileCustomization?.mobileMaxTickLength
                         ? 25
