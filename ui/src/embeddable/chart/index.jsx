@@ -177,6 +177,8 @@ const Chart = (props) => {
     "data-radar-dot-label-offset": radarDotLabelOffset = -12,
     "data-mobile-customization": mobileCustomization = "{}",
   } = props;
+  console.log("chart props:")
+  console.log(props)
   const mobileConfigSettings = JSON.parse(decodeURIComponent(mobileCustomization));
   const isMobileConfigEnabled = (isMobile || isTablet || isMidTablet) && (mobileConfigSettings?.  showCustomization ?? false);
 
