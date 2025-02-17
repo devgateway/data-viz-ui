@@ -1,5 +1,5 @@
 import { Config } from "@/conf";
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {Dropdown, Image} from 'semantic-ui-react'
 
 const changeLanguage = (locale) => {
@@ -8,37 +8,62 @@ const changeLanguage = (locale) => {
 
 
 const toOptions = (languages, show, locale) => {
-    return Object.keys(languages).map(k => ({
-        key: k,
-        text: (show === 'name' || show === 'both') ? languages[k]["name"] : k.toUpperCase(),
-        value: k,
-        selected: k.toUpperCase() === locale.toUpperCase(),
-        icon: (show === 'flag' || show === 'both') ?
-            <Image src={'/wp/wp-content/plugins/wp-multilang/flags/' + languages[k]["flag"]}/> : null
-    }))
-}
+    return Object.keys(languages).map(k => {
+        const shortText = languages[k]["name"].substring(0, 2).toUpperCase(); // Get first 2 letters
+        return {
+            key: k,
+            text: shortText, // Use short text in dropdown
+            value: k,
+            selected: k.toUpperCase() === locale.toUpperCase(),
+            icon: (show === 'flag' || show === 'both') ?
+                <Image src={'/wp/wp-content/plugins/wp-multilang/flags/' + languages[k]["flag"]}/> : null,
+            shortText // Save the short version for the label
+        };
+    });
+};
 
 const Drop = (props) => {
+    const { menu: { menu_item_languages_show: show }, settings: { languages }, locale } = props;
+    const options = toOptions(languages, show, locale);
+    const currentLang = options.find(o => o.value.toUpperCase() === locale.toUpperCase());
 
-    const {menu: {menu_item_languages_show: show}, settings: {languages}, locale} = props
-    const options = toOptions(languages, show, locale)
+    const [open, setOpen] = useState(false);
+    const dropdownRef = useRef(null);
 
-    return (<Dropdown
-        button
-        className='icon language selector'
-        floating
-        labeled
-        icon={'world'}
-        options={options}
-        onChange={(e, {name, value}) => {
+    // Close dropdown when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setOpen(false);
+            }
+        };
 
-            changeLanguage(value)
-        }
-        }
-        text='Language'
-    />)
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
 
-}
+    return (
+        <Dropdown
+            ref={dropdownRef}
+            button
+            className="icon language selector"
+            floating
+            labeled
+            icon="world"
+            options={options}
+            onChange={(e, { value }) => {
+                changeLanguage(value);
+                setOpen(false); // Close dropdown after selection
+            }}
+            text={currentLang ? currentLang.shortText : "??"} // Use shortened text
+            data-short={currentLang ? currentLang.shortText : "??"} // Helps with CSS control
+            defaultValue={locale}
+            open={open} // Control dropdown state
+            onMouseEnter={() => setOpen(true)} // Open on hover
+        />
+    );
+};
+
 const Inline = (props) => {
     const {menu: {menu_item_languages_show: show}, settings: {languages}, locale} = props
     const options = toOptions(languages, show, locale)
