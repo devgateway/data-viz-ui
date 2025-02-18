@@ -550,8 +550,6 @@ const Chart = (props) => {
     dimension1
   };
 
-  console.log("chartProps", chartProps)
-
   let params = {};
   const ff = parse(filters) || {};
 
