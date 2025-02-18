@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { connect } from "react-redux";
 import { Container, Icon } from "semantic-ui-react";
 import { cleanFilter } from "../reducers/data";
@@ -14,14 +14,31 @@ const FiltersResetComponent = (props) => {
         "data-reset-label": resetLabel = "Reset All Filters"
     } = props
 
-    let enabled = false;
 
-    //TODO: Check why we are using Number.MIN_SAFE_INTEGER instead of an empty array
-    Object.keys(initialFilters).forEach(k => {
-        if (initialFilters[k].length != appliedFilters[k].filter(v => v != Number.MIN_SAFE_INTEGER).length) {
-            enabled = true
-        }
-    })
+    const enabled = React.useMemo(() => {
+        return Object.keys(initialFilters).some(k => {
+            const initialValues = initialFilters[k];
+            const appliedValues = appliedFilters[k] || [];
+            const filteredApplied = appliedValues.filter(v => v !== Number.MIN_SAFE_INTEGER);
+
+            if (filteredApplied.length === 0) {
+                return false;
+            }
+
+            // If initial value is MIN_SAFE_INTEGER and we have a single applied filter, enable reset
+            if (initialValues.length === 1 && 
+                initialValues[0] === Number.MIN_SAFE_INTEGER && 
+                filteredApplied.length > 0) {
+                return true;
+            }
+            
+            // Check if arrays have different lengths or different values
+            const res = initialValues.length !== filteredApplied.length && 
+                !initialValues.every(v => filteredApplied.includes(v));
+            console.log("res", res)
+            return res;
+        });
+    }, [initialFilters, appliedFilters]);
 
 
 
