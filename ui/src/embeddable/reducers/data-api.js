@@ -13,12 +13,10 @@ function queryParams(params) {
 
 export const getCategories=({app, params})=>{
     const finalUrl = `${API_ROOT ? API_ROOT: ''}/api/${app}/categories/${params? '?' + queryParams(params) : ''}`;
-    console.log("categories==>", finalUrl);
     return get(finalUrl)
 }
 
 export const getData = ({source, app, params}) => {
-    const finalUrl = `${API_ROOT ? API_ROOT: ''}/api/${app}/stats/${source}${params? '?' + queryParams(params) : ''}`;
-    console.log("data==>", finalUrl);
+    const finalUrl = `${API_ROOT ? API_ROOT: ''}/api/${app}/stats/${source}${params? '?' + queryParams(params) : ''}`; 
     return get(finalUrl)
 }
