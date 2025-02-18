@@ -473,7 +473,7 @@ const MobileConfig = (props) => {
                       })
                     }
                     min={0}
-                    max={30}
+                    max={500}
                   />
                 </PanelRow>
                 <PanelRow>
@@ -493,7 +493,7 @@ const MobileConfig = (props) => {
                       })
                     }
                     min={0}
-                    max={30}
+                    max={500}
                   />
                 </PanelRow>
               </PanelBody>
