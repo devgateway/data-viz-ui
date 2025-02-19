@@ -40,11 +40,11 @@ const FloatingMenu = (props) => {
         settings, withIcons, active, menu, onSetSelected, selected, locale
     } = props;
 
-    return menu.items.filter(i => i.url != "#wpm-languages")
+    return menu.items.filter(i => i.url !== "#wpm-languages")
         .map((i) => {
-            
+
             return (<Menu.Item
-                className={`divided ${i.child_items ? 'has-child-items' : ''} ${selected && selected.ID == i.ID ? 'selected' : ''}  ${active == i.slug ? "active" : ""}`}>
+                className={`divided ${i.child_items ? 'has-child-items' : ''} ${selected && selected.ID === i.ID ? 'selected' : ''}  ${active === i.slug ? "active" : ""}`}>
                 {!i.child_items &&
                     <a onClick={e => onSetSelected(i)} href={localReplaceLink(i.url, locale)}>{i.title}</a>}
                 {i.child_items &&
@@ -80,13 +80,13 @@ const HeaderFloatingMenu = ({
             <Menu.Item className={"logo"}>
                 <a href={`/${locale}`}>
 
-                    {settings.site_logo != 0 && <MediaProvider id={settings.site_logo}>
+                    {settings.site_logo !== 0 && <MediaProvider id={settings.site_logo}>
                         <MediaConsumer>
                             <Logo></Logo>
                         </MediaConsumer>
 
                     </MediaProvider>}
-                    {!window.isCustomizedPreview && settings.site_logo == 0 &&
+                    {!window.isCustomizedPreview && settings.site_logo === 0 &&
                         <img className="brand logo" size="large" src='/dc-logo_01.png'/>}
                 </a>
             </Menu.Item>
