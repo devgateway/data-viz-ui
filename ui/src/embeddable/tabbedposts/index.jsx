@@ -4,6 +4,7 @@ import { MediaConsumer, MediaProvider, PostConsumer, PostIcon, PostLabel, PostPr
 import { injectIntl } from "react-intl";
 import PostIntro from "../connected-templates/PostIntro";
 import getDeviceType from '../../utils/deviceType';
+import { useWindowDimensionsAndDevice } from '@/lib/hooks/window-dimensions';
 
 const ItemMenu = ({ posts, activeItem, setActive, showLabels }) => {
     return posts ? posts.map(post => (
@@ -362,18 +363,9 @@ const Wrapper = (props) => {
     const scrollable = useScrolls === 'true';
     const conditionalHeight = scrollable ? height : undefined;
 
-    // Determine screen width and conditionally render components
-    const [isMobile, setIsMobile] = useState(window.innerWidth <= 1024);
+    const { width: deviceWidth} = useWindowDimensionsAndDevice();
 
-
-    useEffect(() => {
-        const handleResize = () => {
-            setIsMobile(window.innerWidth <= 1024);
-        };
-
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
-    }, []);
+    const isMobile = deviceWidth <= 1024;
 
     return (
         <Container className={`viz tabbed posts ${editing ? 'editing' : ''} ${scrollable ? 'scrollable' : ''}`} fluid={true}>
