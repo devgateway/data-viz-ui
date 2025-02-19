@@ -10,6 +10,7 @@ import {
     PostContent
 } from "@devgateway/wp-react-lib";
 import PostIntro from "../connected-templates/PostIntro";
+import { useWindowDimensionsAndDevice } from '@/lib/hooks/window-dimensions';
 
 interface FeaturedTabsProps {
     posts?: any[],
@@ -244,18 +245,12 @@ const Wrapper = (props: FeatureTabsProps) => {
         unique
     } = props;
     const locale = props.intl.locale;
-    const scrollable = useScrolls == 'true'
+    const scrollable = useScrolls == 'true';
+
+    const { width: deviceWidth} = useWindowDimensionsAndDevice();
 
     // Determine screen width and conditionally render components
-    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
-    useEffect(() => {
-        const handleResize = () => {
-            setIsMobile(window.innerWidth <= 1250);
-        };
-
-        window.addEventListener("resize", handleResize);
-        return () => window.removeEventListener("resize", handleResize);
-    }, []);
+    const isMobile = deviceWidth <= 1024;
 
     return (
         <Container
