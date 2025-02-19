@@ -334,13 +334,23 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
         }
     }
 
-    appendSupersetParams(url, datasetId) {
-        const {attributes: {app, apacheSupersetUrl}} = this.props
-        if (app == ALIVE_SUPERSET_APP) {
-            return `${url}?datasetId=${datasetId}&apacheSupersetUrl=${apacheSupersetUrl}`            
+    appendSupersetParams(url, datId) {
+        let app = this.props.attributes.app || this.props.layer.app
+        let datasetId = datId || this.props.attributes.datasetId
+        let apacheSupersetUrl = this.props.attributes.apacheSupersetUrl
+       
+        if (this.props.layer) {
+            app = this.props.layer.app
+            datasetId = this.props.layer.datasetId
+            apacheSupersetUrl = this.props.layer.apacheSupersetUrl
         }
 
-        return url       
+
+        if (app == ALIVE_SUPERSET_APP) {
+            return `${url}?datasetId=${datasetId}&apacheSupersetUrl=${apacheSupersetUrl}`
+        }
+
+        return url
     }
 
     _loadMetadata(app, datasetId) {
@@ -424,8 +434,11 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
        this._loadMetadata(app, newDatasetId || this.props.attributes.datasetId)       
     }   
 
-    loadDatasets(app) {
-        const {attributes: {apacheSupersetUrl}} = this.props
+    loadDatasets(app) {       
+        let apacheSupersetUrl = this.props.attributes.apacheSupersetUrl
+        if (this.props.layer) {
+            apacheSupersetUrl = this.props.layer.apacheSupersetUrl
+        }
         fetch(`/api/${app}/datasets?apacheSupersetUrl=${apacheSupersetUrl}`)
             .then(response => {
                 if (!response.ok) {

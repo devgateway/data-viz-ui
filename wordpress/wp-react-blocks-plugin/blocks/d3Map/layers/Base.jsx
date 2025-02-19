@@ -9,6 +9,7 @@ import {
     ToggleControl, ButtonGroup
 } from "@wordpress/components";
 import {__} from '@wordpress/i18n';
+import apiFetch from '@wordpress/api-fetch';
 import {getJsonFiles} from "./utils/FileUtils";
 import {useEffect} from "react";
 import {useState} from "@wordpress/element";
@@ -17,6 +18,7 @@ import FlowLayer from "./Flow";
 import LatLongLayer from "./LatLong";
 import {BlockEditWithAPIMetadata, ComponentWithSettings} from "../../commons";
 import Property from "./utils/Property";
+import {ALIVE_SUPERSET_APP} from '../../commons/Constants';
 
 import {PanelColorSettings} from "@wordpress/block-editor";
 import {togglePanel} from "../../commons/Util";
@@ -61,6 +63,7 @@ const Base = (props) => {
         newLayer[atrr] = value
         onChange(newLayer)
     }
+
 
     return [
         <PanelRow>
@@ -220,7 +223,7 @@ const Base = (props) => {
                                                         [feature.properties[labelField] + "_rotation"]: rotation
                                                     })}>
 
-                                    ></AnglePickerControl>
+                                    </AnglePickerControl>
                             </PanelRow>
                         </PanelBody>}
 
@@ -242,7 +245,9 @@ const Base = (props) => {
                     allCategories={metadata.categories}
                     allApps={metadata.apps}
                     features={features}
-                    layer={layer}>
+                    layer={layer}
+                    allDatasets={metadata.datasets}
+                    apacheSupersetUrl={metadata.apache_superset_url} >
                 </DataLayer>
 
             </>}
@@ -269,6 +274,7 @@ const Base = (props) => {
                     allMeasures={metadata.measures}
                     allCategories={metadata.categories}
                     allApps={metadata.apps}
+                    allDatasets={metadata.datasets}
                     features={features}
                     layer={layer}>
                 </LatLongLayer>
@@ -288,6 +294,8 @@ class LayerWithMetadata extends BlockEditWithAPIMetadata {
 
     componentDidMount() {
         const {layer: {name, type, file, app}} = this.props
+
+         apiFetch({path: '/dg/v1/settings'}).then((settingsData) => {
         fetch(`/api/registry/eureka/apps`, {
             headers: {
                 'Accept': 'application/json',
@@ -299,23 +307,42 @@ class LayerWithMetadata extends BlockEditWithAPIMetadata {
                     .filter(a => a.instance[0].metadata.type === 'data')
                     .map(a => ({
                         label: a.name, value: a.instance[0].vipAddress, settings: a.instance[0]
-                    })), {label: 'CSV', value: 'csv'}] : [{label: 'CSV', value: 'csv'}]
+                    })), { label: 'CSV', value: 'csv' }] : [{ label: 'CSV', value: 'csv' }]
+                
 
-                this.setState({...this.state, apps})
-                this._loadMetadata(app)
+                this.setState({
+                    react_ui_url: settingsData["react_ui_url"] + '/' + window._page_locale,
+                    react_api_url: settingsData["react_api_url"],
+                    apache_superset_url: settingsData["apache_superset_url"],
+                    site_language: settingsData["site_language"],
+                    current_language: new URLSearchParams(document.location.search).get("edit_lang"),
+                    apps
+                })
+
+                this._loadMetadata(app)                
             })
             .catch(function (response) {
                 alert("error" + response)
             })
+
+        })
+
+             
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         super.componentDidUpdate(prevProps, prevState, snapshot)
         const {layer: {app}} = this.props
         const {layer: {app: prevAPP}} = prevProps
-        if ((app != prevAPP) || (prevAPP == null && app != null)) {
-            this._loadMetadata(app)
+        const datasetId = this.props.layer.datasetId
+        const prevDatasetId = prevProps.layer.datasetId
+        if ((app != prevAPP) || (prevAPP == null && app != null) || (datasetId != prevDatasetId)) {
+            this._loadMetadata(app, datasetId)
         }
+
+        if ((app != prevAPP) || (prevAPP == null && app != null) && app == ALIVE_SUPERSET_APP) {
+            this.loadDatasets()
+        }        
     }
 
     render() {

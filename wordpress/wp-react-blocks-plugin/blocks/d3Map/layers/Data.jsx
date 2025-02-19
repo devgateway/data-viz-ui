@@ -17,6 +17,7 @@ import BreaksGenerator from "./utils/BreaksGenerator";
 import {PanelColorSettings} from "@wordpress/block-editor";
 import PatternGenerator from "./utils/PatternGenerator";
 import Format from '../../charts/Format.jsx'
+import {ALIVE_SUPERSET_APP} from '../../commons/Constants';
 
 const FilterSelector = ({param, index, options, onUpdateFilterParam}) => {
     const sortedOptions = options.sort(function (a, b) {
@@ -65,6 +66,9 @@ export class DataLayerSetting extends Component {
             measures: [], dimensions: [], filters: [], categories: []
         }
     }
+
+    
+
 
 
     onFormatChange(format, field) {
@@ -205,7 +209,8 @@ export class DataLayerSetting extends Component {
 
     render() {
         const {
-            onChangeProperty, allDimensions, allFilters, allMeasures, allCategories, features, apps,layer, layer: {
+            onChangeProperty,
+            allDimensions, allFilters, allMeasures, allCategories, allDatasets, features, apps,layer, layer: {
                 app,
                 csv,
                 measures,
@@ -233,11 +238,16 @@ export class DataLayerSetting extends Component {
                 patternDiscriminator,
                 onRemoveLayer,
                 onMoveLayer,
+                apacheSupersetUrl,
+                datasetId,
+                           
             }
         } = this.props
 
         let selectedMeasureLabel = ""
         let selectedMeasureValue = ""
+
+        
 
         if (app != 'csv') {
             const theMeasure = measures ? measures[0] : null
@@ -255,18 +265,47 @@ export class DataLayerSetting extends Component {
                 }
             }
         }
+
+        const  datasets = [{label: 'Select Dataset', value: '0'}]
+        if (allDatasets) { {
+            allDatasets.forEach(d => {
+                datasets.push({label: d.label, value: d.id})
+            })
+        }
+
+        console.log("ApacheSupersetUrl", apacheSupersetUrl)
+        console.log("App", app)
+
+        console.log("All Datasets", allDatasets)
+        console.log("DatasetId", datasetId)
+        
+        console.log("AllDimensions", allDimensions)
+        console.log("AllMeasures", allMeasures)
       
         return ([<PanelBody initialOpen={false} title={"Data Source"}>
             <PanelRow>
                 <SelectControl
                     label={__("App", "dg")}
                     value={[app]} // e.g: value = [ 'a', 'c' ]
-                    onChange={(app) => {
-                        onChangeProperty("app", app)
+                    onChange={(app) => {    
+                        onChangeProperty("apacheSupersetUrl", apacheSupersetUrl)        
+                        onChangeProperty("app", app)                            
                     }}
                     options={apps}
                 />
             </PanelRow>
+            {app == ALIVE_SUPERSET_APP && <PanelRow>
+                <SelectControl
+                    label={__('Datasets')}
+                    value={[datasetId]}
+                    onChange={(newDatasetId) => {
+                        onChangeProperty("datasetId", newDatasetId)
+                       // onChangeProperty("apiJoinAttribute", "none")                      
+                    }}
+                    options={datasets}
+                />
+            </PanelRow>
+            }
             {type != 'dataPoints' && <Property property={"featureJoinAttribute"}
                                                type={"select"} onChangeProperty={onChangeProperty}
                                                features={features}
@@ -495,6 +534,7 @@ export class DataLayerSetting extends Component {
         ])
     }
 
+}
 }
 
 export default DataLayerSetting;
