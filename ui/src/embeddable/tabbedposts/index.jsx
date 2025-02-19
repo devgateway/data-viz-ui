@@ -363,11 +363,12 @@ const Wrapper = (props) => {
     const conditionalHeight = scrollable ? height : undefined;
 
     // Determine screen width and conditionally render components
-    const [isMobile, setIsMobile] = useState(window.innerWidth <= 1250);
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
 
     useEffect(() => {
         const handleResize = () => {
-            setIsMobile(window.innerWidth <= 1250);
+            setIsMobile(window.innerWidth <= 768);
         };
 
         window.addEventListener('resize', handleResize);
@@ -385,7 +386,7 @@ const Wrapper = (props) => {
                 perPage={items}>
                 <PostConsumer>
                     <PostConsumer>
-                        {isMobile ? (
+                        {(isMobile) ? (
                             <AccordionContent posts={items} activeItem={items[0]?.slug} setActive={() => { }} />
                         ) : theme === 'light' ? (
                             <SingleTabbedView height={conditionalHeight} showLabels={showLabels === 'true'} />
