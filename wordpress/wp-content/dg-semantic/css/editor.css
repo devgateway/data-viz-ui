@@ -1,0 +1,87 @@
+/* Main column width */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;1,500;1,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@300;400;700&display=swap');
+
+.edit-post-visual-editor > * {
+    font-size: 18px !important;
+    font-family: Roboto !important;
+}
+
+
+
+
+p:not(.has-standard-12-font-size,.has-standard-16-font-size,.has-standard-16-font-size,
+.has-standard-18-font,
+.has-standard-24-font-size,
+.has-standard-30-font-size,
+.has-standard-36-font-size,
+.has-standard-64-font-size) {
+
+}
+
+p.wp-block.rich-text {
+    font-size: 18px;
+
+}
+
+
+.wp-block {
+    max-width: 1200px;
+    margin: auto !important;
+}
+
+
+* {
+    line-height: normal;
+}
+
+.block-editor-block-inspector h2{
+    font-size: 13px !important;
+}
+
+.interface-interface-skeleton__secondary-sidebar h2{
+    font-size: 13px !important;
+}
+
+.media-toolbar h2, .media-sidebar h2{
+    font-size: 15px!important;
+}
+
+.welcome-panel h3 {
+    margin: 1.33em 0 0!important;
+    font-size: 16px !important;
+}
+
+.dashicon{
+    font-family: dashicons !important;
+}
+
+
+.component-color-indicator {
+    font-size: 12px!important;
+}
+
+
+.hndle.ui-sortable-handle {
+    font-size: 18px !important;
+
+}
+
+
+.components-range-control{
+    width: 100%;
+
+}
+.components-range-control label {
+    text-transform: none;
+    font-size: 13px !important;
+    margin-right: 10px;
+    flex-shrink: 0;
+    max-width: 100%;
+}
+
+.wp-block-separator {
+    border: 1px solid #dadada !important;
+    opacity: 0.4 !important;
+    /* Add any other custom styles here */
+}

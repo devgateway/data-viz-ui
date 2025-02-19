@@ -118,7 +118,9 @@ const SaveComponent = (props) => {
             radarDotSize,
             radarEnableDotLabel,
             radarDotLabelOffset,
-            mobileCustomization
+            mobileCustomization,
+            datasetId,
+            apacheSupersetUrl
         }
     } = props;
     const blockProps = useBlockProps.save({
@@ -134,6 +136,7 @@ const SaveComponent = (props) => {
              data-height={height}
              data-type={type}
              data-source={source}
+             data-dataset-id={datasetId}
              data-dimension1={dimension1}
              data-dimension2={dimension2}
              data-dimension3={dimension3}
@@ -247,6 +250,7 @@ const SaveComponent = (props) => {
              data-radar-enable-dot-label={radarEnableDotLabel}
              data-radar-dot-label-offset={radarDotLabelOffset}
              data-mobile-customization={encodeURIComponent(JSON.stringify(mobileCustomization))}
+             data-apache-superset-url={encodeURIComponent(apacheSupersetUrl)} 
              >
             <InnerBlocks.Content/>
         </div>

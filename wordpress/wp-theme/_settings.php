@@ -16,6 +16,14 @@ function add_setting_section()
             'show_in_rest' => true,
             'type' => 'string'
         ));
+      
+    register_setting('general', // Options group
+        'apache_superset_url', // Option name/database
+        array(
+            'show_in_rest' => true,
+            'type' => 'string'
+        ));
+
     register_setting('general', // Options group
         'react_ui_search_type', // Option name/database
         array(
@@ -79,6 +87,14 @@ function add_setting_section()
     // Section ID
     );
 
+    add_settings_field('wp-apache-superset-url', // Field ID
+        __('Apache Superset URL'), // Field title
+        'wp_apache_superset_url_callback', // Field callback function
+        'general', // Settings page slug
+        'wp-react-section'
+    // Section ID
+    );
+
 
 }
 function wp_react_menu_setting_section_header()
@@ -128,6 +144,19 @@ function wp_react_api_url_callback()
     </label>
     <?php
 }
+
+function wp_apache_superset_url_callback()
+{
+    ?>
+    <label for="droid-identification">
+        <input
+            id="apache_superset_url"
+            class="regular-text" type="text" name="apache_superset_url"
+            value="<?php echo(get_option('apache_superset_url')) ?>">
+    </label>
+    <?php
+}
+
 function wp_react_ui_search_type_callback()
 {
     ?>
@@ -156,6 +185,7 @@ function show_ui_setting($request)
     $settings = array(
         "react_ui_url" => get_option("react_ui_url"),
         "react_api_url" => get_option("react_api_url"),
+        "apache_superset_url" => get_option("apache_superset_url"),
         "react_search_type" => get_option("react_ui_search_type"),
         "react_menu_type" => get_option("react_ui_menu_type"),
         "languages" => wpm_get_lang_option()
