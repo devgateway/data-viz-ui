@@ -182,6 +182,8 @@ const Chart = (props) => {
     "data-enable-grid-y": enableGridY = "true",
     "data-enable-grid-x": enableGridX = "false",
   } = props;
+  console.log("chart props:")
+  console.log(props)
   const mobileConfigSettings = JSON.parse(decodeURIComponent(mobileCustomization));
   const isMobileConfigEnabled = (isMobile || isTablet || isMidTablet) && (mobileConfigSettings?.  showCustomization ?? false);
 
