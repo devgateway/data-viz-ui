@@ -44,6 +44,7 @@ const TimeLine = (props) => {
   } = props;
 
   height = window.innerHeight;
+  // eslint-disable-next-line unused-imports/no-unused-vars
   subtitleWidth = 250;
 
   const ref = useRef();
