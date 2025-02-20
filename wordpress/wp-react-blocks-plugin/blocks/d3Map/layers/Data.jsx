@@ -237,8 +237,7 @@ export class DataLayerSetting extends Component {
                 customMeasuresLabels,
                 patternDiscriminator,
                 onRemoveLayer,
-                onMoveLayer,
-                apacheSupersetUrl,
+                onMoveLayer,                
                 datasetId,
                            
             }
@@ -266,20 +265,13 @@ export class DataLayerSetting extends Component {
             }
         }
 
-        const  datasets = [{label: 'Select Dataset', value: '0'}]
-        if (allDatasets) { {
-            allDatasets.forEach(d => {
-                datasets.push({label: d.label, value: d.id})
-            })
-        }
-       
+        
         return ([<PanelBody initialOpen={false} title={"Data Source"}>
             <PanelRow>
                 <SelectControl
                     label={__("App", "dg")}
                     value={[app]} // e.g: value = [ 'a', 'c' ]
-                    onChange={(app) => {    
-                        onChangeProperty("apacheSupersetUrl", apacheSupersetUrl)        
+                    onChange={(app) => {                        
                         onChangeProperty("app", app)                            
                     }}
                     options={apps}
@@ -290,10 +282,9 @@ export class DataLayerSetting extends Component {
                     label={__('Datasets')}
                     value={[datasetId]}
                     onChange={(newDatasetId) => {
-                        onChangeProperty("datasetId", newDatasetId)
-                       // onChangeProperty("apiJoinAttribute", "none")                      
+                        onChangeProperty("datasetId", newDatasetId)                       
                     }}
-                    options={datasets}
+                    options={allDatasets}
                 />
             </PanelRow>
             }
@@ -526,6 +517,6 @@ export class DataLayerSetting extends Component {
     }
 
 }
-}
+
 
 export default DataLayerSetting;

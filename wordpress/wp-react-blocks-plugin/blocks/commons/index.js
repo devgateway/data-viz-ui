@@ -334,20 +334,20 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
         }
     }
 
+  
+
     appendSupersetParams(url, datId) {
         let app = this.props.attributes.app || this.props.layer.app
-        let datasetId = datId || this.props.attributes.datasetId
-        let apacheSupersetUrl = this.props.attributes.apacheSupersetUrl
+        let datasetId = datId || this.props.attributes.datasetId        
        
         if (this.props.layer) {
             app = this.props.layer.app
-            datasetId = this.props.layer.datasetId
-            apacheSupersetUrl = this.props.layer.apacheSupersetUrl
+            datasetId = this.props.layer.datasetId           
         }
 
 
         if (app == ALIVE_SUPERSET_APP) {
-            return `${url}?datasetId=${datasetId}&apacheSupersetUrl=${apacheSupersetUrl}`
+            return `${url}?datasetId=${datasetId}&apacheSupersetUrl=${this.state.apache_superset_url}`
         }
 
         return url
@@ -434,12 +434,8 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
        this._loadMetadata(app, newDatasetId || this.props.attributes.datasetId)       
     }   
 
-    loadDatasets(app) {       
-        let apacheSupersetUrl = this.props.attributes.apacheSupersetUrl
-        if (this.props.layer) {
-            apacheSupersetUrl = this.props.layer.apacheSupersetUrl
-        }
-        fetch(`/api/${app}/datasets?apacheSupersetUrl=${apacheSupersetUrl}`)
+    loadDatasets(app) {   
+          fetch(`/api/${app}/datasets?apacheSupersetUrl=${this.state.apache_superset_url}`)
             .then(response => {
                 if (!response.ok) {
                     throw new Error("HTTP status " + response.status);

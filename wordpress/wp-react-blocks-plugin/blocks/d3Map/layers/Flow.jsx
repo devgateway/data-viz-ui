@@ -16,7 +16,8 @@ import Property from "./utils/Property";
 import BreaksGenerator from "./utils/BreaksGenerator";
 import {PanelColorSettings} from "@wordpress/block-editor";
 import PatternGenerator from "./utils/PatternGenerator";
-import Format from '../../charts/Format.jsx'
+import Format from '../../charts/Format.jsx';
+import {ALIVE_SUPERSET_APP} from '../../commons/Constants';
 
 const FilterSelector = ({param, index, options, onUpdateFilterParam}) => {
     const sortedOptions = options.sort(function (a, b) {
@@ -83,7 +84,7 @@ export class DataLayerSetting extends Component {
                 markFillColor,
                 markBorderColor,
                 markSizeScale,
-                tooltip
+                tooltip                
             }
         } = this.props
 
@@ -205,7 +206,7 @@ export class DataLayerSetting extends Component {
 
     render() {
         const {
-            onChangeProperty, allDimensions, allFilters, allMeasures, allCategories, features, apps, layer, layer: {
+            onChangeProperty, allDimensions, allFilters, allMeasures, allCategories, features, apps, allDatasets, layer, layer: {
                 app,
                 csv,
                 measures,
@@ -238,6 +239,7 @@ export class DataLayerSetting extends Component {
                 flowDestination,
                 onRemoveLayer,
                 flowValuesFrom,
+                datasetId
             }
         } = this.props
 
@@ -260,18 +262,30 @@ export class DataLayerSetting extends Component {
                 }
             }
         }
-        
+
+               
         return ([<PanelBody initialOpen={false} title={"Data Source"}>
             <PanelRow>
                 <SelectControl
                     label={__("App", "dg")}
                     value={[app]} // e.g: value = [ 'a', 'c' ]
-                    onChange={(app) => {
+                    onChange={(app) => {                       
                         onChangeProperty("app", app)
                     }}
                     options={apps}
                 />
             </PanelRow>
+               {app == ALIVE_SUPERSET_APP && <PanelRow>
+                            <SelectControl
+                                label={__('Datasets')}
+                                value={[datasetId]}
+                                onChange={(newDatasetId) => {
+                                    onChangeProperty("datasetId", newDatasetId)                       
+                                }}
+                                options={allDatasets}
+                            />
+                        </PanelRow>
+                        }
             {type != 'dataPoints' && <Property property={"featureJoinAttribute"}
                                                type={"select"} onChangeProperty={onChangeProperty}
                                                features={features}

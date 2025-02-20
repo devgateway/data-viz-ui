@@ -61,8 +61,7 @@ export const Model = {
     customMeasuresLabels: {},
     visible: true,
     flowValuesFrom: 'origin',
-    datasetId: '',
-    apacheSupersetUrl: '',
+    datasetId: ''    
 }
 
 

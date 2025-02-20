@@ -64,6 +64,12 @@ const Base = (props) => {
         onChange(newLayer)
     }
 
+    const datasets = [{ label: 'Select Dataset', value: '0' }]
+    if (metadata.datasets) {
+        metadata.datasets.forEach(d => {
+            datasets.push({ label: d.label, value: d.id })
+        })
+    }
 
     return [
         <PanelRow>
@@ -235,19 +241,18 @@ const Base = (props) => {
             }  </>,
 
         <React.Fragment>
-            {type == 'data' && <>
+            {type == 'data' && <>               
                 <DataLayer
                     apps={metadata.apps}
                     onChangeProperty={onChangeProperty}
-                    allDimensions={metadata.dimensions}
-                    allFilters={metadata.filters}
-                    allMeasures={metadata.measures}
-                    allCategories={metadata.categories}
+                    allDimensions={metadata.dimensions || []}
+                    allFilters={metadata.filters || []}
+                    allMeasures={metadata.measures || []}
+                    allCategories={metadata.categories || []}
                     allApps={metadata.apps}
                     features={features}
                     layer={layer}
-                    allDatasets={metadata.datasets}
-                    apacheSupersetUrl={metadata.apache_superset_url} >
+                    allDatasets={datasets}>
                 </DataLayer>
 
             </>}
@@ -261,7 +266,9 @@ const Base = (props) => {
                     allCategories={metadata.categories}
                     allApps={metadata.apps}
                     features={features}
-                    layer={layer}>
+                    layer={layer}
+                    allDatasets={datasets}                    
+                    >
                 </FlowLayer>
 
             </>}
@@ -276,7 +283,7 @@ const Base = (props) => {
                     allApps={metadata.apps}
                     allDatasets={metadata.datasets}
                     features={features}
-                    layer={layer}>
+                    layer={layer}  >
                 </LatLongLayer>
 
             </>}
