@@ -260,10 +260,10 @@ const Base = (props) => {
                 <FlowLayer
                     apps={metadata.apps}
                     onChangeProperty={onChangeProperty}
-                    allDimensions={metadata.dimensions}
-                    allFilters={metadata.filters}
-                    allMeasures={metadata.measures}
-                    allCategories={metadata.categories}
+                    allDimensions={metadata.dimensions || []}
+                    allFilters={metadata.filters || []}
+                    allMeasures={metadata.measures || []}
+                    allCategories={metadata.categories || []}
                     allApps={metadata.apps}
                     features={features}
                     layer={layer}
@@ -276,14 +276,15 @@ const Base = (props) => {
                 <LatLongLayer
                     apps={metadata.apps}
                     onChangeProperty={onChangeProperty}
-                    allDimensions={metadata.dimensions}
-                    allFilters={metadata.filters}
-                    allMeasures={metadata.measures}
-                    allCategories={metadata.categories}
+                    allDimensions={metadata.dimensions || []}
+                    allFilters={metadata.filters || []}
+                    allMeasures={metadata.measures || []}
+                    allCategories={metadata.categories || []}
                     allApps={metadata.apps}
-                    allDatasets={metadata.datasets}
+                    allDatasets={datasets}
                     features={features}
-                    layer={layer}  >
+                    layer={layer}                  
+                    >
                 </LatLongLayer>
 
             </>}
@@ -302,7 +303,7 @@ class LayerWithMetadata extends BlockEditWithAPIMetadata {
     componentDidMount() {
         const {layer: {name, type, file, app}} = this.props
 
-         apiFetch({path: '/dg/v1/settings'}).then((settingsData) => {
+        apiFetch({path: '/dg/v1/settings'}).then((settingsData) => {
         fetch(`/api/registry/eureka/apps`, {
             headers: {
                 'Accept': 'application/json',

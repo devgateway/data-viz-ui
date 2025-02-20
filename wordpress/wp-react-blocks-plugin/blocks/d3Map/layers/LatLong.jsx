@@ -16,6 +16,8 @@ import Measures from '../../commons/Measures.jsx'
 import Property from "./utils/Property";
 import {PanelColorSettings} from "@wordpress/block-editor";
 import BreaksGenerator from "./utils/BreaksGenerator";
+import {ALIVE_SUPERSET_APP} from '../../commons/Constants';
+
 const compareJsonProps = (p1, p2) => {
     return JSON.stringify(p1) === JSON.stringify(p2)
 }
@@ -191,7 +193,7 @@ export class DataLayerSetting extends Component {
 
     render() {
         const {
-            onChangeProperty, allDimensions, allFilters, allMeasures, allCategories, features, apps, layer: {
+            onChangeProperty, allDimensions, allFilters, allMeasures, allCategories, allDatasets, features, apps, layer: {
                 app,
                 csv,
                 measures,
@@ -212,7 +214,8 @@ export class DataLayerSetting extends Component {
                 markBorderColor,
                 markSizeScale,
                 tooltip,
-                visible = true
+                visible = true,
+                datasetId
             }
         } = this.props
 
@@ -231,6 +234,18 @@ export class DataLayerSetting extends Component {
                     options={apps}
                 />
             </PanelRow>
+
+            {app == ALIVE_SUPERSET_APP && <PanelRow>
+                <SelectControl
+                    label={__('Datasets')}
+                    value={[datasetId]}
+                    onChange={(newDatasetId) => {
+                        onChangeProperty("datasetId", newDatasetId)
+                    }}
+                    options={allDatasets}
+                />
+            </PanelRow>
+            }
 
             {app == 'csv' && <PanelRow>
                 <TextareaControl

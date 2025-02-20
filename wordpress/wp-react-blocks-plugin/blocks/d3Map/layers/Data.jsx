@@ -271,8 +271,8 @@ export class DataLayerSetting extends Component {
                 <SelectControl
                     label={__("App", "dg")}
                     value={[app]} // e.g: value = [ 'a', 'c' ]
-                    onChange={(app) => {                        
-                        onChangeProperty("app", app)                            
+                    onChange={(app) => {  
+                       onChangeProperty("app", app)                            
                     }}
                     options={apps}
                 />
