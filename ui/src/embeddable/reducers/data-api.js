@@ -12,7 +12,7 @@ function queryParams(params) {
 }
 
 export const getCategories=({app, params})=>{
-    const finalUrl = `${API_ROOT ? API_ROOT: ''}/api/${app}/categories/${params? '?' + queryParams(params) : ''}`;
+    const finalUrl = `${API_ROOT ? API_ROOT: ''}/api/${app}/categories${params? '?' + queryParams(params) : ''}`;
     return get(finalUrl)
 }
 
