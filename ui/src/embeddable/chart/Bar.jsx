@@ -7,7 +7,7 @@ import { line } from "d3-shape";
 import LineLayer from "./LineLayer";
 import Papa from "papaparse";
 import FlexWrapDetector from "../../layout/FlexWrapDetector";
-import deviceType from '../../utils/deviceType'
+import deviceType from "../../utils/deviceType";
 
 const POSITION_MIDDLE = "middle";
 const POSITION_TOP = "top";
@@ -77,15 +77,20 @@ const Chart = ({
   reverseLegend,
   enableGridY,
   enableGridX,
-  customAxisFormat
+  customAxisFormat,
 }) => {
-  const isMobileOrTablet = ['mobile', 'tablet', 'midTablet'].includes(deviceType());
-  const isTabletDevice = ['tablet', 'midTablet'].includes(deviceType())
-  const isMobileDevice = deviceType() === 'mobile';
+  const isMobileOrTablet = ["mobile", "tablet", "midTablet"].includes(
+    deviceType()
+  );
+  const isTabletDevice = ["tablet", "midTablet"].includes(deviceType());
+  const isMobileDevice = deviceType() === "mobile";
   const LABEL_SKIP_WIDTH = 30; // important for vertical layout
   const LABEL_SKIP_HEIGHT = 15; // important for horizontal layout
-  const mobileConfigSettings = JSON.parse(decodeURIComponent(mobileCustomization));
-  const isMobileCustomizationEnabled = isMobileOrTablet && (mobileConfigSettings?.showCustomization ?? false);
+  const mobileConfigSettings = JSON.parse(
+    decodeURIComponent(mobileCustomization)
+  );
+  const isMobileCustomizationEnabled =
+    isMobileOrTablet && (mobileConfigSettings?.showCustomization ?? false);
   const normalizeLabelColor = () => {
     if (barLabelColor === "null" || barLabelColor === null || !barLabelColor) {
       return "#000000";
@@ -511,13 +516,17 @@ const Chart = ({
     }
     let lines = [];
     let currentLine = "";
-    if(isMobileCustomizationEnabled) {
+    if (isMobileCustomizationEnabled) {
       const words = String(tickObject.value).split(" ");
       let maxLineLength = 25;
-      if(isMobileDevice) {
+      if (isMobileDevice) {
         maxLineLength = mobileConfigSettings?.mobileMaxTickLength ?? 25;
-      } else if(isTabletDevice) {
+      } else if (isTabletDevice) {
         maxLineLength = mobileConfigSettings?.tabletMaxTickLength ?? 25;
+      } else if (
+        window.matchMedia("(min-width: 768px) and (max-width: 1250px)").matches
+      ) {
+        maxLineLength = 15;
       }
 
       words.forEach((word) => {
@@ -535,9 +544,9 @@ const Chart = ({
       lines = [tickObject.value];
     }
     let lineHeight = 12;
-    if(isMobileDevice) {
+    if (isMobileDevice) {
       lineHeight = mobileConfigSettings?.mobileYAxisLineHeight ?? 12;
-    } else if(isTabletDevice) {
+    } else if (isTabletDevice) {
       lineHeight = mobileConfigSettings?.tabletYAxisLineHeight ?? 12;
     }
     if (tickRotation > 0 && tickRotation < 180) {
@@ -1015,63 +1024,68 @@ const Chart = ({
     );
   };
 
-let hiddenLabels = [];
-if(isMobileCustomizationEnabled) {
+  let hiddenLabels = [];
+  if (isMobileCustomizationEnabled) {
     ticks = parseInt(mobileConfigSettings.yAxisTickValues);
-    const labels = new Map(Object.entries(mobileConfigSettings?.labels?.xAxis ?? {}));
+    const labels = new Map(
+      Object.entries(mobileConfigSettings?.labels?.xAxis ?? {})
+    );
     for (let [key, value] of labels) {
       if (!value) {
         hiddenLabels.push(key);
       }
     }
-}
-
-const AxisLeftCustomTick = (tick) => {
-  if (
-    isMobileCustomizationEnabled &&
-    hiddenLabels.includes(String(tick.value))
-  ) {
-    return "";
   }
-  let maxLineLength = 25;
-  if(isMobileDevice) {
-    maxLineLength = mobileConfigSettings?.mobileMaxTickLength ?? 25;
-  } else if(isTabletDevice) {
-    maxLineLength = mobileConfigSettings?.tabletMaxTickLength ?? 25;
-  }
-  const words =
-    typeof tick.value === "string" ? tick.value.split(" ") : [tick.value];
-  let lines = [];
-  let currentLine = "";
 
-  words.forEach((word) => {
-    if (currentLine.length + String(word).length <= maxLineLength) {
-      currentLine += (currentLine ? " " : "") + word;
-    } else {
-      lines.push(currentLine);
-      currentLine = word;
+  const AxisLeftCustomTick = (tick) => {
+    if (
+      isMobileCustomizationEnabled &&
+      hiddenLabels.includes(String(tick.value))
+    ) {
+      return "";
     }
-  });
+    let maxLineLength = 25;
+    if (isMobileDevice) {
+      maxLineLength = mobileConfigSettings?.mobileMaxTickLength ?? 25;
+    } else if (isTabletDevice) {
+      maxLineLength = mobileConfigSettings?.tabletMaxTickLength ?? 25;
+    } else if (
+      window.matchMedia("(min-width: 768px) and (max-width: 1250px)").matches
+    ) {
+      maxLineLength = 15;
+    }
+    const words =
+      typeof tick.value === "string" ? tick.value.split(" ") : [tick.value];
+    let lines = [];
+    let currentLine = "";
 
-  if (currentLine) {
-    lines.push(currentLine);
-  }
-  let lineHeight = 12;
-  if(isMobileDevice) {
-    lineHeight = mobileConfigSettings?.mobileYAxisLineHeight ?? 12;
-  } else if(isTabletDevice) {
-    lineHeight = mobileConfigSettings?.tabletYAxisLineHeight ?? 12;
-  }
+    words.forEach((word) => {
+      if (currentLine.length + String(word).length <= maxLineLength) {
+        currentLine += (currentLine ? " " : "") + word;
+      } else {
+        lines.push(currentLine);
+        currentLine = word;
+      }
+    });
 
-  return (
-    <g transform={`translate(${tick.x},${tick.y})`}>
-      <line x1={-5} x2={0} y1={0} y2={0} stroke={"#000"} strokeWidth={1} />
-      {lines
-        .map((line, i) => (
+    if (currentLine) {
+      lines.push(currentLine);
+    }
+    let lineHeight = 12;
+    if (isMobileDevice) {
+      lineHeight = mobileConfigSettings?.mobileYAxisLineHeight ?? 12;
+    } else if (isTabletDevice) {
+      lineHeight = mobileConfigSettings?.tabletYAxisLineHeight ?? 12;
+    }
+
+    return (
+      <g transform={`translate(${tick.x},${tick.y})`}>
+        <line x1={-5} x2={0} y1={0} y2={0} stroke={"#000"} strokeWidth={1} />
+        {lines.map((line, i) => (
           <text
             key={i}
             x={-10}
-            y={typeof tick.value === "number" ? 0: i * lineHeight}
+            y={typeof tick.value === "number" ? 0 : i * lineHeight}
             textAnchor="end"
             dominantBaseline="middle"
             style={{
@@ -1083,10 +1097,9 @@ const AxisLeftCustomTick = (tick) => {
             {line}
           </text>
         ))}
-    </g>
-  );
-};
-
+      </g>
+    );
+  };
 
   return (
     <div style={{ height: height }}>
@@ -1133,7 +1146,7 @@ const AxisLeftCustomTick = (tick) => {
                     legendPosition: "middle",
                     legendOffset: parseInt(offsetRight),
                     format: (value) => {
-                      if(!value) return "";
+                      if (!value) return "";
                       if (layout == "vertical") {
                         const effectiveFormat = customAxisFormat
                           ? customAxisFormat
@@ -1154,8 +1167,10 @@ const AxisLeftCustomTick = (tick) => {
                 : null
             }
             axisBottom={
-              isMobileCustomizationEnabled && mobileConfigSettings?.xAxisDisabled === true ? null :
-              layout == "horizontal"
+              isMobileCustomizationEnabled &&
+              mobileConfigSettings?.xAxisDisabled === true
+                ? null
+                : layout == "horizontal"
                 ? {
                     legend: legends.bottom,
                     legendPosition: "middle",
@@ -1164,7 +1179,7 @@ const AxisLeftCustomTick = (tick) => {
                     tickRotation: 0,
                     tickValues: parseInt(xAxisTickValues),
                     format: (value) => {
-                      if(!value) return "";
+                      if (!value) return "";
                       if (layout == "horizontal") {
                         const effectiveFormat = customAxisFormat
                           ? customAxisFormat
@@ -1200,24 +1215,26 @@ const AxisLeftCustomTick = (tick) => {
               legend: legends.left,
               legendPosition: "middle",
               legendOffset: parseInt(offsetY),
-              ...(
-                isMobileCustomizationEnabled ? { renderTick: AxisLeftCustomTick }
+              ...(isMobileCustomizationEnabled
+                ? { renderTick: AxisLeftCustomTick }
                 : {
-                  format: (value) => {
-                    if(!value) return "";
-                    if (layout === "vertical") {
-                      const effectiveFormat = customAxisFormat
-                        ? customAxisFormat
-                        : format;
-                      return intl.formatNumber(
-                        effectiveFormat.style === "percent" ? value / 100 : value,
-                        {
-                          ...effectiveFormat,
-                        }
-                      );
-                    }
-                    return value;
-                  },
+                    format: (value) => {
+                      if (!value) return "";
+                      if (layout === "vertical") {
+                        const effectiveFormat = customAxisFormat
+                          ? customAxisFormat
+                          : format;
+                        return intl.formatNumber(
+                          effectiveFormat.style === "percent"
+                            ? value / 100
+                            : value,
+                          {
+                            ...effectiveFormat,
+                          }
+                        );
+                      }
+                      return value;
+                    },
                   }),
             }}
             enableGridY={enableGridY}
