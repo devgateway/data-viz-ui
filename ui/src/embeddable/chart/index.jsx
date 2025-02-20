@@ -177,7 +177,24 @@ const Chart = (props) => {
   );
   const isMobileConfigEnabled =
     isMobileOrTablet && (mobileConfigSettings?.showCustomization ?? false);
-  const [deviceTickRotation, setTickRotation] = useState(tickRotation);
+
+  const getTickRotation = () => {
+    if (
+      window.matchMedia("(min-width: 768px) and (max-width: 1250px)").matches
+    ) {
+      return isMobileConfigEnabled
+        ? mobileConfigSettings?.tabletXAxisTextRotation ?? tickRotation
+        : tickRotation;
+    } else if (window.matchMedia("(max-width: 480px)").matches) {
+      return isMobileConfigEnabled
+        ? mobileConfigSettings?.mobileXAxisTextRotation ?? tickRotation
+        : tickRotation;
+    } else {
+      return tickRotation;
+    }
+  };
+
+  const [deviceTickRotation, setTickRotation] = useState(getTickRotation());
 
   const locale = props.intl.locale;
   const ref = useRef(null);
@@ -445,21 +462,6 @@ const Chart = (props) => {
   };
 
   useEffect(() => {
-    const getTickRotation = () => {
-      if (
-        window.matchMedia("(min-width: 768px) and (max-width: 1250px)").matches
-      ) {
-        return isMobileConfigEnabled
-          ? mobileConfigSettings?.tabletXAxisTextRotation ?? tickRotation
-          : tickRotation;
-      } else if (window.matchMedia("(max-width: 480px)").matches) {
-        return isMobileConfigEnabled
-          ? mobileConfigSettings?.mobileXAxisTextRotation ?? tickRotation
-          : tickRotation;
-      } else {
-        return tickRotation;
-      }
-    };
     const updateDeviceType = () => {
       setIsMobileOrTablet(window.innerWidth <= 1250);
       setTickRotation(getTickRotation());
