@@ -272,16 +272,7 @@ export class DataLayerSetting extends Component {
                 datasets.push({label: d.label, value: d.id})
             })
         }
-
-        console.log("ApacheSupersetUrl", apacheSupersetUrl)
-        console.log("App", app)
-
-        console.log("All Datasets", allDatasets)
-        console.log("DatasetId", datasetId)
-        
-        console.log("AllDimensions", allDimensions)
-        console.log("AllMeasures", allMeasures)
-      
+       
         return ([<PanelBody initialOpen={false} title={"Data Source"}>
             <PanelRow>
                 <SelectControl
