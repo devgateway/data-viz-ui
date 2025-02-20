@@ -4,7 +4,7 @@
 
 .edit-post-visual-editor > * {
     font-size: 18px !important;
-    font-family: Roboto !important;
+     font-family: Roboto !important;
 }
 
 
@@ -58,8 +58,8 @@ p.wp-block.rich-text {
 
 
 .component-color-indicator {
-    font-size: 12px!important;
-}
+     font-size: 12px!important;
+ }
 
 
 .hndle.ui-sortable-handle {

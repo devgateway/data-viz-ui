@@ -40,14 +40,14 @@ const decode = (value) => {
 }
 
 const parse = (value) => {
-    try { 
+    if (!value || value == "") {
+        return null
+    }
+    try {
         return JSON.parse(decode(value))
-
     } catch (error) {
         throw new Error("error parsing value:" + error);
-    }
-
-    return null
+    }    
 }
 
 const mapStateToProps = (state, ownProps) => {
@@ -402,7 +402,6 @@ const RangeFilterDropDown = connect(mapStateToProps, mapActionCreators)(({
 
 
 const CategoryFilter = (props) => {
-
     const { data, type, showNoDataOption } = props
     const cat = data.filter(d => d.type === type)[0]
     const filteredCategories = cat ? cat.items.filter(f => {
@@ -415,6 +414,7 @@ const CategoryFilter = (props) => {
         return true
     }) : []
     const options = filteredCategories ? toOptions(filteredCategories, props.locale) : []
+    
     return (
         <Container fluid={true} className={`filter`}>
             <FilterDropDown {...props} options={options}></FilterDropDown>
@@ -455,6 +455,7 @@ const CSVFilter = (props) => {
 const Filter = ({
     "data-group": group,
     "data-app": app,
+    "data-dataset-id": datasetId,
     "data-param": param,
     "data-icon": icon,
     "data-type": type,
@@ -477,6 +478,7 @@ const Filter = ({
     "data-close-on-select": closeOnSelect = "false",
     "data-alphabetical-sort": alphabeticalSort = "true",
     "data-asc-order": ascOrder = "true",
+    "data-apache-superset-url": apacheSupersetUrl,
     intl,
 }) => {
 
@@ -489,6 +491,15 @@ const Filter = ({
             if (f.value != null && f.value.filter(v => v != null && v.toString().trim() != "").length > 0)
                 params[f.param] = f.value
         })
+    }
+
+    if (datasetId) {
+        params["datasetId"] = datasetId;
+    }
+
+    if (apacheSupersetUrl) {
+        params["apacheSupersetUrl"] = decodeURIComponent(apacheSupersetUrl);
+        console.log("apacheSupersetUrl", params["apacheSupersetUrl"])
     }
 
     const hiddenFiltersArr = hiddenFilters ?  parse(hiddenFilters): []

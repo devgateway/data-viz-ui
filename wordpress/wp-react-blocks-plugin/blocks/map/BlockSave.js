@@ -73,7 +73,9 @@ const SaveComponent = (props) => {
             labelsExclusionList,
             noDataText,
             customMeasureLabels,
-            showShadingLayerLabels
+            showShadingLayerLabels,
+            datasetId,
+            apacheSupersetUrl
         }
     } = props;
     
@@ -165,7 +167,10 @@ const SaveComponent = (props) => {
              data-labels-exclusion-list={labelsExclusionList}
              data-no-data-text={noDataText}
              data-custom-measure-labels={encodeURIComponent(JSON.stringify(customMeasureLabels))}
-             data-show-shading-layer-labels={showShadingLayerLabels}>
+             data-show-shading-layer-labels={showShadingLayerLabels}
+             data-dataset-id={datasetId}
+             data-apache-superset-url={encodeURIComponent(apacheSupersetUrl)} 
+             >
         </div>
     );
 }
