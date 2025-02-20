@@ -539,7 +539,6 @@ class DataLayer extends BaseLayer {
             featureJoinAttribute,
             apiJoinAttribute,
             datasetId,
-            apacheSupersetUrl,
             editing
         } = this.props
 
@@ -550,11 +549,11 @@ class DataLayer extends BaseLayer {
 
 const DataWrapper = (props) => {
     const {
-        id, unique, filters, csv, app, group = "default", apiJoinAttribute, editing, patternDiscriminator,  datasetId, apacheSupersetUrl, intl
+        id, unique, filters, csv, app, group = "default", apiJoinAttribute, editing, patternDiscriminator,  datasetId, apacheSupersetUrl, intl, settings
     } = props
 
+    
     const params = {}
-
     const ff = filters || {}
 
     if (ff && ff.forEach) {
@@ -568,13 +567,10 @@ const DataWrapper = (props) => {
         params.datasetId = datasetId;
     }
 
-    if (apacheSupersetUrl) {
-        params.apacheSupersetUrl = decodeURIComponent(apacheSupersetUrl);
+    if (settings && settings.apache_superset_url) {         
+        params.apacheSupersetUrl = decodeURIComponent(settings.apache_superset_url);
     }
-
-    console.log("x - datasetId", datasetId)
-    console.log("x - apacheSupersetUrl", apacheSupersetUrl)
-
+    
     return (<DataProvider
         editing={editing}
         params={params}

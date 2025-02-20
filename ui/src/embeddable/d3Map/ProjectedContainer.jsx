@@ -39,7 +39,8 @@ class ProjectedContainer extends React.Component {
     }
 
     render() {
-        const {editing, backgroundColor, height, width, scale = 190, center = [0, 0], initialPosition} = this.props
+        
+        const {editing, backgroundColor, height, width, scale = 190, center = [0, 0], initialPosition, settings} = this.props
         const arrayChildren = Children.toArray(this.props.children);
         return <div
             className={"projected"}
@@ -61,6 +62,7 @@ class ProjectedContainer extends React.Component {
                     editing,
                     height,
                     width,
+                    settings
                 })
 
             })}
