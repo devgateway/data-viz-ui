@@ -9,15 +9,11 @@ import {
     MediaProvider
 } from "@devgateway/wp-react-lib";
 import PostIntro from "../connected-templates/PostIntro";
-import getDeviceType from '../../utils/deviceType';
 
 const AccordionContent = ({ posts, activeItem, setActive, colors }) => {
     const [activeIndex, setActiveIndex] = useState(posts.findIndex(p => p.slug === activeItem));
     const [scrollTarget, setScrollTarget] = useState(null);
-    const isMobileOrTablet =
-    getDeviceType() === "mobile" ||
-    getDeviceType() === "tablet" ||
-    getDeviceType() === "midTablet";
+
 
     const findElementAndAddStyles = (elementClass, containerClass, hasContainerClass) => {
         const elements = document.querySelectorAll(elementClass);
@@ -50,134 +46,115 @@ const AccordionContent = ({ posts, activeItem, setActive, colors }) => {
 
     }, [scrollTarget]);
 
-      useEffect(() => {
-        let timeoutId;
-        let observers = []; // Array to store observers for each accordion
+    useEffect(() => {
+      let timeoutId;
+      let observers = []; // Store MutationObservers for each accordion
 
-        const adjustDataSourceMargin = (ref) => {
-          requestAnimationFrame(() => {
-            // Find all legend containers
-            const legendsContainers = ref.querySelectorAll(
-              ".accordion .legends.container.has-standard-12-font-size.bottom, .legends.container.items-section"
-            );
+      const adjustDataSourceMargin = (ref) => {
+        // Use a timeout for better WebKit compatibility
+        setTimeout(() => {
+          // Get all legend containers
+          const legendsContainers = ref.querySelectorAll(
+            ".accordion .legends.container.has-standard-12-font-size.bottom, .legends.container.items-section"
+          );
 
-            if (legendsContainers.length === 0) {
-              return;
+          if (legendsContainers.length === 0) {
+            return;
+          }
+
+          for (const legendsContainer of legendsContainers) {
+            const container = legendsContainer.closest(".ui.fluid.container.content");
+            const dataSourceParagraph = container
+              ? container.querySelector(".data-source")
+              : null;
+
+            if (!dataSourceParagraph) {
+              continue;
             }
 
-            for (const legendsContainer of legendsContainers) {
-              const container = legendsContainer.closest(
-                ".ui.fluid.container.content"
-              );
-              const dataSourceParagraph = container
-                ? container.querySelector(".data-source")
-                : null;
-
-              if (!dataSourceParagraph) {
-                continue;
-              }
-
-              // Check if the elements have dimensions and are visible
-              if (
-                legendsContainer.offsetParent === null ||
-                dataSourceParagraph.offsetParent === null
-              ) {
-                continue;
-              }
-
-              // Get bounding rectangles
-              const dataSourceRect = dataSourceParagraph.getBoundingClientRect();
-              const legendsRect = legendsContainer.getBoundingClientRect();
-
-              // Get computed styles to include margins in the calculation
-              const dataSourceStyles = window.getComputedStyle(dataSourceParagraph);
-              const legendsStyles = window.getComputedStyle(legendsContainer);
-
-              // Get the margins (parse as float to get numeric values)
-              const dataSourceMarginTop =
-                parseFloat(dataSourceStyles.marginTop) || 0;
-              const legendsMarginBottom =
-                parseFloat(legendsStyles.marginBottom) || 0;
-
-              // Adjust margins if there's an overlap
-              const adjustedLegendsBottom =
-                legendsRect.bottom + legendsMarginBottom; // Including margin-bottom of legends
-
-            const legendsMarginTop = parseFloat(legendsStyles.marginTop) || 0;
-            const adjustedLegendsTop = legendsRect.top - legendsMarginTop; // Adjusted top of legends container
-
-
-              const adjustedDataSourceTop =
-                dataSourceRect.top - dataSourceMarginTop; // Including margin-top of data-source
-
-              if (adjustedLegendsBottom > adjustedDataSourceTop) {
-                const overlap = adjustedLegendsBottom - adjustedDataSourceTop;
-                dataSourceParagraph.style.marginTop = `${overlap + 20}px`; // Add some extra padding
-              }
-
-
-              // check for overlap with the next wp-block-column
-              const wpColumnAfterChart = legendsContainer.closest(
-                ".wp-block-column.is-layout-flow.wp-block-column-is-layout-flow"
-              )?.nextElementSibling;
-
-              if (wpColumnAfterChart) {
-                // check for overlap with legend container
-                const wpColumnAfterChartRect =
-                  wpColumnAfterChart.getBoundingClientRect();
-                const wpColumnAfterChartStyles =
-                  window.getComputedStyle(wpColumnAfterChart);
-
-                const wpColumnAfterChartMarginTop =
-                  parseFloat(wpColumnAfterChartStyles.marginTop) || 0;
-                const legendsMarginBottom =
-                  parseFloat(legendsStyles.marginBottom) || 0;
-
-                const adjustedWpColumnAfterChartTop =
-                  wpColumnAfterChartRect.top - wpColumnAfterChartMarginTop;
-                const adjustedLegendsBottom =
-                  legendsRect.bottom + legendsMarginBottom;
-
-                if (adjustedLegendsBottom > adjustedWpColumnAfterChartTop) {
-                  const overlap =
-                    adjustedLegendsBottom - adjustedWpColumnAfterChartTop;
-                  wpColumnAfterChart.style.marginTop = `${overlap + 20}px`; // Add some extra padding
-                }
-              }
-
-              // check for overlap with the chart container above it
-                const chartContainer = legendsContainer.closest(
-                    ".chart.container"
-                );
-
-                if (chartContainer) {
-                    const chartContainerRect = chartContainer.getBoundingClientRect();
-                    const chartContainerStyles = window.getComputedStyle(chartContainer);
-                    const chartContainerMarginBottom = parseFloat(chartContainerStyles.marginBottom) || 0;
-                    const adjustedChartContainerBottom = chartContainerRect.bottom + chartContainerMarginBottom; // Adjusted bottom of chart container
-
-                    // Check for overlap and adjust margin-bottom of chartContainer if necessary
-                    if (adjustedLegendsTop < adjustedChartContainerBottom) {
-                        const overlap = adjustedChartContainerBottom - adjustedLegendsTop;
-                        legendsContainer.style.marginTop = `${overlap + 20}px`; // Add some extra padding
-                    }
-                }
+            // Extra WebKit check: Ensure elements have dimensions
+            if (
+              legendsContainer.offsetParent === null ||
+              dataSourceParagraph.offsetParent === null ||
+              legendsContainer.offsetHeight === 0 ||
+              dataSourceParagraph.offsetHeight === 0
+            ) {
+              continue;
             }
-          });
-        };
 
-        if (activeIndex !== -1) {
-          timeoutId = setTimeout(() => {
-            const accordions = document.querySelectorAll(".accordion");
-            accordions.forEach((accordion) => adjustDataSourceMargin(accordion));
-          }, 0);
-        }
+            // Get bounding rectangles (fallback for WebKit)
+            const dataSourceRect = dataSourceParagraph.getBoundingClientRect();
+            const legendsRect = legendsContainer.getBoundingClientRect();
 
-        return () => {
-          clearTimeout(timeoutId);
-          observers.forEach((observer) => observer.disconnect());
-        };
-      }, [activeIndex, isMobileOrTablet]);
+            // Get computed styles
+            const dataSourceStyles = window.getComputedStyle(dataSourceParagraph);
+            const legendsStyles = window.getComputedStyle(legendsContainer);
+
+            // Parse margins, fallback to 0 if "auto" is returned
+            const dataSourceMarginTop = parseFloat(dataSourceStyles.marginTop) || 0;
+            const legendsMarginBottom = parseFloat(legendsStyles.marginBottom) || 0;
+
+            // Calculate adjusted positions
+            const adjustedLegendsBottom = legendsRect.bottom + legendsMarginBottom;
+            const adjustedDataSourceTop = dataSourceRect.top - dataSourceMarginTop;
+
+            // Fix overlapping of legends and data source
+            if (adjustedLegendsBottom > adjustedDataSourceTop) {
+              const overlap = adjustedLegendsBottom - adjustedDataSourceTop;
+              dataSourceParagraph.style.marginTop = `${overlap + 20}px`; // Extra padding
+            }
+
+            // Fix overlap with the next `.wp-block-column`
+            const wpColumnAfterChart = legendsContainer.closest(
+              ".wp-block-column.is-layout-flow.wp-block-column-is-layout-flow"
+            )?.nextElementSibling;
+
+            if (wpColumnAfterChart) {
+              const wpColumnAfterChartRect = wpColumnAfterChart.getBoundingClientRect();
+              const wpColumnAfterChartStyles = window.getComputedStyle(wpColumnAfterChart);
+
+              const wpColumnAfterChartMarginTop = parseFloat(wpColumnAfterChartStyles.marginTop) || 0;
+              const adjustedWpColumnAfterChartTop = wpColumnAfterChartRect.top - wpColumnAfterChartMarginTop;
+
+              if (adjustedLegendsBottom > adjustedWpColumnAfterChartTop) {
+                const overlap = adjustedLegendsBottom - adjustedWpColumnAfterChartTop;
+                wpColumnAfterChart.style.marginTop = `${overlap + 20}px`; // Add padding
+              }
+            }
+
+            // Fix overlap with chart container above it
+            const chartContainer = legendsContainer.closest(".chart.container");
+
+            if (chartContainer) {
+              const chartContainerRect = chartContainer.getBoundingClientRect();
+              const chartContainerStyles = window.getComputedStyle(chartContainer);
+              const chartContainerMarginBottom = parseFloat(chartContainerStyles.marginBottom) || 0;
+              const adjustedChartContainerBottom = chartContainerRect.bottom + chartContainerMarginBottom;
+
+              const legendsMarginTop = parseFloat(legendsStyles.marginTop) || 0;
+              const adjustedLegendsTop = legendsRect.top - legendsMarginTop;
+
+              if (adjustedLegendsTop < adjustedChartContainerBottom) {
+                const overlap = adjustedChartContainerBottom - adjustedLegendsTop;
+                legendsContainer.style.marginTop = `${overlap + 20}px`; // Extra padding
+              }
+            }
+          }
+        }, 10); // Delay helps WebKit render layout properly
+      };
+
+      if (activeIndex !== -1) {
+        timeoutId = setTimeout(() => {
+          const accordions = document.querySelectorAll(".accordion");
+          accordions.forEach((accordion) => adjustDataSourceMargin(accordion));
+        }, 0);
+      }
+
+      return () => {
+        clearTimeout(timeoutId);
+        observers.forEach((observer) => observer.disconnect());
+      };
+    }, [activeIndex]);
 
 
     const handleClick = (e, titleProps) => {
@@ -329,14 +306,33 @@ const Wrapper = (props) => {
   const locale = props.intl.locale;
 
   // Determine screen width and conditionally render components
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 1440);
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth <= 1250);
-    };
+  const [isMobileOrTablet, setIsMobileOrTablet] = useState(window.innerWidth <= 1365);
+    const getScreenOrientation = () => {
+      return (
+        window.screen.orientation?.type ||
+        (window.innerWidth > window.innerHeight
+          ? "landscape-primary"
+          : "portrait-primary")
+      );
+    }
+    const [orientation, setOrientation] = useState(getScreenOrientation());
 
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    const handleOrientationChange = () => {
+      setTimeout(() => {
+        setOrientation(getScreenOrientation());
+        setIsMobileOrTablet(window.innerWidth <= 1365);
+      }, 100);
+    }
+  useEffect(() => {
+    if (window.screen.orientation) {
+      window.screen.orientation.addEventListener(
+        "change",
+        handleOrientationChange
+      );
+    }
+    window.addEventListener("resize", handleOrientationChange);
+
+    return () => window.removeEventListener("resize", handleOrientationChange);
   }, []);
 
   const decode = (value) => {
@@ -359,6 +355,7 @@ const Wrapper = (props) => {
       style={{ "max-width": "100%" }}
       className={`viz featured tabs ${editing ? "editing" : ""}`}
       fluid={true}
+      key={orientation}
     >
       <PostProvider
         type={type}
@@ -370,7 +367,7 @@ const Wrapper = (props) => {
         perPage={items}
       >
         <PostConsumer>
-          {isMobile ? (
+          {isMobileOrTablet ? (
             <AccordionContent
               posts={items}
               activeItem={items[0]?.slug}
