@@ -16,11 +16,11 @@ const MapWrapper = (props) => {
         unique,
         editing,
         "data-group": group,
-        "data-layers": dataLayers,
+        "data-layers": dataLayers = "[]",
         "data-height": height = 400,
         "data-width": width = 1000,
         "data-back-ground-color": bgColorParam = '#88e8dc',
-        "data-map-position": paramMapPosition = {},
+        "data-map-position": paramMapPosition = "{}",
         "data-projection": projectionName = "geoMercator",
         "data-zoom-enabled": zoomEnabled = true,
         "data-rotation-enabled": rotationEnabled = false,
@@ -28,7 +28,7 @@ const MapWrapper = (props) => {
     } = props
 
 
-    const [layers, setLayers] = useState(parse(dataLayers))
+    const [layers, setLayers] = useState(parse(dataLayers), [])
     const ref = useRef(null);
     const zoomRef = useRef(null);
     const [transform, setTransform] = useState(null)
