@@ -6,6 +6,7 @@ import { Config } from './conf';
 
 if (Config.GA_CODE || Config.GA_CODE !== '') ReactGA.initialize(Config.GA_CODE || '#REACT_APP_GA_CODE#');
 
+
 const withTracker = (WrappedComponent, options = {}) => {
     const HOC = (props) => {
         const location = useLocation();
