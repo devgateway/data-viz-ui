@@ -53,7 +53,7 @@ const Diverging = (props) => {
   );
 };
 const Chart = (props) => {
-  let {
+  const {
     parent,
     editing = false,
     unique,
@@ -61,6 +61,7 @@ const Chart = (props) => {
     categories,
     injectedMeasures,
     "data-app": app = "prevalence",
+    "data-dataset-id": datasetId,
     "data-group": group = "default",
     "data-height": height = 500,
     "data-type": type = "bar", //'data-source': source = 'gender/smoke',f
@@ -156,8 +157,6 @@ const Chart = (props) => {
     "data-tooltip-enable-markdown": tooltipEnableMarkdown = "false",
     "data-y-axis-tick-values": yAxisTickValues = "10",
     "data-x-axis-tick-values": xAxisTickValues = "10",
-    "data-enable-grid-y": enableGridY = "true",
-    "data-enable-grid-x": enableGridX = "false",
     "data-offset-text": offsetText = 0,
     "data-overall-label": overallLabel = "Overall",
     "data-min-max-clamp": minMaxClamp = "false",
@@ -176,6 +175,12 @@ const Chart = (props) => {
     "data-radar-enable-dot-label": radarEnableDotLabel = "true",
     "data-radar-dot-label-offset": radarDotLabelOffset = -12,
     "data-mobile-customization": mobileCustomization = "{}",
+    "data-apache-superset-url": apacheSupersetUrl = ""
+  } = props;
+
+  let {
+    "data-enable-grid-y": enableGridY = "true",
+    "data-enable-grid-x": enableGridX = "false",
   } = props;
   console.log("chart props:")
   console.log(props)
@@ -198,7 +203,9 @@ const Chart = (props) => {
 
   const parse = (value) => {
     try {
-      return JSON.parse(decode(value));
+      if (value) {
+        return JSON.parse(decode(value));
+      }      
     } catch (error) {
       console.error("error parsing value:" + value);
     }
@@ -290,7 +297,7 @@ const Chart = (props) => {
   let selectedMeasures = getSelectedMeasures();
 
   let selectedFormat = getSelectedFormat();
-  let userMeasures = getUserMeasures();
+  const userMeasures = getUserMeasures();
   let leftLegendForSelectedMeasure = left;
   let rightLegendForSelectedMeasure = rightLegend;
 
@@ -313,7 +320,7 @@ const Chart = (props) => {
     }
   }
 
-  let numberFormat = selectedFormat
+  const numberFormat = selectedFormat
     ? {
         style:
           selectedFormat.style === "compacted"
@@ -335,7 +342,7 @@ const Chart = (props) => {
 
   const groupTotalFormatObject = parse(groupTotalFormat);
 
-  let groupTotalFormatParsed = {
+  const groupTotalFormatParsed = {
     style:
       groupTotalFormatObject.style === "compacted"
         ? "decimal"
@@ -567,6 +574,14 @@ const Chart = (props) => {
     });
   }
 
+  if (datasetId) {
+    params.datasetId = datasetId;
+  }
+
+  if (apacheSupersetUrl) {
+    params.apacheSupersetUrl = decodeURIComponent(apacheSupersetUrl);
+  }
+
   let ChartDataFrame = null;
   let Chart = null;
 
@@ -772,6 +787,7 @@ const Chart = (props) => {
                   <ColorProvider
                     type={type}
                     app={app}
+                    datasetId={datasetId}
                     locale={locale}
                     overallLabel={overallLabel}
                     customLabels={getCustomLabels()}
