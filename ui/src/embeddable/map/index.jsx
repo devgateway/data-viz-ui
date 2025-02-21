@@ -6,6 +6,8 @@ import DataConsumer from "../data/DataConsumer";
 import Map from './map';
 import MapDataFrame from './MapDataFrame';
 import MapCSVDataFrame from './MapCSVDataFrame';
+import { SettingProvider } from '@devgateway/wp-react-lib';
+import {SettingsConsumer} from '@devgateway/wp-react-lib';
 
 const countries = [
     { label: 'KENYA', value: 'KEN', center: [35.8166634, 0.1], scale: 2000}, 
@@ -20,6 +22,16 @@ const countries = [
 ]
 
 const MapWrapper = (props) => {
+    return (
+        <SettingProvider locale={props.intl.locale} changeUUID={props.unique}>
+            <SettingsConsumer>
+                <MapEntry {...props} />
+            </SettingsConsumer>
+        </SettingProvider>
+    );
+}
+
+const MapEntry = (props) => {
     const {
         unique,
         editing,
@@ -92,9 +104,12 @@ const MapWrapper = (props) => {
         'data-labels-exclusion-list': labelsExclusionList = "",
         'data-custom-measure-labels': customMeasureLabels = "{}",
         'data-show-shading-layer-labels': showShadingLayerLabels = "ifUnitHasData",
-        "data-dataset-id": datasetId,
-        "data-apache-superset-url": apacheSupersetUrl = ""
+        "data-dataset-id": datasetId,       
+        intl, 
+        settings
     } = props  
+
+    
 
     const decode = (value) => {
         if (editing) {
@@ -246,13 +261,17 @@ const MapWrapper = (props) => {
     const params = getFilters(filters)
     if (datasetId) {
         params.datasetId = datasetId;
-      }
-    
-      if (apacheSupersetUrl) {
-        params.apacheSupersetUrl = decodeURIComponent(apacheSupersetUrl);
-      }
+    }
 
-    return (<DataProvider 
+    if (settings && settings.apache_superset_url) {
+        params.apacheSupersetUrl = decodeURIComponent(settings.apache_superset_url);
+    }
+
+    return (
+        <SettingProvider locale={intl.locale} changeUUID={unique}>
+                <SettingsConsumer>
+
+    <DataProvider 
         params={params}
         app={app}
         csv={decodeURIComponent(csv)}
@@ -265,7 +284,10 @@ const MapWrapper = (props) => {
             </DataFrame>
         </DataConsumer>
 
-    </DataProvider>);
+    </DataProvider>
+    </SettingsConsumer>
+    </SettingProvider>
+    );
 
 };
 

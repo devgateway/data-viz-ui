@@ -338,18 +338,22 @@ class Map extends React.Component {
       //Reset zoom when filters is applied
       if (prevAppliedFilters) {
         Object.keys(prevAppliedFilters).forEach((k) => {
-          prevAppliedItems.push(
-            ...prevAppliedFilters[k].filter(
-              (v) => v != Number.MIN_SAFE_INTEGER,
-            ),
-          );
+          if (prevAppliedFilters[k] != null && prevAppliedFilters[k] instanceof Array) {
+            prevAppliedItems.push(
+              ...prevAppliedFilters[k].filter(
+                (v) => v != Number.MIN_SAFE_INTEGER,
+              ),
+            );
+          }
         });
       }
       if (appliedFilters) {
         Object.keys(appliedFilters).forEach((k) => {
-          appliedItems.push(
-            ...appliedFilters[k].filter((v) => v != Number.MIN_SAFE_INTEGER),
-          );
+          if (appliedFilters[k] != null && appliedFilters[k] instanceof Array) {
+            appliedItems.push(
+              ...appliedFilters[k].filter((v) => v != Number.MIN_SAFE_INTEGER),
+            );
+        }
         });
       }
       //filters reset
