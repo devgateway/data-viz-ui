@@ -27,7 +27,7 @@ class Body extends React.Component {
     // No llames this.setState() aquí!
     this.state = {
       counter: 0,
-      isMobile: ["mobile", "tablet"].includes(getDeviceType()),
+      isMobile: ["mobile", "tablet", "midTablet"].includes(getDeviceType()),
       isClicked: false,
       selectedOption: "Cancers",
       orientation: this.getScreenOrientation(),
