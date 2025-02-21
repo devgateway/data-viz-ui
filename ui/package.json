@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@artsy/fresnel": "^7.1.4",
-    "@devgateway/customizer": "file:../../custom/ui-customizer",
+    "@devgateway/customizer": "file:../custom/ui-customizer",
     "@devgateway/wp-react-lib": "file:../react-lib/wp-react-lib",
     "@nivo/bar": "^0.87.0",
     "@nivo/bump": "^0.87.0",
