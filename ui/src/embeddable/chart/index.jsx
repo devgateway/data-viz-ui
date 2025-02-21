@@ -9,7 +9,7 @@ import Radar from "./Radar";
 import Bar from "./Bar";
 import Line from "./Line";
 
-import { PostContent } from "@devgateway/wp-react-lib";
+import { PostContent, SettingProvider, SettingsConsumer } from "@devgateway/wp-react-lib";
 import dataFrames from "./data/index";
 
 import CSVDataFrame from "./CSVDataFrame";
@@ -24,6 +24,14 @@ const isMobile = deviceType() === 'mobile';
 const isTablet = deviceType() === 'tablet';
 const isMidTablet = deviceType() === 'midTablet';
 const isMobileOrTablet = deviceType() === 'mobile' || deviceType() === 'tablet' || deviceType() === 'midTablet';
+
+const ChartWrapper = (props) => {  
+return (<SettingProvider locale={props.intl.locale}>
+  <SettingsConsumer>
+    <Chart {...props} />
+    </SettingsConsumer>  
+</SettingProvider>)
+}
 
 const PieChart = (props) => {
   const { data, legends, colors, height } = props;
@@ -174,16 +182,15 @@ const Chart = (props) => {
     "data-radar-dot-size": radarDotSize = 8,
     "data-radar-enable-dot-label": radarEnableDotLabel = "true",
     "data-radar-dot-label-offset": radarDotLabelOffset = -12,
-    "data-mobile-customization": mobileCustomization = "{}",
-    "data-apache-superset-url": apacheSupersetUrl = ""
+    "data-mobile-customization": mobileCustomization = "{}",    
+    settings
   } = props;
-
+  
   let {
     "data-enable-grid-y": enableGridY = "true",
     "data-enable-grid-x": enableGridX = "false",
   } = props;
-  console.log("chart props:")
-  console.log(props)
+  
   const mobileConfigSettings = JSON.parse(decodeURIComponent(mobileCustomization));
   const isMobileConfigEnabled = (isMobile || isTablet || isMidTablet) && (mobileConfigSettings?.  showCustomization ?? false);
 
@@ -559,8 +566,6 @@ const Chart = (props) => {
     dimension1
   };
 
-  console.log("chartProps", chartProps)
-
   let params = {};
   const ff = parse(filters) || {};
 
@@ -578,8 +583,8 @@ const Chart = (props) => {
     params.datasetId = datasetId;
   }
 
-  if (apacheSupersetUrl) {
-    params.apacheSupersetUrl = decodeURIComponent(apacheSupersetUrl);
+  if (settings) {
+    params.apacheSupersetUrl = decodeURIComponent(settings.apache_superset_url);
   }
 
   let ChartDataFrame = null;
@@ -833,4 +838,4 @@ const mapStateToProps = (state, ownProps) => {
   }
 };
 const mapActionCreators = {};
-export default connect(mapStateToProps, mapActionCreators)(injectIntl(Chart));
+export default connect(mapStateToProps, mapActionCreators)(injectIntl(ChartWrapper));
