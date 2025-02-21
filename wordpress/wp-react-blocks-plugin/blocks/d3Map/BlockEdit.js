@@ -25,12 +25,14 @@ class BlockEdit extends ComponentWithSettings {
     }
 
     componentDidMount() {
+        super.componentDidMount();
+        
         const {
             className, isSelected, toggleSelection, setAttributes, attributes: {
                 panelStatus, height, width, group, backGroundColor, layers = [],
             }
         } = this.props;
-        super.componentDidMount();
+        
 
         window.addEventListener("message", (event) => {
             if (event.data.type == `d3_map_${group}`) {

@@ -325,9 +325,11 @@ class LayerWithMetadata extends BlockEditWithAPIMetadata {
                     site_language: settingsData["site_language"],
                     current_language: new URLSearchParams(document.location.search).get("edit_lang"),
                     apps
+                }, ()=> {
+                    this._loadMetadata(app)  
                 })
 
-                this._loadMetadata(app)                
+                              
             })
             .catch(function (response) {
                 alert("error" + response)

@@ -287,6 +287,7 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
     }
 
     componentDidMount() {
+
         apiFetch({path: '/dg/v1/settings'}).then((settingsData) => {
             fetch(`/api/registry/eureka/apps`, {
                 headers: {
@@ -312,6 +313,7 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
                       current_language: new URLSearchParams(document.location.search).get("edit_lang"),
                       apps
                   });
+
                   this.loadMetadata()
               })
               .catch(function (response) {
@@ -435,6 +437,9 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
     }   
 
     loadDatasets(app) {   
+        if (!this.state.apache_superset_url || this.state.apache_superset_url == '' || app != ALIVE_SUPERSET_APP)	 
+            return
+        
           fetch(`/api/${app}/datasets?apacheSupersetUrl=${this.state.apache_superset_url}`)
             .then(response => {
                 if (!response.ok) {
