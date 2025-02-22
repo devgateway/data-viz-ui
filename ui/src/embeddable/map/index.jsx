@@ -250,8 +250,7 @@ const MapEntry = (props) => {
         noDataText,
         labelsExclusionList: labelsExclusionList.split(',').map(l => l.trim()),
         showShadingLayerLabels,
-        datasetId,
-        apacheSupersetUrl
+        datasetId
     } 
       
     const measureLabels = parse(customMeasureLabels) || {}
