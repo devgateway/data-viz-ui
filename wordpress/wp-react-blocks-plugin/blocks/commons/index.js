@@ -312,9 +312,9 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
                       site_language: settingsData["site_language"],
                       current_language: new URLSearchParams(document.location.search).get("edit_lang"),
                       apps
-                  });
-
+                  }, () => {
                   this.loadMetadata()
+                  })
               })
               .catch(function (response) {
 

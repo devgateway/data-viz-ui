@@ -14,7 +14,8 @@ import * as topojson from "topojson-client";
 import Legend from "./legend";
 import { formatContent } from "../common/MapTooltip";
 import getDeviceCategory from '../../utils/deviceType';
-import * as geoStats from "geostats";
+import geostats from 'geostats';
+
 import { Config } from "@/conf";
 const COLOR_VARIABLE = "_Color_";
 const LOCATION = "location";
@@ -584,7 +585,7 @@ class Map extends React.Component {
 
       const colors = colorSchemes[colorScheme];
       if (values.length > 0) {
-        const serie = new geoStats(values);
+        const serie = new geostats(values);
         serie.setPrecision(2);
         const numberOfRanges =
           values.length > 1 ? values.length - 1 : values.length;
