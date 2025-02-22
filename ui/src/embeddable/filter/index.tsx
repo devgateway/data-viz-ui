@@ -5,6 +5,8 @@ import CategoriesProvider from '../data/CategoriesProvider'
 import { connect } from "react-redux";
 import { setFilter, setInitialFilters } from "../reducers/data";
 import { injectIntl } from 'react-intl';
+import { SettingProvider } from '@devgateway/wp-react-lib';
+import {SettingsConsumer} from '@devgateway/wp-react-lib';
 
 const FILTER_TYPE_MULTI_SELECT = 'multi-select';
 const FILTER_TYPE_SINGLE_SELECT = 'single-select';
@@ -451,6 +453,15 @@ const CSVFilter = (props) => {
     </Container>
 }
 
+const FilterWrapper = (props) => {
+    return (
+        <SettingProvider locale={props.intl.locale} changeUUID={props.unique}>
+            <SettingsConsumer>
+                <Filter {...props}></Filter>
+                </SettingsConsumer>
+                </SettingProvider>
+    )
+}
 
 const Filter = ({
     "data-group": group,
@@ -477,8 +488,8 @@ const Filter = ({
     "data-all-none-same-behaviour": allNoneSameBehaviour = "false",
     "data-close-on-select": closeOnSelect = "false",
     "data-alphabetical-sort": alphabeticalSort = "true",
-    "data-asc-order": ascOrder = "true",
-    "data-apache-superset-url": apacheSupersetUrl,
+    "data-asc-order": ascOrder = "true",    
+    settings,
     intl,
 }) => {
 
@@ -497,10 +508,7 @@ const Filter = ({
         params["datasetId"] = datasetId;
     }
 
-    if (apacheSupersetUrl) {
-        params["apacheSupersetUrl"] = decodeURIComponent(apacheSupersetUrl);
-        console.log("apacheSupersetUrl", params["apacheSupersetUrl"])
-    }
+    params["apacheSupersetUrl"] = settings ? settings.apache_superset_url : "";    
 
     const hiddenFiltersArr = hiddenFilters ?  parse(hiddenFilters): []
     let defaultFilterType;
@@ -585,4 +593,4 @@ const Filter = ({
 }
 
 
-export default injectIntl(Filter)
+export default injectIntl(FilterWrapper)
