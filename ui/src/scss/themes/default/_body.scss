@@ -21,6 +21,31 @@
     font-weight: bold;
   }
 
+  .title-rect {
+    fill: transparent;
+    stroke: none;
+    @media screen and (max-width: 800px) {
+      fill: transparent;
+      stroke: $light-blue;
+      stroke-width: 2;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      border-radius: 5px;
+    }
+  }
+
+  .title-rect.on {
+   @media  screen and (max-width: 800px) {
+    fill: #466d92;
+    color: white;
+   }
+  }
+
+  text.title.on {
+    fill: white;
+    font-weight: bold;
+    stroke-width: 4;
+  }
+
   circle,
   line {
     stroke: $light-blue;
@@ -107,3 +132,15 @@
 .st67{clip-path:url(#SVGID_14_);fill:#FFA094;}
 .st68{fill:#DDB6B1;}
 .st69{opacity:0.1797;fill:#D3A79F;}
+
+.wp-block-viz-components-ailments {
+  @media screen and (max-width: 800px) {
+    width: 100vw !important;
+    height: 100% !important;
+  }
+
+  @media screen and (max-width: 1024px) {
+    width: 100% !important;
+    height: 100% !important;
+  }
+}

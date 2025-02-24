@@ -16,12 +16,12 @@ const localReplaceLink = (url, locale) => {
 const MenuChild = injectIntl((props) => {
 
     const {menu, locale, match, selected, active, showIcons, onSetSelected} = props
-    
+
     return <>
 
         {menu && menu.items.map((item, index) => (<Menu.Item
-            className={`divided ${item.child_items ? 'has-child-items' : ''} 
-                    ${selected && selected.ID == item.ID ? 'selected' : ''}  
+            className={`divided ${item.child_items ? 'has-child-items' : ''}
+                    ${selected && selected.ID == item.ID ? 'selected' : ''}
                     ${active == item.slug ? "active" : ""}`}>
 
 
@@ -54,7 +54,6 @@ const InlineMenu = (props) => {
 
     } = props
 
-    
     const [selected, setSelected] = useState(null)
 
     return (<Container fluid textAlign={"right"}>
