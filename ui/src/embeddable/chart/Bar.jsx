@@ -14,7 +14,6 @@ const POSITION_TOP = "top";
 const ZERO_LINE_COLOR = "#66676d";
 const GRID_LINE_COLOR = "#dddddd";
 const DEFAULT_COLOR = "none";
-const LABEL_SKIP_HEIGHT = 0;
 const COLOR_VARIABLE = "_Color";
 
 const Chart = ({
@@ -500,6 +499,8 @@ const Chart = ({
   };
 
   const CustomTick = (tick) => {
+    const theme = useTheme();
+    if (!tick.value) return "";
     const tickObject = Object.assign({}, tick);
     if (
       isMobileCustomizationEnabled &&
@@ -507,7 +508,6 @@ const Chart = ({
     ) {
       tickObject.value = "";
     }
-    const theme = useTheme();
     let effectiveTickColor;
     if (overrideTickColor) {
       effectiveTickColor = tickColor;
@@ -1039,8 +1039,9 @@ const Chart = ({
 
   const AxisLeftCustomTick = (tick) => {
     if (
-      isMobileCustomizationEnabled &&
-      hiddenLabels.includes(String(tick.value))
+      !tick.value ||
+      (isMobileCustomizationEnabled &&
+        hiddenLabels.includes(String(tick.value)))
     ) {
       return "";
     }
