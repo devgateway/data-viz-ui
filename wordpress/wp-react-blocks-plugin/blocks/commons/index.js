@@ -5,7 +5,6 @@ import apiFetch from '@wordpress/api-fetch';
 import {togglePanel} from "./Util";
 
 import {getTranslatedOptions} from './APIutils'
-import {ALIVE_SUPERSET_APP} from './Constants'
 
 export const SizeConfig = ({height, setAttributes, panelStatus,initialOpen}) => {
     return (<PanelBody initialOpen={panelStatus?panelStatus["SIZE"]:initialOpen} onToggle={e => togglePanel("SIZE", panelStatus, setAttributes)}
@@ -34,7 +33,6 @@ export class ComponentWithSettings extends Component {
 
             if (event.data.type == 'componentReady' && event.data.value == true) {
                 if (this.iframe.current) {
-                    console.log("-----------Sending message -----------")
                     this.iframe.current.contentWindow.postMessage(({messageType: 'component-attributes', ...this.props.attributes}), "*")
                 }
             }
@@ -44,27 +42,22 @@ export class ComponentWithSettings extends Component {
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         if (this.iframe.current) {
-            console.log("-----------Sending message -----------")
             this.iframe.current.contentWindow.postMessage(({messageType: 'component-attributes', ...this.props.attributes}), "*")
         }
     }
 
     componentDidMount() {
-        apiFetch({path: '/dg/v1/settings'}).then((data) => {           
+        apiFetch({path: '/dg/v1/settings'}).then((data) => {
             this.setState({
                 react_ui_url: data["react_ui_url"] + '/' + window._page_locale,
                 react_api_url: data["react_api_url"],
-                apache_superset_url: data["apache_superset_url"],
                 site_language: data["site_language"],
                 current_language: new URLSearchParams(document.location.search).get("edit_lang")
             });
         });
     }
 }
-
-
 export class BlockEditWithFilters extends ComponentWithSettings {
-
     constructor(props) {
         super(props);
         this.state = {
@@ -139,7 +132,7 @@ export class BlockEditWithFilters extends ComponentWithSettings {
     }
 
     onCategoryChanged(checked, value) {
-        
+
         const {setAttributes, attributes: {categories}} = this.props
         if (!checked) {
             setAttributes({categories: categories.filter(i => i != value)})
@@ -280,7 +273,6 @@ export class BlockEditWithFilters extends ComponentWithSettings {
     }
 }
 
-
 export class BlockEditWithAPIMetadata extends ComponentWithSettings {
     constructor(props) {
         super(props);
@@ -293,30 +285,29 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
                     'Accept': 'application/json',
                 },
             })
-              .then(response => response.json())
-              .then(data => {
-                  const apps = data.applications ? [...data.applications.application
-                    .filter(a => a.instance[0].metadata.type === 'data')
-                    .map(a => ({
-                        label: a.name,
-                        value: a.instance[0].vipAddress,
-                        settings: a.instance[0]
-                    })), 
-                    {label: 'CSV', value: 'csv'}] : [{label: 'CSV', value: 'csv'}] 
-                    
-                    this.setState({
-                      react_ui_url: settingsData["react_ui_url"] + '/' + window._page_locale,
-                      react_api_url: settingsData["react_api_url"],
-                      apache_superset_url: settingsData["apache_superset_url"],
-                      site_language: settingsData["site_language"],
-                      current_language: new URLSearchParams(document.location.search).get("edit_lang"),
-                      apps
-                  });
-                  this.loadMetadata()
-              })
-              .catch(function (response) {
+                .then(response => response.json())
+                .then(data => {
 
-              })
+                    const apps = data.applications ? [...data.applications.application
+                        // .filter(a => a.instance[0].metadata.type === 'starter')
+                        .filter(a => a.instance[0].metadata.type === 'data')
+                        .map(a => ({
+                            label: a.name,
+                            value: a.instance[0].vipAddress,
+                            settings: a.instance[0]
+                        })), {label: 'CSV', value: 'csv'}] : [{label: 'CSV', value: 'csv'}]
+                    this.setState({
+                        react_ui_url: settingsData["react_ui_url"] + '/' + window._page_locale,
+                        react_api_url: settingsData["react_api_url"],
+                        site_language: settingsData["site_language"],
+                        current_language: new URLSearchParams(document.location.search).get("edit_lang"),
+                        apps
+                    });
+                    this.loadMetadata()
+                })
+                .catch(function (response) {
+
+                })
 
         });
 
@@ -328,24 +319,15 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
         const {attributes: {app}} = this.props
         const {attributes: {app: prevAPP}} = prevProps
 
-
         if (app != prevAPP) {
             this.loadMetadata()
         }
     }
 
-    appendSupersetParams(url, datasetId) {
-        const {attributes: {app, apacheSupersetUrl}} = this.props
-        if (app == ALIVE_SUPERSET_APP) {
-            return `${url}?datasetId=${datasetId}&apacheSupersetUrl=${apacheSupersetUrl}`            
-        }
-
-        return url       
-    }
-
-    _loadMetadata(app, datasetId) {
-         if (app != "csv") {
-            fetch(this.appendSupersetParams(`/api/${app}/dimensions`, datasetId))                
+    loadMetadata() {
+        const {attributes: {app}} = this.props
+        if (app != "csv") {
+            fetch(`/api/${app}/dimensions`)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error("HTTP status " + response.status);
@@ -355,6 +337,7 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
                     }
                 })
                 .then(data => {
+
                     this.setState({
                         ...this.state,
                         dimensions: [{"label": __("None"), "value": "none"}, ...getTranslatedOptions(data)]
@@ -365,7 +348,7 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
                 })
 
 
-            fetch(this.appendSupersetParams(`/api/${app}/filters`, datasetId))
+            fetch(`/api/${app}/filters`)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error("HTTP status " + response.status);
@@ -382,7 +365,7 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
                     console.log("Error when loading filters", response)
                 })
 
-            fetch(this.appendSupersetParams(`/api/${app}/measures`, datasetId))
+            fetch(`/api/${app}/measures`)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error("HTTP status " + response.status);
@@ -390,22 +373,22 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
                     return response.json()
                 })
                 .then(data => {
-
+                    sessionStorage.setItem(`measures_${app}`, JSON.stringify(getTranslatedOptions(data)))
                     this.setState({...this.state, measures: getTranslatedOptions(data)})
                 })
                 .catch(function (response) {
                     console.log("Error when loading measures")
                 })
 
-            fetch(this.appendSupersetParams(`/api/${app}/categories`, datasetId))
+            fetch(`/api/${app}/categories`)
                 .then(response => {
-                    console.log('loadCategories')
                     if (!response.ok) {
                         throw new Error("HTTP status " + response.status);
                     }
                     return response.json()
                 })
                 .then(data => {
+                        sessionStorage.setItem(`categories_${app}`, JSON.stringify(data))
                         this.setState({...this.state, categories: getTranslatedOptions(data)})
                     }
                 )
@@ -413,34 +396,7 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
                     console.log("Error when getting categories", response)
                 })
         }
-
-        if (app == ALIVE_SUPERSET_APP) {
-            this.loadDatasets(app)
-        }
-    }
-
-    loadMetadata(newDatasetId) {
-       const {attributes: {app}} = this.props
-       this._loadMetadata(app, newDatasetId || this.props.attributes.datasetId)       
-    }   
-
-    loadDatasets(app) {
-        const {attributes: {apacheSupersetUrl}} = this.props
-        fetch(`/api/${app}/datasets?apacheSupersetUrl=${apacheSupersetUrl}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error("HTTP status " + response.status);
-                }
-                return response.json()
-            })
-            .then(data => {
-                this.setState({...this.state, datasets: data})
-            })
-            .catch(function (response) {
-                console.log("Error when loading datasets")
-            })
     }
 }
 
 export default SizeConfig
-

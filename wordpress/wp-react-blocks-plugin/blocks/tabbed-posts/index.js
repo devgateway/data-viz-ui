@@ -4,9 +4,9 @@ import BlockSave from "./BlockSave";
 import BlockEdit from "./BlockEdit";
 import {Generic} from '../icons'
 
-registerBlockType(process.env.BLOCKS_NS+'/tabbed-posts',
+registerBlockType(process.env.BLOCKS_NS + '/tabbed-posts',
     {
-        title: __('Tabbed Posts',"dg"),
+        title: __('Tabbed Posts', "dg"),
         icon: Generic,
         category: process.env.BLOCKS_CATEGORY,
         attributes: {
@@ -34,13 +34,17 @@ registerBlockType(process.env.BLOCKS_NS+'/tabbed-posts',
                 type: 'string',
                 default: "buttons",
             },
-            useLabels:{
-                type:"boolean",
-                default:false
+            useLabels: {
+                type: "boolean",
+                default: false
             },
-            showIcons:{
-                type:"boolean",
-                default:false
+            showIcons: {
+                type: "boolean",
+                default: false
+            },
+            useScrolls: {
+                type: "boolean",
+                default: false
             },
             panelStatus: {
                 type: "Object",
