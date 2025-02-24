@@ -4,9 +4,9 @@ import DataProvider from "../data/DataProvider.jsx";
 import DataConsumer from "../data/DataConsumer.jsx";
 import * as d3 from "d3";
 import {injectIntl} from "react-intl";
-
+import Papa from "papaparse";
 import BreaksStyles from "./BreaksStyles.js";
-
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 class DataLayer extends BaseLayer {
     constructor() {
         super();
@@ -28,7 +28,6 @@ class DataLayer extends BaseLayer {
             projection,
             breaks,
             markSizeScale2, //arrow size
-            flowValuesFrom,
             measures,
         } = this.props
 
@@ -229,6 +228,7 @@ class DataLayer extends BaseLayer {
             name,
             file,
             path,
+            csv,
             zoom,
             labelFilter = [],
             labelField,
@@ -260,7 +260,20 @@ class DataLayer extends BaseLayer {
                             d.properties.destinations = values[0].children
                         }
                     } else if (app == 'csv') {
-                        // do something
+
+                        const parsed = Papa.parse(csv, {header: true, dynamicTyping: true});
+
+                        const origin=d.properties[featureJoinAttribute]
+                        parsed.data.filter(r=>r.origin==origin)
+                        const record=parsed.data.filter(r=>r.origin==origin)[0]
+                        if (record!=undefined){
+                          alert("CSV Not implemented Yet, please do it if you have time")
+                            d.properties.meta = record
+                            d.properties._value = record.value
+                            d.properties.destinations = record.destination
+                        }
+
+
                     }
                     return d
                 })
@@ -276,8 +289,8 @@ class DataLayer extends BaseLayer {
     }
 
     componentDidMount() {
-        this.create()
-        this.props.zoom.current.fullView()
+            this.create()
+          this.props.zoom.current.fullView()
     }
 
     render() {
@@ -308,6 +321,8 @@ const DataWrapper = (props) => {
     }
 
 
+    console.log("here")
+    
     return (<DataProvider
         editing={editing}
         params={params}
