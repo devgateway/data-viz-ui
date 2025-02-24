@@ -1,7 +1,7 @@
 /* eslint-disable no-debugger */
 import { Config } from '@/conf'
 import {get} from '../../api/commons'
-const API_ROOT = process.env.VITE_REACT_APP_API_ROOT ? process.env.VITE_REACT_APP_API_ROOT : ""; //"http://localhost"; //Config.REACT_APP_API_ROOT;
+const API_ROOT = process.env.VITE_REACT_APP_API_ROOT ? process.env.VITE_REACT_APP_API_ROOT : "http://localhost"; //"http://localhost"; //Config.REACT_APP_API_ROOT;
 
 console.log("API_ROOT==>", API_ROOT);
 
