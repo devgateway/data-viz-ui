@@ -1,7 +1,7 @@
-export const getTranslatedOptions = (options) => {    
+export const getTranslatedOptions = (options) => {
+
     const currentLocale = (window._user_locale ? window._user_locale : '').toUpperCase()
-    
-    if (options && options instanceof Array) {
+    if (options) {
         return options.map(o => {
             let {label, value, labels} = o
 
@@ -15,7 +15,8 @@ export const getTranslatedOptions = (options) => {
 
 }
 
-export const getTranslation = (translatable) => {    
+export const getTranslation = (translatable) => {
+    
     const currentLocale = (window._user_locale ? window._user_locale : '').toUpperCase()
     let {label, labels, value} = translatable
     if (labels && labels[currentLocale]) {

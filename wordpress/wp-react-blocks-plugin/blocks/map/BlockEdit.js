@@ -9,7 +9,6 @@ import LegendBreaks from "./LegendBreaks"
 import MapSymbols from "./Symbols"
 import Tooltips from "./Tooltips"
 import Settings from "./Settings"
-import {ALIVE_SUPERSET_APP, DEFAULT_FORMAT_SETTINGS} from '../commons/Constants';
 
 class BlockEdit extends BlockEditWithAPIMetadata {
     constructor() {
@@ -341,9 +340,7 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                 defaultPointColor,
                 zoomOnFilter,
                 zoomOnFilterField,
-                showShadingLayerLabels,
-                datasetId,
-                apacheSupersetUrl
+                showShadingLayerLabels
             }
         } = this.props;
 
@@ -356,13 +353,6 @@ class BlockEdit extends BlockEditWithAPIMetadata {
             if (f.value != null && f.value.filter(v => v != null && v.toString().trim() != "").length > 0)
                 params[f.param] = f.value
         })
-
-        const  datasets = [{label: 'Select Dataset', value: '0'}]
-        if (this.state.datasets) {
-            this.state.datasets.forEach(d => {
-                datasets.push({label: d.label, value: d.id})
-            })
-        }
 
         const divStyles = { height: height + 'px', width: '100%' };
 
@@ -478,34 +468,12 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                                     app: app,
                                     dimension1: 'none',
                                     dimension2: 'none',
-                                    filters: [],
-                                    apacheSupersetUrl: this.state.apache_superset_url
+                                    filters: []
                                 })
                             }}
                             options={this.state.apps}
                         />
                     </PanelRow>
-
-                     {app == ALIVE_SUPERSET_APP &&   <PanelRow>
-                                                            <SelectControl
-                                                                label={__('Datasets')}
-                                                                value={[datasetId]} 
-                                                                onChange={(newDatasetId)   => {
-                                                                    setAttributes({
-                                                                        datasetId: newDatasetId,
-                                                                        dimension1: 'none',
-                                                                        dimension2: 'none',
-                                                                        dimension3: 'none',	
-                                                                        measures: []
-                                                                    })
-                                                                    this.setState({dimensions: [], measures: [], filters: [], categories: []})
-                                                                    this.loadMetadata(newDatasetId)
-                                                                }}
-                                                                options={datasets}
-                                                            />
-                                                          </PanelRow>
-                                                        }
-                                                      
                         </PanelBody>
 
                 </PanelBody>

@@ -72,7 +72,7 @@ class BlockEdit extends ComponentWithSettings {
             setAttributes({downloadTooltip: tooltip, tooltip: ''})
             return null;
         }
-       
+
         return (
 
             <div>

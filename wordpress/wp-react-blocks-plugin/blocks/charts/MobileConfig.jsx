@@ -262,8 +262,6 @@ const MobileConfig = (props) => {
       measures,
       dimension1,
       yAxisTickValues,
-      datasetId,
-      apacheSupersetUrl
     },
   } = props;
 
@@ -279,43 +277,35 @@ const MobileConfig = (props) => {
   }, [yAxisTickValues]);
 
   let xAxisLabels = extractAxisValues(csv);
-
   if (app !== "csv") {
     if (dimension1 !== "none") {
       const storedCategories = JSON.parse(
         sessionStorage.getItem(`categories_${app}`)
       );
-      
-      let categories = []
-      xAxisLabels = []
-
-      if (!storedCategories) {
-         fetch(`/api/${app}/categories?datasetId=${datasetId}&apacheSupersetUrl=${apacheSupersetUrl}`)
-        .then((response) => response.json())
-        .then((data) => {
-          categories = getTranslatedOptions(data)
-          xAxisLabels = categories
+      const categories =
+        storedCategories ??
+        fetch(`/api/${app}/categories`)
+          .then((response) => response.json())
+          .then((data) => getTranslatedOptions(data));
+      xAxisLabels =
+        categories
           .filter(
             (category) =>
               category.type?.toLowerCase() === dimension1?.toLowerCase()
           )[0]
+          ?.items?.map((item) => item.value) ??
+        categories
+          .filter((category) =>
+            dimension1?.toLowerCase().includes(category?.type?.toLowerCase())
+          )[0]
           ?.items?.map((item) => item.value);
-          
-        });
-
-      }         
-
-    
-  
-
-      
     } else {
       const storedMeasures = JSON.parse(
         sessionStorage.getItem(`measures_${app}`)
       );
       // if measures are not present in session storage, fetch them from the API
       if (!storedMeasures) {
-        fetch(`/api/${app}/measures?datasetId=${datasetId}&apacheSupersetUrl=${apacheSupersetUrl}`)
+        fetch(`/api/${app}/measures`)
           .then((response) => response.json())
           .then((data) => {
             sessionStorage.setItem(`measures_${app}`, JSON.stringify(data));

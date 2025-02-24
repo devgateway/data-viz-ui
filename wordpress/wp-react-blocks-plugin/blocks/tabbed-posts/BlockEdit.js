@@ -27,14 +27,15 @@ class BlockEdit extends BlockEditWithFilters {
                 categories,
                 height,
                 theme,
+                useScrolls,
                 showIcons,
                 useLabels
             },
         } = this.props;
 
-        
 
-        const queryString = `editing=true&data-type=${type}&data-taxonomy=${taxonomy}&data-categories=${categories}&data-items=${count}&data-height=${height}&data-theme=${theme}&data-show-icons=${showIcons}&data-show-labels=${useLabels}`
+
+        const queryString = `editing=true&data-type=${type}&data-taxonomy=${taxonomy}&data-categories=${categories}&data-items=${count}&data-height=${height}&data-theme=${theme}&data-show-icons=${showIcons}&data-show-labels=${useLabels}&data-use-scrolls=${useScrolls}`
         const divStyles = {height: height + 'px', width: '100%'}
         return (
             <div>
@@ -64,6 +65,13 @@ class BlockEdit extends BlockEditWithFilters {
                                     onChange={() => setAttributes({showIcons: !showIcons})}
                                 />
 
+                            </PanelRow>
+                            <PanelRow>
+                                <p>{__("Use Scrolls","dg")}</p>
+                                <FormToggle
+                                    checked={useScrolls}
+                                    onChange={() => setAttributes({useScrolls: !useScrolls})}
+                                />
                             </PanelRow>
                             <PanelRow>
                                 <RangeControl
@@ -126,4 +134,3 @@ const Edit = (props) => {
 }
 
 export default Edit;
-
