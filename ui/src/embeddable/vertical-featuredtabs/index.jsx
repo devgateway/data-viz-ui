@@ -355,7 +355,7 @@ const Wrapper = (props) => {
       style={{ "max-width": "100%" }}
       className={`viz featured tabs ${editing ? "editing" : ""}`}
       fluid={true}
-      key={orientation}
+      key={orientation + Math.random()}
     >
       <PostProvider
         type={type}
