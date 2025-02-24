@@ -385,7 +385,7 @@ const Header = ({ intl, settings }) => {
                                         <img
                                             className="brand logo"
                                             size="large"
-                                            src="/MoA-Branding-Logo-02.png"
+                                            src="/logo_full.png"
                                         />
                                     )}
 
@@ -393,7 +393,7 @@ const Header = ({ intl, settings }) => {
                                         <img
                                             className="brand logo small"
                                             size="small"
-                                            src="/MoA-Branding-Logo-02.png"
+                                            src="/TCDI-Icon-small_02.png"
                                         />
                                     )}
                                 </a>
