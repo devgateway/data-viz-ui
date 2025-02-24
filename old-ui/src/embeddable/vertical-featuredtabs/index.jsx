@@ -1,12 +1,12 @@
-import React, { LegacyRef, useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { Accordion, Container, Icon } from 'semantic-ui-react'
+import React, {useLayoutEffect, useEffect, useRef, useState} from 'react'
+import {Container, Accordion, Icon} from 'semantic-ui-react'
 import {
     PostConsumer,
+    PostIcon,
     PostProvider,
     PostContent,
-    MediaProvider,
     MediaConsumer,
-    PostIcon
+    MediaProvider
 } from "@devgateway/wp-react-lib";
 import PostIntro from "../connected-templates/PostIntro";
 
@@ -18,7 +18,7 @@ const AccordionContent = ({ posts, activeItem, setActive, colors }) => {
     const findElementAndAddStyles = (elementClass, containerClass, hasContainerClass) => {
         const elements = document.querySelectorAll(elementClass);
         elements.forEach((element) => {
-            if (element.querySelector(containerClass)) {
+            if(element.querySelector(containerClass)) {
                 element.classList.add(hasContainerClass);
             }
         });
@@ -26,8 +26,7 @@ const AccordionContent = ({ posts, activeItem, setActive, colors }) => {
 
     useEffect(() => {
         if (scrollTarget) {
-            const element = scrollTarget as HTMLElement;
-            const offsetTop = element.getBoundingClientRect().top + window.scrollY;
+            const offsetTop = scrollTarget.getBoundingClientRect().top + window.scrollY;
             window.scrollTo({
                 top: offsetTop,
                 behavior: 'smooth',
@@ -70,7 +69,7 @@ const AccordionContent = ({ posts, activeItem, setActive, colors }) => {
                             active={activeIndex === index}
                             index={index}
                             onClick={handleClick}
-                            style={{ backgroundColor: colors[`color_${index}`] }}
+                            style={{ backgroundColor: colors[`color_${index}`]  }}
                         >
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
                                 <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -81,7 +80,7 @@ const AccordionContent = ({ posts, activeItem, setActive, colors }) => {
                                             </MediaConsumer>
                                         </MediaProvider>
                                     )}
-                                    <PostIntro post={post} className="vt-accordion-post-intro" />
+                                    <PostIntro post={post} className="vt-accordion-post-intro"/>
                                 </div>
                                 <Icon name="chevron down" />
                             </div>
@@ -95,7 +94,6 @@ const AccordionContent = ({ posts, activeItem, setActive, colors }) => {
         </Accordion>
     );
 };
-
 
 const IntroWithFeaturedImage = ({ post, count, backgroundColor, active, dimensions, height, coverWidth }) => {
     const media = post['_embedded'] ? post['_embedded']["wp:featuredmedia"] : null;
@@ -122,11 +120,11 @@ const IntroWithFeaturedImage = ({ post, count, backgroundColor, active, dimensio
                 </div>
             </div>
             <div className={`collapsable-content ${active ? 'expanded' : 'collapsed'}`}
-                style={{
-                    "backgroundColor": "#f9f9f9",
-                    width: dimensions.width - (coverWidth * count) + 'px',
-                    "marginLeft": `${coverWidth}px`
-                }}
+                 style={{
+                     "backgroundColor": "#f9f9f9",
+                     width: dimensions.width - (coverWidth * count) + 'px',
+                     "marginLeft": `${coverWidth}px`
+                 }}
             >
                 <PostContent post={post} />
             </div>
@@ -135,21 +133,19 @@ const IntroWithFeaturedImage = ({ post, count, backgroundColor, active, dimensio
 };
 
 
-
-
-const FeaturedTabs = ({ editing, posts, height, colors, coverWidth }) => {
+const FeaturedTabs = ({editing, posts, height, colors, coverWidth}) => {
 
     const [active, setActive] = useState(null)
 
-    const targetRef = useRef<HTMLDivElement>(null);
-    const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+    const targetRef = useRef();
+    const [dimensions, setDimensions] = useState({width: 0, height: 0});
 
 
     const toggleAnimation = (k) => {
         setActive(k)
     }
     useLayoutEffect(() => {
-        if (targetRef.current && targetRef.current.parentElement) {
+        if (targetRef.current) {
             setDimensions({
                 width: targetRef.current.parentElement.offsetWidth,
                 height: targetRef.current.offsetHeight
@@ -166,13 +162,12 @@ const FeaturedTabs = ({ editing, posts, height, colors, coverWidth }) => {
                     ref={targetRef}
                     onClick={e => toggleAnimation(post.slug)}
                     className={isActive ? "item expanded" : "item collapsed"}
-                    style={{ "minHeight": height + 'px', "minWidth": `${coverWidth}px` }}>
-                    <a id={post.slug}></a>
-                    <IntroWithFeaturedImage
-                        coverWidth={coverWidth}
-                        height={height}
-                        backgroundColor={colors['color_' + i]} count={posts.length}
-                        dimensions={dimensions} active={isActive} post={post} />
+                    style={{"minHeight": height + 'px', "minWidth": `${coverWidth}px`}}>
+                    <anchor id={post.slug}></anchor>
+                    <IntroWithFeaturedImage coverWidth={coverWidth}
+                                            height={height}
+                                            backgroundColor={colors['color_' + i]} count={posts.length}
+                                             dimensions={dimensions} active={isActive} post={post}/>
                 </div>
 
             })}
@@ -182,99 +177,86 @@ const FeaturedTabs = ({ editing, posts, height, colors, coverWidth }) => {
     )
 }
 
-export interface VerticalFeaturedTabsProps {
-    "data-height": number;
-    "data-type": string;
-    "data-taxonomy": string;
-    "data-categories": string;
-    "data-count": number;
-    "data-colors": string;
-    "data-cover-width"?: number;
-    "data-read-more-label"?: string;
-    editing: boolean;
-    parent: string;
-    unique: string;
-    intl: any;
-}
 
+const Wrapper = (props) => {
+  const {
+    "data-height": height,
+    "data-type": type,
+    "data-taxonomy": taxonomy,
+    "data-categories": categories,
+    "data-count": items,
+    "data-colors": colors,
+    "data-cover-width": coverWidth = 50,
+    "data-read-more-label": moreLabel = "READ More",
+    editing,
+    parent,
+    unique,
+  } = props;
+  const locale = props.intl.locale;
 
-const Root: React.FC<VerticalFeaturedTabsProps> = (props) => {
-    const {
-        "data-height": height,
-        "data-type": type,
-        "data-taxonomy": taxonomy,
-        "data-categories": categories,
-        "data-count": items,
-        "data-colors": colors,
-        "data-cover-width": coverWidth = 50,
-        "data-read-more-label": moreLabel = "READ More",
-        editing,
-        parent,
-        unique,
-    } = props;
-    const locale = props.intl.locale;
-
-    // Determine screen width and conditionally render components
-    const [isMobile, setIsMobile] = useState(window.innerWidth <= 1440);
-    useEffect(() => {
-        const handleResize = () => {
-            setIsMobile(window.innerWidth <= 1250);
-        };
-
-        window.addEventListener("resize", handleResize);
-        return () => window.removeEventListener("resize", handleResize);
-    }, []);
-
-    const decode = (value) => {
-        if (editing) {
-            return value;
-        }
-        return decodeURIComponent(value);
+  // Determine screen width and conditionally render components
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 1440);
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 1250);
     };
-    const parse = (value) => {
-        try {
-            return JSON.parse(decode(value));
-        } catch (error) {
-            console.error("error parsing value:" + value);
-        }
 
-        return null;
-    };
-    return (
-        <Container
-            style={{ "max-width": "100%" }}
-            className={`viz featured tabs ${editing ? "editing" : ""}`}
-            fluid={true}
-        >
-            <PostProvider
-                type={type}
-                locale={locale}
-                taxonomy={taxonomy}
-                categories={parse(categories).join(",")}
-                store={"vertical_tabs" + parent + "_" + unique}
-                page={1}
-                perPage={items}
-            >
-                <PostConsumer>
-                    {isMobile ? (
-                        <AccordionContent
-                            posts={items}
-                            activeItem={items[0]?.slug}
-                            colors={parse(colors)}
-                            setActive={() => { }}
-                        />
-                    ) : (
-                        <>
-                            {/* @ts-ignore */}
-                            <FeaturedTabs editing={editing} coverWidth={coverWidth} moreLabel={moreLabel} colors={parse(colors)}
-                                height={height}></FeaturedTabs>
-                        </>
-                    )}
-                </PostConsumer>
-            </PostProvider>
-        </Container>
-    );
-}
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const decode = (value) => {
+    if (editing) {
+      return value;
+    }
+    return decodeURIComponent(value);
+  };
+  const parse = (value) => {
+    try {
+      return JSON.parse(decode(value));
+    } catch (error) {
+      console.error("error parsing value:" + value);
+    }
+
+    return null;
+  };
+  return (
+    <Container
+      style={{ "max-width": "100%" }}
+      className={`viz featured tabs ${editing ? "editing" : ""}`}
+      fluid={true}
+    >
+      <PostProvider
+        type={type}
+        locale={locale}
+        taxonomy={taxonomy}
+        categories={parse(categories).join(",")}
+        store={"vertical_tabs" + parent + "_" + unique}
+        page={1}
+        perPage={items}
+      >
+        <PostConsumer>
+          {isMobile ? (
+            <AccordionContent
+              posts={items}
+              activeItem={items[0]?.slug}
+              colors={parse(colors)}
+              setActive={() => {}}
+            />
+          ):  (
+            <FeaturedTabs
+              editing={editing}
+              coverWidth={coverWidth}
+              moreLabel={moreLabel}
+              colors={parse(colors)}
+              height={height}
+            ></FeaturedTabs>
+          )}
+        </PostConsumer>
+      </PostProvider>
+    </Container>
+  );
+};
 
 
-export default Root
+export default Wrapper
