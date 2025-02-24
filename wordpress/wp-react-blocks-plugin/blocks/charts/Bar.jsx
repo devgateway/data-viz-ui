@@ -9,7 +9,6 @@ import ConfidenceIntervalConfig from "./ConfidenceIntervalConfig.jsx"
 import Papa from 'papaparse'
 import GroupTotalSetting from "./GroupTotalSetting.jsx";
 import Sort from "./Sort.jsx";
-import { useEffect, useState  } from 'react';
 
 const BarOptions = (props) => {
     const {
@@ -78,7 +77,7 @@ const BarOptions = (props) => {
             }
 
             if (byDimension) {
-                const ds = allDimensions ? allDimensions.filter(d => d.value == whichDimension) : [];
+                const ds = allDimensions.filter(d => d.value == whichDimension)
                 if (ds.length > 0) {
                     const {type} = ds[0]
                     const cat = allCategories.filter(a => a.type === type)
@@ -126,12 +125,7 @@ const BarOptions = (props) => {
             }
         })
     }
-
-    const [series, setSeries] = useState(getCSVSeries());
-
-    useEffect(() => {
-        setSeries(app == 'csv' ? getCSVSeries() : getSeries())
-    }, [app, csv]);
+    const series = app == 'csv' ? getCSVSeries() : getSeries();
 
     return [
       <PanelBody initialOpen={false} title={__("Bar Options")}>

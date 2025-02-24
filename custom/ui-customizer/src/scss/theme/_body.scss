@@ -5,34 +5,141 @@
     margin: auto;
 
     text.label {
-        cursor: pointer;
-        font-size: 14px;
-        fill: $gray;
-        font-weight: bold;
+      cursor: pointer;
+      font-size: 14px;
+      fill: $gray;
+      font-weight: bold;
     }
 
     text.label:hover {
-        fill: $light-blue;
+      fill: $light-blue;
     }
 
     text.title {
-        cursor: pointer;
-        font-size: 16px;
-        fill: $blue;
-        font-weight: bold;
+      cursor: pointer;
+      font-size: 16px;
+      fill: $blue;
+      font-weight: bold;
+    }
+
+    .title-rect {
+      fill: transparent;
+      stroke: none;
+      @media screen and (max-width: 800px) {
+        fill: transparent;
+        stroke: $light-blue;
+        stroke-width: 2;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        border-radius: 5px;
+      }
+    }
+
+    .title-rect.on {
+     @media  screen and (max-width: 800px) {
+      fill: #466d92;
+      color: white;
+     }
+    }
+
+    text.title.on {
+      fill: white;
+      font-weight: bold;
+      stroke-width: 4;
     }
 
     circle,
     line {
-        stroke: $light-blue;
+      stroke: $light-blue;
     }
 
     circle {
-        fill: $light-blue;
+      fill: $light-blue;
     }
 
     svg {
-        margin: auto;
-        width: 100%;
+      margin: auto;
+      width: 100%;
     }
-}
+  }
+  .st0{fill:#674534;}
+  .st1{fill:url(#SVGID_1_);}
+  .st2{fill:#C8BFB8;}
+  .st3{fill-rule:evenodd;clip-rule:evenodd;fill:#C8BFB8;}
+  .st4{opacity:0.7;fill-rule:evenodd;clip-rule:evenodd;fill:#D6CFC9;enable-background:new    ;}
+  .st5{fill-rule:evenodd;clip-rule:evenodd;fill:#FFFFFF;fill-opacity:0.298;}
+  .st6{fill:#B9B6B5;}
+  .st7{fill-rule:evenodd;clip-rule:evenodd;fill:#B9B6B5;}
+  .st8{opacity:0.7;fill:#D6CFC9;enable-background:new    ;}
+  .st9{fill:none;}
+  .st10{fill-rule:evenodd;clip-rule:evenodd;fill:#FFFFFF;}
+  .st11{fill:#FFFFFF;fill-opacity:0.298;}
+  .st12{fill:url(#SVGID_2_);}
+  .st13{fill-rule:evenodd;clip-rule:evenodd;fill:#674534;}
+  .st14{fill-rule:evenodd;clip-rule:evenodd;fill:#CF785F;}
+  .st15{fill-rule:evenodd;clip-rule:evenodd;fill:#D3A79F;}
+  .st16{fill:#D3A79F;}
+  .st17{opacity:0.4;fill-rule:evenodd;clip-rule:evenodd;fill:#FFFFFF;enable-background:new    ;}
+  .st18{fill-rule:evenodd;clip-rule:evenodd;fill:url(#SVGID_3_);}
+  .st19{fill-rule:evenodd;clip-rule:evenodd;fill:url(#SVGID_4_);fill-opacity:0.298;}
+  .st20{opacity:0.7;fill-rule:evenodd;clip-rule:evenodd;fill:#978679;enable-background:new    ;}
+  .st21{opacity:0.3;fill:#FFFFFF;enable-background:new    ;}
+  .st22{opacity:0.5;}
+  .st23{fill-rule:evenodd;clip-rule:evenodd;fill:url(#SVGID_5_);}
+  .st24{fill-rule:evenodd;clip-rule:evenodd;fill:url(#SVGID_6_);fill-opacity:0.298;}
+  .st25{fill:url(#SVGID_7_);}
+  .st26{fill:#B9684A;}
+  .st27{fill:#CF785F;}
+  .st28{opacity:0.8;fill:#5D798F;enable-background:new    ;}
+  .st29{fill-rule:evenodd;clip-rule:evenodd;fill:url(#SVGID_8_);}
+  .st30{opacity:0.8;fill-rule:evenodd;clip-rule:evenodd;fill:#5D798F;enable-background:new    ;}
+  .st31{fill-rule:evenodd;clip-rule:evenodd;fill:#B9684A;}
+  .st32{opacity:0.4;fill:#FFFFFF;fill-opacity:0.298;enable-background:new    ;}
+  .st33{opacity:0.4;fill:#FFFFFF;enable-background:new    ;}
+  .st34{fill-rule:evenodd;clip-rule:evenodd;fill:#CECCCB;}
+  .st35{opacity:0.6;}
+  .st36{fill-rule:evenodd;clip-rule:evenodd;fill:#663333;}
+  .st37{opacity:0.8;fill:#D3A79F;}
+  .st38{fill:#AA7D6A;}
+  .st39{fill:#D35D63;}
+  .st40{fill:#FF8585;}
+  .st41{fill:#E6E4E0;}
+  .st42{fill:#E3DED5;}
+  .st43{fill:#E8E7E2;}
+  .st44{fill:#333333;}
+  .st45{fill:#91734E;}
+  .st46{fill:#AA996F;}
+  .st47{fill:#212429;}
+  .st48{opacity:0.46;fill:#FFFFFF;}
+  .st49{fill:#FF9191;}
+  .st50{opacity:0.31;fill:#FFFFFF;}
+  .st51{fill:#A83767;}
+  .st52{fill:#DEC752;}
+  .st53{fill:#C96354;}
+  .st54{clip-path:url(#SVGID_10_);fill:#BA4838;}
+  .st55{fill:#E88C80;}
+  .st56{fill:#B84B79;}
+  .st57{fill:#C75E8A;}
+  .st58{fill:#DB796C;}
+  .st59{fill:#E8A874;}
+  .st60{clip-path:url(#SVGID_12_);fill:#F28274;}
+  .st61{fill:#C26153;}
+  .st62{fill:#B34636;}
+  .st63{fill:#D17164;}
+  .st64{fill:#F2BE94;}
+  .st65{fill:#FFDCBF;}
+  .st66{fill:#CE5F5F;}
+  .st67{clip-path:url(#SVGID_14_);fill:#FFA094;}
+  .st68{fill:#DDB6B1;}
+  .st69{opacity:0.1797;fill:#D3A79F;}
+
+  .wp-block-viz-components-ailments {
+    @media screen and (max-width: 800px) {
+      width: 100vw !important;
+      height: 100% !important;
+    }
+
+    @media screen and (max-width: 1024px) {
+      width: 100% !important;
+      height: 100% !important;
+    }
+  }

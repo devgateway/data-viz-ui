@@ -24,7 +24,6 @@ import MobileConfig from './MobileConfig.jsx';
 import Tooltip from "../commons/Tooltip.jsx";
 import {togglePanel} from "../commons/Util";
 import Radar from './Radar.jsx';
-import {ALIVE_SUPERSET_APP, DEFAULT_FORMAT_SETTINGS} from '../commons/Constants';
 
 class BlockEdit extends BlockEditWithAPIMetadata {
     constructor(props) {
@@ -162,8 +161,7 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                 overallLabel,
                 enableGridX,
                 minMaxClamp,
-                mobileCustomization,
-                datasetId
+                mobileCustomization
             }
         } = this.props;
 
@@ -208,13 +206,6 @@ class BlockEdit extends BlockEditWithAPIMetadata {
             if (f.value != null && f.value.filter(v => v != null && v.toString().trim() != "").length > 0)
                 params[f.param] = f.value
         })
-
-        const  datasets = [{label: 'Select Dataset', value: '0'}]
-        if (this.state.datasets) {
-            this.state.datasets.forEach(d => {
-                datasets.push({label: d.label, value: d.id})
-            })
-        }
 
         const divStyles = {height: height + 'px', width: '100%'}
         return ([isSelected && (
@@ -311,33 +302,12 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                                             value={[app]} // e.g: value = [ 'a', 'c' ]
                                             onChange={(app) => {
                                                 setAttributes({
-                                                    app: app,
-                                                    apacheSupersetUrl: this.state.apache_superset_url
+                                                    app: app
                                                 })
                                             }}
                                             options={this.state.apps}
-                                        />                                        
-                                    </PanelRow>
-                                    {app == ALIVE_SUPERSET_APP &&   <PanelRow>
-                                        <SelectControl
-                                            label={__('Datasets')}
-                                            value={[datasetId]} 
-                                            onChange={(newDatasetId)   => {
-                                                setAttributes({
-                                                    datasetId: newDatasetId,
-                                                    dimension1: 'none',
-                                                    dimension2: 'none',
-                                                    dimension3: 'none',	
-                                                    measures: Object.assign({}, DEFAULT_FORMAT_SETTINGS)
-                                                })
-                                                this.setState({dimensions: [], measures: [], filters: [], categories: []})
-                                                this.loadMetadata(newDatasetId)
-                                            }}
-                                            options={datasets}
                                         />
-                                      </PanelRow>
-                                    }
-                                  
+                                    </PanelRow>
                                 </PanelBody>
                                 {app != 'csv' && <APIConfig
                                     allDimensions={this.state.dimensions}

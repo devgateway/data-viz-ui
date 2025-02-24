@@ -124,10 +124,7 @@ registerBlockType(process.env.BLOCKS_NS + '/chart',
                 type: 'String',
                 default: "csv"
             },
-            datasetId: {
-                type: 'String',
-                default: ""
-            },
+
             params: {
                 type: Object,
                 default: {}
@@ -506,7 +503,9 @@ registerBlockType(process.env.BLOCKS_NS + '/chart',
                     marginRight: 25,
                     showXAxisTitle: true,
                     showYAxisTitle: true,
-                    showRightAxisTitle: true
+                    showRightAxisTitle: true,
+                    barPadding: 0.15,
+                    barInnerPadding: 0.7,
                 }
             },
             reverseLegend: {
@@ -565,11 +564,7 @@ registerBlockType(process.env.BLOCKS_NS + '/chart',
             radarDotLabelOffset: {
                 type: 'Numeric',
                 default: -12
-            },
-            apacheSupersetUrl: {
-                type: 'string',
-                default: ''
-            }   
+            }
         },
         edit: BlockEdit,
         save: BlockSave,

@@ -1,4 +1,4 @@
-import {InspectorControls} from '@wordpress/block-editor';
+import {InspectorControls, InspectorAdvancedControls} from '@wordpress/block-editor';
 import {Button, ButtonGroup, Panel, PanelBody, PanelRow, ToggleControl} from '@wordpress/components';
 import {__} from '@wordpress/i18n';
 import {addFilter} from '@wordpress/hooks';
