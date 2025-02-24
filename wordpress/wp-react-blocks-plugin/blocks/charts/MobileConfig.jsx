@@ -535,7 +535,7 @@ const MobileConfig = (props) => {
                       })
                     }
                     min={0}
-                    max={30}
+                    max={500}
                   />
                 </PanelRow>
                 <PanelRow>
