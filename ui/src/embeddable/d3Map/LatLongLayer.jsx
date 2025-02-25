@@ -218,11 +218,7 @@ const DataWrapper = (props) => {
 
     if (datasetId) {
         params.datasetId = datasetId;
-    }
-
-    if (settings && settings.apache_superset_url) {         
-        params.apacheSupersetUrl = decodeURIComponent(settings.apache_superset_url);
-    }
+    }    
 
     return (<DataProvider
         editing={editing}
