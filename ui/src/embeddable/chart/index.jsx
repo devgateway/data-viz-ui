@@ -16,6 +16,7 @@ import CSVDataFrame from "./CSVDataFrame";
 import ColorProvider from "./colors/ColorProvider";
 import Messages from "./Messages";
 import { connect } from "react-redux";
+import { injectIntl } from "react-intl";
 
 const PieChart = (props) => {
   const { data, legends, colors, height } = props;
