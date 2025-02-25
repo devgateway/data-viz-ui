@@ -27,7 +27,7 @@ class Body extends React.Component {
     // No llames this.setState() aquí!
     this.state = {
       counter: 0,
-      isMobile: ["mobile", "tablet"].includes(getDeviceType()),
+      isMobile: ["mobile", "tablet", "midTablet"].includes(getDeviceType()),
       isClicked: false,
       selectedOption: "Cancers",
       orientation: this.getScreenOrientation(),
@@ -116,7 +116,7 @@ class Body extends React.Component {
       root.selectAll("g.system").transition().duration(200).style("opacity", 0);
       element.transition().style("opacity", 1);
     }
-    var bbox = source.node().getBBox();
+    const bbox = source.node().getBBox();
 
     let x1, y1, x2, y2;
     if (bbox.x < 0) {
