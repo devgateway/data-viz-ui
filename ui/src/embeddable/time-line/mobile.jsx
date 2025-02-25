@@ -133,7 +133,7 @@ const TimeLine = (props) => {
         const x = rect.left - parentDiv.left;
         const y = rect.top + parentDiv.top;
         position = [x + xOffset, y + yOffset];
-        const tooltipWidth = 400;
+        let tooltipWidth = 400;
         if (rect.left + x + tooltipWidth + xOffset > window.innerWidth) {
           position[0] = x - tooltipWidth * 0.6;
         }
@@ -203,7 +203,7 @@ const TimeLine = (props) => {
 
     const svgWidth = ref.current.clientWidth;
     const parentWidth = parentRef.current.clientWidth;
-    if (parentWidth > 0) {
+    if(parentWidth > 0) {
       setParentWidth(parentWidth);
     }
     const svgHeight = height;
@@ -290,66 +290,67 @@ const TimeLine = (props) => {
 
     // titles (Post Title)
     g.selectAll(".title")
-      .data(posts)
-      .enter()
-      .append("foreignObject")
-      .attr("x", titleXAxis[deviceType]) // Move the label to the right of the timeline
-      .attr("y", (d, i) => yScale(i) - parseInt(subtitleHeight) / 2)
-      .attr("width", parseInt(subtitleWidthDeviceMap[deviceType]))
-      .attr("height", parseInt(subtitleHeight))
-      .append("xhtml:div")
-      .attr("id", (d, i) => getTitleId(i))
-      .style("font-size", parseInt(fontSize) + 1 + "px")
-      .style("color", (d, i) => titleColor(i))
-      .style("font-weight", "bold")
-      .style("line-height", "1.2rem")
-      .style("text-align", "left")
-      .style("cursor", enableTitlePopup ? "pointer" : "default")
-      .style("overflow", "hidden")
-      .style("display", "-webkit-box")
-      .style("-webkit-line-clamp", "2") // Limit to 2 lines
-      .style("-webkit-box-orient", "vertical") // Required for line-clamp
-      .style("text-overflow", "ellipsis") // Add ellipsis
-      .style("overflow-wrap", "break-word")
-      .html((d, i) => {
-        const readmore = readMoreLabel(i);
-        let title = d.title.rendered;
-        if (readmore) {
-          title += `<br><span style="font-size:${parseInt(fontSize) - 3
-            }px;color:${titleColor(
-              i
-            )};text-decoration:underline;text-underline-offset:3px">${readmore}</span>`;
-        }
-        return title;
-      })
-      .each(function (d, i) {
-        const foreignObject = d3.select(this.parentNode); // Select the foreignObject
+    .data(posts)
+    .enter()
+    .append("foreignObject")
+    .attr("x", titleXAxis[deviceType]) // Move the label to the right of the timeline
+    .attr("y", (d, i) => yScale(i) - parseInt(subtitleHeight) / 2)
+    .attr("width", parseInt(subtitleWidthDeviceMap[deviceType]))
+    .attr("height", parseInt(subtitleHeight))
+    .append("xhtml:div")
+    .attr("id", (d, i) => getTitleId(i))
+    .style("font-size", parseInt(fontSize) + 1 + "px")
+    .style("color", (d, i) => titleColor(i))
+    .style("font-weight", "bold")
+    .style("line-height", "1.2rem")
+    .style("text-align", "left")
+    .style("cursor", enableTitlePopup ? "pointer" : "default")
+    .style("overflow", "hidden")
+    .style("display", "-webkit-box")
+    .style("-webkit-line-clamp", "2") // Limit to 2 lines
+    .style("-webkit-box-orient", "vertical") // Required for line-clamp
+    .style("text-overflow", "ellipsis") // Add ellipsis
+    .style("overflow-wrap", "break-word")
+    .html((d, i) => {
+      const readmore = readMoreLabel(i);
+      let title = d.title.rendered;
+      if (readmore) {
+        title += `<br><span style="font-size:${
+          parseInt(fontSize) - 3
+        }px;color:${titleColor(
+          i
+        )};text-decoration:underline;text-underline-offset:3px">${readmore}</span>`;
+      }
+      return title;
+    })
+    .each(function (d, i) {
+      const foreignObject = d3.select(this.parentNode); // Select the foreignObject
 
-        // Wait for the DOM to be updated before calculating the height
-        setTimeout(() => {
-          const bbox = this.getBoundingClientRect(); // Get the actual bounding box of the rendered content
-          const contentHeight = Math.min(bbox.height, parseInt(subtitleHeight) * 2); // Ensure height doesn't exceed two lines
-          foreignObject.attr("height", contentHeight); // Update the height based on actual content
+      // Wait for the DOM to be updated before calculating the height
+      setTimeout(() => {
+        const bbox = this.getBoundingClientRect(); // Get the actual bounding box of the rendered content
+        const contentHeight = Math.min(bbox.height, parseInt(subtitleHeight) * 2); // Ensure height doesn't exceed two lines
+        foreignObject.attr("height", contentHeight); // Update the height based on actual content
 
-          // Update y position to vertically center the content
-          foreignObject.attr("y", yScale(i) - contentHeight / 2);
-        }, 0); // Timeout ensures the DOM is rendered first before measuring
-      })
-      .on(isTouchDevice() ? "touchstart" : "mouseover", (event, d, i) => {
-        event.preventDefault();
-        if (enableTitlePopup) {
-          isTouchDevice() ? onTouchStart(event, d) : onMouseOver(event, d);
+        // Update y position to vertically center the content
+        foreignObject.attr("y", yScale(i) - contentHeight / 2);
+      }, 0); // Timeout ensures the DOM is rendered first before measuring
+    })
+    .on(isTouchDevice() ? "touchstart" : "mouseover", (event, d, i) => {
+      event.preventDefault();
+      if (enableTitlePopup) {
+        isTouchDevice() ? onTouchStart(event, d) : onMouseOver(event, d);
+      }
+    })
+    .on("mouseout", (event, d, i) => {
+      event.preventDefault();
+      if (enableTitlePopup) {
+        onMouseOut(event, d, d.id);
+        if (closePopupOnMouseOut) {
+          // Additional logic if needed
         }
-      })
-      .on("mouseout", (event, d, i) => {
-        event.preventDefault();
-        if (enableTitlePopup) {
-          onMouseOut(event, d, d.id);
-          if (closePopupOnMouseOut) {
-            // Additional logic if needed
-          }
-        }
-      });
+      }
+    });
 
     g.selectAll(".year")
       .data(posts)
@@ -428,7 +429,7 @@ const PostCarousel = (props) => {
     "data-margin-bottom": marginBottom = 25,
     "data-font-size": fontSize = 14,
     "data-title-width": titleWidth = 100,
-    "data-title-height": titleHeight = 50, 
+    "data-title-height": titleHeight = 50,
     "data-subtitle-height": subtitleHeight = 60,
     "data-enable-title-popup": enableTitlePopup = "false",
     "data-enable-circle-popup": enableCirclePopup = "true",
