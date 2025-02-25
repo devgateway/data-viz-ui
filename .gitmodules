@@ -1,4 +1,5 @@
 [submodule "react-lib"]
 	path = react-lib
 	url = git@github.com:devgateway/wp-react-lib.git
-	branch = fix/TCDIET-411
+	branch = main
+

@@ -1,38 +1,25 @@
-import React, {Component} from 'react';
-
+import React, { useEffect } from 'react';
 import ReactGA from "react-ga4";
+import { useLocation } from 'react-router-dom';
+import { Config } from './conf';
 
 
-
-
-ReactGA.initialize('#REACT_APP_GA_CODE#');
+if (Config.GA_CODE || Config.GA_CODE !== '') ReactGA.initialize(Config.GA_CODE || '#REACT_APP_GA_CODE#');
 
 const withTracker = (WrappedComponent, options = {}) => {
+    const HOC = (props) => {
+        const location = useLocation();
 
-
-    const HOC = class extends Component {
-        componentDidMount() {
-
-            const page = this.props.location.pathname;
-            ReactGA.send({hitType: "pageview", page});
-
-            //trackPage(page);
-        }
-
-        componentDidUpdate = prevPros => {
-            const currentPage = prevPros.location.pathname;
-            const nextPage = this.props.location.pathname;
-
-            if (currentPage !== nextPage) {
-                ReactGA.send({hitType: "pageview", page: nextPage});
-
+        useEffect(() => {
+            if (Config.GA_CODE) {
+                const page = location.pathname;
+                ReactGA.send({ hitType: "pageview", page });
             }
-        };
+           
+        }, [location.pathname]);
 
-        render() {
-
-            return <WrappedComponent {...this.props} />;
-        }
+        
+        return <WrappedComponent {...props} />;
     };
 
     return HOC;
