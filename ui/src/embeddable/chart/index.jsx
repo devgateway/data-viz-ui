@@ -96,7 +96,7 @@ const Chart = (props) => {
     //"data-csv-line-tooltip": lineTooltip = "",
     //"data-csv-line-title": lineTitle = "",
 
-    "data-overlays": overlays,
+    "data-overlays": overlays = "[]",
     "data-max-value": maxValue = "auto",
     "data-value-scale": valueScale = "linear",
     "data-swap": swap = "false",
@@ -447,6 +447,7 @@ const Chart = (props) => {
     return layout;
   };
 
+
   const getMarginValue = (mobileEnabled, mobileSetting, defaultValue) => {
     return mobileEnabled
       ? parseInt(mobileSetting) ?? defaultValue
@@ -525,7 +526,7 @@ const Chart = (props) => {
     valueScale,
     categories,
     lineLayerEnabled: lineLayerEnabled == true || lineLayerEnabled == "true",
-    overlays: parse(overlays) || [],
+    overlays: overlays ? parse(overlays) : [],
     barColor: decodeURIComponent(barColor),
     overrideTickColor: overrideTickColor == true || overrideTickColor == "true",
     fixedMinValue,
@@ -607,7 +608,7 @@ const Chart = (props) => {
     radarDotLabelOffset,
     sort2Dimension,
     mobileCustomization,
-    dimension1,
+    dimension1
   };
 
   let params = {};
@@ -656,8 +657,7 @@ const Chart = (props) => {
     case "line":
       Chart = Line;
       showNotEnoughParameters =
-        app !== "csv" &&
-        (selectedMeasures.length === 0 || dimension1 === "none");
+        app !== "csv" && (selectedMeasures.length === 0 || dimension1 === "none");
       break;
     case "pie":
       showNotEnoughParameters = app != "csv" && selectedMeasures.length == 0;
@@ -905,4 +905,4 @@ const mapStateToProps = (state, ownProps) => {
   }
 };
 const mapActionCreators = {};
-export default connect(mapStateToProps, mapActionCreators)(Chart);
+export default connect(mapStateToProps, mapActionCreators)(injectIntl(Chart));

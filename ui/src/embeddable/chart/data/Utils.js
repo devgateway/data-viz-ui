@@ -29,6 +29,7 @@ export const measureLabel = (map, field) => {
 };
 
 export const getTranslatedValue = (obj, locale) => {
+
   if (obj) {
     if (obj.labels && obj.labels[locale.toUpperCase()]) {
       return obj.labels[locale.toUpperCase()];
