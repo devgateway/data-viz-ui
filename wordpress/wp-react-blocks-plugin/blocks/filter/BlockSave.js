@@ -30,8 +30,7 @@ const SaveComponent = (props) => {
             alphabeticalSort,
             ascOrder,
             useFilterItems,
-            datasetId,
-            apacheSupersetUrl
+            datasetId
         }
     } = props;
 
@@ -69,9 +68,7 @@ const SaveComponent = (props) => {
                  data-hidden-filters={encodeURIComponent(JSON.stringify(hiddenFilters))}
                  data-close-on-select={closeOnSelect}
                  data-use-filter-items={useFilterItems}
-                 data-all-none-same-behaviour={allNoneSameBehaviour}
-                 data-apache-superset-url={encodeURIComponent(apacheSupersetUrl)} 
-                 >
+                 data-all-none-same-behaviour={allNoneSameBehaviour}>
     </div>);
 }
 

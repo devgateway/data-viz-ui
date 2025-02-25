@@ -311,8 +311,7 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                                             value={[app]} // e.g: value = [ 'a', 'c' ]
                                             onChange={(app) => {
                                                 setAttributes({
-                                                    app: app,
-                                                    apacheSupersetUrl: this.state.apache_superset_url
+                                                    app: app                                                   
                                                 })
                                             }}
                                             options={this.state.apps}

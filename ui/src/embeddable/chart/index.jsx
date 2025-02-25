@@ -583,10 +583,6 @@ const Chart = (props) => {
     params.datasetId = datasetId;
   }
 
-  if (settings) {
-    params.apacheSupersetUrl = decodeURIComponent(settings.apache_superset_url);
-  }
-
   let ChartDataFrame = null;
   let Chart = null;
 

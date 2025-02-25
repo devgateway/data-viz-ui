@@ -94,8 +94,7 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                 allNoneSameBehaviour,
                 closeOnSelect,
                 useFilterItems,
-                datasetId,
-                apacheSupersetUrl
+                datasetId
             }
         } = this.props;
 

@@ -342,8 +342,7 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                 zoomOnFilter,
                 zoomOnFilterField,
                 showShadingLayerLabels,
-                datasetId,
-                apacheSupersetUrl
+                datasetId
             }
         } = this.props;
 
@@ -478,8 +477,7 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                                     app: app,
                                     dimension1: 'none',
                                     dimension2: 'none',
-                                    filters: [],
-                                    apacheSupersetUrl: this.state.apache_superset_url
+                                    filters: []                                    
                                 })
                             }}
                             options={this.state.apps}

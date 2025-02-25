@@ -74,8 +74,7 @@ const SaveComponent = (props) => {
             noDataText,
             customMeasureLabels,
             showShadingLayerLabels,
-            datasetId,
-            apacheSupersetUrl
+            datasetId
         }
     } = props;
     
@@ -168,9 +167,7 @@ const SaveComponent = (props) => {
              data-no-data-text={noDataText}
              data-custom-measure-labels={encodeURIComponent(JSON.stringify(customMeasureLabels))}
              data-show-shading-layer-labels={showShadingLayerLabels}
-             data-dataset-id={datasetId}
-             data-apache-superset-url={encodeURIComponent(apacheSupersetUrl)} 
-             >
+             data-dataset-id={datasetId}  >
         </div>
     );
 }

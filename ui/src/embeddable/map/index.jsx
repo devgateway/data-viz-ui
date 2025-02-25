@@ -260,11 +260,7 @@ const MapEntry = (props) => {
     const params = getFilters(filters)
     if (datasetId) {
         params.datasetId = datasetId;
-    }
-
-    if (settings && settings.apache_superset_url) {
-        params.apacheSupersetUrl = decodeURIComponent(settings.apache_superset_url);
-    }
+    }    
 
     return (
         <SettingProvider locale={intl.locale} changeUUID={unique}>

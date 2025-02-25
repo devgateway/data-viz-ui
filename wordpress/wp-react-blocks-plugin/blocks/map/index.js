@@ -307,11 +307,7 @@ registerBlockType(process.env.BLOCKS_NS+'/map',
             datasetId: {
                 type: 'String',
                 default: ""
-            },
-            apacheSupersetUrl: {
-                type: 'string',
-                default: ''
-            }  
+            }            
         },
         edit: BlockEdit,
         save: BlockSave,

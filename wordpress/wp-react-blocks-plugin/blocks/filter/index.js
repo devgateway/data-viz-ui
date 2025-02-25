@@ -127,11 +127,7 @@ registerBlockType(process.env.BLOCKS_NS + '/filter',
             datasetId: {
                 type: 'String',
                 default: ""
-            },
-            apacheSupersetUrl: {
-                type: 'string',
-                default: ''
-            }  
+            }           
         },
         edit: BlockEdit,
         save: BlockSave,

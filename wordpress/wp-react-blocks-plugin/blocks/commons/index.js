@@ -349,7 +349,7 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
 
 
         if (app == ALIVE_SUPERSET_APP) {
-            return `${url}?datasetId=${datasetId}&apacheSupersetUrl=${this.state.apache_superset_url}`
+            return `${url}?datasetId=${datasetId}`
         }
 
         return url
@@ -440,7 +440,7 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
         if (!this.state.apache_superset_url || this.state.apache_superset_url == '' || app != ALIVE_SUPERSET_APP)	 
             return
         
-          fetch(`/api/${app}/datasets?apacheSupersetUrl=${this.state.apache_superset_url}`)
+          fetch(`/api/${app}/datasets`)
             .then(response => {
                 if (!response.ok) {
                     throw new Error("HTTP status " + response.status);
