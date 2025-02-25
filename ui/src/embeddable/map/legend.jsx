@@ -105,8 +105,7 @@ export default class Legend extends React.Component {
                 </span>
               </li>
             )}
-
-            {console.log("symbols", symbols)}
+ 
             {symbols &&
               symbols.map((symbol, i) => {
                 return (

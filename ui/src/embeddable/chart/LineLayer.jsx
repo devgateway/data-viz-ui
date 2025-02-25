@@ -25,7 +25,7 @@ const Line = (
       if (bars && bars.length > 0) {
         indexes = new Set(props.bars.map((b) => b.data.indexValue));
         lineData = data.data.filter((d) => {
-          let indexesArray = Array.from(indexes);
+          const indexesArray = Array.from(indexes);
           return indexesArray.find((i) => i == d[0]);
         });
         barWidth =
@@ -78,7 +78,7 @@ const Line = (
           }
         });
 
-      var tooltip = d3
+      const tooltip = d3
         .select("#root")
         .append("div")
         .attr("class", "chart tooltip")
@@ -97,11 +97,11 @@ const Line = (
             style={{ pointerEvents: "none" }}
           />
           {lineData.map((d) => {
-            let yScaleAdjustment =
+            const yScaleAdjustment =
               layout === "horizontal"
                 ? (barWidth * (centerLine ? keys.length : 1)) / 2
                 : 0;
-            let xScaleAdjustment =
+            const xScaleAdjustment =
               layout === "horizontal"
                 ? 0
                 : (barWidth * (centerLine ? keys.length : 1)) / 2;
