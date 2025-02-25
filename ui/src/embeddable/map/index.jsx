@@ -27,7 +27,7 @@ const MapWrapper = (props) => {
         "data-csv": csv = '',
         'data-dimension1': dimension1 = '',
         'data-dimension2': dimension2 = '',
-        "data-measures": measures = 'prevalenceSmokeAny',
+        "data-measures": measures = '["prevalenceSmokeAny"]',
         "data-height": height = 600,
           width = 960,
         "data-data-source-text": dataSourceText = 'NIDS',
@@ -37,7 +37,7 @@ const MapWrapper = (props) => {
         "data-legend-breaks": legendBreaks = '[]',
         "data-zoom-enabled": zoomEnabled = false, 
         "data-show-legend-labels": showLegendLabels = false,
-        "data-map-file": mapFile = 'NG_Zones_topoJSON.json',
+        "data-map-file": mapFile = 'africa-geojson-tanzania-others-en-v2.json',
         "data-mapping-field": mappingField = 'zone',
         "data-map-label-field": mapLabelField = "admin",
         "data-has-multiple-measures": hasMultipleMeasures = "false",         
@@ -75,7 +75,7 @@ const MapWrapper = (props) => {
         'data-map-container-bg-color': mapContainerBgColor = '#fff',
         'data-map-position': mapPosition = '{}',
         "data-main-layer-id": mainLayerId = '',
-        'data-enabled-layers': enabledLayers = '',
+        'data-enabled-layers': enabledLayers,
         'data-point-label-color': pointLabelColor = '#fff',
         'data-point-label-format': pointLabelFormat = '{locationName} %({value},2)',
         'data-show-no-data-legend-item': showNoDataLegendItem = false,
@@ -141,7 +141,7 @@ const MapWrapper = (props) => {
         return params
     }
 
-    let numberFormat = {
+    const numberFormat = {
         style: (style === 'compacted') ? 'decimal' : style,
         notation: (style === 'compacted') ? 'compact' : "standard",
         currency: currency,
@@ -156,9 +156,9 @@ const MapWrapper = (props) => {
         return l
     })
     
-    let country = countries.find(c => c.value === mapCenter)   
+    const country = countries.find(c => c.value === mapCenter)   
 
-    let multipleMeasures = hasMultipleMeasures == true || hasMultipleMeasures == "true"    
+    const multipleMeasures = hasMultipleMeasures == true || hasMultipleMeasures == "true"    
 
     const levels = [dimension1, dimension2]
     const source = levels.filter(l => l != 'none' && l != null).join('/')
@@ -232,7 +232,7 @@ const MapWrapper = (props) => {
       
     const measureLabels = parse(customMeasureLabels) || {}
     const DataFrame = app === "csv" ? MapCSVDataFrame : MapDataFrame;   
-    let measuresCSV = editing ? (parse(measures) || []).join(',') : measures    
+    const measuresCSV = editing ? (parse(measures) || []).join(',') : measures    
     return (<DataProvider 
         params={getFilters(filters)}
         app={app}

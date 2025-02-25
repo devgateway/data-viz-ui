@@ -1,9 +1,7 @@
-import React, {useEffect} from 'react';
-import {connect} from "react-redux";
-import BaseLayer from "./BaseLayer";
-import DataProvider from "../data/DataProvider";
-import DataConsumer from "../data/DataConsumer";
-import {parse} from "../utils/parseUtils";
+import React from 'react';
+import BaseLayer from "./BaseLayer.jsx";
+import DataProvider from "../data/DataProvider.jsx";
+import DataConsumer from "../data/DataConsumer.jsx";
 import * as d3 from "d3";
 import {injectIntl} from "react-intl";
 
@@ -44,7 +42,7 @@ class DataLayer extends BaseLayer {
             defaultSize: markSizeScale2
         })
 
-        let numberFormat = {
+        const numberFormat = {
             style: (format.style === 'compacted') ? 'decimal' : format.style,
             notation: (format.style === 'compacted') ? 'compact' : "standard",
             currency: format.currency,
@@ -99,7 +97,7 @@ class DataLayer extends BaseLayer {
                         const originID = d1.properties[featureJoinAttribute]
                         const id = d1.properties[featureJoinAttribute] + "--" + d2.properties[featureJoinAttribute];
 
-                        var link = {
+                        const link = {
                             type: "LineString", coordinates: [
                                 [projection.invert(path.centroid(d1))[0],
                                     projection.invert(path.centroid(d1))[1]
@@ -262,7 +260,7 @@ class DataLayer extends BaseLayer {
                             d.properties.destinations = values[0].children
                         }
                     } else if (app == 'csv') {
-
+                        // do something
                     }
                     return d
                 })
@@ -298,7 +296,7 @@ class DataLayer extends BaseLayer {
 const DataWrapper = (props) => {
     const {id, unique, filters, csv, app, group = "default", flowOrigin, editing, flowDestination} = props
 
-    let params = {}
+    const params = {}
 
     const ff = filters || {}
 

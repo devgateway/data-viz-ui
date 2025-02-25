@@ -18,7 +18,6 @@ const Chart = (props) => {
         childContent,
         categories,
         injectedMeasures,
-
         "data-csv": csv = "",
         "data-no-data-message": noDataMsg = "No data matches your selection",
         "data-view-mode": editMode = 'info',
@@ -95,7 +94,7 @@ const Chart = (props) => {
     }
 
     const formatObject = parse(format)
-    let numberFormat = formatObject ? {
+    const numberFormat = formatObject ? {
         style: (formatObject.style === 'compacted') ? 'decimal' : formatObject.style,
         notation: (formatObject.style === 'compacted') ? 'compact' : "standard",
         currency: formatObject.currency,
@@ -114,7 +113,7 @@ const Chart = (props) => {
     const colors = {
         scheme: scheme,
    }
-    let child = null
+    const child = null
     const contentHeight = (editing ? height - 80 : height - 40)
     const legends = {
     }
@@ -131,7 +130,7 @@ const Chart = (props) => {
         height: `${contentHeight}px`,
         legendPosition: legendPosition,
         legends,
-        tooltip: (tooltipEnableMarkdown == true || tooltipEnableMarkdown == "true") ? decode(tooltipHTML) : decode(tooltipHTML).replace(/\r\n/g, '<hr/>').replace(/[\r\n]/g, '<hr/>'),
+        tooltip: tooltipHTML ? ((tooltipEnableMarkdown === true || tooltipEnableMarkdown === "true") ? decode(tooltipHTML) : decode(tooltipHTML).replace(/\r\n/g, '<hr/>').replace(/[\r\n]/g, '<hr/>')) : '',
         colors: colors,
         format: numberFormat,
         categories,
@@ -164,7 +163,7 @@ const Chart = (props) => {
     }
 
 
-    let params = {}
+    const params = {}
     const ff = parse(filters) || {}
 
     if (ff && ff.forEach) {
@@ -188,7 +187,7 @@ const Chart = (props) => {
     }
 
     if (app != 'csv') {
-        if (!dimensions.length || !parse(measures)[0]) {
+        if (!dimensions.length || !measures || !parse(measures) || !parse(measures)[0]) {
             showNotEnoughParameters = true
         }
     } else {
@@ -224,7 +223,9 @@ const Chart = (props) => {
                               locale={locale}
                               manualColors={getManualColor()} colorBy={'id'} scheme={scheme}
                               barColor={chartProps.barColor}>
+
                                 <SankeyChart{...chartProps} dimensions={dimensions} measure={parse(measures)[0] || null}></SankeyChart>
+                                
                             </ColorProvider>
                         </DataFrame>
                     </DataConsumer>}
