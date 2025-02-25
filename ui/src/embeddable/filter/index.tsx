@@ -506,9 +506,7 @@ const Filter = ({
 
     if (datasetId) {
         params["datasetId"] = datasetId;
-    }
-
-    params["apacheSupersetUrl"] = settings ? settings.apache_superset_url : "";    
+    }    
 
     const hiddenFiltersArr = hiddenFilters ?  parse(hiddenFilters): []
     let defaultFilterType;
