@@ -1,8 +1,8 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {Button, Container, Dropdown, Grid, Icon} from "semantic-ui-react";
-import {PostContent} from "@devgateway/wp-react-lib";
-import {cloneNode, toJpeg, toPng} from "./dom-to-image";
-import {saveAs} from 'file-saver';
+import React, { useEffect, useRef, useState } from 'react';
+import { Button, Container, Dropdown, Grid, Icon } from "semantic-ui-react";
+import { PostContent } from "@devgateway/wp-react-lib";
+import { domtoimage } from "./dom-to-image";
+import { saveAs } from 'file-saver';
 
 
 const DownloadableContent = React.forwardRef((props, ref) => (
@@ -57,7 +57,7 @@ const DownloadComponent = (props) => {
         const attributes = node.attributes;
         const attributeNames = []
         if (attributes) {
-            for (var i = 0; i < attributes.length; i++) {
+            for (let i = 0; i < attributes.length; i++) {
                 attributeNames.push(attributes[i].nodeName);
             }
         }
@@ -79,7 +79,7 @@ const DownloadComponent = (props) => {
     const options = {filter, bgcolor: "#FFF"}
     const save = (type) => {
 
-         cloneNode(componentRef.current).then(function (node) {
+         domtoimage.cloneNode(componentRef.current).then(function (node) {
 
              [...node.getElementsByTagName("input")].forEach(e=>e.remove());
 
@@ -109,14 +109,14 @@ const DownloadComponent = (props) => {
               node.style.padding = "20px"
 
               if (type == "PNG") {
-                  toPng(node, options)
+                  domtoimage.toPng(node, options)
                       .then(function (blob) {
                           saveAs(blob, pngLabel)
                       });
               }
 
               if (type == "JPG") {
-                  toJpeg(node, options)
+                  domtoimage.toJpeg(node, options)
                       .then(function (blob) {
                           saveAs(blob, jpgLabel)
                       });
