@@ -18,10 +18,11 @@ import FlowLayer from "./Flow";
 import LatLongLayer from "./LatLong";
 import {BlockEditWithAPIMetadata, ComponentWithSettings} from "../../commons";
 import Property from "./utils/Property";
-import {ALIVE_SUPERSET_APP} from '../../commons/Constants';
 
 import {PanelColorSettings} from "@wordpress/block-editor";
 import {togglePanel} from "../../commons/Util";
+import {isSupersetAPI} from "../../commons/APIutils";
+
 
 const typeOptions = [
     {label: "Base", value: "base"},
@@ -350,8 +351,8 @@ class LayerWithMetadata extends BlockEditWithAPIMetadata {
             this._loadMetadata(app, datasetId)
         }
 
-        if ((app != prevAPP) || (prevAPP == null && app != null) && app == ALIVE_SUPERSET_APP) {
-            this.loadDatasets()
+        if ((app != prevAPP) || (prevAPP == null && app != null) && isSupersetAPI(app, this.state.apps)) {
+            this.loadDatasets(app)
         }        
     }
 

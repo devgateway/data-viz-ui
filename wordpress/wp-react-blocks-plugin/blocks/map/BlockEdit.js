@@ -9,7 +9,7 @@ import LegendBreaks from "./LegendBreaks"
 import MapSymbols from "./Symbols"
 import Tooltips from "./Tooltips"
 import Settings from "./Settings"
-import {ALIVE_SUPERSET_APP, DEFAULT_FORMAT_SETTINGS} from '../commons/Constants';
+import {isSupersetAPI} from "../commons/APIutils";
 
 class BlockEdit extends BlockEditWithAPIMetadata {
     constructor() {
@@ -484,7 +484,7 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                         />
                     </PanelRow>
 
-                     {app == ALIVE_SUPERSET_APP &&   <PanelRow>
+                     {isSupersetAPI(app, this.state.apps) &&   <PanelRow>
                                                             <SelectControl
                                                                 label={__('Datasets')}
                                                                 value={[datasetId]} 

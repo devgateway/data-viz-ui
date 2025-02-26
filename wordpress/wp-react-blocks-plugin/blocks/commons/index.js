@@ -5,7 +5,8 @@ import apiFetch from '@wordpress/api-fetch';
 import {togglePanel} from "./Util";
 
 import {getTranslatedOptions} from './APIutils'
-import {ALIVE_SUPERSET_APP} from './Constants'
+import {isSupersetAPI} from "./APIutils";
+
 
 export const SizeConfig = ({height, setAttributes, panelStatus,initialOpen}) => {
     return (<PanelBody initialOpen={panelStatus?panelStatus["SIZE"]:initialOpen} onToggle={e => togglePanel("SIZE", panelStatus, setAttributes)}
@@ -348,7 +349,7 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
         }
 
 
-        if (app == ALIVE_SUPERSET_APP) {
+        if (isSupersetAPI(app, this.state.apps)) {
             return `${url}?datasetId=${datasetId}`
         }
 
@@ -426,7 +427,7 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
                 })
         }
 
-        if (app == ALIVE_SUPERSET_APP) {
+        if (isSupersetAPI(app, this.state.apps)) {
             this.loadDatasets(app)
         }
     }
@@ -437,7 +438,7 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
     }   
 
     loadDatasets(app) {   
-        if (!this.state.apache_superset_url || this.state.apache_superset_url == '' || app != ALIVE_SUPERSET_APP)	 
+        if (!this.state.apache_superset_url || this.state.apache_superset_url == '' || !isSupersetAPI(app, this.state.apps))    	 
             return
         
           fetch(`/api/${app}/datasets`)
@@ -453,7 +454,7 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
             .catch(function (response) {
                 console.log("Error when loading datasets")
             })
-    }
+    }    
 }
 
 export default SizeConfig

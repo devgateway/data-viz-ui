@@ -2,9 +2,9 @@ import {InspectorControls, useBlockProps} from '@wordpress/block-editor';
 import {Panel, PanelBody, PanelRow, SelectControl, TextControl, ToggleControl, Button} from '@wordpress/components';
 import {__} from '@wordpress/i18n';
 import {BlockEditWithAPIMetadata} from '../commons/index'
+import {isSupersetAPI} from "../commons/APIutils";
 import {useEffect} from "react";
 import DataFilters from "../commons/DataFilters";
-import {ALIVE_SUPERSET_APP} from '../commons/Constants';
 const DEFAULT_VALUE_INPUT = 'DEFAULT_VALUE_INPUT'
 const LOWEST_VALUE = 'LOWEST_VALUE'
 const HIGHEST_VALUE = 'HIGHEST_VALUE'
@@ -131,7 +131,7 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                             />
                         </PanelRow>
 
-                  {app == ALIVE_SUPERSET_APP && 
+                  {isSupersetAPI(app, this.state.apps) && 
                         <PanelRow>
                             
                                         <SelectControl

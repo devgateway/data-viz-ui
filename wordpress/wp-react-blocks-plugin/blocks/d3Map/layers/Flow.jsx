@@ -17,7 +17,7 @@ import BreaksGenerator from "./utils/BreaksGenerator";
 import {PanelColorSettings} from "@wordpress/block-editor";
 import PatternGenerator from "./utils/PatternGenerator";
 import Format from '../../charts/Format.jsx';
-import {ALIVE_SUPERSET_APP} from '../../commons/Constants';
+import {isSupersetAPI} from "../../commons/APIutils";
 
 const FilterSelector = ({param, index, options, onUpdateFilterParam}) => {
     const sortedOptions = options.sort(function (a, b) {
@@ -275,7 +275,7 @@ export class DataLayerSetting extends Component {
                     options={apps}
                 />
             </PanelRow>
-               {app == ALIVE_SUPERSET_APP && <PanelRow>
+               {isSupersetAPI(app, apps) && <PanelRow>
                             <SelectControl
                                 label={__('Datasets')}
                                 value={[datasetId]}

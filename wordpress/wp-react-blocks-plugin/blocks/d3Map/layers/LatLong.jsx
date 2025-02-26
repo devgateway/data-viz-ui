@@ -16,7 +16,7 @@ import Measures from '../../commons/Measures.jsx'
 import Property from "./utils/Property";
 import {PanelColorSettings} from "@wordpress/block-editor";
 import BreaksGenerator from "./utils/BreaksGenerator";
-import {ALIVE_SUPERSET_APP} from '../../commons/Constants';
+import {isSupersetAPI} from "../../commons/APIutils";
 
 const compareJsonProps = (p1, p2) => {
     return JSON.stringify(p1) === JSON.stringify(p2)
@@ -235,7 +235,7 @@ export class DataLayerSetting extends Component {
                 />
             </PanelRow>
 
-            {app == ALIVE_SUPERSET_APP && <PanelRow>
+            {isSupersetAPI(app, apps) && <PanelRow>
                 <SelectControl
                     label={__('Datasets')}
                     value={[datasetId]}

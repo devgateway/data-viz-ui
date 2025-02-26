@@ -1,4 +1,3 @@
-export const ALIVE_SUPERSET_APP = 'superset-proxy'
 export const DEFAULT_FORMAT_SETTINGS = {
     format: {
         style: "percent",

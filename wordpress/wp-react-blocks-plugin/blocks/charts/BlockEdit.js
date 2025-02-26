@@ -24,7 +24,8 @@ import MobileConfig from './MobileConfig.jsx';
 import Tooltip from "../commons/Tooltip.jsx";
 import {togglePanel} from "../commons/Util";
 import Radar from './Radar.jsx';
-import {ALIVE_SUPERSET_APP, DEFAULT_FORMAT_SETTINGS} from '../commons/Constants';
+import {DEFAULT_FORMAT_SETTINGS} from '../commons/Constants';
+import {isSupersetAPI} from "../commons/APIutils";
 
 class BlockEdit extends BlockEditWithAPIMetadata {
     constructor(props) {
@@ -57,8 +58,10 @@ class BlockEdit extends BlockEditWithAPIMetadata {
         }
         super.componentDidUpdate(prevProps, prevState, snapshot);
     }
+    
 
     render() {
+        console.log("apps", this.state.apps)
         const {
             className, isSelected,
             toggleSelection, setAttributes,
@@ -317,7 +320,7 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                                             options={this.state.apps}
                                         />                                        
                                     </PanelRow>
-                                    {app == ALIVE_SUPERSET_APP &&   <PanelRow>
+                                    {isSupersetAPI(app, this.state.apps) &&   <PanelRow>
                                         <SelectControl
                                             label={__('Datasets')}
                                             value={[datasetId]} 

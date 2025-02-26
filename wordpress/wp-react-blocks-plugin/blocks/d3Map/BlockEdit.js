@@ -8,7 +8,6 @@ import {BlockEditWithAPIMetadata, ComponentWithSettings, SizeConfig} from '../co
 import LayerSettings from "./layers/Base";
 import LayerModel from "./layers/Model"
 import {togglePanel} from "../commons/Util";
-import {ALIVE_SUPERSET_APP} from '../commons/Constants';
 
 class BlockEdit extends ComponentWithSettings {
     constructor(props) {

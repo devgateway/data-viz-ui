@@ -24,4 +24,13 @@ export const getTranslation = (translatable) => {
     return label || value || translatable
 }
 
+export const isSupersetAPI = (app, apps) => {    
+    if (app == 'csv' || !apps) {
+        return false
+    }
+    const appObj = apps.filter(a => a.value == app)[0]
+    return appObj && appObj.settings && appObj.settings.metadata 
+    && appObj.settings.metadata.superset == 'true';
+}
+
 export default getTranslatedOptions
