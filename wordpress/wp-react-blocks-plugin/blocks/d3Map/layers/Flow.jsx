@@ -11,7 +11,7 @@ import {
     TextControl,
     ToggleControl
 } from '@wordpress/components';
-import Measures from '../../commons/Measures.jsx'
+import Measures from './utils/MapMeasures.jsx'
 import Property from "./utils/Property";
 import BreaksGenerator from "./utils/BreaksGenerator";
 import {PanelColorSettings} from "@wordpress/block-editor";
@@ -245,7 +245,7 @@ export class DataLayerSetting extends Component {
         let selectedMeasureValue = ""
 
         if (app != 'csv') {
-            
+
             const theMeasure = measures ? measures[0] : null
             const selectedMeasure = allMeasures && theMeasure ? allMeasures.filter(m => m.value == theMeasure)[0] : null
             if (selectedMeasure) {
@@ -260,7 +260,7 @@ export class DataLayerSetting extends Component {
                 }
             }
         }
-        
+
         return ([<PanelBody initialOpen={false} title={"Data Source"}>
             <PanelRow>
                 <SelectControl

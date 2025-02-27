@@ -11,7 +11,7 @@ import {
     TextControl,
     ToggleControl
 } from '@wordpress/components';
-import Measures from '../../commons/Measures.jsx'
+import Measures from './utils/MapMeasures.jsx'
 import Property from "./utils/Property";
 import BreaksGenerator from "./utils/BreaksGenerator";
 import {PanelColorSettings} from "@wordpress/block-editor";
@@ -205,7 +205,7 @@ export class DataLayerSetting extends Component {
 
     render() {
         const {
-            onChangeProperty, allDimensions, allFilters, allMeasures, allCategories, features, apps,layer, layer: {
+            onChangeProperty, allDimensions, allFilters, allMeasures, allCategories, features, apps, layer, layer: {
                 app,
                 csv,
                 measures,
@@ -236,6 +236,9 @@ export class DataLayerSetting extends Component {
             }
         } = this.props
 
+
+        debugger;
+
         let selectedMeasureLabel = ""
         let selectedMeasureValue = ""
 
@@ -255,7 +258,7 @@ export class DataLayerSetting extends Component {
                 }
             }
         }
-      
+        debugger;
         return ([<PanelBody initialOpen={false} title={"Data Source"}>
             <PanelRow>
                 <SelectControl
@@ -316,185 +319,185 @@ export class DataLayerSetting extends Component {
                     "color": "rgb(117, 117, 117)"
                 }}>{"{" + m.value + "}"}</p></PanelRow>)}
         </PanelBody>,
-        <React.Fragment>
-            {app != 'csv' && <Measures
-                onFormatChange={this.onFormatChange}
-                onSetSingleMeasure={this.onSetSingleMeasure}
-                measures={layer.measures}
-                format={layer.format}
-                {...this.props}/>}
-        </React.Fragment>,
-        <React.Fragment>
-            {app != 'csv' && <PanelBody initialOpen={false} title={__("Filters")}>
+            <React.Fragment>
+                {app != 'csv' && <Measures
+                    onFormatChange={this.onFormatChange}
+                    onSetSingleMeasure={this.onSetSingleMeasure}
+                    measures={layer.measures}
+                    format={layer.format}
+                    {...this.props}/>}
+                    </React.Fragment>,
+                    <React.Fragment>
+                {app != 'csv' && <PanelBody initialOpen={false} title={__("Filters")}>
                 {filters.map((f, index) => {
                     return (<PanelBody initialOpen={false} title={__(`Filter - ${f.label}`)}>
-                        <FilterSelector param={f.param} index={index} options={allFilters}
-                                        onUpdateFilterParam={this.updateFilterParam}/>
-                        {<CategoricalFilter value={f.value} index={index} items={this.items(f.type)}
-                                            onUpdateFilterValue={this.updateFilterValue}/>}
+                    <FilterSelector param={f.param} index={index} options={allFilters}
+                    onUpdateFilterParam={this.updateFilterParam}/>
+                {<CategoricalFilter value={f.value} index={index} items={this.items(f.type)}
+                    onUpdateFilterValue={this.updateFilterValue}/>}
                     </PanelBody>)
                 })}
 
-                <PanelRow>
+                    <PanelRow>
                     <Button variant={"link"} onClick={this.addFilter}>{__("Add Filter")}</Button>
                     <Button variant={"link"} onClick={this.removeFilter}>{__("Remove")}</Button>
-                </PanelRow>
-            </PanelBody>}
-        </React.Fragment>,
-        <PanelBody initialOpen={false} title={"Symbols and Styles"}>
-            {app != "csv" && selectedMeasureValue && <PanelRow>
-                <TextControl
+                    </PanelRow>
+                    </PanelBody>}
+                    </React.Fragment>,
+                    <PanelBody initialOpen={false} title={"Symbols and Styles"}>
+                {app != "csv" && selectedMeasureValue && <PanelRow>
+                    <TextControl
                     label={selectedMeasureLabel}
                     help={__("Customize Measure Label")}
                     value={customMeasuresLabels ? customMeasuresLabels[selectedMeasureValue] : ""}
                     onChange={(measureLabel) => {
-                        onChangeProperty("customMeasuresLabels", {
-                            ...customMeasuresLabels, [selectedMeasureValue]: measureLabel
-                        })
+                    onChangeProperty("customMeasuresLabels", {
+                    ...customMeasuresLabels, [selectedMeasureValue]: measureLabel
+                })
 
 
-                    }}>
-                </TextControl>
-            </PanelRow>}
-            <PanelRow>
-                <PanelColorSettings
+                }}>
+                    </TextControl>
+                    </PanelRow>}
+                    <PanelRow>
+                    <PanelColorSettings
                     title={__(`Default Fill Color`)}
                     value={fillColor}
                     colorSettings={[{
-                        clearable: true, enableAlpha: true,
-                        value: fillColor, onChange: (fillColor) => {
-                            onChangeProperty("fillColor", fillColor)
-                        },
+                    clearable: true, enableAlpha: true,
+                    value: fillColor, onChange: (fillColor) => {
+                    onChangeProperty("fillColor", fillColor)
+                },
 
-                    }]}
-                />
-            </PanelRow>
-            <PanelRow>
-                <ToggleControl
+                }]}
+                    />
+                    </PanelRow>
+                    <PanelRow>
+                    <ToggleControl
                     label="Use Centroid Points"
                     checked={useCentroidPoint}
                     onChange={(value) => {
-                        onChangeProperty("useCentroidPoint", true)
-                    }}
-                />
-            </PanelRow>
-            <PanelRow>
-                <ToggleControl
+                    onChangeProperty("useCentroidPoint", true)
+                }}
+                    />
+                    </PanelRow>
+                    <PanelRow>
+                    <ToggleControl
                     label="Use Shape Colors"
                     checked={!useCentroidPoint}
                     onChange={(value) => {
-                        onChangeProperty("useCentroidPoint", false)
-                    }}
-                />
-            </PanelRow>
+                    onChangeProperty("useCentroidPoint", false)
+                }}
+                    />
+                    </PanelRow>
 
 
-            {useCentroidPoint && <PanelRow>
-                <RangeControl
+                {useCentroidPoint && <PanelRow>
+                    <RangeControl
                     label="Point Base Size"
                     value={markSizeScale}
                     onChange={(value) => {
-                        onChangeProperty("markSizeScale", value)
-                    }}
+                    onChangeProperty("markSizeScale", value)
+                }}
                     step={1}
                     min={0}
                     max={100}
-                />
-            </PanelRow>}
-            {useCentroidPoint && <PanelRow>
-                <RangeControl
+                    />
+                    </PanelRow>}
+                {useCentroidPoint && <PanelRow>
+                    <RangeControl
                     label="Point Label Size"
                     value={markerLabelSize}
                     onChange={(markerLabelSize) => {
-                        onChangeProperty("markerLabelSize", markerLabelSize)
-                    }}
+                    onChangeProperty("markerLabelSize", markerLabelSize)
+                }}
                     step={1}
                     min={0}
                     max={100}
-                >
+                    >
 
-                </RangeControl>
-            </PanelRow>}
-            {useCentroidPoint && <PanelRow>
+                    </RangeControl>
+                    </PanelRow>}
+                {useCentroidPoint && <PanelRow>
 
-                <PanelColorSettings
+                    <PanelColorSettings
                     title={__(`Circle Fill Color`)}
                     value={markFillColor}
                     colorSettings={[{
-                        clearable: true, enableAlpha: true, value: markFillColor, onChange: (markFillColor) => {
-                            onChangeProperty("markFillColor", markFillColor)
-                        },
+                    clearable: true, enableAlpha: true, value: markFillColor, onChange: (markFillColor) => {
+                    onChangeProperty("markFillColor", markFillColor)
+                },
 
-                    }]}
-                /></PanelRow>}
+                }]}
+                    /></PanelRow>}
 
-            {useCentroidPoint && <PanelRow>
-                <PanelColorSettings
+                {useCentroidPoint && <PanelRow>
+                    <PanelColorSettings
                     title={__(`Circle Label Color`)}
                     value={markLabelColor}
                     colorSettings={[{
-                        clearable: true,
-                        enableAlpha: true,
-                        value: markLabelColor,
-                        onChange: (markLabelColor) => {
-                            onChangeProperty("markLabelColor", markLabelColor)
-                        },
+                    clearable: true,
+                    enableAlpha: true,
+                    value: markLabelColor,
+                    onChange: (markLabelColor) => {
+                    onChangeProperty("markLabelColor", markLabelColor)
+                },
 
-                    }]}
-                />
-            </PanelRow>}
-            {useCentroidPoint && <PanelRow>
-                <PanelColorSettings
+                }]}
+                    />
+                    </PanelRow>}
+                {useCentroidPoint && <PanelRow>
+                    <PanelColorSettings
                     title={__(`Circle Border Color`)}
                     value={borderColor}
                     colorSettings={[{
-                        clearable: true, enableAlpha: true, value: markBorderColor, onChange: (borderColor) => {
-                            onChangeProperty("markBorderColor", borderColor)
-                        },
+                    clearable: true, enableAlpha: true, value: markBorderColor, onChange: (borderColor) => {
+                    onChangeProperty("markBorderColor", borderColor)
+                },
 
-                    }]}
-                />
-            </PanelRow>}
+                }]}
+                    />
+                    </PanelRow>}
 
-            <PanelRow>
-                <ToggleControl
+                    <PanelRow>
+                    <ToggleControl
                     label="Use Breaks"
                     checked={useBreaks}
                     onChange={e => {
-                        onChangeProperty("useBreaks", !useBreaks)
-                    }}
+                    onChangeProperty("useBreaks", !useBreaks)
+                }}
 
-                />
-            </PanelRow>
+                    />
+                    </PanelRow>
 
-            {useBreaks && <BreaksGenerator
-                showSize={useCentroidPoint}
-                defaultBorderColor={markBorderColor}
-                defaultFillColor={markFillColor}
-                onChangeProperty={onChangeProperty} breaks={breaks}/>}
+                {useBreaks && <BreaksGenerator
+                    showSize={useCentroidPoint}
+                    defaultBorderColor={markBorderColor}
+                    defaultFillColor={markFillColor}
+                    onChangeProperty={onChangeProperty} breaks={breaks}/>}
 
 
-            <PanelRow>
-                <ToggleControl
+                    <PanelRow>
+                    <ToggleControl
                     label="Use Patterns"
                     checked={usePattern}
                     onChange={e => {
-                        onChangeProperty("usePattern", !usePattern)
-                    }}
-                />
-            </PanelRow>
+                    onChangeProperty("usePattern", !usePattern)
+                }}
+                    />
+                    </PanelRow>
 
-            {usePattern && <PatternGenerator allCategories={allCategories} allDimensions={allDimensions}
-                                             defaultFillColor={fillColor} onChangeProperty={onChangeProperty}
-                                             patterns={patterns} app={app} csv={csv}
-                                             patternDiscriminator={patternDiscriminator}/>}
-        </PanelBody>
+                {usePattern && <PatternGenerator allCategories={allCategories} allDimensions={allDimensions}
+                    defaultFillColor={fillColor} onChangeProperty={onChangeProperty}
+                    patterns={patterns} app={app} csv={csv}
+                    patternDiscriminator={patternDiscriminator}/>}
+                    </PanelBody>
 
 
 
-        ])
-    }
+                    ])
+                }
 
-}
+                }
 
-export default DataLayerSetting;
+                export default DataLayerSetting;
