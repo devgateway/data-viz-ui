@@ -18,11 +18,11 @@ const MapWrapper = (props) => {
         unique,
         editing,
         "data-group": group,
-        "data-layers": dataLayers = '[]',
+        "data-layers": dataLayers,
         "data-height": height = 400,
         "data-width": width = 1000,
         "data-back-ground-color": bgColorParam = '#88e8dc',
-        "data-map-position": paramMapPosition = '{}',
+        "data-map-position": paramMapPosition = {},
         "data-projection": projectionName = "geoMercator",
         "data-zoom-enabled": zoomEnabled = true,
         "data-rotation-enabled": rotationEnabled = false,
@@ -63,7 +63,7 @@ const MapWrapper = (props) => {
                                     editing={editing} initialPosition={parse(paramMapPosition, editing)}>
                    
                     <Map rotationEnabled={parse(rotationEnabled, editing)}>
-                        {layers.filter(l => l.visible != false).map((layer, i) => {
+                        {layers&&layers.filter(l => l.visible != false).map((layer, i) => {
                             if (layer.type === 'base') {
                                 return <BaseLayer transform={transform} intl={intl} zoom={zoomRef} unique={unique}
                                                   key={i} {...layer} />

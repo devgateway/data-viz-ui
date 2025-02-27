@@ -1,13 +1,15 @@
-import React, { MutableRefObject, useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import deviceType from '../utils/deviceType';
 
 const FlexWrapDetector = ({ children, onWrapChange, className }) => {
-  const containerRef: MutableRefObject<any> = useRef(null);
+  const containerRef = useRef(null);
   const [wrapCount, setWrapCount] = useState(0);
+  const isMobileOrTablet = deviceType() === 'mobile' || deviceType() === 'tablet' || deviceType() === 'midTablet';
 
   const makeFlexWrap = useCallback(() => {
     if (containerRef.current) {
       containerRef.current.style.setProperty("display", "flex", "important");
-      if (wrapCount > 0) {
+      if (wrapCount > 0 || isMobileOrTablet) {
         containerRef.current.style.setProperty(
           "flex-wrap",
           "wrap",
@@ -21,7 +23,7 @@ const FlexWrapDetector = ({ children, onWrapChange, className }) => {
         );
       }
     }
-  }, [wrapCount]);
+  }, [wrapCount, isMobileOrTablet]);
 
   const checkWrap = useCallback(() => {
     const container = containerRef.current;
@@ -29,7 +31,7 @@ const FlexWrapDetector = ({ children, onWrapChange, className }) => {
     if (container && container.children.length > 1) {
       const firstTop = container.children[0].getBoundingClientRect().top;
       Array.from(container.children).forEach((child, index) => {
-        if (index > 0 && (child as Element).getBoundingClientRect().top > firstTop) {
+        if (index > 0 && child.getBoundingClientRect().top > firstTop) {
           count++;
         }
       });
