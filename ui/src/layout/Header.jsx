@@ -12,7 +12,7 @@ import { useParams } from "react-router-dom";
 import SearchComponent from "./SearchControl";
 import LangSwitcher from "./LangSwitcher";
 
-const SITE_URL_WITH_LOCALE =  "#";
+
 
 const getPath = (menu, params) => {
     const path = [];
@@ -356,6 +356,9 @@ const Header = ({ intl, settings }) => {
         );
     };
 
+    const hasLandingPageSettings = settings?.landing_page_url !== "";
+    const SITE_URL_WITH_LOCALE =   hasLandingPageSettings ? settings?.landing_page_url : "/";
+
     return (
         <React.Fragment>
             <MenuProvider slug={"main"} locale={intl.locale}>
@@ -373,7 +376,7 @@ const Header = ({ intl, settings }) => {
                     <Container fluid={true} className={"background"} ref={menuRef}>
                         <Menu className={"branding"} text>
                             <Menu.Item>
-                                <a href={`${SITE_URL_WITH_LOCALE}`}>
+                                <a href={`${SITE_URL_WITH_LOCALE}`} target={hasLandingPageSettings ? "_blank" : "_self"} rel="noopener noreferrer">
                                     {settings.site_logo !== 0 && !isMediumScreen && (
                                         <MediaProvider id={settings.site_logo}>
                                             <MediaConsumer>
