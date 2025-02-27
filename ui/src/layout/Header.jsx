@@ -356,8 +356,11 @@ const Header = ({ intl, settings }) => {
         );
     };
 
-    const hasLandingPageSettings = settings?.landing_page_url !== "";
-    const SITE_URL_WITH_LOCALE =   hasLandingPageSettings ? settings?.landing_page_url : "/";
+    const hasLandingPageSettings = settings?.landing_page_url && 
+                              settings.landing_page_url !== false && 
+                              settings.landing_page_url !== undefined && 
+                              settings.landing_page_url !== "";
+    const SITE_URL_WITH_LOCALE = hasLandingPageSettings ? settings.landing_page_url : `/${intl.locale}`;
 
     return (
         <React.Fragment>
