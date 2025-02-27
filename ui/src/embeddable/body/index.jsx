@@ -27,7 +27,7 @@ class Body extends React.Component {
     // No llames this.setState() aquí!
     this.state = {
       counter: 0,
-      isMobile: ["mobile", "tablet", "midTablet"].includes(getDeviceType()),
+      isMobile: ["mobile", "tablet"].includes(getDeviceType()),
       isClicked: false,
       selectedOption: "Cancers",
       orientation: this.getScreenOrientation(),
@@ -506,7 +506,7 @@ class Body extends React.Component {
 
     const { selectedOption, isMobile } = this.state;
 
-    let data = selectedOption === "Cancers" ? left : right;
+    const data = selectedOption === "Cancers" ? left : right;
 
     let sy = 60;
 
