@@ -318,7 +318,7 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                                                 })
                                             }}
                                             options={this.state.apps}
-                                        />                                        
+                                        />
                                     </PanelRow>
                                     {isSupersetAPI(app, this.state.apps) &&   <PanelRow>
                                         <SelectControl

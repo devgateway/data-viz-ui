@@ -32,7 +32,6 @@ class BlockEdit extends BlockEditWithAPIMetadata {
         super(props);
         this.iframe = React.createRef();
         this.updateHiddenFilters = this.updateHiddenFilters.bind(this)
-        //this.onFilterChange = this.onFilterChange.bind(this)
         this.items = this.items.bind(this)
     }
 
@@ -44,10 +43,6 @@ class BlockEdit extends BlockEditWithAPIMetadata {
             setAttributes({hiddenFilters: [...hiddenFilters, value]})
         }
     }
-
-    /*onFilterChange() {
-        this.loadMetadata();
-    }*/
 
     items(type) {
         const allCategories = this.state.categories
@@ -75,7 +70,10 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                 group,
                 placeHolder,
                 param,
+                icon,
                 app,
+                type,
+                csvField,
                 csvValue,
                 isRange,
                 allLabel,
@@ -102,12 +100,14 @@ class BlockEdit extends BlockEditWithAPIMetadata {
         const selectedFilters = this.state.filters ? this.state.filters.filter(f => f.param == param && f.type != 'Boolean') : null
 
         const filter = selectedFilters && selectedFilters.length > 0 ? selectedFilters[0] : null
+
         const  datasets = [{label: 'Select Dataset', value: '0'}]
         if (this.state.datasets) {
             this.state.datasets.forEach(d => {
                 datasets.push({label: d.label, value: d.id})
             })
         }
+
 
         return ([isSelected && (<InspectorControls>
                 <Panel header={__("Filter Configuration")}>
@@ -153,11 +153,11 @@ class BlockEdit extends BlockEditWithAPIMetadata {
         }
                     </PanelBody>
 
-                    {app != 'csv' && this.state.filters && <PanelBody initialOpen={false} title={__("Select Filter")}>
+                    {app != 'csv' && <PanelBody initialOpen={false} title={__("Select Filter")}>
                         <PanelRow>
                             <SelectControl
                                 value={param}
-                                options={[{value:'', label: __("Select Filter")}, ...this.state.filters]}
+                                options={this.state.filters}
                                 onChange={param => {
                                     const type = this.state.filters.filter(f => f.param === param)[0].type
                                     setAttributes({param, type, hiddenFilters: []})
@@ -165,7 +165,7 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                         </PanelRow>
 
                     </PanelBody>}
-                    {app == 'csv' && this.state.filters && <PanelBody initialOpen={false} title={__("Select Filter")}>
+                    {app == 'csv' && <PanelBody initialOpen={false} title={__("Select Filter")}>
                         <PanelRow>
                             <TextControl label={__("Field")} value={param}
                                          onChange={(param) => setAttributes({param})}></TextControl>
@@ -231,33 +231,14 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                             />
                         </PanelRow>}
                     </PanelBody>
-                    {app != 'csv' && <PanelBody initialOpen={false} title={__("Filter or hide items")}>
-                        <PanelRow>
-                            <ToggleControl
-                              label={__("Filter items")}
-                              checked={useFilterItems}
-                              onChange={() => setAttributes({useFilterItems: !useFilterItems, filters: [], hiddenFilters: []})}/>
-                        </PanelRow>
-                        <PanelRow>
-                            <ToggleControl
-                              label={__("Hide items")}
-                              checked={!useFilterItems}
-                              onChange={() => setAttributes({useFilterItems: !useFilterItems, filters: [], hiddenFilters: []})}/>
-                        </PanelRow>
-                            {useFilterItems && <DataFilters
-                              allFilters={this.state.filters}
-                              allCategories={this.state.categories}
-                              {...this.props}/>
-                            }
-                            {!useFilterItems && <PanelBody initialOpen={false} title={__("Hidden Filter Options")}>
-                                {(selectedFilters || []).map((f, index) => {
-                                    return (
-                                      <CategoricalFilter value={hiddenFilters} index={index} items={this.items(f.type)}
-                                                         onUpdateFilterValue={this.updateHiddenFilters}/>)
-                                })}
-                            </PanelBody>
-                            }
-                    </PanelBody>}
+                    {app != 'csv' && selectedFilters && selectedFilters.length > 0 &&
+                        <PanelBody initialOpen={false} title={__("Hidden Filter Options")}>
+                            {selectedFilters.map((f, index) => {
+                                return (
+                                    <CategoricalFilter value={hiddenFilters} index={index} items={this.items(f.type)}
+                                                       onUpdateFilterValue={this.updateHiddenFilters}/>)
+                            })}
+                        </PanelBody>}
                     <PanelBody title={__("Labels")}>
                         <PanelRow>
                             <TextControl

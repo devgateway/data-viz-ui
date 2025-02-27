@@ -438,7 +438,7 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
     }   
 
     loadDatasets(app) {   
-        if (!this.state.apache_superset_url || this.state.apache_superset_url == '' || !isSupersetAPI(app, this.state.apps))    	 
+        if (!isSupersetAPI(app, this.state.apps))    	 
             return
         
           fetch(`/api/${app}/datasets`)
@@ -458,4 +458,3 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
 }
 
 export default SizeConfig
-

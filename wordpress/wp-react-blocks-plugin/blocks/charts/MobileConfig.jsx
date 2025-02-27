@@ -262,7 +262,7 @@ const MobileConfig = (props) => {
       measures,
       dimension1,
       yAxisTickValues,
-      datasetId      
+      datasetId
     },
   } = props;
 
