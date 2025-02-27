@@ -302,7 +302,7 @@ class LayerWithMetadata extends BlockEditWithAPIMetadata {
                     })), {label: 'CSV', value: 'csv'}] : [{label: 'CSV', value: 'csv'}]
 
                 this.setState({...this.state, apps})
-                this._loadMetadata(app)
+                this.loadMetadata(app)
             })
             .catch(function (response) {
                 alert("error" + response)
@@ -314,7 +314,7 @@ class LayerWithMetadata extends BlockEditWithAPIMetadata {
         const {layer: {app}} = this.props
         const {layer: {app: prevAPP}} = prevProps
         if ((app != prevAPP) || (prevAPP == null && app != null)) {
-            this._loadMetadata(app)
+            this.loadMetadata(app)
         }
     }
 
