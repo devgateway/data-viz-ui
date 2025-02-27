@@ -58,7 +58,7 @@ const MapWrapper = (props) => {
                                     projectionName={projectionName}
                                     editing={editing} initialPosition={parse(paramMapPosition, editing)}>
                     <Map rotationEnabled={parse(rotationEnabled, editing)}>
-                        {layers.filter(l => l.visible != false).map((layer, i) => {
+                        {layers&&layers.filter(l => l.visible != false).map((layer, i) => {
                             if (layer.type === 'base') {
                                 return <BaseLayer transform={transform} intl={intl} zoom={zoomRef} unique={unique}
                                                   key={i} {...layer} />
