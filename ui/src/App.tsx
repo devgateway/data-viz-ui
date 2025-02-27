@@ -45,7 +45,6 @@ const PreviewComponentParameterParser = () => {
 
     const [params, setParams] = useState(queryString.parse(location.search))
     const readMessage = (event) => {
-        console.log("-------------------------------reading message ----------------------------------------")
         const data = event.data
         if (data.messageType && data.messageType == 'component-attributes') {
 
@@ -53,7 +52,7 @@ const PreviewComponentParameterParser = () => {
             Object.keys(data).forEach(k => {
                 newPrams["data-" + k.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()] = typeof data[k] == 'object' ? JSON.stringify(data[k]) : data[k]
             })
-            console.log(newPrams)
+            
             setParams(newPrams)
         }
     };
@@ -87,8 +86,7 @@ const PreviewComponentParameterParser = () => {
 const InjectTitle = injectIntl((props) => {
 
     // @ts-expect-error description
-    document.title = props.settings.description
-    console.log(props)
+    document.title = props.settings.description   
     return <></>
 })
 

@@ -58,13 +58,13 @@ export const setInitialFilters = ({app, group, param, value}) => (dispatch, getS
 
 export const getCategories = (props) => (dispatch, getState) => {
     const {app, params} = props
-    dispatch({type: LOAD_CATEGORIES, params, app})
+    dispatch({type: LOAD_CATEGORIES, params, app, datasetId: params.datasetId})
     api.getCategories({app, params})
-      .then(data => {
+      .then(data => {              
           data.appliedFilters = params
-          return dispatch({type: LOAD_CATEGORIES_DONE, app, data})
+          return dispatch({type: LOAD_CATEGORIES_DONE, app, data, datasetId: params.datasetId})
       })
-      .catch(error => dispatch({type: LOAD_CATEGORIES_ERROR, app, error}))
+      .catch(error => dispatch({type: LOAD_CATEGORIES_ERROR, app, error, datasetId: params.datasetId}))
 }
 
 
@@ -137,26 +137,40 @@ export default (state = initialState, action) => {
 
 
         case LOAD_CATEGORIES: {
+            const {data, app, datasetId} = action
+            const path = ["categories", app]
 
-            const app = action.app
-            return state.setIn(["categories", app, "loading"], true)
-                .deleteIn(["categories", app, "error"])
+            if (datasetId) {
+                path.push(datasetId)
+            }
+
+            return state.setIn([...path, "loading"], true)
+                .deleteIn([...path, "error"])
         }
 
         case LOAD_CATEGORIES_DONE: {
-            const {data, app} = action
+            const {data, app, datasetId} = action
+            const path = ["categories", app]
 
-            return state.setIn(["categories", app, "loading"], false)
-                .setIn(['categories', app, "items"], Immutable.fromJS(data))
+            if (datasetId) {
+                path.push(datasetId)
+            }
+            
+            return state.setIn([...path, "loading"], false)
+                    .setIn([...path, "items"], Immutable.fromJS(data))            
         }
-
         case LOAD_CATEGORIES_ERROR: {
-            const {app, error} = action
-            return state.setIn(["categories", app, "loading"], false)
-                .setIn(["categories", app, "error"], error)
+             const {data, app, datasetId} = action
+            const path = ["categories", app]
+
+            if (datasetId) {
+                path.push(datasetId)
+            }
+            
+            return state.setIn([...path, "loading"], false)
+                .setIn([...path, "error"], data)
+          
         }
-
-
         case SET_FILTER: {
             const {app, group, param, value} = action
             return state.setIn(['filters', app, group, param], value.length === 0 ? [Number.MIN_SAFE_INTEGER] : value)
