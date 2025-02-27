@@ -222,16 +222,16 @@ class DataLayer extends BaseLayer {
                     })
                     .attr("stroke", borderColor)
                     .attr("id", "state-borders")
-                    .attr("d", path).on("mouseenter", (d) => {
-                    if (d.properties._value) {
-                        this.showToolTip(tooltip, getTooltipVariables(d), brStyles.getColor(d.properties._value))
+                    .attr("d", path).on("mouseenter", (d, p) => {
+                    if (p.properties._value) {
+                        this.showToolTip(tooltip, getTooltipVariables(p), brStyles.getColor(p.properties._value), p)
                     }
                 })
                     .on("mouseleave", (d) => {
-                        this.hiddenToolTip()
+                        this.hiddenToolTip(d)
                     })
                     .on("mousemove", (d) => {
-                        this.moveToolTip()
+                        this.moveToolTip(d)
                     })
 
                 this.createLabels(json)

@@ -23,7 +23,6 @@ class BaseLayer extends Layer {
 
             const svg = d3.select(this.gRef.current.parentElement);
             
-
             this.g.attr("class", "base-layer") //add unique name
             this.g.selectAll("path").remove()
             this.g.selectAll(".label").remove()
