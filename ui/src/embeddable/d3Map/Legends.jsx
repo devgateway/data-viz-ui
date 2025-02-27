@@ -294,7 +294,7 @@ const Legends = (props) => {
     const divRef = useRef(null);
     const {layers = [], onItemClick, patternsData, group} = props;
     return <div className={"legends"} ref={divRef}>
-        {layers.map(l => {
+        {layers&&layers.map(l => {
             return <div>
                 {l.type == "base" && <BaseLayerLegend {...l} group={group} onItemClick={onItemClick}/>}
                 {l.type == "data" &&
