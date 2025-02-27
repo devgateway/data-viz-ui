@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { connect } from "react-redux";
 import DataProvider from "../data/DataProvider";
@@ -120,14 +119,10 @@ const MapEntry = (props) => {
 
     const parse = (value) => {
         try {
-          if (value) {
-            return JSON.parse(decode(value));
-          }      
+            return JSON.parse(decode(value))
         } catch (error) {
-          console.error("error parsing value:" + value);
-        }
-    
-        return null;
+            console.error("error parsing value:" + value)
+        } 
     }
 
     const getBreaks = (legendBreaks) => {

@@ -112,82 +112,29 @@ const MenuItems = injectIntl(({
                     if (!exists) {
                         newItems.push(value.value)
                     }
-                }
-            },
-            [params, menu, onSetSelected, selected]
-        );
 
-        /*Original menu mixed with customization changes*/
-        const [mixedMenu, setMixedMenu] = useState(null);
-        //const [removedItems, setRemoved] = useState(null)
+                }
+
 
             })
             setMixedMenu({ ...menu, items: newItems.filter((i) => removed.indexOf(i.ID) === -1) })
 
-        useEffect(() => {
-            if (settings && settings.menu_settings && mixedMenu) {
-                const removed = [];
-                const newItems = menu.items.map((item) => {
-                    //if menu exists in partial settings
-                    //if item  deleted
-                    if (
-                        settings.menu_settings &&
-                        settings.menu_settings["nav_menu_item[" + item.ID + "]"] === false
-                    ) {
-                        removed.push(item.ID);
-                    }
-                    //if item  removed
-                    if (
-                        settings.menu_settings &&
-                        settings.menu_settings["nav_menu_item[" + item.ID + "]"]
-                    ) {
-                        const updatedItem =
-                            settings.menu_settings["nav_menu_item[" + item.ID + "]"];
-                        return {
-                            ...item,
-                            ...settings.menu_settings["nav_menu_item[" + item.ID + "]"],
-                        };
-                    } else {
-                        return item;
-                    }
-                });
-                //if item is new
-                Object.keys(settings.menu_settings).map((mk) => {
-                    const value = settings.menu_settings[mk];
-                    if (value.type == "nav_menu_item") {
-                        const re = /(-)?[0-9]+/g;
-                        const results = re.exec(mk);
-                        const id = parseInt(results[0]);
-                        const exists = newItems.find((m) => m.ID == id);
-                        if (!exists) {
-                            newItems.push(value.value);
-                        }
-                    }
-                });
-                setMixedMenu({
-                    ...menu,
-                    items: newItems.filter((i) => removed.indexOf(i.ID) === -1),
-                });
+            /*
+            const items = menu.items.map(item => {
+                if (settings.menu_settings && settings.menu_settings["nav_menu_item[" + item.ID + "]"]) {
+                    return {...item, ...settings.menu_settings["nav_menu_item[" + item.ID + "]"]}
+                } else {
+                    return item;
+                }
+            })*/
 
-                /*
-                  const items = menu.items.map(item => {
-                      if (settings.menu_settings && settings.menu_settings["nav_menu_item[" + item.ID + "]"]) {
-                          return {...item, ...settings.menu_settings["nav_menu_item[" + item.ID + "]"]}
-                      } else {
-                          return item;
-                      }
-                  })*/
+            //  setMixedMenu({...menu, items:newItems})
+        }
 
-                //  setMixedMenu({...menu, items:newItems})
-            }
-        }, [settings]);
+    }, [settings])
 
-        const [isMobileResolution, setIsMobileResolution] = useState(false);
 
-        useEffect(() => {
-            const handleResize = () => {
-                setIsMobileResolution(window.innerWidth <= 1024);
-            };
+    return mixedMenu && <React.Fragment>
 
         {mixedMenu.items.filter(i => i.url != "#wpm-languages").map(i => {
             return (<Menu.Item
@@ -210,9 +157,9 @@ const MenuItems = injectIntl(({
 
 const Header = ({ intl,  settings }) => {
 
-const Header = ({ intl, settings }) => {
     const [selected, setSelected] = useState()
     const { slug } = useParams();
+
 
     const Logo = ({ media }) => {
         return media ? <Image src={media.guid.rendered} /> :
@@ -281,7 +228,7 @@ const Header = ({ intl, settings }) => {
 
             <Container className={"url breadcrumbs"}>
                 <MenuConsumer>
-                    <BreadCrumbs key={slug}></BreadCrumbs>
+                    <BreadCrumbs></BreadCrumbs>
                 </MenuConsumer>
 
             </Container>

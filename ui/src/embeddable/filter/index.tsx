@@ -42,14 +42,14 @@ const decode = (value) => {
 }
 
 const parse = (value) => {
-    if (!value || value == "") {
-        return null
-    }
-    try {
+    try { 
         return JSON.parse(decode(value))
+
     } catch (error) {
         throw new Error("error parsing value:" + error);
-    }    
+    }
+
+    return null
 }
 
 const mapStateToProps = (state, ownProps) => {
@@ -404,6 +404,7 @@ const RangeFilterDropDown = connect(mapStateToProps, mapActionCreators)(({
 
 
 const CategoryFilter = (props) => {
+
     const { data, type, showNoDataOption } = props
     const cat = data.filter(d => d.type === type)[0]
     const filteredCategories = cat ? cat.items.filter(f => {
@@ -416,7 +417,6 @@ const CategoryFilter = (props) => {
         return true
     }) : []
     const options = filteredCategories ? toOptions(filteredCategories, props.locale) : []
-    
     return (
         <Container fluid={true} className={`filter`}>
             <FilterDropDown {...props} options={options}></FilterDropDown>
