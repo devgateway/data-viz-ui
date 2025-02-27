@@ -61,11 +61,10 @@ const mapActionCreators = {
 };
 
 const FilterDropDown = (props) => {
-
     const {isRange, options, alphabeticalSort, ascOrder} = props
     let sortedOptions = []
     if (booleanParameter(alphabeticalSort)) {
-        sortedOptions = options.sort(function (a, b) {
+         options.sort(function (a, b) {
             const aText = a.text ? a.text.toLowerCase() : "";
             const bText = b.text ? b.text.toLowerCase() : "";
             if (booleanParameter(ascOrder)) {
@@ -75,12 +74,12 @@ const FilterDropDown = (props) => {
             }
         });
     } else {
-        sortedOptions = options.sort(function (a, b) {
+         options.sort(function (a, b) {
             return booleanParameter(ascOrder) ? a.position - b.position : b.position - a.position;
         });
     }
 
-    const filterProps = {...props, options: sortedOptions}
+    const filterProps = {...props, options: options}
 
     if (isRange) {
         return <RangeFilterDropDown  {...filterProps}/>
@@ -189,7 +188,7 @@ const ListFilterDropDown = connect(mapStateToProps, mapActionCreators)((props) =
                     }
                     onInit({app, group, param, value: filterValues})
                 }else{
-                    
+
                     onInit({app, group, param, value: [filterItems[0]]})
                 }
             }
@@ -303,8 +302,9 @@ const RangeFilterDropDown = connect(mapStateToProps, mapActionCreators)(({
                                                                              current
                                                                          }) => {
 
-    const [start, setStart] = useState(options[0].position)
-    const [end, setEnd] = useState(options[options.length - 1].position)
+    const [start, setStart] = useState(Math.min(...options.map(o=>parseInt(o.position))))
+    const [end, setEnd] = useState(Math.max(...options.map(o=>parseInt(o.position))))
+
     useEffect((e) => {
 
         const current = options.filter(v => (v.position > start || v.position === start) && (v.position < end || v.position === end)).map(o => o.value)
@@ -328,7 +328,6 @@ const RangeFilterDropDown = connect(mapStateToProps, mapActionCreators)(({
 
     >
         <Dropdown.Menu>
-
             <Segment>
                 <Dropdown.Item> <Label basic>{startLabel}</Label></Dropdown.Item>
             </Segment>
@@ -359,7 +358,6 @@ const RangeFilterDropDown = connect(mapStateToProps, mapActionCreators)(({
 
 
 const CategoryFilter = (props) => {
-    
     const {data, type, showNoDataOption} = props
     const cat = data.filter(d => d.type === type)[0]
     const filteredCategories = cat ? cat.items.filter(f => {
@@ -461,6 +459,7 @@ const Filter = ({
                           icon={icon} placeholder={placeholder}
                           startLabel={startLabel} endLabel={endLabel}
                           param={param}
+                          ascOrder={ascOrder}
                           useSingleColumn={useSingleColumn === 'true'}
                           enableTextSearch={enableTextSearch === 'true'}
                           filterType={defaultFilterType}
@@ -473,10 +472,7 @@ const Filter = ({
     } else {
 
         if (app) {
-            return (<CategoriesProvider
-              params={params}
-              app={app}
-              hiddenFilters={hiddenFiltersArr || []}>
+            return (<CategoriesProvider app={app} hiddenFilters={hiddenFiltersArr || []}>
                 <CategoriesConsumer>
                     <Container fluid={true}>
                         {type === "Boolean" &&

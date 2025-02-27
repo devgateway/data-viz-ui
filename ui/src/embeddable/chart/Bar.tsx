@@ -174,6 +174,7 @@ const Chart = ({
     DEFAULT_COLOR,
     colorGenerator
   ) => {
+
     type ChartLegends = {
       enabled: boolean;
       color: string;
