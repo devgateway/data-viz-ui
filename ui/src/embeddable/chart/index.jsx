@@ -61,7 +61,7 @@ const Diverging = (props) => {
   );
 };
 const Chart = (props) => {
-  const {
+  let {
     parent,
     editing = false,
     unique,
@@ -165,6 +165,8 @@ const Chart = (props) => {
     "data-tooltip-enable-markdown": tooltipEnableMarkdown = "false",
     "data-y-axis-tick-values": yAxisTickValues = "10",
     "data-x-axis-tick-values": xAxisTickValues = "10",
+    "data-enable-grid-y": enableGridY = "true",
+    "data-enable-grid-x": enableGridX = "false",
     "data-offset-text": offsetText = 0,
     "data-overall-label": overallLabel = "Overall",
     "data-min-max-clamp": minMaxClamp = "false",
@@ -186,11 +188,6 @@ const Chart = (props) => {
     settings
   } = props;
   
-  let {
-    "data-enable-grid-y": enableGridY = "true",
-    "data-enable-grid-x": enableGridX = "false",
-  } = props;
-  
   const mobileConfigSettings = JSON.parse(decodeURIComponent(mobileCustomization));
   const isMobileConfigEnabled = (isMobile || isTablet || isMidTablet) && (mobileConfigSettings?.  showCustomization ?? false);
 
@@ -210,9 +207,7 @@ const Chart = (props) => {
 
   const parse = (value) => {
     try {
-      if (value) {
-        return JSON.parse(decode(value));
-      }      
+      return JSON.parse(decode(value));
     } catch (error) {
       console.error("error parsing value:" + value);
     }
@@ -304,7 +299,7 @@ const Chart = (props) => {
   let selectedMeasures = getSelectedMeasures();
 
   let selectedFormat = getSelectedFormat();
-  const userMeasures = getUserMeasures();
+  let userMeasures = getUserMeasures();
   let leftLegendForSelectedMeasure = left;
   let rightLegendForSelectedMeasure = rightLegend;
 
@@ -327,7 +322,7 @@ const Chart = (props) => {
     }
   }
 
-  const numberFormat = selectedFormat
+  let numberFormat = selectedFormat
     ? {
         style:
           selectedFormat.style === "compacted"
@@ -349,7 +344,7 @@ const Chart = (props) => {
 
   const groupTotalFormatObject = parse(groupTotalFormat);
 
-  const groupTotalFormatParsed = {
+  let groupTotalFormatParsed = {
     style:
       groupTotalFormatObject.style === "compacted"
         ? "decimal"
@@ -788,7 +783,6 @@ const Chart = (props) => {
                   <ColorProvider
                     type={type}
                     app={app}
-                    datasetId={datasetId}
                     locale={locale}
                     overallLabel={overallLabel}
                     customLabels={getCustomLabels()}
