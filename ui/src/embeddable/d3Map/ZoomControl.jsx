@@ -125,7 +125,10 @@ class ZoomControl extends React.Component {
 
 
     _fullView(transition = true) {
-        const {editing, initialPosition: {x = 100, y = 23, k = 1, width: oW, height: oH}, width, height} = this.props
+
+
+        const {editing, initialPosition, width, height} = this.props
+        const {x = 100, y = 23, k = 1, width: oW, height: oH} = initialPosition || {}
         const selection = this.getSelection()
         const dx = x / oW
         const dy = y / oH
