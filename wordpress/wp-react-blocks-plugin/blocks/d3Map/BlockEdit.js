@@ -51,6 +51,7 @@ class BlockEdit extends ComponentWithSettings {
         const model = {...LayerModel}
         model.id = Date.now()
         newLayers.push(model)
+        debugger;
         setAttributes({layers: newLayers})
     }
 
@@ -96,6 +97,8 @@ class BlockEdit extends ComponentWithSettings {
             }
         } = this.props;
 
+
+        debugger;
         const divStyles = {height: height + 'px', width: '100%'};
         return ([isSelected && (<InspectorControls>
             <Panel header={__("Map Configuration")}>
@@ -203,13 +206,13 @@ class BlockEdit extends ComponentWithSettings {
                 <PanelBody initialOpen={false}//{panelStatus['LAYERS']}
                            onToggle={e => togglePanel("LAYERS", panelStatus, setAttributes)} title={__("Layers")}>
                     {layers.map((layer) => (<LayerSettings
+                        {...this.props}
                         setAttributes={setAttributes}
-                        panelStatus={panelStatus}
                         onRemoveLayer={(e) => this.removeLayer(layer)}
                         onChange={this.onChangeLayer}
                         onMoveLayer={this.onMoveLayer}
                         layer={layer}
-                        {...this.props}
+
                     />))}
                     <PanelRow>
                         <Button variant={"primary"} onClick={e => this.addLayer()}>Add New Layer</Button>

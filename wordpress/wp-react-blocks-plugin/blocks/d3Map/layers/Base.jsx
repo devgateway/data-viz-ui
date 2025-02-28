@@ -39,9 +39,12 @@ const toOptions = (files) => {
 
 const Base = (props) => {
     const {onChange, metadata, layer, layer: {name, shapeColor, labelFilter, type, file, app, labelField, visible}} = props
-
+    debugger;
     const [files, setFiles] = useState([])
     const [features, setFeatures] = useState([])
+
+
+
     useEffect(() => {
 
         getJsonFiles().then(files => {
@@ -244,6 +247,7 @@ const Base = (props) => {
         <React.Fragment>
             {type == 'data' && <>               
                 <DataLayer
+                    {...props}
                     apps={metadata.apps}
                     onChangeProperty={onChangeProperty}
                     allDimensions={metadata.dimensions || []}
@@ -259,6 +263,7 @@ const Base = (props) => {
             </>}
             {type == 'flow' && <>
                 <FlowLayer
+                    {...props}
                     apps={metadata.apps}
                     onChangeProperty={onChangeProperty}
                     allDimensions={metadata.dimensions || []}
@@ -275,6 +280,7 @@ const Base = (props) => {
             </>}
             {type == 'dataPoints' && <>
                 <LatLongLayer
+                    {...props}
                     apps={metadata.apps}
                     onChangeProperty={onChangeProperty}
                     allDimensions={metadata.dimensions || []}
@@ -365,7 +371,7 @@ class LayerWithMetadata extends BlockEditWithAPIMetadata {
             layer,
             layer: {name, type, file, app}
         } = this.props
-
+    debugger;
         return <PanelBody
             initialOpen={false}
             onToggle={e => togglePanel('LAYERS_' + name, panelStatus, setAttributes)} title={__("Layers")}
