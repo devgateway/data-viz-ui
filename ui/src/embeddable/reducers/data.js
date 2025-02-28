@@ -104,6 +104,7 @@ export const getData = ({app, group, source, store, params}) => (dispatch, getSt
     api.getData({app, source, params})
         .then(data => {
             data.appliedFilters = params
+            debugger; // eslint-disable-line no-debugger
             return dispatch({type: LOAD_DATA_DONE, store, data})
         })
         .catch(error => dispatch({type: LOAD_DATA_ERROR, store, error}))
