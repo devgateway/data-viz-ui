@@ -355,9 +355,10 @@ const Wrapper: React.FC<VerticalFeaturedTabsProps> = (props) => {
     unique,
   } = props;
   const locale = props.intl.locale;
+  const dataCategories = categories ? categories : "[]";
 
   // Determine screen width and conditionally render components
-  const [isMobileOrTablet, setIsMobileOrTablet] = useState(window.innerWidth <= 1365);
+  const [isMobileOrTablet, setIsMobileOrTablet] = useState(window.innerWidth <= 768);
   
   const getScreenOrientation = (): string => {
     return (
@@ -373,7 +374,7 @@ const Wrapper: React.FC<VerticalFeaturedTabsProps> = (props) => {
   const handleOrientationChange = () => {
     setTimeout(() => {
       setOrientation(getScreenOrientation());
-      setIsMobileOrTablet(window.innerWidth <= 1365);
+      setIsMobileOrTablet(window.innerWidth <= 768);
     }, 100);
   };
   
@@ -408,7 +409,7 @@ const Wrapper: React.FC<VerticalFeaturedTabsProps> = (props) => {
     try {
       return JSON.parse(decode(value));
     } catch (error) {
-      console.error("error parsing value:" + value);
+      console.error("error parsing value:" + value + "\n error:" + error);
     }
 
     return null;
@@ -425,7 +426,7 @@ const Wrapper: React.FC<VerticalFeaturedTabsProps> = (props) => {
         type={type}
         locale={locale}
         taxonomy={taxonomy}
-        categories={parse(categories).join(",")}
+        categories={parse(dataCategories)}
         store={`vertical_tabs${parent}_${unique}`}
         page={1}
         perPage={items}
