@@ -564,7 +564,7 @@ registerBlockType(process.env.BLOCKS_NS + '/chart',
             radarDotLabelOffset: {
                 type: 'Numeric',
                 default: -12
-            }
+            }            
         },
         edit: BlockEdit,
         save: BlockSave,

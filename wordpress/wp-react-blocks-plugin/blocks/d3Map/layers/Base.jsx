@@ -9,6 +9,7 @@ import {
     ToggleControl, ButtonGroup
 } from "@wordpress/components";
 import {__} from '@wordpress/i18n';
+import apiFetch from '@wordpress/api-fetch';
 import {getJsonFiles} from "./utils/FileUtils";
 import {useEffect} from "react";
 import {useState} from "@wordpress/element";
@@ -20,6 +21,8 @@ import Property from "./utils/Property";
 
 import {PanelColorSettings} from "@wordpress/block-editor";
 import {togglePanel} from "../../commons/Util";
+import {isSupersetAPI} from "../../commons/APIutils";
+
 
 const typeOptions = [
     {label: "Base", value: "base"},
@@ -63,6 +66,13 @@ const Base = (props) => {
         const newLayer = {...layer}
         newLayer[atrr] = value
         onChange(newLayer)
+    }
+
+    const datasets = [{ label: 'Select Dataset', value: '0' }]
+    if (metadata.datasets) {
+        metadata.datasets.forEach(d => {
+            datasets.push({ label: d.label, value: d.id })
+        })
     }
 
     return [
@@ -223,7 +233,7 @@ const Base = (props) => {
                                                         [feature.properties[labelField] + "_rotation"]: rotation
                                                     })}>
 
-                                    ></AnglePickerControl>
+                                    </AnglePickerControl>
                             </PanelRow>
                         </PanelBody>}
 
@@ -235,20 +245,19 @@ const Base = (props) => {
             }  </>,
 
         <React.Fragment>
-            {type == 'data' && <>
+            {type == 'data' && <>               
                 <DataLayer
                     {...props}
                     apps={metadata.apps}
                     onChangeProperty={onChangeProperty}
-                    allDimensions={metadata.dimensions}
-                    allFilters={metadata.filters}
-                    allMeasures={metadata.measures}
-                    allCategories={metadata.categories}
+                    allDimensions={metadata.dimensions || []}
+                    allFilters={metadata.filters || []}
+                    allMeasures={metadata.measures || []}
+                    allCategories={metadata.categories || []}
                     allApps={metadata.apps}
                     features={features}
-
-
-                >
+                    layer={layer}
+                    allDatasets={datasets}>
                 </DataLayer>
 
             </>}
@@ -257,13 +266,15 @@ const Base = (props) => {
                     {...props}
                     apps={metadata.apps}
                     onChangeProperty={onChangeProperty}
-                    allDimensions={metadata.dimensions}
-                    allFilters={metadata.filters}
-                    allMeasures={metadata.measures}
-                    allCategories={metadata.categories}
+                    allDimensions={metadata.dimensions || []}
+                    allFilters={metadata.filters || []}
+                    allMeasures={metadata.measures || []}
+                    allCategories={metadata.categories || []}
                     allApps={metadata.apps}
                     features={features}
-                    layer={layer}>
+                    layer={layer}
+                    allDatasets={datasets}                    
+                    >
                 </FlowLayer>
 
             </>}
@@ -272,13 +283,15 @@ const Base = (props) => {
                     {...props}
                     apps={metadata.apps}
                     onChangeProperty={onChangeProperty}
-                    allDimensions={metadata.dimensions}
-                    allFilters={metadata.filters}
-                    allMeasures={metadata.measures}
-                    allCategories={metadata.categories}
+                    allDimensions={metadata.dimensions || []}
+                    allFilters={metadata.filters || []}
+                    allMeasures={metadata.measures || []}
+                    allCategories={metadata.categories || []}
                     allApps={metadata.apps}
+                    allDatasets={datasets}
                     features={features}
-                    layer={layer}>
+                    layer={layer}                  
+                    >
                 </LatLongLayer>
 
             </>}
@@ -296,6 +309,8 @@ class LayerWithMetadata extends BlockEditWithAPIMetadata {
 
     componentDidMount() {
         const {layer: {name, type, file, app}} = this.props
+
+        apiFetch({path: '/dg/v1/settings'}).then((settingsData) => {
         fetch(`/api/registry/eureka/apps`, {
             headers: {
                 'Accept': 'application/json',
@@ -307,23 +322,44 @@ class LayerWithMetadata extends BlockEditWithAPIMetadata {
                     .filter(a => a.instance[0].metadata.type === 'data')
                     .map(a => ({
                         label: a.name, value: a.instance[0].vipAddress, settings: a.instance[0]
-                    })), {label: 'CSV', value: 'csv'}] : [{label: 'CSV', value: 'csv'}]
+                    })), { label: 'CSV', value: 'csv' }] : [{ label: 'CSV', value: 'csv' }]
+                
 
-                this.setState({...this.state, apps})
-                this.loadMetadata(app)
+                this.setState({
+                    react_ui_url: settingsData["react_ui_url"] + '/' + window._page_locale,
+                    react_api_url: settingsData["react_api_url"],
+                    apache_superset_url: settingsData["apache_superset_url"],
+                    site_language: settingsData["site_language"],
+                    current_language: new URLSearchParams(document.location.search).get("edit_lang"),
+                    apps
+                }, ()=> {
+                    this._loadMetadata(app)  
+                })
+
+                              
             })
             .catch(function (response) {
                 alert("error" + response)
             })
+
+        })
+
+             
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         super.componentDidUpdate(prevProps, prevState, snapshot)
         const {layer: {app}} = this.props
         const {layer: {app: prevAPP}} = prevProps
-        if ((app != prevAPP) || (prevAPP == null && app != null)) {
-            this.loadMetadata(app)
+        const datasetId = this.props.layer.datasetId
+        const prevDatasetId = prevProps.layer.datasetId
+        if ((app != prevAPP) || (prevAPP == null && app != null) || (datasetId != prevDatasetId)) {
+            this._loadMetadata(app, datasetId)
         }
+
+        if ((app != prevAPP) || (prevAPP == null && app != null) && isSupersetAPI(app, this.state.apps)) {
+            this.loadDatasets(app)
+        }        
     }
 
     render() {

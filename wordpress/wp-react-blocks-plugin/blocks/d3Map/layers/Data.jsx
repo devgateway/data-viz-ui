@@ -17,6 +17,8 @@ import BreaksGenerator from "./utils/BreaksGenerator";
 import {PanelColorSettings} from "@wordpress/block-editor";
 import PatternGenerator from "./utils/PatternGenerator";
 import Format from '../../charts/Format.jsx'
+import {isSupersetAPI} from "../../commons/APIutils";
+
 
 const FilterSelector = ({param, index, options, onUpdateFilterParam}) => {
     const sortedOptions = options.sort(function (a, b) {
@@ -65,6 +67,9 @@ export class DataLayerSetting extends Component {
             measures: [], dimensions: [], filters: [], categories: []
         }
     }
+
+    
+
 
 
     onFormatChange(format, field) {
@@ -205,7 +210,8 @@ export class DataLayerSetting extends Component {
 
     render() {
         const {
-            onChangeProperty, allDimensions, allFilters, allMeasures, allCategories, features, apps, layer, layer: {
+            onChangeProperty,
+            allDimensions, allFilters, allMeasures, allCategories, allDatasets, features, apps,layer, layer: {
                 app,
                 csv,
                 measures,
@@ -232,7 +238,9 @@ export class DataLayerSetting extends Component {
                 customMeasuresLabels,
                 patternDiscriminator,
                 onRemoveLayer,
-                onMoveLayer,
+                onMoveLayer,                
+                datasetId,
+                           
             }
         } = this.props
 
@@ -241,6 +249,8 @@ export class DataLayerSetting extends Component {
 
         let selectedMeasureLabel = ""
         let selectedMeasureValue = ""
+
+        
 
         if (app != 'csv') {
             const theMeasure = measures ? measures[0] : null
@@ -258,18 +268,29 @@ export class DataLayerSetting extends Component {
                 }
             }
         }
-        debugger;
         return ([<PanelBody initialOpen={false} title={"Data Source"}>
             <PanelRow>
                 <SelectControl
                     label={__("App", "dg")}
                     value={[app]} // e.g: value = [ 'a', 'c' ]
-                    onChange={(app) => {
-                        onChangeProperty("app", app)
+                    onChange={(app) => {  
+                       onChangeProperty("app", app)                            
                     }}
                     options={apps}
                 />
             </PanelRow>
+            {isSupersetAPI(app, apps)  &&
+            <PanelRow>
+                <SelectControl
+                    label={__('Datasets')}
+                    value={[datasetId]}
+                    onChange={(newDatasetId) => {
+                        onChangeProperty("datasetId", newDatasetId)                       
+                    }}
+                    options={allDatasets}
+                />
+            </PanelRow>
+            }
             {type != 'dataPoints' && <Property property={"featureJoinAttribute"}
                                                type={"select"} onChangeProperty={onChangeProperty}
                                                features={features}
@@ -500,4 +521,5 @@ export class DataLayerSetting extends Component {
 
                 }
 
-                export default DataLayerSetting;
+
+export default DataLayerSetting;

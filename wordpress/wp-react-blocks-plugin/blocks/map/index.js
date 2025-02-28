@@ -303,7 +303,11 @@ registerBlockType(process.env.BLOCKS_NS+'/map',
             customMeasureLabels: {
                 type: "Object",
                 default: {}
-            }
+            },
+            datasetId: {
+                type: 'String',
+                default: ""
+            }            
         },
         edit: BlockEdit,
         save: BlockSave,

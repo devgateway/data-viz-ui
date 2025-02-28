@@ -14,8 +14,8 @@ import * as topojson from "topojson-client";
 import Legend from "./legend";
 import { formatContent } from "../common/MapTooltip";
 import getDeviceCategory from '../../utils/deviceType';
+import geostats from 'geostats';
 
-import * as geoStats from "geostats";
 import { Config } from "@/conf";
 const COLOR_VARIABLE = "_Color_";
 const LOCATION = "location";
@@ -339,18 +339,22 @@ componentWillUnmount() {
       //Reset zoom when filters is applied
       if (prevAppliedFilters) {
         Object.keys(prevAppliedFilters).forEach((k) => {
-          prevAppliedItems.push(
-            ...prevAppliedFilters[k].filter(
-              (v) => v != Number.MIN_SAFE_INTEGER,
-            ),
-          );
+          if (prevAppliedFilters[k] != null && prevAppliedFilters[k] instanceof Array) {
+            prevAppliedItems.push(
+              ...prevAppliedFilters[k].filter(
+                (v) => v != Number.MIN_SAFE_INTEGER,
+              ),
+            );
+          }
         });
       }
       if (appliedFilters) {
         Object.keys(appliedFilters).forEach((k) => {
-          appliedItems.push(
-            ...appliedFilters[k].filter((v) => v != Number.MIN_SAFE_INTEGER),
-          );
+          if (appliedFilters[k] != null && appliedFilters[k] instanceof Array) {
+            appliedItems.push(
+              ...appliedFilters[k].filter((v) => v != Number.MIN_SAFE_INTEGER),
+            );
+        }
         });
       }
       //filters reset
@@ -581,7 +585,7 @@ componentWillUnmount() {
 
       const colors = colorSchemes[colorScheme];
       if (values.length > 0) {
-        const serie = new geoStats(values);
+        const serie = new geostats(values);
         serie.setPrecision(2);
         const numberOfRanges =
           values.length > 1 ? values.length - 1 : values.length;
@@ -1541,7 +1545,7 @@ componentWillUnmount() {
       filteredFeatures.map((f) => {
         if (filterLocationsData) {
           const dataItem = filterLocationsData.find((d) => {
-            const nameOnData = d.label ? d.label.toLowerCase() : "";
+            const nameOnData = d.label ? ("" + d.label).toLowerCase() : "";
             const nameOnMapFile = f.properties[mappingField]
               ? f.properties[mappingField].toLowerCase()
               : "";

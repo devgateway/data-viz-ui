@@ -9,6 +9,7 @@ import LegendBreaks from "./LegendBreaks"
 import MapSymbols from "./Symbols"
 import Tooltips from "./Tooltips"
 import Settings from "./Settings"
+import {isSupersetAPI} from "../commons/APIutils";
 
 class BlockEdit extends BlockEditWithAPIMetadata {
     constructor() {
@@ -340,7 +341,8 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                 defaultPointColor,
                 zoomOnFilter,
                 zoomOnFilterField,
-                showShadingLayerLabels
+                showShadingLayerLabels,
+                datasetId
             }
         } = this.props;
 
@@ -468,12 +470,33 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                                     app: app,
                                     dimension1: 'none',
                                     dimension2: 'none',
-                                    filters: []
+                                    filters: []                                    
                                 })
                             }}
                             options={this.state.apps}
                         />
                     </PanelRow>
+
+                     {isSupersetAPI(app, this.state.apps) &&   <PanelRow>
+                                                            <SelectControl
+                                                                label={__('Datasets')}
+                                                                value={[datasetId]} 
+                                                                onChange={(newDatasetId)   => {
+                                                                    setAttributes({
+                                                                        datasetId: newDatasetId,
+                                                                        dimension1: 'none',
+                                                                        dimension2: 'none',
+                                                                        dimension3: 'none',	
+                                                                        measures: []
+                                                                    })
+                                                                    this.setState({dimensions: [], measures: [], filters: [], categories: []})
+                                                                    this.loadMetadata(newDatasetId)
+                                                                }}
+                                                                options={datasets}
+                                                            />
+                                                          </PanelRow>
+                                                        }
+                                                      
                         </PanelBody>
 
                 </PanelBody>

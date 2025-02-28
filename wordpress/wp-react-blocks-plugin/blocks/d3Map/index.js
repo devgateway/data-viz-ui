@@ -52,8 +52,7 @@ registerBlockType(process.env.BLOCKS_NS + '/new-d3-map',
             rotationEnabled: {
                 type: "Boolean",
                 default: false
-            }
-
+            }          
         },
         edit: BlockEdit,
         save: BlockSave,
