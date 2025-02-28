@@ -30,7 +30,7 @@ const MapWrapper = (props) => {
     } = props
 
 
-    const [layers, setLayers] = useState(parse(dataLayers))
+    const [layers, setLayers] = useState(parse(dataLayers), [])
     const ref = useRef(null);
     const zoomRef = useRef(null);
     const [transform, setTransform] = useState(null)
