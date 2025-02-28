@@ -1545,7 +1545,7 @@ componentWillUnmount() {
       filteredFeatures.map((f) => {
         if (filterLocationsData) {
           const dataItem = filterLocationsData.find((d) => {
-            const nameOnData = d.label ? d.label.toLowerCase() : "";
+            const nameOnData = d.label ? ("" + d.label).toLowerCase() : "";
             const nameOnMapFile = f.properties[mappingField]
               ? f.properties[mappingField].toLowerCase()
               : "";
