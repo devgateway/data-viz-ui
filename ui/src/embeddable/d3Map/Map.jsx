@@ -75,7 +75,7 @@ class Map extends React.Component {
        
         return (
             <svg viewBox={`0 0 ${width} ${height}`} className={"map"} height={height} width={width} ref={this.svgRef}>
-                {projection && this.props.children? this.props.children.map(child => React.cloneElement(child, {
+                {projection && this.props.children ? this.props.children.map(child => React.cloneElement(child, {
                     ...this.props,
                     svg: this.svgRef.current,
                     ...this.state
@@ -84,4 +84,4 @@ class Map extends React.Component {
     }
 }
 
-export default Map
+export default Map;
