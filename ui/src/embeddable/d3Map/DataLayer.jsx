@@ -538,7 +538,7 @@ class DataLayer extends BaseLayer {
             borderColor,
             featureJoinAttribute,
             apiJoinAttribute,
-
+            datasetId,
             editing
         } = this.props
 
@@ -549,11 +549,11 @@ class DataLayer extends BaseLayer {
 
 const DataWrapper = (props) => {
     const {
-        id, unique, filters, csv, app, group = "default", apiJoinAttribute, editing, patternDiscriminator, intl
+        id, unique, filters, csv, app, group = "default", apiJoinAttribute, editing, patternDiscriminator,  datasetId, intl, settings
     } = props
 
+    
     const params = {}
-
     const ff = filters || {}
 
     if (ff && ff.forEach) {
@@ -563,7 +563,10 @@ const DataWrapper = (props) => {
         })
     }
 
-
+    if (datasetId) {
+        params.datasetId = datasetId;
+    }
+     
     return (<DataProvider
         editing={editing}
         params={params}
