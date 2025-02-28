@@ -1,5 +1,5 @@
 import React from 'react';
-import * as ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import * as d3 from 'd3' // d3 plugin
 import Tooltip from "./Tooltip";
 
@@ -62,9 +62,9 @@ class BaseLayer extends React.Component {
                 .html("")
                 .style("left", (event.pageX + 15) + "px")
                 .style("top", (event.pageY - 50) + "px")
-
-            ReactDOM.render(<Tooltip intl={this.props.intl} tooltip={content} data={data}
-                                     tooltipEnableMarkdown={false}/>, tip._groups[0][0])
+            const root = createRoot(tip._groups[0][0]);
+            root.render(<Tooltip intl={this.props.intl} tooltip={content} data={data}
+                                     tooltipEnableMarkdown={false}/>)
         }
     }
 
