@@ -79,6 +79,8 @@ class DataLayer extends React.Component {
             dimension2,
             visible = true
         } = this.props
+
+        
         const sizeScale = d3.scaleThreshold()
           .domain(breaks.map(d => d.end))
           .range(breaks.map(d => d.size));
@@ -92,9 +94,9 @@ class DataLayer extends React.Component {
           .range(breaks.map(d => d.borderColor));
 
         let points = []
-        const g = d3.select(this.gRef.current)
-        if (app != 'csv' && data && data.children) {
-            points = data.children.map((d) => {
+        const g = d3.select(this.gRef.current)       
+        if (app != 'csv' && data && data.children) {            
+            points = data.children.map((d) => {                
                 const latLong = d.value.split(',')
                 let pointStyle = {color: markFillColor, size: markSizeScale, border: markBorderColor}
                 let value = 1
@@ -122,9 +124,9 @@ class DataLayer extends React.Component {
             const valueField = data.meta.fields[2]
 
             points = data.data.map((d) => {
-
+                let pointStyle = {color: markFillColor, size: markSizeScale, border: markBorderColor}
                 return {
-                    x: d[latField], y: d[longField], value: d[valueField], meta:d
+                    x: d[latField], y: d[longField], value: d[valueField], meta:d, pointStyle
                 }
             })
 
@@ -200,7 +202,8 @@ class DataLayer extends React.Component {
 
 const DataWrapper = (props) => {
     const {
-        id, unique, filters, csv, app, group = "default", apiJoinAttribute, editing, dimension2, pointStyleBy
+        id, unique, filters, csv, app, group = "default", apiJoinAttribute, editing, dimension2, pointStyleBy,
+        datasetId, settings
     } = props
 
     const secondDimension = pointStyleBy === "dimension" && dimension2 != 'none' ? "/" + dimension2 : ''
@@ -213,6 +216,9 @@ const DataWrapper = (props) => {
         })
     }
 
+    if (datasetId) {
+        params.datasetId = datasetId;
+    }    
 
     return (<DataProvider
         editing={editing}

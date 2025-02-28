@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { connect } from "react-redux";
 import DataProvider from "../data/DataProvider";
@@ -5,6 +6,8 @@ import DataConsumer from "../data/DataConsumer";
 import Map from './map';
 import MapDataFrame from './MapDataFrame';
 import MapCSVDataFrame from './MapCSVDataFrame';
+import { SettingProvider } from '@devgateway/wp-react-lib';
+import {SettingsConsumer} from '@devgateway/wp-react-lib';
 
 const countries = [
     { label: 'KENYA', value: 'KEN', center: [35.8166634, 0.1], scale: 2000}, 
@@ -19,6 +22,16 @@ const countries = [
 ]
 
 const MapWrapper = (props) => {
+    return (
+        <SettingProvider locale={props.intl.locale} changeUUID={props.unique}>
+            <SettingsConsumer>
+                <MapEntry {...props} />
+            </SettingsConsumer>
+        </SettingProvider>
+    );
+}
+
+const MapEntry = (props) => {
     const {
         unique,
         editing,
@@ -91,7 +104,12 @@ const MapWrapper = (props) => {
         'data-labels-exclusion-list': labelsExclusionList = "",
         'data-custom-measure-labels': customMeasureLabels = "{}",
         'data-show-shading-layer-labels': showShadingLayerLabels = "ifUnitHasData",
+        "data-dataset-id": datasetId,       
+        intl, 
+        settings
     } = props  
+
+    
 
     const decode = (value) => {
         if (editing) {
@@ -102,10 +120,14 @@ const MapWrapper = (props) => {
 
     const parse = (value) => {
         try {
-            return JSON.parse(decode(value))
+          if (value) {
+            return JSON.parse(decode(value));
+          }      
         } catch (error) {
-            console.error("error parsing value:" + value)
-        } 
+          console.error("error parsing value:" + value);
+        }
+    
+        return null;
     }
 
     const getBreaks = (legendBreaks) => {
@@ -227,14 +249,25 @@ const MapWrapper = (props) => {
         zoomOnFilterField: zoomOnFilterField,
         noDataText,
         labelsExclusionList: labelsExclusionList.split(',').map(l => l.trim()),
-        showShadingLayerLabels
+        showShadingLayerLabels,
+        datasetId
     } 
       
     const measureLabels = parse(customMeasureLabels) || {}
     const DataFrame = app === "csv" ? MapCSVDataFrame : MapDataFrame;   
-    const measuresCSV = editing ? (parse(measures) || []).join(',') : measures    
-    return (<DataProvider 
-        params={getFilters(filters)}
+    const measuresCSV = editing ? (parse(measures) || []).join(',') : measures  
+    
+    const params = getFilters(filters)
+    if (datasetId) {
+        params.datasetId = datasetId;
+    }    
+
+    return (
+        <SettingProvider locale={intl.locale} changeUUID={unique}>
+                <SettingsConsumer>
+
+    <DataProvider 
+        params={params}
         app={app}
         csv={decodeURIComponent(csv)}
         group={group}
@@ -246,7 +279,10 @@ const MapWrapper = (props) => {
             </DataFrame>
         </DataConsumer>
 
-    </DataProvider>);
+    </DataProvider>
+    </SettingsConsumer>
+    </SettingProvider>
+    );
 
 };
 

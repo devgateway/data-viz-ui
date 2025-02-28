@@ -5,6 +5,8 @@ import CategoriesProvider from '../data/CategoriesProvider'
 import { connect } from "react-redux";
 import { setFilter, setInitialFilters } from "../reducers/data";
 import { injectIntl } from 'react-intl';
+import { SettingProvider } from '@devgateway/wp-react-lib';
+import {SettingsConsumer} from '@devgateway/wp-react-lib';
 
 const FILTER_TYPE_MULTI_SELECT = 'multi-select';
 const FILTER_TYPE_SINGLE_SELECT = 'single-select';
@@ -40,14 +42,14 @@ const decode = (value) => {
 }
 
 const parse = (value) => {
-    try { 
+    if (!value || value == "") {
+        return null
+    }
+    try {
         return JSON.parse(decode(value))
-
     } catch (error) {
         throw new Error("error parsing value:" + error);
-    }
-
-    return null
+    }    
 }
 
 const mapStateToProps = (state, ownProps) => {
@@ -402,7 +404,6 @@ const RangeFilterDropDown = connect(mapStateToProps, mapActionCreators)(({
 
 
 const CategoryFilter = (props) => {
-
     const { data, type, showNoDataOption } = props
     const cat = data.filter(d => d.type === type)[0]
     const filteredCategories = cat ? cat.items.filter(f => {
@@ -415,6 +416,7 @@ const CategoryFilter = (props) => {
         return true
     }) : []
     const options = filteredCategories ? toOptions(filteredCategories, props.locale) : []
+    
     return (
         <Container fluid={true} className={`filter`}>
             <FilterDropDown {...props} options={options}></FilterDropDown>
@@ -451,10 +453,20 @@ const CSVFilter = (props) => {
     </Container>
 }
 
+const FilterWrapper = (props) => {
+    return (
+        <SettingProvider locale={props.intl.locale} changeUUID={props.unique}>
+            <SettingsConsumer>
+                <Filter {...props}></Filter>
+                </SettingsConsumer>
+                </SettingProvider>
+    )
+}
 
 const Filter = ({
     "data-group": group,
     "data-app": app,
+    "data-dataset-id": datasetId,
     "data-param": param,
     "data-icon": icon,
     "data-type": type,
@@ -476,7 +488,8 @@ const Filter = ({
     "data-all-none-same-behaviour": allNoneSameBehaviour = "false",
     "data-close-on-select": closeOnSelect = "false",
     "data-alphabetical-sort": alphabeticalSort = "true",
-    "data-asc-order": ascOrder = "true",
+    "data-asc-order": ascOrder = "true",    
+    settings,
     intl,
 }) => {
 
@@ -490,6 +503,10 @@ const Filter = ({
                 params[f.param] = f.value
         })
     }
+
+    if (datasetId) {
+        params["datasetId"] = datasetId;
+    }    
 
     const hiddenFiltersArr = hiddenFilters ?  parse(hiddenFilters): []
     let defaultFilterType;
@@ -574,4 +591,4 @@ const Filter = ({
 }
 
 
-export default injectIntl(Filter)
+export default injectIntl(FilterWrapper)
