@@ -69,9 +69,8 @@ const SaveComponent = (props) => {
                  data-close-on-select={closeOnSelect}
                  data-use-filter-items={useFilterItems}
                  data-all-none-same-behaviour={allNoneSameBehaviour}>
-                 data-all-none-same-behaviour={allNoneSameBehaviour}>
     </div>);
 }
 
 
-export default SaveComponent
+export default SaveComponent;
