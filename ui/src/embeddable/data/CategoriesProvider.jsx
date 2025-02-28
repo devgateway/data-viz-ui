@@ -67,12 +67,15 @@ class DataProvider extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
-    const {app} = ownProps
-
+    const {app, params} = ownProps
+    const path = ['data', 'categories', app]
+    if (params.datasetId) {
+        path.push(params.datasetId)
+    }
     return {
-        data: state.getIn(['data', 'categories', app, 'items']),
-        error: state.getIn(['data', 'categories', app, 'error']),
-        loading: state.getIn(['data', 'categories', app, 'loading']),
+        data: state.getIn([...path, 'items']),
+        error: state.getIn([...path, 'error']),
+        loading: state.getIn([...path, 'loading']),
     }
 }
 
