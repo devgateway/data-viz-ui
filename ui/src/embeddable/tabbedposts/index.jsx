@@ -3,7 +3,6 @@ import { Button, Container, Grid, Label, Menu, Accordion, Icon } from 'semantic-
 import { MediaConsumer, MediaProvider, PostConsumer, PostIcon, PostLabel, PostProvider } from "@devgateway/wp-react-lib";
 import { injectIntl } from "react-intl";
 import PostIntro from "../connected-templates/PostIntro";
-import getDeviceType from '../../utils/deviceType';
 import { useWindowDimensionsAndDevice } from '@/lib/hooks/window-dimensions';
 
 const ItemMenu = ({ posts, activeItem, setActive, showLabels }) => {
@@ -73,7 +72,7 @@ const AccordionContent = ({ posts, activeItem, setActive }) => {
   );
   const [scrollTarget, setScrollTarget] = useState(null);
   const ref = useRef(null);
-  const [isMobileOrTablet, setIsMobileOrTablet] = useState(window.innerWidth <= 1250);
+  const [isMobileOrTablet, setIsMobileOrTablet] = useState(window.innerWidth <= 768);
 
   useEffect(() => {
     if (scrollTarget) {
@@ -99,7 +98,7 @@ const AccordionContent = ({ posts, activeItem, setActive }) => {
   const handleOrientationChange = () => {
     setTimeout(() => {
       setOrientation(getScreenOrientation());
-      setIsMobileOrTablet(window.innerWidth <= 1250);
+      setIsMobileOrTablet(window.innerWidth <= 768);
     }, 100);
   }
 
@@ -209,7 +208,7 @@ const AccordionContent = ({ posts, activeItem, setActive }) => {
 
   useEffect(() => {
     let timeoutId;
-    let observers = []; // Store MutationObservers for each accordion
+    const observers = []; // Store MutationObservers for each accordion
 
     if (activeIndex !== -1) {
       timeoutId = setTimeout(() => {
