@@ -324,8 +324,11 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
         }
     }
 
-    loadMetadata() {
-        const {attributes: {app}} = this.props
+    loadMetadata(app) {
+        if (app==null){
+            app = this.props.attributes.app
+        }
+        //const {attributes: {app}} = this.props
         if (app != "csv") {
             fetch(`/api/${app}/dimensions`)
                 .then(response => {
