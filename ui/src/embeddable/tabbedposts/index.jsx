@@ -3,6 +3,7 @@ import { Button, Container, Grid, Label, Menu, Accordion, Icon } from 'semantic-
 import { MediaConsumer, MediaProvider, PostConsumer, PostIcon, PostLabel, PostProvider } from "@devgateway/wp-react-lib";
 import { injectIntl } from "react-intl";
 import PostIntro from "../connected-templates/PostIntro";
+import { useWindowDimensionsAndDevice } from '@/lib/hooks/window-dimensions';
 
 const ItemMenu = ({ posts, activeItem, setActive, showLabels }) => {
     return posts ? posts.map(post => (
@@ -207,7 +208,7 @@ const AccordionContent = ({ posts, activeItem, setActive }) => {
 
   useEffect(() => {
     let timeoutId;
-    let observers = []; // Store MutationObservers for each accordion
+    const observers = []; // Store MutationObservers for each accordion
 
     if (activeIndex !== -1) {
       timeoutId = setTimeout(() => {
