@@ -72,7 +72,7 @@ const AccordionContent = ({ posts, activeItem, setActive }) => {
   );
   const [scrollTarget, setScrollTarget] = useState(null);
   const ref = useRef(null);
-  const [isMobileOrTablet, setIsMobileOrTablet] = useState(window.innerWidth <= 768);
+  const [isMobileOrTablet, setIsMobileOrTablet] = useState(window.innerWidth <= 1250);
 
   useEffect(() => {
     if (scrollTarget) {
@@ -98,7 +98,7 @@ const AccordionContent = ({ posts, activeItem, setActive }) => {
   const handleOrientationChange = () => {
     setTimeout(() => {
       setOrientation(getScreenOrientation());
-      setIsMobileOrTablet(window.innerWidth <= 768);
+      setIsMobileOrTablet(window.innerWidth <= 1250);
     }, 100);
   }
 
