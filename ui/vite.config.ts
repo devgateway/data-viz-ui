@@ -16,7 +16,7 @@ export default defineConfig(({ mode }) => {
         //     'process.env': env,
         // }, 
         plugins: [
-            react({}),
+            react(),
             eslintPlugin({
                 exclude: ['/virtual:/**', 'node_modules/**', "dist/**"],
             }),
@@ -28,11 +28,11 @@ export default defineConfig(({ mode }) => {
             alias: {
                 "@": path.resolve(__dirname, "./src"),
                 react: path.resolve('./node_modules/react'),
-               "inmutable": path.resolve('./node_modules/inmutable'),
+                "inmutable": path.resolve('./node_modules/inmutable'),
                 "react-dom": path.resolve('./node_modules/react-dom'),
                 "react-router-dom": path.resolve('./node_modules/react-router-dom'),
                 "react-redux": path.resolve('./node_modules/react-redux'),
-                // '@devgateway/customizer' : path.resolve(__dirname, '../../custom/ui-customizer/')
+                '@devgateway/customizer': path.resolve(__dirname, '../../custom/ui-customizer')
             },
             preserveSymlinks: true,
         },
@@ -55,7 +55,7 @@ export default defineConfig(({ mode }) => {
 
         optimizeDeps: {
             include: [
-                "@devgateway/ui-customizer",
+                "../../custom/ui-customizer",
                 "@devgateway/wp-react-lib",
                 "react",
                 "semantic-ui-react",
@@ -75,7 +75,15 @@ export default defineConfig(({ mode }) => {
                     '../../custom/ui-customizer',
                 ]
             },
-            
+            // watch: {
+            //     include: [
+            //         'src/**',
+            //         "public/**",
+            //         '../react-lib/wp-react-lib/dist/**',
+            //         '../../custom/ui-customizer/dist/**',
+            //     ]
+            // },
+
         },
         css: {
             postcss: {
