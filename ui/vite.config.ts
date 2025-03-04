@@ -75,6 +75,7 @@ export default defineConfig(({ mode }) => {
                     '../../custom/ui-customizer',
                 ]
             },
+            
         },
         css: {
             postcss: {
