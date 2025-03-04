@@ -75,16 +75,6 @@ export default defineConfig(({ mode }) => {
                     '../../custom/ui-customizer',
                 ]
             },
-            // watch: {
-            //     include: [
-            //         'src/**',
-            //         "public/**",
-            //         '../react-lib/wp-react-lib/dist/**',
-            //         '../../custom/ui-customizer/dist/**',
-            //     ]
-            // },
-
-        },
         css: {
             postcss: {
                 plugins: [
