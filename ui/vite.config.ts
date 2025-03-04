@@ -63,9 +63,6 @@ export default defineConfig(({ mode }) => {
             ]
         },
         appType: 'spa',
-        experimental: {
-
-        },
         server: {
             cors: false,
             fs: {
@@ -75,6 +72,7 @@ export default defineConfig(({ mode }) => {
                     '../../custom/ui-customizer',
                 ]
             },
+        },
         css: {
             postcss: {
                 plugins: [
