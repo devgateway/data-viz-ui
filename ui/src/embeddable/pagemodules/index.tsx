@@ -5,6 +5,7 @@ import { MediaConsumer, MediaProvider, PageConsumer, PageProvider, PostContent }
 
 import { injectIntl } from "react-intl";
 import FloatingNavigator from './FloatingNavigator'
+import Visibility from 'semantic-ui-react/dist/commonjs/behaviors/Visibility';
 
 const decodeHtmlEntity = function (str: string) {
     if (str) {
@@ -76,35 +77,19 @@ const PageIterator: React.FC<PageIteratorProps> = ({ pages, locale, editing, nav
     const [modules, setModules] = useState<any>([]);
 
     const onVisibilityUpdate = useCallback((id, {
-        direction,
+        direction = 'down',
         onScreen,
     }) => {
-        let active = false;
-        const bboxScreen = document.body.getBoundingClientRect();
-        const bbox = document.getElementById(id)?.getBoundingClientRect();
-
-        if (onScreen && bbox) {
-            if (direction === 'down') {
-                if (bbox.y / bboxScreen.height < 0.7) {
-                    active = true;
+        if (onScreen) {
+            setModules(prevModules => {
+                if (prevModules.indexOf(id) === -1) {
+                    return [...prevModules, id];
                 }
-            }
-            if (direction == 'up' && bbox.y / bboxScreen.height < .7) {
-                active = true;
-            }
+                return prevModules;
+            });
+        } else {
+            setModules(prevModules => prevModules.filter(d => d !== id));
         }
-
-        setModules(prevModules => {
-            let modules = prevModules.slice();
-            if (active) {
-                if (modules.indexOf(id) == -1) {
-                    modules.push(id);
-                }
-            } else {
-                modules = modules.filter(d => d != id);
-            }
-            return modules;
-        });
     }, []);
 
     const childPages = pages ? pages.sort((a, b) => a.menu_order - b.menu_order) : [];
