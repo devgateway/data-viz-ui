@@ -280,15 +280,14 @@ const MobileConfig = (props) => {
   let xAxisLabels = extractAxisValues(csv);
 
   if (app !== "csv") {
+    const key = `${app}_categories_${datasetId ? datasetId : ""}`;
     if (dimension1 !== "none") {
-      const storedCategories = JSON.parse(
-        sessionStorage.getItem(`categories_${app}`)
-      );
+      const storedCategories = JSON.parse(sessionStorage.getItem(key));
       
       let categories = []
       xAxisLabels = []
 
-      if (!storedCategories) {
+      if (!storedCategories) {        
          fetch(`/api/${app}/categories?datasetId=${datasetId}`)
         .then((response) => response.json())
         .then((data) => {
@@ -301,23 +300,17 @@ const MobileConfig = (props) => {
           ?.items?.map((item) => item.value);
           
         });
+      }  
 
-      }         
-
-    
-  
-
-      
     } else {
-      const storedMeasures = JSON.parse(
-        sessionStorage.getItem(`measures_${app}`)
-      );
+      const key = `${app}_measures_${datasetId ? datasetId : ""}`;
+      const storedMeasures = JSON.parse(sessionStorage.getItem(key));
       // if measures are not present in session storage, fetch them from the API
       if (!storedMeasures) {
         fetch(`/api/${app}/measures?datasetId=${datasetId}`)
           .then((response) => response.json())
           .then((data) => {
-            sessionStorage.setItem(`measures_${app}`, JSON.stringify(data));
+            sessionStorage.setItem(key, JSON.stringify(data));
             updateMeasureLabels(data, measures, app);
           });
       } else {
