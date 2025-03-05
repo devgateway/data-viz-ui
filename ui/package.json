@@ -15,7 +15,6 @@
     "@artsy/fresnel": "^7.1.4",
     "@devgateway/customizer": "file:../../custom/ui-customizer",
     "@devgateway/wp-react-lib": "file:../react-lib/wp-react-lib",
-    "@fluentui/react-component-ref": "^0.66.5",
     "@nivo/bar": "^0.87.0",
     "@nivo/bump": "^0.87.0",
     "@nivo/colors": "^0.87.0",
