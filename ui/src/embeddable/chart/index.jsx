@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Container } from "semantic-ui-react";
 import DataProvider from "../data/DataProvider";
 import DataConsumer from "../data/DataConsumer";
+import getDeviceType from "../../utils/deviceType";
 import { buildDivergingOptions, buildPieOptions } from "./prevalenceBuilder";
 import HalfPie from "./Pie";
 
@@ -473,6 +474,16 @@ const Chart = (props) => {
     };
   }, []);
 
+  const determineLegendPosition = () => {
+    const isTabletOrMobile = ["tablet", "mobile", "midTablet"].includes(
+      getDeviceType()
+    );
+    if (editing) {
+      return isTabletOrMobile ? "bottom" : legendPosition;
+    }
+    return !isTabletOrMobile ? legendPosition : "bottom";
+  };
+
   const chartProps = {
     app,
     tickColor: decodeURIComponent(tickColor),
@@ -505,7 +516,7 @@ const Chart = (props) => {
       parseInt(marginBottom)
     ),
     height: `${contentHeight}px`,
-    legendPosition: isMobileOrTablet ? "bottom" : legendPosition,
+    legendPosition: determineLegendPosition(),
     legends,
     tooltip:
       tooltipEnableMarkdown == true || tooltipEnableMarkdown == "true"
@@ -795,20 +806,29 @@ const Chart = (props) => {
 
   useEffect(() => {
     const handleResize = () => {
-      setTimeout(() => {
-        setOrientation(getScreenOrientation());
-      }, 100);
+        setTimeout(() => {
+            setOrientation(getScreenOrientation());
+        }, 100);
     };
+
     if (window.screen.orientation) {
-      window.screen.orientation.addEventListener("change", handleResize);
+        window.screen.orientation.addEventListener("change", handleResize);
     } else {
-      window.addEventListener("resize", handleResize);
+        window.addEventListener("resize", handleResize);
     }
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+
+    return () => {
+        if (window.screen.orientation) {
+            window.screen.orientation.removeEventListener("change", handleResize);
+        } else {
+            window.removeEventListener("resize", handleResize);
+        }
+    };
+}, []);
+
 
   return (
-    <div ref={ref} key={orientation}>
+    <div ref={ref} key={orientation + Math.random()}>
       <Container
         className={"chart container"}
         style={{
