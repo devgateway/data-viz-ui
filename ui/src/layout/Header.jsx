@@ -263,10 +263,11 @@ const Header = ({ intl, settings }) => {
     const { slug } = useParams();
 
     const menuRef = useRef(null); // Reference for the menu container
+    const hamburgerRef = useRef(null); // Reference for the hamburger icon
 
     const toggleMenu = () => {
-        setHasInteracted(true);
-        setMenuVisible((prevState) => !prevState);
+        setHasInteracted(!hasInteracted);
+        setMenuVisible(!isMenuVisible);
     };
 
     // Close the menu when clicking outside of it or pressing Esc
@@ -274,19 +275,21 @@ const Header = ({ intl, settings }) => {
         const handleClickOutside = (event) => {
             // Close menu if clicking outside of menuRef or directly on an element with the "desktop" class
             if (
-                menuRef.current &&
-                !menuRef.current.contains(event.target) ||
+                (menuRef.current &&
+                    !menuRef.current.contains(event.target)
+                    && !hamburgerRef.current.contains(event.target)) ||
                 event.target.closest(".desktop") ||
                 event.target.closest(".breadcrumbs")
             ) {
                 setMenuVisible(false);
+                setHasInteracted(false);
             }
         };
-
 
         const handleEscKey = (event) => {
             if (event.key === "Escape") {
                 setMenuVisible(false);
+                setHasInteracted(false);
             }
         };
 
@@ -299,16 +302,18 @@ const Header = ({ intl, settings }) => {
         };
     }, []);
 
+    const isNowSmallScreen = window.innerWidth <= 1200;
+
     // Debounced resize logic
     useEffect(() => {
         let resizeTimeout;
 
         const updateScreenSize = () => {
-            const isNowSmallScreen = window.innerWidth <= 1200;
 
-            if (isNowSmallScreen && !isSmallScreen) {
+            if (isNowSmallScreen && !isSmallScreen && isMenuVisible) {
                 // Reset menu visibility when switching to mobile view
                 setMenuVisible(false);
+              
             }
 
             setIsSmallScreen(isNowSmallScreen);
@@ -356,17 +361,22 @@ const Header = ({ intl, settings }) => {
         );
     };
 
-    const hasLandingPageSettings = settings?.landing_page_url && 
-                              settings.landing_page_url !== false && 
-                              settings.landing_page_url !== undefined && 
-                              settings.landing_page_url !== "";
+    const hasLandingPageSettings = settings?.landing_page_url &&
+        settings.landing_page_url !== false &&
+        settings.landing_page_url !== undefined &&
+        settings.landing_page_url !== "";
     const SITE_URL_WITH_LOCALE = hasLandingPageSettings ? settings.landing_page_url : `/${intl.locale}`;
+
+    console.log("isMenuVisible", isMenuVisible);
+
+
 
     return (
         <React.Fragment>
             <MenuProvider slug={"main"} locale={intl.locale}>
                 <Container key="header-container" fluid={true} className="header">
                     <div
+                        ref={hamburgerRef}
                         className={`hamburger-menu ${hasInteracted ? "animate" : ""} ${isMenuVisible ? "open" : "close"
                             }`}
                         onClick={toggleMenu}
