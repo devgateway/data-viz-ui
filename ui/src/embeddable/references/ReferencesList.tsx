@@ -35,11 +35,23 @@ const References = ({
 }) => {
 
     const { width: deviceWidth } = useWindowDimensionsAndDevice();
+    const [orientation, setOrientation] = useState(window.innerWidth > window.innerHeight ? 'landscape' : 'portrait');
+    const [isMobileOrTablet, setIsMobileOrTablet] = useState(deviceWidth < 1380);
 
-    const isMobileOrTablet = deviceWidth < 1380;
+    useEffect(() => {
+        const handleResize = () => {
+            setOrientation(window.innerWidth > window.innerHeight ? 'landscape' : 'portrait');
+            setIsMobileOrTablet(window.innerWidth < 1380);
+        };
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     const style: { flexDirection: string; height?: string } = { flexDirection }
     const [elements, setElements] = useState<NodeListOf<Element> | []>([])
+
+    console.log("isMobileOrTablet", isMobileOrTablet)
 
     if (flexDirection == "column" && cols > 1) {
         style.height = height + "px"
@@ -68,20 +80,20 @@ const References = ({
         {editing &&
             <div className="edit-mode-message"><p>No preview available. The full list of references will be displayed in the live page.</p></div>
         }
-        <Grid fluid stretched={isMobileOrTablet ? true : false } columns={cols as SemanticWIDTHS} style={style}>
+        <Grid fluid stretched={isMobileOrTablet ? true : false} columns={isMobileOrTablet ? 1 : cols as SemanticWIDTHS} style={style}>
             {/* <GridRow style={style}> */}
-                {unique.sort((a, b) => {
-                    const indexA = a.getAttribute("data-index") ?? ""; // Handle null case
-                    const indexB = b.getAttribute("data-index") ?? ""; // Handle null case
-                    const numA = indexA ? parseInt(indexA) : Number.POSITIVE_INFINITY;
-                    const numB = indexB ? parseInt(indexB) : Number.POSITIVE_INFINITY;
-                    return numA - numB;
-                }).map(i => {
-                    const index = i.getAttribute("data-index") ?? ""; // Handle null case
-                    return <Reference key={index} index={index}
-                        content={decodeContent(i.getAttribute("data-description"))}
-                        link={i.getAttribute("data-link")}></Reference>
-                })}
+            {unique.sort((a, b) => {
+                const indexA = a.getAttribute("data-index") ?? ""; // Handle null case
+                const indexB = b.getAttribute("data-index") ?? ""; // Handle null case
+                const numA = indexA ? parseInt(indexA) : Number.POSITIVE_INFINITY;
+                const numB = indexB ? parseInt(indexB) : Number.POSITIVE_INFINITY;
+                return numA - numB;
+            }).map(i => {
+                const index = i.getAttribute("data-index") ?? ""; // Handle null case
+                return <Reference key={index} index={index}
+                    content={decodeContent(i.getAttribute("data-description"))}
+                    link={i.getAttribute("data-link")}></Reference>
+            })}
             {/* </GridRow> */}
 
         </Grid>
