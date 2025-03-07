@@ -333,7 +333,7 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                                                     measures: Object.assign({}, DEFAULT_FORMAT_SETTINGS)
                                                 })
                                                 this.setState({dimensions: [], measures: [], filters: [], categories: []})
-                                                this.loadMetadata(newDatasetId)
+                                                this.loadMetadataForSuperset(app, newDatasetId)
                                             }}
                                             options={datasets}
                                         />

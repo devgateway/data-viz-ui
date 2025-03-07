@@ -356,6 +356,13 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                 params[f.param] = f.value
         })
 
+        const  datasets = [{label: 'Select Dataset', value: '0'}]
+        if (this.state.datasets) {
+            this.state.datasets.forEach(d => {
+                datasets.push({label: d.label, value: d.id})
+            })
+        }
+
         const divStyles = { height: height + 'px', width: '100%' };
 
         return ([isSelected && (<InspectorControls>
@@ -490,7 +497,7 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                                                                         measures: []
                                                                     })
                                                                     this.setState({dimensions: [], measures: [], filters: [], categories: []})
-                                                                    this.loadMetadata(newDatasetId)
+                                                                    this.loadMetadataForSuperset(app, newDatasetId)
                                                                 }}
                                                                 options={datasets}
                                                             />

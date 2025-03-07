@@ -45,10 +45,7 @@ class BlockEdit extends BlockEditWithAPIMetadata {
         }
     }
 
-    /*onFilterChange() {
-        this.loadMetadata();
-    }*/
-
+ 
     items(type) {
         const allCategories = this.state.categories
         const values = allCategories ? allCategories.filter(c => c.type === type) : []
@@ -145,7 +142,7 @@ class BlockEdit extends BlockEditWithAPIMetadata {
 
                                           })
                                                 this.setState({dimensions: [], measures: [], filters: [], categories: []})                                              
-                                                this.loadMetadata(newDatasetId)
+                                                this.loadMetadataForSuperset(app, newDatasetId)
                                             }}
                                             options={datasets}
                                         />

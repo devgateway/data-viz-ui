@@ -288,173 +288,185 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
     }
 
     componentDidMount() {
-
-        apiFetch({path: '/dg/v1/settings'}).then((settingsData) => {
+        apiFetch({
+            path: '/dg/v1/settings'
+        }).then((settingsData) => {
             fetch(`/api/registry/eureka/apps`, {
                 headers: {
                     'Accept': 'application/json',
                 },
             })
-              .then(response => response.json())
-              .then(data => {
-                  const apps = data.applications ? [...data.applications.application
-                    .filter(a => a.instance[0].metadata.type === 'data')
-                    .map(a => ({
-                        label: a.name,
-                        value: a.instance[0].vipAddress,
-                        settings: a.instance[0]
-                    })), 
-                    {label: 'CSV', value: 'csv'}] : [{label: 'CSV', value: 'csv'}] 
-                    
-                    this.setState({
-                      react_ui_url: settingsData["react_ui_url"] + '/' + window._page_locale,
-                      react_api_url: settingsData["react_api_url"],
-                      apache_superset_url: settingsData["apache_superset_url"],
-                      site_language: settingsData["site_language"],
-                      current_language: new URLSearchParams(document.location.search).get("edit_lang"),
-                      apps
-                  }, () => {
-                  this.loadMetadata()
-                  })
-              })
-              .catch(function (response) {
+            .then(response => response.json())
+            .then(data => {
+                const apps = data.applications ? [...data.applications.application
+                        .filter(a => a.instance[0].metadata.type === 'data')
+                        .map(a => ({
+                                label: a.name,
+                                value: a.instance[0].vipAddress,
+                                settings: a.instance[0]
+                            })), {
+                            label: 'CSV',
+                            value: 'csv'
+                        }
+                    ] : [{
+                            label: 'CSV',
+                            value: 'csv'
+                        }
+                    ];
 
-              })
-
+                this.setState({
+                    react_ui_url: settingsData["react_ui_url"] + '/' + window._page_locale,
+                    react_api_url: settingsData["react_api_url"],
+                    apache_superset_url: settingsData["apache_superset_url"],
+                    site_language: settingsData["site_language"],
+                    current_language: new URLSearchParams(document.location.search).get("edit_lang"),
+                    apps
+                }, () => {
+                    this.loadMetadata();
+                });
+            })
+            .catch(() => {
+                console.log("Error when loading apps");
+            });
         });
-
-
     }
 
-    componentDidUpdate(prevProps, prevState, snapshot) {
-        super.componentDidUpdate(prevProps, prevState, snapshot)
-        const {attributes: {app}} = this.props
-        const {attributes: {app: prevAPP}} = prevProps
-
+    componentDidUpdate(prevProps) {
+        super.componentDidUpdate(prevProps);
+        const {
+            attributes: {
+                app
+            }
+        } = this.props;
+        const {
+            attributes: {
+                app: prevAPP
+            }
+        } = prevProps;
 
         if (app != prevAPP) {
-            this.loadMetadata()
+            this.loadMetadata();
         }
+    }
+
+    
+    loadMetadata() {
+        const {
+            attributes: {
+                app
+            }
+        } = this.props;
+
+        if (app == 'csv') {
+            return;
+        }
+
+        this.loadMetaDataByApp(app);
+    }
+
+    loadMetaDataByApp(app) {
+        if (isSupersetAPI(app, this.state.apps)) {
+            this.loadDatasets(app);
+            this.loadMetadataForSuperset();
+        } else {
+            this.loadMetadataForAPI();
+        }   
+    }
+
+       
+    loadMetadataForSuperset(selectedApp, datasetId) {
+        let app =  selectedApp || this.props.attributes.app;
+        let newDatasetId = datasetId || this.props.attributes.datasetId;
+        if  (!newDatasetId || !app)
+            return;
+
+        this.fetchData(this.appendSupersetParams( `/api/${app}/dimensions`, newDatasetId), 
+        'dimensions', 
+        data => [{
+            "label": __("None"),
+            "value": "none"
+        }, ...getTranslatedOptions(data)]);
+
+        this.fetchData(this.appendSupersetParams( `/api/${app}/filters`, newDatasetId), 'filters', data => data.map(f => ({
+            ...f,
+            value: f.param
+        })));
+        this.fetchData(this.appendSupersetParams( `/api/${app}/measures`, newDatasetId), 'measures', getTranslatedOptions);
+        this.fetchData(this.appendSupersetParams( `/api/${app}/categories`, newDatasetId), 'categories', getTranslatedOptions);
+    }
+
+    loadMetadataForAPI() {
+        const {
+            attributes: {
+                app
+            }
+        } = this.props;
+        this.fetchData(`/api/${app}/dimensions`, 'dimensions', data => [{
+            "label": __("None"),
+            "value": "none"
+        }, ...getTranslatedOptions(data)]);
+        this.fetchData(`/api/${app}/filters`, 'filters', data => data.map(f => ({
+            ...f,
+            value: f.param
+        })));
+        this.fetchData(`/api/${app}/measures`, 'measures', getTranslatedOptions);
+        this.fetchData(`/api/${app}/categories`, 'categories', getTranslatedOptions);
+    }
+
+    loadDatasets(app) {
+       fetch(`/api/${app}/datasets`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("HTTP status " + response.status);
+            }
+            return response.json();
+        })
+        .then(data => {
+            this.setState({
+                datasets: data
+            });
+        })
+        .catch(() => {
+            console.log("Error when loading datasets");
+        });
+    }
+
+    appendSupersetParams(url, datId) {
+        let app = this.props.attributes.app || this.props.layer.app;
+        let datasetId = datId || this.props.attributes.datasetId;
+
+        if (this.props.layer) {
+            app = this.props.layer.app;
+            datasetId = this.props.layer.datasetId;
+        }
+
+        if (isSupersetAPI(app, this.state.apps)) {
+            return `${url}?datasetId=${datasetId}`;
+        }
+
+        return url;
     }
 
   
 
-    appendSupersetParams(url, datId) {
-        let app = this.props.attributes.app || this.props.layer.app
-        let datasetId = datId || this.props.attributes.datasetId        
-       
-        if (this.props.layer) {
-            app = this.props.layer.app
-            datasetId = this.props.layer.datasetId           
-        }
-
-
-        if (isSupersetAPI(app, this.state.apps)) {
-            return `${url}?datasetId=${datasetId}`
-        }
-
-        return url
+    fetchData(url, stateKey, transformData) {
+        fetch(url)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("HTTP status " + response.status);
+            }
+            return response.json();
+        })
+        .then(data => {
+            this.setState({
+                [stateKey]: transformData(data)
+            });
+        })
+        .catch(() => {
+            console.log(`Error when loading ${stateKey}`);
+        });
     }
 
-    _loadMetadata(app, datasetId) {
-         if (app != "csv") {
-            fetch(this.appendSupersetParams(`/api/${app}/dimensions`, datasetId))                
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error("HTTP status " + response.status);
-                    } else {
-
-                        return response.json()
-                    }
-                })
-                .then(data => {
-                    this.setState({
-                        ...this.state,
-                        dimensions: [{"label": __("None"), "value": "none"}, ...getTranslatedOptions(data)]
-                    })
-                })
-                .catch(function (response) {
-                    console.log("Error when loading dimensions")
-                })
-
-
-            fetch(this.appendSupersetParams(`/api/${app}/filters`, datasetId))
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error("HTTP status " + response.status);
-                    }
-                    return response.json()
-                })
-                .then(data => {
-
-                    const options = data.map(f => ({...f, value: f.param}))
-                    this.setState({...this.state, filters: options})
-
-                })
-                .catch(function (response) {
-                    console.log("Error when loading filters", response)
-                })
-
-            fetch(this.appendSupersetParams(`/api/${app}/measures`, datasetId))
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error("HTTP status " + response.status);
-                    }
-                    return response.json()
-                })
-                .then(data => {
-
-                    this.setState({...this.state, measures: getTranslatedOptions(data)})
-                })
-                .catch(function (response) {
-                    console.log("Error when loading measures")
-                })
-
-            fetch(this.appendSupersetParams(`/api/${app}/categories`, datasetId))
-                .then(response => {
-                    console.log('loadCategories')
-                    if (!response.ok) {
-                        throw new Error("HTTP status " + response.status);
-                    }
-                    return response.json()
-                })
-                .then(data => {
-                        this.setState({...this.state, categories: getTranslatedOptions(data)})
-                    }
-                )
-                .catch(function (response) {
-                    console.log("Error when getting categories", response)
-                })
-        }
-
-        if (isSupersetAPI(app, this.state.apps)) {
-            this.loadDatasets(app)
-        }
-    }
-
-    loadMetadata(newDatasetId) {
-       const {attributes: {app}} = this.props
-       this._loadMetadata(app, newDatasetId || this.props.attributes.datasetId)       
-    }   
-
-    loadDatasets(app) {   
-        if (!isSupersetAPI(app, this.state.apps))    	 
-            return
-        
-          fetch(`/api/${app}/datasets`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error("HTTP status " + response.status);
-                }
-                return response.json()
-            })
-            .then(data => {
-                this.setState({...this.state, datasets: data})
-            })
-            .catch(function (response) {
-                console.log("Error when loading datasets")
-            })
-    }    
 }
 
 export default SizeConfig
