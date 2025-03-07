@@ -36,7 +36,7 @@ const References = ({
 
     const { width: deviceWidth } = useWindowDimensionsAndDevice();
 
-    const isMobile = deviceWidth < 1250;
+    const isMobileOrTablet = deviceWidth < 1380;
 
     const style: { flexDirection: string; height?: string } = { flexDirection }
     const [elements, setElements] = useState<NodeListOf<Element> | []>([])
@@ -64,14 +64,11 @@ const References = ({
         }
     })
 
-    console.log("columns", cols)
-    console.log("height", height)
-
     return (<Container className={"references list"}>
         {editing &&
             <div className="edit-mode-message"><p>No preview available. The full list of references will be displayed in the live page.</p></div>
         }
-        <Grid fluid stretched={isMobile ? true : false } columns={cols as SemanticWIDTHS} style={style}>
+        <Grid fluid stretched={isMobileOrTablet ? true : false } columns={cols as SemanticWIDTHS} style={style}>
             {/* <GridRow style={style}> */}
                 {unique.sort((a, b) => {
                     const indexA = a.getAttribute("data-index") ?? ""; // Handle null case
