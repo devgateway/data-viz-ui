@@ -116,7 +116,7 @@ class Body extends React.Component {
       root.selectAll("g.system").transition().duration(200).style("opacity", 0);
       element.transition().style("opacity", 1);
     }
-    var bbox = source.node().getBBox();
+    const bbox = source.node().getBBox();
 
     let x1, y1, x2, y2;
     if (bbox.x < 0) {
@@ -506,7 +506,7 @@ class Body extends React.Component {
 
     const { selectedOption, isMobile } = this.state;
 
-    let data = selectedOption === "Cancers" ? left : right;
+    const data = selectedOption === "Cancers" ? left : right;
 
     let sy = 60;
 

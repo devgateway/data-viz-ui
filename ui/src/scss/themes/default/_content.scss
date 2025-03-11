@@ -24,6 +24,7 @@
 .wp-block-image img {
   height: -webkit-fill-available;
   height: auto;
+
 }
 
 
@@ -226,7 +227,8 @@ Alternative compacted style for columns
 
 // Removes extra white space
 .wp-block-spacer {
-  clear: none;
+  clear: none !important;
+
 }
 
 // Facsheet references

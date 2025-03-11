@@ -56,8 +56,6 @@ const Chart = ({
   const [wrapCount, setWrapCount] = useState(0);
   const [newMarginBottom, setNewMarginBottom] = useState(marginBottom);
 
-  console.log('lgend position...', legendPosition)
-
   const chartLegends = optionsVal.data
     .sort((a, b) => {
       if (a.position && b.position) {
@@ -66,7 +64,7 @@ const Chart = ({
       return 0;
     })
     .map((d, index) => {
-      let theColor = colorGenerator.getColor(d.id, d);
+      const theColor = colorGenerator.getColor(d.id, d);
       return {
         color: theColor,
         id: d.id,
@@ -123,7 +121,7 @@ const Chart = ({
     return null;
   }
 
-  let margins = {
+  const margins = {
     top: newMarginTop,
     right: marginRight,
     bottom: newMarginBottom,
@@ -234,7 +232,7 @@ const Chart = ({
 
   const CenterText = (layerProps) => {
     const { centerX, centerY } = layerProps;
-    let centerText = centerLabel.split(/[\r\n]/g);
+    const centerText = centerLabel.split(/[\r\n]/g);
     let totalValue = 0;
     if (layerProps.dataWithArc) {
       totalValue = layerProps.dataWithArc.reduce(function (
@@ -325,7 +323,7 @@ const Chart = ({
             labelTextColor={{ from: "color", modifiers: [["darker", 1.6]] }}
             tooltip={(d) => {
               if (d.datum && d.datum.data && d.datum.data.variables) {
-                let percent = (d.datum.arc.angleDeg / 360) * 100;
+                const percent = (d.datum.arc.angleDeg / 360) * 100;
                 d.datum.data.variables.valuePercent = percent;
                 d.datum.data.variables.category = d.datum.id;
               }
