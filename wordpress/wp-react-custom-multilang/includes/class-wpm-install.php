@@ -90,13 +90,15 @@ class WPM_Install {
 	 * This function is hooked into admin_init to affect admin only.
 	 */
 	public static function install_actions() {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		if ( ! empty( $_GET['do_update_wpm'] ) ) {
 			self::update();
 			WPM_Admin_Notices::add_notice( 'update' );
 		}
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		if ( ! empty( $_GET['force_update_wpm'] ) ) {
 			do_action( 'wp_wpm_updater_cron' );
-			wp_safe_redirect( admin_url( 'options-general.php?page=wpm-settings' ) );
+			wp_safe_redirect( admin_url( 'admin.php?page=wpm-settings' ) );
 			exit;
 		}
 	}
@@ -263,21 +265,29 @@ class WPM_Install {
 
 		$languages              = array();
 		$available_translations = wpm_get_available_translations();
-
-		foreach ( wpm_get_installed_languages() as $locale ) {
-
-			$code = sanitize_title( current( $available_translations[ $locale ]['iso'] ) );
-			$flag = explode( '_', strtolower( $locale ) );
-
-			$languages[ $code ] = array(
-				'enable'      => 1,
-				'locale'      => $locale,
-				'name'        => $available_translations[ $locale ]['native_name'],
-				'translation' => $locale,
-				'date'        => '',
-				'time'        => '',
-				'flag'        => ( isset( $flag[1] ) ? $flag[1] : $flag[0] ) . '.png',
-			);
+		$installed_languages = wpm_get_installed_languages();
+		if(!empty($installed_languages) && is_array($installed_languages)){
+			foreach ( $installed_languages as $locale ) {
+				$code = ''; $name = '';
+				$flag = explode( '_', strtolower( $locale ) );
+				if( ! empty( $available_translations[ $locale ] ) && is_array($available_translations[ $locale ])){
+					if(isset($available_translations[ $locale ]['iso']) && is_array($available_translations[ $locale ]['iso'])){
+						$code = sanitize_title( current( $available_translations[ $locale ]['iso'] ) );
+					}
+					if(isset($available_translations[ $locale ]['native_name'])){
+						$name = sanitize_text_field($available_translations[ $locale ]['native_name']);
+					}
+				}
+				$languages[ $code ] = array(
+					'enable'      => 1,
+					'locale'      => $locale,
+					'name'        => $name,
+					'translation' => $locale,
+					'date'        => '',
+					'time'        => '',
+					'flag'        => ( isset( $flag[1] ) ? $flag[1] : $flag[0] ) . '.png',
+				);
+			}
 		}
 
 		add_option( 'wpm_languages', $languages );
@@ -417,7 +427,7 @@ class WPM_Install {
 	 */
 	public static function plugin_action_links( $links ) {
 		$action_links = array(
-			'settings' => '<a href="' . admin_url( 'options-general.php?page=wpm-settings' ) . '" aria-label="' . esc_attr__( 'View WP Multilang settings', 'wp-multilang' ) . '">' . esc_html__( 'Settings', 'wp-multilang' ) . '</a>',
+			'settings' => '<a href="' . admin_url( 'admin.php?page=wpm-settings' ) . '" aria-label="' . esc_attr__( 'View WP Multilang settings', 'wp-multilang' ) . '">' . esc_html__( 'Settings', 'wp-multilang' ) . '</a>',
 		);
 
 		return array_merge( $action_links, $links );

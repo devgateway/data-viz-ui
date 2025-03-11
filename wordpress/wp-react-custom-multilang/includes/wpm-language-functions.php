@@ -110,16 +110,20 @@ function wpm_get_language() {
 
 	$referrer = wp_get_raw_referer();
 
-	if ( ( defined( 'REST_REQUEST' ) && ( 'GET' !== $_SERVER['REQUEST_METHOD'] || is_admin_url( $referrer ) ) ) || is_admin() ) {
+	if ( ( defined( 'REST_REQUEST' ) && isset( $_SERVER['REQUEST_METHOD'] ) && ( 'GET' !== $_SERVER['REQUEST_METHOD'] || is_admin_url( $referrer ) ) ) || is_admin() ) {
 
 		$languages = wpm_get_languages();
+		//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$query     = $_REQUEST;
 
 		if ( wp_doing_ajax() ) {
 			if ( $referrer && ! is_front_ajax() ) {
-				$query = wp_parse_url( $referrer, PHP_URL_QUERY );
+				$query = wp_parse_url( $referrer, PHP_URL_QUERY );								
+				if(is_string($query)){
+					parse_str($query, $query);
+				}						
 			} else {
-				return wpm_get_user_language();
+				return apply_filters('wpm_get_language_from_url', wpm_get_user_language());
 			}
 		}
 
@@ -135,7 +139,7 @@ function wpm_get_language() {
 		}
 
 	} else {
-		$lang = wpm_get_user_language();
+		$lang = apply_filters('wpm_get_language_from_url', wpm_get_user_language());
 	}
 
 	return $lang;

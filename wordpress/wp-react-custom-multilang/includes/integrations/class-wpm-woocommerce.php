@@ -62,10 +62,16 @@ class WPM_WooCommerce {
 		add_action( 'admin_action_duplicate_product', array( $this, 'remove_filters' ), 9 );
 		add_filter( 'woocommerce_rest_prepare_product_object', array( $this, 'translate_rest_object' ), 10, 3 );
 		add_filter( 'woocommerce_rest_prepare_product_variation_object', array( $this, 'translate_rest_object' ), 10, 3 );
+		add_filter( 'wpm_modify_woocommerce_product_attributes_config', array( $this, 'modify_product_attributes' ), 10, 4 );
+		add_action( 'woocommerce_admin_process_variation_object', array( $this, 'translate_variation_attribute' ), 10, 2 );
 
 		if ( is_admin() ) {
 			add_filter( 'wpm_taxonomies_config', array( $this, 'add_attribute_taxonomies' ) );
 		}
+		add_filter( 'rest_post_dispatch', array( $this, 'wpm_translate_filter_attribute_widget' ), 10, 3);
+
+		add_filter( 'woocommerce_dropdown_variation_attribute_options_args', array( $this, 'translate_variation_attribute_options_args' ) );
+		add_filter( 'get_term', array( $this, 'translate_product_variation_metadata' ), 10, 2 );
 	}
 
 
@@ -148,6 +154,7 @@ class WPM_WooCommerce {
 	 */
 	public function remove_filter( $query_args ) {
 
+		//phpcs:ignore 	WordPressVIPMinimum.Performance.WPQueryParams.SuppressFilters_suppress_filters --Reason This is not a global code, this works only on some woocoomerce hooks.
 		$query_args['suppress_filters'] = true;
 
 		return $query_args;
@@ -191,7 +198,8 @@ class WPM_WooCommerce {
 			}
 		}
 
-		return wpm_array_merge_recursive( $this->attribute_taxonomies_config, $taxonomies_config );
+		return wpm_array_merge_recursive( $this->attribute_taxonomies_config, $taxonomies_config );	
+		
 	}
 
 	/**
@@ -217,8 +225,10 @@ class WPM_WooCommerce {
 		$action = '';
 
 		// Action to perform: add, edit, delete or none
+		//phpcs:ignore WordPress.Security.NonceVerification.Missing -- this is a dependent function and its all security measurament is done wherever it has been used.
 		if ( ! empty( $_POST['add_new_attribute'] ) ) {
 			$action = 'add';
+		//phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.NonceVerification.Recommended -- this is a dependent function and its all security measurament is done wherever it has been used
 		} elseif ( ! empty( $_POST['save_attribute'] ) && ! empty( $_GET['edit'] ) ) {
 			$action = 'edit';
 		}
@@ -241,7 +251,9 @@ class WPM_WooCommerce {
 
 		$label = '';
 
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitization is handled below in wc_clean() function
 		if ( isset( $_POST['attribute_label'] ) ) {
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitization is handled below in wc_clean() function
 			$label = wpm_set_new_value( '', wc_clean( stripslashes( $_POST['attribute_label'] ) ) );
 		}
 
@@ -252,13 +264,16 @@ class WPM_WooCommerce {
 	 * Save new attribute with translate
 	 */
 	private function process_edit_attribute() {
-		$attribute_id = absint( $_GET['edit'] );
+		
+		$attribute_id = isset( $_GET['edit'] ) ? absint( $_GET['edit'] ) : '';
 		check_admin_referer( 'woocommerce-save-attribute_' . $attribute_id );
 
 		$label = '';
 
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitization is handled below in wc_clean() function
 		if ( isset( $_POST['attribute_label'] ) ) {
 			$attribute = wc_get_attribute( $attribute_id );
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitization is handled below in wc_clean() function
 			$label     = wpm_set_new_value( $attribute->name, wc_clean( stripslashes( $_POST['attribute_label'] ) ) );
 		}
 
@@ -313,14 +328,8 @@ class WPM_WooCommerce {
 
 		$meta_sql = get_meta_sql( $meta_query, 'comment', $wpdb->comments, 'comment_ID' );
 
-		$count = $wpdb->get_var( $wpdb->prepare("
-			SELECT COUNT( DISTINCT({$wpdb->comments}.comment_ID) ) FROM {$wpdb->comments}
-			{$meta_sql['join']}
-			WHERE comment_parent = 0
-			AND comment_post_ID = %d
-			AND comment_approved = '1'
-			{$meta_sql['where']}
-		", $product->get_id() ) );
+		//phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery
+		$count = $wpdb->get_var( $wpdb->prepare("SELECT COUNT( DISTINCT({$wpdb->comments}.comment_ID) ) FROM {$wpdb->comments} {$meta_sql['join']} WHERE comment_parent = 0 AND comment_post_ID = %d AND comment_approved = '1' {$meta_sql['where']}", $product->get_id() ) );
 
 		$count_array[ $lang ] = $count;
 		wp_cache_add( $product->get_id(), $count_array, 'wpm_comment_count' );
@@ -369,5 +378,177 @@ class WPM_WooCommerce {
 		}
 
 		return $response;
+	}
+	
+	public function modify_product_attributes($object_fields_config, $meta_key, $meta_value, $product_id){
+
+		$attribute_key = array();
+
+		if($meta_key == '_product_attributes'){
+
+			if(function_exists('wc_get_product')){
+
+				$product = wc_get_product($product_id);
+				if ( $product->get_type() == 'simple' || $product->get_type() == 'variable' ){
+					if(isset($object_fields_config[$meta_key]) && is_array($object_fields_config[$meta_key])){
+						if(is_array($meta_value) && !empty($meta_value)){
+							$attr_array = array();
+							foreach ($object_fields_config[$meta_key] as $ofc_key => $ofc_value) {
+								$attr_array = $ofc_value;
+							}
+							foreach ($meta_value as $key => $value) {
+								$attribute_key[] = $key;
+								$object_fields_config[$meta_key][$key] = $attr_array;
+							}
+						}
+					}
+				}
+			}
+		}
+
+		return $object_fields_config;
+	}
+	
+	/**
+	 * Translate attribute term name
+	 * @param 	$term 		WP_Term
+	 * @param 	$taxonomy 	string
+	 * @return  $term 		WP_Term
+	 * @since 2.4.14
+	 * */
+	public function translate_product_variation_metadata( $term, $taxonomy ){
+
+		if ( is_object( $term ) && ! empty( $term->name ) && strpos( $taxonomy, 'pa_' ) !== false ) {
+			$term->name 	=	wpm_translate_string( $term->name );	
+		}
+		
+		return $term;
+	}
+	
+	/**
+	 * Translate filter attribute widget name
+	 * @param 	$result 	WP_HTTP_Response
+	 * @param 	$server 	WP_REST_Server
+	 * @param 	$request 	WP_REST_Request
+	 * @return  $result 	WP_HTTP_Response
+	 * @since 2.4.11
+	 * */
+	public function wpm_translate_filter_attribute_widget( $result, $server, $request ){
+		
+		if( ! empty( $result->data ) && is_array( $result->data ) ) {
+
+			foreach ($result->data as $r_key => $attribute) {
+
+				if( ! empty( $attribute ) && is_array( $attribute ) ) {
+
+					// Check if current response is of product attribute or not
+					if( ! empty( $attribute['name'] ) && is_string( $attribute['name'] ) ){
+						$result->data[ $r_key ]['name'] 	=	wpm_translate_string( $attribute['name'] );	
+					}
+
+				}
+
+			}
+
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Translate variation attribute meta data
+	 * @param 	$variation 	Object
+	 * @param 	$product_id Integer
+	 * @since 	2.4.14
+	 * */
+	public function translate_variation_attribute( $variation, $product_id ){
+
+		if ( ! empty( $variation ) && is_object( $variation ) ) {
+
+			global $wpdb;
+
+			$lang 				=	wpm_get_language();
+
+			$variation_id 		=	$variation->get_id();
+
+			$old_variation 		=	new \WC_Product_Variation( $variation_id );
+			$old_attributes 	=	$old_variation->get_attributes();
+
+			$attributes 		=	$variation->get_attributes();
+
+			if ( ! empty( $attributes ) && is_array( $attributes ) ) {
+
+				foreach ($attributes as $key => $value) {
+					
+					$attr_key 	=	'attribute_'.$key;	
+
+					if ( isset( $old_attributes[$key] ) ) {
+
+						//phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+						$old_value  = $wpdb->get_var( $wpdb->prepare( "SELECT meta_value FROM {$wpdb->postmeta} WHERE meta_key = %s AND post_id = %d LIMIT 1;", $attr_key, $variation_id ) );
+						$old_value  = maybe_unserialize( $old_value );
+
+						$attributes[$key] = wpm_set_new_value( $old_value, $value );	
+					}
+				}
+			}
+
+			$variation->set_attributes( $attributes );
+
+		}
+	}
+	
+	/**
+	 * Translate dropdown attribute arguments on single product page
+	 * @param 	$args 	Array
+	 * @return  $args 	Array
+	 * @since 	2.4.14
+	 * */
+	public function translate_variation_attribute_options_args( $args ) {
+
+		if ( ! empty( $args['options'] ) && is_array( $args['options'] ) ) {
+
+			$args['options'] 	=	wpm_translate_value( $args['options'] );
+
+		}else if ( empty( $args['options'] ) && ! empty( $args['attribute'] ) && ! empty( $args['product'] ) && is_object( $args['product'] ) ) {
+
+			$product 		=	$args['product'];
+			$attribute 		=	strtolower( $args['attribute'] );
+			$attribute 		=	str_replace( ' ', '-', $attribute );
+			
+			if ( $product->is_type( 'variable' ) ) {
+				
+				// Get all variation IDs
+				$variation_ids 	= 	$product->get_children();	
+
+				if ( ! empty( $variation_ids ) && is_array( $variation_ids ) ) {
+					foreach ($variation_ids as $key => $variation_id) {
+						
+						// Get the variation product
+						$variation = new \WC_Product_Variation( $variation_id );
+
+						if ( ! empty( $variation )  && is_object( $variation ) ) {
+							// Get Attributes
+							$attributes 	=	$variation->get_attributes();
+							if ( ! empty( $attributes ) && is_array( $attributes ) ) {
+								foreach ($attributes as $a_key => $a_val) {
+									
+									if ( $a_key == $attribute ) {
+										$args['options'][] 	=	wpm_translate_string( $a_val );	
+									}
+								}
+							}
+						}
+					}
+				}
+				
+			}
+		}
+
+		if ( ! empty( $args['options'] ) ){
+			$args['options'] = array_unique( $args['options'] );
+		}
+
+		return $args;
 	}
 }

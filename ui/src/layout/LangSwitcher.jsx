@@ -1,3 +1,4 @@
+import { Config } from "@/conf";
 import React, {useEffect, useState} from "react";
 import {Dropdown, Image} from 'semantic-ui-react'
 
@@ -9,10 +10,10 @@ const changeLanguage = (locale) => {
 const toOptions = (languages, show, locale) => {
     return Object.keys(languages).map(k => ({
         key: k,
-        text: (show == 'name' || show == 'both') ? languages[k]["name"] : k.toUpperCase(),
+        text: (show === 'name' || show === 'both') ? languages[k]["name"] : k.toUpperCase(),
         value: k,
-        selected: k.toUpperCase() == locale.toUpperCase(),
-        icon: (show == 'flag' || show == 'both') ?
+        selected: k.toUpperCase() === locale.toUpperCase(),
+        icon: (show === 'flag' || show === 'both') ?
             <Image src={'/wp/wp-content/plugins/wp-multilang/flags/' + languages[k]["flag"]}/> : null
     }))
 }
@@ -90,10 +91,10 @@ const Selector = (props) => {
     const [settings, setSettings] = useState(null);
 
 
-    useEffect(async () => {
+    useEffect(() => {
         async function fetchData() {
             const response = await fetch(
-                process.env.REACT_APP_WP_API + '/dg/v1/settings', {
+                Config.REACT_APP_WP_API + '/dg/v1/settings', {
                     headers: {
                         'Content-Type': 'application/json'
                         // 'Content-Type': 'application/x-www-form-urlencoded',

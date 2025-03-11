@@ -289,6 +289,7 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
                 .then(data => {
 
                     const apps = data.applications ? [...data.applications.application
+                        // .filter(a => a.instance[0].metadata.type === 'starter')
                         .filter(a => a.instance[0].metadata.type === 'data')
                         .map(a => ({
                             label: a.name,

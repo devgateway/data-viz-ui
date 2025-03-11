@@ -1,4 +1,4 @@
-FROM node:12.22.10 AS compiler
+FROM node:22-slim AS compiler
 WORKDIR /tmp/blocks
 COPY blocks ./
 RUN npm install
@@ -11,3 +11,4 @@ COPY update.sh /usr/local/bin
 RUN chmod +x /usr/local/bin/update.sh
 VOLUME /var/plugins
 CMD ["/usr/local/bin/update.sh"]
+ 
