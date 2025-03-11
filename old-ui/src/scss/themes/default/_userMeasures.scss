@@ -1,0 +1,31 @@
+.chart.container {
+  .measures {
+    display: flex;
+    justify-content: left;
+    .measure.item {
+      cursor: pointer;
+      border-radius: 6px;
+      padding: 5px;
+      border: 1px solid $gray;
+      font-size: 11px;
+      margin-left: 10px;
+    }
+    .label-item{
+      padding: 5px;
+      label{       
+        font-size: 14px;
+        font-weight: bold;
+        color: #66676d;
+      }
+    }
+
+    .measure.item.active{
+      color: #FFF;
+      background-color: $green;
+    }
+    .single-select{
+      padding: 5px;
+      font-size: 13px;
+    }
+  }
+}

@@ -57,7 +57,7 @@ const Chart = ({
   }
 
   //margin settings
-  let margins = {
+  const margins = {
     top: marginTop,
     right: marginRight,
     bottom: marginBottom,
