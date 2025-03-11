@@ -22,7 +22,7 @@ const hiddenStyle = {
 
 const DEFAULT_HIGHLIGHTED_POST = 0;
 const TimeLine = (props) => {
-  let {
+  const{
     posts,
     position,
     lineWidth,
@@ -174,7 +174,7 @@ const TimeLine = (props) => {
         const x = rect.left - parentDiv.left;
         const y = rect.top - parentDiv.top;
         position = [x + xOffset, y + yOffset];
-        let tooltipWidth = 600;
+        const tooltipWidth = 600;
         if (rect.left + x + tooltipWidth + xOffset > window.innerWidth) {
           position[0] = x - tooltipWidth * 0.6;
         }
@@ -502,4 +502,3 @@ if(['mobile', 'tablet', 'midTablet'].includes(getDeviceType())) {
 }
 
 export default carousel;
-

@@ -3,6 +3,7 @@ import { Button, Container, Grid, Label, Menu, Accordion, Icon } from 'semantic-
 import { MediaConsumer, MediaProvider, PostConsumer, PostIcon, PostLabel, PostProvider } from "@devgateway/wp-react-lib";
 import { injectIntl } from "react-intl";
 import PostIntro from "../connected-templates/PostIntro";
+import { useWindowDimensionsAndDevice } from '@/lib/hooks/window-dimensions';
 
 const ItemMenu = ({ posts, activeItem, setActive, showLabels }) => {
     return posts ? posts.map(post => (
@@ -207,7 +208,7 @@ const AccordionContent = ({ posts, activeItem, setActive }) => {
 
   useEffect(() => {
     let timeoutId;
-    let observers = []; // Store MutationObservers for each accordion
+    const observers = []; // Store MutationObservers for each accordion
 
     if (activeIndex !== -1) {
       timeoutId = setTimeout(() => {
@@ -368,17 +369,9 @@ const Wrapper = (props) => {
     const scrollable = useScrolls === 'true';
     const conditionalHeight = scrollable ? height : undefined;
 
-    // Determine screen width and conditionally render components
-    const [isMobile, setIsMobile] = useState(window.innerWidth <= 1250);
+    const { width: deviceWidth} = useWindowDimensionsAndDevice();
 
-    useEffect(() => {
-        const handleResize = () => {
-            setIsMobile(window.innerWidth <= 1250);
-        };
-
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
-    }, []);
+    const isMobile = deviceWidth <= 1024;
 
     return (
         <Container className={`viz tabbed posts ${editing ? 'editing' : ''} ${scrollable ? 'scrollable' : ''}`} fluid={true}>

@@ -3,7 +3,7 @@ if [ -n "$SKIP_WP_UPDATE" ]; then
   echo Dev mode: skipping Wordpress file update
 else
   echo Updating Wordpress files...
-  tar -xf /tmp/wp-content.tgz
+  tar -xvf /tmp/wp-content.tgz
 fi
 
 exec /usr/local/bin/docker-entrypoint.sh $@

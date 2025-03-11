@@ -17,6 +17,7 @@ import CSVDataFrame from "./CSVDataFrame";
 import ColorProvider from "./colors/ColorProvider";
 import Messages from "./Messages";
 import { connect } from "react-redux";
+import { injectIntl } from "react-intl";
 
 const PieChart = (props) => {
   const { data, legends, colors, height } = props;
@@ -97,7 +98,7 @@ const Chart = (props) => {
     //"data-csv-line-tooltip": lineTooltip = "",
     //"data-csv-line-title": lineTitle = "",
 
-    "data-overlays": overlays,
+    "data-overlays": overlays = "[]",
     "data-max-value": maxValue = "auto",
     "data-value-scale": valueScale = "linear",
     "data-swap": swap = "false",
@@ -305,7 +306,7 @@ const Chart = (props) => {
   let selectedMeasures = getSelectedMeasures();
 
   let selectedFormat = getSelectedFormat();
-  let userMeasures = getUserMeasures();
+  const userMeasures = getUserMeasures();
   let leftLegendForSelectedMeasure = left;
   let rightLegendForSelectedMeasure = rightLegend;
 
@@ -328,7 +329,7 @@ const Chart = (props) => {
     }
   }
 
-  let numberFormat = selectedFormat
+  const numberFormat = selectedFormat
     ? {
         style:
           selectedFormat.style === "compacted"
@@ -350,7 +351,7 @@ const Chart = (props) => {
 
   const groupTotalFormatObject = parse(groupTotalFormat);
 
-  let groupTotalFormatParsed = {
+  const groupTotalFormatParsed = {
     style:
       groupTotalFormatObject.style === "compacted"
         ? "decimal"
@@ -371,7 +372,7 @@ const Chart = (props) => {
     scheme: scheme,
     colorBy: colorBy,
   };
-  let child = null;
+  const child = null;
   const contentHeight = editing ? height - 80 : height;
 
   const showXAxisTitle = () => {
@@ -536,7 +537,7 @@ const Chart = (props) => {
     valueScale,
     categories,
     lineLayerEnabled: lineLayerEnabled == true || lineLayerEnabled == "true",
-    overlays: parse(overlays) || [],
+    overlays: overlays ? parse(overlays) : [],
     barColor: decodeURIComponent(barColor),
     overrideTickColor: overrideTickColor == true || overrideTickColor == "true",
     fixedMinValue,
@@ -621,7 +622,7 @@ const Chart = (props) => {
     dimension1,
   };
 
-  let params = {};
+  const params = {};
   const ff = parse(filters) || {};
 
   if (ff && ff.forEach) {
@@ -805,17 +806,25 @@ const Chart = (props) => {
 
   useEffect(() => {
     const handleResize = () => {
-      setTimeout(() => {
-        setOrientation(getScreenOrientation());
-      }, 100);
+        setTimeout(() => {
+            setOrientation(getScreenOrientation());
+        }, 100);
     };
+
     if (window.screen.orientation) {
-      window.screen.orientation.addEventListener("change", handleResize);
+        window.screen.orientation.addEventListener("change", handleResize);
     } else {
-      window.addEventListener("resize", handleResize);
+        window.addEventListener("resize", handleResize);
     }
-    return () => window.removeEventListener("resize", handleResize);
-  });
+    return () => {
+        if (window.screen.orientation) {
+            window.screen.orientation.removeEventListener("change", handleResize);
+        } else {
+            window.removeEventListener("resize", handleResize);
+        }
+    };
+}, []);
+
 
   return (
     <div ref={ref} key={orientation + Math.random()}>
@@ -916,4 +925,4 @@ const mapStateToProps = (state, ownProps) => {
   }
 };
 const mapActionCreators = {};
-export default connect(mapStateToProps, mapActionCreators)(Chart);
+export default connect(mapStateToProps, mapActionCreators)(injectIntl(Chart));

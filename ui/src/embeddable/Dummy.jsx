@@ -51,7 +51,7 @@ const getVal = (k, props) => {
 
 
         } catch (e) {
-
+            return props[k]
         }
     }
     return props[k]

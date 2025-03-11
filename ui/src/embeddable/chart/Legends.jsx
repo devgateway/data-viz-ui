@@ -1,4 +1,5 @@
 import React from "react";
+import { injectIntl } from "react-intl";
 
 const Legends = ({
   filter,
@@ -40,6 +41,7 @@ const Legends = ({
                   className={"ignore"}
                   type="checkbox"
                   checked={filter.length == 0 || !filter.includes(legend.id)}
+                  readOnly
                 />
 
                 <span
@@ -98,4 +100,4 @@ const Legends = ({
   );
 };
 
-export default Legends;
+export default injectIntl(Legends);
