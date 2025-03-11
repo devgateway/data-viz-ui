@@ -3,7 +3,7 @@ import {connect} from 'react-redux'
 import {injectIntl} from 'react-intl';
 import {CategoriesContext} from './DataContext'
 import {getCategories} from "../reducers/data";
-import {Container, Dimmer, Loader, Segment} from "semantic-ui-react";
+import {Container, Segment} from "semantic-ui-react";
 
 class DataProvider extends React.Component {
 
