@@ -6,8 +6,12 @@ import {
     partitionHTMLProps,
     htmlInputAttrs,
     useKeyOnly,
-    useValueAndKey
+    useValueAndKey,
+    getComponentType
 } from 'semantic-ui-react/dist/commonjs/lib'
+import { injectIntl, useIntl } from "react-intl";
+import { utils } from "@devgateway/wp-react-lib";
+
 
 // type SearchProps = typeof Search;
 
@@ -24,11 +28,58 @@ import {
 //     total : number;
 // }
 
+const ResultRenderer = injectIntl(({
+    ID,
+    title,
+    slug,
+    parent_title,
+    parent_slug,
+    parent_link,
+    extract,
+    type,
+    link,
+    terms,
+    subtype,
+    bread_crumbs = [],
+    intl: { locale }
+}) => {
+
+    
+
+
+    const target = parent_link ? utils.replaceLink(parent_link, locale) + `#${slug}` : utils.replaceLink(link, locale)
+    // target = metadata?.redirect_url ? redirect_url + `#${slug}` : target
+
+
+    return (
+        <div className="search-results-wrapper searching-results" style={{ display: 'flex', flexDirection: 'column' }}>
+            <div className={"has-standard-12-font-size"} onClick={e => document.location.href = target}>
+                <h5 className="breadcrumbs-search">{Array.isArray(bread_crumbs) && bread_crumbs.length > 0 ? bread_crumbs.join(' / ') : ''}</h5>
+                <div className={"has-standard-14-font-size"}><h4 className="search-title">{String(title)}</h4></div>
+                <div className='search-content'
+                    dangerouslySetInnerHTML={{ __html: utils.replaceHTMLinks(extract, locale) }} />
+            </div>
+        </div>
+    )
+})
+
 const CustomSearch = (props) => {
-    const { results, resultRenderer, onSearchChange, value, showNoResults, onResultSelect, loading } = props;
+    const { results, resultRenderer, onSearchChange, value, showNoResults, onResultSelect, loading, placeholder, perPage, total } = props;
+    const intl = useIntl()
     const [searchClasses, setSearchClasses] = React.useState('');
     const [focus, setFocus] = React.useState(false);
     const [open, setOpen] = React.useState(false);
+    const augmentedResults = results && results.length > 0
+        ? [{
+            isHeader: true, headerText: intl.formatMessage({
+                id: 'search.results.summary',
+                defaultMessage: '{count} of {} Results'
+            }, {
+                count: total < perPage ? total : perPage, total: total
+            })
+        }, ...results]
+        : [];
+
 
     const renderHeader = () => {
         const { perPage, total } = props;
@@ -39,19 +90,27 @@ const CustomSearch = (props) => {
         );
 
         return (
-            <Segment color="blue" textAlign="left" className={classes}>
-                <span>{total < perPage ? total : perPage} of {total} Results</span>
+            <Segment basic textAlign="left" className={classes}>
+                {intl.formatMessage({
+                    id: 'search.results.summary',
+                    defaultMessage: '{count} of {} Results'
+                }, {
+                    count: total < perPage ? total : perPage, total: total
+                })}
             </Segment>
         );
     };
 
-    const renderResults = () => {
+    const renderResults = (res) => {
+        console.log('res', res);
+
+        if (res.isHeader) {
+            return renderHeader();
+        }
+
         return (
             <React.Fragment>
-                {renderHeader()}
-                {results.map((result, index) => (
-                    <Search.Result key={index} {...result} />
-                ))}
+                <ResultRenderer {...res} />
             </React.Fragment>
         );
     };
@@ -91,6 +150,7 @@ const CustomSearch = (props) => {
         size,
         searchClasses,
         useKeyOnly(category, 'category'),
+        useKeyOnly(focus, 'focus'),
         useKeyOnly(fluid, 'fluid'),
         useKeyOnly(loading, 'loading'),
         useValueAndKey(aligned, 'aligned'),
@@ -100,29 +160,37 @@ const CustomSearch = (props) => {
 
 
     const unhandled = getUnhandledProps(Search, props);
-    // const ElementType = getComponentType(Search, props);
+    const ElementType = getComponentType(Search, props);
     const [htmlInputProps, rest] = partitionHTMLProps(unhandled, {
         htmlProps: htmlInputAttrs,
     });
 
+
     return (
         <>
+
             <Search
                 {...rest}
+                as={Input}
                 className={classes}
                 onBlur={handleBlur}
-                size="tiny"
+                size="mini"
+                aligned="left"
+                placeholder={placeholder}
                 onFocus={handleFocus}
                 onMouseDown={handleMouseDown}
-                resultRenderer={resultRenderer}
+                resultRenderer={(res) => renderResults(res)}
                 onSearchChange={onSearchChange}
-                results={results}
+                results={augmentedResults}
+                input={renderSearchInput(htmlInputProps)}
                 value={value}
                 showNoResults={showNoResults}
                 onResultSelect={onResultSelect}
                 loading={loading}
+                header={renderHeader()}
 
-            />
+            >
+            </Search>
         </>
 
     );
