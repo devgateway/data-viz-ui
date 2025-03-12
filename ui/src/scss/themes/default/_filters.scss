@@ -1,18 +1,13 @@
-@import "../vars";
+@import "../../vars";
 
 .ui.container.filter {
-  margin-left: 0em !important;
-  margin-right: 0em !important;
-
-  margin-left: 0px !important;
-  margin-right: 0px !important;
-  padding: 0px 2px;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding: 0 2px;
   input {
     display: none;
   }
-
   .ui.button {
-
     text-wrap: none;
     cursor: pointer !important;
     color: $gray;
@@ -23,34 +18,23 @@
     font-weight: 400;
     background-color: #f5f6f9;
   }
-
-
   .ui.button.applied {
     color: $light-blue;
   }
-
-  .ui.button.active {
-
-  }
-
   .angle.down.icon {
     float: right;
     margin-right: 4px;
     margin-left: auto;
     margin-top: 9px;
   }
-
   .ui.dropdown {
-
-    width: auto !important;
-
+    width: 100%;
     .divider.text {
       cursor: pointer;
       width: 100%;
       font-size: 14px;
       line-height: 25px;
     }
-
     .ui.label {
       cursor: pointer;
       border: 0px;
@@ -59,16 +43,13 @@
       margin: 0px;
       padding: 5px 0px;
     }
-
     i {
       margin-right: -1em;
       margin-top: .5em;
     }
-
     .item {
       height: 25px;
     }
-
     .ui.segment {
       color: $gray;
       border-radius: 0px;
@@ -79,12 +60,9 @@
       font-size: 14px;
       font-weight: 300;
     }
-
     .menu {
       min-height: 100px;
-
     }
-
     .ui.container {
       margin: 0px;
       width: auto;
@@ -92,62 +70,68 @@
       flex-direction: column;
       justify-content: flex-start;
       flex-wrap: wrap;
-
       font-weight: 200;
       padding: 0px 15px 10px 15px;
-      max-height: 120px;
-
+      max-height: 200px;
       .item {
         height: 25px;
         box-sizing: border-box;
         border: 1px;
         max-width: 50%;
       }
-
       .ui.checkbox label {
-
         padding-left: 1.6em;
         font-size: 15px;
       }
     }
   }
-
-
 }
 
 // Special style for direct cost chart filter
 .dropdown-single-column{
   max-height: none !important;
 }
-
 .dropdown-item-single-column{
   max-width: $extend !important;
-	width: $extend !important;
+  width: $extend !important;
 }
-
 .filter-search{
   display: inline-flex !important;
 }
-
 .clear-icon{
   margin-right: auto !important;
-  margin-top: auto !important;  
+  margin-top: auto !important;
 }
-
 [data-group='directcost'] .ui.container.filter .ui.dropdown .ui.container{
-	max-height: none;
+  max-height: none;
 }
 [data-group='directcost'] .ui.container.filter .ui.dropdown .ui.container .item{
-	max-width: $extend;
-	width: $extend;
+  max-width: $extend;
+  width: $extend;
 }
-
-
+[data-group='datamap'] .ui.container.filter .ui.dropdown .ui.container{
+  // max-height: none;
+}
 .editing {
   .ui.container.filter {
     margin: 3px !important;
-        .menu {
-       display: none !important;
+    .menu {
+      display: none !important;
     }
+  }
+}
+
+
+
+/* General Adjustments for responsiveness:*/
+
+.ui.container.filter {
+  width: 100% !important;
+  padding: 0 !important;
+  .item {
+    display: block !important;
+  }
+  .item.dropdown-item-single-column {
+    display: block !important;
   }
 }
