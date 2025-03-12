@@ -2,13 +2,11 @@ import { Search, Segment, Input } from "semantic-ui-react";
 import React from "react";
 import clsx from "clsx";
 import {
-    getUnhandledProps,
-    partitionHTMLProps,
-    htmlInputAttrs,
     useKeyOnly,
     useValueAndKey,
-    getComponentType
-} from 'semantic-ui-react/dist/commonjs/lib'
+} from 'semantic-ui-react/src/lib/classNameBuilders';
+import { partitionHTMLProps, htmlInputAttrs, } from 'semantic-ui-react/src/lib/htmlPropsUtils';
+import getUnhandledProps from 'semantic-ui-react/src/lib/getUnhandledProps';
 import { injectIntl, useIntl } from "react-intl";
 import { utils } from "@devgateway/wp-react-lib";
 
@@ -43,10 +41,6 @@ const ResultRenderer = injectIntl(({
     bread_crumbs = [],
     intl: { locale }
 }) => {
-
-    
-
-
     const target = parent_link ? utils.replaceLink(parent_link, locale) + `#${slug}` : utils.replaceLink(link, locale)
     // target = metadata?.redirect_url ? redirect_url + `#${slug}` : target
 
@@ -102,7 +96,6 @@ const CustomSearch = (props) => {
     };
 
     const renderResults = (res) => {
-        console.log('res', res);
 
         if (res.isHeader) {
             return renderHeader();
@@ -160,10 +153,11 @@ const CustomSearch = (props) => {
 
 
     const unhandled = getUnhandledProps(Search, props);
-    const ElementType = getComponentType(Search, props);
     const [htmlInputProps, rest] = partitionHTMLProps(unhandled, {
         htmlProps: htmlInputAttrs,
     });
+
+    console.log("classes", classes);
 
 
     return (
