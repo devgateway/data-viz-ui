@@ -1,3 +1,5 @@
+@use "sass:color";
+
 .container.header {
   height: 90px;
   padding: 0;
@@ -48,7 +50,7 @@
         background-repeat: no-repeat !important;
         background: url("../public/flags/et-flag-header.png");
         background-size: 100% 100%;
-        border: 1px solid lighten($light-gray, 5%);
+        border: 1px solid color.adjust($light-gray, $lightness: 5%, $space: hsl);
       }
     }
 
