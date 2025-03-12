@@ -1,4 +1,4 @@
-@import '../vars';
+@import '../../vars';
 @import 'colors';
 @import 'fonts';
 @import 'content';
@@ -10,6 +10,7 @@
 @import 'responsive';
 @import 'floating';
 @import 'featured';
+@import 'verticalFeatured';
 @import 'inline-list';
 @import 'charts';
 @import 'carousel';
@@ -26,5 +27,4 @@
 @import "backtotop";
 @import "dataFiltersReset";
 @import "tooltip";
-@import "3dmap";
-
+@import "agreeAndDownloadForm";

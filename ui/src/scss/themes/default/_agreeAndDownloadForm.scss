@@ -1,0 +1,215 @@
+.agree-and-download.link {
+  font-size: 16px;
+  cursor: pointer;
+}
+.agree-and-download.link:hover {
+  color: #195079 !important;
+}
+
+.modal {
+  .agreement-header {
+    display: flex !important;
+    align-items: center;
+    font-family: "Roboto", sans-serif !important;
+    font-size: 23px !important;
+    background-color: #5BAF95 !important;
+    color: #FFFFFF !important;
+    font-weight: 300 !important;
+    position: relative;
+    height: 75px;
+  }
+  .agreement-header span {
+    display: inline-block;
+    transform: translateY(1px);
+  }
+  .agreement-header svg {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    margin: 0 12px 0 10px;
+    stroke-width: 4px;
+  }
+  .agreement-body {
+    background-color: #F6F6F6 !important;
+    padding: 30px 80px 5px 80px !important;
+    .wp-block-separator {
+      color: #e5e5e5;
+      width: 100%;
+    }
+  }
+  .agreement-footer {
+    background-color: #F6F6F6 !important;
+    border: none !important;
+    padding-top: 30px !important;
+    padding-bottom: 45px !important;
+  }
+  .modal-cancel-button {
+    height: 35px;
+    width: 140px;
+    transform: translateX(96px);
+    padding-top: 11px;
+    font-size: 14px !important;
+    font-weight: 400;
+    color: #FFFFFF !important;
+    background-color: #C96A6A !important;
+    transition: background-color 0.3s ease;
+  }
+  .modal-cancel-button:hover {
+    background-color: #a65454 !important;
+  }
+  .modal-agree-button{
+    height: 35px;
+    width: 140px;
+    transform: translateX(-659px);
+    padding-top: 11px;
+    font-size: 14px !important;
+    font-weight: 400;
+    color: #FFFFFF !important;
+    background-color: #5BAF95 !important;
+    transition: background-color 0.3s ease;
+  }
+  .modal-agree-button:hover {
+    background-color: #468670 !important;
+  }
+
+}
+
+
+/* Styles for editor*/
+
+.has-standard-14-font-size {
+  font-size: 14px;
+}
+
+.has-standard-12-font-size {
+  font-size: 12px;
+}
+
+.has-standard-14-font-size{
+  font-size: 14px;
+}
+
+.has-standard-15-font-size{
+  font-size: 15px;
+}
+
+.has-standard-16-font-size {
+  font-size: 16px;
+}
+
+.has-standard-18-font-size {
+  font-size: 18px;
+}
+
+.has-standard-24-font-size {
+  font-size: 24px;
+}
+
+.has-standard-27-font-size{
+  font-size: 27px;
+}
+
+.has-standard-30-font-size {
+  font-size: 30px;
+}
+
+.has-standard-36-font-size {
+  font-size: 36px;
+}
+
+.has-standard-64-font-size {
+  font-size: 64px;
+  line-height: 110%;
+}
+
+
+.has-condensed-text {
+  font-stretch: condensed;
+  line-height: 115% !important;
+}
+
+
+.has-weight-300 {
+  font-weight: 300;
+}
+
+.has-weight-400 {
+  font-weight: 400;
+}
+
+.has-weight-700 {
+  font-weight: 700;
+}
+
+*{
+  -webkit-print-color-adjust: exact;
+}
+.has-white-color {
+  color: #FFF
+}
+
+.has-light-blue-color {
+  color: $light-blue
+
+}
+
+.has-light-green-color {
+  color: #82b38b
+}
+
+.has-light-blue-background-color {
+  background-color: $light-blue !important;
+}
+
+.has-blue-color {
+  color: $light-blue;
+}
+
+.has-blue-background-color {
+  background-color: $light-blue;
+}
+
+
+.has-gray-color {
+  color: $gray
+}
+
+.has-gray-border {
+  border: 1px solid #EEE;
+}
+
+.has-gray-background-color {
+  background-color: $gray;
+}
+
+.has-dark-gray-color {
+  color: $dark-gray;
+}
+
+.has-dark-gray-background-color {
+  color: $dark-gray
+}
+
+.has-green-color {
+  color: $green
+}
+
+.has-green-background-color {
+  background-color: $green;
+}
+
+.has-red-color {
+  color: $red
+}
+
+.has-red-background-color {
+  background-color: $red;
+}
+
+.has-ligth-green-color {
+  color: $light-green
+}
+
+.has-ligth-green-background-color {
+  background-color: $light-green;
+}
