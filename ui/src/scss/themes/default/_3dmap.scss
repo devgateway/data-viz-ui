@@ -1,0 +1,175 @@
+body {
+    background-color: transparent !important;
+}
+
+
+.d3map-container {
+    overflow: hidden;
+
+    .projected {
+        position: relative;
+
+        .map {
+            position: relative;
+            background-color: transparent;
+
+            svg {
+                background-color: transparent;
+                cursor: pointer;
+                vector-effect: non-scaling-stroke;
+            }
+
+            path {
+                vector-effect: non-scaling-stroke;
+                stroke-width: 1px;
+            }
+
+            text {
+                text-anchor: middle;
+                dominant-baseline: middle;
+                font-family: "Open Sans";
+                font-weight: bold;
+            }
+
+        }
+
+        .zoom {
+            font-size: 16px;
+            position: absolute;
+            left: 30px;
+            bottom: 50px;
+
+            .button {
+                box-sizing: border-box;
+                width: 25px;
+                height: 20px;
+                background-color: #ffffff;
+                height: auto;
+                margin: 2px;
+                cursor: pointer;
+                padding: 4px;
+                box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+
+                i {
+                    margin-left: 1.5px;
+                    color: #464646;
+                }
+            }
+
+            .button:hover {
+                background-color: #eeeeee;
+            }
+
+            .button:active {
+                transform: scale(0.95);
+            }
+
+            .icon {
+                height: auto;
+            }
+        }
+    }
+
+
+    .legends {
+        min-width: 20%;
+        min-height: 30%;
+        margin: 5px;
+        padding: 5px;
+        background: #fff;
+        opacity: 0.9;
+        font-family: Roboto;
+        position: absolute;
+        top: 0;
+    }
+
+    svg {
+        text.patterns-labels {
+            font-size: 12px;
+            font-family: Roboto;
+            transform: translate(5px, 12px);
+        }
+
+        text.patterns-title {
+            font-weight: bold;
+            font-size: 12px;
+            font-family: Roboto;
+            transform: translate(5px, 12px);
+        }
+    }
+
+    .legend-item {
+        display: flex;
+        margin-bottom: 5px;
+        font-size: 11px;
+        font-family: Roboto;
+
+        .legend-check {
+            text-align: center;
+            line-height: 19px;
+            font-size: 21px;
+            cursor: pointer;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            margin-right: 5px;
+            border: 1px solid #3c434a;
+        }
+
+        .legend-label {
+            font-weight: bold;
+            line-height: 20px;
+            font-size: 13px;
+        }
+
+
+    }
+
+    .legend-breaks {
+        margin-top: -5px;
+        margin-left: 18px;
+        font-size: 11px;
+        font-family: Roboto;
+
+        .break-item {
+            margin-bottom: 7px;
+            font-weight: bold;
+            font-size: 12px;
+            width: 18px;
+            height: 18px;
+
+        }
+
+        .break {
+            display: flex;
+            flex-direction: row;
+
+            .break-item {
+                font-weight: bold;
+                font-size: 12px;
+                margin: 3px;
+                width: 18px;
+                height: 18px;
+
+            }
+
+            .break-item.point {
+                border-radius: 50%;
+
+            }
+
+            .break-item-shape {
+                margin: 3px;
+                width: 18px;
+                height: 18px;
+            }
+
+            .break-label {
+                line-height: 24px;
+            }
+        }
+    }
+
+}
