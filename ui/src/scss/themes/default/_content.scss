@@ -1,3 +1,5 @@
+@use "sass:color";
+
 .entry-content {
   margin: 0;
   display: block;
@@ -259,7 +261,7 @@ Alternative compacted style for columns
 .wp-block-quote {
   @include border-radius($base-unit * 4);
   @include quote();
-  background-color: lighten($green, 40%);
+  background-color: color.adjust($green, $lightness: 40%, $space: hsl);
   background-image:none;
   display: block;
   padding: $base-unit * 2 $base-unit * 4.5 $base-unit * 3 $base-unit * 10.5;
@@ -321,7 +323,7 @@ Alternative compacted style for columns
 
 .background-quote-img{
   @include border-radius($base-unit * 4);
-  background-color: lighten($green, 40%);
+  background-color: color.adjust($green, $lightness: 40%, $space: hsl);
   background-image:none;
   display: block;
 }
