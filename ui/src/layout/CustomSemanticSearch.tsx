@@ -111,7 +111,7 @@ const CustomSearch = (props) => {
                 {...rest}
                 className={classes}
                 onBlur={handleBlur}
-                size="tiny"
+                size="mini"
                 onFocus={handleFocus}
                 onMouseDown={handleMouseDown}
                 resultRenderer={resultRenderer}
