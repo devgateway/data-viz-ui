@@ -28,7 +28,7 @@ $extend: 100%;
   .ui.dropdown>.dropdown.icon{
     &:before{
       float: right;
-      margin-top: -($base-unit / 2)
+      margin-top: -($base-unit * 0.5)
     }
   }
 
@@ -48,6 +48,7 @@ $extend: 100%;
       color: rgba(191, 191, 191, .87);
     }
   }
+  
 
   .validated {
     .field.error {
