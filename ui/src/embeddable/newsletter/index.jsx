@@ -49,7 +49,7 @@ const Index = (props) => {
                    placeholder={placeholder}/>
             <Button disabled={!valid} primary onClick={e => submit()}>{label}</Button>
         </div>
-        {/* {message} */}
+        {message}
     </div>
 }
 
