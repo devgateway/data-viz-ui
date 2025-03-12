@@ -51,8 +51,6 @@ const References = ({
     const style: { flexDirection: string; height?: string } = { flexDirection }
     const [elements, setElements] = useState<NodeListOf<Element> | []>([])
 
-    console.log("isMobileOrTablet", isMobileOrTablet)
-
     if (flexDirection == "column" && cols > 1) {
         style.height = height + "px"
     }
