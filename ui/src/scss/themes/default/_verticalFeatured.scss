@@ -2,21 +2,28 @@
 
   .item {
     overflow: hidden;
-    cursor: pointer;
     flex-grow: 1;
   }
 
-
   .item.expanded {
     flex-grow: 1;
-    transition: all .7s;
+    transition: all 0.5s;
+    backface-visibility: hidden;
   }
 
   .item.collapsed {
     flex-grow: 0;
-    transition: all .7s;
+    transition: all 0.5s;
+    backface-visibility: hidden;
   }
 
+  .item.collapsed:hover {
+    transform: translateX(-7px);
+    .cover {
+      transition: filter 0.25s ease-in-out;
+      filter: brightness(1.18);
+    }
+  }
 
   .content-area {
     height: 100%;
@@ -24,11 +31,14 @@
     position: relative;
 
     .cover {
+      cursor: pointer;
       padding: 0px;
       left: 0px;
       float: left;
       position: absolute;
       height: 100%;
+      display: grid;
+      transition: filter 0.25s ease-in-out;
 
       .rotator {
         position: absolute;
@@ -39,24 +49,97 @@
           padding: 0px;
         }
 
+        img {
+          transform: rotate(-90deg);
+        }
+
+        p {
+          transform: rotate(180deg);
+          text-align: right;
+        }
       }
     }
 
     .collapsable-content {
       .entry-content {
+        cursor: default !important;
+        height: 100%;
         margin: auto;
         padding: 0px;
+
+        .ui.fluid.container.content {
+          height: 100%;
+          overflow-y: auto;
+
+          &::-webkit-scrollbar-thumb {
+            @include border-radius(4px);
+            background-color: $gray;
+          }
+
+          &::-webkit-scrollbar-track {
+            @include border-radius(0);
+            background-color: $light-gray;
+          }
+        }
       }
 
       height: 100%;
       position: absolute;
       display: block;
       margin-right: 0px;
-
     }
 
   }
 
+  .overlay-label-container {
+    position: absolute;
+    transform: rotate(-90deg);
+    bottom: 65px;
+    justify-self: center;
+    width: 100px;
+    text-align: center;
+  }
+
+  .overlay-label {
+    color: white;
+    font-size: 11px;
+    font-weight: 300;
+    line-height: 1;
+    opacity: 0;
+    transition: opacity 0.25s ease-in-out;
+    text-align: center;
+    transform: translate(-16px, 2px);
+  }
+
+  .overlay-label.visible {
+    opacity: 1;
+  }
+
+  .arrow-svg {
+    height: 20px;
+    background: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMTIiIHZpZXdCb3g9IjAgMCAyMCAxMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTE5LjE3MjcgMTEuMTM2QzE5LjMyIDEwLjk4NzMgMTkuNDM2OSAxMC44MTAzIDE5LjUxNjcgMTAuNjE1M0MxOS41OTY1IDEwLjQyMDQgMTkuNjM3NiAxMC4yMTEyIDE5LjYzNzYgMTBDMTkuNjM3NiA5Ljc4ODc4IDE5LjU5NjUgOS41Nzk2NSAxOS41MTY3IDkuMzg0NjhDMTkuNDM2OSA5LjE4OTcgMTkuMzIgOS4wMTI3NCAxOS4xNzI3IDguODY0TDExLjMxNTYgMC44NjQwMDFDMTEuMTY5NSAwLjcxNDAzNiAxMC45OTU3IDAuNTk1MDA1IDEwLjgwNDIgMC41MTM3NzVDMTAuNjEyNyAwLjQzMjU0NSAxMC40MDczIDAuMzkwNzI0IDEwLjE5OTkgMC4zOTA3MjRDOS45OTI0NCAwLjM5MDcyNCA5Ljc4NzA1IDAuNDMyNTQ1IDkuNTk1NTYgMC41MTM3NzVDOS40MDQwNiAwLjU5NTAwNSA5LjIzMDI2IDAuNzE0MDM2IDkuMDg0MTggMC44NjQwMDFMMS4yMjcwNCA4Ljg2NEMxLjA3OTc1IDkuMDEyNzQgMC45NjI4MzkgOS4xODk3IDAuODgzMDYgOS4zODQ2OEMwLjgwMzI4MSA5LjU3OTY1IDAuNzYyMjA3IDkuNzg4NzggMC43NjIyMDcgMTBDMC43NjIyMDcgMTAuMjExMiAwLjgwMzI4MSAxMC40MjAzIDAuODgzMDYgMTAuNjE1M0MwLjk2MjgzOSAxMC44MTAzIDEuMDc5NzUgMTAuOTg3MyAxLjIyNzA0IDExLjEzNkMxLjM3MzEyIDExLjI4NiAxLjU0NjkyIDExLjQwNSAxLjczODQxIDExLjQ4NjJDMS45Mjk5MSAxMS41Njc1IDIuMTM1MyAxMS42MDkzIDIuMzQyNzUgMTEuNjA5M0MyLjU1MDE5IDExLjYwOTMgMi43NTU1OSAxMS41Njc1IDIuOTQ3MDggMTEuNDg2MkMzLjEzODU4IDExLjQwNSAzLjMxMjM3IDExLjI4NiAzLjQ1ODQ2IDExLjEzNkwxMC4xOTk5IDQuMjU2TDE2Ljk0MTMgMTEuMTM2QzE3LjA4NzQgMTEuMjg2IDE3LjI2MTIgMTEuNDA1IDE3LjQ1MjcgMTEuNDg2MkMxNy42NDQyIDExLjU2NzUgMTcuODQ5NiAxMS42MDkzIDE4LjA1NyAxMS42MDkzQzE4LjI2NDUgMTEuNjA5MyAxOC40Njk5IDExLjU2NzUgMTguNjYxNCAxMS40ODYyQzE4Ljg1MjkgMTEuNDA1IDE5LjAyNjcgMTEuMjg2IDE5LjE3MjcgMTEuMTM2WiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+Cg==') no-repeat;
+    transform: translate(25px, -3px);
+    transition: transform 0.25s ease-in-out;
+  }
+
+  .overlay-label.visible + .arrow-svg {
+    transform: translate(25px, 6px);
+    transition: transform 0.25s ease-in-out, opacity 0.25s ease-in-out;
+
+  }
+
+ .item.expanded {
+    .arrow-svg {
+      opacity: 0;
+      transition: transform 0.25s ease-in-out, opacity 0.25s ease-in-out;
+    }
+  }
+
+  .item.collapsed {
+    .arrow-svg {
+      opacity: 1;
+      transition: transform 0.25s ease-in-out, opacity 0.25s ease-in-out;
+    }
+  }
 
 }
-
