@@ -183,7 +183,7 @@
   .ui.button.download {
     border: 0px;
     font-weight: 400;
-    padding: $base-unit / 2;
+    padding: $base-unit * 0.5;
     background-color: transparent;
     color: #0692fe;
     margin-right: 0;
