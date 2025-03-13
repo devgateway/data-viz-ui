@@ -26,7 +26,8 @@ const PieOptions = (props) => {
             centerLabelFontWeight,
             centerLabelFontSize,
             centerLabelXOffset,
-            centerLabelYOffset
+            centerLabelYOffset,
+            showPercentage,
         }
     } = props;
 
@@ -62,6 +63,14 @@ const PieOptions = (props) => {
                 checked={showArcLinkLabels}
                 onChange={() => setAttributes({showArcLinkLabels: !showArcLinkLabels})}/>
         </PanelRow>
+        
+        <PanelRow>
+            <ToggleControl
+                label={__("Show Percentage")}
+                checked={showPercentage}
+                onChange={() => setAttributes({showPercentage: !showPercentage})}/>
+        </PanelRow>
+
         <ChartLegends {...props}></ChartLegends>
 
 
