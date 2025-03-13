@@ -34,22 +34,28 @@ class DataProvider extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        const {app, filters, source, store, params, csv, group, editing} = this.props
-        if (filters != prevProps.filters ||
-            JSON.stringify(params) != JSON.stringify(prevProps.params)
-            || app != prevProps.app
-            || prevProps.source != source
-            || csv != prevProps.csv) {
+        const {app, filters, source, store, params, csv, group, autoApply, editing} = this.props
 
-            if (app === "csv") {
-                this.props.onSetData({app, csv, store, params, group})
-            } else {
-                if (editing) {
-                    params.v = (Math.random() + 1).toString(36).substring(7)
+        if (filters != prevProps.filters && filters != null && JSON.stringify(filters) != JSON.stringify(prevProps.filters) && autoApply == false) {
+            //silence is golden
+
+        } else {
+
+
+            if (filters != prevProps.filters || JSON.stringify(params) != JSON.stringify(prevProps.params)
+                || app != prevProps.app
+                || prevProps.source != source
+                || csv != prevProps.csv) {
+
+                if (app === "csv") {
+
+                    this.props.onSetData({app, csv, store, params, group})
+
+                } else {
+                    this.setState({showLoading: false})
+                    this.props.onLoadData({app, source, store, params, group})
+                    setTimeout(this.checkLoadingTime, 100);
                 }
-                this.setState({showLoading: false})
-                this.props.onLoadData({app, source, store, params, group})
-                setTimeout(this.checkLoadingTime, 100);
             }
         }
     }
@@ -102,10 +108,11 @@ class DataProvider extends React.Component {
 
 const mapStateToProps = (state, ownProps) => {
     const {store, group, app} = ownProps
-
+    debugger //eslint-disable-line
     return {
         data: state.getIn(['data', ...store, 'data']),
         filters: state.getIn(['data', 'filters', app, group]),
+        autoApply: state.getIn(['data', 'filters-settings', app, group, "autoApply"]),
         error: state.getIn(['data', ...store, 'error']),
         loading: state.getIn(['data', ...store, 'loading']),
         time: state.getIn(['data', ...store, 'time']),
