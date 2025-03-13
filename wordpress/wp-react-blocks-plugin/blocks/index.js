@@ -31,6 +31,7 @@ require("./menu")
 require("./wrapped-component")
 require("./sankey-chart")
 require("./data-labels")
+require("./big-number")
 require("../../../../custom/wp-customizer/blocks/index")
 
 
