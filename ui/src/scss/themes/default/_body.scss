@@ -11,39 +11,38 @@
   }
 
   text.label:hover {
-    fill: $light-blue;
+    fill: #5087A3;
   }
 
   text.title {
-    cursor: pointer;
     font-size: 16px;
-    fill: $blue;
+    fill: #5087A3;
     font-weight: bold;
+    @media screen and (max-width: 768px) {
+      transform: translateX(-20px);
+      fill: #A7AEB1;
+      cursor: pointer;
+    }
   }
 
   .title-rect {
     fill: transparent;
     stroke: none;
     @media screen and (max-width: 800px) {
-      fill: transparent;
-      stroke: $light-blue;
-      stroke-width: 2;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      border-radius: 5px;
+      //fill: transparent;
+      //stroke: $light-blue;
+      //stroke-width: 2;
+      //box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      //border-radius: 5px;
     }
   }
 
-  .title-rect.on {
-   @media  screen and (max-width: 800px) {
-    fill: #466d92;
-    color: white;
-   }
+  .title-line.on {
+    fill: #5087A3;
   }
 
   text.title.on {
-    fill: white;
-    font-weight: bold;
-    stroke-width: 4;
+    fill: #5087A3;
   }
 
   circle,
@@ -133,14 +132,13 @@
 .st68{fill:#DDB6B1;}
 .st69{opacity:0.1797;fill:#D3A79F;}
 
-.wp-block-viz-components-ailments {
+.wp-block-viz-ailments {
   @media screen and (max-width: 800px) {
     width: 100vw !important;
-    height: auto; 
+    height: auto !important;
   }
-
   @media screen and (max-width: 1024px) {
     width: 100% !important;
-    height: auto;
+    height: auto !important;
   }
 }
