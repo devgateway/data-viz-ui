@@ -358,7 +358,7 @@ const Wrapper: React.FC<VerticalFeaturedTabsProps> = (props) => {
   const dataCategories = categories ? categories : "[]";
 
   // Determine screen width and conditionally render components
-  const [isMobileOrTablet, setIsMobileOrTablet] = useState(window.innerWidth <= 1250);
+  const [isMobileOrTablet, setIsMobileOrTablet] = useState(window.innerWidth <= 1380);
 
   const getScreenOrientation = (): string => {
     return (
@@ -374,7 +374,7 @@ const Wrapper: React.FC<VerticalFeaturedTabsProps> = (props) => {
   const handleOrientationChange = () => {
     setTimeout(() => {
       setOrientation(getScreenOrientation());
-      setIsMobileOrTablet(window.innerWidth <= 1250);
+      setIsMobileOrTablet(window.innerWidth <= 1380);
     }, 100);
   };
 

@@ -1,4 +1,4 @@
-@import '../vars';
+@import '../../vars';
 
 .green {
 
@@ -13,7 +13,7 @@
     margin-left: -8vw;
 
     .ui.menu {
-      background-color: $health-color;
+      background-color: $green;
       margin: 0;
       padding: 0;
       width: 90px;
@@ -30,7 +30,7 @@
 
       .item {
         border-bottom: 1px solid #FFF;
-        padding: 10% 1%;
+        padding: 10% 1.5%;
         box-sizing: border-box;
         text-align: center;
 
@@ -42,6 +42,7 @@
           text-transform: uppercase;
           width: 100%;
           border: 0;
+          word-break: break-word;
         }
 
         img {
@@ -55,7 +56,7 @@
       }
 
       .item.active {
-        background-color: $light-blue;
+        background-color: $blue;
       }
     }
   }
@@ -65,7 +66,7 @@
     .left.navigator {
 
       .ui.menu {
-        background-color: $health-color;
+        background-color: $green;
         margin: 0;
         padding: 0;
         width: 5vw;
@@ -79,21 +80,9 @@
       }
     }
   }
-  @media screen and (max-width: 1023px) {
+  @media screen and (max-width: 1366px) {
     .left.navigator {
-
-
-      display: none;
-
-      .label {
-        display: none;
-      }
-    }
-  }
-  @media screen and (max-width: 1023px) {
-    .left.navigator {
-      display: none;
-
+      display: none !important;
       .label {
         display: none;
       }
@@ -158,5 +147,6 @@
 }
 .opacity-100{
   @include opacity-transition();
+
   opacity: 1;
 }

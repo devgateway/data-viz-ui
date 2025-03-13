@@ -1,0 +1,131 @@
+
+.ui.float-search {
+
+  text-align: center;
+  display: block;
+  font-family: Roboto;
+  font-weight: 700;
+  height: 71px;
+  width: 50px;
+  color: #54657e;
+  margin-top: 26px;
+  padding: 8px 0px 0px 13px;
+  z-index: 10;
+  border: 1px solid transparent;
+  border-bottom: 1px solid transparent;
+}
+
+.ui-float-search-active {
+  color: #5089a6;
+  background-color: #FFFFFF;
+  border: 1px solid #dadada !important;
+  border-bottom: 1px solid #FFFFFF !important;
+  cursor: pointer !important;
+}
+
+#float-input-container {
+  text-align: center;
+  margin: 0px;
+  padding-left: 108px;
+  left: 0px;
+  top: 196px;
+  width: 100%;
+  height: 51.43px;
+  position: absolute;
+  border: 1px solid #dadada !important;
+  background-color: #FFF;
+  transform: translateY(2px);
+  z-index: 9999999;
+
+
+  .input.search {
+
+    border-radius: 0px;
+    border: 0px;
+    width: 100%;
+    height: 50px;
+
+  }
+
+  .input.search:focus {
+    outline: none;
+    box-shadow: none;
+
+  }
+
+}
+
+#float-results-container {
+  background-color: #FFF;
+  border: 1px solid #dadada;
+  border-right: 0 !important;
+  border-left: 0 !important;
+  //border-top: 0px;
+  padding: 12px;
+  text-align: left;
+  //max-width: 1266px;
+
+  left: 50%;
+  transform: translate(-50%, 0.5px);
+  top: 50px;
+  z-index: 1500;
+  cursor: pointer;
+  position: absolute;
+  width: 100vw !important;
+
+  .searching-results {
+    padding: 15px 0px 15px 108px;
+    border-bottom: 1px solid #dadada;
+  }
+  .searching-results:first-child {
+    border-top: 0px solid #dadada;
+  }
+  .searching-results:last-child {
+    border-bottom: 0px solid #dadada;
+  }
+  .searching-results:hover {
+    background-color: #F9FAFB;
+  }
+
+  .search-title {
+    font-family: Roboto;
+    font-size: 18px !important;
+    color: #4C4D50;
+  }
+
+  .search-content {
+    font-family: Roboto;
+    font-size: 16px !important;
+    color: #4C4D50;
+    padding-top: 5px;
+    max-width: 700px;
+  }
+
+  .breadcrumbs-search {
+    margin: 0;
+    font-family: Roboto;
+    font-size: 14px !important;
+    padding-bottom: 10px;
+    color: #003a5b;
+    font-weight: 300;
+  }
+
+  .float-results-header {
+    margin: 0 30px 0 30px;
+    display: block;
+    //width: 100%;
+    padding-top: 5px;
+    padding-left: 78px;
+
+    font-family: Roboto;
+    font-size: 12px;
+    color: #616161;
+    font-weight: 300;
+  }
+
+  b {
+    color: #003a5b;
+    font-weight: 700;
+  }
+
+}
