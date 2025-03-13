@@ -89,13 +89,14 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                 defaultValueCriteria,
                 hiddenFilters,
                 allNoneSameBehaviour,
+                autoApply,
                 closeOnSelect,
                 useFilterItems,
                 datasetId
             }
         } = this.props;
 
-        const iframeStyles = {height: '65px'}
+        const iframeStyles = {height: '65px','width': '100%', border: 'none', 'overflow': 'hidden'}
         const selectedFilters = this.state.filters ? this.state.filters.filter(f => f.param == param && f.type != 'Boolean') : null
 
         const filter = selectedFilters && selectedFilters.length > 0 ? selectedFilters[0] : null
@@ -321,6 +322,17 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                                     onChange={() => setAttributes({allNoneSameBehaviour: !allNoneSameBehaviour})}/>
                             </PanelRow>
                         </>}
+
+
+                        <PanelBody title={__("Auto Apply")}>
+                            <PanelRow>
+                                <ToggleControl
+                                    label={__("Enable Auto Apply")}
+                                    checked={autoApply}
+                                    onChange={() => setAttributes({autoApply: !autoApply})}/>
+                            </PanelRow>
+
+                        </PanelBody>
                     </PanelBody>
 
                 </Panel>

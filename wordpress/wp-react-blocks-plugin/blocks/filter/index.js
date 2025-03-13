@@ -127,7 +127,11 @@ registerBlockType(process.env.BLOCKS_NS + '/filter',
             datasetId: {
                 type: 'String',
                 default: ""
-            }           
+            },
+            autoApply: {
+                type: 'Boolean',
+                default: true
+            },
         },
         edit: BlockEdit,
         save: BlockSave,
