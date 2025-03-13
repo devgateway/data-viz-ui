@@ -38,9 +38,9 @@ export const setMeasures = ({app, group, mGroup}) => (dispatch, getState) => {
 }
 
 
-export const setFilter = ({app, group, param, value}) => (dispatch, getState) => {
+export const setFilter = ({app, group, param, value, autoApply}) => (dispatch, getState) => {
 
-    dispatch({type: SET_FILTER, app, group, param, value})
+    dispatch({type: SET_FILTER, app, group, param, value,autoApply})
 }
 
 
@@ -172,8 +172,10 @@ export default (state = initialState, action) => {
           
         }
         case SET_FILTER: {
-            const {app, group, param, value} = action
-            return state.setIn(['filters', app, group, param], value.length === 0 ? [Number.MIN_SAFE_INTEGER] : value)
+            const {app, group, param, value,autoApply} = action
+            debugger; //eslint-disable-line
+            return  state.setIn(['filters-settings', app, group, "autoApply"],autoApply)
+                .setIn(['filters', app, group, param], value.length === 0 ? [Number.MIN_SAFE_INTEGER] : value)
         }
 
         case SET_INITIAL_FILTER: {
