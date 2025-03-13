@@ -1,3 +1,7 @@
+.wp-block-viz-components-featured-tabs {
+  margin-bottom: 30px;
+}
+
 .featured.tabs {
   display: flex;
 
@@ -36,7 +40,7 @@
         font-weight: 400;
         line-height: 160%;
         margin: auto;
-        margin-top: auto;
+        //margin-top: auto;
         margin-bottom: 5%;
         width: 150px;
         border: 1px solid #FFF;
@@ -99,6 +103,7 @@
         padding: 0px 10px;
         border: 0px;
         border-radius: 0px;
+        margin-bottom: 0;
 
         img {
           margin-left: 2%;
@@ -125,19 +130,19 @@
         margin: 0px;
         padding: 4%;
         width: $extend;
-
       }
 
       .label.closeIconText {
-        position: absolute;
-        right: 15px;
-        bottom: 15px;
+        //position: absolute;
+        //right: 0;
+        //bottom: -70px;
         cursor: pointer;
         color: #FFF;
-        background-color: $green;
+        //background-color: $green;
+        margin: 25px 0 15px 90%;
 
         .icon {
-          background-color: $green;
+          //background-color: $green;
           position: relative !important;
           left: auto !important;
           top: auto !important;
@@ -180,4 +185,16 @@
   }
 
 
+}
+
+.ui.fluid.container.viz.featured.tabs {
+  .entry-content {
+    overflow: hidden;
+  }
+}
+
+.ui.fluid.container.viz.featured.tabs.scrollable {
+  .entry-content {
+    overflow-y: auto;
+  }
 }
