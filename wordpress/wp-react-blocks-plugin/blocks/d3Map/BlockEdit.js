@@ -51,7 +51,7 @@ class BlockEdit extends ComponentWithSettings {
         const model = {...LayerModel}
         model.id = Date.now()
         newLayers.push(model)
-        debugger;
+        
         setAttributes({layers: newLayers})
     }
 
@@ -98,7 +98,7 @@ class BlockEdit extends ComponentWithSettings {
         } = this.props;
 
 
-        debugger;
+        
         const divStyles = {height: height + 'px', width: '100%'};
         return ([isSelected && (<InspectorControls>
             <Panel header={__("Map Configuration")}>

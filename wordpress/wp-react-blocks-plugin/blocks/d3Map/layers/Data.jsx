@@ -245,7 +245,7 @@ export class DataLayerSetting extends Component {
         } = this.props
 
 
-        debugger;
+        
 
         let selectedMeasureLabel = ""
         let selectedMeasureValue = ""

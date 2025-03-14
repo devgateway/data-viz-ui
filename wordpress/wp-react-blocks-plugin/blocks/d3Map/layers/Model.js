@@ -61,6 +61,8 @@ export const Model = {
     customMeasuresLabels: {},
     visible: true,
     flowValuesFrom: 'origin',
+    flowOrigin: 'none',
+    flowDestination: 'none',
     datasetId: ''    
 }
 
