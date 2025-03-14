@@ -1,23 +1,23 @@
-import React, {useEffect, useRef, useState} from "react";
-import {Container} from "semantic-ui-react";
+import React, { useEffect, useRef, useState } from "react";
+import { Container } from "semantic-ui-react";
 import DataProvider from "../data/DataProvider";
 import DataConsumer from "../data/DataConsumer";
-import {buildDivergingOptions, buildPieOptions} from "./prevalenceBuilder";
+import { buildDivergingOptions, buildPieOptions } from "./prevalenceBuilder";
 import HalfPie from "./Pie";
 
 import Radar from "./Radar";
 import Bar from "./Bar";
 import Line from "./Line";
 
-import {PostContent, SettingProvider, SettingsConsumer} from "@devgateway/wp-react-lib";
+import { PostContent, SettingProvider, SettingsConsumer } from "@devgateway/wp-react-lib";
 import dataFrames from "./data/index";
 
 import CSVDataFrame from "./CSVDataFrame";
 import ColorProvider from "./colors/ColorProvider";
 import Messages from "./Messages";
-import {connect} from "react-redux";
+import { connect } from "react-redux";
 import deviceType from '../../utils/deviceType';
-import {injectIntl} from 'react-intl';
+import { injectIntl } from 'react-intl';
 
 
 const isMobile = deviceType() === 'mobile';
@@ -25,169 +25,169 @@ const isTablet = deviceType() === 'tablet';
 const isMidTablet = deviceType() === 'midTablet';
 const isMobileOrTablet = deviceType() === 'mobile' || deviceType() === 'tablet' || deviceType() === 'midTablet';
 
-const ChartWrapper = (props) => {
-    return (<SettingProvider locale={props.intl.locale}>
-        <SettingsConsumer>
-            <Chart {...props} />
-        </SettingsConsumer>
-    </SettingProvider>)
+const ChartWrapper = (props) => {  
+return (<SettingProvider locale={props.intl.locale}>
+  <SettingsConsumer>
+    <Chart {...props} />
+    </SettingsConsumer>  
+</SettingProvider>)
 }
 
 const PieChart = (props) => {
-    const {data, legends, colors, height} = props;
-    const options = buildPieOptions(data, true);
-    return (
-        <HalfPie
-            height={height}
-            legends={legends}
-            colors={colors}
-            options={options}
-            format={{style: "percent"}}
-        ></HalfPie>
-    );
+  const { data, legends, colors, height } = props;
+  const options = buildPieOptions(data, true);
+  return (
+    <HalfPie
+      height={height}
+      legends={legends}
+      colors={colors}
+      options={options}
+      format={{ style: "percent" }}
+    ></HalfPie>
+  );
 };
 
 const Diverging = (props) => {
-    const {data, legends, colors, height} = props;
-    const options = buildDivergingOptions(data, true);
-    return (
-        <Diverging
-            height={height}
-            legends={legends}
-            colors={colors}
-            options={options}
-            format={{style: "percent", currency: "EUR"}}
-        ></Diverging>
-    );
+  const { data, legends, colors, height } = props;
+  const options = buildDivergingOptions(data, true);
+  return (
+    <Diverging
+      height={height}
+      legends={legends}
+      colors={colors}
+      options={options}
+      format={{ style: "percent", currency: "EUR" }}
+    ></Diverging>
+  );
 };
 const Chart = (props) => {
-    let {
-        parent,
-        editing = false,
-        unique,
-        childContent,
-        categories,
-        injectedMeasures,
-        "data-app": app = "csv",
-        "data-dataset-id": datasetId,
-        "data-group": group = "default",
-        "data-height": height = 500,
-        "data-type": type = "bar", //'data-source': source = 'gender/smoke',f
-        "data-dimension1": dimension1,
-        "data-dimension2": dimension2,
-        "data-dimension3": dimension3,
-        "data-color-by": colorBy = "index",
-        "data-scheme": scheme = "system",
-        "data-group-mode": groupMode = "grouped",
-        "data-left-legend": left = "Left Legend",
-        "data-legend-label": legendLabel = "",
-        "data-bottom-legend": bottom = "Bottom Legend",
-        "data-dualmode": dualMode,
-        "data-legend-position": legendPosition = "right",
-        "data-show-legends": showLegends = "true",
-        "data-data-source-label": dataSourceLabel = "Source",
-        "data-chart-data-source": dataSource = "Data Source",
-        "data-toggle-info-label": toggleInfoLabel = "Info Graphic",
-        "data-toggle-chart-label": toggleChartLabel = "Chart", //'data-number-format': format = '{"style":"percent", "minimumFractionDigits": 1, "maximumFractionDigits": 1}',
-        "data-tick-rotation": tickRotation = 0,
-        "data-tick-color": tickColor = "rgb(92,93,99)",
-        "data-measures": measures = "{}",
-        "data-format": format = "{}",
-        "data-csv": csv = "",
-        "data-margin-left": marginLeft = 50,
-        "data-margin-top": marginTop = 25,
-        "data-margin-right": marginRight = 25,
-        "data-margin-bottom": marginBottom = 25,
-        "data-start-angle": startAngle = 0,
-        "data-end-angle": endAngle = 360,
-        "data-view-mode": editMode = "info",
-        "data-filters": filters = "[]", //filters
-        "data-tooltip-html": tooltip = "",
-        "data-layout": layout = "vertical",
-        "data-reverse": reverse = "false",
-        "data-offset-y": offsetY = "-40",
-        "data-line-layer-enabled": lineLayerEnabled = "false",
+  let {
+    parent,
+    editing = false,
+    unique,
+    childContent,
+    categories,
+    injectedMeasures,
+    "data-app": app = "prevalence",
+    "data-dataset-id": datasetId,
+    "data-group": group = "default",
+    "data-height": height = 500,
+    "data-type": type = "bar", //'data-source': source = 'gender/smoke',f
+    "data-dimension1": dimension1,
+    "data-dimension2": dimension2,
+    "data-dimension3": dimension3,
+    "data-color-by": colorBy = "index",
+    "data-scheme": scheme = "system",
+    "data-group-mode": groupMode = "grouped",
+    "data-left-legend": left = "Left Legend",
+    "data-legend-label": legendLabel = "",
+    "data-bottom-legend": bottom = "Bottom Legend",
+    "data-dualmode": dualMode,
+    "data-legend-position": legendPosition = "right",
+    "data-show-legends": showLegends = "true",
+    "data-data-source-label": dataSourceLabel = "Source",
+    "data-chart-data-source": dataSource = "Data Source",
+    "data-toggle-info-label": toggleInfoLabel = "Info Graphic",
+    "data-toggle-chart-label": toggleChartLabel = "Chart", //'data-number-format': format = '{"style":"percent", "minimumFractionDigits": 1, "maximumFractionDigits": 1}',
+    "data-tick-rotation": tickRotation = 0,
+    "data-tick-color": tickColor = "rgb(92,93,99)",
+    "data-measures": measures = "{}",
+    "data-format": format = "{}",
+    "data-csv": csv = "",
+    "data-margin-left": marginLeft = 50,
+    "data-margin-top": marginTop = 25,
+    "data-margin-right": marginRight = 25,
+    "data-margin-bottom": marginBottom = 25,
+    "data-start-angle": startAngle = 0,
+    "data-end-angle": endAngle = 360,
+    "data-view-mode": editMode = "info",
+    "data-filters": filters = "[]", //filters
+    "data-tooltip-html": tooltip = "",
+    "data-layout": layout = "vertical",
+    "data-reverse": reverse = "false",
+    "data-offset-y": offsetY = "-40",
+    "data-line-layer-enabled": lineLayerEnabled = "false",
 
-        //"data-csv-line-layer-data": csvLineLayerData = "",
-        //"data-csv-line-color": lineColor = "#000000",
-        //"data-csv-line-tooltip": lineTooltip = "",
-        //"data-csv-line-title": lineTitle = "",
+    //"data-csv-line-layer-data": csvLineLayerData = "",
+    //"data-csv-line-color": lineColor = "#000000",
+    //"data-csv-line-tooltip": lineTooltip = "",
+    //"data-csv-line-title": lineTitle = "",
 
-        "data-overlays": overlays = "[]",
-        "data-max-value": maxValue = "auto",
-        "data-value-scale": valueScale = "linear",
-        "data-swap": swap = "false",
-        "data-no-data-message": noDataMsg = "No data matches your selection",
-        "data-bar-color": barColor = "rgb(0,0,0)",
-        "data-override-tick-color": overrideTickColor = "false",
-        "data-fixed-min-value": fixedMinValue = 0,
-        "data-fixed-max-value": fixedMaxValue = 0,
-        "data-bar-padding": barPadding = 0.15,
-        "data-bar-label-position": barLabelPosition = "middle",
-        "data-line-label-position": lineLabelPosition = "none",
-        "data-show-grid": showGrid = "true",
-        "data-include-overall": includeOverall = "false",
-        "data-bar-inner-padding": barInnerPadding = 0.7,
-        "data-x-label-color": xLabelColor = "#000",
-        "data-bar-label-color": barLabelColor = "#000",
-        "data-legend-label-color": legendLabelColor = "#000",
-        "data-tooltip-enabled": tooltipEnabled = "true",
-        "data-use-check-box-background": legendCheckBack = "false",
-        "data-use-label-background": legendLabelBack = "true",
-        "data-highlight-xaxis-line": highlightXAxisLine = "false",
-        "data-show-tick-line": showTickLine = "true",
-        "data-show-right-axis": showRightAxis = "true",
-        "data-manual-colors": manualColors = "{}",
-        "data-right-legend": rightLegend = "",
-        "data-offset-right": offsetRight = "40",
-        "data-offset-bottom": offsetBottom = "40",
-        "data-hidden-bars": hiddenBars = [],
-        "data-confidence-intervals": confidenceIntervals = "[]",
-        "data-enable-area": enableArea = "false",
-        "data-area-shading-criteria": areaShadingCriteria = "DEFAULT",
-        "data-area-lower-bound": areaLowerBound = "",
-        "data-area-upper-bound": areaUpperBound = "",
-        "data-show-points": showPoints = "true",
-        "data-center-label": centerLabel = "",
-        "data-show-arc-labels": showArcLabels = "true",
-        "data-show-arc-link-labels": showArcLinkLabels = "true",
-        "data-slice-padding": slicePadding = 1,
-        "data-center-label-font-weight": centerLabelFontWeight = "normal",
-        "data-center-label-font-size": centerLabelFontSize = "12",
-        "data-center-label-xoffset": centerLabelXOffset = 0,
-        "data-center-label-yoffset": centerLabelYOffset = 0,
-        "data-group-total-measure": groupTotalMeasure = "",
-        "data-show-group-total": showGroupTotal = "true",
-        "data-group-total-label": groupTotalLabel = "",
-        "data-group-total-format": groupTotalFormat = "{}",
-        "data-group-total-label-offset": groupTotalOffset,
-        "data-group-total-fixed-position": groupTotalFixedPosition = "false",
-        "data-tooltip-enable-markdown": tooltipEnableMarkdown = "false",
-        "data-y-axis-tick-values": yAxisTickValues = "10",
-        "data-x-axis-tick-values": xAxisTickValues = "10",
-        "data-enable-grid-y": enableGridY = "true",
-        "data-enable-grid-x": enableGridX = "false",
-        "data-offset-text": offsetText = 0,
-        "data-overall-label": overallLabel = "Overall",
-        "data-min-max-clamp": minMaxClamp = "false",
-        "data-reverse-legend": reverseLegend = "false",
-        "data-sort": sort = "default",
-        "data-sort-reverse": sortReverse = "false",
-        "data-sort2dimension": sort2Dimension = "_total",
-        "data-radar-curve": radarCurve = "linearClosed",
-        "data-radar-fill-opacity": radarFillOpacity = 0.25,
-        "data-radar-border-width": radarBorderWidth = 2,
-        "data-radar-grid-levels": radarGridLevels = 3,
-        "data-radar-grid-shape": radarGridShape = "circular",
-        "data-radar-grid-label-offset": radarGridLabelOffset = 36,
-        "data-radar-enable-dots": radarEnableDots = "true",
-        "data-radar-dot-size": radarDotSize = 8,
-        "data-radar-enable-dot-label": radarEnableDotLabel = "true",
-        "data-radar-dot-label-offset": radarDotLabelOffset = -12,
-        "data-mobile-customization": mobileCustomization = "{}",
-        settings
-    } = props;
-
+    "data-overlays": overlays = "[]",
+    "data-max-value": maxValue = "auto",
+    "data-value-scale": valueScale = "linear",
+    "data-swap": swap = "false",
+    "data-no-data-message": noDataMsg = "No data matches your selection",
+    "data-bar-color": barColor = "rgb(0,0,0)",
+    "data-override-tick-color": overrideTickColor = "false",
+    "data-fixed-min-value": fixedMinValue = 0,
+    "data-fixed-max-value": fixedMaxValue = 0,
+    "data-bar-padding": barPadding = 0.15,
+    "data-bar-label-position": barLabelPosition = "middle",
+    "data-line-label-position": lineLabelPosition = "none",
+    "data-show-grid": showGrid = "true",
+    "data-include-overall": includeOverall = "false",
+    "data-bar-inner-padding": barInnerPadding = 0.7,
+    "data-x-label-color": xLabelColor = "#000",
+    "data-bar-label-color": barLabelColor = "#000",
+    "data-legend-label-color": legendLabelColor = "#000",
+    "data-tooltip-enabled": tooltipEnabled = "true",
+    "data-use-check-box-background": legendCheckBack = "false",
+    "data-use-label-background": legendLabelBack = "true",
+    "data-highlight-xaxis-line": highlightXAxisLine = "false",
+    "data-show-tick-line": showTickLine = "true",
+    "data-show-right-axis": showRightAxis = "true",
+    "data-manual-colors": manualColors = "{}",
+    "data-right-legend": rightLegend = "",
+    "data-offset-right": offsetRight = "40",
+    "data-offset-bottom": offsetBottom = "40",
+    "data-hidden-bars": hiddenBars = [],
+    "data-confidence-intervals": confidenceIntervals = "[]",
+    "data-enable-area": enableArea = "false",
+    "data-area-shading-criteria": areaShadingCriteria = "DEFAULT",
+    "data-area-lower-bound": areaLowerBound = "",
+    "data-area-upper-bound": areaUpperBound = "",
+    "data-show-points": showPoints = "true",
+    "data-center-label": centerLabel = "",
+    "data-show-arc-labels": showArcLabels = "true",
+    "data-show-arc-link-labels": showArcLinkLabels = "true",
+    "data-slice-padding": slicePadding = 1,
+    "data-center-label-font-weight": centerLabelFontWeight = "normal",
+    "data-center-label-font-size": centerLabelFontSize = "12",
+    "data-center-label-xoffset": centerLabelXOffset = 0,
+    "data-center-label-yoffset": centerLabelYOffset = 0,
+    "data-group-total-measure": groupTotalMeasure = "",
+    "data-show-group-total": showGroupTotal = "true",
+    "data-group-total-label": groupTotalLabel = "",
+    "data-group-total-format": groupTotalFormat = "{}",
+    "data-group-total-label-offset": groupTotalOffset,
+    "data-group-total-fixed-position": groupTotalFixedPosition = "false",
+    "data-tooltip-enable-markdown": tooltipEnableMarkdown = "false",
+    "data-y-axis-tick-values": yAxisTickValues = "10",
+    "data-x-axis-tick-values": xAxisTickValues = "10",
+    "data-enable-grid-y": enableGridY = "true",
+    "data-enable-grid-x": enableGridX = "false",
+    "data-offset-text": offsetText = 0,
+    "data-overall-label": overallLabel = "Overall",
+    "data-min-max-clamp": minMaxClamp = "false",
+    "data-reverse-legend": reverseLegend = "false",
+    "data-sort": sort = "default",
+    "data-sort-reverse": sortReverse = "false",
+    "data-sort2dimension": sort2Dimension = "_total",
+    "data-radar-curve": radarCurve = "linearClosed",
+    "data-radar-fill-opacity": radarFillOpacity = 0.25,
+    "data-radar-border-width": radarBorderWidth = 2,
+    "data-radar-grid-levels": radarGridLevels = 3,
+    "data-radar-grid-shape": radarGridShape = "circular",
+    "data-radar-grid-label-offset": radarGridLabelOffset = 36,
+    "data-radar-enable-dots": radarEnableDots = "true",
+    "data-radar-dot-size": radarDotSize = 8,
+    "data-radar-enable-dot-label": radarEnableDotLabel = "true",
+    "data-radar-dot-label-offset": radarDotLabelOffset = -12,
+    "data-mobile-customization": mobileCustomization = "{}",    
+    settings
+  } = props;
+  
 
     const locale = props.intl.locale;
     const ref = useRef(null);
@@ -524,8 +524,7 @@ const Chart = (props) => {
         groupTotalLabel,
         groupTotalFormat: groupTotalFormatParsed,
         groupTotalOffset,
-        groupTotalFixedPosition:
-            groupTotalFixedPosition == true || groupTotalFixedPosition == "true",
+        groupTotalFixedPosition:groupTotalFixedPosition == true || groupTotalFixedPosition == "true",
         centerLabel,
         showArcLabels: showArcLabels == true || showArcLabels == "true",
         showArcLinkLabels: showArcLinkLabels == true || showArcLinkLabels == "true",
@@ -535,8 +534,7 @@ const Chart = (props) => {
         centerLabelXOffset,
         centerLabelYOffset,
         userMeasures,
-        tooltipEnableMarkdown:
-            tooltipEnableMarkdown == true || tooltipEnableMarkdown == "true",
+        tooltipEnableMarkdown: tooltipEnableMarkdown == true || tooltipEnableMarkdown == "true",
         yAxisTickValues: isMobileConfigEnabled ? mobileConfigSettings.yAxisTickValues ?? yAxisTickValues : yAxisTickValues,
         xAxisTickValues,
         enableGridY: enableGridY == true || enableGridY == "true",
