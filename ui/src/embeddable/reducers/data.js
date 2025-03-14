@@ -96,7 +96,7 @@ export const setData = ({app, group, csv, store, params}) => (dispatch, getState
 
 export const getData = ({app, group, source, store, params}) => (dispatch, getState) => {
     const filters = getState().get('data').getIn(['filters', app, group])
-
+    debugger; //eslint-disable-line
     if (filters) {
         params = {...params, ...filters.toJS()}
     }

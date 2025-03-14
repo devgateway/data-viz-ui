@@ -1,5 +1,6 @@
 import {InspectorControls, useBlockProps} from '@wordpress/block-editor';
 import {
+    Button, ButtonGroup,
     Panel,
     PanelBody,
     PanelRow,
@@ -337,6 +338,11 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                                             }}
                                             options={datasets}
                                         />
+
+                                            <Button  isPrimary={true} size={"small"}
+                                                    onClick={() => this.evictSuperSetCache()}>O</Button>
+
+
                                       </PanelRow>
                                     }
                                   
