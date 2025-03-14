@@ -2,7 +2,8 @@ import React from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
-import template from 'string-template';
+
+const template = require("string-template");
 
 const percentExpresion = /(\+?\%)[\(]([A-z0-9,.,-]+)\)/gi;
 const numericExpresion = /(\+?\#)[\(]([A-z0-9,.,-]+)\)/gi;
@@ -33,6 +34,15 @@ export const formatContent = (
   intl,
   tooltipEnableMarkdown
 ) => {
+  // if variables have a property called "field" and another property with the value being _${field},
+  // add _value to the variables object with the value of the _${field} property
+  if (variables.field && variables[`_${variables.field}`]) {
+    variables._value = variables[`_${variables.field}`];
+  }
+  //if there is a category prop in the variables and field is not defined, set field to category
+  if(!variables.field && variables.category){
+    variables.field = variables.category
+  }
   let str = tooltipEnableMarkdown
     ? template(tooltip, variables)
     : template(tooltip, variables).replace(/(?:\r\n|\r|\n)/g, "<br>");
@@ -48,7 +58,7 @@ export const formatContent = (
   return str;
 };
 
-const Tooltip = ({ tooltip, d, intl, tooltipEnableMarkdown, format }) => {
+const Tooltip = ({ tooltip, d, intl, tooltipEnableMarkdown }) => {
   const { color, data } = d.datum || d.point || d;
   const current =
     d.value ||
