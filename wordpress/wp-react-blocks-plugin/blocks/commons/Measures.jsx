@@ -24,6 +24,7 @@ const Measures = (props) => {
         allMeasures,
         setAttributes,
         title,
+        format,
         attributes: {
             panelStatus,
             measures,
@@ -46,9 +47,16 @@ const Measures = (props) => {
 
     const MCheckbox = ({measure}) => {
         const userMeasure = measures[app] ? measures[app][measure.value] : {}
+        let isChecked 
+        if (measures instanceof Array) {
+            isChecked = measures.includes(measure.value)
+        } else {
+            isChecked = userMeasure ? userMeasure.selected : false
+        }
+
         return <CheckboxControl
             label={getTranslation(measure)}
-            checked={userMeasure ? userMeasure.selected : false}
+            checked={isChecked}
             onChange={(value) => onSetSingleMeasure(measure.value)}/>
     }
 
@@ -142,7 +150,7 @@ const Measures = (props) => {
               any dimensions selected
 
         */
-            ((type == 'bar' && dimension2 != 'none') || (type == 'pie' && (dimension1 != 'none' || dimension2 != 'none'))) && allMeasures && [...new Set(allMeasures.map(p => getTranslation(p.group)))].map(g => {
+            ((type=='big-number') || (type == 'bar' && dimension2 != 'none') || (type == 'pie' && (dimension1 != 'none' || dimension2 != 'none'))) && allMeasures && [...new Set(allMeasures.map(p => getTranslation(p.group)))].map(g => {
                 return (<PanelBody
                         initialOpen={panelStatus[g]}
                         onToggle={e => togglePanel(g, panelStatus, setAttributes)}
@@ -176,7 +184,7 @@ const Measures = (props) => {
                                            onToggle={e => togglePanel("FORMAT", panelStatus, setAttributes)}>
             <Format
                 showCustomAxisFormat={type!='radar'}
-                format={measures[app] && measures[app].format ? measures[app].format : defaultFormat}
+                format={format || (measures[app] && measures[app].format ? measures[app].format : defaultFormat)}
                 customFormat={measures[app] && measures[app].customFormat ? measures[app].customFormat : defaultFormat}
                 useCustomAxisFormat={measures[app] ? measures[app].useCustomAxisFormat : false}
                 onFormatChange={(format, field) => {
