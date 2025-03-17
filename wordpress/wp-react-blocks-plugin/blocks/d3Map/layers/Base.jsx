@@ -39,7 +39,7 @@ const toOptions = (files) => {
 
 const Base = (props) => {
     const {onChange, metadata, layer, layer: {name, shapeColor, labelFilter, type, file, app, labelField, visible}} = props
-    debugger;
+    
     const [files, setFiles] = useState([])
     const [features, setFeatures] = useState([])
 
@@ -63,6 +63,7 @@ const Base = (props) => {
 
     const onChangeProperty = (atrr, value) => {
         console.log("change attribute " + atrr + " to " + value)
+        debugger;
         const newLayer = {...layer}
         newLayer[atrr] = value
         onChange(newLayer)
@@ -371,7 +372,7 @@ class LayerWithMetadata extends BlockEditWithAPIMetadata {
             layer,
             layer: {name, type, file, app}
         } = this.props
-    debugger;
+    
         return <PanelBody
             initialOpen={false}
             onToggle={e => togglePanel('LAYERS_' + name, panelStatus, setAttributes)} title={__("Layers")}

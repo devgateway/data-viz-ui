@@ -21,7 +21,9 @@ const Sort = (props) => {
                     label: __('Alphabetically ', "dg"),
                     value: 'alphabetically'
 
-                }, {label: __('Value ', "dg"), value: 'values'}]}
+                }, 
+                {label: __('By Date ', "dg"), value: 'date'},
+                {label: __('Value ', "dg"), value: 'values'}]}
             />
         </PanelRow>,
             <PanelRow>

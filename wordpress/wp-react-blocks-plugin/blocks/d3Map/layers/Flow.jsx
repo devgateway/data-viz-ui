@@ -262,6 +262,8 @@ export class DataLayerSetting extends Component {
                 }
             }
         }
+
+      debugger;
         
         return ([<PanelBody initialOpen={false} title={"Data Source"}>
             <PanelRow>
@@ -301,12 +303,14 @@ export class DataLayerSetting extends Component {
                 />
             </PanelRow>}
 
+
+
             {app == 'csv' && <PanelRow>
                 <Format title={"Format"} format={format} hiddenCustomAxisFormat={true}
                         onFormatChange={this.onFormatChange}></Format>
             </PanelRow>}
 
-            {app != 'csv' && <PanelRow>
+            {app != 'csv' &&<PanelRow>
                 <SelectControl
                     label={'Origin'}
                     value={[flowOrigin]} // e.g: value = [ 'a', 'c' ]
