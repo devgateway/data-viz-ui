@@ -9,7 +9,7 @@ import Radar from "./Radar";
 import Bar from "./Bar";
 import Line from "./Line";
 
-import { PostContent, SettingProvider, SettingsConsumer } from "@devgateway/wp-react-lib";
+import { PostContent } from "@devgateway/wp-react-lib";
 import dataFrames from "./data/index";
 
 import CSVDataFrame from "./CSVDataFrame";
@@ -24,25 +24,17 @@ const isTablet = deviceType() === 'tablet';
 const isMidTablet = deviceType() === 'midTablet';
 const isMobileOrTablet = deviceType() === 'mobile' || deviceType() === 'tablet' || deviceType() === 'midTablet';
 
-const ChartWrapper = (props) => {
-return (<SettingProvider locale={props.intl.locale}>
-  <SettingsConsumer>
-    <Chart {...props} />
-    </SettingsConsumer>
-</SettingProvider>)
-}
-
 const PieChart = (props) => {
   const { data, legends, colors, height } = props;
   const options = buildPieOptions(data, true);
   return (
-    <HalfPie
-      height={height}
-      legends={legends}
-      colors={colors}
-      options={options}
-      format={{ style: "percent" }}
-    ></HalfPie>
+      <HalfPie
+          height={height}
+          legends={legends}
+          colors={colors}
+          options={options}
+          format={{ style: "percent" }}
+      ></HalfPie>
   );
 };
 
@@ -50,13 +42,13 @@ const Diverging = (props) => {
   const { data, legends, colors, height } = props;
   const options = buildDivergingOptions(data, true);
   return (
-    <Diverging
-      height={height}
-      legends={legends}
-      colors={colors}
-      options={options}
-      format={{ style: "percent", currency: "EUR" }}
-    ></Diverging>
+      <Diverging
+          height={height}
+          legends={legends}
+          colors={colors}
+          options={options}
+          format={{ style: "percent", currency: "EUR" }}
+      ></Diverging>
   );
 };
 const Chart = (props) => {
@@ -184,23 +176,23 @@ const Chart = (props) => {
     "data-radar-enable-dot-label": radarEnableDotLabel = "true",
     "data-radar-dot-label-offset": radarDotLabelOffset = -12,
     "data-mobile-customization": mobileCustomization = "{}",
-    settings
   } = props;
+  const mobileConfigSettings = JSON.parse(decodeURIComponent(mobileCustomization));
+  const isMobileConfigEnabled = (isMobile || isTablet || isMidTablet) && (mobileConfigSettings?.  showCustomization ?? false);
 
-
-    const locale = props.intl.locale;
-    const ref = useRef(null);
-    const decode = (value) => {
-        try {
-            if (editing) {
-                return value;
-            }
-            return decodeURIComponent(value);
-        } catch (err) {
-            console.error("error decoding value:" + value);
-            return value;
-        }
-    };
+  const locale = props.intl.locale;
+  const ref = useRef(null);
+  const decode = (value) => {
+    try {
+      if (editing) {
+        return value;
+      }
+      return decodeURIComponent(value);
+    } catch(err) {
+      console.error("error decoding value:" + value);
+      return value;
+    }
+  };
 
   const parse = (value) => {
     try {
@@ -226,8 +218,8 @@ const Chart = (props) => {
         const keys = Object.keys(measuresObject[app]);
         for (let i = 0; i < keys.length; i++) {
           if (
-            measuresObject[app][keys[i]].selected &&
-            measuresObject[app][keys[i]].format
+              measuresObject[app][keys[i]].selected &&
+              measuresObject[app][keys[i]].format
           ) {
             format = measuresObject[app][keys[i]].format;
             break;
@@ -238,8 +230,8 @@ const Chart = (props) => {
       return format;
     } else {
       return measuresObject && measuresObject["csv"]
-        ? measuresObject["csv"].format
-        : null;
+          ? measuresObject["csv"].format
+          : null;
     }
   };
 
@@ -265,9 +257,9 @@ const Chart = (props) => {
   const getSelectedMeasures = () => {
     if (measuresObject[app]) {
       return Object.keys(measuresObject[app])
-        .map((s) => ({ value: s, ...measuresObject[app][s] }))
-        .filter((m) => m.selected)
-        .map((s) => s.value);
+          .map((s) => ({ value: s, ...measuresObject[app][s] }))
+          .filter((m) => m.selected)
+          .map((s) => s.value);
     }
     return [];
   };
@@ -275,8 +267,8 @@ const Chart = (props) => {
     const customLabels = {};
     if (measuresObject[app]) {
       const hasCustomLabels = Object.keys(measuresObject[app])
-        .map((s) => ({ value: s, ...measuresObject[app][s] }))
-        .filter((m) => m.selected && m.hasCustomLabel);
+          .map((s) => ({ value: s, ...measuresObject[app][s] }))
+          .filter((m) => m.selected && m.hasCustomLabel);
       hasCustomLabels.forEach((m) => {
         customLabels[m.value] = m.customLabel;
       });
@@ -286,7 +278,7 @@ const Chart = (props) => {
   const getUserMeasures = () => {
     if (measuresObject[app]) {
       return Object.keys(measuresObject[app]).filter(
-        (k) => measuresObject[app][k].allowSelection
+          (k) => measuresObject[app][k].allowSelection
       );
     }
     return [];
@@ -305,9 +297,9 @@ const Chart = (props) => {
 
   if (injectedMeasures) {
     const selected = Object.keys(injectedMeasures[app].measures)
-      .map((s) => ({ value: s, ...injectedMeasures[app].measures[s] }))
-      .filter((m) => m.selected)
-      .map((s) => s.value);
+        .map((s) => ({ value: s, ...injectedMeasures[app].measures[s] }))
+        .filter((m) => m.selected)
+        .map((s) => s.value);
     measuresObject = injectedMeasures;
     selectedMeasures = selected;
     selectedFormat = getSelectedFormat();
@@ -320,17 +312,17 @@ const Chart = (props) => {
   }
 
   let numberFormat = selectedFormat
-    ? {
+      ? {
         style:
-          selectedFormat.style === "compacted"
-            ? "decimal"
-            : selectedFormat.style,
+            selectedFormat.style === "compacted"
+                ? "decimal"
+                : selectedFormat.style,
         notation: selectedFormat.style === "compacted" ? "compact" : "standard",
         currency: selectedFormat.currency,
         minimumFractionDigits: parseInt(selectedFormat.minimumFractionDigits),
         maximumFractionDigits: parseInt(selectedFormat.maximumFractionDigits),
       }
-    : {
+      : {
         notation: "standard",
         currency: "USD",
         minimumFractionDigits: 2,
@@ -343,17 +335,17 @@ const Chart = (props) => {
 
   let groupTotalFormatParsed = {
     style:
-      groupTotalFormatObject.style === "compacted"
-        ? "decimal"
-        : groupTotalFormatObject.style,
+        groupTotalFormatObject.style === "compacted"
+            ? "decimal"
+            : groupTotalFormatObject.style,
     notation:
-      groupTotalFormatObject.style === "compacted" ? "compact" : "standard",
+        groupTotalFormatObject.style === "compacted" ? "compact" : "standard",
     currency: groupTotalFormatObject.currency,
     minimumFractionDigits: parseInt(
-      groupTotalFormatObject.minimumFractionDigits
+        groupTotalFormatObject.minimumFractionDigits
     ),
     maximumFractionDigits: parseInt(
-      groupTotalFormatObject.maximumFractionDigits
+        groupTotalFormatObject.maximumFractionDigits
     ),
   };
   const [mode, setMode] = useState(editMode);
@@ -467,11 +459,11 @@ const Chart = (props) => {
     legendPosition: isMobileOrTablet ? "bottom" : legendPosition,
     legends,
     tooltip:
-      tooltipEnableMarkdown == true || tooltipEnableMarkdown == "true"
-        ? tooltipForSelectedMeasure
-        : tooltipForSelectedMeasure
-            .replace(/\r\n/g, "<hr/>")
-            .replace(/[\r\n]/g, "<hr/>"),
+        tooltipEnableMarkdown == true || tooltipEnableMarkdown == "true"
+            ? tooltipForSelectedMeasure
+            : tooltipForSelectedMeasure
+                .replace(/\r\n/g, "<hr/>")
+                .replace(/[\r\n]/g, "<hr/>"),
     colors: colors,
     groupMode: groupMode,
     format: numberFormat,
@@ -492,6 +484,7 @@ const Chart = (props) => {
     fixedMaxValue,
     barPadding: getBarPadValueOuterOrInner(isMobileConfigEnabled, mobileConfigSettings?.barPadding, barPadding),
     barLabelPosition,
+    lineLabelPosition,
     barInnerPadding: getBarPadValueOuterOrInner(isMobileConfigEnabled, mobileConfigSettings?.barInnerPadding, barInnerPadding),
     xLabelColor: decodeURIComponent(xLabelColor),
     barLabelColor: decodeURIComponent(barLabelColor),
@@ -500,7 +493,7 @@ const Chart = (props) => {
     legendLabelBack: legendLabelBack == true || legendLabelBack == "true",
     legendCheckBack: legendCheckBack == true || legendCheckBack == "true",
     highlightXAxisLine:
-      highlightXAxisLine == true || highlightXAxisLine == "true",
+        highlightXAxisLine == true || highlightXAxisLine == "true",
     showTickLine: showTickLine == true || showTickLine == "true",
     showRightAxis: showRightAxis == true || showRightAxis == "true",
     offsetRight,
@@ -517,7 +510,7 @@ const Chart = (props) => {
     groupTotalFormat: groupTotalFormatParsed,
     groupTotalOffset,
     groupTotalFixedPosition:
-      groupTotalFixedPosition == true || groupTotalFixedPosition == "true",
+        groupTotalFixedPosition == true || groupTotalFixedPosition == "true",
     centerLabel,
     showArcLabels: showArcLabels == true || showArcLabels == "true",
     showArcLinkLabels: showArcLinkLabels == true || showArcLinkLabels == "true",
@@ -528,9 +521,9 @@ const Chart = (props) => {
     centerLabelYOffset,
     userMeasures,
     tooltipEnableMarkdown:
-      tooltipEnableMarkdown == true || tooltipEnableMarkdown == "true",
+        tooltipEnableMarkdown == true || tooltipEnableMarkdown == "true",
     yAxisTickValues: isMobileConfigEnabled ? mobileConfigSettings.yAxisTickValues ?? yAxisTickValues : yAxisTickValues,
-    xAxisTickValues,
+    xAxisTickValues: isMobileConfigEnabled ? mobileConfigSettings.xAxisTickValues ?? xAxisTickValues : xAxisTickValues,
     enableGridY: enableGridY == true || enableGridY == "true",
     enableGridX: enableGridX == true || enableGridX == "true",
     offsetText,
@@ -550,7 +543,7 @@ const Chart = (props) => {
     radarEnableDots: radarEnableDots == true || radarEnableDots == "true",
     radarDotSize,
     radarEnableDotLabel:
-      radarEnableDotLabel == true || radarEnableDotLabel == "true",
+        radarEnableDotLabel == true || radarEnableDotLabel == "true",
     radarDotLabelOffset,
     sort2Dimension,
     mobileCustomization,
@@ -563,11 +556,15 @@ const Chart = (props) => {
   if (ff && ff.forEach) {
     ff.forEach((f) => {
       if (
-        f.value != null &&
-        f.value.filter((v) => v != null && v.toString().trim() != "").length > 0
+          f.value != null &&
+          f.value.filter((v) => v != null && v.toString().trim() != "").length > 0
       )
         params[f.param] = f.value;
     });
+  }
+
+  if (datasetId) {
+    params.datasetId = datasetId;
   }
 
   let ChartDataFrame = null;
@@ -598,12 +595,12 @@ const Chart = (props) => {
     case "bar":
       Chart = Bar;
       showNotEnoughParameters =
-        app != "csv" && dimension1 == "none" && selectedMeasures.length == 0;
+          app != "csv" && dimension1 == "none" && selectedMeasures.length == 0;
       break;
     case "line":
       Chart = Line;
       showNotEnoughParameters =
-        app !== "csv" && (selectedMeasures.length === 0 || dimension1 === "none");
+          app !== "csv" && (selectedMeasures.length === 0 || dimension1 === "none");
       break;
     case "pie":
       showNotEnoughParameters = app != "csv" && selectedMeasures.length == 0;
@@ -627,6 +624,16 @@ const Chart = (props) => {
     dimensions.push(dimension2);
   }
   const [legendsContainerHeight, setLegendsContainerHeight] = useState(0);
+  const [, setOrientation] = useState(getScreenOrientation());
+
+  function getScreenOrientation() {
+    return (
+        window.screen.orientation?.type ||
+        (window.innerWidth > window.innerHeight
+            ? "landscape-primary"
+            : "portrait-primary")
+    );
+  };
 
 
   useEffect(() => {
@@ -635,9 +642,9 @@ const Chart = (props) => {
         // Function to handle margin adjustment for all charts
         const adjustDataSourceMargin = () => {
           const legendsContainer =
-            ref.current.querySelector(
-              ".legends.container.has-standard-12-font-size.bottom"
-            ) || ref.current.querySelector(".legends.container.items-section");
+              ref.current.querySelector(
+                  ".legends.container.has-standard-12-font-size.bottom"
+              ) || ref.current.querySelector(".legends.container.items-section");
 
           if (!legendsContainer) return;
 
@@ -649,7 +656,7 @@ const Chart = (props) => {
           const paddingTop = parseInt(styles.paddingTop);
           const paddingBottom = parseInt(styles.paddingBottom);
           const totalHeight =
-            height + marginTop + marginBottom + paddingTop + paddingBottom;
+              height + marginTop + marginBottom + paddingTop + paddingBottom;
 
           // Find the closest '.ui.fluid.container.content' ancestor from the legends container
           const container = legendsContainer.closest(".ui.fluid.container.content");
@@ -680,7 +687,7 @@ const Chart = (props) => {
                 setTimeout(() => {
                   if (dataSourceRect.top < legendsRect.bottom) {
                     dataSourceParagraph.style.marginTop = `${
-                      legendsRect.bottom - dataSourceRect.top + 1
+                        legendsRect.bottom - dataSourceRect.top + 1
                     }px`;
                   }
                 }, 1000);
@@ -694,9 +701,9 @@ const Chart = (props) => {
             const chartContainerRect = chartContainer.getBoundingClientRect();
             const chartContainerStyles = window.getComputedStyle(chartContainer);
             const chartContainerMarginBottom =
-              parseFloat(chartContainerStyles.marginBottom) || 0;
+                parseFloat(chartContainerStyles.marginBottom) || 0;
             const adjustedChartContainerBottom =
-              chartContainerRect.bottom + chartContainerMarginBottom;
+                chartContainerRect.bottom + chartContainerMarginBottom;
 
             const legendsRect = legendsContainer.getBoundingClientRect();
             const legendsMarginTop = parseFloat(styles.marginTop) || 0;
@@ -721,90 +728,104 @@ const Chart = (props) => {
     };
   }, [isMobileOrTablet, ref]);
 
-  return (
-    <div ref={ref}>
-      <Container
-          className={"chart container"}
-          style={{
-            minHeight:
-                type === "pie" && window.innerWidth <= 480
-                    ? `${parseInt(height) + parseInt(legendsContainerHeight) * 0.5}px`
-                    : `${parseInt(height) + parseInt(legendsContainerHeight)}px`,
-          }}
-          fluid={true}
-      >
-        <DataProvider
-          editing={editing}
-          style={{ height: `${contentHeight}px` }}
-          params={params}
-          app={app}
-          group={group}
-          csv={csv}
-          store={[app, unique, ...dimensions]}
-          source={dimensions.join("/")}
-        >
-          <Container
-            style={{ height: `${contentHeight}px` }}
-            className={"body"}
-            fluid={true}
-          >
-            {showNotEnoughParameters && <Messages editing={editing}></Messages>}
-            {!showNotEnoughParameters && (
-              <DataConsumer>
-                <Messages app={app} group={group} noDataMsg={noDataMsg}>
-                  {" "}
-                </Messages>
-                <ChartDataFrame
-                  locale={locale}
-                  colorBy={colorBy}
-                  hiddenBars={hiddenBars}
-                  swap={swap === "true" || swap === true}
-                  type={type}
-                  includeTotal={true}
-                  includeOverall={
-                    includeOverall === true || includeOverall === "true"
-                  }
-                  overallLabel={overallLabel}
-                  measures={selectedMeasures}
-                  dimensions={[...dimensions]}
-                  sort={sort}
-                  sortreverse={sortReverse === true || sortReverse === "true"}
-                  sort2Dimension={sort2Dimension}
-                  customLabels={getCustomLabels()}
-                >
-                  <ColorProvider
-                    type={type}
-                    app={app}
-                    locale={locale}
-                    overallLabel={overallLabel}
-                    customLabels={getCustomLabels()}
-                    manualColors={getManualColor()}
-                    colorBy={colorBy}
-                    scheme={scheme}
-                    barColor={chartProps.barColor}
-                  >
-                    <Chart {...chartProps}></Chart>
-                  </ColorProvider>
-                </ChartDataFrame>
-              </DataConsumer>
-            )}
-          </Container>
-        </DataProvider>
+  useEffect(() => {
+    const handleResize = () => {
+      setTimeout(() => {
+        setOrientation(getScreenOrientation());
+      }, 100);
+    };
+    if(window.screen.orientation) {
+      window.screen.orientation.addEventListener("change", handleResize);
+    } else {
+      window.addEventListener("resize", handleResize);
+    }
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
-        <br />
-        {dual && childContent && viewMode === "info" && (
-          <Container
+  return (
+      <div ref={ref}>
+        <Container
+            className={"chart container"}
+            style={{
+              minHeight:
+                  type === "pie" && window.innerWidth <= 480
+                      ? `${parseInt(height) + parseInt(legendsContainerHeight) * 0.5}px`
+                      : `${parseInt(height) + parseInt(legendsContainerHeight)}px`,
+            }}
             fluid={true}
-            style={{ height: contentHeight + "px" }}
-            className={"body"}
+        >
+          <DataProvider
+              editing={editing}
+              style={{ height: `${contentHeight}px` }}
+              params={params}
+              app={app}
+              group={group}
+              csv={csv}
+              store={[app, unique, ...dimensions]}
+              source={dimensions.join("/")}
           >
-            <PostContent
-              post={{ content: { rendered: childContent } }}
-            ></PostContent>
-          </Container>
-        )}
-      </Container>
-    </div>
+            <Container
+                style={{ height: `${contentHeight}px` }}
+                className={"body"}
+                fluid={true}
+            >
+              {showNotEnoughParameters && <Messages editing={editing}></Messages>}
+              {!showNotEnoughParameters && (
+                  <DataConsumer>
+                    <Messages app={app} group={group} noDataMsg={noDataMsg}>
+                      {" "}
+                    </Messages>
+                    <ChartDataFrame
+                        locale={locale}
+                        colorBy={colorBy}
+                        hiddenBars={hiddenBars}
+                        swap={swap === "true" || swap === true}
+                        type={type}
+                        includeTotal={true}
+                        includeOverall={
+                            includeOverall === true || includeOverall === "true"
+                        }
+                        overallLabel={overallLabel}
+                        measures={selectedMeasures}
+                        dimensions={[...dimensions]}
+                        sort={sort}
+                        sortreverse={sortReverse === true || sortReverse === "true"}
+                        sort2Dimension={sort2Dimension}
+                        customLabels={getCustomLabels()}
+                    >
+                      <ColorProvider
+                          type={type}
+                          app={app}
+                          locale={locale}
+                          overallLabel={overallLabel}
+                          customLabels={getCustomLabels()}
+                          manualColors={getManualColor()}
+                          colorBy={colorBy}
+                          scheme={scheme}
+                          barColor={chartProps.barColor}
+                      >
+                        <Chart {...chartProps}></Chart>
+                      </ColorProvider>
+                    </ChartDataFrame>
+                  </DataConsumer>
+              )}
+            </Container>
+          </DataProvider>
+
+          <br />
+          {dual && childContent && viewMode === "info" && (
+              <Container
+                  fluid={true}
+                  style={{ height: contentHeight + "px" }}
+                  className={"body"}
+              >
+                <PostContent
+                    post={{ content: { rendered: childContent } }}
+                ></PostContent>
+              </Container>
+          )}
+        </Container>
+      </div>
   );
 };
 
@@ -820,4 +841,4 @@ const mapStateToProps = (state, ownProps) => {
   }
 };
 const mapActionCreators = {};
-export default connect(mapStateToProps, mapActionCreators)(injectIntl(ChartWrapper));
+export default connect(mapStateToProps, mapActionCreators)(Chart);
