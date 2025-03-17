@@ -55,6 +55,7 @@ const Chart = ({
   groupMode,
   reverse,
   marginLeft,
+  lineLabelPosition,
   marginTop,
   marginRight,
   marginBottom,
@@ -560,6 +561,14 @@ const Chart = ({
           }
           enableGridY={enableGridY}
           enableGridX={enableGridX}
+          enablePointLabel={lineLabelPosition === 'top'}
+          pointLabel={(l) => {
+            return intl.formatNumber(
+              format.style === "percent" ? l.yFormatted / 100 : l.yFormatted,
+              format
+            )
+          }
+          }
           lineWidth={3}
           colors={(d) => {
             return colorGenerator.getColor(d.id, d);
@@ -609,7 +618,6 @@ const Chart = ({
           pointSize={10}
           pointBorderWidth={2}
           pointBorderColor={{ from: "serieColor" }}
-          pointLabelYOffset={-12}
           useMesh={true}
         />
 
