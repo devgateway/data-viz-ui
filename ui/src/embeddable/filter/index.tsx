@@ -71,9 +71,8 @@ interface FilterDropDownProps {
 const FilterDropDown = (props: FilterDropDownProps) => {
 
     const { isRange, options, alphabeticalSort, ascOrder } = props
-    let sortedOptions: any [] = []
     if (booleanParameter(alphabeticalSort)) {
-        sortedOptions = options.sort(function (a, b) {
+        options.sort(function (a, b) {
             const aText = a.text ? a.text.toLowerCase() : "";
             const bText = b.text ? b.text.toLowerCase() : "";
             if (booleanParameter(ascOrder)) {
@@ -83,12 +82,12 @@ const FilterDropDown = (props: FilterDropDownProps) => {
             }
         });
     } else {
-        sortedOptions = options.sort(function (a, b) {
+        options.sort(function (a, b) {
             return booleanParameter(ascOrder) ? a.position - b.position : b.position - a.position;
         });
     }
 
-    const filterProps = { ...props, options: sortedOptions }
+    const filterProps = { ...props, options }
 
     if (isRange) {
         return <RangeFilterDropDown  {...filterProps} />
@@ -505,6 +504,7 @@ const Filter = ({
             icon={icon} placeholder={placeholder}
             startLabel={startLabel} endLabel={endLabel}
             param={param}
+            ascOrder={ascOrder}
             useSingleColumn={useSingleColumn === 'true'}
             enableTextSearch={enableTextSearch === 'true'}
             filterType={defaultFilterType}
