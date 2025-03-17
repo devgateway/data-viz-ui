@@ -70,10 +70,7 @@ export class BlockEditWithFilters extends ComponentWithSettings {
     constructor(props) {
         super(props);
         this.state = {
-            taxonomyValues: [],
-            types: null,
-            taxonomies: null,
-            loading: true
+            taxonomyValues: [], types: null, taxonomies: null, loading: true
         }
         this.onTypeChanged = this.onTypeChanged.bind(this)
         this.onTaxonomyChanged = this.onTaxonomyChanged.bind(this)
@@ -83,11 +80,8 @@ export class BlockEditWithFilters extends ComponentWithSettings {
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         const {
-            setAttributes,
-            attributes: {
-                type,
-                taxonomy,
-                count
+            setAttributes, attributes: {
+                type, taxonomy, count
             },
         } = this.props;
 
@@ -110,11 +104,8 @@ export class BlockEditWithFilters extends ComponentWithSettings {
         this.getTaxonomies()
 
         const {
-            setAttributes,
-            attributes: {
-                type,
-                taxonomy,
-                count
+            setAttributes, attributes: {
+                type, taxonomy, count
             },
         } = this.props;
 
@@ -155,11 +146,8 @@ export class BlockEditWithFilters extends ComponentWithSettings {
 
     getTaxonomyValues() {
         const {
-            setAttributes,
-            attributes: {
-                type,
-                taxonomy,
-                count
+            setAttributes, attributes: {
+                type, taxonomy, count
             },
         } = this.props;
 
@@ -188,29 +176,22 @@ export class BlockEditWithFilters extends ComponentWithSettings {
         }).then(data => {
             const types = data
             this.setState({
-                types: data,
-                loading: false
+                types: data, loading: false
             });
         });
     }
 
     typeOptions() {
         const {
-            setAttributes,
-            attributes: {
-                count,
-                type,
-                taxonomy,
-                category
+            setAttributes, attributes: {
+                count, type, taxonomy, category
             },
         } = this.props;
         const {types, taxonomies, taxonomyValues} = this.state
         const typeOptions = types ? Object.keys(types)
             .filter(k => ['page', 'attachment', 'wp_block']
                 .indexOf(k) == -1).map(k => ({
-                slug: types[k].slug,
-                label: types[k].name,
-                value: types[k].rest_base
+                slug: types[k].slug, label: types[k].name, value: types[k].rest_base
             })) : []
 
         return typeOptions
@@ -230,8 +211,7 @@ export class BlockEditWithFilters extends ComponentWithSettings {
 
             const taxonomyOptions = types && taxonomies ? Object.keys(taxonomies)
                 .filter(i => taxonomies[i].types.indexOf(slug) > -1).map(k => ({
-                    label: types[slug].name + ' -> ' + taxonomies[k].name,
-                    value: taxonomies[k].rest_base
+                    label: types[slug].name + ' -> ' + taxonomies[k].name, value: taxonomies[k].rest_base
                 })) : []
 
             return [{label: 'None', value: 'none'}, ...taxonomyOptions]
@@ -250,9 +230,7 @@ export class BlockEditWithFilters extends ComponentWithSettings {
     renderFilters() {
         const {
             attributes: {
-                type,
-                taxonomy,
-                categories,
+                type, taxonomy, categories,
 
             }
         } = this.props
@@ -302,18 +280,12 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
                     const apps = data.applications ? [...data.applications.application
                         .filter(a => a.instance[0].metadata.type === 'data')
                         .map(a => ({
-                            label: a.name,
-                            value: a.instance[0].vipAddress,
-                            settings: a.instance[0]
+                            label: a.name, value: a.instance[0].vipAddress, settings: a.instance[0]
                         })), {
-                        label: 'CSV',
-                        value: 'csv'
-                    }
-                    ] : [{
-                        label: 'CSV',
-                        value: 'csv'
-                    }
-                    ];
+                        label: 'CSV', value: 'csv'
+                    }] : [{
+                        label: 'CSV', value: 'csv'
+                    }];
 
                     this.setState({
                         react_ui_url: settingsData["react_ui_url"] + '/' + window._page_locale,
@@ -323,7 +295,11 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
                         current_language: new URLSearchParams(document.location.search).get("edit_lang"),
                         apps
                     }, () => {
-                        this.loadMetadata();
+
+                        const {app, dvzProxyDatasetId} = this.props.attributes;
+                        if (app && app != 'none') {
+                            this.loadMetadata(app, dvzProxyDatasetId);
+                        }
                     });
                 })
                 .catch(() => {
@@ -336,92 +312,47 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
         super.componentDidUpdate(prevProps);
         const {
             attributes: {
-                app
+                app,
+                dvzProxyDatasetId
             }
         } = this.props;
         const {
             attributes: {
+                dvzProxyDatasetId: prevDvzProxyDatasetId,
                 app: prevAPP
             }
         } = prevProps;
 
-        if (app != prevAPP) {
-            this.loadMetadata();
-        }
-    }
 
+        if (app != prevAPP) { //if app changes we shoudl reload metadta
 
-    loadMetadata() {
-        const {
-            attributes: {
-                app
+            debugger;
+            if (isSupersetAPI(app, this.state.apps)) { //if app is superset proxy an additional step is added
+                this.loadDatasets(app)
+                if (dvzProxyDatasetId) {
+                    this.loadMetadata(app, dvzProxyDatasetId)
+                }
+            } else {
+                this.loadMetadata(app);
             }
-        } = this.props;
+        } else {//app wasn't changed
+            debugger;
+            if (dvzProxyDatasetId != prevDvzProxyDatasetId) {
+                this.loadMetadata(app, dvzProxyDatasetId);
+            }
 
-        if (app == 'csv') {
-            return;
-        }
-
-        this.loadMetaDataByApp(app);
-    }
-
-    loadMetaDataByApp(app) {
-        if (isSupersetAPI(app, this.state.apps)) {
-            this.loadDatasets(app);
-            this.loadMetadataForSuperset();
-        } else {
-            this.loadMetadataForAPI();
         }
     }
 
 
     evictSuperSetCache() {
-        const {app, datasetId} = this.props.attributes;
-
-        fetch(this.appendSupersetParams(`/api/${app}/cacheEvict`, datasetId)).then(() => {
-            
-            this.loadMetadataForSuperset(app, datasetId)
+        const {app, dvzProxyDatasetId} = this.props.attributes;
+        fetch(`/api/${app}/cacheEvict?dvzProxyDatasetId=${dvzProxyDatasetId}`).then(() => {
+            this.loadMetadata(app, dvzProxyDatasetId)
         })
+
     }
 
-    loadMetadataForSuperset(selectedApp, datasetId) {
-        let app = selectedApp || this.props.attributes.app;
-        let newDatasetId = datasetId || this.props.attributes.datasetId;
-        if (!newDatasetId || !app)
-            return;
-
-        this.fetchData(this.appendSupersetParams(`/api/${app}/dimensions`, newDatasetId),
-            'dimensions',
-            data => [{
-                "label": __("None"),
-                "value": "none"
-            }, ...getTranslatedOptions(data)]);
-
-        this.fetchData(this.appendSupersetParams(`/api/${app}/filters`, newDatasetId), 'filters', data => data.map(f => ({
-            ...f,
-            value: f.param
-        })));
-        this.fetchData(this.appendSupersetParams(`/api/${app}/measures`, newDatasetId), 'measures', getTranslatedOptions);
-        this.fetchData(this.appendSupersetParams(`/api/${app}/categories`, newDatasetId), 'categories', getTranslatedOptions);
-    }
-
-    loadMetadataForAPI() {
-        const {
-            attributes: {
-                app
-            }
-        } = this.props;
-        this.fetchData(`/api/${app}/dimensions`, 'dimensions', data => [{
-            "label": __("None"),
-            "value": "none"
-        }, ...getTranslatedOptions(data)]);
-        this.fetchData(`/api/${app}/filters`, 'filters', data => data.map(f => ({
-            ...f,
-            value: f.param
-        })));
-        this.fetchData(`/api/${app}/measures`, 'measures', getTranslatedOptions);
-        this.fetchData(`/api/${app}/categories`, 'categories', getTranslatedOptions);
-    }
 
     loadDatasets(app) {
         fetch(`/api/${app}/datasets`)
@@ -441,20 +372,89 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
             });
     }
 
-    appendSupersetParams(url, datId) {
-        let app = this.props.attributes.app || this.props.layer.app;
-        let datasetId = datId || this.props.attributes.datasetId;
 
-        if (this.props.layer) {
-            app = this.props.layer.app;
-            datasetId = this.props.layer.datasetId;
+    loadMetadata(app, dvzProxyDatasetId) {
+        if (app == 'csv') {
+            return;
         }
 
-        if (isSupersetAPI(app, this.state.apps)) {
-            return `${url}?datasetId=${datasetId}`;
+        debugger;
+        const dimensionsUrl = `/api/${app}/dimensions${dvzProxyDatasetId ? `?dvzProxyDatasetId=${dvzProxyDatasetId}` : ''}`
+        const measuresUrl = `/api/${app}/measures${dvzProxyDatasetId ? `?dvzProxyDatasetId=${dvzProxyDatasetId}` : ''}`
+        const filtersUrl = `/api/${app}/filters${dvzProxyDatasetId ? `?dvzProxyDatasetId=${dvzProxyDatasetId}` : ''}`
+        const categoriesUrl = `/api/${app}/categories${dvzProxyDatasetId ? `?dvzProxyDatasetId=${dvzProxyDatasetId}` : ''}`
+
+        if (app != "csv") {
+            fetch(dimensionsUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("HTTP status " + response.status);
+                    } else {
+
+                        return response.json()
+                    }
+                })
+                .then(data => {
+
+                    this.setState({
+                        ...this.state,
+                        dimensions: [{"label": __("None"), "value": "none"}, ...getTranslatedOptions(data)]
+                    })
+                })
+                .catch(function (response) {
+                    console.log("Error when loading dimensions")
+                })
+
+
+            fetch(filtersUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("HTTP status " + response.status);
+                    }
+                    return response.json()
+                })
+                .then(data => {
+
+                    const options = data.map(f => ({...f, value: f.param}))
+                    this.setState({...this.state, filters: options})
+
+                })
+                .catch(function (response) {
+                    console.log("Error when loading filters", response)
+                })
+
+            fetch(measuresUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("HTTP status " + response.status);
+                    }
+                    return response.json()
+                })
+                .then(data => {
+                    sessionStorage.setItem(`measures_${app}`, JSON.stringify(getTranslatedOptions(data)))
+                    this.setState({...this.state, measures: getTranslatedOptions(data)})
+                })
+                .catch(function (response) {
+                    console.log("Error when loading measures")
+                })
+
+            fetch(categoriesUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("HTTP status " + response.status);
+                    }
+                    return response.json()
+                })
+                .then(data => {
+                        sessionStorage.setItem(`categories_${app}`, JSON.stringify(data))
+                        this.setState({...this.state, categories: getTranslatedOptions(data)})
+                    }
+                )
+                .catch(function (response) {
+                    console.log("Error when getting categories", response)
+                })
         }
 
-        return url;
     }
 
 
@@ -467,6 +467,7 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
                 return response.json();
             })
             .then(data => {
+                debugger;
                 this.setState({
                     [stateKey]: transformData(data)
                 });

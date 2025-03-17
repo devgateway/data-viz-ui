@@ -167,7 +167,7 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                 enableGridX,
                 minMaxClamp,
                 mobileCustomization,
-                datasetId
+                dvzProxyDatasetId
             }
         } = this.props;
 
@@ -314,27 +314,44 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                                             label={__('Provider')}
                                             value={[app]} // e.g: value = [ 'a', 'c' ]
                                             onChange={(app) => {
+                                                this.setState({dimensions: [], measures: [], filters: [], categories: []}, () => {
+                                                    setAttributes({
+                                                        dvzProxyDatasetId: null,
+                                                        dimension1: 'none',
+                                                        dimension2: 'none',
+                                                        dimension3: 'none',
+                                                        measures: Object.assign({}, DEFAULT_FORMAT_SETTINGS)
+                                                    })
+                                                })
                                                 setAttributes({
                                                     app: app                                                   
                                                 })
+
                                             }}
                                             options={this.state.apps}
                                         />
                                     </PanelRow>
+
+
                                     {isSupersetAPI(app, this.state.apps) &&   <PanelRow>
                                         <SelectControl
                                             label={__('Datasets')}
-                                            value={[datasetId]} 
+                                            value={[dvzProxyDatasetId]}
                                             onChange={(newDatasetId)   => {
-                                                setAttributes({
-                                                    datasetId: newDatasetId,
-                                                    dimension1: 'none',
-                                                    dimension2: 'none',
-                                                    dimension3: 'none',	
-                                                    measures: Object.assign({}, DEFAULT_FORMAT_SETTINGS)
+
+                                                this.setState({dimensions: [], measures: [], filters: [], categories: []}, () => {
+                                                    setAttributes({
+                                                        dvzProxyDatasetId: newDatasetId,
+                                                        dimension1: 'none',
+                                                        dimension2: 'none',
+                                                        dimension3: 'none',
+                                                        measures: Object.assign({}, DEFAULT_FORMAT_SETTINGS)
+                                                    })
                                                 })
-                                                this.setState({dimensions: [], measures: [], filters: [], categories: []})
-                                                this.loadMetadataForSuperset(app, newDatasetId)
+
+
+                                                //look at component did update of BlockEditWithAPIMetadata
+                                                //this.loadMetadata(app, newDatasetId)
                                             }}
                                             options={datasets}
                                         />

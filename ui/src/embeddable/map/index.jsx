@@ -104,7 +104,7 @@ const MapEntry = (props) => {
         'data-labels-exclusion-list': labelsExclusionList = "",
         'data-custom-measure-labels': customMeasureLabels = "{}",
         'data-show-shading-layer-labels': showShadingLayerLabels = "ifUnitHasData",
-        "data-dataset-id": datasetId,       
+        "data-dvz-proxy-dataset-id": dvzProxyDatasetId,
         intl, 
         settings
     } = props  
@@ -250,7 +250,7 @@ const MapEntry = (props) => {
         noDataText,
         labelsExclusionList: labelsExclusionList.split(',').map(l => l.trim()),
         showShadingLayerLabels,
-        datasetId
+        dvzProxyDatasetId,
     } 
       
     const measureLabels = parse(customMeasureLabels) || {}
@@ -258,8 +258,8 @@ const MapEntry = (props) => {
     const measuresCSV = editing ? (parse(measures) || []).join(',') : measures  
     
     const params = getFilters(filters)
-    if (datasetId) {
-        params.datasetId = datasetId;
+    if (dvzProxyDatasetId) {
+        params.dvzProxyDatasetId = dvzProxyDatasetId;
     }    
 
     return (

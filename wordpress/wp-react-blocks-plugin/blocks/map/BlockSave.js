@@ -74,7 +74,7 @@ const SaveComponent = (props) => {
             noDataText,
             customMeasureLabels,
             showShadingLayerLabels,
-            datasetId
+            dvzProxyDatasetId
         }
     } = props;
     
@@ -167,7 +167,7 @@ const SaveComponent = (props) => {
              data-no-data-text={noDataText}
              data-custom-measure-labels={encodeURIComponent(JSON.stringify(customMeasureLabels))}
              data-show-shading-layer-labels={showShadingLayerLabels}
-             data-dataset-id={datasetId}  >
+             data-dvz-proxy-dataset-id={dvzProxyDatasetId}  >
         </div>
     );
 }

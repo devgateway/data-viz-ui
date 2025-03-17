@@ -92,7 +92,7 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                 autoApply,
                 closeOnSelect,
                 useFilterItems,
-                datasetId
+                dvzProxyDatasetId
             }
         } = this.props;
 
@@ -134,10 +134,10 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                             
                                         <SelectControl
                                             label={__('Datasets')}
-                                            value={[datasetId]} 
+                                            value={[dvzProxyDatasetId]}
                                             onChange={(newDatasetId)   => {
                                                 setAttributes({
-                                                    datasetId: newDatasetId,
+                                                    dvzProxyDatasetId: newDatasetId,
                                                     dimension1: 'none',
                                                     dimension2: 'none'  
 

@@ -215,7 +215,7 @@ export class DataLayerSetting extends Component {
                 markSizeScale,
                 tooltip,
                 visible = true,
-                datasetId
+                dvzProxyDatasetId
             }
         } = this.props
 
@@ -238,9 +238,9 @@ export class DataLayerSetting extends Component {
             {isSupersetAPI(app, apps) && <PanelRow>
                 <SelectControl
                     label={__('Datasets')}
-                    value={[datasetId]}
+                    value={[dvzProxyDatasetId]}
                     onChange={(newDatasetId) => {
-                        onChangeProperty("datasetId", newDatasetId)
+                        onChangeProperty("dvzProxyDatasetId", newDatasetId)
                     }}
                     options={allDatasets}
                 />

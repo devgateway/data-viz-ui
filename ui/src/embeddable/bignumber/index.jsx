@@ -12,7 +12,7 @@ const Chart = (props) => {
         intl,
         childContent,
         "data-csv": csv = "",
-        "data-dataset-id": datasetId,
+        "data-dvz-proxy-dataset-id": dvzProxyDatasetId,
         "data-no-data-message": noDataMsg = "No data matches your selection",
         "data-view-mode": editMode = 'info',
         'data-height': height,
@@ -75,8 +75,8 @@ const Chart = (props) => {
         })
     }
 
-    if (datasetId) {
-        params.datasetId = datasetId;
+    if (dvzProxyDatasetId) {
+        params.dvzProxyDatasetId = dvzProxyDatasetId;
       }
 
     const dimensions = []   

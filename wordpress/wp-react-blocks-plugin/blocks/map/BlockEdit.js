@@ -342,7 +342,7 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                 zoomOnFilter,
                 zoomOnFilterField,
                 showShadingLayerLabels,
-                datasetId
+                dvzProxyDatasetId
             }
         } = this.props;
 
@@ -487,17 +487,17 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                      {isSupersetAPI(app, this.state.apps) &&   <PanelRow>
                                                             <SelectControl
                                                                 label={__('Datasets')}
-                                                                value={[datasetId]} 
+                                                                value={[dvzProxyDatasetId]}
                                                                 onChange={(newDatasetId)   => {
                                                                     setAttributes({
-                                                                        datasetId: newDatasetId,
+                                                                        dvzProxyDatasetId: newDatasetId,
                                                                         dimension1: 'none',
                                                                         dimension2: 'none',
                                                                         dimension3: 'none',	
                                                                         measures: []
                                                                     })
                                                                     this.setState({dimensions: [], measures: [], filters: [], categories: []})
-                                                                    this.loadMetadataForSuperset(app, newDatasetId)
+                                                                    this.loadMetadata(app, newDatasetId)
                                                                 }}
                                                                 options={datasets}
                                                             />

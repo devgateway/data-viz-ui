@@ -10,7 +10,7 @@ const SaveComponent = (props) => {
             filters,
             group,            
             noDataMsg,
-            datasetId,
+            dvzProxyDatasetId,
             numberFontSize,
             numberColor,
             labelFontSize,
@@ -31,7 +31,7 @@ const SaveComponent = (props) => {
              data-height={height}
              data-source={source}
              data-app={app}
-             data-dataset-id={datasetId}
+             data-dvz-proxy-dataset-id={dvzProxyDatasetId}
              data-measures={encodeURIComponent(JSON.stringify(measures))}
              data-format={encodeURIComponent(JSON.stringify(format))}
              data-group={group}

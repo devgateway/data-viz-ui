@@ -304,7 +304,7 @@ registerBlockType(process.env.BLOCKS_NS+'/map',
                 type: "Object",
                 default: {}
             },
-            datasetId: {
+            dvzProxyDatasetId: {
                 type: 'String',
                 default: ""
             }            

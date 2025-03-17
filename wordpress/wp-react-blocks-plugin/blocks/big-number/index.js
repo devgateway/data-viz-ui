@@ -53,8 +53,8 @@ registerBlockType(process.env.BLOCKS_NS + '/bignumber',
             filters: {
                 type: "Array",
                 default: []
-            },          
-            datasetId: {
+            },
+            dvzProxyDatasetId: {
                 type: 'String',
                 default: ""
             },

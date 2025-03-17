@@ -63,7 +63,7 @@ export const Model = {
     flowValuesFrom: 'origin',
     flowOrigin: 'none',
     flowDestination: 'none',
-    datasetId: ''    
+    dvzProxyDatasetId: ''
 }
 
 

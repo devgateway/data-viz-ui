@@ -238,8 +238,8 @@ export class DataLayerSetting extends Component {
                 customMeasuresLabels,
                 patternDiscriminator,
                 onRemoveLayer,
-                onMoveLayer,                
-                datasetId,
+                onMoveLayer,
+                dvzProxyDatasetId,
                            
             }
         } = this.props
@@ -283,9 +283,9 @@ export class DataLayerSetting extends Component {
             <PanelRow>
                 <SelectControl
                     label={__('Datasets')}
-                    value={[datasetId]}
+                    value={[dvzProxyDatasetId]}
                     onChange={(newDatasetId) => {
-                        onChangeProperty("datasetId", newDatasetId)                       
+                        onChangeProperty("dvzProxyDatasetId", newDatasetId)
                     }}
                     options={allDatasets}
                 />

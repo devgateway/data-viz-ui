@@ -262,7 +262,7 @@ const MobileConfig = (props) => {
       measures,
       dimension1,
       yAxisTickValues,
-      datasetId
+      dvzProxyDatasetId
     },
   } = props;
 
@@ -280,7 +280,7 @@ const MobileConfig = (props) => {
   let xAxisLabels = extractAxisValues(csv);
 
   if (app !== "csv") {
-    const key = `${app}_categories_${datasetId ? datasetId : ""}`;
+    const key = `${app}_categories_${dvzProxyDatasetId ? dvzProxyDatasetId : ""}`;
     if (dimension1 !== "none") {
       const storedCategories = JSON.parse(sessionStorage.getItem(key));
       
@@ -288,7 +288,7 @@ const MobileConfig = (props) => {
       xAxisLabels = []
 
       if (!storedCategories) {        
-         fetch(`/api/${app}/categories?datasetId=${datasetId}`)
+         fetch(`/api/${app}/categories?dvzProxyDatasetId=${dvzProxyDatasetId}`)
         .then((response) => response.json())
         .then((data) => {
           categories = getTranslatedOptions(data)
@@ -303,11 +303,11 @@ const MobileConfig = (props) => {
       }  
 
     } else {
-      const key = `${app}_measures_${datasetId ? datasetId : ""}`;
+      const key = `${app}_measures_${dvzProxyDatasetId ? dvzProxyDatasetId : ""}`;
       const storedMeasures = JSON.parse(sessionStorage.getItem(key));
       // if measures are not present in session storage, fetch them from the API
       if (!storedMeasures) {
-        fetch(`/api/${app}/measures?datasetId=${datasetId}`)
+        fetch(`/api/${app}/measures?dvzProxyDatasetId=${dvzProxyDatasetId}`)
           .then((response) => response.json())
           .then((data) => {
             sessionStorage.setItem(key, JSON.stringify(data));

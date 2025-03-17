@@ -333,9 +333,9 @@ class LayerWithMetadata extends BlockEditWithAPIMetadata {
                     site_language: settingsData["site_language"],
                     current_language: new URLSearchParams(document.location.search).get("edit_lang"),
                     apps
-                }, ()=> {
-                    this.loadMetaDataByApp(app)  
                 })
+                debugger;
+                this.loadMetaDataByApp(app)
 
                               
             })
@@ -352,15 +352,17 @@ class LayerWithMetadata extends BlockEditWithAPIMetadata {
         super.componentDidUpdate(prevProps, prevState, snapshot)
         const {layer: {app}} = this.props
         const {layer: {app: prevAPP}} = prevProps
-        const datasetId = this.props.layer.datasetId
-        const prevDatasetId = prevProps.layer.datasetId
-        if ((app != prevAPP) || (prevAPP == null && app != null) || (datasetId != prevDatasetId)) {
-            this.loadMetadataForSuperset(app, datasetId)
+        const dvzProxyDatasetId = this.props.layer.dvzProxyDatasetId
+        const prevDatasetId = prevProps.layer.dvzProxyDatasetId
+
+        debugger;
+        if ((app != prevAPP) || (prevAPP == null && app != null) || (dvzProxyDatasetId != prevDatasetId)) {
+            this.loadMetadata(app, dvzProxyDatasetId)
         }
 
         if ((app != prevAPP) || (prevAPP == null && app != null) && isSupersetAPI(app, this.state.apps)) {
             this.loadDatasets(app)
-        }        
+        }
     }
 
     render() {

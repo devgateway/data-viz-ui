@@ -30,7 +30,7 @@ const SaveComponent = (props) => {
             alphabeticalSort,
             ascOrder,
             useFilterItems,
-            datasetId,
+            dvzProxyDatasetId,
             autoApply
         }
     } = props;
@@ -42,7 +42,7 @@ const SaveComponent = (props) => {
     return (<div className={"viz-component"}
                  data-component={"filter"}
                  data-app={app}
-                 data-dataset-id={datasetId}
+                 data-dvz-proxy-dataset-id={dvzProxyDatasetId}
                  data-icon={icon}
                  data-alphabetical-sort={alphabeticalSort}
                  data-asc-order={ascOrder}

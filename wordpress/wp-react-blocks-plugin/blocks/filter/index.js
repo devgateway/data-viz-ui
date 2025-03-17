@@ -124,7 +124,7 @@ registerBlockType(process.env.BLOCKS_NS + '/filter',
                 type: 'Boolean',
                 default: true
             },
-            datasetId: {
+            dvzProxyDatasetId: {
                 type: 'String',
                 default: ""
             },

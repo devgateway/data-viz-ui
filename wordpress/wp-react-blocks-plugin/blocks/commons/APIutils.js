@@ -24,7 +24,8 @@ export const getTranslation = (translatable) => {
     return label || value || translatable
 }
 
-export const isSupersetAPI = (app, apps) => {    
+export const isSupersetAPI = (app, apps) => {
+    debugger;
     if (app == 'csv' || !apps) {
         return false
     }

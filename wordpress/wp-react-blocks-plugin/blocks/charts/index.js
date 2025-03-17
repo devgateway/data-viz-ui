@@ -129,7 +129,7 @@ registerBlockType(process.env.BLOCKS_NS + '/chart',
                 type: Object,
                 default: {}
             },
-            datasetId: {
+            dvzProxyDatasetId: {
                 type: 'String',
                 default: ""
             },

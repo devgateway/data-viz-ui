@@ -38,8 +38,8 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                 format,
                 filters,
                 group,
-                panelStatus,              
-                datasetId,
+                panelStatus,
+                dvzProxyDatasetId,
                 label,
                 numberFontSize,
                 numberColor,
@@ -99,13 +99,13 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                              {isSupersetAPI(app, this.state.apps) &&   <PanelRow>
                                                                     <SelectControl
                                                                         label={__('Datasets')}
-                                                                        value={[datasetId]} 
+                                                                        value={[dvzProxyDatasetId]}
                                                                         onChange={(newDatasetId)   => {
                                                                             setAttributes({
-                                                                                datasetId: newDatasetId                                                                           
+                                                                                dvzProxyDatasetId: newDatasetId
                                                                             })
                                                                             
-                                                                            this.loadMetadataForSuperset(app, newDatasetId)
+                                                                            this.loadMetadata(app, newDatasetId)
                                                                         }}
                                                                         options={datasets}
                                                                     />
