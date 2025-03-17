@@ -18,12 +18,12 @@ class BlockEdit extends BlockEditWithAPIMetadata {
             attributes: {
                 group,
                 app,
-                resetLabel
+                label
             }
         } = this.props;
 
         
-        const queryString = `data-group=${group}&data-app=${app}&data-reset-label=${resetLabel}`
+
         const iframeStyles = {height: '65px'}
 
         return ([isSelected && (<InspectorControls>
@@ -51,9 +51,9 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                     <PanelBody initialOpen={false} title={__("Labels")}>
                         <PanelRow>
                             <TextControl
-                                label={__('Reset Label')}
-                                value={resetLabel}
-                                onChange={(resetLabel) => setAttributes({resetLabel})}
+                                label={__('Label')}
+                                value={label}
+                                onChange={(label) => setAttributes({label})}
                             />
                         </PanelRow>
                     </PanelBody>                  
@@ -64,7 +64,7 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                         {this.state.react_ui_url &&
                         <iframe  ref={this.iframe} scrolling={"no"}
                                 style={iframeStyles}
-                                src={this.state.react_ui_url + "/embeddable/datafiltersreset"}/>}
+                                src={this.state.react_ui_url + "/embeddable/dataFiltersApply"}/>}
                     </div>
 
                 )]
