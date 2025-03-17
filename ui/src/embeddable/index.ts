@@ -21,6 +21,7 @@ const AgreeAndDownload = lazy(() => import("./agree-and-download/"));
 const DownloadPdf = lazy(() => import("./downloadPDF"));
 const Map = lazy(() => import("./map"));
 const DataFiltersReset = lazy(() => import("./datafiltersreset"));
+const DataFiltersApply = lazy(() => import("./datafilters-apply"));
 const Tooltip = lazy(() => import("./tooltip"));
 const ReferencesList = lazy(() => import("./references/ReferencesList"));
 const Reference = lazy(() => import("./references/Reference"));
@@ -62,6 +63,7 @@ const components = {
     downloadPdf: DownloadPdf,
     map: Map,
     dataFiltersReset: DataFiltersReset,
+    dataFiltersApply: DataFiltersApply,
     tooltip: Tooltip,
     references: ReferencesList,
     reference: Reference,
