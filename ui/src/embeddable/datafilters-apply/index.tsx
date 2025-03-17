@@ -28,7 +28,7 @@ const FiltersResetComponent = (props) => {
 
     useEffect(() => {
 
-        debugger; //eslint-disable-line
+        
         if (prevFilters) {
             Object.keys(prevFilters).forEach(k => {
                 if (prevFilters[k].length != appliedFilters[k].filter(v => v != Number.MIN_SAFE_INTEGER).length) {

@@ -69,8 +69,8 @@ class DataProvider extends React.Component {
 const mapStateToProps = (state, ownProps) => {
     const {app, params} = ownProps
     const path = ['data', 'categories', app]
-    if (params.datasetId) {
-        path.push(params.datasetId)
+    if (params.dvzProxyDatasetId) {
+        path.push(params.dvzProxyDatasetId)
     }
     return {
         data: state.getIn([...path, 'items']),
