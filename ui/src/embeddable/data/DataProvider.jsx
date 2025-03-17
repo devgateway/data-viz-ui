@@ -18,7 +18,7 @@ class DataProvider extends React.Component {
     componentDidMount() {
 
         const {app, source, store, params, csv, group, editing} = this.props
-        debugger // eslint-disable-line
+
         if (app === "csv") {
             this.props.onSetData({app, csv, store, params, group})
         } else {
@@ -35,7 +35,7 @@ class DataProvider extends React.Component {
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         const {app, filters, source, store, params, csv, group, autoApply, editing} = this.props
-        debugger // eslint-disable-line
+
         if (filters != prevProps.filters && filters != null && JSON.stringify(filters) != JSON.stringify(prevProps.filters) && autoApply == false) {
             //silence is golden
 

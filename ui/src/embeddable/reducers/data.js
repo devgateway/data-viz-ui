@@ -53,13 +53,13 @@ export const setInitialFilters = ({app, group, param, value}) => (dispatch, getS
 
 export const getCategories = (props) => (dispatch, getState) => {
     const {app, params} = props
-    dispatch({type: LOAD_CATEGORIES, params, app, datasetId: params.datasetId})
+    dispatch({type: LOAD_CATEGORIES, params, app, dvzProxyDatasetId: params.dvzProxyDatasetId})
     api.getCategories({app, params})
       .then(data => {              
           data.appliedFilters = params
-          return dispatch({type: LOAD_CATEGORIES_DONE, app, data, datasetId: params.datasetId})
+          return dispatch({type: LOAD_CATEGORIES_DONE, app, data, dvzProxyDatasetId: params.dvzProxyDatasetId})
       })
-      .catch(error => dispatch({type: LOAD_CATEGORIES_ERROR, app, error, datasetId: params.datasetId}))
+      .catch(error => dispatch({type: LOAD_CATEGORIES_ERROR, app, error, dvzProxyDatasetId: params.dvzProxyDatasetId}))
 }
 
 export const setData = ({app, group, csv, store, params}) => (dispatch, getState) => {
@@ -89,7 +89,7 @@ export const setData = ({app, group, csv, store, params}) => (dispatch, getState
 }
 export const getData = ({app, group, source, store, params}) => (dispatch, getState) => {
     const filters = getState().get('data').getIn(['filters', app, group])
-    debugger; //eslint-disable-line
+
     if (filters) {
         params = {...params, ...filters.toJS()}
     }
@@ -129,11 +129,11 @@ export default (state = initialState, action) => {
 
 
         case LOAD_CATEGORIES: {
-            const {data, app, datasetId} = action
+            const {data, app, dvzProxyDatasetId} = action
             const path = ["categories", app]
 
-            if (datasetId) {
-                path.push(datasetId)
+            if (dvzProxyDatasetId) {
+                path.push(dvzProxyDatasetId)
             }
 
             return state.setIn([...path, "loading"], true)
@@ -141,22 +141,22 @@ export default (state = initialState, action) => {
         }
 
         case LOAD_CATEGORIES_DONE: {
-            const {data, app, datasetId} = action
+            const {data, app, dvzProxyDatasetId} = action
             const path = ["categories", app]
 
-            if (datasetId) {
-                path.push(datasetId)
+            if (dvzProxyDatasetId) {
+                path.push(dvzProxyDatasetId)
             }
             
             return state.setIn([...path, "loading"], false)
                     .setIn([...path, "items"], Immutable.fromJS(data))            
         }
         case LOAD_CATEGORIES_ERROR: {
-             const {data, app, datasetId} = action
+             const {data, app, dvzProxyDatasetId} = action
             const path = ["categories", app]
 
-            if (datasetId) {
-                path.push(datasetId)
+            if (dvzProxyDatasetId) {
+                path.push(dvzProxyDatasetId)
             }
             
             return state.setIn([...path, "loading"], false)
@@ -165,7 +165,7 @@ export default (state = initialState, action) => {
         }
         case SET_FILTER: {
             const {app, group, param, value,autoApply} = action
-            debugger; //eslint-disable-line
+            
             return  state.setIn(['filters-settings', app, group, "autoApply"],autoApply)
                 .setIn(['filters', app, group, param], value.length === 0 ? [Number.MIN_SAFE_INTEGER] : value)
         }

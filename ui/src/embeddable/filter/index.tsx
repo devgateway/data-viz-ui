@@ -470,7 +470,7 @@ const FilterWrapper = (props) => {
 const Filter = ({
     "data-group": group,
     "data-app": app,
-    "data-dataset-id": datasetId,
+    "data-dvz-proxy-dataset-id": dvzProxyDatasetId,
     "data-param": param,
     "data-icon": icon,
     "data-type": type,
@@ -509,8 +509,8 @@ const Filter = ({
         })
     }
 
-    if (datasetId) {
-        params["datasetId"] = datasetId;
+    if (dvzProxyDatasetId) {
+        params["dvzProxyDatasetId"] = dvzProxyDatasetId;
     }
 
     const hiddenFiltersArr = hiddenFilters ?  parse(hiddenFilters): []

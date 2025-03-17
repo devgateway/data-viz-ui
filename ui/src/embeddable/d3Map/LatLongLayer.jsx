@@ -203,7 +203,7 @@ class DataLayer extends React.Component {
 const DataWrapper = (props) => {
     const {
         id, unique, filters, csv, app, group = "default", apiJoinAttribute, editing, dimension2, pointStyleBy,
-        datasetId, settings
+        dvzProxyDatasetId, settings
     } = props
 
     const secondDimension = pointStyleBy === "dimension" && dimension2 != 'none' ? "/" + dimension2 : ''
@@ -216,8 +216,8 @@ const DataWrapper = (props) => {
         })
     }
 
-    if (datasetId) {
-        params.datasetId = datasetId;
+    if (dvzProxyDatasetId) {
+        params.dvzProxyDatasetId = dvzProxyDatasetId;
     }    
 
     return (<DataProvider
