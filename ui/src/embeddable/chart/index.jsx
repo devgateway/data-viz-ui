@@ -59,8 +59,8 @@ const Chart = (props) => {
     childContent,
     categories,
     injectedMeasures,
-    "data-app": app = "prevalence",
-    "data-dataset-id": datasetId,
+    "data-app": app = "csv",
+    "data-dvz-proxy-dataset-id": dvzProxyDatasetId,
     "data-group": group = "default",
     "data-height": height = 500,
     "data-type": type = "bar", //'data-source': source = 'gender/smoke',f
@@ -563,8 +563,8 @@ const Chart = (props) => {
     });
   }
 
-  if (datasetId) {
-    params.datasetId = datasetId;
+  if (dvzProxyDatasetId) {
+    params.dvzProxyDatasetId = dvzProxyDatasetId;
   }
 
   let ChartDataFrame = null;
