@@ -4,7 +4,7 @@ const SaveComponent = (props) => {
         attributes: {
            group,
            app,
-           resetLabel
+           label
         }
     } = props;
 
@@ -12,12 +12,13 @@ const SaveComponent = (props) => {
     const divStyles = {}
 
     return (<div className={"viz-component"}
-             data-component={"dataFiltersReset"}
+             data-component={"dataFiltersApply"}
              data-group={group}
              data-app={app}
-             data-reset-label={resetLabel}>
+             data-label={label}>
         </div>);
 }
+
 
 
 export default SaveComponent
