@@ -21,8 +21,6 @@ const CLEAN_MEASURES = 'CLEAN_MEASURES'
 export const cleanMeasures = ({app, group}) => (dispatch, getState) => {
     dispatch({type: CLEAN_MEASURES, app, group})
 }
-
-
 export const setMeasures = ({app, group, mGroup}) => (dispatch, getState) => {
 
     const measures = Object.keys(mGroup.measures).filter(k => mGroup.measures[k].selected)
@@ -36,25 +34,22 @@ export const setMeasures = ({app, group, mGroup}) => (dispatch, getState) => {
     newMgroup[app].format = mGroup.format
     dispatch({type: SET_MEASURES, app, group, measure: newMgroup})
 }
-
-
 export const setFilter = ({app, group, param, value, autoApply}) => (dispatch, getState) => {
 
     dispatch({type: SET_FILTER, app, group, param, value,autoApply})
 }
-
-
 export const cleanFilter = ({app, group}) => (dispatch, getState) => {
 
     dispatch({type: CLEAN_FILTER, app, group})
     //dispatch({type: CLEAN_MEASURES, app, group})
 }
 
-
+export const applyFilter = ({app, group}) => (dispatch, getState) => {
+    alert('test')
+}
 export const setInitialFilters = ({app, group, param, value}) => (dispatch, getState) => {
     dispatch({type: SET_INITIAL_FILTER, app, group, param, value})
 }
-
 
 export const getCategories = (props) => (dispatch, getState) => {
     const {app, params} = props
@@ -66,7 +61,6 @@ export const getCategories = (props) => (dispatch, getState) => {
       })
       .catch(error => dispatch({type: LOAD_CATEGORIES_ERROR, app, error, datasetId: params.datasetId}))
 }
-
 
 export const setData = ({app, group, csv, store, params}) => (dispatch, getState) => {
     const filters = getState().get('data').getIn(['filters', app, group])
@@ -93,7 +87,6 @@ export const setData = ({app, group, csv, store, params}) => (dispatch, getState
     const d2 = {...data, data: filtered, appliedFilters: params}
     dispatch({type: LOAD_DATA_DONE, store, data: {count: d2.data.length, itemsSize: d2.data.length, ...d2}})
 }
-
 export const getData = ({app, group, source, store, params}) => (dispatch, getState) => {
     const filters = getState().get('data').getIn(['filters', app, group])
     debugger; //eslint-disable-line
@@ -109,7 +102,6 @@ export const getData = ({app, group, source, store, params}) => (dispatch, getSt
         .catch(error => dispatch({type: LOAD_DATA_ERROR, store, error}))
 
 }
-
 
 export default (state = initialState, action) => {
 
