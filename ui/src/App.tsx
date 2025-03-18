@@ -62,9 +62,11 @@ const PreviewComponentParameterParser = () => {
 
     useEffect(() => {
         window.addEventListener("message", readMessage, false);
-
         if (window.parent) {
             window.parent.postMessage({ type: "componentReady", value: true }, "*")
+        }
+        if(window.top) {
+            window.top.postMessage({ type: "componentReady", value: true }, "*")
         }
         return () => {
             window.removeEventListener('message', readMessage);
