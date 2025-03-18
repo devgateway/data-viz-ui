@@ -263,7 +263,7 @@ export class DataLayerSetting extends Component {
             }
         }
 
-      debugger;
+      
         
         return ([<PanelBody initialOpen={false} title={"Data Source"}>
             <PanelRow>
