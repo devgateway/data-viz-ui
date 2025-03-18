@@ -25,6 +25,7 @@ class DataProvider extends React.Component {
             if (editing) {
                 // params.v = (Math.random() + 1).toString(36).substring(7)
             }
+            debugger; // eslint-disable-line no-debugger
             this.setState({showLoading: false})
             this.props.onLoadData({app, source, store, params, group})
             setTimeout(this.checkLoadingTime, 100);
