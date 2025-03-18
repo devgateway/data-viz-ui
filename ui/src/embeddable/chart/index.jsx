@@ -54,7 +54,7 @@ const Chart = (props) => {
     childContent,
     categories,
     injectedMeasures,
-    "data-app": app = "prevalence",
+    "data-app": app = "csv",
     "data-group": group = "default",
     "data-height": height = 500,
     "data-type": type = "bar", //'data-source': source = 'gender/smoke',f
@@ -170,6 +170,7 @@ const Chart = (props) => {
     "data-radar-enable-dot-label": radarEnableDotLabel = "true",
     "data-radar-dot-label-offset": radarDotLabelOffset = -12,
     "data-mobile-customization": mobileCustomization = "{}",
+    "data-preview-mode": previewMode = "Desktop",
   } = props;
   const mobileConfigSettings = JSON.parse(
     decodeURIComponent(mobileCustomization)
@@ -180,20 +181,36 @@ const Chart = (props) => {
   const isMobileConfigEnabled =
     isMobileOrTablet && (mobileConfigSettings?.showCustomization ?? false);
 
+  const isTabletEditMode =  (["Tablet"].includes(previewMode) && editing);
+  const isMobileEditMode =  (["Mobile"].includes(previewMode) && editing);
+
+  const isNotDesktopPreview = isMobileConfigEnabled && previewMode !== "Desktop";
+  const isNotEditingAndIsMobileOrTablet = isMobileConfigEnabled && !editing;
+
   const getTickRotation = () => {
     if (
-      window.matchMedia("(min-width: 768px) and (max-width: 1250px)").matches
+      isTabletEditMode
     ) {
       return isMobileConfigEnabled
         ? mobileConfigSettings?.tabletXAxisTextRotation ?? tickRotation
         : tickRotation;
-    } else if (window.matchMedia("(max-width: 480px)").matches) {
-      return isMobileConfigEnabled
+    }
+    if (isMobileEditMode) {
+      return isMobileConfigEnabled && previewMode !== "Desktop"
         ? mobileConfigSettings?.mobileXAxisTextRotation ?? tickRotation
         : tickRotation;
-    } else {
-      return tickRotation;
     }
+    if(window.matchMedia("(min-width: 768px) and (max-width: 1250px)").matches) {
+      return isMobileConfigEnabled
+        ? mobileConfigSettings?.tabletXAxisTextRotation ?? tickRotation
+        : tickRotation;
+    }
+    if(window.matchMedia("(max-width: 480px)").matches) {
+      return isMobileConfigEnabled && previewMode !== "Desktop"
+        ? mobileConfigSettings?.mobileXAxisTextRotation ?? tickRotation
+        : tickRotation;
+    }
+    return tickRotation;
   };
 
   const [deviceTickRotation, setTickRotation] = useState(getTickRotation());
@@ -375,35 +392,28 @@ const Chart = (props) => {
   const child = null;
   const contentHeight = editing ? height - 80 : height;
 
-  const showXAxisTitle = () => {
-    if (isMobileConfigEnabled) {
-      if (mobileConfigSettings?.showXAxisTitle) {
-        return bottom;
-      } else {
-        return "";
-      }
-    }
-    return bottom;
-  };
+  const showXAxisTitle = () => (
+    (isNotDesktopPreview || isNotEditingAndIsMobileOrTablet) && !mobileConfigSettings?.showXAxisTitle
+      ? ""
+      : bottom
+  );
 
   const showYAxisTitle = () => {
-    if (isMobileConfigEnabled) {
+    if (isNotDesktopPreview || isNotEditingAndIsMobileOrTablet) {
       if (mobileConfigSettings?.showYAxisTitle) {
         return leftLegendForSelectedMeasure;
-      } else {
-        return "";
       }
+      return "";
     }
     return leftLegendForSelectedMeasure;
   };
 
   const showRightAxisTitle = () => {
-    if (isMobileConfigEnabled) {
+    if (isNotDesktopPreview || isNotEditingAndIsMobileOrTablet) {
       if (mobileConfigSettings?.showRightAxisTitle) {
         return rightLegendForSelectedMeasure;
-      } else {
-        return "";
       }
+      return "";
     }
     return rightLegendForSelectedMeasure;
   };
@@ -417,7 +427,8 @@ const Chart = (props) => {
   const parseBoolean = (str) => {
     if (str === "true" || str === true) {
       return true;
-    } else if (str === "false" || str === false) {
+    }
+    if (str === "false" || str === false) {
       return false;
     }
   };
@@ -436,10 +447,9 @@ const Chart = (props) => {
     if (layout === "horizontal") {
       switchGridLines();
       return "vertical";
-    } else {
-      switchGridLines();
-      return "horizontal";
     }
+    switchGridLines();
+    return "horizontal";
   };
 
   const mobileLayout = () => {
@@ -451,7 +461,7 @@ const Chart = (props) => {
 
   const getMarginValue = (mobileEnabled, mobileSetting, defaultValue) => {
     return mobileEnabled
-      ? parseInt(mobileSetting) ?? defaultValue
+      ? Number.parseInt(mobileSetting) ?? defaultValue
       : defaultValue;
   };
 
@@ -465,55 +475,63 @@ const Chart = (props) => {
 
   useEffect(() => {
     const updateDeviceType = () => {
+      const rotation = getTickRotation();
       setIsMobileOrTablet(window.innerWidth <= 1250);
-      setTickRotation(getTickRotation());
+      setTickRotation(rotation);
     };
     window.addEventListener("resize", updateDeviceType);
+    if ((editing && previewMode !== "Desktop") || !editing) {
+      setTickRotation(getTickRotation());
+    }
     return () => {
       window.removeEventListener("resize", updateDeviceType);
     };
-  }, []);
+  }, [
+    previewMode,
+    isMobileConfigEnabled,
+    mobileConfigSettings?.tabletXAxisTextRotation,
+    mobileConfigSettings?.mobileXAxisTextRotation,
+  ]);
 
   const determineLegendPosition = () => {
-    const isTabletOrMobile = ["tablet", "mobile", "midTablet"].includes(
-      getDeviceType()
-    );
-    if (editing) {
-      return isTabletOrMobile ? "bottom" : legendPosition;
+    const isTabletOrMobile = ["tablet", "mobile", "midTablet"].includes(getDeviceType());
+    if (editing && previewMode !== "Desktop") {
+      return "bottom";
     }
-    return !isTabletOrMobile ? legendPosition : "bottom";
+    return isTabletOrMobile ? "bottom" : legendPosition;
   };
+
 
   const chartProps = {
     app,
+    editing,
     tickColor: decodeURIComponent(tickColor),
     tickRotation: deviceTickRotation,
-    layout: isMobileConfigEnabled ? mobileLayout() : layout,
+    layout: (isNotDesktopPreview || isNotEditingAndIsMobileOrTablet) ? mobileLayout() : layout,
     reverse: reverse == true || reverse == "true",
     showLegends: showLegends == true || showLegends == "true",
     legendLabel,
     swap: swap == true || swap == "true",
     showGrid: showGrid == true || showGrid == "true",
-
     marginLeft: getMarginValue(
-      isMobileConfigEnabled,
-      parseInt(mobileConfigSettings?.marginLeft),
+      (isNotDesktopPreview || isNotEditingAndIsMobileOrTablet),
+      Number.parseInt(mobileConfigSettings?.marginLeft),
       parseInt(marginLeft)
     ),
     marginTop: getMarginValue(
-      isMobileConfigEnabled,
-      parseInt(mobileConfigSettings?.marginTop),
+      (isNotDesktopPreview || isNotEditingAndIsMobileOrTablet),
+      Number.parseInt(mobileConfigSettings?.marginTop),
       parseInt(marginTop)
     ),
     marginRight: getMarginValue(
-      isMobileConfigEnabled,
-      parseInt(mobileConfigSettings?.marginRight),
-      parseInt(marginRight)
+      (isNotDesktopPreview || isNotEditingAndIsMobileOrTablet),
+      Number.parseInt(mobileConfigSettings?.marginRight),
+      Number.parseInt(marginRight)
     ),
     marginBottom: getMarginValue(
-      isMobileConfigEnabled,
-      parseInt(mobileConfigSettings?.marginBottom),
-      parseInt(marginBottom)
+      (isNotDesktopPreview || isNotEditingAndIsMobileOrTablet),
+      Number.parseInt(mobileConfigSettings?.marginBottom),
+      Number.parseInt(marginBottom)
     ),
     height: `${contentHeight}px`,
     legendPosition: determineLegendPosition(),
@@ -543,14 +561,14 @@ const Chart = (props) => {
     fixedMinValue,
     fixedMaxValue,
     barPadding: getBarPadValueOuterOrInner(
-      isMobileConfigEnabled,
+      (isNotDesktopPreview || isNotEditingAndIsMobileOrTablet),
       mobileConfigSettings?.barPadding,
       barPadding
     ),
     barLabelPosition,
     lineLabelPosition,
     barInnerPadding: getBarPadValueOuterOrInner(
-      isMobileConfigEnabled,
+      (isNotDesktopPreview || isNotEditingAndIsMobileOrTablet),
       mobileConfigSettings?.barInnerPadding,
       barInnerPadding
     ),
@@ -590,10 +608,10 @@ const Chart = (props) => {
     userMeasures,
     tooltipEnableMarkdown:
       tooltipEnableMarkdown == true || tooltipEnableMarkdown == "true",
-    yAxisTickValues: isMobileConfigEnabled
+    yAxisTickValues: (isNotDesktopPreview || isNotEditingAndIsMobileOrTablet)
       ? mobileConfigSettings.yAxisTickValues ?? yAxisTickValues
       : yAxisTickValues,
-    xAxisTickValues: isMobileConfigEnabled
+    xAxisTickValues:(isNotDesktopPreview || isNotEditingAndIsMobileOrTablet)
       ? mobileConfigSettings.xAxisTickValues ?? xAxisTickValues
       : xAxisTickValues,
     enableGridY: enableGridY == true || enableGridY == "true",
@@ -620,6 +638,7 @@ const Chart = (props) => {
     sort2Dimension,
     mobileCustomization,
     dimension1,
+    previewMode
   };
 
   const params = {};
@@ -777,12 +796,12 @@ const Chart = (props) => {
             const chartContainerStyles =
               window.getComputedStyle(chartContainer);
             const chartContainerMarginBottom =
-              parseFloat(chartContainerStyles.marginBottom) || 0;
+              Number.parseFloat(chartContainerStyles.marginBottom) || 0;
             const adjustedChartContainerBottom =
               chartContainerRect.bottom + chartContainerMarginBottom;
 
             const legendsRect = legendsContainer.getBoundingClientRect();
-            const legendsMarginTop = parseFloat(styles.marginTop) || 0;
+            const legendsMarginTop = Number.parseFloat(styles.marginTop) || 0;
             const adjustedLegendsTop = legendsRect.top - legendsMarginTop;
 
             if (adjustedLegendsTop < adjustedChartContainerBottom) {
