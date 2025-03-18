@@ -50,7 +50,7 @@ const ResultRenderer = injectIntl(({
             <div className={"has-standard-12-font-size"} onClick={e => document.location.href = target}>
                 <h5 className="breadcrumbs-search">{Array.isArray(bread_crumbs) && bread_crumbs.length > 0 ? bread_crumbs.join(' / ') : ''}</h5>
                 <div className={"has-standard-14-font-size"}><h4 className="search-title">{String(title)}</h4></div>
-                <div className='search-content'
+                <div className='search-content has-standard-14-font-size'
                     dangerouslySetInnerHTML={{ __html: utils.replaceHTMLinks(extract, locale) }} />
             </div>
         </div>
@@ -139,7 +139,7 @@ const CustomSearch = (props) => {
 
     const classes = clsx(
         'ui',
-        open && 'active visible',
+        open && 'active',
         size,
         searchClasses,
         useKeyOnly(category, 'category'),
@@ -169,7 +169,7 @@ const CustomSearch = (props) => {
                 className={classes}
                 onBlur={handleBlur}
                 size="mini"
-                aligned="left"
+                aligned
                 placeholder={placeholder}
                 onFocus={handleFocus}
                 onMouseDown={handleMouseDown}
