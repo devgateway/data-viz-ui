@@ -30,8 +30,7 @@ export class ComponentWithSettings extends Component {
         }
 
         window.addEventListener("message", (event) => {
-
-            if (event.data.type == 'componentReady' && event.data.value == true) {
+            if (event.data.type === 'componentReady' && event.data.value === true) {
                 if (this.iframe.current) {
                     this.iframe.current.contentWindow.postMessage(({messageType: 'component-attributes', ...this.props.attributes}), "*")
                 }
@@ -41,7 +40,7 @@ export class ComponentWithSettings extends Component {
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        if (this.iframe.current) {
+        if (this.iframe.current?.contentWindow) {
             this.iframe.current.contentWindow.postMessage(({messageType: 'component-attributes', ...this.props.attributes}), "*")
         }
     }

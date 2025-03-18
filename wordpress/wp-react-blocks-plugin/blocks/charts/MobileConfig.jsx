@@ -235,7 +235,7 @@ const IntervalsSection = ({
               value={
                 !mobileCustomization?.yAxisIntervalUserModified
                   ? yAxisTickValues
-                  : mobileCustomization.yAxisTickValues
+                  : mobileCustomization.yAxisTickValues ?? yAxisTickValues
               }
               onChange={(newYAxisTickValue) =>
                 onIntervalChange(
@@ -263,7 +263,7 @@ const IntervalsSection = ({
               value={
                 !mobileCustomization?.xAxisIntervalUserModified
                   ? xAxisTickValues
-                  : mobileCustomization.xAxisTickValues
+                  : mobileCustomization.xAxisTickValues ?? xAxisTickValues
               }
               onChange={(newXAxisTickValue) =>
                 onIntervalChange(
@@ -360,7 +360,7 @@ const MobileConfig = (props) => {
 
   const onXAxisLabelChange = (label, value) => {
     const newObject = Object.assign({}, mobileCustomization);
-    if (newObject && newObject.labels && newObject.labels.xAxis) {
+    if (newObject?.labels?.xAxis) {
       newObject.labels.xAxis[label] = value;
     }
     setAttributes({ mobileCustomization: newObject });
@@ -515,7 +515,7 @@ const MobileConfig = (props) => {
                       })
                     }
                     min={0}
-                    max={30}
+                    max={500}
                   />
                 </PanelRow>
                 <PanelRow>
