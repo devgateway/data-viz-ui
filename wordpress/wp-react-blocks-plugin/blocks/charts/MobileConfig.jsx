@@ -262,6 +262,7 @@ const MobileConfig = (props) => {
       measures,
       dimension1,
       yAxisTickValues,
+      dvzProxyDatasetId
     },
   } = props;
 
@@ -277,38 +278,39 @@ const MobileConfig = (props) => {
   }, [yAxisTickValues]);
 
   let xAxisLabels = extractAxisValues(csv);
+
   if (app !== "csv") {
+    const key = `${app}_categories_${dvzProxyDatasetId ? dvzProxyDatasetId : ""}`;
     if (dimension1 !== "none") {
-      const storedCategories = JSON.parse(
-        sessionStorage.getItem(`categories_${app}`)
-      );
-      const categories =
-        storedCategories ??
-        fetch(`/api/${app}/categories`)
-          .then((response) => response.json())
-          .then((data) => getTranslatedOptions(data));
-      xAxisLabels =
-        categories
+      const storedCategories = JSON.parse(sessionStorage.getItem(key));
+      
+      let categories = []
+      xAxisLabels = []
+
+      if (!storedCategories) {        
+         fetch(`/api/${app}/categories?dvzProxyDatasetId=${dvzProxyDatasetId}`)
+        .then((response) => response.json())
+        .then((data) => {
+          categories = getTranslatedOptions(data)
+          xAxisLabels = categories
           .filter(
             (category) =>
               category.type?.toLowerCase() === dimension1?.toLowerCase()
           )[0]
-          ?.items?.map((item) => item.value) ??
-        categories
-          .filter((category) =>
-            dimension1?.toLowerCase().includes(category?.type?.toLowerCase())
-          )[0]
           ?.items?.map((item) => item.value);
+          
+        });
+      }  
+
     } else {
-      const storedMeasures = JSON.parse(
-        sessionStorage.getItem(`measures_${app}`)
-      );
+      const key = `${app}_measures_${dvzProxyDatasetId ? dvzProxyDatasetId : ""}`;
+      const storedMeasures = JSON.parse(sessionStorage.getItem(key));
       // if measures are not present in session storage, fetch them from the API
       if (!storedMeasures) {
-        fetch(`/api/${app}/measures`)
+        fetch(`/api/${app}/measures?dvzProxyDatasetId=${dvzProxyDatasetId}`)
           .then((response) => response.json())
           .then((data) => {
-            sessionStorage.setItem(`measures_${app}`, JSON.stringify(data));
+            sessionStorage.setItem(key, JSON.stringify(data));
             updateMeasureLabels(data, measures, app);
           });
       } else {

@@ -5,9 +5,12 @@ import apiFetch from '@wordpress/api-fetch';
 import {togglePanel} from "./Util";
 
 import {getTranslatedOptions} from './APIutils'
+import {isSupersetAPI} from "./APIutils";
 
-export const SizeConfig = ({height, setAttributes, panelStatus,initialOpen}) => {
-    return (<PanelBody initialOpen={panelStatus?panelStatus["SIZE"]:initialOpen} onToggle={e => togglePanel("SIZE", panelStatus, setAttributes)}
+
+export const SizeConfig = ({height, setAttributes, panelStatus, initialOpen}) => {
+    return (<PanelBody initialOpen={panelStatus ? panelStatus["SIZE"] : initialOpen}
+                       onToggle={e => togglePanel("SIZE", panelStatus, setAttributes)}
                        title={__("Size")}>
         <PanelRow>
             <TextControl
@@ -33,6 +36,7 @@ export class ComponentWithSettings extends Component {
 
             if (event.data.type == 'componentReady' && event.data.value == true) {
                 if (this.iframe.current) {
+                    console.log("-----------Sending message -----------")
                     this.iframe.current.contentWindow.postMessage(({messageType: 'component-attributes', ...this.props.attributes}), "*")
                 }
             }
@@ -42,6 +46,7 @@ export class ComponentWithSettings extends Component {
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         if (this.iframe.current) {
+            console.log("-----------Sending message -----------")
             this.iframe.current.contentWindow.postMessage(({messageType: 'component-attributes', ...this.props.attributes}), "*")
         }
     }
@@ -51,20 +56,21 @@ export class ComponentWithSettings extends Component {
             this.setState({
                 react_ui_url: data["react_ui_url"] + '/' + window._page_locale,
                 react_api_url: data["react_api_url"],
+                apache_superset_url: data["apache_superset_url"],
                 site_language: data["site_language"],
                 current_language: new URLSearchParams(document.location.search).get("edit_lang")
             });
         });
     }
 }
+
+
 export class BlockEditWithFilters extends ComponentWithSettings {
+
     constructor(props) {
         super(props);
         this.state = {
-            taxonomyValues: [],
-            types: null,
-            taxonomies: null,
-            loading: true
+            taxonomyValues: [], types: null, taxonomies: null, loading: true
         }
         this.onTypeChanged = this.onTypeChanged.bind(this)
         this.onTaxonomyChanged = this.onTaxonomyChanged.bind(this)
@@ -74,16 +80,13 @@ export class BlockEditWithFilters extends ComponentWithSettings {
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         const {
-            setAttributes,
-            attributes: {
-                type,
-                taxonomy,
-                count
+            setAttributes, attributes: {
+                type, taxonomy, count
             },
         } = this.props;
 
         super.componentDidUpdate(prevProps, prevState, snapshot)
-            if (prevProps.attributes) {
+        if (prevProps.attributes) {
             if (type != prevProps.attributes.type) {
 
             }
@@ -101,11 +104,8 @@ export class BlockEditWithFilters extends ComponentWithSettings {
         this.getTaxonomies()
 
         const {
-            setAttributes,
-            attributes: {
-                type,
-                taxonomy,
-                count
+            setAttributes, attributes: {
+                type, taxonomy, count
             },
         } = this.props;
 
@@ -146,11 +146,8 @@ export class BlockEditWithFilters extends ComponentWithSettings {
 
     getTaxonomyValues() {
         const {
-            setAttributes,
-            attributes: {
-                type,
-                taxonomy,
-                count
+            setAttributes, attributes: {
+                type, taxonomy, count
             },
         } = this.props;
 
@@ -179,29 +176,22 @@ export class BlockEditWithFilters extends ComponentWithSettings {
         }).then(data => {
             const types = data
             this.setState({
-                types: data,
-                loading: false
+                types: data, loading: false
             });
         });
     }
 
     typeOptions() {
         const {
-            setAttributes,
-            attributes: {
-                count,
-                type,
-                taxonomy,
-                category
+            setAttributes, attributes: {
+                count, type, taxonomy, category
             },
         } = this.props;
         const {types, taxonomies, taxonomyValues} = this.state
         const typeOptions = types ? Object.keys(types)
             .filter(k => ['page', 'attachment', 'wp_block']
                 .indexOf(k) == -1).map(k => ({
-                slug: types[k].slug,
-                label: types[k].name,
-                value: types[k].rest_base
+                slug: types[k].slug, label: types[k].name, value: types[k].rest_base
             })) : []
 
         return typeOptions
@@ -221,8 +211,7 @@ export class BlockEditWithFilters extends ComponentWithSettings {
 
             const taxonomyOptions = types && taxonomies ? Object.keys(taxonomies)
                 .filter(i => taxonomies[i].types.indexOf(slug) > -1).map(k => ({
-                    label: types[slug].name + ' -> ' + taxonomies[k].name,
-                    value: taxonomies[k].rest_base
+                    label: types[slug].name + ' -> ' + taxonomies[k].name, value: taxonomies[k].rest_base
                 })) : []
 
             return [{label: 'None', value: 'none'}, ...taxonomyOptions]
@@ -241,9 +230,7 @@ export class BlockEditWithFilters extends ComponentWithSettings {
     renderFilters() {
         const {
             attributes: {
-                type,
-                taxonomy,
-                categories,
+                type, taxonomy, categories,
 
             }
         } = this.props
@@ -273,13 +260,16 @@ export class BlockEditWithFilters extends ComponentWithSettings {
     }
 }
 
+
 export class BlockEditWithAPIMetadata extends ComponentWithSettings {
     constructor(props) {
         super(props);
     }
 
     componentDidMount() {
-        apiFetch({path: '/dg/v1/settings'}).then((settingsData) => {
+        apiFetch({
+            path: '/dg/v1/settings'
+        }).then((settingsData) => {
             fetch(`/api/registry/eureka/apps`, {
                 headers: {
                     'Accept': 'application/json',
@@ -287,50 +277,115 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
             })
                 .then(response => response.json())
                 .then(data => {
-
                     const apps = data.applications ? [...data.applications.application
-                        // .filter(a => a.instance[0].metadata.type === 'starter')
                         .filter(a => a.instance[0].metadata.type === 'data')
                         .map(a => ({
-                            label: a.name,
-                            value: a.instance[0].vipAddress,
-                            settings: a.instance[0]
-                        })), {label: 'CSV', value: 'csv'}] : [{label: 'CSV', value: 'csv'}]
+                            label: a.name, value: a.instance[0].vipAddress, settings: a.instance[0]
+                        })), {
+                        label: 'CSV', value: 'csv'
+                    }] : [{
+                        label: 'CSV', value: 'csv'
+                    }];
+
                     this.setState({
                         react_ui_url: settingsData["react_ui_url"] + '/' + window._page_locale,
                         react_api_url: settingsData["react_api_url"],
+                        apache_superset_url: settingsData["apache_superset_url"],
                         site_language: settingsData["site_language"],
                         current_language: new URLSearchParams(document.location.search).get("edit_lang"),
                         apps
+                    }, () => {
+
+                        const {app, dvzProxyDatasetId} = this.props.attributes;
+                        if (app && app != 'none') {
+                            this.loadMetadata(app, dvzProxyDatasetId);
+                        }
                     });
-                    this.loadMetadata()
                 })
-                .catch(function (response) {
-
-                })
-
+                .catch(() => {
+                    console.log("Error when loading apps");
+                });
         });
-
-
     }
 
-    componentDidUpdate(prevProps, prevState, snapshot) {
-        super.componentDidUpdate(prevProps, prevState, snapshot)
-        const {attributes: {app}} = this.props
-        const {attributes: {app: prevAPP}} = prevProps
+    componentDidUpdate(prevProps) {
+        super.componentDidUpdate(prevProps);
+        const {
+            attributes: {
+                app,
+                dvzProxyDatasetId
+            }
+        } = this.props;
+        const {
+            attributes: {
+                dvzProxyDatasetId: prevDvzProxyDatasetId,
+                app: prevAPP
+            }
+        } = prevProps;
 
-        if (app != prevAPP) {
-            this.loadMetadata()
+
+        if (app != prevAPP) { //if app changes we shoudl reload metadta
+
+            
+            if (isSupersetAPI(app, this.state.apps)) { //if app is superset proxy an additional step is added
+                this.loadDatasets(app)
+                if (dvzProxyDatasetId) {
+                    this.loadMetadata(app, dvzProxyDatasetId)
+                }
+            } else {
+                this.loadMetadata(app);
+            }
+        } else {//app wasn't changed
+            
+            if (dvzProxyDatasetId != prevDvzProxyDatasetId) {
+                this.loadMetadata(app, dvzProxyDatasetId);
+            }
+
         }
     }
 
-    loadMetadata(app) {
-        if (app==null){
-            app = this.props.attributes.app
+
+    evictSuperSetCache() {
+        const {app, dvzProxyDatasetId} = this.props.attributes;
+        fetch(`/api/${app}/cacheEvict?dvzProxyDatasetId=${dvzProxyDatasetId}`).then(() => {
+            this.loadMetadata(app, dvzProxyDatasetId)
+        })
+
+    }
+
+
+    loadDatasets(app) {
+        fetch(`/api/${app}/datasets`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("HTTP status " + response.status);
+                }
+                return response.json();
+            })
+            .then(data => {
+                this.setState({
+                    datasets: data
+                });
+            })
+            .catch(() => {
+                console.log("Error when loading datasets");
+            });
+    }
+
+
+    loadMetadata(app, dvzProxyDatasetId) {
+        if (app == 'csv') {
+            return;
         }
-        //const {attributes: {app}} = this.props
+
+        
+        const dimensionsUrl = `/api/${app}/dimensions${dvzProxyDatasetId ? `?dvzProxyDatasetId=${dvzProxyDatasetId}` : ''}`
+        const measuresUrl = `/api/${app}/measures${dvzProxyDatasetId ? `?dvzProxyDatasetId=${dvzProxyDatasetId}` : ''}`
+        const filtersUrl = `/api/${app}/filters${dvzProxyDatasetId ? `?dvzProxyDatasetId=${dvzProxyDatasetId}` : ''}`
+        const categoriesUrl = `/api/${app}/categories${dvzProxyDatasetId ? `?dvzProxyDatasetId=${dvzProxyDatasetId}` : ''}`
+
         if (app != "csv") {
-            fetch(`/api/${app}/dimensions`)
+            fetch(dimensionsUrl)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error("HTTP status " + response.status);
@@ -351,7 +406,7 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
                 })
 
 
-            fetch(`/api/${app}/filters`)
+            fetch(filtersUrl)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error("HTTP status " + response.status);
@@ -368,7 +423,7 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
                     console.log("Error when loading filters", response)
                 })
 
-            fetch(`/api/${app}/measures`)
+            fetch(measuresUrl)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error("HTTP status " + response.status);
@@ -383,7 +438,7 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
                     console.log("Error when loading measures")
                 })
 
-            fetch(`/api/${app}/categories`)
+            fetch(categoriesUrl)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error("HTTP status " + response.status);
@@ -399,7 +454,29 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
                     console.log("Error when getting categories", response)
                 })
         }
+
     }
+
+
+    fetchData(url, stateKey, transformData) {
+        fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("HTTP status " + response.status);
+                }
+                return response.json();
+            })
+            .then(data => {
+                
+                this.setState({
+                    [stateKey]: transformData(data)
+                });
+            })
+            .catch(() => {
+                console.log(`Error when loading ${stateKey}`);
+            });
+    }
+
 }
 
 export default SizeConfig

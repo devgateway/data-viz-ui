@@ -123,9 +123,15 @@ registerBlockType(process.env.BLOCKS_NS + '/filter',
             useFilterItems: {
                 type: 'Boolean',
                 default: true
-            }
-
-
+            },
+            dvzProxyDatasetId: {
+                type: 'String',
+                default: ""
+            },
+            autoApply: {
+                type: 'Boolean',
+                default: true
+            },
         },
         edit: BlockEdit,
         save: BlockSave,

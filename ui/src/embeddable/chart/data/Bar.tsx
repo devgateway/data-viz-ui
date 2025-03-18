@@ -12,6 +12,17 @@ const numericSort = (reverse, a, b) => {
     return reverse ? b - a : a - b;
 };
 
+const dateSort = (reverse, a, b) => {
+    let aDate = Date.parse(a);
+    let bDate = Date.parse(b);
+   
+    if (!isNaN(aDate) && !isNaN(bDate)) {
+        return reverse ? bDate - aDate : aDate - bDate;
+    }
+
+    return 0;
+}
+
 interface RowObject {
     type?: string;
     [key: string]: any;
@@ -238,6 +249,13 @@ const BarOneDimension = (props) => {
                 alphaSort(props.sortreverse, locale, a[indexBy], b[indexBy])
             );
         }
+
+        if (props.sort == "date") {
+            filtered = filtered.sort((a, b) =>
+                dateSort(props.sortreverse, a[indexBy], b[indexBy])
+            );
+        }
+
         if (props.sort == "values") {
             filtered = filtered.sort((a, b) => {
                 const va = Math.max(...allKeys.map((k: any) => a[k]));

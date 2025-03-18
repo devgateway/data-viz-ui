@@ -61,7 +61,10 @@ export const Model = {
     customMeasuresLabels: {},
     visible: true,
     flowValuesFrom: 'origin',
+    flowOrigin: 'none',
+    flowDestination: 'none',
+    dvzProxyDatasetId: ''
 }
 
 
-export default Model
+export default Model;
