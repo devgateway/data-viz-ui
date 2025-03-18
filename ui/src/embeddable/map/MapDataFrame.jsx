@@ -8,16 +8,16 @@ const MapDataFrame = ({children, data, measures, customMeasureLabels}) => {
         measureLabelMap: {}
     }
 
-    data.metadata.measures.forEach(m => {
-        if (customMeasureLabels && customMeasureLabels[m.value] && customMeasureLabels[m.value].hasCustomLabel && customMeasureLabels[m.value].customLabel) {
-            transformedData.measureLabelMap[m.value] = customMeasureLabels[m.value].customLabel;
-        } else {
+    if (data.metadata && data.metadata.measures) {
+        data.metadata.measures.forEach(m => {
+            if (customMeasureLabels && customMeasureLabels[m.value] && customMeasureLabels[m.value].hasCustomLabel && customMeasureLabels[m.value].customLabel) {
+                transformedData.measureLabelMap[m.value] = customMeasureLabels[m.value].customLabel;
+            } else {
 
-            transformedData.measureLabelMap[m.value] = m.label;
-        }
-
-
-    })
+                transformedData.measureLabelMap[m.value] = m.label;
+            }
+        })
+    }
 
     const measuresArray = measures.split(",");
     if (data && data.children) {
