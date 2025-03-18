@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import * as ReactDOM from 'react-dom/client';
+import * as ReactDOM from 'react-dom';
 import { utils, SearchConsumer, SearchProvider } from "@devgateway/wp-react-lib";
 import CustomSemanticSearch from "./CustomSemanticSearch";
 import { Icon } from "semantic-ui-react";
