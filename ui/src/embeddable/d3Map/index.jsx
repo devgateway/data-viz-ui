@@ -9,6 +9,8 @@ import ZoomControl from "./ZoomControl";
 import ProjectedContainer from "./ProjectedContainer";
 import Legends from "./Legends"
 import FlowLayer from "./FlowLayer";
+import { SettingProvider } from '@devgateway/wp-react-lib';
+import {SettingsConsumer} from '@devgateway/wp-react-lib';
 
 
 const MapWrapper = (props) => {
@@ -16,11 +18,11 @@ const MapWrapper = (props) => {
         unique,
         editing,
         "data-group": group,
-        "data-layers": dataLayers,
+        "data-layers": dataLayers = '[]',
         "data-height": height = 400,
         "data-width": width = 1000,
         "data-back-ground-color": bgColorParam = '#88e8dc',
-        "data-map-position": paramMapPosition = {},
+        "data-map-position": paramMapPosition = '{}',
         "data-projection": projectionName = "geoMercator",
         "data-zoom-enabled": zoomEnabled = true,
         "data-rotation-enabled": rotationEnabled = false,
@@ -52,13 +54,16 @@ const MapWrapper = (props) => {
 
     return (
         <div ref={ref} className={"d3map-container"}>
+             <SettingProvider locale={intl.locale} changeUUID={unique}>
+                <SettingsConsumer>
                 <ProjectedContainer backgroundColor={decode(bgColorParam)}
                                     height={height}
                                     width={width}
                                     projectionName={projectionName}
                                     editing={editing} initialPosition={parse(paramMapPosition, editing)}>
+                   
                     <Map rotationEnabled={parse(rotationEnabled, editing)}>
-                        {layers&&layers.filter(l => l.visible != false).map((layer, i) => {
+                        {layers && layers.filter(l => l.visible != false).map((layer, i) => {
                             if (layer.type === 'base') {
                                 return <BaseLayer transform={transform} intl={intl} zoom={zoomRef} unique={unique}
                                                   key={i} {...layer} />
@@ -70,7 +75,9 @@ const MapWrapper = (props) => {
                                 } transform={transform} intl={intl}
                                                   group={group} zoom={zoomRef}
                                                   unique={unique}
-                                                  key={i} {...layer} />
+                                                  key={i} {...layer} 
+                                                  settings={props.wordress}
+                                                  />
 
                             }
                             if (layer.type === 'flow') {
@@ -97,8 +104,9 @@ const MapWrapper = (props) => {
                                  height={height} ref={zoomRef} group={group}
                                  editing={editing}/>
 
-
                 </ProjectedContainer>
+               </SettingsConsumer>
+                </SettingProvider>
 
         </div>
     );

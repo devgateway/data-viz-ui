@@ -21,6 +21,7 @@ const AgreeAndDownload = lazy(() => import("./agree-and-download/"));
 const DownloadPdf = lazy(() => import("./downloadPDF"));
 const Map = lazy(() => import("./map"));
 const DataFiltersReset = lazy(() => import("./datafiltersreset"));
+const DataFiltersApply = lazy(() => import("./datafilters-apply"));
 const Tooltip = lazy(() => import("./tooltip"));
 const ReferencesList = lazy(() => import("./references/ReferencesList"));
 const Reference = lazy(() => import("./references/Reference"));
@@ -35,6 +36,9 @@ const Wrapped = lazy(() => import("./wrapped"));
 const SankeyChart = lazy(() => import("./sankeychart"));
 const DataLabel = lazy(() => import("./datalabel"));
 const Body = lazy(() => import("./body"));
+const SupersetChart = lazy(() => import("./superset-chart"));
+const SupersetDashboard = lazy(() => import("./superset-dashboard"));
+const BigNumber = lazy(() => import("./bignumber"));
 
 let reducerList = { data, embeddable };
 
@@ -60,6 +64,7 @@ const components = {
     downloadPdf: DownloadPdf,
     map: Map,
     dataFiltersReset: DataFiltersReset,
+    dataFiltersApply: DataFiltersApply,
     tooltip: Tooltip,
     references: ReferencesList,
     reference: Reference,
@@ -74,7 +79,10 @@ const components = {
     sankeyChart: SankeyChart,
     dataLabel: DataLabel,
     body: Body,
+	supersetChart: SupersetChart,
+    supersetDashboard: SupersetDashboard,
     agreeAndDownload: AgreeAndDownload,
+	bigNumber: BigNumber,
     redirect: () => null
 }
 

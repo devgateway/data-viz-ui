@@ -247,6 +247,7 @@ class DataLayer extends BaseLayer {
         } = this.props
 
 
+
         if (file != "none") {
             debugger; // eslint-disable-line no-debugger
             this.loadJSON(file).then(json => {
@@ -308,9 +309,12 @@ class DataLayer extends BaseLayer {
 }
 
 const DataWrapper = (props) => {
-    const {id, unique, filters, csv, app, group = "default", flowOrigin, editing, flowDestination} = props
 
-    const params = {}
+
+
+    const {id, unique, filters, csv, app, group = "default", flowOrigin, editing, flowDestination,dvzProxyDatasetId} = props
+
+    const params = {dvzProxyDatasetId}
 
     const ff = filters || {}
 

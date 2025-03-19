@@ -1,5 +1,6 @@
 import {InspectorControls, useBlockProps} from '@wordpress/block-editor';
 import {
+    Button, ButtonGroup,
     Panel,
     PanelBody,
     PanelRow,
@@ -24,6 +25,8 @@ import MobileConfig from './MobileConfig.jsx';
 import Tooltip from "../commons/Tooltip.jsx";
 import {togglePanel} from "../commons/Util";
 import Radar from './Radar.jsx';
+import {DEFAULT_FORMAT_SETTINGS} from '../commons/Constants';
+import {isSupersetAPI} from "../commons/APIutils";
 
 class BlockEdit extends BlockEditWithAPIMetadata {
     constructor(props) {
@@ -56,8 +59,10 @@ class BlockEdit extends BlockEditWithAPIMetadata {
         }
         super.componentDidUpdate(prevProps, prevState, snapshot);
     }
+    
 
     render() {
+        console.log("apps", this.state.apps)
         const {
             className, isSelected,
             toggleSelection, setAttributes,
@@ -161,7 +166,8 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                 overallLabel,
                 enableGridX,
                 minMaxClamp,
-                mobileCustomization
+                mobileCustomization,
+                dvzProxyDatasetId
             }
         } = this.props;
 
@@ -206,6 +212,13 @@ class BlockEdit extends BlockEditWithAPIMetadata {
             if (f.value != null && f.value.filter(v => v != null && v.toString().trim() != "").length > 0)
                 params[f.param] = f.value
         })
+
+        const  datasets = [{label: 'Select Dataset', value: '0'}]
+        if (this.state.datasets) {
+            this.state.datasets.forEach(d => {
+                datasets.push({label: d.label, value: d.id})
+            })
+        }
 
         const divStyles = {height: height + 'px', width: '100%'}
         return ([isSelected && (
@@ -301,13 +314,55 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                                             label={__('Provider')}
                                             value={[app]} // e.g: value = [ 'a', 'c' ]
                                             onChange={(app) => {
-                                                setAttributes({
-                                                    app: app
+                                                this.setState({dimensions: [], measures: [], filters: [], categories: []}, () => {
+                                                    setAttributes({
+                                                        dvzProxyDatasetId: null,
+                                                        dimension1: 'none',
+                                                        dimension2: 'none',
+                                                        dimension3: 'none',
+                                                        measures: Object.assign({}, DEFAULT_FORMAT_SETTINGS)
+                                                    })
                                                 })
+                                                setAttributes({
+                                                    app: app                                                   
+                                                })
+
                                             }}
                                             options={this.state.apps}
                                         />
                                     </PanelRow>
+
+
+                                    {isSupersetAPI(app, this.state.apps) &&   <PanelRow>
+                                        <SelectControl
+                                            label={__('Datasets')}
+                                            value={[dvzProxyDatasetId]}
+                                            onChange={(newDatasetId)   => {
+
+                                                this.setState({dimensions: [], measures: [], filters: [], categories: []}, () => {
+                                                    setAttributes({
+                                                        dvzProxyDatasetId: newDatasetId,
+                                                        dimension1: 'none',
+                                                        dimension2: 'none',
+                                                        dimension3: 'none',
+                                                        measures: Object.assign({}, DEFAULT_FORMAT_SETTINGS)
+                                                    })
+                                                })
+
+
+                                                //look at component did update of BlockEditWithAPIMetadata
+                                                //this.loadMetadata(app, newDatasetId)
+                                            }}
+                                            options={datasets}
+                                        />
+
+                                            <Button  isPrimary={true} size={"small"}
+                                                    onClick={() => this.evictSuperSetCache()}>O</Button>
+
+
+                                      </PanelRow>
+                                    }
+                                  
                                 </PanelBody>
                                 {app != 'csv' && <APIConfig
                                     allDimensions={this.state.dimensions}

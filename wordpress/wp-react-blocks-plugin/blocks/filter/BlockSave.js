@@ -29,7 +29,9 @@ const SaveComponent = (props) => {
             closeOnSelect,
             alphabeticalSort,
             ascOrder,
-            useFilterItems
+            useFilterItems,
+            dvzProxyDatasetId,
+            autoApply
         }
     } = props;
 
@@ -40,6 +42,7 @@ const SaveComponent = (props) => {
     return (<div className={"viz-component"}
                  data-component={"filter"}
                  data-app={app}
+                 data-dvz-proxy-dataset-id={dvzProxyDatasetId}
                  data-icon={icon}
                  data-alphabetical-sort={alphabeticalSort}
                  data-asc-order={ascOrder}
@@ -66,9 +69,10 @@ const SaveComponent = (props) => {
                  data-hidden-filters={encodeURIComponent(JSON.stringify(hiddenFilters))}
                  data-close-on-select={closeOnSelect}
                  data-use-filter-items={useFilterItems}
-                 data-all-none-same-behaviour={allNoneSameBehaviour}>
+                 data-all-none-same-behaviour={allNoneSameBehaviour}
+                 data-auto-apply={autoApply}>
     </div>);
 }
 
 
-export default SaveComponent
+export default SaveComponent;

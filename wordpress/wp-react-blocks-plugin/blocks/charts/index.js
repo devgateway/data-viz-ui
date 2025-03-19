@@ -129,6 +129,10 @@ registerBlockType(process.env.BLOCKS_NS + '/chart',
                 type: Object,
                 default: {}
             },
+            dvzProxyDatasetId: {
+                type: 'String',
+                default: ""
+            },
             format: {
                 type: Object,
                 default: {
@@ -494,6 +498,8 @@ registerBlockType(process.env.BLOCKS_NS + '/chart',
                     },
                     xAxisDisabled: false,
                     tickRotation: 0,
+                    xAxisTickValues: 0,
+                    xAxisIntervalUserModified: false,
                     yAxisTickValues: 0,
                     yAxisIntervalUserModified: false,
                     chartLayoutOverride: false,
@@ -506,6 +512,10 @@ registerBlockType(process.env.BLOCKS_NS + '/chart',
                     showRightAxisTitle: true,
                     barPadding: 0.15,
                     barInnerPadding: 0.7,
+                    mobileYAxisLineHeight: 12,
+                    mobileMaxTickLength: 25,
+                    tabletYAxisLineHeight: 12,
+                    tabletMaxTickLength: 25,
                 }
             },
             reverseLegend: {
@@ -564,7 +574,11 @@ registerBlockType(process.env.BLOCKS_NS + '/chart',
             radarDotLabelOffset: {
                 type: 'Numeric',
                 default: -12
-            }
+            }, 
+            showPercentage: {
+                type: 'Boolean',
+                default: false
+            }        
         },
         edit: BlockEdit,
         save: BlockSave,

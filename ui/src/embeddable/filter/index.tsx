@@ -5,6 +5,8 @@ import CategoriesProvider from '../data/CategoriesProvider'
 import { connect } from "react-redux";
 import { setFilter, setInitialFilters } from "../reducers/data";
 import { injectIntl } from 'react-intl';
+import { SettingProvider } from '@devgateway/wp-react-lib';
+import { SettingsConsumer } from '@devgateway/wp-react-lib';
 
 const FILTER_TYPE_MULTI_SELECT = 'multi-select';
 const FILTER_TYPE_SINGLE_SELECT = 'single-select';
@@ -40,14 +42,14 @@ const decode = (value) => {
 }
 
 const parse = (value) => {
-    try { 
+    if (!value || value == "") {
+        return null
+    }
+    try {
         return JSON.parse(decode(value))
-
     } catch (error) {
         throw new Error("error parsing value:" + error);
     }
-
-    return null
 }
 
 const mapStateToProps = (state, ownProps) => {
@@ -141,11 +143,13 @@ const ListFilterDropDown = connect(mapStateToProps, mapActionCreators)((props: L
         defaultValueCriteria,
         allNoneSameBehaviour,
         closeOnSelect,
-        hiddenFilters
+        hiddenFilters,
+        autoApply
     } = props
 
     const [searchFilter, setSearchFilter] = useState("")
     const changeFilter = (value) => {
+
         let newValue: any[] = []
         if (filterType != FILTER_TYPE_SINGLE_SELECT && !closeOnSelect && current && current.indexOf(value) > -1) {
             newValue = current.filter(i => i !== value)
@@ -155,7 +159,7 @@ const ListFilterDropDown = connect(mapStateToProps, mapActionCreators)((props: L
             newValue = [value]
         }
 
-        onChange({ app, group, param, value: newValue })
+        onChange({ app, group, param, value: newValue,autoApply })
         if (closeOnSelect && refContainer.current) {
             refContainer.current.close();
         }
@@ -168,7 +172,7 @@ const ListFilterDropDown = connect(mapStateToProps, mapActionCreators)((props: L
             return true;
         })
 
-        onChange({ app, group, param, value: matchingItems.map(v => v.value) })
+        onChange({ app, group, param, value: matchingItems.map(v => v.value), autoApply})
         if (closeOnSelect && refContainer.current) {
             refContainer.current.close()
         }
@@ -182,7 +186,7 @@ const ListFilterDropDown = connect(mapStateToProps, mapActionCreators)((props: L
             return true;
         })
 
-        onChange({ app, group, param, value: allNoneSameBehaviour ? matchingItems.map(v => v.value) : [] })
+        onChange({ app, group, param, value: allNoneSameBehaviour ? matchingItems.map(v => v.value) : [] ,autoApply})
         if (closeOnSelect && refContainer.current) {
             refContainer.current.close()
         }
@@ -196,7 +200,7 @@ const ListFilterDropDown = connect(mapStateToProps, mapActionCreators)((props: L
             }
             return true;
         })
-        onChange({ app, group, param, value: matchingItems.map(v => v.value) })
+        onChange({ app, group, param, value: matchingItems.map(v => v.value),autoApply})
     }
 
     useEffect(() => {
@@ -331,7 +335,8 @@ interface RangeFilterDropDownProps {
     group: string,
     param: string,
     current: any[],
-    onChange: any
+    onChange: any,
+    autoApply: boolean
 }
 
 const RangeFilterDropDown = connect(mapStateToProps, mapActionCreators)(({
@@ -343,7 +348,8 @@ const RangeFilterDropDown = connect(mapStateToProps, mapActionCreators)(({
     app,
     group,
     param,
-    current
+    current,
+    autoApply
 }: RangeFilterDropDownProps) => {
 
     const [start, setStart] = useState(options[0].position)
@@ -351,7 +357,7 @@ const RangeFilterDropDown = connect(mapStateToProps, mapActionCreators)(({
 
     useEffect(() => {
         const current = options.filter(v => (v.position > start || v.position === start) && (v.position < end || v.position === end)).map(o => o.value)
-        onChange({ app, group, param, value: current })
+        onChange({ app, group, param, value: current ,autoApply})
     }, [start, end])
 
     const refContainer = useRef<DropdownProps>(null);
@@ -402,7 +408,6 @@ const RangeFilterDropDown = connect(mapStateToProps, mapActionCreators)(({
 
 
 const CategoryFilter = (props) => {
-
     const { data, type, showNoDataOption } = props
     const cat = data.filter(d => d.type === type)[0]
     const filteredCategories = cat ? cat.items.filter(f => {
@@ -415,6 +420,7 @@ const CategoryFilter = (props) => {
         return true
     }) : []
     const options = filteredCategories ? toOptions(filteredCategories, props.locale) : []
+
     return (
         <Container fluid={true} className={`filter`}>
             <FilterDropDown {...props} options={options}></FilterDropDown>
@@ -451,10 +457,20 @@ const CSVFilter = (props) => {
     </Container>
 }
 
+const FilterWrapper = (props) => {
+    return (
+        <SettingProvider locale={props.intl.locale} changeUUID={props.unique}>
+            <SettingsConsumer>
+                <Filter {...props}></Filter>
+                </SettingsConsumer>
+            </SettingProvider>
+    )
+}
 
 const Filter = ({
     "data-group": group,
     "data-app": app,
+    "data-dvz-proxy-dataset-id": dvzProxyDatasetId,
     "data-param": param,
     "data-icon": icon,
     "data-type": type,
@@ -477,6 +493,8 @@ const Filter = ({
     "data-close-on-select": closeOnSelect = "false",
     "data-alphabetical-sort": alphabeticalSort = "true",
     "data-asc-order": ascOrder = "true",
+    "data-auto-apply": autoApply = "true",
+    settings,
     intl,
 }) => {
 
@@ -489,6 +507,10 @@ const Filter = ({
             if (f.value != null && f.value.filter(v => v != null && v.toString().trim() != "").length > 0)
                 params[f.param] = f.value
         })
+    }
+
+    if (dvzProxyDatasetId) {
+        params["dvzProxyDatasetId"] = dvzProxyDatasetId;
     }
 
     const hiddenFiltersArr = hiddenFilters ?  parse(hiddenFilters): []
@@ -558,6 +580,7 @@ const Filter = ({
                                 defaultValueCriteria={defaultValueCriteria}
                                 hiddenFilters={hiddenFiltersArr || []}
                                 allNoneSameBehaviour={allNoneSameBehaviour == "true"}
+                                autoApply={booleanParameter(autoApply)}
                                 closeOnSelect={booleanParameter(closeOnSelect)}
                                 locale={intl.locale}>
 
@@ -574,4 +597,4 @@ const Filter = ({
 }
 
 
-export default injectIntl(Filter)
+export default injectIntl(FilterWrapper)

@@ -9,6 +9,7 @@ import {
     ToggleControl, ButtonGroup
 } from "@wordpress/components";
 import {__} from '@wordpress/i18n';
+import apiFetch from '@wordpress/api-fetch';
 import {getJsonFiles} from "./utils/FileUtils";
 import {useEffect} from "react";
 import {useState} from "@wordpress/element";
@@ -20,6 +21,8 @@ import Property from "./utils/Property";
 
 import {PanelColorSettings} from "@wordpress/block-editor";
 import {togglePanel} from "../../commons/Util";
+import {isSupersetAPI} from "../../commons/APIutils";
+
 
 const typeOptions = [
     {label: "Base", value: "base"},
@@ -35,11 +38,15 @@ const toOptions = (files) => {
 }
 
 const Base = (props) => {
-    const {onChange, metadata, layer, layer: {name, shapeColor, labelFilter, type, file, app, labelField, visible}} = props
-    debugger;
+    const {
+        onChange,
+        metadata,
+        layer,
+        layer: {name, shapeColor, labelFilter, type, file, app, labelField, visible}
+    } = props
+
     const [files, setFiles] = useState([])
     const [features, setFeatures] = useState([])
-
 
 
     useEffect(() => {
@@ -59,10 +66,20 @@ const Base = (props) => {
     }, [layer.file])
 
     const onChangeProperty = (atrr, value) => {
+
+        debugger
         console.log("change attribute " + atrr + " to " + value)
+
         const newLayer = {...layer}
         newLayer[atrr] = value
         onChange(newLayer)
+    }
+
+    const datasets = [{label: 'Select Dataset', value: '0'}]
+    if (metadata.datasets) {
+        metadata.datasets.forEach(d => {
+            datasets.push({label: d.label, value: d.id})
+        })
     }
 
     return [
@@ -76,11 +93,11 @@ const Base = (props) => {
         </PanelRow>,
         <PanelRow>
             <ToggleControl
-              label="Default visible"
-              checked={visible}
-              onChange={e => {
-                  onChangeProperty("visible", !visible)
-              }}
+                label="Default visible"
+                checked={visible}
+                onChange={e => {
+                    onChangeProperty("visible", !visible)
+                }}
             />
         </PanelRow>,
         <PanelRow>
@@ -99,7 +116,7 @@ const Base = (props) => {
                 value={file}
                 options={files}>
             </SelectControl>
-            </PanelRow>
+        </PanelRow>
         }</>,
         <>
             {type != 'dataPoints' && type != 'flow' && <PanelBody title={"Colors"} initialOpen={false}>
@@ -147,7 +164,7 @@ const Base = (props) => {
             </PanelBody>}
         </>,
         <>
-            {type != 'dataPoints'&& type != 'flow' && <PanelBody title={"Labels"} initialOpen={false}>
+            {type != 'dataPoints' && type != 'flow' && <PanelBody title={"Labels"} initialOpen={false}>
 
                 <Property
                     title={"Label Field"}
@@ -182,7 +199,7 @@ const Base = (props) => {
                             }}
                         />
                     </PanelRow>
-                    {features && features.sort(f=>f.properties[labelField]).map(feature => <>
+                    {features && features.sort(f => f.properties[labelField]).map(feature => <>
                         <PanelRow>
                             <ToggleControl
                                 label={feature.properties[labelField]}
@@ -192,40 +209,43 @@ const Base = (props) => {
                                 }}
                             />
                         </PanelRow>
-                        {(labelFilter.indexOf(feature.properties[labelField]) == -1) && <PanelBody title={__("Rotation")} initialOpen={false}>
-                            <PanelRow>
-                                <RangeControl
-                                    label="Offset X"
-                                    min={-500}
-                                    max={500}
-                                    value={layer.labelSettings[feature.properties[labelField] + "_offsetX"] || 0}
-                                    onChange={(offsetX) => onChangeProperty("labelSettings", {
-                                        ...layer.labelSettings, [feature.properties[labelField] + "_offsetX"]: offsetX
-                                    })}
-                                />
-                            </PanelRow>
-                            <PanelRow>
-                                <RangeControl
-                                    label="Offset Y"
-                                    min={-500}
-                                    max={500}
-                                    value={layer.labelSettings[feature.properties[labelField] + "_offsetY"] || 0}
-                                    onChange={(offset) => onChangeProperty("labelSettings", {
-                                        ...layer.labelSettings, [feature.properties[labelField] + "_offsetY"]: offset
-                                    })}
-                                />
-                            </PanelRow>
-                            <PanelRow>
-                                <AnglePickerControl label={"Rotation"}
-                                                    value={layer.labelSettings[feature.properties[labelField] + "_rotation"] || 0}
-                                                    onChange={(rotation) => onChangeProperty("labelSettings", {
-                                                        ...layer.labelSettings,
-                                                        [feature.properties[labelField] + "_rotation"]: rotation
-                                                    })}>
+                        {(labelFilter.indexOf(feature.properties[labelField]) == -1) &&
+                            <PanelBody title={__("Rotation")} initialOpen={false}>
+                                <PanelRow>
+                                    <RangeControl
+                                        label="Offset X"
+                                        min={-500}
+                                        max={500}
+                                        value={layer.labelSettings[feature.properties[labelField] + "_offsetX"] || 0}
+                                        onChange={(offsetX) => onChangeProperty("labelSettings", {
+                                            ...layer.labelSettings,
+                                            [feature.properties[labelField] + "_offsetX"]: offsetX
+                                        })}
+                                    />
+                                </PanelRow>
+                                <PanelRow>
+                                    <RangeControl
+                                        label="Offset Y"
+                                        min={-500}
+                                        max={500}
+                                        value={layer.labelSettings[feature.properties[labelField] + "_offsetY"] || 0}
+                                        onChange={(offset) => onChangeProperty("labelSettings", {
+                                            ...layer.labelSettings,
+                                            [feature.properties[labelField] + "_offsetY"]: offset
+                                        })}
+                                    />
+                                </PanelRow>
+                                <PanelRow>
+                                    <AnglePickerControl label={"Rotation"}
+                                                        value={layer.labelSettings[feature.properties[labelField] + "_rotation"] || 0}
+                                                        onChange={(rotation) => onChangeProperty("labelSettings", {
+                                                            ...layer.labelSettings,
+                                                            [feature.properties[labelField] + "_rotation"]: rotation
+                                                        })}>
 
-                                    ></AnglePickerControl>
-                            </PanelRow>
-                        </PanelBody>}
+                                    </AnglePickerControl>
+                                </PanelRow>
+                            </PanelBody>}
 
                     </>)}
 
@@ -240,15 +260,14 @@ const Base = (props) => {
                     {...props}
                     apps={metadata.apps}
                     onChangeProperty={onChangeProperty}
-                    allDimensions={metadata.dimensions}
-                    allFilters={metadata.filters}
-                    allMeasures={metadata.measures}
-                    allCategories={metadata.categories}
+                    allDimensions={metadata.dimensions || []}
+                    allFilters={metadata.filters || []}
+                    allMeasures={metadata.measures || []}
+                    allCategories={metadata.categories || []}
                     allApps={metadata.apps}
                     features={features}
-
-
-                >
+                    layer={layer}
+                    allDatasets={datasets}>
                 </DataLayer>
 
             </>}
@@ -257,13 +276,15 @@ const Base = (props) => {
                     {...props}
                     apps={metadata.apps}
                     onChangeProperty={onChangeProperty}
-                    allDimensions={metadata.dimensions}
-                    allFilters={metadata.filters}
-                    allMeasures={metadata.measures}
-                    allCategories={metadata.categories}
+                    allDimensions={metadata.dimensions || []}
+                    allFilters={metadata.filters || []}
+                    allMeasures={metadata.measures || []}
+                    allCategories={metadata.categories || []}
                     allApps={metadata.apps}
                     features={features}
-                    layer={layer}>
+                    layer={layer}
+                    allDatasets={datasets}
+                >
                 </FlowLayer>
 
             </>}
@@ -272,13 +293,15 @@ const Base = (props) => {
                     {...props}
                     apps={metadata.apps}
                     onChangeProperty={onChangeProperty}
-                    allDimensions={metadata.dimensions}
-                    allFilters={metadata.filters}
-                    allMeasures={metadata.measures}
-                    allCategories={metadata.categories}
+                    allDimensions={metadata.dimensions || []}
+                    allFilters={metadata.filters || []}
+                    allMeasures={metadata.measures || []}
+                    allCategories={metadata.categories || []}
                     allApps={metadata.apps}
+                    allDatasets={datasets}
                     features={features}
-                    layer={layer}>
+                    layer={layer}
+                >
                 </LatLongLayer>
 
             </>}
@@ -294,8 +317,11 @@ class LayerWithMetadata extends BlockEditWithAPIMetadata {
         super(props);
     }
 
+
     componentDidMount() {
-        const {layer: {name, type, file, app}} = this.props
+        const {layer: {name, type, file, app, dvzProxyDatasetId}} = this.props
+        debugger;
+
         fetch(`/api/registry/eureka/apps`, {
             headers: {
                 'Accept': 'application/json',
@@ -310,7 +336,13 @@ class LayerWithMetadata extends BlockEditWithAPIMetadata {
                     })), {label: 'CSV', value: 'csv'}] : [{label: 'CSV', value: 'csv'}]
 
                 this.setState({...this.state, apps})
-                this.loadMetadata(app)
+
+
+
+                if (app && app != 'none') {
+                    this.loadMetadata(app, dvzProxyDatasetId);
+                }
+
             })
             .catch(function (response) {
                 alert("error" + response)
@@ -319,10 +351,26 @@ class LayerWithMetadata extends BlockEditWithAPIMetadata {
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         super.componentDidUpdate(prevProps, prevState, snapshot)
-        const {layer: {app}} = this.props
-        const {layer: {app: prevAPP}} = prevProps
-        if ((app != prevAPP) || (prevAPP == null && app != null)) {
-            this.loadMetadata(app)
+        const {layer: {app, dvzProxyDatasetId}} = this.props
+        const {layer: {app: prevAPP, dvzProxyDatasetId: prevDvzProxyDatasetId}} = prevProps
+        debugger;
+        if (app != prevAPP) { //if app changes we shoudl reload metadta
+
+
+            if (isSupersetAPI(app, this.state.apps)) { //if app is superset proxy an additional step is added
+                this.loadDatasets(app)
+                if (dvzProxyDatasetId) {
+                    this.loadMetadata(app, dvzProxyDatasetId)
+                }
+            } else {
+                this.loadMetadata(app);
+            }
+        } else {//app wasn't changed
+
+            if (dvzProxyDatasetId != prevDvzProxyDatasetId) {
+                this.loadMetadata(app, dvzProxyDatasetId);
+            }
+
         }
     }
 
@@ -335,11 +383,15 @@ class LayerWithMetadata extends BlockEditWithAPIMetadata {
             layer,
             layer: {name, type, file, app}
         } = this.props
-    debugger;
+
+
+        console.log(this.state)
+
         return <PanelBody
             initialOpen={false}
             onToggle={e => togglePanel('LAYERS_' + name, panelStatus, setAttributes)} title={__("Layers")}
             title={__(`${name}`)}>
+
             <Base {...this.props} metadata={this.state}></Base>
             <PanelBody>
                 <ButtonGroup>
