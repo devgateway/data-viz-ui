@@ -77,7 +77,7 @@ const PreviewComponentParameterParser = () => {
         <div>
             <Container fluid={true} className={"editing"}>
                 {/* @ts-ignore */}
-                {UIComponent ? <UIComponent  {...params} editing={true}></UIComponent> :
+                {UIComponent ? <UIComponent  {...params} editing={true} /> :
                     <Segment.Group color={"red"} textAlign={"center"}><h1>Wrong Component Name</h1></Segment.Group>}
             </Container>
 

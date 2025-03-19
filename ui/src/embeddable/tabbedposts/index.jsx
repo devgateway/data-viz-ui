@@ -6,32 +6,78 @@ import PostIntro from "../connected-templates/PostIntro";
 import { useWindowDimensionsAndDevice } from '@/lib/hooks/window-dimensions';
 
 const ItemMenu = ({ posts, activeItem, setActive, showLabels }) => {
-    return posts ? posts.map(post => (
-        <Menu.Item key={post.id} onClick={() => setActive(post.slug)} className={post.slug === activeItem ? 'active' : ''}>
-            {showLabels ? <PostLabel post={post} /> : <Label><span dangerouslySetInnerHTML={{ __html: post.title.rendered }} /></Label>}
+  return posts
+    ? posts.map((post) => (
+        <Menu.Item
+          key={post.id}
+          onClick={() => setActive(post.slug)}
+          className={post.slug === activeItem ? "active" : ""}
+        >
+          {showLabels ? (
+            <PostLabel post={post} />
+          ) : (
+            <Label>
+              <span dangerouslySetInnerHTML={{ __html: post.title.rendered }} />
+            </Label>
+          )}
         </Menu.Item>
-    )) : null;
+      ))
+    : null;
 };
 
-const GriNavigator = ({ posts, activeItem, setActive, showIcons, showLabels }) => {
-    const count = posts.length;
-    return posts ? posts.map(post => {
-        const iconUrl = post['_embedded'] && post['_embedded']["wp:featuredmedia"] ? post['_embedded']["wp:featuredmedia"][0].source_url : null;
+const GriNavigator = ({
+  posts,
+  activeItem,
+  setActive,
+  showIcons,
+  showLabels,
+}) => {
+  const count = posts.length;
+  return posts
+    ? posts.map((post) => {
+        const iconUrl =
+          post["_embedded"]?.["wp:featuredmedia"]
+            ? post["_embedded"]["wp:featuredmedia"][0].source_url
+            : null;
         return (
-            <Grid.Column key={post.id} className={(post.slug === activeItem ? 'active' : '') + (showIcons ? ' has-icon' : '')}>
-                <Button onClick={() => setActive(post.slug)} className={`nav  ${count === 1 ? 'one' : ''}`}>
-                    {showIcons && (
-                        <MediaProvider id={post.meta_fields && post.meta_fields.icon ? post.meta_fields.icon[0] : null}>
-                            <MediaConsumer>
-                                <PostIcon className={"icon"} />
-                            </MediaConsumer>
-                        </MediaProvider>
-                    )}
-                    {showLabels ? <PostLabel post={post} /> : <Label><span dangerouslySetInnerHTML={{ __html: post.title.rendered }} /></Label>}
-                </Button>
-            </Grid.Column>
+          <Grid.Column
+            key={post.id}
+            className={
+              (post.slug === activeItem ? "active" : "") +
+              (showIcons ? " has-icon" : "")
+            }
+          >
+            <Button
+              onClick={() => setActive(post.slug)}
+              className={`nav  ${count === 1 ? "one" : ""}`}
+            >
+              {showIcons && (
+                <MediaProvider
+                  id={
+                    post.meta_fields?.icon
+                      ? post.meta_fields.icon[0]
+                      : null
+                  }
+                >
+                  <MediaConsumer>
+                    <PostIcon className={"icon"} />
+                  </MediaConsumer>
+                </MediaProvider>
+              )}
+              {showLabels ? (
+                <PostLabel post={post} />
+              ) : (
+                <Label>
+                  <span
+                    dangerouslySetInnerHTML={{ __html: post.title.rendered }}
+                  />
+                </Label>
+              )}
+            </Button>
+          </Grid.Column>
         );
-    }) : null;
+      })
+    : null;
 };
 
 const TabContent = ({ posts, activeItem }) => {
@@ -143,8 +189,8 @@ const AccordionContent = ({ posts, activeItem, setActive }) => {
         const legendsStyles = window.getComputedStyle(legendsContainer);
 
         // Parse margins, fallback to 0 if "auto" is returned
-        const dataSourceMarginTop = parseFloat(dataSourceStyles.marginTop) || 0;
-        const legendsMarginBottom = parseFloat(legendsStyles.marginBottom) || 0;
+        const dataSourceMarginTop = Number.parseFloat(dataSourceStyles.marginTop) || 0;
+        const legendsMarginBottom = Number.parseFloat(legendsStyles.marginBottom) || 0;
 
         // Calculate adjusted positions
         const adjustedLegendsBottom = legendsRect.bottom + legendsMarginBottom;
@@ -165,7 +211,7 @@ const AccordionContent = ({ posts, activeItem, setActive }) => {
           const wpColumnAfterChartRect = wpColumnAfterChart.getBoundingClientRect();
           const wpColumnAfterChartStyles = window.getComputedStyle(wpColumnAfterChart);
 
-          const wpColumnAfterChartMarginTop = parseFloat(wpColumnAfterChartStyles.marginTop) || 0;
+          const wpColumnAfterChartMarginTop = Number.parseFloat(wpColumnAfterChartStyles.marginTop) || 0;
           const adjustedWpColumnAfterChartTop = wpColumnAfterChartRect.top - wpColumnAfterChartMarginTop;
 
           if (adjustedLegendsBottom > adjustedWpColumnAfterChartTop) {
@@ -180,10 +226,10 @@ const AccordionContent = ({ posts, activeItem, setActive }) => {
         if (chartContainer) {
           const chartContainerRect = chartContainer.getBoundingClientRect();
           const chartContainerStyles = window.getComputedStyle(chartContainer);
-          const chartContainerMarginBottom = parseFloat(chartContainerStyles.marginBottom) || 0;
+          const chartContainerMarginBottom = Number.parseFloat(chartContainerStyles.marginBottom) || 0;
           const adjustedChartContainerBottom = chartContainerRect.bottom + chartContainerMarginBottom;
 
-          const legendsMarginTop = parseFloat(legendsStyles.marginTop) || 0;
+          const legendsMarginTop = Number.parseFloat(legendsStyles.marginTop) || 0;
           const adjustedLegendsTop = legendsRect.top - legendsMarginTop;
 
           if (adjustedLegendsTop < adjustedChartContainerBottom) {
@@ -240,7 +286,7 @@ const AccordionContent = ({ posts, activeItem, setActive }) => {
     <Accordion fluid styled>
       {posts.map((post, index) => {
         const iconUrl =
-          post.meta_fields && post.meta_fields.icon
+          post.meta_fields?.icon
             ? post.meta_fields.icon[0]
             : null;
 
@@ -290,9 +336,6 @@ const AccordionContent = ({ posts, activeItem, setActive }) => {
   );
 };
 
-
-
-
 const SingleTabbedView = ({ posts, showLabels, height }) => {
     const [activeItem, setActive] = useState(posts ? posts[0].slug : null);
 
@@ -339,7 +382,7 @@ const GridTabbedView = ({ posts, showLabels, showIcons, height }) => {
         <React.Fragment>
             <Grid stackable className="tabbed posts" columns={posts.length} style={{ height: height + "px" }}>
                 <GriNavigator showIcons={showIcons} showLabels={showLabels} posts={posts} activeItem={activeItem} setActive={setActive} />
-                <Grid.Row style={{ height: height + "px" }}>
+                <Grid.Row style={{ height: `${height}px` }}>
                     <Grid.Column width={16} className={"content"}>
                         <Container className={'content-tab'} style={{ height: `${height}px` }}>
                             <TabContent className={"content-tab"} posts={posts} activeItem={activeItem} />
@@ -362,6 +405,7 @@ const Wrapper = (props) => {
         "data-use-scrolls": useScrolls,
         "data-show-labels": showLabels,
         "data-height": height,
+        "data-preview-mode": previewMode = 'Desktop',
         parent, editing, unique
     } = props;
     const locale = props.intl.locale;
@@ -372,6 +416,8 @@ const Wrapper = (props) => {
     const { width: deviceWidth} = useWindowDimensionsAndDevice();
 
     const isMobile = deviceWidth <= 1024;
+    const isNotDesktopPreview = previewMode !== 'Desktop' && editing;
+    const isMobileRenderMode = isMobile && !editing;
 
     return (
         <Container className={`viz tabbed posts ${editing ? 'editing' : ''} ${scrollable ? 'scrollable' : ''}`} fluid={true}>
@@ -380,11 +426,11 @@ const Wrapper = (props) => {
                 type={type}
                 taxonomy={taxonomy}
                 categories={categories}
-                store={"tabbedposts_" + parent + '_' + unique} page={1}
+                store={`tabbedposts_${parent}_${unique}`} page={1}
                 perPage={items}>
                 <PostConsumer>
                     <PostConsumer>
-                        {isMobile ? (
+                        {(isMobileRenderMode || isNotDesktopPreview) ? (
                             <AccordionContent posts={items} activeItem={items[0]?.slug} setActive={() => { }} />
                         ) : theme === 'light' ? (
                             <SingleTabbedView height={conditionalHeight} showLabels={showLabels === 'true'} />
