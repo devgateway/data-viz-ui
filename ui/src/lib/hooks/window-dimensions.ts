@@ -8,12 +8,12 @@ interface WindowDimensionsParams {
 
 type WindowDimensions<T extends WindowDimensionsParams> = {
     width: number;
-} & (T['getHeight'] extends true ? { height: number } : {}) 
+} & (T['getHeight'] extends true ? { height: number } : {})
   & (T['getDeviceType'] extends true ? { deviceType: 'mobile' | 'tablet' | 'midTablet' | 'laptop' | 'desktop' | 'wide' } : {});
 
 
 /**
- * 
+ *
  * A react hook that returns the width,height and the device type.
  * @description A react hook that returns the width,height and the device type.
  * until the issue above is fixed.
