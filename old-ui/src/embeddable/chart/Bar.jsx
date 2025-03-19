@@ -79,11 +79,13 @@ const Chart = ({
   enableGridX,
   customAxisFormat
 }) => {
-  const isMobile = deviceType() === "mobile";
+  const isMobileOrTablet = ['mobile', 'tablet', 'midTablet'].includes(deviceType());
+  const isTabletDevice = ['tablet', 'midTablet'].includes(deviceType())
+  const isMobileDevice = deviceType() === 'mobile';
   const LABEL_SKIP_WIDTH = 30; // important for vertical layout
   const LABEL_SKIP_HEIGHT = 15; // important for horizontal layout
   const mobileConfigSettings = JSON.parse(decodeURIComponent(mobileCustomization));
-  const isMobileCustomizationEnabled = isMobile && (mobileConfigSettings?.showCustomization ?? false);
+  const isMobileCustomizationEnabled = isMobileOrTablet && (mobileConfigSettings?.showCustomization ?? false);
   const normalizeLabelColor = () => {
     if (barLabelColor === "null" || barLabelColor === null || !barLabelColor) {
       return "#000000";
@@ -101,7 +103,7 @@ const Chart = ({
   const [showLine, setShowLine] = useState(lineVisibility);
   const [bottomSpacing, setBottomSpacing] = useState(50);
   const [newMarginTop, setNewMarginTop] = useState(marginTop);
-  const [wrapCount, setWrapCount] = useState(0);
+  const [_wrapCount, setWrapCount] = useState(0);
   const [newMarginBottom, setNewMarginBottom] = useState(marginBottom);
 
   const generateChartLegends = (
@@ -494,7 +496,10 @@ const Chart = ({
 
   const CustomTick = (tick) => {
     const tickObject = Object.assign({}, tick);
-    if(isMobileCustomizationEnabled && hiddenLabels.includes(String(tickObject.value))) {
+    if (
+      isMobileCustomizationEnabled &&
+      hiddenLabels.includes(String(tickObject.value))
+    ) {
       tickObject.value = "";
     }
     const theme = useTheme();
@@ -504,8 +509,37 @@ const Chart = ({
     } else {
       effectiveTickColor = legendColor(tick);
     }
-    const width = getTextWidth(tickObject.value, "12px Roboto") + 30;
+    let lines = [];
+    let currentLine = "";
+    if(isMobileCustomizationEnabled) {
+      const words = String(tickObject.value).split(" ");
+      let maxLineLength = 25;
+      if(isMobileDevice) {
+        maxLineLength = mobileConfigSettings?.mobileMaxTickLength ?? 25;
+      } else if(isTabletDevice) {
+        maxLineLength = mobileConfigSettings?.tabletMaxTickLength ?? 25;
+      }
 
+      words.forEach((word) => {
+        if (currentLine.length + String(word).length <= maxLineLength) {
+          currentLine += (currentLine ? " " : "") + word;
+        } else {
+          lines.push(currentLine);
+          currentLine = word;
+        }
+      });
+      if (currentLine) {
+        lines.push(currentLine);
+      }
+    } else {
+      lines = [tickObject.value];
+    }
+    let lineHeight = 12;
+    if(isMobileDevice) {
+      lineHeight = mobileConfigSettings?.mobileYAxisLineHeight ?? 12;
+    } else if(isTabletDevice) {
+      lineHeight = mobileConfigSettings?.tabletYAxisLineHeight ?? 12;
+    }
     if (tickRotation > 0 && tickRotation < 180) {
       return (
         <g transform={`translate(${tick.x},${tick.y + 30})`}>
@@ -519,29 +553,23 @@ const Chart = ({
           )}
 
           <g transform={`translate(0, ${tick.y + offsetText})`}>
-            {/* <rect
-              transform={`rotate(${tickRotation})`}
-              x={-12}
-              y={-12}
-              rx={2}
-              ry={2}
-              width={width}
-              height={22}
-              fill={"#FFFFFF"}
-            /> */}
-
-            <text
-              transform={`rotate(${tickRotation})`}
-              textAnchor="start"
-              dominantBaseline="middle"
-              style={{
-                ...theme.axis.ticks.text,
-                fill: xLabelColor === "null" ? "black" : xLabelColor,
-                fontSize: "12px",
-              }}
-            >
-              {tickObject.value}
-            </text>
+            {lines.map((line, i) => (
+              <text
+                key={i}
+                transform={`rotate(${tickRotation})`}
+                textAnchor="start"
+                y={typeof tick.value === "number" ? 0 : i * lineHeight}
+                dominantBaseline="middle"
+                style={{
+                  ...theme.axis.ticks.text,
+                  fill: xLabelColor === "null" ? "black" : xLabelColor,
+                  fontSize: "12px",
+                  fontFamily: "Roboto",
+                }}
+              >
+                {line}
+              </text>
+            ))}
           </g>
         </g>
       );
@@ -558,29 +586,23 @@ const Chart = ({
           )}
 
           <g transform={`translate(0, ${tick.y + offsetText})`}>
-            {/* <rect
-              transform={`rotate(${tickRotation - 180})`}
-              x={-12}
-              y={-10}
-              rx={2}
-              ry={2}
-              width={width}
-              height={22}
-              fill={"#FFFFFF"}
-            /> */}
-
-            <text
-              transform={`rotate(${tickRotation})`}
-              textAnchor="end"
-              dominantBaseline="middle"
-              style={{
-                ...theme.axis.ticks.text,
-                fill: xLabelColor === "null" ? "black" : xLabelColor,
-                fontSize: "12px",
-              }}
-            >
-              {tickObject.value}
-            </text>
+            {lines.map((line, i) => (
+              <text
+                key={i}
+                transform={`rotate(${tickRotation})`}
+                textAnchor="end"
+                y={typeof tick.value === "number" ? 0 : i * lineHeight}
+                dominantBaseline="middle"
+                style={{
+                  ...theme.axis.ticks.text,
+                  fill: xLabelColor === "null" ? "black" : xLabelColor,
+                  fontSize: "12px",
+                  fontFamily: "Roboto",
+                }}
+              >
+                {line}
+              </text>
+            ))}
           </g>
         </g>
       );
@@ -597,29 +619,23 @@ const Chart = ({
           )}
 
           <g transform={`translate(0, ${tick.y + offsetText})`}>
-            {/* <rect
-              transform={`rotate(${tickRotation})`}
-              x={(-1 * width) / 2}
-              y={-12}
-              rx={2}
-              ry={2}
-              width={width}
-              height={22}
-              fill={"#FFFFFF"}
-            /> */}
-
-            <text
-              transform={`rotate(${tickRotation})`}
-              textAnchor="middle"
-              dominantBaseline="middle"
-              style={{
-                ...theme.axis.ticks.text,
-                fill: xLabelColor === "null" ? "black" : xLabelColor,
-                fontSize: "12px",
-              }}
-            >
-              {tickObject.value}
-            </text>
+            {lines.map((line, i) => (
+              <text
+                key={i}
+                transform={`rotate(${tickRotation})`}
+                textAnchor="middle"
+                y={typeof tick.value === "number" ? 0 : i * lineHeight}
+                dominantBaseline="middle"
+                style={{
+                  ...theme.axis.ticks.text,
+                  fill: xLabelColor === "null" ? "black" : xLabelColor,
+                  fontSize: "12px",
+                  fontFamily: "Roboto",
+                }}
+              >
+                {line}
+              </text>
+            ))}
           </g>
         </g>
       );
@@ -1010,6 +1026,68 @@ if(isMobileCustomizationEnabled) {
     }
 }
 
+const AxisLeftCustomTick = (tick) => {
+  if (
+    isMobileCustomizationEnabled &&
+    hiddenLabels.includes(String(tick.value))
+  ) {
+    return "";
+  }
+  let maxLineLength = 25;
+  if(isMobileDevice) {
+    maxLineLength = mobileConfigSettings?.mobileMaxTickLength ?? 25;
+  } else if(isTabletDevice) {
+    maxLineLength = mobileConfigSettings?.tabletMaxTickLength ?? 25;
+  }
+  const words =
+    typeof tick.value === "string" ? tick.value.split(" ") : [tick.value];
+  let lines = [];
+  let currentLine = "";
+
+  words.forEach((word) => {
+    if (currentLine.length + String(word).length <= maxLineLength) {
+      currentLine += (currentLine ? " " : "") + word;
+    } else {
+      lines.push(currentLine);
+      currentLine = word;
+    }
+  });
+
+  if (currentLine) {
+    lines.push(currentLine);
+  }
+  let lineHeight = 12;
+  if(isMobileDevice) {
+    lineHeight = mobileConfigSettings?.mobileYAxisLineHeight ?? 12;
+  } else if(isTabletDevice) {
+    lineHeight = mobileConfigSettings?.tabletYAxisLineHeight ?? 12;
+  }
+
+  return (
+    <g transform={`translate(${tick.x},${tick.y})`}>
+      <line x1={-5} x2={0} y1={0} y2={0} stroke={"#000"} strokeWidth={1} />
+      {lines
+        .map((line, i) => (
+          <text
+            key={i}
+            x={-10}
+            y={typeof tick.value === "number" ? 0: i * lineHeight}
+            textAnchor="end"
+            dominantBaseline="middle"
+            style={{
+              fill: xLabelColor === "null" ? "black" : xLabelColor,
+              fontSize: "12px",
+              fontFamily: "Roboto",
+            }}
+          >
+            {line}
+          </text>
+        ))}
+    </g>
+  );
+};
+
+
   return (
     <div style={{ height: height }}>
       {options && options.data && options.data.length > 0 && (
@@ -1055,6 +1133,7 @@ if(isMobileCustomizationEnabled) {
                     legendPosition: "middle",
                     legendOffset: parseInt(offsetRight),
                     format: (value) => {
+                      if(!value) return "";
                       if (layout == "vertical") {
                         const effectiveFormat = customAxisFormat
                           ? customAxisFormat
@@ -1085,6 +1164,7 @@ if(isMobileCustomizationEnabled) {
                     tickRotation: 0,
                     tickValues: parseInt(xAxisTickValues),
                     format: (value) => {
+                      if(!value) return "";
                       if (layout == "horizontal") {
                         const effectiveFormat = customAxisFormat
                           ? customAxisFormat
@@ -1120,20 +1200,25 @@ if(isMobileCustomizationEnabled) {
               legend: legends.left,
               legendPosition: "middle",
               legendOffset: parseInt(offsetY),
-              format: (value) => {
-                if (layout == "vertical") {
-                  const effectiveFormat = customAxisFormat
-                    ? customAxisFormat
-                    : format;
-                  return intl.formatNumber(
-                    effectiveFormat.style === "percent" ? value / 100 : value,
-                    {
-                      ...effectiveFormat,
+              ...(
+                isMobileCustomizationEnabled ? { renderTick: AxisLeftCustomTick }
+                : {
+                  format: (value) => {
+                    if(!value) return "";
+                    if (layout === "vertical") {
+                      const effectiveFormat = customAxisFormat
+                        ? customAxisFormat
+                        : format;
+                      return intl.formatNumber(
+                        effectiveFormat.style === "percent" ? value / 100 : value,
+                        {
+                          ...effectiveFormat,
+                        }
+                      );
                     }
-                  );
-                }
-                return value;
-              },
+                    return value;
+                  },
+                  }),
             }}
             enableGridY={enableGridY}
             enableGridX={enableGridX}
