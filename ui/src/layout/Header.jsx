@@ -472,7 +472,7 @@ const Header = ({ intl, settings }) => {
                             </Menu.Item>
                         </Menu>
                     </Container>
-                    <Container fluid={true} className={"child"}>
+                    <Container fluid className={"child"}>
                         {selected && selected.child_items && (
                             <Menu fluid text>
                                 <MenuItems
