@@ -47,6 +47,7 @@ const Chart = ({
   centerLabelYOffset,
   tooltipEnableMarkdown,
   reverseLegend,
+  showPercentage
 }) => {
   const [filter, setFilter] = useState([]);
   const [tooltipValue, setTooltipValue] = useState(tooltip);
@@ -270,13 +271,27 @@ const Chart = ({
     );
   };
 
+  const getData = (d, showPercentage) => {
+    if (showPercentage) {
+      const total = d.reduce((acc, current) => acc + current.value, 0);
+      return d.map((item) => {
+        return {
+          ...item,
+          value: (item.value / total) * 100,
+        };
+      });
+    }
+
+    return d;
+  }
+
   return (
     <div style={{ height: height }} className={"pie-chart"}>
       {optionsVal && optionsVal.data && optionsVal.data.length > 0 && (
         <>
           <ResponsivePie
             key={optionsVal.id}
-            data={applyFilter(optionsVal.data)}
+            data={applyFilter(getData(optionsVal.data, showPercentage))}
             margin={margins}
             startAngle={startAngle}
             endAngle={endAngle}
