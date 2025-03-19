@@ -37,6 +37,12 @@ export class ComponentWithSettings extends Component {
             }
         }, false);
         this.iframe = React.createRef();
+        this.unsubscribe = wp.data.subscribe(() => {
+            const newPreviewMode = wp.data.select("core/editor").getDeviceType();
+            if (newPreviewMode !== this.state.previewMode) {
+                this.setState({previewMode: newPreviewMode });
+            }
+        });
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
@@ -55,7 +61,14 @@ export class ComponentWithSettings extends Component {
             });
         });
     }
+
+    componentWillUnmount() {
+        if (this.unsubscribe) {
+            this.unsubscribe();
+        }
+    }
 }
+
 export class BlockEditWithFilters extends ComponentWithSettings {
     constructor(props) {
         super(props);

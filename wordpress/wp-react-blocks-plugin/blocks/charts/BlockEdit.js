@@ -29,43 +29,31 @@ class BlockEdit extends BlockEditWithAPIMetadata {
     constructor(props) {
         super(props);
         this.ignoreAttributes = ['tooltip'];
-        this.unsubscribe = wp.data.subscribe(() => {
-            const newPreviewMode = wp.data.select("core/editor").getDeviceType();
-            if (newPreviewMode !== this.state.previewMode) {
-                this.setState({previewMode: newPreviewMode });
-            }
-        });
-    }
-
-    componentWillUnmount() {
-        if (this.unsubscribe) {
-            this.unsubscribe();
-        }
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        const {setAttributes, attributes: {type,colorBy,dimension1, dimension2, types, measures, app, previewMode}} = this.props
-        const {attributes: {type: prevType, dimension2: prevDimension2}} = prevProps
+        const {setAttributes, attributes: {type,colorBy,dimension1, dimension2 }} = this.props
+        const {attributes: {type: prevType }} = prevProps
         const newPreviewMode = this.state?.previewMode;
 
         if (newPreviewMode !== prevState.previewMode) {
             setAttributes({previewMode: newPreviewMode});
         }
 
-        if (type != prevType) {
-            if (type == 'radar') {
-                if (colorBy != 'id') {
+        if (type !== prevType) {
+            if (type === 'radar') {
+                if (colorBy !== 'id') {
                     setAttributes({colorBy: 'id'})
 
                 }
             }
-            if (type == 'pie') {
+            if (type === 'pie') {
 
-                if (dimension1 != 'none' && dimension2 == 'none' && colorBy != 'index') {
+                if (dimension1 !== 'none' && dimension2 === 'none' && colorBy !== 'index') {
                     setAttributes({colorBy: 'index'})
 
                 }
-                if (dimension1 != 'none' && dimension2 != 'none' && colorBy != 'id') {
+                if (dimension1 !== 'none' && dimension2 !== 'none' && colorBy !== 'id') {
                     setAttributes({colorBy: 'id'})
 
                 }
