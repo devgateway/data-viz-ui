@@ -4,22 +4,24 @@ import data from './reducers/data'
 import embeddable from './reducers/embeddable'
 import {injectIntl} from "react-intl";
 import * as customizer from "@devgateway/customizer";
-const TabbedPosts = asyncComponent(() => import("./tabbedposts"));
-const PostsCarousel = asyncComponent(() => import("./postscarousel"));
-const PageGallery = asyncComponent(() => import("./pagegallery"));
-const PageModules = asyncComponent(() => import("./pagemodules"));
-const FeaturedTabs = asyncComponent(() => import("./featuredtabs"));
-const VerticalFeaturedTabs = asyncComponent(() => import("./vertical-featuredtabs"));
-const InlineList = asyncComponent(() => import("./inlinelist"));
-const Chart = asyncComponent(() => import("./chart"));
-const NewsLetter = asyncComponent(() => import("./newsletter"));
-const ShowcaseForm = asyncComponent(() => import("./showcase"));
-const Filter = asyncComponent(() => import("./filter"));
-const Download = asyncComponent(() => import("./download"));
-const DownloadPdf = asyncComponent(() => import('./downloadPDF'))
-const Map = asyncComponent(() => import('./map'))
-const DataFiltersReset = asyncComponent(() => import('./datafiltersreset'))
-const Tooltip = asyncComponent(() => import('./tooltip'))
+
+const TabbedPosts = asyncComponent(() => import("./tabbedposts/"));
+const PostsCarousel = asyncComponent(() => import("./postscarousel/"));
+const PageGallery = asyncComponent(() => import("./pagegallery/"));
+const PageModules = asyncComponent(() => import("./pagemodules/"));
+const FeaturedTabs = asyncComponent(() => import("./featuredtabs/"));
+const VerticalFeaturedTabs = asyncComponent(() => import("./vertical-featuredtabs/"));
+const InlineList = asyncComponent(() => import("./inlinelist/"));
+const AgreeAndDownload = asyncComponent(() => import("./agree-and-download/"));
+const Chart = asyncComponent(() => import("./chart/"));
+const NewsLetter = asyncComponent(() => import("./newsletter/"));
+const ShowcaseForm = asyncComponent(() => import("./showcase/"));
+const Filter = asyncComponent(() => import("./filter/"));
+const Download = asyncComponent(() => import("./download/"));
+const DownloadPdf = asyncComponent(() => import('./downloadPDF/'))
+const Map = asyncComponent(() => import('./map/'))
+const DataFiltersReset = asyncComponent(() => import('./datafiltersreset/'))
+const Tooltip = asyncComponent(() => import('./tooltip/'))
 const ReferencesList = asyncComponent(() => import('./references/ReferencesList'))
 const Reference = asyncComponent(() => import('./references/Reference'))
 const TimeLine = asyncComponent(() => import('./time-line'))
@@ -72,6 +74,8 @@ const components = {
     wrapped: Wrapped,
     sankeyChart: SankeyChart,
     dataLabel: DataLabel,
+    body: Body,
+    agreeAndDownload: AgreeAndDownload,
     redirect: () => null
 
 }
@@ -82,7 +86,7 @@ export const getComponentByNameIgnoreCase = (name) => {
     if (k.length > 0) {
         return injectIntl(components[k])
     } else {
-        
+
         const customComponent = customizer.getComponentByNameIgnoreCase(name)
         if (customComponent) {
             return injectIntl(customComponent)
