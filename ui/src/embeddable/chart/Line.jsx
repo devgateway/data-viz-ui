@@ -107,7 +107,7 @@ const Chart = ({
   const mobileConfigSettings = JSON.parse(decodeURIComponent(mobileCustomization));
   const isMobileConfigEnabled = isMobileOrTablet && (mobileConfigSettings?.showCustomization ?? false);
   const isNotDesktopPreview = isMobileConfigEnabled && (previewMode !== 'Desktop');
-  const isNotEditingAndIsMobileCustomizationEnabled = !editing && isMobileCustomizationEnabled;
+  const isNotEditingAndIsMobileCustomizationEnabled = !editing && isMobileConfigEnabled;
   const [bottomSpacing, setBottomSpacing] = useState(50);
   const [newMarginTop, setNewMarginTop] = useState(marginTop);
   const [wrapCount, setWrapCount] = useState(0);
