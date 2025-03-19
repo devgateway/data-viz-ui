@@ -50,7 +50,7 @@ const ResultRenderer = injectIntl(({
             <div className={"has-standard-12-font-size"} onClick={e => document.location.href = target}>
                 <h5 className="breadcrumbs-search">{Array.isArray(bread_crumbs) && bread_crumbs.length > 0 ? bread_crumbs.join(' / ') : ''}</h5>
                 <div className={"has-standard-14-font-size"}><h4 className="search-title">{String(title)}</h4></div>
-                <div className='search-content has-standard-14-font-size'
+                <div className='has-standard-12-font-size search-content'
                     dangerouslySetInnerHTML={{ __html: utils.replaceHTMLinks(extract, locale) }} />
             </div>
         </div>
