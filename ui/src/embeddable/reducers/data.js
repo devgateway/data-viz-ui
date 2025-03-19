@@ -21,8 +21,6 @@ const CLEAN_MEASURES = 'CLEAN_MEASURES'
 export const cleanMeasures = ({app, group}) => (dispatch, getState) => {
     dispatch({type: CLEAN_MEASURES, app, group})
 }
-
-
 export const setMeasures = ({app, group, mGroup}) => (dispatch, getState) => {
 
     const measures = Object.keys(mGroup.measures).filter(k => mGroup.measures[k].selected)
@@ -36,37 +34,33 @@ export const setMeasures = ({app, group, mGroup}) => (dispatch, getState) => {
     newMgroup[app].format = mGroup.format
     dispatch({type: SET_MEASURES, app, group, measure: newMgroup})
 }
+export const setFilter = ({app, group, param, value, autoApply}) => (dispatch, getState) => {
 
-
-export const setFilter = ({app, group, param, value}) => (dispatch, getState) => {
-
-    dispatch({type: SET_FILTER, app, group, param, value})
+    dispatch({type: SET_FILTER, app, group, param, value,autoApply})
 }
-
-
 export const cleanFilter = ({app, group}) => (dispatch, getState) => {
 
     dispatch({type: CLEAN_FILTER, app, group})
     //dispatch({type: CLEAN_MEASURES, app, group})
 }
 
-
+export const applyFilter = ({app, group}) => (dispatch, getState) => {
+    alert('test')
+}
 export const setInitialFilters = ({app, group, param, value}) => (dispatch, getState) => {
     dispatch({type: SET_INITIAL_FILTER, app, group, param, value})
 }
 
-
 export const getCategories = (props) => (dispatch, getState) => {
     const {app, params} = props
-    dispatch({type: LOAD_CATEGORIES, params, app})
+    dispatch({type: LOAD_CATEGORIES, params, app, dvzProxyDatasetId: params.dvzProxyDatasetId})
     api.getCategories({app, params})
-      .then(data => {
+      .then(data => {              
           data.appliedFilters = params
-          return dispatch({type: LOAD_CATEGORIES_DONE, app, data})
+          return dispatch({type: LOAD_CATEGORIES_DONE, app, data, dvzProxyDatasetId: params.dvzProxyDatasetId})
       })
-      .catch(error => dispatch({type: LOAD_CATEGORIES_ERROR, app, error}))
+      .catch(error => dispatch({type: LOAD_CATEGORIES_ERROR, app, error, dvzProxyDatasetId: params.dvzProxyDatasetId}))
 }
-
 
 export const setData = ({app, group, csv, store, params}) => (dispatch, getState) => {
     const filters = getState().get('data').getIn(['filters', app, group])
@@ -93,7 +87,6 @@ export const setData = ({app, group, csv, store, params}) => (dispatch, getState
     const d2 = {...data, data: filtered, appliedFilters: params}
     dispatch({type: LOAD_DATA_DONE, store, data: {count: d2.data.length, itemsSize: d2.data.length, ...d2}})
 }
-
 export const getData = ({app, group, source, store, params}) => (dispatch, getState) => {
     const filters = getState().get('data').getIn(['filters', app, group])
 
@@ -110,7 +103,6 @@ export const getData = ({app, group, source, store, params}) => (dispatch, getSt
         .catch(error => dispatch({type: LOAD_DATA_ERROR, store, error}))
 
 }
-
 
 export default (state = initialState, action) => {
 
@@ -138,29 +130,45 @@ export default (state = initialState, action) => {
 
 
         case LOAD_CATEGORIES: {
+            const {data, app, dvzProxyDatasetId} = action
+            const path = ["categories", app]
 
-            const app = action.app
-            return state.setIn(["categories", app, "loading"], true)
-                .deleteIn(["categories", app, "error"])
+            if (dvzProxyDatasetId) {
+                path.push(dvzProxyDatasetId)
+            }
+
+            return state.setIn([...path, "loading"], true)
+                .deleteIn([...path, "error"])
         }
 
         case LOAD_CATEGORIES_DONE: {
-            const {data, app} = action
+            const {data, app, dvzProxyDatasetId} = action
+            const path = ["categories", app]
 
-            return state.setIn(["categories", app, "loading"], false)
-                .setIn(['categories', app, "items"], Immutable.fromJS(data))
+            if (dvzProxyDatasetId) {
+                path.push(dvzProxyDatasetId)
+            }
+            
+            return state.setIn([...path, "loading"], false)
+                    .setIn([...path, "items"], Immutable.fromJS(data))            
         }
-
         case LOAD_CATEGORIES_ERROR: {
-            const {app, error} = action
-            return state.setIn(["categories", app, "loading"], false)
-                .setIn(["categories", app, "error"], error)
+             const {data, app, dvzProxyDatasetId} = action
+            const path = ["categories", app]
+
+            if (dvzProxyDatasetId) {
+                path.push(dvzProxyDatasetId)
+            }
+            
+            return state.setIn([...path, "loading"], false)
+                .setIn([...path, "error"], data)
+          
         }
-
-
         case SET_FILTER: {
-            const {app, group, param, value} = action
-            return state.setIn(['filters', app, group, param], value.length === 0 ? [Number.MIN_SAFE_INTEGER] : value)
+            const {app, group, param, value,autoApply} = action
+            
+            return  state.setIn(['filters-settings', app, group, "autoApply"],autoApply)
+                .setIn(['filters', app, group, param], value.length === 0 ? [Number.MIN_SAFE_INTEGER] : value)
         }
 
         case SET_INITIAL_FILTER: {
