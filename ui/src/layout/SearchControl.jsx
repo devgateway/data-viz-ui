@@ -1,10 +1,18 @@
 import React, { useEffect, useState, useRef } from "react";
 import { utils, SearchConsumer, SearchProvider } from "@devgateway/wp-react-lib";
 import CustomSemanticSearch from "./CustomSemanticSearch";
-import { createPortal } from 'react-dom';
+import { createPortal } from "react-dom";
 import { Icon } from "semantic-ui-react";
 import { IntlProvider, injectIntl } from "react-intl";
 
+// Utility function to highlight search terms
+const highlightSearchTerm = (text, term) => {
+  if (!term || !text) return text;
+  const regex = new RegExp(`(${term})`, "gi");
+  return text.replace(regex, "<b>$1</b>");
+};
+
+// ResultRenderer component with highlighting
 const ResultRenderer = injectIntl(({
   ID,
   title,
@@ -20,6 +28,7 @@ const ResultRenderer = injectIntl(({
   bread_crumbs = [],
   metadata: { redirect_url },
   intl: { locale },
+  searchTerm, // Added searchTerm prop
 }) => {
   let target = parent_link
     ? utils.replaceLink(parent_link, locale) + `#${slug}`
@@ -35,18 +44,30 @@ const ResultRenderer = injectIntl(({
         className={"has-standard-12-font-size"}
         onClick={(e) => (document.location.href = target)}
       >
-        <h5 className="breadcrumbs-search">
-          {bread_crumbs && bread_crumbs.length > 0
-            ? `${bread_crumbs.join(" / ")}`
-            : ""}{" "}
-        </h5>
+        <h5
+          className="breadcrumbs-search"
+          dangerouslySetInnerHTML={{
+            __html:
+              bread_crumbs && bread_crumbs.length > 0
+                ? highlightSearchTerm(bread_crumbs.join(" / "), searchTerm)
+                : "",
+          }}
+        />
         <div className={"has-standard-14-font-size"}>
-          <h4 className="search-title">{title}</h4>
+          <h4
+            className="search-title"
+            dangerouslySetInnerHTML={{
+              __html: highlightSearchTerm(title, searchTerm),
+            }}
+          />
         </div>
         <div
           className="search-content"
           dangerouslySetInnerHTML={{
-            __html: utils.replaceHTMLinks(extract, locale),
+            __html: utils.replaceHTMLinks(
+              highlightSearchTerm(extract, searchTerm),
+              locale
+            ),
           }}
         />
       </div>
@@ -55,98 +76,58 @@ const ResultRenderer = injectIntl(({
 }
 );
 
-const replaceString = (content, words) => {
-  const regex = RegExp(words, "gi");
-  let newHTML = content;
-  const instances = [...newHTML.matchAll(regex)];
-  let shift = 0;
-  const lengthBeforeChange = newHTML.length;
-  instances.forEach((instance) => {
-    const replacement =
-      "<b>" +
-      newHTML.substring(
-        instance.index + shift,
-        instance.index + shift + words.length
-      ) +
-      "</b>";
-    newHTML =
-      newHTML.substring(0, instance.index + shift) +
-      replacement +
-      newHTML.substring(instance.index + words.length + shift);
-    shift = newHTML.length - lengthBeforeChange;
-  });
-
-  return newHTML;
-};
-
-const searchTextHandler = (words) => {
-  let searchedPara = document.querySelector(".results");
-  const searchResultHeading =
-    (searchedPara =
-      searchedPara =
-      document.querySelectorAll("H5"));
-  const searchResult =
-    (searchedPara =
-      searchedPara =
-      document.querySelectorAll(".search-content"));
-  for (let i = 0; i < searchResult.length; i++) {
-    if (searchResult[i]) {
-      searchResult[i].innerHTML = replaceString(
-        searchResult[i].textContent,
-        words
-      );
-    }
-  }
-
-  for (let i = 0; i < searchResultHeading.length; i++) {
-    if (searchResultHeading[i]) {
-      searchResultHeading[i].innerHTML = replaceString(
-        searchResultHeading[i].textContent,
-        words
-      );
-    }
-  }
-};
-
-const SearchControl = ({ onSearch, perPage, loading, results, meta, intl }) => {
+// FloatSearchResults component with highlighting
+const FloatSearchResults = ({ results, meta, perPage, intl, searchTerm }) => {
   const total = meta ? meta["x-wp-total"] : 0;
   const totalPages = meta ? meta["x-wp-totalpages"] : 0;
 
-  const [searchTerm, setSearchTerm] = useState("");
-
-  useEffect(() => {
-    const delayDebounceFn = setTimeout(() => {
-      onSearch(searchTerm);
-    }, 300);
-
-    return () => clearTimeout(delayDebounceFn);
-  }, [searchTerm]);
-
-  useEffect(() => searchTextHandler(searchTerm), [results]);
   return (
-    <CustomSemanticSearch
-      value={searchTerm}
-      loading={loading}
+    <div id="float-results-container">
+      <span className="float-results-header">
+        {intl.formatMessage(
+          {
+            id: "search.results.summary",
+            defaultMessage: "{count} of {total} Results",
+          },
+          { count: total < perPage ? total : perPage, total: total }
+        )}
+      </span>
+      {results.map((r) => (
+        <ResultRenderer key={r.ID} {...r} searchTerm={searchTerm} />
+      ))}
+    </div>
+  );
+};
+
+// FloatSearchInput component
+const FloatSearchInput = ({
+  onSearch,
+  perPage,
+  loading,
+  results,
+  meta,
+  intl,
+}) => {
+  const total = meta ? meta["x-wp-total"] : 0;
+  const totalPages = meta ? meta["x-wp-totalpages"] : 0;
+
+  return (
+    <input
       placeholder={intl.formatMessage({
         id: "search.placeholder",
         defaultMessage: "Search...",
       })}
-      onResultSelect={(e, data) => null}
-      total={total}
-      perPage={perPage}
-      totalPages={totalPages}
-      onSearchChange={(a, b) => {
-        setSearchTerm(b.value);
+      type={"text"}
+      className={"input search"}
+      name={"search"}
+      onChange={(e) => {
+        onSearch(e.target.value);
       }}
-      searchTextHandler={searchTextHandler}
-      resultRenderer={ResultRenderer}
-      results={results}
-      showNoResults={false}
-      intl={intl}
     />
   );
 };
 
+// FloatingSearchController component
 const FloatingSearchController = ({
   onSearch,
   onSetSelected,
@@ -156,17 +137,17 @@ const FloatingSearchController = ({
   meta,
   locale,
   intl,
+  search, // Added search from SearchConsumer
 }) => {
   const [showSearchInput, setShowSearchInput] = useState(false);
   const containerRef = useRef(null);
 
   useEffect(() => {
-    const newContainer = document.createElement('div');
-    newContainer.setAttribute('id', 'float-input-container');
-    newContainer.setAttribute('class', 'input container');
-    newContainer.style.display = 'none'; // Hide container by default
-    // Append to #root to preserve the original layout context (width & position)
-    const rootElement = document.getElementById('root');
+    const newContainer = document.createElement("div");
+    newContainer.setAttribute("id", "float-input-container");
+    newContainer.setAttribute("class", "input container");
+    newContainer.style.display = "none"; // Hide container by default
+    const rootElement = document.getElementById("root");
     if (rootElement) {
       rootElement.appendChild(newContainer);
       containerRef.current = newContainer;
@@ -180,7 +161,7 @@ const FloatingSearchController = ({
 
   useEffect(() => {
     if (containerRef.current) {
-      containerRef.current.style.display = showSearchInput ? 'block' : 'none';
+      containerRef.current.style.display = showSearchInput ? "block" : "none";
     }
   }, [showSearchInput]);
 
@@ -223,90 +204,70 @@ const FloatingSearchController = ({
                     meta={meta}
                     perPage={perPage}
                     intl={intl}
+                    searchTerm={search} // Pass search term
                   />
                 </IntlProvider>
               )}
             </div>
           ) : null,
           containerRef.current
-        )
-      }
+        )}
     </>
   );
 };
 
-const FloatSearchInput = ({
-  onSearch,
-  perPage,
-  loading,
-  results,
-  meta,
-  intl,
-}) => {
+// SearchControl component
+const SearchControl = ({ onSearch, perPage, loading, results, meta, intl }) => {
   const total = meta ? meta["x-wp-total"] : 0;
   const totalPages = meta ? meta["x-wp-totalpages"] : 0;
+  const [searchTerm, setSearchTerm] = useState("");
+
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      onSearch(searchTerm);
+    }, 300);
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchTerm]);
+
+  const enhancedResultRenderer = (props) => (
+    <ResultRenderer {...props} searchTerm={searchTerm} />
+  );
 
   return (
-    <input
+    <CustomSemanticSearch
+      value={searchTerm}
+      loading={loading}
       placeholder={intl.formatMessage({
         id: "search.placeholder",
         defaultMessage: "Search...",
       })}
-      type={"text"}
-      className={"input search"}
-      name={"search"}
-      onChange={(e) => {
-        onSearch(e.target.value);
+      onResultSelect={(e, data) => null}
+      total={total}
+      perPage={perPage}
+      totalPages={totalPages}
+      onSearchChange={(a, b) => {
+        setSearchTerm(b.value);
       }}
+      resultRenderer={enhancedResultRenderer} // Use wrapper to pass searchTerm
+      results={results}
+      showNoResults={false}
+      intl={intl}
     />
   );
 };
 
-const FloatSearchResults = ({ results, meta, perPage, intl }) => {
-  const total = meta ? meta["x-wp-total"] : 0;
-  const totalPages = meta ? meta["x-wp-totalpages"] : 0;
-
-  useEffect(() => {
-    const searchWords = document.querySelector(".input.search").value;
-    searchTextHandler(searchWords);
-  }, [results]);
-
-  return (
-    <div id="float-results-container">
-      <span className="float-results-header">
-        {intl.formatMessage(
-          {
-            id: "search.results.summary",
-            defaultMessage: "{count} of {total} Results",
-          },
-          { count: total < perPage ? total : perPage, total: total }
-        )}
-      </span>
-      {results.map((r) => (
-        <ResultRenderer {...r} />
-      ))}
-    </div>
-  );
-};
-
+// Main SearchComponent
 const SearchComponent = injectIntl((props) => {
   const { intl, onSetSelected } = props;
   const [query, setQuery] = useState("");
+  const [isSmallScreen, setIsSmallScreen] = useState(false); // Track small screen
 
-  const [isSmallScreen, setIsSmallScreen] = useState(false); // State to track small screen
   useEffect(() => {
-    // Function to update isSmallScreen state
     const updateScreenSize = () => {
       setIsSmallScreen(window.innerWidth <= 1365); // Check if width is 1365px or lower
     };
-
-    // Initial check
     updateScreenSize();
-
-    // Event listener for window resize
     window.addEventListener("resize", updateScreenSize);
-
-    // Cleanup
     return () => window.removeEventListener("resize", updateScreenSize);
   }, []);
 
@@ -324,8 +285,9 @@ const SearchComponent = injectIntl((props) => {
         onSearch={setQuery}
         perPage={5}
         {...props}
-      ></SearchControl>
+      />
     );
+
   return (
     <SearchProvider search={query} perPage={5} locale={intl.locale}>
       <SearchConsumer>{component}</SearchConsumer>
