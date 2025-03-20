@@ -1,12 +1,12 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Provider } from 'react-redux'
-import { Route, Routes, BrowserRouter, Navigate, useLocation, useParams, createBrowserRouter, createRoutesFromElements, RouterProvider } from 'react-router-dom';
+import { Route, Routes, Navigate, useLocation, useParams, createBrowserRouter, createRoutesFromElements, RouterProvider } from 'react-router-dom';
 import { store } from './redux/store'
 import messages_en from "./translations/en.json";
 import messages_fr from "./translations/fr.json";
 import messages_am from './translations/af.json';
 import { updateIntl } from '@/lib/react-intl-redux'
-import { injectIntl, IntlProvider, useIntl } from "react-intl";
+import { injectIntl, IntlProvider } from "react-intl";
 import ResponsiveContainer from './layout'
 import { getComponentByNameIgnoreCase } from "./embeddable";
 import Helmet from './Helmet'
