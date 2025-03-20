@@ -1,4 +1,4 @@
-/* eslint-disable no-debugger */
+ 
 import { Config } from '@/conf'
 import {get} from '../../api/commons'
 const API_ROOT = Config.REACT_APP_API_ROOT;
