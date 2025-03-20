@@ -5,7 +5,6 @@ import { MediaConsumer, MediaProvider, PageConsumer, PageProvider, PostContent }
 
 import { injectIntl } from "react-intl";
 import FloatingNavigator from './FloatingNavigator'
-import Visibility from 'semantic-ui-react/dist/commonjs/behaviors/Visibility';
 
 const decodeHtmlEntity = function (str: string) {
     if (str) {
