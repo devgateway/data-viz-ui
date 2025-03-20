@@ -19,11 +19,11 @@ export interface VerticalFeaturedTabsProps {
     "data-colors": string;
     "data-cover-width"?: number;
     "data-read-more-label"?: string;
+    "data-preview-mode"?: string;
     editing: boolean;
     parent: string;
     unique: string;
     intl: any;
-
 }
 
 interface AccordionContentProps {
@@ -41,6 +41,8 @@ interface IntroWithFeaturedImageProps {
     dimensions: { width: number; height: number };
     height: number;
     coverWidth: number;
+    index: number;
+    editing: boolean;
 }
 
 interface FeaturedTabsProps {
@@ -156,7 +158,7 @@ const AccordionContent: React.FC<AccordionContentProps> = ({ posts, activeItem, 
               const wpColumnAfterChartRect = wpColumnAfterChart.getBoundingClientRect();
               const wpColumnAfterChartStyles = window.getComputedStyle(wpColumnAfterChart);
 
-              const wpColumnAfterChartMarginTop = parseFloat(wpColumnAfterChartStyles.marginTop) || 0;
+              const wpColumnAfterChartMarginTop = Number.parseFloat(wpColumnAfterChartStyles.marginTop) || 0;
               const adjustedWpColumnAfterChartTop = wpColumnAfterChartRect.top - wpColumnAfterChartMarginTop;
 
               if (adjustedLegendsBottom > adjustedWpColumnAfterChartTop) {
@@ -171,10 +173,10 @@ const AccordionContent: React.FC<AccordionContentProps> = ({ posts, activeItem, 
             if (chartContainer) {
               const chartContainerRect = chartContainer.getBoundingClientRect();
               const chartContainerStyles = window.getComputedStyle(chartContainer);
-              const chartContainerMarginBottom = parseFloat(chartContainerStyles.marginBottom) || 0;
+              const chartContainerMarginBottom = Number.parseFloat(chartContainerStyles.marginBottom) || 0;
               const adjustedChartContainerBottom = chartContainerRect.bottom + chartContainerMarginBottom;
 
-              const legendsMarginTop = parseFloat(legendsStyles.marginTop) || 0;
+              const legendsMarginTop = Number.parseFloat(legendsStyles.marginTop) || 0;
               const adjustedLegendsTop = legendsRect.top - legendsMarginTop;
 
               if (adjustedLegendsTop < adjustedChartContainerBottom) {
@@ -200,6 +202,7 @@ const AccordionContent: React.FC<AccordionContentProps> = ({ posts, activeItem, 
     }, [activeIndex]);
 
     const handleClick = (e: React.MouseEvent, titleProps: { index: number }) => {
+      console.log("Accordion clicked inside iframe", e);
         const { index } = titleProps;
         const newIndex = activeIndex === index ? -1 : index;
         setActiveIndex(newIndex);
@@ -214,8 +217,7 @@ const AccordionContent: React.FC<AccordionContentProps> = ({ posts, activeItem, 
     return (
         <Accordion fluid styled>
             {posts.map((post, index) => {
-                const iconUrl = post.meta_fields && post.meta_fields.icon ? post.meta_fields.icon[0] : null;
-
+                const iconUrl = post.meta_fields?.icon ? post.meta_fields.icon[0] : null;
                 return (
                     <React.Fragment key={post.id}>
                         <Accordion.Title
@@ -255,10 +257,13 @@ const IntroWithFeaturedImage: React.FC<IntroWithFeaturedImageProps> = ({
     active,
     dimensions,
     height,
-    coverWidth
+    coverWidth,
+    index,
+    editing
 }) => {
-    const media = post['_embedded'] ? post['_embedded']["wp:featuredmedia"] : null;
+    const media = post._embedded ? post._embedded["wp:featuredmedia"] : null;
     const [isHovered, setIsHovered] = useState(false);
+    const editingMargin = editing ? (count - index) : 1;
 
     return (
         <div className={"content-area"}>
@@ -267,24 +272,24 @@ const IntroWithFeaturedImage: React.FC<IntroWithFeaturedImageProps> = ({
                 style={{
                     'width': `${coverWidth}px`,
                     "backgroundColor": backgroundColor,
-                    "backgroundImage": 'url(' + (media ? media[0].source_url : '') + ')'
+                    "backgroundImage": `url(${media ? media[0].source_url : ''})`
                 }}
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
             >
-                <div className="rotator" style={{ width: height + 'px', "transform": `translate(${coverWidth / 2}px, 0px) rotate(90deg)` }}>
+                <div className="rotator" style={{ width: `${height}px`, "transform": `translate(${coverWidth / 2}px, 0px) rotate(90deg)` }}>
                     <PostIntro post={post} />
                 </div>
                 <div className="overlay-label-container">
                     <div className={`overlay-label ${isHovered && !active ? 'visible' : ''}`}>CLICK TO EXPAND</div>
-                    <div className="arrow-svg"></div>
+                    <div className="arrow-svg" />
                 </div>
             </div>
             <div className={`collapsable-content ${active ? 'expanded' : 'collapsed'}`}
                  style={{
                      "backgroundColor": "#f9f9f9",
-                     width: dimensions.width - (coverWidth * count) + 'px',
-                     "marginLeft": `${coverWidth}px`
+                     width: `${dimensions.width - (coverWidth * count)}px`,
+                     "marginLeft": `${coverWidth * editingMargin}px`
                  }}
             >
                 <PostContent post={post} />
@@ -303,17 +308,19 @@ const FeaturedTabs: React.FC<FeaturedTabsProps> = ({editing, posts, height, colo
     }
 
     useLayoutEffect(() => {
-        if (targetRef.current && targetRef.current.parentElement) {
-            setDimensions({
-                width: targetRef.current.parentElement.offsetWidth,
-                height: targetRef.current.offsetHeight
-            });
-        }
-    }, []);
+      if (targetRef.current?.parentElement) {
+        setDimensions({
+          width: editing
+            ? targetRef.current.parentElement?.parentElement?.offsetWidth ?? 0
+            : targetRef.current.parentElement?.offsetWidth ?? 0,
+          height: targetRef.current.offsetHeight,
+        });
+      }
+    }, [editing]);
 
     return (
-        <Container fluid={true} className={`vertical featured tabs ${editing ? 'editing' : ''}`}>
-            {posts && posts.map((post, i) => {
+        <Container fluid={true} className={"vertical featured tabs"}>
+            {posts?.map((post, i) => {
                 const isActive = active ? post.slug === active : i === 0;
                 return (
                     <div
@@ -321,17 +328,19 @@ const FeaturedTabs: React.FC<FeaturedTabsProps> = ({editing, posts, height, colo
                         ref={targetRef}
                         onClick={() => toggleAnimation(post.slug)}
                         className={isActive ? "item expanded" : "item collapsed"}
-                        style={{"minHeight": height + 'px', "minWidth": `${coverWidth}px`}}
+                        style={{"minHeight": `${height}px`, "minWidth": `${coverWidth}px`}}
                     >
                         <a id={post.slug}></a>
                         <IntroWithFeaturedImage
+                            editing={editing}
                             coverWidth={coverWidth}
                             height={height}
-                            backgroundColor={colors['color_' + i]}
+                            backgroundColor={colors[`color_${i}`]}
                             count={posts.length}
                             dimensions={dimensions}
                             active={isActive}
                             post={post}
+                            index={i}
                         />
                     </div>
                 );
@@ -350,6 +359,7 @@ const Wrapper: React.FC<VerticalFeaturedTabsProps> = (props) => {
     "data-colors": colors,
     "data-cover-width": coverWidth = 50,
     "data-read-more-label": moreLabel = "READ More",
+    "data-preview-mode": previewMode = 'Desktop',
     editing,
     parent,
     unique,
@@ -358,7 +368,7 @@ const Wrapper: React.FC<VerticalFeaturedTabsProps> = (props) => {
   const dataCategories = categories ? categories : "[]";
 
   // Determine screen width and conditionally render components
-  const [isMobileOrTablet, setIsMobileOrTablet] = useState(window.innerWidth <= 1380);
+  const [isMobileOrTablet, setIsMobileOrTablet] = useState(window.innerWidth <= 1365);
 
   const getScreenOrientation = (): string => {
     return (
@@ -374,7 +384,7 @@ const Wrapper: React.FC<VerticalFeaturedTabsProps> = (props) => {
   const handleOrientationChange = () => {
     setTimeout(() => {
       setOrientation(getScreenOrientation());
-      setIsMobileOrTablet(window.innerWidth <= 1380);
+      setIsMobileOrTablet(window.innerWidth <= 1365);
     }, 100);
   };
 
@@ -406,14 +416,18 @@ const Wrapper: React.FC<VerticalFeaturedTabsProps> = (props) => {
   };
 
   const parse = (value: string): any => {
+    if(!value) return null;
     try {
       return JSON.parse(decode(value));
     } catch (error) {
-      console.error("error parsing value:" + value + "\n error:" + error);
+      console.error(`error parsing value:${value}\n error:${error}`);
     }
 
     return null;
   };
+
+  const isNotDesktopPreview = previewMode !== 'Desktop' && editing;
+  const isMobileRenderMode = isMobileOrTablet && !editing;
 
   return (
     <Container
@@ -432,7 +446,7 @@ const Wrapper: React.FC<VerticalFeaturedTabsProps> = (props) => {
         perPage={items}
       >
         <PostConsumer>
-          {isMobileOrTablet ? (
+          {(isMobileRenderMode || isNotDesktopPreview) ? (
             <AccordionContent
               posts={items}
               activeItem={items?.[0]?.slug}
