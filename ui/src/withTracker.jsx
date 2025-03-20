@@ -2,16 +2,21 @@ import React, { useEffect } from 'react';
 import ReactGA from "react-ga4";
 import { useLocation } from 'react-router-dom';
 import { Config } from './conf';
+import { SettingsContext } from '@devgateway/wp-react-lib';
 
-
-if (Config.GA_CODE || Config.GA_CODE !== '') ReactGA.initialize(Config.GA_CODE || '#REACT_APP_GA_CODE#');
 
 const withTracker = (WrappedComponent, options = {}) => {
     const HOC = (props) => {
+        const settings = React.useContext(SettingsContext) ||  {};
+        const gaCode = settings?.data?.google_analytics_code || Config.GA_CODE;
+        console.log('gaCode', gaCode);
         const location = useLocation();
 
+        ReactGA.initialize(gaCode || '#REACT_APP_GA_CODE#');
+
+
         useEffect(() => {
-            if (Config.GA_CODE) {
+            if (gaCode) {
                 const page = location.pathname;
                 ReactGA.send({ hitType: "pageview", page });
             }
