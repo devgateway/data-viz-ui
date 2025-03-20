@@ -1280,8 +1280,8 @@ componentWillUnmount() {
           let html = `<div style='font-size:${tooltipFontSize}px;' class='tooltip-content' >`;
           if (d.properties.value != null) {
             const lines = format.split("\n");
-            let headerFormat = lines[0];
-            let overallFormat = lines.length > 1 ? lines[1] : null;
+            const headerFormat = lines[0];
+            const overallFormat = lines.length > 1 ? lines[1] : null;
             let breakdownLineIndex = 1;
             let breakdownFormat;
             if (fields.length > 1 && mapType != "POINTS_MAP") {
