@@ -44,6 +44,14 @@ function add_setting_section()
             'type' => 'string'
         )
     );
+    register_setting(
+        'general', // Options group
+        'react_google_analytics', // Option name/database
+        array(
+            'show_in_rest' => true,
+            'type' => 'string'
+        )
+    );
 
     /* Create settings section */
     add_settings_section(
@@ -71,6 +79,13 @@ function add_setting_section()
         'wp-react-landing-page-section', // Section ID
         'Landing Page Settings', // Section title
         'wp_react_landing_page_url_section_header', // Section callback function
+        'general',
+    );
+
+    add_settings_section(
+        'wp-react-google-analytics-section', // Section ID
+        'Website Analytics Code', // Section title
+        'wp_react_google_analytics_section_header', // Section callback function
         'general',
     );
 
@@ -113,6 +128,15 @@ function add_setting_section()
         'wp_react_landing_page_url_callback', // Field callback function
         'general', // Settings page slug
         'wp-react-landing-page-section'
+        // Section ID
+    );
+
+    add_settings_field(
+        'wp-react-google-analytics', // Field ID
+        __('Website Analytics Code'), // Field title
+        'wp_react_google_analytics_callback', // Field callback function
+        'general', // Settings page slug
+        'wp-react-google-analytics-section'
         // Section ID
     );
 }
@@ -196,6 +220,23 @@ function wp_react_landing_page_url_callback()
 <?php
 }
 
+function wp_react_google_analytics_section_header()
+{
+    echo "<p>Add the site’s tag id to be used to gather analytics for this website. e.g. G-A1234B6789</p>";
+}
+
+function wp_react_google_analytics_callback()
+{
+?>
+    <label for="droid-identification"> 
+        <input
+            id="react_google_analytics"
+            class="regular-text" type="text" name="react_google_analytics" placeholder="Google Analytics Code"
+            value="<?php echo (get_option('react_google_analytics')) ?>">
+    </label>
+<?php
+}
+
 function namespace_register_setting_route()
 {
     register_rest_route('dg/v1', '/settings', ['methods' => WP_REST_Server::READABLE, 'callback' => 'show_ui_setting', 'args' => namespace_get_search_args()]);
@@ -212,6 +253,7 @@ function show_ui_setting($request)
         "react_menu_type" => get_option("react_ui_menu_type"),
         "languages" => wpm_get_lang_option(),
         "landing_page_url" => get_option("react_landing_page_url"),
+        "google_analytics_code" => get_option("react_google_analytics"),
     );
 
     $current_name = wpm_translate_value(get_option('blogname'));
