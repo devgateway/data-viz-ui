@@ -1,6 +1,5 @@
 const SaveComponent = (props) => {
     const {
-        setAttributes,
         attributes: {
             count,
             type,
@@ -10,6 +9,7 @@ const SaveComponent = (props) => {
             colors,
             readMoreLabel,
             coverWidth,
+            previewMode
         },
     } = props;
 
@@ -26,7 +26,9 @@ const SaveComponent = (props) => {
                      data-categories={encodeURIComponent(JSON.stringify(categories))}
                      className={"viz-component"}
                      data-read-more-label={readMoreLabel}
-                     data-component={"verticalTabs"}>
+                     data-component={"verticalTabs"}
+                     data-preview-mode={previewMode}
+                     >
                 </div>
         </div>
 

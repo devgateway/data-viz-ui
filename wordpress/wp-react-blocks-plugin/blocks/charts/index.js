@@ -571,6 +571,10 @@ registerBlockType(process.env.BLOCKS_NS + '/chart',
             radarDotLabelOffset: {
                 type: 'Numeric',
                 default: -12
+            },
+            previewMode: {
+                type: "string",
+                default: "Desktop"
             }
         },
         edit: BlockEdit,

@@ -22,7 +22,19 @@ class BlockEdit extends BlockEditWithFilters {
         newColors["color_" + i] = value
 
         setAttributes({"colors": newColors})
+    }
 
+    componentWillUnmount() {
+        if (this.unsubscribe) {
+            this.unsubscribe()
+        }
+    }
+
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        const newPreviewMode = this.state?.previewMode
+        if (newPreviewMode !== prevState.previewMode) {
+            this.props.setAttributes({previewMode: newPreviewMode})
+        }
     }
 
     render() {
@@ -38,13 +50,14 @@ class BlockEdit extends BlockEditWithFilters {
                 height,
                 colors,
                 readMoreLabel,
-                coverWidth
+                coverWidth,
+                previewMode
             },
         } = this.props;
 
         const colorsParams = Object.keys(colors).map(k => colors[k]).join(",")
-        const queryString = `editing=true&data-type=${type}&data-taxonomy=${taxonomy}&data-categories=${categories}&data-items=${count}&data-height=${height}&data-color=${encodeURIComponent(colorsParams)}&data-read-more-label=${readMoreLabel}`
-        const divStyles = {height: height + 'px', width: "100%"}
+        const queryString = `editing=true&data-type=${type}&data-taxonomy=${taxonomy}&data-categories=${categories}&data-items=${count}&data-height=${height}&data-color=${encodeURIComponent(colorsParams)}&data-read-more-label=${readMoreLabel}&data-preview-mode=${previewMode}`
+        const divStyles = {height: `${height}px`, width: "100%"}
         return (
             <div>
 
@@ -75,12 +88,12 @@ class BlockEdit extends BlockEditWithFilters {
                         {this.renderFilters()}
                         <PanelBody title={__("Colors")}>
                             {new Array(count).fill(1).map((v, i) =>
-                                <PanelRow>
+                                <PanelRow key={i}>
                                     <PanelColorSettings
                                         title={__(`Color Settings  ${i + 1}`)}
                                         colorSettings={[
                                             {
-                                                value: colors["color_" + i],
+                                                value: colors[`color_${i}`],
                                                 onChange: (colorValue) => this.onChangeColor(i, colorValue),
                                                 label: __('Background Color'),
                                             }
