@@ -30,6 +30,7 @@ export interface FeatureTabsProps {
     "data-color": string,
     "data-read-more-label": string,
     "data-use-scrolls": string,
+    "data-preview-mode": string,
     editing: boolean,
     parent: number,
     unique: number,
@@ -59,7 +60,7 @@ const FeaturedPost: React.FC<FeaturedPostProps> = ({ post, onClick, active, more
     const media = post['_embedded'] ? post['_embedded']["wp:featuredmedia"] : null;
 
     return (
-        <div className="cover" style={{ "backgroundImage": 'url(' + (media ? media[0].source_url : '') + ')' }}>
+        <div className="cover" style={{ "backgroundImage": `url(${media ? media[0].source_url : ''})` }}>
             <PostIntro post={post} />
             {!active ?
                 <Label onClick={onClick}><Icon name='search' size="large" /> {moreLabel}</Label> :
@@ -126,7 +127,7 @@ const FeaturedTabs: React.FC<FeaturedTabsProps> = ({ posts, width, height, color
         <Container fluid={true} className="featured tabs" style={{ minHeight: `${height}px` }}>
             {/*  @ts-expect-error */}
             <Grid stackable columns={active != null ? 1 : posts?.length} className="desktop">
-                {posts && posts.map((post, i) => (
+                {posts?.map((post, i) => (
                     <React.Fragment key={post.slug}>
                         <Grid.Column
                             style={active == null ? { display: 'block', visibility: 'visible', backgroundColor: arrayColors[i] } : { display: 'none', visibility: 'hidden' }}
@@ -141,7 +142,7 @@ const FeaturedTabs: React.FC<FeaturedTabsProps> = ({ posts, width, height, color
                             style={active != post.slug ? { display: 'none', visibility: 'hidden' } : { display: 'block', visibility: 'visible' }}
                         >
                             <Segment style={{ "backgroundColor": arrayColors[i] }}>
-                                {post.meta_fields && post.meta_fields.icon &&
+                                {post.meta_fields?.icon &&
                                     <MediaProvider id={post.meta_fields ? post.meta_fields.icon[0] : null}>
                                         <MediaConsumer>
                                             <PostIcon />
@@ -245,7 +246,7 @@ const AccordionContent: React.FC<AccordionContentProps> = ({ posts, activeItem, 
     return (
         <Accordion fluid styled>
             {posts.map((post, index) => {
-                const iconUrl = post.meta_fields && post.meta_fields.icon ? post.meta_fields.icon[0] : null;
+                const iconUrl = post.meta_fields?.icon ? post.meta_fields.icon[0] : null;
 
                 return (
                     <React.Fragment key={post.id}>
@@ -293,6 +294,7 @@ const Wrapper: React.FC<FeatureTabsProps> = (props) => {
         "data-color": color,
         "data-use-scrolls": useScrolls,
         "data-read-more-label": moreLabel = "READ More",
+        "data-preview-mode": previewMode = "Desktop",
         editing,
         parent,
         unique
@@ -304,6 +306,8 @@ const Wrapper: React.FC<FeatureTabsProps> = (props) => {
 
     // Determine screen width and conditionally render components
     const isMobile = deviceWidth <= 1250;
+    const isNotDesktopPreview = previewMode !== 'Desktop' && editing;
+    const isMobileRenderMode = isMobile && !editing;
 
     return (
         <Container
@@ -320,7 +324,7 @@ const Wrapper: React.FC<FeatureTabsProps> = (props) => {
                 perPage={items}
             >
                 <PostConsumer>
-                    {isMobile ? (
+                    {(isNotDesktopPreview || isMobileRenderMode) ? (
                         <AccordionContent
                             posts={items}
                             activeItem={items?.[0]?.slug}
