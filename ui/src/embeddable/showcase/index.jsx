@@ -110,7 +110,7 @@ const ValidatedDropDown = ({options, placeholder, name, required, showValidation
         }
     }));
 
-    return <Dropdown
+    return <Form.Dropdown
         value={value}
 
         error={error && showValidation}
@@ -119,7 +119,6 @@ const ValidatedDropDown = ({options, placeholder, name, required, showValidation
             setValue(value.value)
 
         }}
-        fluid
         multiple={false}
         search
         selection
