@@ -202,7 +202,6 @@ const AccordionContent: React.FC<AccordionContentProps> = ({ posts, activeItem, 
     }, [activeIndex]);
 
     const handleClick = (e: React.MouseEvent, titleProps: { index: number }) => {
-      console.log("Accordion clicked inside iframe", e);
         const { index } = titleProps;
         const newIndex = activeIndex === index ? -1 : index;
         setActiveIndex(newIndex);
