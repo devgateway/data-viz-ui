@@ -95,62 +95,6 @@ const InjectTitle = injectIntl((props) => {
     return <></>
 });
 
-
-const TrackedRoutes = withTracker(({ children, locale }: { children: any, locale: string }) => {
-    return (
-        <>
-            <ScrollToTop />
-            <CustomizerWrapper>
-                <InjectTitle />
-            </CustomizerWrapper>
-            <Routes>
-                {/* <Route path="/" element={<Outlet />} /> */}
-                {
-                    //Category Route
-                }
-                <Route path="/category/:slug/" element={
-                    <ResponsiveContainer>
-                        <Category />
-                    </ResponsiveContainer>
-                }>
-                </Route>
-                {
-                    //default route (home)
-                }
-
-                <Route path="/" element={(
-                    <PageProvider
-                        slug={"home"}
-                        locale={locale}
-                        store={"home"}>
-                        <PageConsumer>
-                            <ResponsiveContainer locale={locale}>
-                                <PageConsumer>
-                                    <Page />
-                                    <Helmet locale={locale} />
-                                </PageConsumer>
-                            </ResponsiveContainer>
-                        </PageConsumer>
-                    </PageProvider>
-                )}>
-                </Route>
-                <Route path="embeddable/:name" element={
-                    <SettingsConsumer>
-                        <PreviewComponentParameterParser />
-                    </SettingsConsumer>}>
-                </Route>
-
-                <Route path={"preview/page/:id"} element={<PreviewPageContainer />} />
-                <Route path={"preview/:type/:id"} element={<PreviewTypeContainer />} />
-                <Route path=":slug" element={<SlugContainer />} />
-                <Route path=":parent/:slug" element={<SlugContainer />} />
-                <Route path=":year/:month/:day/:slug" element={<SlugPostContainer />} />
-                <Route path=":parent/:year/:month/:day/:slug" element={<SlugPostContainer />} />
-            </Routes>
-        </>
-    )
-});
-
 const IntlRoutes = () => {
     const pathParams = useParams();
     const defaultLocale = Config.DEFAULT_LOCALE;
@@ -198,7 +142,54 @@ const IntlRoutes = () => {
             <AppContextProvider getComponent={getComponentByNameIgnoreCase} store={store} locale={locale}>
                 <SettingProvider locale={locale} changeUUID={customize_changeset_uuid}>
                     <SettingsConsumer>
-                        <TrackedRoutes locale={locale} />
+                        <ScrollToTop />
+                        <CustomizerWrapper>
+                            <InjectTitle />
+                        </CustomizerWrapper>
+                        <Routes>
+                            {/* <Route path="/" element={<Outlet />} /> */}
+                            {
+                                //Category Route
+                            }
+                            <Route path="/category/:slug/" element={
+                                <ResponsiveContainer>
+                                    <Category />
+                                </ResponsiveContainer>
+                            }>
+                            </Route>
+                            {
+                                //default route (home)
+                            }
+
+                            <Route path="/" element={(
+                                <PageProvider
+                                    slug={"home"}
+                                    locale={locale}
+                                    store={"home"}>
+                                    <PageConsumer>
+                                        <ResponsiveContainer locale={locale}>
+                                            <PageConsumer>
+                                                <Page />
+                                                <Helmet locale={locale} />
+                                            </PageConsumer>
+                                        </ResponsiveContainer>
+                                    </PageConsumer>
+                                </PageProvider>
+                            )}>
+                            </Route>
+                            <Route path="embeddable/:name" element={
+                                <SettingsConsumer>
+                                    <PreviewComponentParameterParser />
+                                </SettingsConsumer>}>
+                            </Route>
+
+                            <Route path={"preview/page/:id"} element={<PreviewPageContainer />} />
+                            <Route path={"preview/:type/:id"} element={<PreviewTypeContainer />} />
+                            <Route path=":slug" element={<SlugContainer />} />
+                            <Route path=":parent/:slug" element={<SlugContainer />} />
+                            <Route path=":year/:month/:day/:slug" element={<SlugPostContainer />} />
+                            <Route path=":parent/:year/:month/:day/:slug" element={<SlugPostContainer />} />
+                        </Routes>
                     </SettingsConsumer>
                 </SettingProvider>
             </AppContextProvider>
@@ -206,12 +197,14 @@ const IntlRoutes = () => {
     );
 };
 
+const TrackedRoutes = withTracker(IntlRoutes);
+
 
 const router = createBrowserRouter(
     createRoutesFromElements(
         <Route>
-            <Route path="/:lan/*" element={<IntlRoutes />} />
-            <Route path={"/"} element={<IntlRoutes />} />
+            <Route path="/:lan/*" element={<TrackedRoutes />} />
+            <Route path={"/"} element={<TrackedRoutes />} />
         </Route>
     )
 )
