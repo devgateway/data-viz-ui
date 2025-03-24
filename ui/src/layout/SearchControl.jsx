@@ -252,6 +252,7 @@ const SearchControl = ({ onSearch, perPage, loading, results, meta, intl }) => {
       results={results}
       showNoResults={false}
       intl={intl}
+      searchTerm={searchTerm}
     />
   );
 };
