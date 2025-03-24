@@ -15,7 +15,7 @@ export function transformDataToAppObject(data, appName, existingObject = {}) {
     return existingObject;
   }
   existingObject[appName] = {};
-  data.forEach((item) => {
+  data?.forEach((item) => {
     const key = item.value;
     existingObject[appName][key] = {
       selected: false,
@@ -69,7 +69,7 @@ export function updateMeasureLabels(data, measures, app) {
   const apiMeasures = getTranslatedOptions(data);
   // for each api measure, find the corresponding measure in the measures array
   // and add a label property to the measure in the measures array
-  apiMeasures.forEach((apiMeasure) => {
+  apiMeasures?.forEach((apiMeasure) => {
     const measure = measures[app][apiMeasure.value];
     if (measure) {
       measure.label = apiMeasure.label;

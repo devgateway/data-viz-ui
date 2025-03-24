@@ -338,9 +338,11 @@ useEffect(() => {
       const matchedCategories = categories.filter((a) => a.type === dimType);
       labels = matchedCategories[0]?.items?.map((item) => item.value) || [];
     } else {
-      updateMeasureLabels(allMeasures, measures, app);
-      const selectedMeasures = getSelectedItemsForApp(measures, app);
-      labels = _.isEmpty(selectedMeasures) ? [] : getSelectedLabelsForApp(selectedMeasures);
+      if(allMeasures && measures) {
+        updateMeasureLabels(allMeasures, measures, app);
+        const selectedMeasures = getSelectedItemsForApp(measures, app);
+        labels = _.isEmpty(selectedMeasures) ? [] : getSelectedLabelsForApp(selectedMeasures);
+      }
     }
   }
   setXAxisLabels(labels);
