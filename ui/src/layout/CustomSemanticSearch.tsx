@@ -38,27 +38,36 @@ const ResultRenderer = injectIntl(({
     link,
     terms,
     subtype,
+    searchTerm,
     bread_crumbs = [],
     intl: { locale }
 }) => {
     const target = parent_link ? utils.replaceLink(parent_link, locale) + `#${slug}` : utils.replaceLink(link, locale)
     // target = metadata?.redirect_url ? redirect_url + `#${slug}` : target
 
+    const boldSearchTerm = (text) => {
+        if (!searchTerm) return text;
+        const regex = new RegExp(`(${searchTerm})`, 'gi');
+        return text.replace(regex, '<strong>$1</strong>');
+    }
+
+    const boldedTitle = boldSearchTerm(String(title));
+    const boldedExtract = boldSearchTerm(extract);
 
     return (
         <div className="search-results-wrapper searching-results" style={{ display: 'flex', flexDirection: 'column' }}>
             <div className={"has-standard-12-font-size"} onClick={e => document.location.href = target}>
                 <h5 className="breadcrumbs-search">{Array.isArray(bread_crumbs) && bread_crumbs.length > 0 ? bread_crumbs.join(' / ') : ''}</h5>
-                <div className={"has-standard-14-font-size"}><h4 className="search-title">{String(title)}</h4></div>
+                <div className={"has-standard-14-font-size"}><h4 className="search-title" dangerouslySetInnerHTML={{ __html: boldedTitle }} /></div>
                 <div className='has-standard-12-font-size search-content'
-                    dangerouslySetInnerHTML={{ __html: utils.replaceHTMLinks(extract, locale) }} />
+                    dangerouslySetInnerHTML={{ __html: utils.replaceHTMLinks(boldedExtract, locale) }} />
             </div>
         </div>
     )
 })
 
 const CustomSearch = (props) => {
-    const { results, resultRenderer, onSearchChange, value, showNoResults, onResultSelect, loading, placeholder, perPage, total } = props;
+    const { results, resultRenderer, onSearchChange, value, showNoResults, onResultSelect, loading, placeholder, perPage, total, searchTerm } = props;
     const intl = useIntl()
     const [searchClasses, setSearchClasses] = React.useState('');
     const [focus, setFocus] = React.useState(false);
@@ -101,16 +110,18 @@ const CustomSearch = (props) => {
             return renderHeader();
         }
 
+        console.log("res", res);
+
         return (
             <React.Fragment>
-                <ResultRenderer {...res} />
+                <ResultRenderer {...res} searchTerm={searchTerm} />
             </React.Fragment>
         );
     };
 
-    const renderSearchInput = (htmlInputProps) => {
+    const renderSearchInput = (htmlInputProps?: any) => {
         // Assuming there is an existing renderSearchInput logic
-        return <Input {...htmlInputProps} />;
+        return <Input icon="search" placeholder={placeholder} {...htmlInputProps} />;
     };
 
     const handleBlur = (e, data) => {
@@ -165,7 +176,6 @@ const CustomSearch = (props) => {
 
             <Search
                 {...rest}
-                as={Input}
                 className={classes}
                 onBlur={handleBlur}
                 size="mini"
@@ -176,7 +186,7 @@ const CustomSearch = (props) => {
                 resultRenderer={(res) => renderResults(res)}
                 onSearchChange={onSearchChange}
                 results={augmentedResults}
-                input={renderSearchInput(htmlInputProps)}
+                input={renderSearchInput()}
                 value={value}
                 showNoResults={showNoResults}
                 onResultSelect={onResultSelect}
