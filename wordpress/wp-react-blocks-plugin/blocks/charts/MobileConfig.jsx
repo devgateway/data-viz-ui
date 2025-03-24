@@ -342,6 +342,8 @@ useEffect(() => {
         updateMeasureLabels(allMeasures, measures, app);
         const selectedMeasures = getSelectedItemsForApp(measures, app);
         labels = _.isEmpty(selectedMeasures) ? [] : getSelectedLabelsForApp(selectedMeasures);
+      } else {
+        labels = [];
       }
     }
   }
