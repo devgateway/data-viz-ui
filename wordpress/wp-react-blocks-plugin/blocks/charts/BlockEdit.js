@@ -441,6 +441,9 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                                     </PanelRow>
                                 </PanelBody>
                                 <MobileConfig
+                                    allMeasures={this.state.measures}
+                                    allDimensions={this.state.dimensions}
+                                    allCategories={this.state.categories}
                                     attributes={this.props.attributes}
                                     setAttributes={setAttributes}>
                                 </MobileConfig>

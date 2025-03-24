@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import {
   AnglePickerControl,
   PanelBody,
@@ -6,11 +7,13 @@ import {
   RangeControl,
 } from "@wordpress/components";
 import { __ } from "@wordpress/i18n";
-import { useEffect } from "react";
+import { useEffect, useState} from "react";
 import {
   extractAxisValues,
+  getStoredOrSetItem,
+  getSelectedItemsForApp,
   getSelectedLabelsForApp,
-  updateMeasureLabels,
+  updateMeasureLabels
 } from "../commons/MobileConfigUtils";
 
 const MarginSection = ({
@@ -295,7 +298,12 @@ const MobileConfig = (props) => {
       yAxisTickValues,
       xAxisTickValues,
     },
+    allMeasures,
+    allCategories,
+    allDimensions,
   } = props;
+
+  const [xAxisLabels, setXAxisLabels] = useState([]);
 
   useEffect(() => {
     if (!mobileCustomization.yAxisIntervalUserModified) {
@@ -316,47 +324,28 @@ const MobileConfig = (props) => {
     }
   }, [yAxisTickValues, xAxisTickValues]);
 
-  let xAxisLabels = extractAxisValues(csv);
-  if (app !== "csv") {
+useEffect(() => {
+  let labels = [];
+  const categoryKey = `_categories_${app}`;
+  if (app === "csv") {
+    labels = extractAxisValues(csv);
+  } else {
     if (dimension1 !== "none") {
-      const storedCategories = JSON.parse(
-        sessionStorage.getItem(`categories_${app}`)
-      );
-      const categories =
-        storedCategories ??
-        fetch(`/api/${app}/categories`)
-          .then((response) => response.json())
-          .then((data) => getTranslatedOptions(data));
-      xAxisLabels =
-        categories
-          .filter(
-            (category) =>
-              category.type?.toLowerCase() === dimension1?.toLowerCase()
-          )[0]
-          ?.items?.map((item) => item.value) ??
-        categories
-          .filter((category) =>
-            dimension1?.toLowerCase().includes(category?.type?.toLowerCase())
-          )[0]
-          ?.items?.map((item) => item.value);
+      const dimensionKey = `_dimensions_${app}`;
+      const dimensions = getStoredOrSetItem(dimensionKey, allDimensions, true);
+      const categories = getStoredOrSetItem(categoryKey, allCategories, true);
+      const dimType = dimensions.filter((dim) => dim.value === dimension1)?.[0]?.type;
+      const matchedCategories = categories.filter((a) => a.type === dimType);
+      labels = matchedCategories[0]?.items?.map((item) => item.value) || [];
     } else {
-      const storedMeasures = JSON.parse(
-        sessionStorage.getItem(`measures_${app}`)
-      );
-      // if measures are not present in session storage, fetch them from the API
-      if (!storedMeasures) {
-        fetch(`/api/${app}/measures`)
-          .then((response) => response.json())
-          .then((data) => {
-            sessionStorage.setItem(`measures_${app}`, JSON.stringify(data));
-            updateMeasureLabels(data, measures, app);
-          });
-      } else {
-        updateMeasureLabels(storedMeasures, measures, app);
-      }
-      xAxisLabels = getSelectedLabelsForApp(measures, app);
+      updateMeasureLabels(allMeasures, measures, app);
+      const selectedMeasures = getSelectedItemsForApp(measures, app);
+      labels = _.isEmpty(selectedMeasures) ? [] : getSelectedLabelsForApp(selectedMeasures);
     }
   }
+  setXAxisLabels(labels);
+}, [app, dimension1, csv, allDimensions, allCategories, allMeasures, measures]);
+
 
   const onXAxisLabelChange = (label, value) => {
     const newObject = Object.assign({}, mobileCustomization);
