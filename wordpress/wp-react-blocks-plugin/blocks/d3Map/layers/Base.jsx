@@ -67,7 +67,7 @@ const Base = (props) => {
 
     const onChangeProperty = (atrr, value) => {
 
-        debugger
+
         console.log("change attribute " + atrr + " to " + value)
 
         const newLayer = {...layer}
@@ -320,7 +320,7 @@ class LayerWithMetadata extends BlockEditWithAPIMetadata {
 
     componentDidMount() {
         const {layer: {name, type, file, app, dvzProxyDatasetId}} = this.props
-        debugger;
+
 
         fetch(`/api/registry/eureka/apps`, {
             headers: {
@@ -353,7 +353,7 @@ class LayerWithMetadata extends BlockEditWithAPIMetadata {
         super.componentDidUpdate(prevProps, prevState, snapshot)
         const {layer: {app, dvzProxyDatasetId}} = this.props
         const {layer: {app: prevAPP, dvzProxyDatasetId: prevDvzProxyDatasetId}} = prevProps
-        debugger;
+
         if (app != prevAPP) { //if app changes we shoudl reload metadta
 
 
