@@ -7,6 +7,7 @@ import AxisConfig from './AxisConfig.jsx'
 import Labels from "./Labels.jsx"
 import Format from "./Format.jsx"
 import Papa from 'papaparse'
+import Sort from "./Sort.jsx"
 
 
 const LineOptions = (props) => {
@@ -84,6 +85,10 @@ const LineOptions = (props) => {
                 checked={groupMode === "grouped"}
                 onChange={() => setAttributes({groupMode: (groupMode === "grouped" ? "stacked" : "grouped")})}/>
         </PanelRow>
+        {app !== "csv" && <Sort {...props} options = {[{label: __('Default', "dg"), value: 'default'}, 
+        {label: __('Alphabetically ', "dg"), value: 'alphabetically'}, 
+                {label: __('By Date ', "dg"), value: 'date'}]}
+        ></Sort>}
         <PanelRow>
             <ToggleControl
                 label={__("Show Line Points")}
