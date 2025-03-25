@@ -297,6 +297,11 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
                     }, () => {
 
                         const {app, dvzProxyDatasetId} = this.props.attributes;
+
+                        if (isSupersetAPI(app, this.state.apps)) {
+                            this.loadDatasets(app)
+                        }
+
                         if (app && app != 'none') {
                             this.loadMetadata(app, dvzProxyDatasetId);
                         }

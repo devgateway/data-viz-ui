@@ -24,7 +24,7 @@ class BlockEdit extends BlockEditWithAPIMetadata {
 
         
 
-        const iframeStyles = {height: '65px'}
+        const iframeStyles = {height: '30px'}
 
         return ([isSelected && (<InspectorControls>
                 <Panel header={__("Filter Reset Configuration")}>

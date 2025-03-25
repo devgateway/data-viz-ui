@@ -17,7 +17,7 @@ const Sort = (props) => {
                     setAttributes({sort})
 
                 }}
-                options={[{label: __('Default', "dg"), value: 'default'}, {
+                options={props.options || [{label: __('Default', "dg"), value: 'default'}, {
                     label: __('Alphabetically ', "dg"),
                     value: 'alphabetically'
 

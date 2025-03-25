@@ -249,7 +249,6 @@ class DataLayer extends BaseLayer {
 
 
         if (file != "none") {
-            debugger; // eslint-disable-line no-debugger
             this.loadJSON(file).then(json => {
                 const features = json.features.map(d => {
                     const joinValue = d.properties[featureJoinAttribute]
