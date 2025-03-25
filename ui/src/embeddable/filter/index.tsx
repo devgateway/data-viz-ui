@@ -147,6 +147,8 @@ const ListFilterDropDown = connect(mapStateToProps, mapActionCreators)((props: L
         autoApply
     } = props
 
+
+
     const [searchFilter, setSearchFilter] = useState("")
     const changeFilter = (value) => {
 
@@ -230,6 +232,9 @@ const ListFilterDropDown = connect(mapStateToProps, mapActionCreators)((props: L
         }
 
     }, [])
+
+
+
 
     const getSelected = () => {
         if (filterType == FILTER_TYPE_SINGLE_SELECT) {
@@ -409,7 +414,10 @@ const RangeFilterDropDown = connect(mapStateToProps, mapActionCreators)(({
 
 const CategoryFilter = (props) => {
     const { data, type, showNoDataOption } = props
+
+
     const cat = data.filter(d => d.type === type)[0]
+
     const filteredCategories = cat ? cat.items.filter(f => {
         if (!showNoDataOption && f.code == NO_DATA) {
             return false
@@ -420,10 +428,14 @@ const CategoryFilter = (props) => {
         return true
     }) : []
     const options = filteredCategories ? toOptions(filteredCategories, props.locale) : []
+    const placeholder=data.find(d=>d.type='FilterDefinition').items.find(i=>i.fieldType==type)
+        const value=placeholder?placeholder.value:'Filter'
+
+
 
     return (
         <Container fluid={true} className={`filter`}>
-            <FilterDropDown {...props} options={options}></FilterDropDown>
+            <FilterDropDown  {...props} options={options}  placeholder={props.placeholder?props.placeholder:placeholder}></FilterDropDown>
         </Container>
     )
 }
@@ -568,7 +580,8 @@ const Filter = ({
                                 noneLabel={noneLabel}
                                 isRange={booleanParameter(isRange)}
                                 app={app} group={group}
-                                icon={icon} placeholder={placeholder}
+                                icon={icon}
+                                placeholder={placeholder}
                                 param={param}
                                 alphabeticalSort={alphabeticalSort}
                                 ascOrder={ascOrder}

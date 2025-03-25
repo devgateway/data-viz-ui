@@ -12,6 +12,9 @@ const LOAD_CATEGORIES_ERROR = 'LOAD_CATEGORIES_ERROR'
 
 const SET_FILTER = 'SET_FILTER'
 const SET_INITIAL_FILTER = 'SET_INITIAL_FILTER'
+
+const SET_APPLY = 'SET_APPLY'
+
 const CLEAN_FILTER = 'CLEAN_FILTER'
 const initialState = Immutable.Map({mode: 'info'})
 
@@ -35,8 +38,7 @@ export const setMeasures = ({app, group, mGroup}) => (dispatch, getState) => {
     dispatch({type: SET_MEASURES, app, group, measure: newMgroup})
 }
 export const setFilter = ({app, group, param, value, autoApply}) => (dispatch, getState) => {
-
-    dispatch({type: SET_FILTER, app, group, param, value,autoApply})
+    dispatch({type: SET_FILTER, app, group, param, value, autoApply})
 }
 export const cleanFilter = ({app, group}) => (dispatch, getState) => {
 
@@ -45,7 +47,7 @@ export const cleanFilter = ({app, group}) => (dispatch, getState) => {
 }
 
 export const applyFilter = ({app, group}) => (dispatch, getState) => {
-    alert('test')
+     dispatch({type: SET_APPLY, app, group})
 }
 export const setInitialFilters = ({app, group, param, value}) => (dispatch, getState) => {
     dispatch({type: SET_INITIAL_FILTER, app, group, param, value})
@@ -55,14 +57,20 @@ export const getCategories = (props) => (dispatch, getState) => {
     const {app, params} = props
     dispatch({type: LOAD_CATEGORIES, params, app, dvzProxyDatasetId: params.dvzProxyDatasetId})
     api.getCategories({app, params})
-      .then(data => {              
-          data.appliedFilters = params
-          return dispatch({type: LOAD_CATEGORIES_DONE, app, data, dvzProxyDatasetId: params.dvzProxyDatasetId})
-      })
-      .catch(error => dispatch({type: LOAD_CATEGORIES_ERROR, app, error, dvzProxyDatasetId: params.dvzProxyDatasetId}))
+        .then(data => {
+            data.appliedFilters = params
+            return dispatch({type: LOAD_CATEGORIES_DONE, app, data, dvzProxyDatasetId: params.dvzProxyDatasetId})
+        })
+        .catch(error => dispatch({
+            type: LOAD_CATEGORIES_ERROR,
+            app,
+            error,
+            dvzProxyDatasetId: params.dvzProxyDatasetId
+        }))
 }
 
 export const setData = ({app, group, csv, store, params}) => (dispatch, getState) => {
+
     const filters = getState().get('data').getIn(['filters', app, group])
     if (filters) {
         params = {...params, ...filters.toJS()}
@@ -85,7 +93,7 @@ export const setData = ({app, group, csv, store, params}) => (dispatch, getState
     })
 
     const d2 = {...data, data: filtered, appliedFilters: params}
-    dispatch({type: LOAD_DATA_DONE, store, data: {count: d2.data.length, itemsSize: d2.data.length, ...d2}})
+    dispatch({type: LOAD_DATA_DONE, app, group, store, data: {count: d2.data.length, itemsSize: d2.data.length, ...d2}})
 }
 export const getData = ({app, group, source, store, params}) => (dispatch, getState) => {
     const filters = getState().get('data').getIn(['filters', app, group])
@@ -93,14 +101,13 @@ export const getData = ({app, group, source, store, params}) => (dispatch, getSt
     if (filters) {
         params = {...params, ...filters.toJS()}
     }
-    dispatch({type: LOAD_DATA, params, store})
+    dispatch({type: LOAD_DATA,app,group, params, store})
     api.getData({app, source, params})
         .then(data => {
             data.appliedFilters = params
-            debugger; // eslint-disable-line no-debugger
-            return dispatch({type: LOAD_DATA_DONE, store, data})
+            return dispatch({type: LOAD_DATA_DONE,app,group, store, data})
         })
-        .catch(error => dispatch({type: LOAD_DATA_ERROR, store, error}))
+        .catch(error => dispatch({type: LOAD_DATA_ERROR,app,group, store, error}))
 
 }
 
@@ -108,24 +115,27 @@ export default (state = initialState, action) => {
 
     switch (action.type) {
         case LOAD_DATA: {
-            const {store} = action
-            const time=Date.now()
+            const {store, app, group} = action
+            const time = Date.now()
             return state.deleteIn([...store, 'error'])
                 .setIn([...store, 'loading'], true)
                 .setIn([...store, 'time'], time)
+
         }
         case LOAD_DATA_ERROR: {
-            const {error, store} = action
+            const {error, store, app, group} = action
             return state
                 .setIn([...store, 'loading'], false)
                 .setIn([...store, 'error'], error)
+                .setIn(['filters-settings', app, group, "apply"], null)
         }
         case LOAD_DATA_DONE: {
-            const {data, store} = action
+            const {data, app, group, store} = action
             return state
                 .setIn([...store, 'loading'], false)
                 .deleteIn([...store, 'error'])
                 .setIn([...store, 'data'], data)
+                .setIn(['filters-settings', app, group, "apply"], null)
         }
 
 
@@ -148,27 +158,34 @@ export default (state = initialState, action) => {
             if (dvzProxyDatasetId) {
                 path.push(dvzProxyDatasetId)
             }
-            
+
             return state.setIn([...path, "loading"], false)
-                    .setIn([...path, "items"], Immutable.fromJS(data))            
+                .setIn([...path, "items"], Immutable.fromJS(data))
         }
         case LOAD_CATEGORIES_ERROR: {
-             const {data, app, dvzProxyDatasetId} = action
+            const {data, app, dvzProxyDatasetId} = action
             const path = ["categories", app]
 
             if (dvzProxyDatasetId) {
                 path.push(dvzProxyDatasetId)
             }
-            
+
             return state.setIn([...path, "loading"], false)
                 .setIn([...path, "error"], data)
-          
+
+
         }
+        case SET_APPLY: {
+            const {app, group} = action
+            debugger // eslint-disable-line
+            return state.setIn(['filters-settings', app, group, "apply"], new Date().getTime())
+        }
+
         case SET_FILTER: {
-            const {app, group, param, value,autoApply} = action
-            
-            return  state.setIn(['filters-settings', app, group, "autoApply"],autoApply)
+            const {app, group, param, value, autoApply} = action
+            return state.setIn(['filters-settings', app, group, "autoApply"], autoApply)
                 .setIn(['filters', app, group, param], value.length === 0 ? [Number.MIN_SAFE_INTEGER] : value)
+                .setIn(['filters-settings', app, group, "apply"],null)
         }
 
         case SET_INITIAL_FILTER: {

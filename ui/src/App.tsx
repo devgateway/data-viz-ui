@@ -30,6 +30,8 @@ import SlugContainer from './layout/containers/SlugContainer';
 import SlugPostContainer from './layout/containers/SlugPostContainer';
 import withTracker from './withTracker';
 
+
+
 const messages = {
     'en': messages_en,
     'fr' : messages_fr,
@@ -99,6 +101,7 @@ const IntlRoutes = () => {
 
     useEffect(() => {
         if (process.env) {
+
             console.log("----------.env-----------");
             console.log(process.env);
             console.log("----------.env-----------");
