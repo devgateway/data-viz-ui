@@ -25,7 +25,7 @@ class DataProvider extends React.Component {
             if (editing) {
                 // params.v = (Math.random() + 1).toString(36).substring(7)
             }
-            debugger; // eslint-disable-line no-debugger
+
             this.setState({showLoading: false})
             this.props.onLoadData({app, source, store, params, group})
             setTimeout(this.checkLoadingTime, 100);
@@ -35,14 +35,15 @@ class DataProvider extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        const {app, filters, source, store, params, csv, group, autoApply, editing} = this.props
+        const {app, filters, apply, source, store, params, csv, group, autoApply, editing} = this.props
 
-        if (filters != prevProps.filters && filters != null && JSON.stringify(filters) != JSON.stringify(prevProps.filters) && autoApply == false) {
-            //silence is golden
+        let doApply = false
 
-        } else {
+        if (apply !== undefined  && apply !== null && apply !=prevState.apply) {
+            doApply = true;
+        }
 
-
+        if (autoApply!==false) {
             if (filters != prevProps.filters || JSON.stringify(params) != JSON.stringify(prevProps.params)
                 || app != prevProps.app
                 || prevProps.source != source
@@ -57,8 +58,15 @@ class DataProvider extends React.Component {
                     this.props.onLoadData({app, source, store, params, group})
                     setTimeout(this.checkLoadingTime, 100);
                 }
+
             }
+
+        } else if (doApply) {
+
+            this.props.onLoadData({app, source, store, params, group})
         }
+
+
     }
 
 
@@ -110,10 +118,13 @@ class DataProvider extends React.Component {
 const mapStateToProps = (state, ownProps) => {
     const {store, group, app} = ownProps
 
+
+
     return {
         data: state.getIn(['data', ...store, 'data']),
         filters: state.getIn(['data', 'filters', app, group]),
         autoApply: state.getIn(['data', 'filters-settings', app, group, "autoApply"]),
+        apply: state.getIn(['data', 'filters-settings', app, group, "apply"]),
         error: state.getIn(['data', ...store, 'error']),
         loading: state.getIn(['data', ...store, 'loading']),
         time: state.getIn(['data', ...store, 'time']),
