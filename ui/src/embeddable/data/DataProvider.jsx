@@ -87,7 +87,7 @@ class DataProvider extends React.Component {
     render() {
         const {data, style, loading, time, error, editing} = this.props
 
-        if ((loading && this.state.showLoading && !editing) || true) {
+        if ((loading && this.state.showLoading && !editing)) {
             return (<Container style={style} className={"loading"}>
                 <Segment basic={true} padded={true} textAlign={"center"} style={{margin: '30px', ...style}}>
                     <Dimmer active inverted>
