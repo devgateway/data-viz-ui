@@ -6,11 +6,11 @@ import { Icon } from "semantic-ui-react";
 import { IntlProvider, injectIntl } from "react-intl";
 
 // Utility function to highlight search terms
-const highlightSearchTerm = (text, term) => {
-  if (!term || !text) return text;
-  const regex = new RegExp(`(${term})`, "gi");
-  return text.replace(regex, "<b>$1</b>");
-};
+const boldSearchTerm = (text, searchTerm) => {
+  if (!searchTerm) return text;
+  const regex = new RegExp(`(${searchTerm})`, 'gi');
+  return text.replace(regex, '<strong>$1</strong>');
+}
 
 // ResultRenderer component with highlighting
 const ResultRenderer = injectIntl(({
@@ -34,6 +34,13 @@ const ResultRenderer = injectIntl(({
     ? utils.replaceLink(parent_link, locale) + `#${slug}`
     : utils.replaceLink(link, locale);
   target = redirect_url ? redirect_url + `#${slug}` : target;
+  
+
+ 
+
+  const boldedTitle = boldSearchTerm(String(title), searchTerm);
+  const boldedExtract = boldSearchTerm(extract, searchTerm);
+
 
   return (
     <div
@@ -49,7 +56,7 @@ const ResultRenderer = injectIntl(({
           dangerouslySetInnerHTML={{
             __html:
               bread_crumbs && bread_crumbs.length > 0
-                ? highlightSearchTerm(bread_crumbs.join(" / "), searchTerm)
+                ? boldSearchTerm(bread_crumbs.join(" / "), searchTerm)
                 : "",
           }}
         />
@@ -57,17 +64,14 @@ const ResultRenderer = injectIntl(({
           <h4
             className="search-title"
             dangerouslySetInnerHTML={{
-              __html: highlightSearchTerm(title, searchTerm),
+              __html: boldedTitle
             }}
           />
         </div>
         <div
           className="search-content"
           dangerouslySetInnerHTML={{
-            __html: utils.replaceHTMLinks(
-              highlightSearchTerm(extract, searchTerm),
-              locale
-            ),
+            __html:  utils.replaceHTMLinks(boldedExtract, locale)
           }}
         />
       </div>
@@ -137,7 +141,7 @@ const FloatingSearchController = ({
   meta,
   locale,
   intl,
-  search, // Added search from SearchConsumer
+  searchTerm, // Added search from SearchConsumer
 }) => {
   const [showSearchInput, setShowSearchInput] = useState(false);
   const containerRef = useRef(null);
@@ -195,6 +199,7 @@ const FloatingSearchController = ({
                   results={results}
                   meta={meta}
                   intl={intl}
+                  searchTerm={searchTerm}
                 />
               </div>
               {results && results.length > 0 && (
@@ -204,7 +209,7 @@ const FloatingSearchController = ({
                     meta={meta}
                     perPage={perPage}
                     intl={intl}
-                    searchTerm={search} // Pass search term
+                    searchTerm={searchTerm} // Pass search term
                   />
                 </IntlProvider>
               )}
@@ -279,6 +284,7 @@ const SearchComponent = injectIntl((props) => {
         onSearch={setQuery}
         perPage={5}
         {...props}
+        searchTerm={query}
       />
     ) : (
       <SearchControl

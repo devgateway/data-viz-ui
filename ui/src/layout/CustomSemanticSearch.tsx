@@ -11,20 +11,12 @@ import { injectIntl, useIntl } from "react-intl";
 import { utils } from "@devgateway/wp-react-lib";
 
 
-// type SearchProps = typeof Search;
-
-// type ExtendedSearchProps = SearchProps & React.HTMLProps<HTMLInputElement>;
-
-// interface CustomSearchProps extends ExtendedSearchProps {
-//     resultRenderer : React.ComponentType<any> | React.ReactNode | JSX.Element;
-//     onSearchChange : (event: React.SyntheticEvent, data: any) => void;
-//     value : string;
-//     showNoResults : boolean;
-//     onResultSelect : (event: React.SyntheticEvent, data: any) => void;
-//     loading : boolean;
-//     perPage : number;
-//     total : number;
-// }
+const boldSearchTerm = (text, searchTerm) => {
+    if (!searchTerm) return text;
+    const regex = new RegExp(`(${searchTerm})`, 'gi');
+    return text.replace(regex, '<strong>$1</strong>');
+}
+  
 
 const ResultRenderer = injectIntl(({
     ID,
@@ -39,25 +31,24 @@ const ResultRenderer = injectIntl(({
     terms,
     subtype,
     searchTerm,
+    metadata,
     bread_crumbs = [],
     intl: { locale }
 }) => {
-    const target = parent_link ? utils.replaceLink(parent_link, locale) + `#${slug}` : utils.replaceLink(link, locale)
-    // target = metadata?.redirect_url ? redirect_url + `#${slug}` : target
+    let target = parent_link ? utils.replaceLink(parent_link, locale) + `#${slug}` : utils.replaceLink(link, locale);
+    // @ts-ignore
+    target = metadata?.redirect_url ? metadata?.redirect_url + `#${slug}` : target
 
-    const boldSearchTerm = (text) => {
-        if (!searchTerm) return text;
-        const regex = new RegExp(`(${searchTerm})`, 'gi');
-        return text.replace(regex, '<strong>$1</strong>');
-    }
 
-    const boldedTitle = boldSearchTerm(String(title));
-    const boldedExtract = boldSearchTerm(extract);
+    const boldedTitle = boldSearchTerm(String(title), searchTerm);
+    const boldedExtract = boldSearchTerm(extract, searchTerm);
 
     return (
         <div className="search-results-wrapper searching-results" style={{ display: 'flex', flexDirection: 'column' }}>
             <div className={"has-standard-12-font-size"} onClick={e => document.location.href = target}>
-                <h5 className="breadcrumbs-search">{Array.isArray(bread_crumbs) && bread_crumbs.length > 0 ? bread_crumbs.join(' / ') : ''}</h5>
+                <h5 className="breadcrumbs-search"
+                    dangerouslySetInnerHTML={{ __html: Array.isArray(bread_crumbs) && bread_crumbs.length > 0 ? boldSearchTerm(bread_crumbs.join(' / '), searchTerm) : '' }}
+                />
                 <div className={"has-standard-14-font-size"}><h4 className="search-title" dangerouslySetInnerHTML={{ __html: boldedTitle }} /></div>
                 <div className='has-standard-12-font-size search-content'
                     dangerouslySetInnerHTML={{ __html: utils.replaceHTMLinks(boldedExtract, locale) }} />
