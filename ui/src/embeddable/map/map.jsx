@@ -8,6 +8,7 @@ import {
   Dimmer,
   Loader,
   Segment,
+  Message
 } from "semantic-ui-react";
 import React from "react";
 import * as topojson from "topojson-client";
@@ -1870,6 +1871,18 @@ componentWillUnmount() {
     );
   }
 
+  noMapSelected(){
+    return (
+      <Message icon warning>
+        <Icon name="map outline" />
+        <Message.Content>
+          <Message.Header>No map selected</Message.Header>
+          Pick one from the list in the <strong>Map Layers</strong> section.
+        </Message.Content>
+      </Message>
+    );
+  };
+
   render() {
     let {
       app,
@@ -1982,7 +1995,7 @@ componentWillUnmount() {
 
     return (
       <div className="map component wp-data-viz-map" ref={this.mapContainer}>
-        {this.state.layersLoading && this.renderLoader()}
+        {this.state.layersLoading && this.noMapSelected()}
         {!this.state.layersLoading && (
           <>
            { !isMobileOrTablet && <MapLegendComponent />}
