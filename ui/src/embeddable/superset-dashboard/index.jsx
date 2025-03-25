@@ -1,6 +1,4 @@
 import React from 'react';
-import { embedDashboard } from "@superset-ui/embedded-sdk";
-import { injectIntl, FormattedMessage } from "react-intl";
 import {connect} from "react-redux";
 
 import { SettingProvider } from '@devgateway/wp-react-lib';
