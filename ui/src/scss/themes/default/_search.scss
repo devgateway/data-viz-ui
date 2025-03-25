@@ -47,6 +47,14 @@
     padding: 4px 8px 0px 19px;
   }
 
+  .ui.search input.prompt {
+    border-radius: 3px;
+  }
+
+  .ui.icon.input>input {
+    border-radius: 3px;
+  }
+
   .has-standard-12-font-size,
   .has-standard-12-font-size {
     color: #9e9e9e;
@@ -76,11 +84,18 @@
     color: #003a5b;
     font-weight: 700;
   }
-  
+
   .search-content {
     color: #666666;
+    font-size: 12px;
+    padding-top: 8px !important;
+    padding-bottom: 16px !important;
+
+    strong {
+      color: #003a5b;
+    }
   }
-  
+
   .results.transition.visible {
     transform: translateX(-12.3em) !important;
     margin-top: 0;
@@ -109,4 +124,3 @@
 .ui.segment {
   box-shadow: none;
 }
-
