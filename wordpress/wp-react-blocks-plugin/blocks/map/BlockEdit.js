@@ -49,12 +49,17 @@ class BlockEdit extends BlockEditWithAPIMetadata {
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        const {attributes: {fileType}} = this.props;
+        const {attributes: {fileType, mapFile}} = this.props;
         super.componentDidUpdate(prevProps, prevState, snapshot)
         if (prevProps.attributes) {
             if (fileType != prevProps.attributes.fileType) {
                 this.getMapFiles()
             }
+        }
+        if(mapFile !== prevProps.attributes.mapFile) {
+            this.setState({
+                mapFile: mapFile
+            })
         }
     }
 
@@ -335,6 +340,7 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                 mapCenter,
                 enabledLayers,
                 mapType,
+                mapFile,
                 aggregationFormula,
                 zoomLevelToShowPoints,
                 defaultPointColor,
@@ -477,6 +483,18 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                         </PanelBody>
 
                 </PanelBody>
+                <PanelBody>
+                    <PanelRow>
+                        <TextControl
+                            label={__("Map File")}
+                            value={ this.state?.mapFile ?? mapFile}
+                            onChange={(value) => {
+                                setAttributes({ mapFile: value })
+                            }}
+                            disabled={false}
+                        />
+                    </PanelRow>
+                </PanelBody>
                 {app != 'csv' &&
                     <APIConfig
                         allDimensions={this.state.dimensions || []}
@@ -579,7 +597,7 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                     toggleSelection(false);
                 }}>
 
-                <div>
+                <div key={this.props.attributes.mapFile}>
                     {this.state.react_ui_url && <iframe ref={this.iframe} scrolling={"no"}
                         style={divStyles}
                         src={this.state.react_ui_url + "/embeddable/map?"} />}
