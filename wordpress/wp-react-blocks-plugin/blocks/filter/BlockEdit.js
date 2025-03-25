@@ -143,7 +143,7 @@ class BlockEdit extends BlockEditWithAPIMetadata {
 
                                           })
                                                 this.setState({dimensions: [], measures: [], filters: [], categories: []})                                              
-                                                this.loadMetadataForSuperset(app, newDatasetId)
+                                              //  this.loadMetadataForSuperset(app, newDatasetId)
                                             }}
                                             options={datasets}
                                         />
