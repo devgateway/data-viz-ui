@@ -8,9 +8,22 @@ const alphaSort = (reverse, locale, a, b) => {
     sensitivity: "variant",
   }).compare(reverse ? b : a, reverse ? a : b);
 };
+
 const numericSort = (reverse, a, b) => {
   return reverse ? b - a : a - b;
 };
+
+const dateSort = (reverse, a, b) => {
+  let aDate = Date.parse(a);
+  let bDate = Date.parse(b);
+ 
+  if (!isNaN(aDate) && !isNaN(bDate)) {
+      return reverse ? bDate - aDate : aDate - bDate;
+  }
+
+  return 0;
+}
+
 
 const getOptionsNoDimension = (props) => {
   const { data, measures, swap, dimensions, locale, customLabels } = props;
@@ -224,20 +237,27 @@ const BarOneDimension = (props) => {
     let filtered =
       hiddenBars && series
         ? series.filter((s) => hiddenBars.indexOf(s[indexBy]) == -1)
-        : series;
+        : series;        
 
     if (props.sort == "alphabetically") {
-      filtered = filtered.sort((a, b) =>
-        alphaSort(props.sortreverse, locale, a[indexBy], b[indexBy])
-      );
+      for (let i = 0; i < filtered.length; i++) {
+        if (filtered[i].data) {
+          filtered[i].data = filtered[i].data.sort((a, b) =>
+            alphaSort(props.sortreverse, locale, a['x'], b['x'])
+          );
+        }
+      }
     }
-    if (props.sort == "values") {
-      filtered = filtered.sort((a, b) => {
-        const va = Math.max(...allKeys.map((k) => a[k]));
-        const vb = Math.max(...allKeys.map((k) => b[k]));
-        return numericSort(props.sortreverse, va, vb);
-      });
+
+    if (props.sort == "date") {
+      for (let i = 0; i < filtered.length; i++) {
+        filtered[i].data = filtered[i].data.sort((a, b) =>
+          dateSort(props.sortreverse, a['x'], b['x'])
+        );
+      }
     }
+  
+ 
     options = {
       metadata: data.metadata,
       indexBy,
