@@ -1,12 +1,23 @@
-import React, { LegacyRef, useEffect, useRef, useState } from "react";
-import { Checkbox, Container, Divider, Dropdown, DropdownProps, Icon, Input, Label, Radio, Segment } from "semantic-ui-react";
+import React, {LegacyRef, useEffect, useRef, useState} from "react";
+import {
+    Checkbox,
+    Container,
+    Divider,
+    Dropdown,
+    DropdownProps,
+    Icon,
+    Input,
+    Label,
+    Radio,
+    Segment
+} from "semantic-ui-react";
 import CategoriesConsumer from '../data/CategoriesConsumer'
 import CategoriesProvider from '../data/CategoriesProvider'
-import { connect } from "react-redux";
-import { setFilter, setInitialFilters } from "../reducers/data";
-import { injectIntl } from 'react-intl';
-import { SettingProvider } from '@devgateway/wp-react-lib';
-import { SettingsConsumer } from '@devgateway/wp-react-lib';
+import {connect} from "react-redux";
+import {setFilter, setInitialFilters} from "../reducers/data";
+import {injectIntl} from 'react-intl';
+import {SettingProvider} from '@devgateway/wp-react-lib';
+import {SettingsConsumer} from '@devgateway/wp-react-lib';
 
 const FILTER_TYPE_MULTI_SELECT = 'multi-select';
 const FILTER_TYPE_SINGLE_SELECT = 'single-select';
@@ -53,7 +64,7 @@ const parse = (value) => {
 }
 
 const mapStateToProps = (state, ownProps) => {
-    const { app, group, param } = ownProps
+    const {app, group, param} = ownProps
     return {
         current: state.getIn(['data', 'filters', app, group, param]),
     }
@@ -72,7 +83,7 @@ interface FilterDropDownProps {
 
 const FilterDropDown = (props: FilterDropDownProps) => {
 
-    const { isRange, options, alphabeticalSort, ascOrder } = props
+    const {isRange, options, alphabeticalSort, ascOrder} = props
     let sortedOptions: any [] = []
     if (booleanParameter(alphabeticalSort)) {
         sortedOptions = options.sort(function (a, b) {
@@ -90,7 +101,7 @@ const FilterDropDown = (props: FilterDropDownProps) => {
         });
     }
 
-    const filterProps = { ...props, options: sortedOptions }
+    const filterProps = {...props, options: sortedOptions}
 
     if (isRange) {
         return <RangeFilterDropDown  {...filterProps} />
@@ -148,7 +159,6 @@ const ListFilterDropDown = connect(mapStateToProps, mapActionCreators)((props: L
     } = props
 
 
-
     const [searchFilter, setSearchFilter] = useState("")
     const changeFilter = (value) => {
 
@@ -161,7 +171,7 @@ const ListFilterDropDown = connect(mapStateToProps, mapActionCreators)((props: L
             newValue = [value]
         }
 
-        onChange({ app, group, param, value: newValue,autoApply })
+        onChange({app, group, param, value: newValue, autoApply})
         if (closeOnSelect && refContainer.current) {
             refContainer.current.close();
         }
@@ -174,7 +184,7 @@ const ListFilterDropDown = connect(mapStateToProps, mapActionCreators)((props: L
             return true;
         })
 
-        onChange({ app, group, param, value: matchingItems.map(v => v.value), autoApply})
+        onChange({app, group, param, value: matchingItems.map(v => v.value), autoApply})
         if (closeOnSelect && refContainer.current) {
             refContainer.current.close()
         }
@@ -188,7 +198,7 @@ const ListFilterDropDown = connect(mapStateToProps, mapActionCreators)((props: L
             return true;
         })
 
-        onChange({ app, group, param, value: allNoneSameBehaviour ? matchingItems.map(v => v.value) : [] ,autoApply})
+        onChange({app, group, param, value: allNoneSameBehaviour ? matchingItems.map(v => v.value) : [], autoApply})
         if (closeOnSelect && refContainer.current) {
             refContainer.current.close()
         }
@@ -202,7 +212,7 @@ const ListFilterDropDown = connect(mapStateToProps, mapActionCreators)((props: L
             }
             return true;
         })
-        onChange({ app, group, param, value: matchingItems.map(v => v.value),autoApply})
+        onChange({app, group, param, value: matchingItems.map(v => v.value), autoApply})
     }
 
     useEffect(() => {
@@ -211,7 +221,7 @@ const ListFilterDropDown = connect(mapStateToProps, mapActionCreators)((props: L
             const filterItems = options.map(o => o.value)
             if (filterType == FILTER_TYPE_MULTI_SELECT || filterType == "") {
                 //if multiple select select all  elements
-                onInit({ app, group, param, value: filterItems })
+                onInit({app, group, param, value: filterItems})
             } else {
                 if (app == "csv") {
                     //if single select select base on default value criteria
@@ -223,17 +233,15 @@ const ListFilterDropDown = connect(mapStateToProps, mapActionCreators)((props: L
                     } else if (defaultValueCriteria == HIGHEST_VALUE) {
                         filterValues = filterItems.length > 0 ? [filterItems[filterItems.length - 1]] : []
                     }
-                    onInit({ app, group, param, value: filterValues })
+                    onInit({app, group, param, value: filterValues})
                 } else {
 
-                    onInit({ app, group, param, value: [filterItems[0]] })
+                    onInit({app, group, param, value: [filterItems[0]]})
                 }
             }
         }
 
     }, [])
-
-
 
 
     const getSelected = () => {
@@ -281,7 +289,7 @@ const ListFilterDropDown = connect(mapStateToProps, mapActionCreators)((props: L
                     <Segment>
                         <Dropdown.Item>
                             <Label basic onClick={all}>{allLabel}</Label> | <Label basic
-                                onClick={none}>{noneLabel}</Label>
+                                                                                   onClick={none}>{noneLabel}</Label>
                         </Dropdown.Item>
                     </Segment>
                     {enableTextSearch && <>
@@ -293,7 +301,7 @@ const ListFilterDropDown = connect(mapStateToProps, mapActionCreators)((props: L
                                     <Input placeholder='Search...'>
                                         <input className="filter-search" value={searchText} onChange={e => {
                                             freeTextSelect(e.target.value)
-                                        }} />
+                                        }}/>
 
                                         <Icon name='remove' link className="clear-icon ignore" onClick={e => {
                                             freeTextSelect('')
@@ -302,7 +310,7 @@ const ListFilterDropDown = connect(mapStateToProps, mapActionCreators)((props: L
                                 </div>
                             </Dropdown.Item>
                         </Container>
-                        <Divider />
+                        <Divider/>
                     </>}
 
                 </>}
@@ -313,16 +321,16 @@ const ListFilterDropDown = connect(mapStateToProps, mapActionCreators)((props: L
                             return o.text.toLowerCase().includes(searchText.toLowerCase())
                         }
                         return true;
-                    }).map(({ value, text }, index) => (
+                    }).map(({value, text}, index) => (
                         <Dropdown.Item key={index} className={useSingleColumn ? "dropdown-item-single-column" : ""}>
                             {filterType == FILTER_TYPE_SINGLE_SELECT && <Radio
                                 checked={current && current.indexOf(value) > -1 ? true : false}
                                 onChange={e => changeFilter(value)}
-                                label={text} />}
+                                label={text}/>}
                             {filterType == FILTER_TYPE_MULTI_SELECT && <Checkbox
                                 checked={(current && current.indexOf(value) > -1) && !(options.length == current.length && allNoneSameBehaviour) ? true : false}
                                 onChange={e => changeFilter(value)}
-                                label={text} />}
+                                label={text}/>}
                         </Dropdown.Item>))}
                 </Container>
             </Dropdown.Menu>
@@ -345,24 +353,24 @@ interface RangeFilterDropDownProps {
 }
 
 const RangeFilterDropDown = connect(mapStateToProps, mapActionCreators)(({
-    placeholder,
-    startLabel,
-    endLabel,
-    options,
-    onChange,
-    app,
-    group,
-    param,
-    current,
-    autoApply
-}: RangeFilterDropDownProps) => {
+                                                                             placeholder,
+                                                                             startLabel,
+                                                                             endLabel,
+                                                                             options,
+                                                                             onChange,
+                                                                             app,
+                                                                             group,
+                                                                             param,
+                                                                             current,
+                                                                             autoApply
+                                                                         }: RangeFilterDropDownProps) => {
 
     const [start, setStart] = useState(options[0].position)
     const [end, setEnd] = useState(options[options.length - 1].position);
 
     useEffect(() => {
         const current = options.filter(v => (v.position > start || v.position === start) && (v.position < end || v.position === end)).map(o => o.value)
-        onChange({ app, group, param, value: current ,autoApply})
+        onChange({app, group, param, value: current, autoApply})
     }, [start, end])
 
     const refContainer = useRef<DropdownProps>(null);
@@ -388,24 +396,24 @@ const RangeFilterDropDown = connect(mapStateToProps, mapActionCreators)(({
             </Segment>
             <Container>
 
-                {options.map(({ value, text, position }) => (<Dropdown.Item>
+                {options.map(({value, text, position}) => (<Dropdown.Item>
                     <Radio
                         disabled={position > end}
                         checked={start === position}
                         onChange={e => setStart(position)}
-                        label={text} /></Dropdown.Item>))}
+                        label={text}/></Dropdown.Item>))}
             </Container>
             <Segment>
                 <Dropdown.Item> <Label basic>{endLabel}</Label></Dropdown.Item>
             </Segment>
             <Container>
 
-                {options.map(({ value, text, position }) => (<Dropdown.Item>
+                {options.map(({value, text, position}) => (<Dropdown.Item>
                     <Radio
                         disabled={position < start}
                         checked={end === position}
                         onChange={e => setEnd(position)}
-                        label={text} /></Dropdown.Item>))}
+                        label={text}/></Dropdown.Item>))}
             </Container>
         </Dropdown.Menu>
     </Dropdown>)
@@ -413,7 +421,7 @@ const RangeFilterDropDown = connect(mapStateToProps, mapActionCreators)(({
 
 
 const CategoryFilter = (props) => {
-    const { data, type, showNoDataOption } = props
+    const {data, type, showNoDataOption} = props
 
 
     const cat = data.filter(d => d.type === type)[0]
@@ -428,14 +436,19 @@ const CategoryFilter = (props) => {
         return true
     }) : []
     const options = filteredCategories ? toOptions(filteredCategories, props.locale) : []
-    const placeholder=data.find(d=>d.type='FilterDefinition').items.find(i=>i.fieldType==type)
-        const value=placeholder?placeholder.value:'Filter'
 
+
+    const filterDefinitions = data.find(d => d.type = 'FilterDefinition');
+
+
+    const placeholder = filterDefinitions ? filterDefinitions.items.find(i => i.fieldType == type) : null
+    const value = placeholder ? placeholder.value : 'Filter'
 
 
     return (
         <Container fluid={true} className={`filter`}>
-            <FilterDropDown  {...props} options={options}  placeholder={props.placeholder?props.placeholder:placeholder}></FilterDropDown>
+            <FilterDropDown  {...props} options={options}
+                             placeholder={props.placeholder ? props.placeholder : value}></FilterDropDown>
         </Container>
     )
 }
@@ -456,7 +469,7 @@ const BooleanFilter = connect(mapStateToProps, mapActionCreators)((props: any) =
 })
 
 const CSVFilter = (props) => {
-    const { csvValue } = props
+    const {csvValue} = props
     let idx = 0
     const options = csvValue.split(',').map(o => {
         return {
@@ -474,45 +487,45 @@ const FilterWrapper = (props) => {
         <SettingProvider locale={props.intl.locale} changeUUID={props.unique}>
             <SettingsConsumer>
                 <Filter {...props}></Filter>
-                </SettingsConsumer>
-            </SettingProvider>
+            </SettingsConsumer>
+        </SettingProvider>
     )
 }
 
 const Filter = ({
-    "data-group": group,
-    "data-app": app,
-    "data-dvz-proxy-dataset-id": dvzProxyDatasetId,
-    "data-param": param,
-    "data-icon": icon,
-    "data-type": type,
-    "data-place-holder": placeholder,
-    "data-is-range": isRange = "false",
-    "data-all-label": allLabel,
-    "data-none-label": noneLabel,
-    "data-start-label": startLabel,
-    "data-end-label": endLabel,
-    "data-csv-value": csvValue,
-    "data-filters": filters = '[]',
-    "data-use-single-column": useSingleColumn = "false",
-    "data-enable-text-search": enableTextSearch = "false",
-    "data-filter-type": filterType,
-    "data-default-values": defaultValues,
-    "data-show-no-data-option": showNoDataOption = "true",
-    "data-default-value-criteria": defaultValueCriteria = "DEFAULT_VALUE_INPUT",
-    "data-hidden-filters": hiddenFilters = '[]',
-    "data-all-none-same-behaviour": allNoneSameBehaviour = "false",
-    "data-close-on-select": closeOnSelect = "false",
-    "data-alphabetical-sort": alphabeticalSort = "true",
-    "data-asc-order": ascOrder = "true",
-    "data-auto-apply": autoApply = "true",
-    settings,
-    intl,
-}) => {
+                    "data-group": group,
+                    "data-app": app,
+                    "data-dvz-proxy-dataset-id": dvzProxyDatasetId,
+                    "data-param": param,
+                    "data-icon": icon,
+                    "data-type": type,
+                    "data-place-holder": placeholder,
+                    "data-is-range": isRange = "false",
+                    "data-all-label": allLabel,
+                    "data-none-label": noneLabel,
+                    "data-start-label": startLabel,
+                    "data-end-label": endLabel,
+                    "data-csv-value": csvValue,
+                    "data-filters": filters = '[]',
+                    "data-use-single-column": useSingleColumn = "false",
+                    "data-enable-text-search": enableTextSearch = "false",
+                    "data-filter-type": filterType,
+                    "data-default-values": defaultValues,
+                    "data-show-no-data-option": showNoDataOption = "true",
+                    "data-default-value-criteria": defaultValueCriteria = "DEFAULT_VALUE_INPUT",
+                    "data-hidden-filters": hiddenFilters = '[]',
+                    "data-all-none-same-behaviour": allNoneSameBehaviour = "false",
+                    "data-close-on-select": closeOnSelect = "false",
+                    "data-alphabetical-sort": alphabeticalSort = "true",
+                    "data-asc-order": ascOrder = "true",
+                    "data-auto-apply": autoApply = "true",
+                    settings,
+                    intl,
+                }) => {
 
 
     const params = {}
-    const ff = filters? parse(filters) : {}
+    const ff = filters ? parse(filters) : {}
 
     if (ff && ff.forEach) {
         ff.forEach(f => {
@@ -525,7 +538,7 @@ const Filter = ({
         params["dvzProxyDatasetId"] = dvzProxyDatasetId;
     }
 
-    const hiddenFiltersArr = hiddenFilters ?  parse(hiddenFilters): []
+    const hiddenFiltersArr = hiddenFilters ? parse(hiddenFilters) : []
     let defaultFilterType;
     if (filterType == null || filterType == "") {
         defaultFilterType = isRange === 'true' ? "range" : "multi-select";
@@ -534,19 +547,19 @@ const Filter = ({
     }
     if (app === 'csv') {
         return <CSVFilter allLabel={allLabel} noneLabel={noneLabel}
-            isRange={isRange === 'true'}
-            csvValue={csvValue} app={app} group={group}
-            icon={icon} placeholder={placeholder}
-            startLabel={startLabel} endLabel={endLabel}
-            param={param}
-            useSingleColumn={useSingleColumn === 'true'}
-            enableTextSearch={enableTextSearch === 'true'}
-            filterType={defaultFilterType}
-            defaultValues={defaultValues}
-            defaultValueCriteria={defaultValueCriteria}
-            allNoneSameBehaviour={allNoneSameBehaviour === 'true'}
-            closeOnSelect={closeOnSelect === 'true'}
-            locale={intl.locale}
+                          isRange={isRange === 'true'}
+                          csvValue={csvValue} app={app} group={group}
+                          icon={icon} placeholder={placeholder}
+                          startLabel={startLabel} endLabel={endLabel}
+                          param={param}
+                          useSingleColumn={useSingleColumn === 'true'}
+                          enableTextSearch={enableTextSearch === 'true'}
+                          filterType={defaultFilterType}
+                          defaultValues={defaultValues}
+                          defaultValueCriteria={defaultValueCriteria}
+                          allNoneSameBehaviour={allNoneSameBehaviour === 'true'}
+                          closeOnSelect={closeOnSelect === 'true'}
+                          locale={intl.locale}
         />
     } else {
 
@@ -559,18 +572,18 @@ const Filter = ({
                     <Container fluid={true}>
                         {type === "Boolean" &&
                             <BooleanFilter startLabel={startLabel}
-                                endLabel={endLabel}
-                                allLabel={allLabel}
-                                noneLabel={noneLabel}
-                                isRange={booleanParameter(isRange)}
-                                app={app}
-                                group={group}
-                                icon={icon}
-                                placeholder={placeholder}
-                                param={param}
-                                filterType={defaultFilterType}
-                                defaultValues={defaultValues}
-                                locale={intl.locale}>
+                                           endLabel={endLabel}
+                                           allLabel={allLabel}
+                                           noneLabel={noneLabel}
+                                           isRange={booleanParameter(isRange)}
+                                           app={app}
+                                           group={group}
+                                           icon={icon}
+                                           placeholder={placeholder}
+                                           param={param}
+                                           filterType={defaultFilterType}
+                                           defaultValues={defaultValues}
+                                           locale={intl.locale}>
 
                             </BooleanFilter>}
                         {type !== "Boolean" && <CategoriesConsumer type={type}>
