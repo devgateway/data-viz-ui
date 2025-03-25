@@ -38,8 +38,8 @@ class DataProvider extends React.Component {
         const {app, filters, apply, source, store, params, csv, group, autoApply, editing} = this.props
 
         let doApply = false
-
-        if (apply !== undefined  && apply !== null && apply !=prevState.apply) {
+            debugger; //eslint-disable-line
+        if (apply !== undefined  && apply !== null && apply !=prevProps.apply) {
             doApply = true;
         }
 
@@ -64,6 +64,8 @@ class DataProvider extends React.Component {
         } else if (doApply) {
 
             this.props.onLoadData({app, source, store, params, group})
+            this.setState({showLoading: false})
+            setTimeout(this.checkLoadingTime, 100);
         }
 
 
@@ -85,7 +87,7 @@ class DataProvider extends React.Component {
     render() {
         const {data, style, loading, time, error, editing} = this.props
 
-        if ((loading && this.state.showLoading && !editing)) {
+        if ((loading && this.state.showLoading && !editing) || true) {
             return (<Container style={style} className={"loading"}>
                 <Segment basic={true} padded={true} textAlign={"center"} style={{margin: '30px', ...style}}>
                     <Dimmer active inverted>
