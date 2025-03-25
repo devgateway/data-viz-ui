@@ -428,7 +428,8 @@ const CategoryFilter = (props) => {
         return true
     }) : []
     const options = filteredCategories ? toOptions(filteredCategories, props.locale) : []
-    const placeholder=data.find(d=>d.type='FilterDefinition').items.find(i=>i.fieldType==type).value
+    const placeholder=data.find(d=>d.type='FilterDefinition').items.find(i=>i.fieldType==type)
+        const value=placeholder?placeholder.value:'Filter'
 
 
 
