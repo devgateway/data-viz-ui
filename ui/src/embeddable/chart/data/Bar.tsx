@@ -208,8 +208,10 @@ const BarOneDimension = (props) => {
                 series.push({ ...row });
             });
         } else {
-            indexBy = data.children[0].type;
-            const total = 0;
+            if (data.children[0]) {
+                indexBy = data.children[0].type;
+            }         
+            
             data.children.forEach((d) => {
                 const variables = {};
                 const row = {};
