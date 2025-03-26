@@ -223,6 +223,7 @@ class DataLayer extends BaseLayer {
                     .attr("stroke", borderColor)
                     .attr("id", "state-borders")
                     .attr("d", path).on("mouseenter", (d, p) => {
+
                     if (p.properties._value) {
                         this.showToolTip(tooltip, getTooltipVariables(p), brStyles.getColor(p.properties._value), p)
                     }
@@ -395,17 +396,18 @@ class DataLayer extends BaseLayer {
                         return brStyles.getSize(d.properties._value) * 1 / k
                     })
                     //.attr("transform", this.props.transform)
-                    .on("mouseenter", (d) => {
-                        
-                        if (d.properties._value) {
+                    .on("mouseenter", (d,p) => {
+                        //eslint-disable-next-line
+                        debugger;
+                        if (p.properties._value) {
 
                             const variables = {
-                                ...d.properties, meta: {
-                                    [apiJoinAttribute]: d.properties.meta ? d.properties.meta.value : '', ...d.properties.meta,
-                                    value: d.properties._value
+                                ...p.properties, meta: {
+                                    [apiJoinAttribute]: p.properties.meta ? p.properties.meta.value : '', ...p.properties.meta,
+                                    value: p.properties._value
                                 }
                             }
-                            this.showToolTip(tooltip, variables, brStyles.getColor(d.properties._value))
+                            this.showToolTip(tooltip, variables, brStyles.getColor(p.properties._value))
                         }
                     })
                     .on("mouseleave", (d) => {
