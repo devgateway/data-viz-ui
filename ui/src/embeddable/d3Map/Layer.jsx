@@ -54,14 +54,15 @@ class BaseLayer extends React.Component {
 
     showToolTip(content, data, color, event) {
         if (data) {
-
+            //eslint-disable-next-line
+            debugger;
             const tip = d3.select("body").append("div")
                 .attr("class", "d3MapTooltip")
                 .style("position", "absolute")
                 //.style("background-color", color)
                 .html("")
-                .style("left", (event.pageX + 15) + "px")
-                .style("top", (event.pageY - 50) + "px")
+                .style("left", (window.event.pageX + 15) + "px")
+                .style("top", (window.event.pageY - 50) + "px")
             const root = createRoot(tip._groups[0][0]);
             root.render(<Tooltip intl={this.props.intl} tooltip={content} data={data}
                                      tooltipEnableMarkdown={false}/>)
@@ -71,8 +72,8 @@ class BaseLayer extends React.Component {
 
     moveToolTip(event) {
         const tip = d3.select(".d3MapTooltip")
-            .style("left", (event.pageX + 15) + "px")
-            .style("top", (event.pageY - 50) + "px")
+            .style("left", (window.event.pageX + 15) + "px")
+            .style("top", (window.event.pageY - 50) + "px")
     }
 
     hiddenToolTip(event) {
