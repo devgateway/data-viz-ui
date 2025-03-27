@@ -1904,7 +1904,7 @@ componentWillUnmount() {
     } = this.props;
 
     if(!zoomEnabled) {
-      zoomEnabled = ['mobile', 'tablet', 'midTablet'].includes(getDeviceCategory()) ? true: false;
+      zoomEnabled = !!['mobile', 'tablet', 'midTablet'].includes(getDeviceCategory());
     }
     const nationalAverage = this.getAvg();
     const filters = this.getFilters();
@@ -1995,7 +1995,7 @@ componentWillUnmount() {
 
     return (
       <div className="map component wp-data-viz-map" ref={this.mapContainer}>
-        {this.state.layersLoading && this.noMapSelected()}
+        {this.state.layersLoading && ( editing ? this.noMapSelected(): this.renderLoader())}
         {!this.state.layersLoading && (
           <>
            { !isMobileOrTablet && <MapLegendComponent />}
