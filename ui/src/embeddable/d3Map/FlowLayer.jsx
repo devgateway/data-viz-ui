@@ -29,6 +29,8 @@ class DataLayer extends BaseLayer {
             breaks,
             markSizeScale2, //arrow size
             measures,
+            zoom,
+            offsetPixels=10
         } = this.props
 
         const measure = measures[0];
@@ -76,12 +78,8 @@ class DataLayer extends BaseLayer {
         this.g.selectAll(".end-point").remove()
         this.g.select("defs").selectAll("*").remove()
 
-
         const k = this.props.transform ? this.props.transform.k : 1
-
         const originPoints = []
-
-
         filteredData.forEach(d1 => {
 
             //collect starting points ro be rendered later and keep them on top of the svg layers
@@ -96,14 +94,34 @@ class DataLayer extends BaseLayer {
                         const originID = d1.properties[featureJoinAttribute]
                         const id = d1.properties[featureJoinAttribute] + "--" + d2.properties[featureJoinAttribute];
 
+
+
+
+
+                        const startPx = path.centroid(d1); // [x1, y1] in pixels
+                        const endPx = path.centroid(d2);   // [x2, y2] in pixels
+
+                        const dx = endPx[0] - startPx[0];
+                        const dy = endPx[1] - startPx[1];
+                        const length = Math.sqrt(dx * dx + dy * dy);
+
+                        const ux = dx / length;
+                        const uy = dy / length;
+
+                        const adjustedEndPx = [
+                            endPx[0] - ux * offsetPixels,
+                            endPx[1] - uy * offsetPixels
+                        ];
+                        const adjustedEndGeo = projection.invert(adjustedEndPx);
+
                         const link = {
-                            type: "LineString", coordinates: [
-                                [projection.invert(path.centroid(d1))[0],
-                                    projection.invert(path.centroid(d1))[1]
-                                ],
-                                [projection.invert(path.centroid(d2))[0],
-                                    projection.invert(path.centroid(d2))[1]]]
-                        } // Change these data to see ho the great circle reacts
+                            type: "LineString",
+                            coordinates: [
+                                projection.invert(startPx), // Start in geo coords
+                                adjustedEndGeo              // New endpoint before d2
+                            ]
+                        };
+                        // Change these data to see ho the great circle reacts
                         //d1 is origin
                         //d2 is destination
 
@@ -121,7 +139,6 @@ class DataLayer extends BaseLayer {
                             .attr("d", "M2,2 L10,6 L2,10 L6,6 L2,2")
                             .attr("d", "M2,2 L10,6 L2,10 L6,6 L2,2")
                             .attr("style", e => {
-
                                 return "fill: " + brStyles.getColor(value) + ";"
                             });
 
@@ -193,7 +210,6 @@ class DataLayer extends BaseLayer {
 
             })
         })
-
         originPoints.forEach(d1 => {
             this.g.append("circle")
                 .attr("fill", markFillColor)
