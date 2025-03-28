@@ -6,6 +6,7 @@ import * as d3 from "d3";
 import {injectIntl} from "react-intl";
 import Papa from "papaparse";
 import BreaksStyles from "./BreaksStyles.js";
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 class DataLayer extends BaseLayer {
     constructor() {
@@ -30,7 +31,7 @@ class DataLayer extends BaseLayer {
             markSizeScale2, //arrow size
             measures,
             zoom,
-            offsetPixels=10
+            offsetPixels = 10
         } = this.props
 
         const measure = measures[0];
@@ -86,16 +87,16 @@ class DataLayer extends BaseLayer {
             originPoints.push(d1) //started points to be rendered later
 
             d1.properties.destinations.forEach(child => {
-                const value = child[measure] //value by target country
 
+                const value = child[measure] //value by target country
+                debugger; //eslint-disable-line
                 json.features.filter(feature => feature.properties[featureJoinAttribute] == child.value)
                     .forEach(d2 => {
 
+                        d2.properties.meta=child
+
                         const originID = d1.properties[featureJoinAttribute]
                         const id = d1.properties[featureJoinAttribute] + "--" + d2.properties[featureJoinAttribute];
-
-
-
 
 
                         const startPx = path.centroid(d1); // [x1, y1] in pixels
@@ -175,14 +176,23 @@ class DataLayer extends BaseLayer {
                                 g.selectAll(".start-point.circle_" + originID).transition().duration("200").style("opacity", 1)
 
                                 if (value) {
+                                    debugger; //eslint-disable-line
                                     const origin = {}
                                     const target = {}
                                     Object.keys(d1.properties).forEach(key => {
                                         origin["origin_" + key] = d1.properties[key]
                                     })
+
+
                                     Object.keys(d2.properties).forEach(key => {
                                         target["target_" + key] = d2.properties[key]
                                     })
+
+                                    Object.keys(d2.properties.meta).forEach(key => {
+                                        target["target_" + key] = d2.properties.meta[key]
+                                    })
+                                    debugger; //eslint-disable-line
+
                                     const variables = {
                                         ...origin,
                                         ...target,
@@ -263,13 +273,13 @@ class DataLayer extends BaseLayer {
         } = this.props
 
 
-
         if (file != "none") {
             this.loadJSON(file).then(json => {
                 const features = json.features.map(d => {
                     const joinValue = d.properties[featureJoinAttribute]
                     if (app != 'csv' && data && data.children) {
                         const values = data.children.filter(d => d.value.indexOf(joinValue) > -1)
+
                         if (values.length > 0) {
                             const measureValue = (values[0][measures[0]])
                             d.properties.meta = values[0]
@@ -280,11 +290,11 @@ class DataLayer extends BaseLayer {
 
                         const parsed = Papa.parse(csv, {header: true, dynamicTyping: true});
 
-                        const origin=d.properties[featureJoinAttribute]
-                        parsed.data.filter(r=>r.origin==origin)
-                        const record=parsed.data.filter(r=>r.origin==origin)[0]
-                        if (record!=undefined){
-                          alert("CSV Not implemented Yet, please do it if you have time")
+                        const origin = d.properties[featureJoinAttribute]
+                        parsed.data.filter(r => r.origin == origin)
+                        const record = parsed.data.filter(r => r.origin == origin)[0]
+                        if (record != undefined) {
+                            alert("CSV Not implemented Yet, please do it if you have time")
                             d.properties.meta = record
                             d.properties._value = record.value
                             d.properties.destinations = record.destination
@@ -306,8 +316,8 @@ class DataLayer extends BaseLayer {
     }
 
     componentDidMount() {
-            this.create()
-          this.props.zoom.current.fullView()
+        this.create()
+        this.props.zoom.current.fullView()
     }
 
     render() {
@@ -326,8 +336,18 @@ class DataLayer extends BaseLayer {
 const DataWrapper = (props) => {
 
 
-
-    const {id, unique, filters, csv, app, group = "default", flowOrigin, editing, flowDestination,dvzProxyDatasetId} = props
+    const {
+        id,
+        unique,
+        filters,
+        csv,
+        app,
+        group = "default",
+        flowOrigin,
+        editing,
+        flowDestination,
+        dvzProxyDatasetId
+    } = props
 
     const params = {dvzProxyDatasetId}
 
@@ -342,7 +362,7 @@ const DataWrapper = (props) => {
 
 
     console.log("here")
-    
+
     return (<DataProvider
         editing={editing}
         params={params}
