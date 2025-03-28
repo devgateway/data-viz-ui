@@ -1,0 +1,38 @@
+.chart.big-number-trend-container {  
+  /*trend */
+.trend {
+  text-align: left; 
+  font-size: 16px;
+  margin: 10px;
+}
+
+.label {
+  font-size: 14px;
+  color: #666; 
+}
+
+.number-and-icon {
+  display: flex; 
+  align-items: center; 
+  justify-content: flex-start;
+  margin: 4px 0; 
+}
+
+.number {
+  margin-right: 8px; 
+  font-size: 24px; 
+}
+
+.icon {
+  width: 24px;
+  height: 24px; 
+}
+
+.percentage {
+  color: green; 
+  font-size: 18px; 
+}
+
+}
+
+
