@@ -158,18 +158,19 @@ const DataFrame = (props) => {
         color: decodeURIComponent(textColor),
         fontSize: labelFontSize + 'px'        
     }
+
     return <div className="trend">
         <div className="label" style={labelStyle}>{label}</div>
         <div className="number-and-icon">
             <span className="number" style={numberStyle}>{formattedNumber}</span>
-            {previousValue &&
-            <img src={previousValue > 0 ? "/trend-up.svg" : "/trend-down.svg"} alt="Arrow" className="icon" />
+            {percentChange &&
+                <img src={percentChange > 0 ? "/trend-up.svg" : "/trend-down.svg"} alt="Arrow" className="icon" />
             }
         </div>
-        {showPercentageChange &&
-         <div className="percentage" style={percentStyle}>{percentChangeFormatted}</div>
-        }       
-    </div>    
+        {showPercentageChange && percentChange &&
+            <div className="percentage" style={percentStyle}>{percentChangeFormatted}</div>
+        }
+    </div>
 }
 
 
