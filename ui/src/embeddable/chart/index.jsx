@@ -176,6 +176,7 @@ const Chart = (props) => {
     "data-radar-enable-dot-label": radarEnableDotLabel = "true",
     "data-radar-dot-label-offset": radarDotLabelOffset = -12,
     "data-mobile-customization": mobileCustomization = "{}",
+    "data-show-percentage": showPercentage = "false",
   } = props;
   const mobileConfigSettings = JSON.parse(decodeURIComponent(mobileCustomization));
   const isMobileConfigEnabled = (isMobile || isTablet || isMidTablet) && (mobileConfigSettings?.  showCustomization ?? false);
@@ -450,7 +451,7 @@ const Chart = (props) => {
     legendLabel,
     swap: swap == true || swap == "true",
     showGrid: showGrid == true || showGrid == "true",
-
+    showPercentage: showPercentage == true || showPercentage == "true",
     marginLeft: getMarginValue(isMobileConfigEnabled, parseInt(mobileConfigSettings?.marginLeft), parseInt(marginLeft)),
     marginTop: getMarginValue(isMobileConfigEnabled, parseInt(mobileConfigSettings?.marginTop), parseInt(marginTop)),
     marginRight: getMarginValue(isMobileConfigEnabled, parseInt(mobileConfigSettings?.marginRight), parseInt(marginRight)),
