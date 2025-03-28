@@ -337,10 +337,17 @@ class LayerWithMetadata extends BlockEditWithAPIMetadata {
 
                 this.setState({...this.state, apps})
 
-
+                debugger;
 
                 if (app && app != 'none') {
-                    this.loadMetadata(app, dvzProxyDatasetId);
+                    if (isSupersetAPI(app, apps)) { //if app is superset proxy an additional step is added
+                        this.loadDatasets(app)
+                        if (dvzProxyDatasetId) {
+                            this.loadMetadata(app, dvzProxyDatasetId)
+                        }
+                    } else {
+                        this.loadMetadata(app);
+                    }
                 }
 
             })

@@ -239,7 +239,8 @@ export class DataLayerSetting extends Component {
                 flowDestination,
                 onRemoveLayer,
                 flowValuesFrom,
-                dvzProxyDatasetId
+                dvzProxyDatasetId,
+                offsetPixels
             }
         } = this.props
 
@@ -441,6 +442,19 @@ export class DataLayerSetting extends Component {
                         value={markSizeScale2}
                         onChange={(value) => {
                             onChangeProperty("markSizeScale2", value)
+                        }}
+                        step={1}
+                        min={0}
+                        max={100}
+                    />
+
+                </PanelRow>
+                <PanelRow>
+                    <RangeControl
+                        label="Offset Size"
+                        value={offsetPixels}
+                        onChange={(offsetPixels) => {
+                            onChangeProperty("offsetPixels", offsetPixels)
                         }}
                         step={1}
                         min={0}
