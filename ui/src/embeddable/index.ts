@@ -39,6 +39,7 @@ const Body = lazy(() => import("./body"));
 const SupersetChart = lazy(() => import("./superset-chart"));
 const SupersetDashboard = lazy(() => import("./superset-dashboard"));
 const BigNumber = lazy(() => import("./bignumber"));
+const BigNumberTrend = lazy(() => import("./bignumbertrend"));
 
 let reducerList = { data, embeddable };
 
@@ -83,6 +84,7 @@ const components = {
     supersetDashboard: SupersetDashboard,
     agreeAndDownload: AgreeAndDownload,
 	bigNumber: BigNumber,
+    bigNumberTrend: BigNumberTrend,
     redirect: () => null
 }
 
