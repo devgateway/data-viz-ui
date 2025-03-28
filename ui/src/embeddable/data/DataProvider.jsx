@@ -38,7 +38,7 @@ class DataProvider extends React.Component {
         const {app, filters, apply, source, store, params, csv, group, autoApply, editing} = this.props
 
         let doApply = false
-            debugger; //eslint-disable-line
+
         if (apply !== undefined  && apply !== null && apply !=prevProps.apply) {
             doApply = true;
         }
