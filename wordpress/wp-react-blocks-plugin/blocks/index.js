@@ -32,6 +32,7 @@ require("./wrapped-component")
 require("./sankey-chart")
 require("./data-labels")
 require("./big-number")
+require("./big-number-trend")
 require("./data-filters-apply")
 require("../../../../custom/wp-customizer/blocks/index")
 
