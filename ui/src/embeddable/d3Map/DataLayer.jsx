@@ -144,7 +144,10 @@ class DataLayer extends BaseLayer {
                     }
                 })
             } else if (patternDiscriminator != 'none') {
+
                 const types = data.metadata.types.filter(d => d.dimension == patternDiscriminator)
+
+                debugger; //eslint-disable-line
                 patternsData = types && types.length > 0 ? types[0].items.map(item => {
                     const key = item.value
                     return {
@@ -241,6 +244,9 @@ class DataLayer extends BaseLayer {
 
 
             if (usePattern && json && json.features) {
+
+                debugger;// eslint-disable-line
+
                 json.features.forEach(d => {
                     let patterns = []
                     if (d.properties && d.properties.meta) {
@@ -278,14 +284,13 @@ class DataLayer extends BaseLayer {
                 })
 
                 /*Adding patterns to legends*/
-                
+                    debugger; //eslint-disable-line
                 patternsData = patternsData.filter(p => {
                     return p.type != undefined
                 }).sort((a, b) => {
                     return new Intl.Collator(intl.locale, {caseFirst: 'upper', numeric: true, sensitivity: 'variant'})
                         .compare(a.key, b.key);
                 })
-                
 
 
                 d3.select(this.gRef.current.parentNode.parentNode).select(`.layer_${toGenericID(id)}`).select("svg").remove()
@@ -345,7 +350,7 @@ class DataLayer extends BaseLayer {
                 })
 
                 g.attr("width", "150px")
-                    .attr("height", patternsData.length * 40 + "px")
+                    .attr("height", patternsData.length * 30 + "px")
 
                 g.append("text")
                     .attr("class", "patterns-title")
@@ -366,7 +371,7 @@ class DataLayer extends BaseLayer {
                         return "none;fill:url(#" + 'l_' + toId(d.key) + ");"
                     })
 
-                
+
                 g.selectAll(".patterns-labels")
                     .data(patternsData)
                     .enter()
@@ -396,9 +401,9 @@ class DataLayer extends BaseLayer {
                         return brStyles.getSize(d.properties._value) * 1 / k
                     })
                     //.attr("transform", this.props.transform)
-                    .on("mouseenter", (d,p) => {
+                    .on("mouseenter", (d, p) => {
                         //eslint-disable-next-line
-                        debugger;
+
                         if (p.properties._value) {
 
                             const variables = {
@@ -465,9 +470,15 @@ class DataLayer extends BaseLayer {
         if (file != "none") {
             this.loadJSON(file).then(json => {
                 const features = json.features.map(d => {
+
+
                     const joinValue = d.properties[featureJoinAttribute]
+
                     if (app != 'csv' && data && data.children) {
-                        const values = data.children.filter(d => d.value.indexOf(joinValue) > -1)
+                        const values = data.children.filter(d => {
+                           return d.value == joinValue
+                        })
+
                         if (values.length > 0) {
                             const measureValue = (values[0][measures[0]])
                             d.properties.meta = values[0]
@@ -551,10 +562,21 @@ class DataLayer extends BaseLayer {
 
 const DataWrapper = (props) => {
     const {
-        id, unique, filters, csv, app, group = "default", apiJoinAttribute, editing, patternDiscriminator,  dvzProxyDatasetId, intl, settings
+        id,
+        unique,
+        filters,
+        csv,
+        app,
+        group = "default",
+        apiJoinAttribute,
+        editing,
+        patternDiscriminator,
+        dvzProxyDatasetId,
+        intl,
+        settings
     } = props
 
-    
+
     const params = {}
     const ff = filters || {}
 
@@ -568,7 +590,7 @@ const DataWrapper = (props) => {
     if (dvzProxyDatasetId) {
         params.dvzProxyDatasetId = dvzProxyDatasetId;
     }
-     
+
     return (<DataProvider
         editing={editing}
         params={params}
