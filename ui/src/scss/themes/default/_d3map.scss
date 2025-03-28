@@ -1,11 +1,10 @@
-
 body {
   background-color: transparent !important;
 }
 
 
-
 .d3map-container {
+  overflow: hidden;
   .projected {
     position: relative;
 
@@ -27,6 +26,8 @@ body {
       text {
         text-anchor: middle;
         dominant-baseline: middle;
+        font-family: "Open Sans";
+        font-weight: bold;
       }
 
     }
@@ -41,21 +42,157 @@ body {
         box-sizing: border-box;
         width: 25px;
         height: 20px;
-        background-color: #f6fdf6;
+        background-color: #ffffff;
         height: auto;
         margin: 2px;
         cursor: pointer;
         padding: 4px;
+        box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+
+        i {
+          margin-left: 1.5px;
+          color: #464646;
+        }
+      }
+
+      .button:hover {
+        background-color: #eeeeee;
       }
 
       .button:active {
-
+        transform: scale(0.95);
       }
 
       .icon {
         height: auto;
       }
     }
+  }
+
+
+  .legends {
+    padding-top: 5px;
+    padding-right: 20px;
+    padding-left: 5px;
+    min-height: 30%;
+    background: #fff;
+    opacity: 0.9;
+    font-family: Roboto;
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 1);
+  }
+
+  svg {
+    text.patterns-labels {
+      font-size: 11px;
+      font-family: Roboto;
+      transform: translate(5px, 12px);
+    }
+
+    text.patterns-title {
+      font-weight: bold;
+      font-size: 11px;
+      font-family: Roboto;
+      transform: translate(5px, 12px);
+    }
+  }
+
+  .legend-item {
+    display: flex;
+    margin-bottom: 5px;
+    font-size: 11px;
+    font-family: Roboto;
+
+    .legend-check {
+      font-family: Roboto;
+      text-align: center;
+      line-height: 15px;
+      font-size: 15px;
+      cursor: pointer;
+      border: 1px solid #3c434a;
+    }
+
+    .legend-color {
+
+     width: 16px;
+      height: 16px;
+      margin-right: 5px;
+      border: 1px solid #3c434a;
+    }
+
+    .legend-label {
+      font-weight: bold;
+      line-height: 20px;
+      font-size: 12px;
+    }
+
+
+  }
+
+  .legend-breaks {
+    padding-bottom: 5px;
+    margin-top: -5px;
+    margin-left: 18px;
+    font-size: 11px;
+    font-family: Roboto;
+
+    .break-item {
+      margin-bottom: 7px;
+      font-weight: bold;
+      font-size: 11px;
+      width: 15px;
+      height: 15px;
+
+    }
+
+    .break {
+      display: flex;
+      flex-direction: row;
+
+      .break-item {
+        font-weight: bold;
+        font-size: 12px;
+        margin: 3px;
+
+      }
+
+      .break-item.point {
+        border-radius: 50%;
+
+      }
+
+      .break-item-shape {
+        margin: 3px;
+        width: 18px;
+        height: 18px;
+      }
+
+      .break-label {
+        line-height: 24px;
+      }
+    }
+  }
+
+}
+
+
+.d3MapTooltip {
+   br {
+    display: block;
+    margin-bottom: 2px;
+    font-size:2px;
+    line-height: 2px;
+  }
+  h1 {
+
+  }
+
+  h2 {
+    color: #FFF !important;
+    font-size: 1.2em !important;
+    margin: 0 !important;
   }
 }
 
