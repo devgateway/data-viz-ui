@@ -68,6 +68,7 @@ const BreadCrumbs = injectIntl(({ menu, intl }) => {
 /*
 Setting objects will inject customization preview
 * */
+
 const MenuItems = injectIntl(
     ({
         settings,
@@ -77,21 +78,18 @@ const MenuItems = injectIntl(
         onSetSelected,
         selected,
         intl: { locale },
-        isSmallScreen,
-    }) => {
+        isSmallScreen
+     }) => {
         const params = useParams();
-        useEffect(
-            (e) => {
-                if (!selected) {
-                    const pathSelected = getPath(menu, params);
-                    const items = pathSelected.filter((i) => i.menu_item_parent == 0);
-                    if (items) {
-                        onSetSelected(items[0]);
-                    }
-                }
-            },
-            [menu, onSetSelected, selected]
-        );
+        /*useEffect(() => {
+        if (!selected) {
+            const pathSelected = getPath(menu, params);
+            const items = pathSelected.filter((i) => i.menu_item_parent == 0);
+            if (items.length > 0) {
+                onSetSelected(items[0]);
+            }
+        }
+        }, [menu, onSetSelected, selected]);*/
 
         /*Original menu mixed with customization changes*/
         const [mixedMenu, setMixedMenu] = useState(null);
@@ -174,6 +172,9 @@ const MenuItems = injectIntl(
             return () => window.removeEventListener("resize", handleResize);
         }, []);
 
+        const [hoveredItem, setHoveredItem] = useState(null);
+        const [hoveredChildItem, setHoveredChildItem] = useState(null);
+
         return (
             mixedMenu && (
                 <React.Fragment>
@@ -183,49 +184,47 @@ const MenuItems = injectIntl(
                             <React.Fragment key={item.ID}>
                                 {/* Render parent menu item */}
                                 <Menu.Item
-                                    className={`divided ${item.child_items ? "has-child-items" : ""
-                                        }
-                            ${selected && selected.ID === item.ID
-                                            ? "selected"
-                                            : ""
-                                        }
-                            ${active === item.slug ? "active" : ""}`}
+                                    className={`divided ${item.child_items ? "has-child-items" : ""}
+      ${selected && selected.ID === item.ID ? "selected" : ""}
+      ${active === item.slug ? "active" : ""}`}
+                                    onMouseEnter={() => setHoveredItem(item.ID)}
+                                    onMouseLeave={() => setHoveredItem(null)}
                                 >
-                                    {withIcons && (
-                                        <a href={localReplaceLink(item.url, locale)}>
-                                            <div className={"mark"}>
-                                                <span className="sr-only">{item.title}</span>
-                                            </div>
-                                        </a>
-                                    )}
+                                    <div className="mark">
+                                        {item.thumbnail_src && (
+                                            <img
+                                                src={
+                                                    (hoveredItem === item.ID || active === item.slug) && item.thumbnail_hover_src
+                                                        ? item.thumbnail_hover_src
+                                                        : item.thumbnail_src
+                                                }
+                                                alt={item.title}
+                                                style={{ width: "24px", height: "24px", marginRight: "8px" }}
+                                            />
+                                        )}
+                                    </div>
+
                                     {isSmallScreen ? (
                                         item.child_items ? (
-                                            <span
-                                                onClick={() =>
-                                                    onSetSelected(selected === item ? null : item)
-                                                }
-                                            >
-                                                {item.title}
-                                            </span>
+                                            <span onClick={() => onSetSelected(selected === item ? null : item)}>
+                {item.title}
+            </span>
                                         ) : (
-                                            <a href={localReplaceLink(item.url, locale)}>
-                                                {item.title}
-                                            </a>
+                                            <a href={localReplaceLink(item.url, locale)}>{item.title}</a>
                                         )
                                     ) : item.child_items ? (
-                                        <span onMouseOver={(e) => onSetSelected(item)}>
-                                            {item.title}
-                                        </span>
+                                        <span onMouseOver={() => onSetSelected(item)}>{item.title}</span>
                                     ) : (
                                         <a
-                                            onMouseOut={(e) => onSetSelected(null)}
-                                            onMouseOver={(e) => onSetSelected(item)}
+                                            onMouseOut={() => onSetSelected(null)}
+                                            onMouseOver={() => onSetSelected(item)}
                                             href={localReplaceLink(item.url, locale)}
                                         >
                                             {item.title}
                                         </a>
                                     )}
                                 </Menu.Item>
+
                                 {/* Render child items below the parent if mobile resolution */}
                                 {isMobileResolution &&
                                     selected &&
@@ -235,10 +234,23 @@ const MenuItems = injectIntl(
                                             {selected.child_items.map((childItem) => (
                                                 <Menu.Item
                                                     key={childItem.ID}
-                                                    className={`divided child-item ${active === childItem.slug ? "active" : ""
-                                                        }`}
+                                                    className={`divided child-item ${active === childItem.slug ? "active" : ""}`}
+                                                    onMouseEnter={() => setHoveredChildItem(childItem.ID)}
+                                                    onMouseLeave={() => setHoveredChildItem(null)}
                                                 >
-                                                    <div className={"mark"}></div>
+                                                    <div className="mark">
+                                                        {childItem.thumbnail_src && (
+                                                            <img
+                                                                src={
+                                                                    (hoveredChildItem === childItem.ID || active === childItem.slug) && childItem.thumbnail_hover_src
+                                                                        ? childItem.thumbnail_hover_src
+                                                                        : childItem.thumbnail_src
+                                                                }
+                                                                alt={childItem.title}
+                                                                style={{ width: "24px", height: "24px", marginRight: "8px" }}
+                                                            />
+                                                        )}
+                                                    </div>
                                                     <a href={localReplaceLink(childItem.url, locale)}>
                                                         {childItem.title}
                                                     </a>
@@ -258,14 +270,12 @@ const Header = ({ intl, settings }) => {
     const [selected, setSelected] = useState();
     const [isMenuVisible, setMenuVisible] = useState(false);
     const [isSmallScreen, setIsSmallScreen] = useState(false);
-    const [hasInteracted, setHasInteracted] = useState(false);
 
     const { slug } = useParams();
 
     const menuRef = useRef(null); // Reference for the menu container
 
     const toggleMenu = () => {
-        setHasInteracted(true);
         setMenuVisible((prevState) => !prevState);
     };
 
@@ -361,8 +371,7 @@ const Header = ({ intl, settings }) => {
             <MenuProvider slug={"main"} locale={intl.locale}>
                 <Container key="header-container" fluid={true} className="header">
                     <div
-                        className={`hamburger-menu ${hasInteracted ? "animate" : ""} ${isMenuVisible ? "open" : "close"
-                            }`}
+                        className={`hamburger-menu ${isMenuVisible ? "open" : "close"}`}
                         onClick={toggleMenu}
                     >
                         <div></div>
@@ -435,6 +444,7 @@ const Header = ({ intl, settings }) => {
                                             active={slug}
                                             selected={selected}
                                             onSetSelected={setSelected}
+                                            withIcons
                                         ></MenuItems>
                                     </MenuConsumer>
                                 </Menu.Menu>
@@ -456,7 +466,11 @@ const Header = ({ intl, settings }) => {
                             </Menu.Item>
                         </Menu>
                     </Container>
-                    <Container fluid={true} className={`child ${selected?.child_items?.length ? "has-selected" : ""}`}>
+                    <Container
+                        fluid={true}
+                        className={`child ${selected?.child_items?.length ? "has-selected" : ""}`}
+                        onMouseLeave={() => setSelected(null)}
+                    >
                         {selected && selected.child_items && (
                             <Menu fluid text>
                                 <MenuItems
