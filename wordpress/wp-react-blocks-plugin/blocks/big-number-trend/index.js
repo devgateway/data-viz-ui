@@ -25,7 +25,7 @@ registerBlockType(process.env.BLOCKS_NS + '/bignumbertrend',
             },
             height: {
                 type: 'number',
-                default: 20,
+                default: 100,
             },
             app: {
                 type: 'String',
