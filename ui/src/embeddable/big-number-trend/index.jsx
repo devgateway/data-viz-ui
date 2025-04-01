@@ -5,6 +5,7 @@ import DataConsumer from "../data/DataConsumer.jsx";
 import {PostContent} from "@devgateway/wp-react-lib";
 import {connect} from "react-redux";
 import {alphaSort} from "../utils/common.js";
+import { csv } from "d3";
 
 
 const Chart = (props) => {
@@ -88,7 +89,8 @@ const Chart = (props) => {
         dimensions.push(dimension1)
      }
     
-    
+
+         
     return (<div ref={ref}>
         <Container className={"chart container big-number-trend-container"} style={{"height": height + 'px'}} fluid={true}>
             <DataProvider
@@ -103,7 +105,7 @@ const Chart = (props) => {
                         <DataFrame
                           locale={locale}                          
                           intl={intl}
-                          app={app}
+                          app={app}                          
                           format={numberFormat}
                           measure={parse(measures)[0] || null}
                             label={label}
@@ -122,20 +124,38 @@ const Chart = (props) => {
 }
 
 const DataFrame = (props) => {
-    const { measure, data, format, label, textColor, bigNumberFontSize, percentFontSize, labelFontSize, showPercentageChange, intl } = props
-    
-    if (!data.children  || data.children.length == 0) {
-        return null
-    }
+    const { app, measure, data, format, label, textColor, bigNumberFontSize, percentFontSize, labelFontSize, showPercentageChange, intl } = props
+    let dataItems = [];
+    let dimensionField
+    let measureField
+    if (app =="csv") {        
+        const { data: json, meta: { fields } } = data
+        dimensionField = fields[0];
+        measureField = fields[1];
+        dataItems = data.data.map(d => {
+            return {
+                value: d[dimensionField],
+                [measureField]: d[measureField]
+            }
+        })
+    } else {
+        dataItems = !data.children  || data.children.length == 0 ? [] : data.children
+        measureField = measure;
 
-    data.children = data.children.sort((a, b) => {
+    }
+    
+    if (dataItems.length == 0) {
+            return null
+    }   
+
+    dataItems = dataItems.sort((a, b) => {
         return alphaSort(false, intl.locale, a.value, b.value)
     })    
 
-    let currentValue = data.children[data.children.length - 1][measure]
+    let currentValue = dataItems[dataItems.length - 1][measureField]   
     let previousValue 
-    if (data.children.length > 1) {
-        previousValue = data.children[data.children.length - 2][measure]
+    if (dataItems.length > 1) {
+        previousValue = dataItems[dataItems.length - 2][measureField]
     }    
 
     const formattedNumber = intl.formatNumber(format.style === 'percent' ? currentValue / 100 : currentValue, { ...format })
