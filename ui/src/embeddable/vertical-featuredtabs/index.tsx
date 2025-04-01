@@ -297,55 +297,75 @@ const IntroWithFeaturedImage: React.FC<IntroWithFeaturedImageProps> = ({
     );
 };
 
-const FeaturedTabs: React.FC<FeaturedTabsProps> = ({editing, posts, height, colors, coverWidth}) => {
-    const [active, setActive] = useState<string | null>(null);
-    const targetRef = useRef<HTMLDivElement>(null);
-    const [dimensions, setDimensions] = useState({width: 0, height: 0});
+const FeaturedTabs: React.FC<FeaturedTabsProps> = ({
+  editing,
+  posts,
+  height,
+  colors,
+  coverWidth,
+}) => {
+  const [active, setActive] = useState<string | null>(null);
+  const targetRef = useRef<HTMLDivElement>(null);
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+  const containerRef = useRef<HTMLDivElement>(null);
 
-    const toggleAnimation = (k: string) => {
-        setActive(k);
+  const toggleAnimation = (slug: string) => {
+    setActive((prev) => (prev === slug ? null : slug));
+  };
+
+  useEffect(() => {
+    if (posts.length > 0 && !active && editing) {
+      setActive(posts[0].slug);
     }
+  }, [posts, active, editing]);
 
-    useLayoutEffect(() => {
-      if (targetRef.current?.parentElement) {
-        setDimensions({
-          width: editing
-            ? targetRef.current.parentElement?.parentElement?.offsetWidth ?? 0
-            : targetRef.current.parentElement?.offsetWidth ?? 0,
-          height: targetRef.current.offsetHeight,
-        });
-      }
-    }, [editing]);
+  useLayoutEffect(() => {
+    if (targetRef.current?.parentElement) {
+      setDimensions({
+        width: editing
+          ? targetRef.current.parentElement?.parentElement?.offsetWidth ?? 0
+          : targetRef.current.parentElement?.offsetWidth ?? 0,
+        height: targetRef.current.offsetHeight,
+      });
+    }
+    const container = containerRef.current;
+    if (!container) return;
+    container.style.overflow = editing ? 'visible' : 'hidden';
+  }, [editing]);
 
-    return (
-        <Container fluid={true} className={"vertical featured tabs"}>
-            {posts?.map((post, i) => {
-                const isActive = active ? post.slug === active : i === 0;
-                return (
-                    <div
-                        key={post.slug}
-                        ref={targetRef}
-                        onClick={() => toggleAnimation(post.slug)}
-                        className={isActive ? "item expanded" : "item collapsed"}
-                        style={{"minHeight": `${height}px`, "minWidth": `${coverWidth}px`}}
-                    >
-                        <a id={post.slug}></a>
-                        <IntroWithFeaturedImage
-                            editing={editing}
-                            coverWidth={coverWidth}
-                            height={height}
-                            backgroundColor={colors[`color_${i}`]}
-                            count={posts.length}
-                            dimensions={dimensions}
-                            active={isActive}
-                            post={post}
-                            index={i}
-                        />
-                    </div>
-                );
-            })}
-        </Container>
-    );
+  return (
+    <Container
+      fluid={true}
+      className={"vertical featured tabs"}
+      ref={containerRef}
+    >
+      {posts?.map((post, i) => {
+        const isActive = active ? post.slug === active : i === 0;
+        return (
+          <div
+            key={post.slug}
+            ref={targetRef}
+            onClick={() => toggleAnimation(post.slug)}
+            className={isActive ? "item expanded" : "item collapsed"}
+            style={{ minHeight: `${height}px`, minWidth: `${coverWidth}px` }}
+          >
+            <a id={post.slug}></a>
+            <IntroWithFeaturedImage
+              editing={editing}
+              coverWidth={coverWidth}
+              height={height}
+              backgroundColor={colors[`color_${i}`]}
+              count={posts.length}
+              dimensions={dimensions}
+              active={isActive}
+              post={post}
+              index={i}
+            />
+          </div>
+        );
+      })}
+    </Container>
+  );
 };
 
 const Wrapper: React.FC<VerticalFeaturedTabsProps> = (props) => {
@@ -363,6 +383,7 @@ const Wrapper: React.FC<VerticalFeaturedTabsProps> = (props) => {
     parent,
     unique,
   } = props;
+
   const locale = props.intl.locale;
   const dataCategories = categories ? categories : "[]";
 
