@@ -10,7 +10,7 @@ const defaultFormat = {
     "currency": "USD"     
 }
 
-const CSVConfig = ({attributes: {csv, panelStatus, measures}, setAttributes}) => {
+const CSVConfig = ({attributes: {csv, panelStatus, measures, type}, setAttributes}) => {
 
     const onFormatChange = (format, field) => {           
         const app = "csv"
@@ -54,6 +54,7 @@ const CSVConfig = ({attributes: {csv, panelStatus, measures}, setAttributes}) =>
             </PanelRow>
 
             <Format
+                hiddenCustomAxisFormat={type=='radar' || type=='big-number'}              
                 format={measures["csv"] && measures["csv"].format ? measures["csv"].format : {}}
                 customFormat={measures["csv"] && measures["csv"].customFormat ? measures["csv"].customFormat : {}}
                 useCustomAxisFormat={measures["csv"] ? measures["csv"].useCustomAxisFormat : false}
