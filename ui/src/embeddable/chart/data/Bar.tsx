@@ -1,27 +1,5 @@
 import React from "react";
-import { getTranslatedValue, measuresMap, typesMap } from "./Utils";
-
-const alphaSort = (reverse, locale, a, b) => {
-    return new Intl.Collator(locale, {
-        caseFirst: "upper",
-        numeric: true,
-        sensitivity: "variant",
-    }).compare(reverse ? b : a, reverse ? a : b);
-};
-const numericSort = (reverse, a, b) => {
-    return reverse ? b - a : a - b;
-};
-
-const dateSort = (reverse, a, b) => {
-    let aDate = Date.parse(a);
-    let bDate = Date.parse(b);
-   
-    if (!isNaN(aDate) && !isNaN(bDate)) {
-        return reverse ? bDate - aDate : aDate - bDate;
-    }
-
-    return 0;
-}
+import { getTranslatedValue, measuresMap, typesMap, alphaSort,  numericSort,  dateSort } from "./Utils";
 
 interface RowObject {
     type?: string;
@@ -389,6 +367,10 @@ const Bar2Dimensions = (props) => {
         if (props.sort == "alphabetically") {
             filtered.sort((a, b) =>
                 alphaSort(props.sortreverse, locale, a[indexBy], b[indexBy])
+            );
+        } else if (props.sort == "date") {
+            filtered.sort((a, b) =>
+                dateSort(props.sortreverse, a[indexBy], b[indexBy])
             );
         } else if (props.sort == "values") {
             // @ts-ignore
