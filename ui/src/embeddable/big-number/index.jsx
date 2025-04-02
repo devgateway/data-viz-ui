@@ -5,6 +5,7 @@ import DataConsumer from "../data/DataConsumer";
 import {PostContent} from "@devgateway/wp-react-lib";
 import {connect} from "react-redux";
 
+
 const Chart = (props) => {
     const {
         editing = false,
@@ -114,12 +115,22 @@ const Chart = (props) => {
 }
 
 const DataFrame = (props) => {
-    const { measure, data, format, label, numberColor, numberFontSize, 
+    const { app, measure, data, format, label, numberColor, numberFontSize, 
         labelColor, labelFontSize,
         intl } = props
+
+    let measureField = measure
+    let dataItem = data
+    if (app == 'csv') {
+        const { data: json, meta: { fields } } = data
+        measureField = fields[0];   
+        dataItem = data.data[0]    
+    } 
+
+
     let formattedNumber = ''
-    if (data && data[measure]) {
-        formattedNumber = intl.formatNumber(format.style === 'percent' ? data[measure] / 100 : data[measure], { ...format })
+    if (dataItem && dataItem[measureField]) {
+        formattedNumber = intl.formatNumber(format.style === 'percent' ? dataItem[measureField] / 100 : dataItem[measureField], { ...format })
     }
     const numberStyle = {
         color: decodeURIComponent(numberColor),
