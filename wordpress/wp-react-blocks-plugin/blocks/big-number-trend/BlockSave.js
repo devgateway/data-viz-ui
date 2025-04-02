@@ -6,6 +6,7 @@ const SaveComponent = (props) => {
             height,
             dimension1,
             app,
+            csv,
             format,
             filters,
             group,            
@@ -32,6 +33,7 @@ const SaveComponent = (props) => {
              data-height={height}
              data-source={source}
              data-app={app}
+             data-csv={csv}
              data-dvz-proxy-dataset-id={dvzProxyDatasetId}
              data-measures={encodeURIComponent(JSON.stringify(measures))}
              data-dimension1={dimension1}

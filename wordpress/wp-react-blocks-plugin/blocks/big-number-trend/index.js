@@ -25,7 +25,7 @@ registerBlockType(process.env.BLOCKS_NS + '/bignumbertrend',
             },
             height: {
                 type: 'number',
-                default: 20,
+                default: 120,
             },
             app: {
                 type: 'String',
@@ -35,6 +35,10 @@ registerBlockType(process.env.BLOCKS_NS + '/bignumbertrend',
                 type: 'String',
                 default: 'none'
             },
+            csv: {
+                type: "String",
+                default: "Year,Amount \n2019,20000 \n2018,10000"
+            },           
             params: {
                 type: Object,
                 default: {}
@@ -42,12 +46,13 @@ registerBlockType(process.env.BLOCKS_NS + '/bignumbertrend',
             format: {
                 type: Object,
                 default: {
-                    "style": "percent",
-                    "minimumFractionDigits": 1,
-                    "maximumFractionDigits": 1,
+                    "style": "decimal",
+                    "minimumFractionDigits": 0,
+                    "maximumFractionDigits": 0,
                     "currency": "USD"
                 }
             },
+            
             measures: {
                 type: "Array",
                 default: []
@@ -69,15 +74,15 @@ registerBlockType(process.env.BLOCKS_NS + '/bignumbertrend',
             },
             label: {
                 type: 'String',
-                default: ""
+                default: "# of animals"
             },           
             textColor: {
                 type: 'string',
-                default: "#a7a9ac",
+                default: "#5a5d68",
             },
             bigNumberFontSize: {
                 type: 'Numeric',
-                default: 14
+                default: 24
             },
             labelFontSize: {
                 type: 'Numeric',

@@ -15,7 +15,8 @@ const SaveComponent = (props) => {
             numberColor,
             labelFontSize,
             labelColor,
-            label
+            label,
+            csv
         }
     } = props;
     const blockProps = useBlockProps.save({
@@ -31,6 +32,7 @@ const SaveComponent = (props) => {
              data-height={height}
              data-source={source}
              data-app={app}
+             data-csv={csv}
              data-dvz-proxy-dataset-id={dvzProxyDatasetId}
              data-measures={encodeURIComponent(JSON.stringify(measures))}
              data-format={encodeURIComponent(JSON.stringify(format))}

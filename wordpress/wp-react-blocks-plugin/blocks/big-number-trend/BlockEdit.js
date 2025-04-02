@@ -8,7 +8,8 @@ import {
     TextControl,
     FontSizePicker,
     __experimentalText as Text,
-    ToggleControl
+    ToggleControl,
+    TextareaControl
 } from '@wordpress/components';
 import {__} from '@wordpress/i18n';
 import {BlockEditWithAPIMetadata, SizeConfig} from '../commons/index'
@@ -17,7 +18,8 @@ import {togglePanel} from "../commons/Util";
 import Measures from "../commons/Measures";
 import DataFilters from "../commons/DataFilters";
 import {isSupersetAPI} from "../commons/APIutils";
-import {DEFAULT_FORMAT_SETTINGS} from '../commons/Constants';
+import Format from "../charts/Format.jsx";
+
 
 class BlockEdit extends BlockEditWithAPIMetadata {
     constructor(props) {
@@ -47,7 +49,9 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                 labelFontSize,   
                 textColor,          
                 dimension1,
-                showPercentageChange     
+                showPercentageChange,
+                csv, 
+                type
             }
         } = this.props;
 
@@ -131,6 +135,34 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                                    />
                                </PanelRow>
                            </PanelBody>
+                         }
+                         {app == 'csv' &&
+                         <>
+                            <PanelBody initialOpen={false} title={__("CSV Configuration")}
+                                                onToggle={e => togglePanel("csv_cfg",panelStatus,setAttributes)}>
+                                        <PanelRow>
+                                            <TextareaControl
+                                                label={__("CSV Data")}
+                                                value={csv}
+                                                onChange={(csv) => setAttributes({csv})}
+                                            />
+                                        </PanelRow>
+                            
+                                        <Format
+                                            hiddenCustomAxisFormat={type=='radar' || type=='big-number'}              
+                                            format={format}
+                                            customFormat={{}}
+                                            useCustomAxisFormat={false}
+                                            onFormatChange={(newFormat, field) => {
+                                                console.log("newFormat", newFormat)
+                                                setAttributes({format: newFormat})
+                                            }}
+                                            onUseCustomAxisFormatChange = {value => {                                               
+                                            }}
+                                            >
+                                        </Format>
+                                    </PanelBody>
+                                    </>
                          }
                       
                         {app != 'csv' &&  
