@@ -87,9 +87,7 @@ const Chart = (props) => {
     const dimensions = []   
     if (dimension1 != "none") {
         dimensions.push(dimension1)
-     }
-    
-
+    }   
          
     return (<div ref={ref}>
         <Container className={"chart container big-number-trend-container"} style={{"height": height + 'px'}} fluid={true}>
@@ -103,6 +101,7 @@ const Chart = (props) => {
                 store={[app, unique, ...dimensions]} source={dimensions.join("/")}>               
                     <DataConsumer>
                         <DataFrame
+                          editing={editing}
                           locale={locale}                          
                           intl={intl}
                           app={app}                          
@@ -124,7 +123,7 @@ const Chart = (props) => {
 }
 
 const DataFrame = (props) => {
-    const { app, measure, data, format, label, textColor, bigNumberFontSize, percentFontSize, labelFontSize, showPercentageChange, intl } = props
+    const { editing, app, measure, data, format, label, textColor, bigNumberFontSize, percentFontSize, labelFontSize, showPercentageChange, intl } = props
     let dataItems = [];
     let dimensionField
     let measureField
@@ -141,12 +140,11 @@ const DataFrame = (props) => {
     } else {
         dataItems = !data.children  || data.children.length == 0 ? [] : data.children
         measureField = measure;
-
-    }
+   }
     
     if (dataItems.length == 0) {
-            return null
-    }   
+       return null
+    } 
 
     dataItems = dataItems.sort((a, b) => {
         return alphaSort(false, intl.locale, a.value, b.value)
