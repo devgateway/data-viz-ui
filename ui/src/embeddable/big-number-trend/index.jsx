@@ -5,7 +5,6 @@ import DataConsumer from "../data/DataConsumer.jsx";
 import {PostContent} from "@devgateway/wp-react-lib";
 import {connect} from "react-redux";
 import {alphaSort} from "../utils/common.js";
-import { csv } from "d3";
 
 
 const Chart = (props) => {
