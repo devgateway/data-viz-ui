@@ -25,13 +25,16 @@ registerBlockType(process.env.BLOCKS_NS + '/bignumber',
             },
             height: {
                 type: 'number',
-                default: 20,
+                default: 120,
             },
             app: {
                 type: 'String',
                 default: "csv"
             },
-
+            csv: {
+                type: "String",
+                default: "Amount \n20000"
+            },    
             params: {
                 type: Object,
                 default: {}
@@ -39,9 +42,9 @@ registerBlockType(process.env.BLOCKS_NS + '/bignumber',
             format: {
                 type: Object,
                 default: {
-                    "style": "percent",
-                    "minimumFractionDigits": 1,
-                    "maximumFractionDigits": 1,
+                    "style": "decimal",
+                    "minimumFractionDigits": 0,
+                    "maximumFractionDigits": 0,
                     "currency": "USD"
                 }
             },
@@ -66,15 +69,15 @@ registerBlockType(process.env.BLOCKS_NS + '/bignumber',
             },
             label: {
                 type: 'String',
-                default: ""
+                default: "# of animals"
             },
             numberFontSize: {
                 type: 'Numeric',
-                default: 14
+                default: 24
             },
             numberColor: {
                 type: 'string',
-                default: "#a7a9ac",
+                default: "#5a5d68",
             },
             labelFontSize: {
                 type: 'Numeric',
@@ -82,7 +85,7 @@ registerBlockType(process.env.BLOCKS_NS + '/bignumber',
             },
             labelColor: {
                 type: 'string',
-                default: "#a7a9ac",
+                default: "#5a5d68",
             },
         },
 
