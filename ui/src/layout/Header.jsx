@@ -485,11 +485,13 @@ const Header = ({ intl, settings }) => {
                     </Container>
                 </Container>
 
-                <Container className={"url breadcrumbs"}>
-                    <MenuConsumer>
-                        <BreadCrumbs></BreadCrumbs>
-                    </MenuConsumer>
-                </Container>
+                {slug && slug !== "home" && (
+                    <Container className={"url breadcrumbs"}>
+                        <MenuConsumer>
+                            <BreadCrumbs />
+                        </MenuConsumer>
+                    </Container>
+                )}
             </MenuProvider>
         </React.Fragment>
     );
