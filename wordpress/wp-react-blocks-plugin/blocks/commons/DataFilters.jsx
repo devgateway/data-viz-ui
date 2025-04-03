@@ -72,7 +72,7 @@ const DataFilters = (props) => {
   const CategoricalFilter = ({value, index, items, onUpdateFilterValue}) => {
     if (items) {
       const sortedItems = items.sort(function (a, b) {
-        if (a.position !== undefined && b.position != undefined) {        
+        if (a.position !== undefined && b.position !== undefined) {        
           return a.position - b.position;
         }
   
