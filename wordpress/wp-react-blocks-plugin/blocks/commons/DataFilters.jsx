@@ -72,7 +72,13 @@ const DataFilters = (props) => {
   const CategoricalFilter = ({value, index, items, onUpdateFilterValue}) => {
     if (items) {
       const sortedItems = items.sort(function (a, b) {
-        return a.position - b.position
+        if (a.poistion !== undefined && b.position != undefined) {        
+          return a.position - b.position;
+        }
+  
+        let aValue = a.value ? a.value.toLowerCase() : "";
+        let bValue = b.value ? b.value.toLowerCase() : "";
+        return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
       });
       return sortedItems.map(v => <PanelRow>
         <ToggleControl label={v.value} checked={value.indexOf(v.id) > -1} onChange={e => {onUpdateFilterValue(v.id, index)}}/>
