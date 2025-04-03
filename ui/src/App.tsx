@@ -5,12 +5,12 @@ import { store } from './redux/store'
 import messages_en from "./translations/en.json";
 import messages_fr from "./translations/fr.json";
 import messages_am from './translations/af.json';
-import { updateIntl } from '@/lib/react-intl-redux'
+import { updateIntl } from '@/lib/react-intl-redux';
 import { injectIntl, IntlProvider } from "react-intl";
 import ResponsiveContainer from './layout'
 import { getComponentByNameIgnoreCase } from "./embeddable";
-import Helmet from './Helmet'
-// import WithTracker from "./withTracker";
+import Helmet from './Helmet';
+
 import {
     AppContextProvider,
     Category,
@@ -30,6 +30,7 @@ import SlugContainer from './layout/containers/SlugContainer';
 import SlugPostContainer from './layout/containers/SlugPostContainer';
 import withTracker from './withTracker';
 import { Config } from './conf';
+import useDynamicFavicon from './layout/FavIcon';
 
 const messages = {
     'en': messages_en,
@@ -224,6 +225,7 @@ const MainRoutes = () => {
 }
 
 const AppWrapper = () => {
+    useDynamicFavicon(Config.REACT_APP_WP_API);
     return (
         <Provider store={store}>
             <MainRoutes />
