@@ -85,17 +85,44 @@ class DataProvider extends React.Component {
 
 
     render() {
-        const {data, style, loading, time, error, editing} = this.props
+        const {data, style, loading, time, error, editing, isSvg} = this.props
+           
 
         if ((loading && this.state.showLoading && !editing)) {
-            return (<Container style={style} className={"loading"}>
-                <Segment basic={true} padded={true} textAlign={"center"} style={{margin: '30px', ...style}}>
-                    <Dimmer active inverted>
-                        <Loader size='medium'></Loader>
+            const foreignObjectStyle = {
+                width: "100%",
+                height: "100%",
+                background: "transparent",
+                verticalAlign: "middle",
+                overflow: "hidden"
+            }
+
+            const segmentStyle = Object.assign({}, style, {
+                height: "90%",
+                background: "transparent",
+                textAlign: "center",
+                margin: "30px"
+            })
+            
+
+            const spinner = <Segment basic={true} padded={true} style={segmentStyle}>
+                    <Dimmer active inverted style={{ background: "transparent" }} >
+                        <Loader size='medium' style={{ background: "transparent" }}></Loader>
                     </Dimmer>
                 </Segment>
 
-            </Container>)
+            if (isSvg) {
+                return (<foreignObject style={foreignObjectStyle}>
+                    <Container style={style} className={"loading"}>
+                        {spinner}
+                    </Container>
+                </foreignObject>)
+            } else {
+                return (<Container style={style} className={"loading"}>
+                    {spinner}
+                </Container>)
+            }
+           
         } else if (!error) {
             return <DataContext.Provider value={data}>{this.props.children}</DataContext.Provider>
         } else if (error) {
@@ -111,9 +138,7 @@ class DataProvider extends React.Component {
                     <p>Can't find this page</p>
                 </Segment>
             </Container>
-        }
-
-        return null;
+        }   
     }
 }
 

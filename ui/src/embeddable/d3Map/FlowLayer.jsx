@@ -361,8 +361,6 @@ const DataWrapper = (props) => {
     }
 
 
-    console.log("here")
-
     return (<DataProvider
         editing={editing}
         params={params}
