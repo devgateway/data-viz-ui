@@ -85,7 +85,7 @@ class DataProvider extends React.Component {
 
 
     render() {
-        const {data, style, loading, time, error, editing} = this.props
+        const {data, style, loading, time, error, editing, isSvg} = this.props
            
 
         if ((loading && this.state.showLoading && !editing)) {
@@ -93,25 +93,33 @@ class DataProvider extends React.Component {
                 width: "100%",
                 height: "100%",
                 background: "transparent",
-                verticalAlign: "middle",            
+                verticalAlign: "middle",
                 overflow: "hidden"
-            }  
+            }
 
             const segmentStyle = Object.assign({}, style)
             segmentStyle.height = "90%"
             segmentStyle.background = "transparent"
             segmentStyle.margin = "30px"
             segmentStyle.textAlign = "center"
-            
-            return (<foreignObject style={foreignObjectStyle}>
-                <Container style={style} className={"loading"}>
-                    <Segment basic={true} padded={true} style={segmentStyle}>
-                        <Dimmer active inverted style={{background: "transparent"}} >
-                            <Loader size='medium' style={{background: "transparent"}}></Loader>
-                        </Dimmer>
-                    </Segment>    
-                </Container>
+            const spinner = <Segment basic={true} padded={true} style={segmentStyle}>
+                    <Dimmer active inverted style={{ background: "transparent" }} >
+                        <Loader size='medium' style={{ background: "transparent" }}></Loader>
+                    </Dimmer>
+                </Segment>
+
+            if (isSvg) {
+                return (<foreignObject style={foreignObjectStyle}>
+                    <Container style={style} className={"loading"}>
+                        {spinner}
+                    </Container>
                 </foreignObject>)
+            } else {
+                return (<Container style={style} className={"loading"}>
+                    {spinner}
+                </Container>)
+            }
+           
         } else if (!error) {
             return <DataContext.Provider value={data}>{this.props.children}</DataContext.Provider>
         } else if (error) {
