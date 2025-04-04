@@ -86,16 +86,24 @@ class DataProvider extends React.Component {
 
     render() {
         const {data, style, loading, time, error, editing} = this.props
+        const foreignObjectStyle = {
+            width: "100%",
+            height: "100%",
+            background: "transparent",
+            verticalAlign: "middle",            
+            overflow: "hidden"
+        }      
 
         if ((loading && this.state.showLoading && !editing)) {
-            return (<Container style={style} className={"loading"}>
-                <Segment basic={true} padded={true} textAlign={"center"} style={{margin: '30px', ...style}}>
-                    <Dimmer active inverted>
-                        <Loader size='medium'></Loader>
-                    </Dimmer>
-                </Segment>
-
-            </Container>)
+            return (<foreignObject style={foreignObjectStyle}>
+                <Container style={{...style}} className={"loading"}>
+                    <Segment basic={true} padded={true} textAlign={"center"} style={{margin: '30px',  height: "90%", ...style}}>
+                        <Dimmer active inverted style={{background: "transparent"}} >
+                            <Loader size='medium' style={{background: "transparent"}}></Loader>
+                        </Dimmer>
+                    </Segment>    
+                </Container>
+                </foreignObject>)
         } else if (!error) {
             return <DataContext.Provider value={data}>{this.props.children}</DataContext.Provider>
         } else if (error) {
@@ -111,9 +119,7 @@ class DataProvider extends React.Component {
                     <p>Can't find this page</p>
                 </Segment>
             </Container>
-        }
-
-        return null;
+        }   
     }
 }
 
