@@ -97,11 +97,14 @@ class DataProvider extends React.Component {
                 overflow: "hidden"
             }
 
-            const segmentStyle = Object.assign({}, style)
-            segmentStyle.height = "90%"
-            segmentStyle.background = "transparent"
-            segmentStyle.margin = "30px"
-            segmentStyle.textAlign = "center"
+            const segmentStyle = Object.assign({}, style, {
+                height: "90%",
+                background: "transparent",
+                textAlign: "center",
+                margin: "30px"
+            })
+            
+
             const spinner = <Segment basic={true} padded={true} style={segmentStyle}>
                     <Dimmer active inverted style={{ background: "transparent" }} >
                         <Loader size='medium' style={{ background: "transparent" }}></Loader>
