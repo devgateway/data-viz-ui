@@ -849,18 +849,18 @@ const Chart = ({
           }
           const value = data.value
             ? intl.formatNumber(
-              format.style === "percent" ? data.value / 100 : data.value,
-              format
-            )
+                format.style === "percent" ? data.value / 100 : data.value,
+                format
+              )
             : "";
           const valueLength = value.length;
           let yPos;
           let xPos;
           if (
-            (layout == "vertical" && height >= LABEL_SKIP_HEIGHT) ||
-            (layout == "horizontal" && width >= LABEL_SKIP_HEIGHT)
+            (layout === "vertical" && width >= LABEL_SKIP_WIDTH) ||
+            (layout === "horizontal" && height >= LABEL_SKIP_HEIGHT)
           ) {
-            if (layout == "vertical") {
+            if (layout === "vertical") {
               const padding = 6; // adjusts position not to be too close to the bar
               yPos = y - padding;
               xPos = x + width / 2 - valueLength * 3.5;
