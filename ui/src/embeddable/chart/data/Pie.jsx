@@ -13,11 +13,14 @@ export const PieData = (props) => {
     const values = [];
     const tMap = typesMap(data);
     const keys = [];
+   
     data.children.forEach((d) => {
+      dimensionsMetadata.add(tMap[d.type]);
       if (d.children) {
         d.children.forEach((d1) => {
           const row = new Object();
-          const variables = new Object();
+          const variables = new Object();        
+
           variables[d.type] =
             getTranslatedValue(
               tMap[d.type].items.filter((i) => i.value === d.value)[0],
@@ -41,7 +44,8 @@ export const PieData = (props) => {
             getTranslatedValue(
               tMap[d1.type].items.filter((i) => i.value === d1.value)[0],
               locale
-            ); //Male /African ect (dimension value)
+            );          
+
           keys.push(d.value + " - " + d1.value);
           row.value = d1[measures[0]];
           row.label =
@@ -56,6 +60,28 @@ export const PieData = (props) => {
             ); //Male /African ect (dimension value)
           row.variables = variables;
           values.push(row);
+
+          //Add metadata for second dimension                 
+          let metadata = Array.from(dimensionsMetadata).find(i => i.dimension === d1.type) || { ...tMap[d1.type] };
+
+          if (!Array.from(dimensionsMetadata).some(i => i.dimension === d1.type)) {
+            dimensionsMetadata.add(metadata);
+          }
+          
+          let metaItem = metadata.items.find(i => i.id === row.id) || {
+            dimension: d1.type,
+            type: d1.type,
+            categoryStyle: { color: '#484848' },
+            position: 0,
+            labels: {},
+            code: row.id,
+            value: row.id,
+            id: row.id
+          };
+          
+          if (!metadata.items.some(i => i.id === row.id)) {
+            metadata.items.push(metaItem);
+          }
         });
       } else {
         const category = tMap[d.type].items.filter(
