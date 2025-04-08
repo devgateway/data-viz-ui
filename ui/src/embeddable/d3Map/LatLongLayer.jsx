@@ -180,7 +180,7 @@ class DataLayer extends React.Component {
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         const {projection} = this.props
-       // this.create()
+        this.create()
     }
 
     componentDidMount() {
