@@ -37,6 +37,8 @@ class DataProvider extends React.Component {
     componentDidUpdate(prevProps, prevState, snapshot) {
         const {app, filters, apply, source, store, params, csv, group, autoApply, editing} = this.props
 
+        debugger; // eslint-disable-line no-debugger
+
         let doApply = false
 
         if (apply !== undefined  && apply !== null && apply !=prevProps.apply) {
@@ -46,7 +48,7 @@ class DataProvider extends React.Component {
         if (autoApply!==false) {
             if (filters != prevProps.filters || JSON.stringify(params) != JSON.stringify(prevProps.params)
                 || app != prevProps.app
-                || prevProps.source != source
+                ||  JSON.stringify(prevProps.source) !=  JSON.stringify(source)
                 || csv != prevProps.csv) {
 
                 if (app === "csv") {
