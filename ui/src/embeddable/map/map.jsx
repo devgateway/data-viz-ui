@@ -8,6 +8,7 @@ import {
   Dimmer,
   Loader,
   Segment,
+  Message
 } from "semantic-ui-react";
 import React from "react";
 import * as topojson from "topojson-client";
@@ -263,8 +264,6 @@ componentWillUnmount() {
       layers: [],
       layersLoading: true,
     });
-
-    console.log("enabledLayers", enabledLayers)
     if (enabledLayers && enabledLayers.length > 0) {
       const metadataFuncs = [];
       enabledLayers.forEach((l) => {
@@ -1876,6 +1875,18 @@ componentWillUnmount() {
     );
   }
 
+  noMapSelected(){
+    return (
+      <Message icon warning>
+        <Icon name="map outline" />
+        <Message.Content>
+          <Message.Header>No map selected</Message.Header>
+          Pick one from the list in the <strong>Map Layers</strong> section.
+        </Message.Content>
+      </Message>
+    );
+  };
+
   render() {
     let {
       app,
@@ -1897,7 +1908,7 @@ componentWillUnmount() {
     } = this.props;
 
     if(!zoomEnabled) {
-      zoomEnabled = ['mobile', 'tablet', 'midTablet'].includes(getDeviceCategory()) ? true: false;
+      zoomEnabled = !!['mobile', 'tablet', 'midTablet'].includes(getDeviceCategory());
     }
     const nationalAverage = this.getAvg();
     const filters = this.getFilters();
@@ -1988,7 +1999,7 @@ componentWillUnmount() {
 
     return (
       <div className="map component wp-data-viz-map" ref={this.mapContainer}>
-        {this.state.layersLoading && this.renderLoader()}
+        {this.state.layersLoading && ( editing ? this.noMapSelected(): this.renderLoader())}
         {!this.state.layersLoading && (
           <>
            { !isMobileOrTablet && <MapLegendComponent />}
