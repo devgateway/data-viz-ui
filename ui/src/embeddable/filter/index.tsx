@@ -86,7 +86,7 @@ const FilterDropDown = (props: FilterDropDownProps) => {
     const {isRange, options, alphabeticalSort, ascOrder} = props
     let sortedOptions: any [] = []
     if (booleanParameter(alphabeticalSort)) {
-        sortedOptions = options.sort(function (a, b) {
+        options.sort(function (a, b) {
             const aText = a.text ? a.text.toLowerCase() : "";
             const bText = b.text ? b.text.toLowerCase() : "";
             if (booleanParameter(ascOrder)) {
@@ -96,7 +96,7 @@ const FilterDropDown = (props: FilterDropDownProps) => {
             }
         });
     } else {
-        sortedOptions = options.sort(function (a, b) {
+        options.sort(function (a, b) {
             return booleanParameter(ascOrder) ? a.position - b.position : b.position - a.position;
         });
     }
@@ -547,79 +547,77 @@ const Filter = ({
     }
     if (app === 'csv') {
         return <CSVFilter allLabel={allLabel} noneLabel={noneLabel}
-                          isRange={isRange === 'true'}
-                          csvValue={csvValue} app={app} group={group}
-                          icon={icon} placeholder={placeholder}
-                          startLabel={startLabel} endLabel={endLabel}
-                          param={param}
-                          useSingleColumn={useSingleColumn === 'true'}
-                          enableTextSearch={enableTextSearch === 'true'}
-                          filterType={defaultFilterType}
-                          defaultValues={defaultValues}
-                          defaultValueCriteria={defaultValueCriteria}
-                          allNoneSameBehaviour={allNoneSameBehaviour === 'true'}
-                          closeOnSelect={closeOnSelect === 'true'}
-                          locale={intl.locale}
+            isRange={isRange === 'true'}
+            csvValue={csvValue} app={app} group={group}
+            icon={icon} placeholder={placeholder}
+            startLabel={startLabel} endLabel={endLabel}
+            param={param}
+            ascOrder={ascOrder}
+            useSingleColumn={useSingleColumn === 'true'}
+            enableTextSearch={enableTextSearch === 'true'}
+            filterType={defaultFilterType}
+            defaultValues={defaultValues}
+            defaultValueCriteria={defaultValueCriteria}
+            allNoneSameBehaviour={allNoneSameBehaviour === 'true'}
+            closeOnSelect={closeOnSelect === 'true'}
+            locale={intl.locale}
         />
-    } else {
-
-        if (app) {
-            return (<CategoriesProvider
-                params={params}
-                app={app}
-                hiddenFilters={hiddenFiltersArr || []}>
-                <CategoriesConsumer>
-                    <Container fluid={true}>
-                        {type === "Boolean" &&
-                            <BooleanFilter startLabel={startLabel}
-                                           endLabel={endLabel}
-                                           allLabel={allLabel}
-                                           noneLabel={noneLabel}
-                                           isRange={booleanParameter(isRange)}
-                                           app={app}
-                                           group={group}
-                                           icon={icon}
-                                           placeholder={placeholder}
-                                           param={param}
-                                           filterType={defaultFilterType}
-                                           defaultValues={defaultValues}
-                                           locale={intl.locale}>
-
-                            </BooleanFilter>}
-                        {type !== "Boolean" && <CategoriesConsumer type={type}>
-                            <CategoryFilter
-                                startLabel={startLabel}
-                                endLabel={endLabel} allLabel={allLabel}
-                                noneLabel={noneLabel}
-                                isRange={booleanParameter(isRange)}
-                                app={app} group={group}
-                                icon={icon}
-                                placeholder={placeholder}
-                                param={param}
-                                alphabeticalSort={alphabeticalSort}
-                                ascOrder={ascOrder}
-                                useSingleColumn={booleanParameter(useSingleColumn)}
-                                enableTextSearch={booleanParameter(enableTextSearch)}
-                                showNoDataOption={booleanParameter(showNoDataOption)}
-                                filterType={defaultFilterType}
-                                defaultValues={defaultValues}
-                                defaultValueCriteria={defaultValueCriteria}
-                                hiddenFilters={hiddenFiltersArr || []}
-                                allNoneSameBehaviour={allNoneSameBehaviour == "true"}
-                                autoApply={booleanParameter(autoApply)}
-                                closeOnSelect={booleanParameter(closeOnSelect)}
-                                locale={intl.locale}>
-
-                            </CategoryFilter>
-                        </CategoriesConsumer>}
-
-                    </Container>
-                </CategoriesConsumer>
-            </CategoriesProvider>)
-        } else {
-            return null;
-        }
     }
+    if (app) {
+        return (<CategoriesProvider
+            params={params}
+            app={app}
+            hiddenFilters={hiddenFiltersArr || []}>
+            <CategoriesConsumer>
+                <Container fluid={true}>
+                    {type === "Boolean" &&
+                        <BooleanFilter startLabel={startLabel}
+                                       endLabel={endLabel}
+                                       allLabel={allLabel}
+                                       noneLabel={noneLabel}
+                                       isRange={booleanParameter(isRange)}
+                                       app={app}
+                                       group={group}
+                                       icon={icon}
+                                       placeholder={placeholder}
+                                       param={param}
+                                       filterType={defaultFilterType}
+                                       defaultValues={defaultValues}
+                                       locale={intl.locale}>
+
+                        </BooleanFilter>}
+                    {type !== "Boolean" && <CategoriesConsumer type={type}>
+                        <CategoryFilter
+                            startLabel={startLabel}
+                            endLabel={endLabel} allLabel={allLabel}
+                            noneLabel={noneLabel}
+                            isRange={booleanParameter(isRange)}
+                            app={app} group={group}
+                            icon={icon}
+                            placeholder={placeholder}
+                            param={param}
+                            alphabeticalSort={alphabeticalSort}
+                            ascOrder={ascOrder}
+                            useSingleColumn={booleanParameter(useSingleColumn)}
+                            enableTextSearch={booleanParameter(enableTextSearch)}
+                            showNoDataOption={booleanParameter(showNoDataOption)}
+                            filterType={defaultFilterType}
+                            defaultValues={defaultValues}
+                            defaultValueCriteria={defaultValueCriteria}
+                            hiddenFilters={hiddenFiltersArr || []}
+                            allNoneSameBehaviour={allNoneSameBehaviour == "true"}
+                            autoApply={booleanParameter(autoApply)}
+                            closeOnSelect={booleanParameter(closeOnSelect)}
+                            locale={intl.locale}>
+
+                        </CategoryFilter>
+                    </CategoriesConsumer>}
+
+                </Container>
+            </CategoriesConsumer>
+        </CategoriesProvider>)
+    }
+    return null;
 }
 
 

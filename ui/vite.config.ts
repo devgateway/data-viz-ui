@@ -14,9 +14,9 @@ export default defineConfig(({ mode }) => {
     return {
         // define: {
         //     'process.env': env,
-        // }, 
+        // },
         plugins: [
-            react({}),
+            react(),
             eslintPlugin({
                 exclude: ['/virtual:/**', 'node_modules/**', "dist/**"],
             }),
@@ -28,7 +28,7 @@ export default defineConfig(({ mode }) => {
             alias: {
                 "@": path.resolve(__dirname, "./src"),
                 react: path.resolve('./node_modules/react'),
-               "inmutable": path.resolve('./node_modules/inmutable'),
+                "inmutable": path.resolve('./node_modules/inmutable'),
                 "react-dom": path.resolve('./node_modules/react-dom'),
                 "react-router-dom": path.resolve('./node_modules/react-router-dom'),
                 "react-redux": path.resolve('./node_modules/react-redux'),
@@ -55,7 +55,7 @@ export default defineConfig(({ mode }) => {
 
         optimizeDeps: {
             include: [
-                "@devgateway/ui-customizer",
+                "../../custom/ui-customizer",
                 "@devgateway/wp-react-lib",
                 "react",
                 "semantic-ui-react",
@@ -63,9 +63,6 @@ export default defineConfig(({ mode }) => {
             ]
         },
         appType: 'spa',
-        experimental: {
-
-        },
         server: {
             hrm: {
                 overlay: false,
@@ -75,6 +72,7 @@ export default defineConfig(({ mode }) => {
                 allow: [
                     searchForWorkspaceRoot(process.cwd()),
                     '../react-lib/wp-react-lib',
+                    '../../custom/ui-customizer',
                 ]
             },
         },
