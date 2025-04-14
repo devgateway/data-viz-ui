@@ -101,8 +101,8 @@
 
 }
 
-
-.wp-block-viz-components-time-line {
+.wp-block-viz-components-time-line,
+.wp-block-viz-time-line {
   @media screen and (max-width: 1024px) {
     height: 100vh !important;
     margin-top: -45px;

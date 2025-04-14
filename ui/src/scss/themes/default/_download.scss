@@ -1,25 +1,31 @@
 .viz.download {
-  margin-top: -5px;
+
   .download-header{
     align-items: center;
     .ui.container.entry-content{
-      padding:0;
-    }
-    >.column{
-      margin:0;
-      padding: 0;
-    }
-  }
-
-  .download.area {
-    display: flex;
-    .ui.container.entry-content{
-      padding: 0;
+      padding-bottom: $base-unit !important;
+      padding-top: $base-unit !important;
     }
   }
 
   .wp-block-columns{
     margin-bottom: $base-unit + 5;
+  }
+
+  .download.area {
+    display: flex;
+    //width: 100% !important;
+    .ui.container.entry-content{
+      width: 100% !important;
+      padding: 0;
+    }
+    i.icon.question.circle{
+      color: $ng-green;
+      cursor: pointer;
+      font-size: 0.8em;
+      margin-left: 5px;
+      padding: 0 0 $base-unit * 2 0;
+    }
   }
 
   .button.download {
@@ -53,7 +59,7 @@
 
   .active {
     .download-icon:before {
-      padding-bottom: 17px;
+      //padding-bottom: 17px;
       border-bottom: 0px;
       border-bottom-left-radius: 0px !important;
       border-bottom-right-radius: 0px !important;
@@ -119,6 +125,18 @@
     }
   }
 
+
+}
+
+.viz.download.has-title {
+  .download.title {
+    padding: 0;
+    margin: 0px;
+    float: left;
+    p{
+      line-height: 125%;
+    }
+  }
   .ui.grid, .column {
     padding: 0px;
     margin: 0px;
@@ -129,63 +147,238 @@
   }
   .ui.grid {
     margin-bottom: -5px;
-    //margin-top: -5px;
+    margin-top: -5px;
   }
 }
 
-.viz.download.light {
+.viz.download {
 
   .wrapper {
-    border: 1px solid #0692fe;
+    border: 2px solid #0692fe;
     padding: 3px 5px;
     border-radius: 5px;
     float: right;
   }
 
   .map.wrapper{
-    border: none;
+    background-color: #FFFFFF;
+    border:none;
+    float: none;
+    overflow: hidden;
+    @media print{
+      margin-left: 20px;
+    }
+    //height: 100% !important;
+  }
+
+  [data-tooltip]{
+    &:after{
+      font-size: 0.8rem;
+    }
+    &:before{
+      bottom: $base-unit + 13px;
+    }
   }
 
   .ui.button.download {
     border: 0px;
-    font-weight: 300;
-    padding: 5px 5px;
-    background-color: #FFF;
+    font-weight: 400;
+    padding: $base-unit * 0.5;
+    background-color: transparent;
     color: #0692fe;
-
+    margin-right: 0;
+    &:hover{
+      color: #0692fe;
+    }
+  }
+  .dropdown.download{
+    padding-right: $base-unit - 3;
+  }
+  .download-icon{
+    &:before{
+      @include border-radius(0);
+      border: 0px;
+      border-left: 2px solid #0692fe;
+      color: #0692fe;
+      height: $base-unit * 2;
+      margin-left: 5px;
+      padding: 0 4px 0 7px;
+    }
+    /*&:hover{
+      &:before{
+        color: #046fbe;
+      }
+    }*/
   }
 
-  .download-icon:before {
-    padding: 0px 4px;
-    border: 0px;
-    color: #0692fe;
+  .wrapper:hover {
+    background-color: #0692fe;
+    .ui.button.download{
+      background-color: transparent;
+      color: #FFFFFF;
+    }
+    .download-icon{
+      &:before{
+        color: #FFFFFF;
+        background-color: transparent !important;
+        border-left: 2px solid #FFFFFF;
+      }
+    }
   }
-
-  .ui.dropdown.download {
-
+  .map.wrapper:hover {
+    background-color: #FFFFFF;
   }
 
   .dropdown.download {
     .visible.menu.transition {
-      border: 1px solid #0692fe;
+      border: 2px solid #0692fe;
       top: 30px;
-      right: -5px;
+      right: -7px;
       font-weight: 400;
       color: #0692fe;
-      border-radius: 5px;
+      border-radius: 5px !important;
     }
   }
 }
 
+.viz.download.heavy {
+  .wrapper {
+    background-color: #0692fe;
+    border: 2px solid #0692fe;
+    .ui.button.download{
+      background-color: transparent;
+      color: #FFFFFF;
+    }
+    .download-icon{
+      &:before{
+        color: #ffffff;
+        background-color: transparent !important;
+        border-left: 2px solid #FFFFFF;
+      }
+    }
+  }
+  .wrapper:hover {
+    background-color: #0083e8;
+    border: 2px solid #0083e8;
+  }
+}
 
+.ui.top.left.popup.title-popup{
+  background-color: $popup-bg;
+  padding: $base-unit * 2;
+  &:before{
+    background: $popup-bg;
+  }
+}
 
-.viz.download.has-title {
-  .download.title {
-    padding: 0;
-    margin: 0px;
-    float: left;
-    p{
-      line-height: 125%;
+@media only screen and (max-width: 1024px) {
+
+  .wp-block-viz-download {
+
+    .viz.download .ui.grid {
+      margin-bottom: 0 !important;
+      margin-top: 0 !important;
+    }
+
+    .container.viz.download {
+      .download-header {
+        .ui.container.entry-content {
+          padding-bottom: 0 !important;
+          padding-top: 0 !important;
+
+          p {
+            font-size: 18px !important;
+          }
+        }
+        flex-direction: row !important;
+        .column {
+          flex-grow: 1 !important;
+          max-width: 90% !important;
+          padding: 0 30px 0 0 !important;
+          align-self: center !important;
+        }
+        .column:last-child {
+          flex: 0 0 10% !important;
+          max-width: 8% !important;
+          padding: 3px 0 0 0 !important;
+          align-self: flex-start !important;
+        }
+
+        //.sixteen.wide.column.ignore targets download component that don't use a title only:
+        .sixteen.wide.column.ignore {
+          flex: 1 1 auto !important;
+          max-width: 100% !important;
+        }
+
+        .wrapper {
+          width: 44px;
+          height: 44px;
+          display: flex;
+          justify-content: center;
+          align-content: center;
+          flex-wrap: wrap;
+          padding: 5px !important;
+        }
+        .ui.dropdown.download {
+          .download-icon {
+            margin: 0 !important;
+          }
+          .download-icon::before {
+            border: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+          }
+        }
+      }
+    }
+
+    .ui.active.visible.dropdown.download {
+      .menu.transition.visible {
+        border: 2px solid #0692fe !important;
+        top: 35px !important;
+        right: -11px !important;
+        min-height: 120px !important;
+        .item {
+          display: block !important;
+          visibility: visible !important;
+        }
+      }
+    }
+
+    .viz.download {
+      [data-tooltip] {
+        padding: 0 !important;
+        &:after {
+          display: none !important;
+        }
+
+        &:before {
+          display: none !important;
+        }
+      }
+    }
+
+  }
+
+  .wp-block-viz-download {
+    .single-format{
+      .wrapper {
+        width: 44px !important;
+        .ui.button.download {
+          display: block !important;
+          padding-bottom: 16px !important;
+          &::first-line {
+            visibility: hidden !important;
+          }
+        }
+      }
+    }
+    .multi-format{
+      .wrapper {
+        .ui.button.download {
+          display: none !important;
+        }
+      }
     }
   }
 

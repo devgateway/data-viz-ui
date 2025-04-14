@@ -1,16 +1,16 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Provider } from 'react-redux'
-import { Route, Routes, BrowserRouter, Navigate, useLocation, useParams, createBrowserRouter, createRoutesFromElements, RouterProvider } from 'react-router-dom';
+import { Route, Routes, Navigate, useLocation, useParams, createBrowserRouter, createRoutesFromElements, RouterProvider } from 'react-router-dom';
 import { store } from './redux/store'
 import messages_en from "./translations/en.json";
 import messages_fr from "./translations/fr.json";
 import messages_am from './translations/af.json';
-import { updateIntl } from '@/lib/react-intl-redux'
+import { updateIntl } from '@/lib/react-intl-redux';
 import { injectIntl, IntlProvider } from "react-intl";
 import ResponsiveContainer from './layout'
 import { getComponentByNameIgnoreCase } from "./embeddable";
-import Helmet from './Helmet'
-// import WithTracker from "./withTracker";
+import Helmet from './Helmet';
+
 import {
     AppContextProvider,
     Category,
@@ -29,13 +29,15 @@ import PreviewTypeContainer from './layout/containers/PreviewTypeContainer';
 import SlugContainer from './layout/containers/SlugContainer';
 import SlugPostContainer from './layout/containers/SlugPostContainer';
 import withTracker from './withTracker';
+import { Config } from './conf';
+import useDynamicFavicon from './layout/FavIcon';
 
 
 
 const messages = {
     'en': messages_en,
-    'fr' : messages_fr,
-    'am' : messages_am
+    'fr': messages_fr,
+    'am': messages_am
 };
 
 const PreviewComponentParameterParser = () => {
@@ -62,9 +64,11 @@ const PreviewComponentParameterParser = () => {
 
     useEffect(() => {
         window.addEventListener("message", readMessage, false);
-
         if (window.parent) {
             window.parent.postMessage({ type: "componentReady", value: true }, "*")
+        }
+        if (window.top) {
+            window.top.postMessage({ type: "componentReady", value: true }, "*")
         }
         return () => {
             window.removeEventListener('message', readMessage);
@@ -73,11 +77,11 @@ const PreviewComponentParameterParser = () => {
 
     return (
         <div>
-           <Container fluid={true} className={"editing"}>
-                    {/* @ts-ignore */}
-                    {UIComponent ? <UIComponent  {...params} editing={true}></UIComponent> :
-                        <Segment.Group color={"red"} textAlign={"center"}><h1>Wrong Component Name</h1></Segment.Group>}
-                </Container>
+            <Container fluid={true} className={"editing"}>
+                {/* @ts-ignore */}
+                {UIComponent ? <UIComponent  {...params} editing={true} /> :
+                    <Segment.Group color={"red"} textAlign={"center"}><h1>Wrong Component Name</h1></Segment.Group>}
+            </Container>
 
         </div>
 
@@ -90,14 +94,68 @@ const InjectTitle = injectIntl((props) => {
     // @ts-expect-error description
     document.title = props.settings.description   
     return <></>
-})
+});
+
+
+const TrackedRoutes = withTracker(({ children, locale }: { children: any, locale: string }) => {
+    return (
+        <>
+            <ScrollToTop />
+            <CustomizerWrapper>
+                <InjectTitle />
+            </CustomizerWrapper>
+            <Routes>
+                {/* <Route path="/" element={<Outlet />} /> */}
+                {
+                    //Category Route
+                }
+                <Route path="/category/:slug/" element={
+                    <ResponsiveContainer>
+                        <Category />
+                    </ResponsiveContainer>
+                }>
+                </Route>
+                {
+                    //default route (home)
+                }
+
+                <Route path="/" element={(
+                    <PageProvider
+                        slug={"home"}
+                        locale={locale}
+                        store={"home"}>
+                        <PageConsumer>
+                            <ResponsiveContainer locale={locale}>
+                                <PageConsumer>
+                                    <Page />
+                                    <Helmet locale={locale} />
+                                </PageConsumer>
+                            </ResponsiveContainer>
+                        </PageConsumer>
+                    </PageProvider>
+                )}>
+                </Route>
+                <Route path="embeddable/:name" element={
+                    <SettingsConsumer>
+                        <PreviewComponentParameterParser />
+                    </SettingsConsumer>}>
+                </Route>
+
+                <Route path={"preview/page/:id"} element={<PreviewPageContainer />} />
+                <Route path={"preview/:type/:id"} element={<PreviewTypeContainer />} />
+                <Route path=":slug" element={<SlugContainer />} />
+                <Route path=":parent/:slug" element={<SlugContainer />} />
+                <Route path=":year/:month/:day/:slug" element={<SlugPostContainer />} />
+                <Route path=":parent/:year/:month/:day/:slug" element={<SlugPostContainer />} />
+            </Routes>
+        </>
+    )
+});
 
 const IntlRoutes = () => {
     const pathParams = useParams();
-
+    const defaultLocale = Config.DEFAULT_LOCALE;
     const locale = pathParams.lan;
-
-
 
     useEffect(() => {
         if (process.env) {
@@ -125,71 +183,25 @@ const IntlRoutes = () => {
 
     const urlParams = new URLSearchParams(window.location.search);
     const customize_changeset_uuid = urlParams.get('customize_changeset_uuid');
- 
+
 
     useEffect(() => {
         // @ts-ignore
         window.isCustomizedPreview = customize_changeset_uuid != null;
     }, [customize_changeset_uuid]);
 
+
     if (!locale) {
-        return <Navigate to={"/en"}></Navigate>
+        return <Navigate to={defaultLocale}></Navigate>
     }
 
     return (
         <IntlProvider key={locale} locale={locale} messages={messages[locale]}>
             <AppContextProvider getComponent={getComponentByNameIgnoreCase} store={store} locale={locale}>
                 <SettingProvider locale={locale} changeUUID={customize_changeset_uuid}>
-                    <ScrollToTop />
                     <SettingsConsumer>
-                        <CustomizerWrapper>
-                            <InjectTitle />
-                        </CustomizerWrapper>
+                        <TrackedRoutes locale={locale} />
                     </SettingsConsumer>
-                    <Routes>
-                        {/* <Route path="/" element={<Outlet />} /> */}
-                        {
-                            //Category Route
-                        }
-                        <Route path="/category/:slug/" element={
-                            <ResponsiveContainer>
-                                <Category />
-                            </ResponsiveContainer>
-                        }>
-                        </Route>
-                        {
-                            //default route (home)
-                        }
-
-                        <Route path="/" element={(
-                            <PageProvider
-                                slug={"home"}
-                                locale={locale}
-                                store={"home"}>
-                                <PageConsumer>
-                                    <ResponsiveContainer>
-                                        <PageConsumer>
-                                            <Page />
-                                            <Helmet locale={locale} />
-                                        </PageConsumer>
-                                    </ResponsiveContainer>
-                                </PageConsumer>
-                            </PageProvider>
-                        )}>
-                        </Route>
-                        <Route path="embeddable/:name" element={
-                            <SettingsConsumer>
-                                <PreviewComponentParameterParser />
-                            </SettingsConsumer>}>
-                        </Route>
-
-                        <Route path={"preview/page/:id"} element={<PreviewPageContainer />} />
-                        <Route path={"preview/:type/:id"} element={<PreviewTypeContainer />} />
-                        <Route path=":slug" element={<SlugContainer />} />
-                        <Route path=":parent/:slug" element={<SlugContainer />} />
-                        <Route path=":year/:month/:day/:slug" element={<SlugPostContainer />} />
-                        <Route path=":parent/:year/:month/:day/:slug" element={<SlugPostContainer />} />
-                    </Routes>
                 </SettingProvider>
             </AppContextProvider>
         </IntlProvider>
@@ -197,27 +209,24 @@ const IntlRoutes = () => {
 };
 
 
-
-// TODO: Return Tracker
-const WithTrackerRoutes = withTracker(IntlRoutes);
-// const WithTrackerRoutes = IntlRoutes;
-
 const router = createBrowserRouter(
     createRoutesFromElements(
         <Route>
-            <Route path="/:lan/*" element={<WithTrackerRoutes />} />
-            <Route path={"/"} element={<WithTrackerRoutes />} />
+            <Route path="/:lan/*" element={<IntlRoutes />} />
+            <Route path={"/"} element={<IntlRoutes />} />
         </Route>
     )
 )
 
 const MainRoutes = () => {
+
     return (
-        <RouterProvider router={router}/>
+        <RouterProvider router={router} />
     )
 }
 
 const AppWrapper = () => {
+    useDynamicFavicon(Config.REACT_APP_WP_API);
     return (
         <Provider store={store}>
             <MainRoutes />
