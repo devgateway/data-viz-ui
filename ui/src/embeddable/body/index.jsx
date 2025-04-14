@@ -506,7 +506,7 @@ class Body extends React.Component {
 
     const { selectedOption, isMobile } = this.state;
 
-    let data = selectedOption === "Cancers" ? left : right;
+    const data = selectedOption === "Cancers" ? left : right;
 
     let sy = 60;
 

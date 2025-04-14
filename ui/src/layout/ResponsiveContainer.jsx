@@ -15,7 +15,7 @@ const DesktopContainer = ({ children, fixed }) => {
         <Container fluid={true}>
             <SettingsConsumer>
                 <CustomizerWrapper>
-                    <Header></Header>
+                    <Header />
                 </CustomizerWrapper>
             </SettingsConsumer>
             <Container className="desktop">
@@ -43,7 +43,7 @@ function ResponsiveContainer (props) {
             <DesktopContainer fixed={fixed}>
                 {children}
             </DesktopContainer>
-            {page && page.template === "noofoter.php" ? "" : <Footer></Footer>}
+            {page && page.template === "noofoter.php" ? "" : <Footer />}
         </div>)
 }
 
