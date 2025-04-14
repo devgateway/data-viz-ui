@@ -23,6 +23,19 @@ class BlockEdit extends BlockEditWithFilters {
         setAttributes({ "colors": newColors });
     }
 
+    componentWillUnmount() {
+        if (this.unsubscribe) {
+            this.unsubscribe();
+        }
+    }
+
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        const newPreviewMode = this.state?.previewMode;
+        if (newPreviewMode !== prevState.previewMode) {
+            this.props.setAttributes({ previewMode: newPreviewMode });
+        }
+    }
+
     render() {
         const {
             className, isSelected,
@@ -36,13 +49,14 @@ class BlockEdit extends BlockEditWithFilters {
                 height,
                 colors,
                 useScrolls,
-                readMoreLabel
+                readMoreLabel,
+                previewMode
             },
         } = this.props;
 
         const colorsParams = Object.keys(colors).map(k => colors[k]).join(",");
-        const queryString = `editing=true&data-type=${type}&data-taxonomy=${taxonomy}&data-categories=${categories}&data-items=${count}&data-height=${height}&data-color=${encodeURIComponent(colorsParams)}&data-read-more-label=${readMoreLabel}&data-use-scrolls=${useScrolls}`;
-        const divStyles = { height: height + 'px', width: "100%" };
+        const queryString = `editing=true&data-type=${type}&data-taxonomy=${taxonomy}&data-categories=${categories}&data-items=${count}&data-height=${height}&data-color=${encodeURIComponent(colorsParams)}&data-read-more-label=${readMoreLabel}&data-use-scrolls=${useScrolls}&data-preview-mode=${previewMode}`;
+        const divStyles = { height: `${height}px`, width: "100%" };
 
         return (
             <div>
@@ -101,7 +115,7 @@ class BlockEdit extends BlockEditWithFilters {
                                         title={__(`Color Settings  ${i + 1}`)}
                                         colorSettings={[
                                             {
-                                                value: colors["color_" + i],
+                                                value: colors[`color_${i}`],
                                                 onChange: (colorValue) => this.onChangeColor(i, colorValue),
                                                 label: __('Background Color'),
                                             }

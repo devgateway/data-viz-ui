@@ -50,7 +50,7 @@ function wpm_get_post_config( $post_type ) {
  */
 function wpm_get_taxonomy_config( $taxonomy ) {
 	$config            = wpm_get_config();
-	$taxonomies_config = apply_filters( 'wpm_taxonomies_config', $config['taxonomies'] );
+	$taxonomies_config = apply_filters( 'wpm_taxonomies_config', (array) $config['taxonomies'] );
 	$taxonomy_config   = apply_filters( "wpm_taxonomy_{$taxonomy}_config", isset( $taxonomies_config[ $taxonomy ] ) ? $taxonomies_config[ $taxonomy ] : null );
 
 	if ( null !== $taxonomy_config ) {
@@ -82,6 +82,7 @@ function wpm_get_widget_config( $widget ) {
 		$default_fields = array(
 			'title' => array(),
 			'text'  => array(),
+			'content'  => array(),
 		);
 
 		$widget_config = wpm_array_merge_recursive( $default_fields, $widget_config );

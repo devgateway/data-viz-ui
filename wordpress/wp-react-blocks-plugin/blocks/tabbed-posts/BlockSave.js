@@ -12,7 +12,7 @@ const SaveComponent = (props) => {
             showIcons,
             useScrolls,
             theme,
-
+            previewMode
         },
     } = props;
 
@@ -33,6 +33,7 @@ const SaveComponent = (props) => {
                 data-show-icons={showIcons}
                 data-use-scrolls={useScrolls}
                 data-theme={theme}
+                data-preview-mode={previewMode}
                 className={"viz-component"}
                 data-component={"tabbedPosts"}>
             </div>

@@ -10,10 +10,15 @@
     },
     "any": {},
     "customize_changeset": null,
-    "revision": null
+    "revision": null,
+    "wp_template": {},
+    "wp_template_part": {},
+    "wp_navigation": {},
+    "wp_global_styles": {}
   },
   "post_fields": {
-    "_wp_attachment_image_alt": {}
+    "_wp_attachment_image_alt": {},
+    "_thumbnail_id":{}
   },
   "taxonomies": {
     "category" : {},
@@ -32,7 +37,8 @@
   ],
   "options": {
     "blogname": {},
-    "blogdescription": {}
+    "blogdescription": {},
+    "site_logo": {}
   },
   "site_options": {
     "site_name": {},

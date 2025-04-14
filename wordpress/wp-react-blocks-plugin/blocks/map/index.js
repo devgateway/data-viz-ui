@@ -82,7 +82,7 @@ registerBlockType(process.env.BLOCKS_NS+'/map',
             },
             mapFile: {
                 type: "String",
-                default: 'africa-geojson-tanzania-others-en-v2.json' 
+                default: ''
             },
             enabledLayers: {
                 type: "Array",

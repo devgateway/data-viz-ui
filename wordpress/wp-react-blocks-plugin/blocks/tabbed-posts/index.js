@@ -49,6 +49,10 @@ registerBlockType(process.env.BLOCKS_NS + '/tabbed-posts',
             panelStatus: {
                 type: "Object",
                 default: {}
+            },
+            previewMode: {
+                type: "string",
+                default: "Desktop"
             }
         },
         edit: BlockEdit,

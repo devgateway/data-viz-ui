@@ -128,7 +128,11 @@ function custom_api_search($request)
                 ))),
 
                 'link' => get_permalink($post->ID),
-
+                'bread_crumbs'=>array_map(
+                     function ($term) {
+                         return  wpm_translate_value($term->name, $request['lang']);
+                    },
+                      wp_get_post_terms($post->ID, "bread_crumbs", array( "orderby" => "parent")))
      ];
 
 

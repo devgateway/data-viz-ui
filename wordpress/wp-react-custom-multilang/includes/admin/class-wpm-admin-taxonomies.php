@@ -63,7 +63,7 @@ class WPM_Admin_Taxonomies {
 			$columns = array();
 		}
 
-		return wpm_array_insert_after( $columns, 'name', array( 'languages' => __( 'Languages', 'wp-multilang' ) ) );
+		return wpm_array_insert_after( $columns, 'name', array( 'languages' => esc_html__( 'Languages', 'wp-multilang' ) ) );
 	}
 
 
@@ -89,6 +89,7 @@ class WPM_Admin_Taxonomies {
 
 			foreach ( $languages as $code => $language ) {
 				if ( isset( $strings[ $code ] ) && ! empty( $strings[ $code ] ) ) {
+					// phpcs:ignore PluginCheck.CodeAnalysis.ImageFunctions.NonEnqueuedImage -- Reason Using built in function doesn't work in our case, so created custom function
 					$output[] = '<img src="' . esc_url( wpm_get_flag_url( $language['flag'] ) ) . '" alt="' . esc_attr( $language['name'] ) . '" title="' . $language['name'] . '">';
 				}
 			}
@@ -111,7 +112,7 @@ class WPM_Admin_Taxonomies {
 		$i         = 0;
 		?>
 		<div class="form-field term-languages">
-			<p><?php _e( 'Show term only in:', 'wp-multilang' ); ?></p>
+			<p><?php esc_html_e( 'Show term only in:', 'wp-multilang' ); ?></p>
 			<?php foreach ( $languages as $code => $language ) { ?>
 				<label><input type="checkbox" name="wpm_languages[<?php echo esc_attr( $i ); ?>]" id="wpm-languages-<?php echo esc_attr( $code ); ?>" value="<?php echo esc_attr( $code ); ?>"><?php echo esc_html( $language['name'] ); ?></label>
 				<?php $i ++;
@@ -137,7 +138,7 @@ class WPM_Admin_Taxonomies {
 		$i         = 0;
 		?>
 		<tr class="form-field">
-			<th scope="row" valign="top"><?php _e( 'Show term only in:', 'wp-multilang' ); ?></th>
+			<th scope="row" valign="top"><?php esc_html_e( 'Show term only in:', 'wp-multilang' ); ?></th>
 			<td>
 				<ul class="languagechecklist">
 					<?php foreach ( $languages as $code => $language ) { ?>

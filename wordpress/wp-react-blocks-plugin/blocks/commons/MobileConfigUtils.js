@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import { getTranslatedOptions } from "./APIutils";
 
 
@@ -14,7 +15,7 @@ export function transformDataToAppObject(data, appName, existingObject = {}) {
     return existingObject;
   }
   existingObject[appName] = {};
-  data.forEach((item) => {
+  data?.forEach((item) => {
     const key = item.value;
     existingObject[appName][key] = {
       selected: false,
@@ -32,8 +33,25 @@ export function transformDataToAppObject(data, appName, existingObject = {}) {
   return existingObject;
 }
 
+export function getSelectedItemsForApp(config, appName) {
+  const appConfig = config[appName];
+  if (!appConfig) return {};
+
+  const selectedEntries = {};
+
+  for (const key in appConfig) {
+    const value = appConfig[key];
+    if (value && typeof value === 'object' && value.selected === true) {
+      selectedEntries[key] = value;
+    }
+  }
+
+  return selectedEntries;
+}
+
+
 export function getSelectedLabelsForApp(data, appName) {
-  const appData = data[appName];
+  const appData = data;
   if (!appData) {
     return [];
   }
@@ -51,10 +69,26 @@ export function updateMeasureLabels(data, measures, app) {
   const apiMeasures = getTranslatedOptions(data);
   // for each api measure, find the corresponding measure in the measures array
   // and add a label property to the measure in the measures array
-  apiMeasures.forEach((apiMeasure) => {
+  apiMeasures?.forEach((apiMeasure) => {
     const measure = measures[app][apiMeasure.value];
     if (measure) {
       measure.label = apiMeasure.label;
     }
   });
 };
+
+
+export function getStoredOrSetItem(key, fallback, overwrite=false) {
+  const fallbackValue = fallback || [];
+  if (overwrite && !_.isEmpty(fallbackValue)) {
+    sessionStorage
+      .setItem(key, JSON.stringify(fallbackValue));
+    return fallbackValue;
+  }
+  const stored = JSON.parse(sessionStorage.getItem(key));
+  if (!stored) {
+    sessionStorage.setItem(key, JSON.stringify(fallbackValue));
+    return fallbackValue;
+  }
+  return stored;
+}

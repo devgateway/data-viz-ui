@@ -27,7 +27,6 @@ function register_scripts(){
 wp_register_script( 'dummy-handle-header2', '' );
 
 
-
 wp_enqueue_script( 'dummy-handle-header2' );
 
         if (function_exists('wpm_get_language')) {
