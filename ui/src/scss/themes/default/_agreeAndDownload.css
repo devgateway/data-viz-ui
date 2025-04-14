@@ -1,0 +1,12 @@
+.agree-and-download.link {
+    font-size: 16px;
+}
+
+
+.ui.button.agree-and-download, .components-button.agree-and-download {
+    margin: 0px;
+    font-size: 16px;
+    padding: 10px !important;
+    font-weight: 300 !important;
+    text-decoration: none;
+}

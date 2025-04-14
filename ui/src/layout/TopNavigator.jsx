@@ -3,13 +3,16 @@ import {Menu} from 'semantic-ui-react'
 
 
 const TopNavigator = () => {
+    const [show, setShow] = React.useState(false);
+
     useEffect(() => {
+       
         const handleScroll = () => {
-            const topNavigator = document.getElementById("top-navigator");
+            // const topNavigator = document.getElementById("top-navigator");
             if (window.pageYOffset > 150) {
-                topNavigator.classList.add("visible");
+                setShow(true);
             } else {
-                topNavigator.classList.remove("visible");
+                setShow(false);
             }
         };
 
@@ -18,18 +21,21 @@ const TopNavigator = () => {
         return () => {
             window.removeEventListener('scroll', handleScroll);
         };
-    }, []);
+    }, [window.scroll]);
 
     const scrollToTop = () => {
         document.body.scrollIntoView({ behavior: "smooth", block: "start", inline: "start" });
     };
 
     return (
-        <div id="top-navigator" className="top-navigator">
+        <>
+        {show && <div id="top-navigator" className="top-navigator">
             <Menu>
                 <Menu.Item onClick={scrollToTop}>Back to the top</Menu.Item>
             </Menu>
-        </div>
+        </div>}
+        </>
+        
     );
 };
 
