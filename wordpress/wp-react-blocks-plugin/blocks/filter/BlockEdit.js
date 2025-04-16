@@ -12,14 +12,14 @@ const HIGHEST_VALUE = 'HIGHEST_VALUE'
 const CategoricalFilter = ({value, index, items, onUpdateFilterValue}) => {
     if (items) {
         const sortedItems = items.sort(function (a, b) {
-            if (a.position !== undefined && b.position !== undefined) {        
+            if (a.position !== undefined && b.position !== undefined) {
                 return a.position - b.position
             }
 
             let aValue = a.value ? a.value.toLowerCase() : "";
             let bValue = b.value ? b.value.toLowerCase() : "";
             return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
-           
+
         });
 
         return sortedItems.map(v => <PanelRow> <ToggleControl label={v.value} checked={value.indexOf(v.id) > -1}
@@ -49,7 +49,7 @@ class BlockEdit extends BlockEditWithAPIMetadata {
         }
     }
 
- 
+
     items(type) {
         const allCategories = this.state.categories
         const values = allCategories ? allCategories.filter(c => c.type === type) : []
@@ -133,9 +133,9 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                             />
                         </PanelRow>
 
-                  {isSupersetAPI(app, this.state.apps) && 
+                  {isSupersetAPI(app, this.state.apps) &&
                         <PanelRow>
-                            
+
                                         <SelectControl
                                             label={__('Datasets')}
                                             value={[dvzProxyDatasetId]}
@@ -143,10 +143,10 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                                                 setAttributes({
                                                     dvzProxyDatasetId: newDatasetId,
                                                     dimension1: 'none',
-                                                    dimension2: 'none'  
+                                                    dimension2: 'none'
 
                                           })
-                                                this.setState({dimensions: [], measures: [], filters: [], categories: []})                                              
+                                                this.setState({dimensions: [], measures: [], filters: [], categories: []})
                                               //  this.loadMetadataForSuperset(app, newDatasetId)
                                             }}
                                             options={datasets}
