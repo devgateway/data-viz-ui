@@ -95,10 +95,8 @@ export const getComponentByNameIgnoreCase = (name: string) => {
         const Component = components[k]
         return React.memo(injectIntl(Component))
     }
-    else {
-        const customComponent = customizer.getComponentByNameIgnoreCase(name)
-        if (customComponent) {
-            return injectIntl(customComponent)
-        }
+    const customComponent = customizer.getComponentByNameIgnoreCase(name)
+    if (customComponent) {
+        return injectIntl(customComponent)
     }
 }

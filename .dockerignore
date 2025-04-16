@@ -1,2 +1,5 @@
 wordpress/wp-theme/_functions.php
 wordpress/wp-content/uploads
+ui/node_modules
+ui/dist
+node_modules

@@ -14,9 +14,9 @@ export default defineConfig(({ mode }) => {
     return {
         // define: {
         //     'process.env': env,
-        // }, 
+        // },
         plugins: [
-            react({}),
+            react(),
             eslintPlugin({
                 exclude: ['/virtual:/**', 'node_modules/**', "dist/**"],
             }),
@@ -28,11 +28,17 @@ export default defineConfig(({ mode }) => {
             alias: {
                 "@": path.resolve(__dirname, "./src"),
                 react: path.resolve('./node_modules/react'),
-               "inmutable": path.resolve('./node_modules/inmutable'),
+                "immutable": path.resolve('./node_modules/immutable'),
                 "react-dom": path.resolve('./node_modules/react-dom'),
                 "react-router-dom": path.resolve('./node_modules/react-router-dom'),
                 "react-redux": path.resolve('./node_modules/react-redux'),
-                '@devgateway/customizer': path.resolve(__dirname, '../../custom/ui-customizer/')
+                "react-intl": path.resolve('./node_modules/react-intl'),
+                "react-compiler-runtime": path.resolve('./node_modules/react-compiler-runtime'),
+                "semantic-ui-react": path.resolve('./node_modules/semantic-ui-react'),
+                "papaparse": path.resolve('./node_modules/papaparse'),
+                "@nivo/colors": path.resolve('./node_modules/@nivo/colors'),
+                "@devgateway/wp-react-lib": path.resolve(__dirname, '../react-lib/wp-react-lib'),
+                '@devgateway/customizer': path.resolve(__dirname, '../../custom/ui-customizer/'),
             },
             preserveSymlinks: true,
         },
@@ -45,17 +51,17 @@ export default defineConfig(({ mode }) => {
             rollupOptions: {
                 treeshake: true,
                 cache: true,
+                // external: ['react-compiler-runtime', 'semantic-ui-react', 'react-intl']
             },
             commonjsOptions: {
                 transformMixedEsModules: true,
-
             },
 
         },
 
         optimizeDeps: {
             include: [
-                "@devgateway/ui-customizer",
+                "../../custom/ui-customizer",
                 "@devgateway/wp-react-lib",
                 "react",
                 "semantic-ui-react",
@@ -63,9 +69,6 @@ export default defineConfig(({ mode }) => {
             ]
         },
         appType: 'spa',
-        experimental: {
-
-        },
         server: {
             hrm: {
                 overlay: false,
@@ -75,6 +78,7 @@ export default defineConfig(({ mode }) => {
                 allow: [
                     searchForWorkspaceRoot(process.cwd()),
                     '../react-lib/wp-react-lib',
+                    '../../custom/ui-customizer',
                 ]
             },
         },
