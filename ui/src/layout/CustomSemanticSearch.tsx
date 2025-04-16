@@ -2,33 +2,78 @@ import { Search, Segment, Input } from "semantic-ui-react";
 import React from "react";
 import clsx from "clsx";
 import {
-    getUnhandledProps,
-    partitionHTMLProps,
-    htmlInputAttrs,
     useKeyOnly,
-    useValueAndKey
-} from 'semantic-ui-react/dist/commonjs/lib'
+    useValueAndKey,
+} from 'semantic-ui-react/src/lib/classNameBuilders';
+import { partitionHTMLProps, htmlInputAttrs, } from 'semantic-ui-react/src/lib/htmlPropsUtils';
+import getUnhandledProps from 'semantic-ui-react/src/lib/getUnhandledProps';
+import { injectIntl, useIntl } from "react-intl";
+import { utils } from "@devgateway/wp-react-lib";
 
-// type SearchProps = typeof Search;
 
-// type ExtendedSearchProps = SearchProps & React.HTMLProps<HTMLInputElement>;
+const boldSearchTerm = (text, searchTerm) => {
+    if (!searchTerm) return text;
+    const regex = new RegExp(`(${searchTerm})`, 'gi');
+    return text.replace(regex, '<strong>$1</strong>');
+}
+  
 
-// interface CustomSearchProps extends ExtendedSearchProps {
-//     resultRenderer : React.ComponentType<any> | React.ReactNode | JSX.Element;
-//     onSearchChange : (event: React.SyntheticEvent, data: any) => void;
-//     value : string;
-//     showNoResults : boolean;
-//     onResultSelect : (event: React.SyntheticEvent, data: any) => void;
-//     loading : boolean;
-//     perPage : number;
-//     total : number;
-// }
+const ResultRenderer = injectIntl(({
+    ID,
+    title,
+    slug,
+    parent_title,
+    parent_slug,
+    parent_link,
+    extract,
+    type,
+    link,
+    terms,
+    subtype,
+    searchTerm,
+    metadata,
+    bread_crumbs = [],
+    intl: { locale }
+}) => {
+    let target = parent_link ? utils.replaceLink(parent_link, locale) + `#${slug}` : utils.replaceLink(link, locale);
+    // @ts-ignore
+    target = metadata?.redirect_url ? metadata?.redirect_url + `#${slug}` : target
+
+
+    const boldedTitle = boldSearchTerm(String(title), searchTerm);
+    const boldedExtract = boldSearchTerm(extract, searchTerm);
+
+    return (
+        <div className="search-results-wrapper searching-results" style={{ display: 'flex', flexDirection: 'column' }}>
+            <div className={"has-standard-12-font-size"} onClick={e => document.location.href = target}>
+                <h5 className="breadcrumbs-search"
+                    dangerouslySetInnerHTML={{ __html: Array.isArray(bread_crumbs) && bread_crumbs.length > 0 ? boldSearchTerm(bread_crumbs.join(' / '), searchTerm) : '' }}
+                />
+                <div className={"has-standard-14-font-size"}><h4 className="search-title" dangerouslySetInnerHTML={{ __html: boldedTitle }} /></div>
+                <div className='has-standard-12-font-size search-content'
+                    dangerouslySetInnerHTML={{ __html: utils.replaceHTMLinks(boldedExtract, locale) }} />
+            </div>
+        </div>
+    )
+})
 
 const CustomSearch = (props) => {
-    const { results, resultRenderer, onSearchChange, value, showNoResults, onResultSelect, loading } = props;
+    const { results, resultRenderer, onSearchChange, value, showNoResults, onResultSelect, loading, placeholder, perPage, total, searchTerm } = props;
+    const intl = useIntl()
     const [searchClasses, setSearchClasses] = React.useState('');
     const [focus, setFocus] = React.useState(false);
     const [open, setOpen] = React.useState(false);
+    const augmentedResults = results && results.length > 0
+        ? [{
+            isHeader: true, headerText: intl.formatMessage({
+                id: 'search.results.summary',
+                defaultMessage: '{count} of {} Results'
+            }, {
+                count: total < perPage ? total : perPage, total: total
+            })
+        }, ...results]
+        : [];
+
 
     const renderHeader = () => {
         const { perPage, total } = props;
@@ -39,26 +84,35 @@ const CustomSearch = (props) => {
         );
 
         return (
-            <Segment color="blue" textAlign="left" className={classes}>
-                <span>{total < perPage ? total : perPage} of {total} Results</span>
+            <Segment basic textAlign="left" className={classes}>
+                {intl.formatMessage({
+                    id: 'search.results.summary',
+                    defaultMessage: '{count} of {} Results'
+                }, {
+                    count: total < perPage ? total : perPage, total: total
+                })}
             </Segment>
         );
     };
 
-    const renderResults = () => {
+    const renderResults = (res) => {
+
+        if (res.isHeader) {
+            return renderHeader();
+        }
+
+        console.log("res", res);
+
         return (
             <React.Fragment>
-                {renderHeader()}
-                {results.map((result, index) => (
-                    <Search.Result key={index} {...result} />
-                ))}
+                <ResultRenderer {...res} searchTerm={searchTerm} />
             </React.Fragment>
         );
     };
 
-    const renderSearchInput = (htmlInputProps) => {
+    const renderSearchInput = (htmlInputProps?: any) => {
         // Assuming there is an existing renderSearchInput logic
-        return <Input {...htmlInputProps} />;
+        return <Input icon="search" placeholder={placeholder} {...htmlInputProps} />;
     };
 
     const handleBlur = (e, data) => {
@@ -87,10 +141,11 @@ const CustomSearch = (props) => {
 
     const classes = clsx(
         'ui',
-        open && 'active visible',
+        open && 'active',
         size,
         searchClasses,
         useKeyOnly(category, 'category'),
+        useKeyOnly(focus, 'focus'),
         useKeyOnly(fluid, 'fluid'),
         useKeyOnly(loading, 'loading'),
         useValueAndKey(aligned, 'aligned'),
@@ -100,29 +155,37 @@ const CustomSearch = (props) => {
 
 
     const unhandled = getUnhandledProps(Search, props);
-    // const ElementType = getComponentType(Search, props);
     const [htmlInputProps, rest] = partitionHTMLProps(unhandled, {
         htmlProps: htmlInputAttrs,
     });
 
+    console.log("classes", classes);
+
+
     return (
         <>
+
             <Search
                 {...rest}
                 className={classes}
                 onBlur={handleBlur}
-                size="tiny"
+                size="mini"
+                aligned
+                placeholder={placeholder}
                 onFocus={handleFocus}
                 onMouseDown={handleMouseDown}
-                resultRenderer={resultRenderer}
+                resultRenderer={(res) => renderResults(res)}
                 onSearchChange={onSearchChange}
-                results={results}
+                results={augmentedResults}
+                input={renderSearchInput()}
                 value={value}
                 showNoResults={showNoResults}
                 onResultSelect={onResultSelect}
                 loading={loading}
+                header={renderHeader()}
 
-            />
+            >
+            </Search>
         </>
 
     );

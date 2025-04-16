@@ -78,9 +78,12 @@ export interface BarChartProps {
   enableGridY: boolean;
   enableGridX: boolean;
   customAxisFormat: any;
+  previewMode: string;
+  editing: boolean;
 }
 
 const Chart = ({
+  editing,
   legends,
   marginLeft,
   marginTop,
@@ -140,13 +143,22 @@ const Chart = ({
   reverseLegend,
   enableGridY,
   enableGridX,
-  customAxisFormat
+  customAxisFormat,
+  previewMode
 }: BarChartProps) => {
-  const isMobile = deviceType() === "mobile";
+  const isMobileOrTablet = ["mobile", "tablet", "midTablet"].includes(
+    deviceType()
+  );
+  const isTabletDevice = ["tablet", "midTablet"].includes(deviceType());
+  const isMobileDevice = deviceType() === "mobile";
   const LABEL_SKIP_WIDTH = 30; // important for vertical layout
   const LABEL_SKIP_HEIGHT = 15; // important for horizontal layout
   const mobileConfigSettings = JSON.parse(decodeURIComponent(mobileCustomization));
-  const isMobileCustomizationEnabled = isMobile && (mobileConfigSettings?.showCustomization ?? false);
+  const isMobileCustomizationEnabled =
+    isMobileOrTablet && (mobileConfigSettings?.showCustomization ?? false);
+  const isNotDesktopPreview = isMobileCustomizationEnabled && (previewMode !== 'Desktop');
+  const isNotEditingAndIsMobileCustomizationEnabled = !editing && isMobileCustomizationEnabled;
+
   const normalizeLabelColor = () => {
     if (barLabelColor === "null" || barLabelColor === null || !barLabelColor) {
       return "#000000";
@@ -569,19 +581,59 @@ const Chart = ({
   };
 
   const CustomTick = (tick) => {
-    const tickObject: any = Object.assign({}, tick);
-    if (isMobileCustomizationEnabled && hiddenLabels.includes(String(tickObject.value))) {
+    const theme = useTheme();
+    if (!tick.value) return "";
+    const tickObject = Object.assign({}, tick);
+    if (
+      (isNotEditingAndIsMobileCustomizationEnabled ||
+      isNotDesktopPreview) &&
+      hiddenLabels.includes(String(tickObject.value))
+    ) {
       tickObject.value = "";
     }
-    const theme = useTheme();
     let effectiveTickColor;
     if (overrideTickColor) {
       effectiveTickColor = tickColor;
     } else {
       effectiveTickColor = legendColor(tick);
     }
-    const width = getTextWidth(tickObject.value, "12px Roboto") + 30;
+    let lines: any[] = [];
+    let currentLine = "";
+    if (isNotDesktopPreview || isNotEditingAndIsMobileCustomizationEnabled) {
+      const words = String(tickObject.value).split(" ");
+      let maxLineLength = 25;
+      if ((editing && previewMode === "Mobile") || (isMobileDevice && !editing)) {
+        maxLineLength = mobileConfigSettings?.mobileMaxTickLength ?? 25;
+      } else if ((editing && previewMode === "Tablet") || (isTabletDevice && !editing)) {
+        maxLineLength = mobileConfigSettings?.tabletMaxTickLength ?? 25;
+      } else if (
+        window.matchMedia("(min-width: 768px) and (max-width: 1250px)").matches && !editing
+      ) {
+        maxLineLength = 15;
+      }
 
+      words.forEach((word) => {
+        if (currentLine.length + String(word).length <= maxLineLength) {
+          currentLine += (currentLine ? " " : "") + word;
+        } else {
+          lines.push(currentLine);
+          currentLine = word;
+        }
+      });
+      if (currentLine) {
+        lines.push(currentLine);
+      }
+    } else {
+      lines = [tickObject.value];
+    }
+    let lineHeight = 12;
+    if (isMobileDevice) {
+      lineHeight = mobileConfigSettings?.mobileYAxisLineHeight ?? 12;
+    } else if (isTabletDevice) {
+      lineHeight = mobileConfigSettings?.tabletYAxisLineHeight ?? 12;
+    }
+
+    // Render multi-line text based on rotation
     if (tickRotation > 0 && tickRotation < 180) {
       return (
         <g transform={`translate(${tick.x},${tick.y + 30})`}>
@@ -595,111 +647,176 @@ const Chart = ({
           )}
 
           <g transform={`translate(0, ${tick.y + offsetText})`}>
-            {/* <rect
-              transform={`rotate(${tickRotation})`}
-              x={-12}
-              y={-12}
-              rx={2}
-              ry={2}
-              width={width}
-              height={22}
-              fill={"#FFFFFF"}
-            /> */}
-
-            <text
-              transform={`rotate(${tickRotation})`}
-              textAnchor="start"
-              dominantBaseline="middle"
-              style={{
-                ...theme.axis.ticks.text,
-                fill: xLabelColor === "null" ? "black" : xLabelColor,
-                fontSize: "12px",
-              }}
-            >
-              {tickObject.value}
-            </text>
-          </g>
-        </g>
-      );
-    } else if (tickRotation > 180 && tickRotation < 360) {
-      return (
-        <g transform={`translate(${tick.x},${tick.y + 30})`}>
-          {showTickLine && (
-            <line
-              stroke={effectiveTickColor}
-              strokeWidth={1.5}
-              y1={-32}
-              y2={-12}
-            />
-          )}
-
-          <g transform={`translate(0, ${tick.y + offsetText})`}>
-            {/* <rect
-              transform={`rotate(${tickRotation - 180})`}
-              x={-12}
-              y={-10}
-              rx={2}
-              ry={2}
-              width={width}
-              height={22}
-              fill={"#FFFFFF"}
-            /> */}
-
-            <text
-              transform={`rotate(${tickRotation})`}
-              textAnchor="end"
-              dominantBaseline="middle"
-              style={{
-                ...theme.axis.ticks.text,
-                fill: xLabelColor === "null" ? "black" : xLabelColor,
-                fontSize: "12px",
-              }}
-            >
-              {tickObject.value}
-            </text>
-          </g>
-        </g>
-      );
-    } else {
-      return (
-        <g transform={`translate(${tick.x},${tick.y + 30})`}>
-          {showTickLine && (
-            <line
-              stroke={effectiveTickColor}
-              strokeWidth={1.5}
-              y1={-32}
-              y2={-12}
-            />
-          )}
-
-          <g transform={`translate(0, ${tick.y + offsetText})`}>
-            {/* <rect
-              transform={`rotate(${tickRotation})`}
-              x={(-1 * width) / 2}
-              y={-12}
-              rx={2}
-              ry={2}
-              width={width}
-              height={22}
-              fill={"#FFFFFF"}
-            /> */}
-
-            <text
-              transform={`rotate(${tickRotation})`}
-              textAnchor="middle"
-              dominantBaseline="middle"
-              style={{
-                ...theme.axis.ticks.text,
-                fill: xLabelColor === "null" ? "black" : xLabelColor,
-                fontSize: "12px",
-              }}
-            >
-              {tickObject.value}
-            </text>
+            {lines.map((line, i) => (
+              <text
+                key={line}
+                transform={`rotate(${tickRotation})`}
+                textAnchor="start"
+                y={typeof tick.value === "number" ? 0 : i * lineHeight}
+                dominantBaseline="middle"
+                style={{
+                  ...theme.axis.ticks.text,
+                  fill: xLabelColor === "null" ? "black" : xLabelColor,
+                  fontSize: "12px",
+                  fontFamily: "Roboto",
+                }}
+              >
+                {line}
+              </text>
+            ))}
           </g>
         </g>
       );
     }
+    if (tickRotation > 180 && tickRotation < 360) {
+      return (
+        <g transform={`translate(${tick.x},${tick.y + 30})`}>
+          {showTickLine && (
+            <line
+              stroke={effectiveTickColor}
+              strokeWidth={1.5}
+              y1={-32}
+              y2={-12}
+            />
+          )}
+
+          <g transform={`translate(0, ${tick.y + offsetText})`}>
+            {lines.map((line, i) => (
+              <text
+                key={i}
+                transform={`rotate(${tickRotation})`}
+                textAnchor="end"
+                y={typeof tick.value === "number" ? 0 : i * lineHeight}
+                dominantBaseline="middle"
+                style={{
+                  ...theme.axis.ticks.text,
+                  fill: xLabelColor === "null" ? "black" : xLabelColor,
+                  fontSize: "12px",
+                  fontFamily: "Roboto",
+                }}
+              >
+                {line}
+              </text>
+            ))}
+          </g>
+        </g>
+      );
+    }
+    return (
+        <g transform={`translate(${tick.x},${tick.y + 30})`}>
+          {showTickLine && (
+            <line
+              stroke={effectiveTickColor}
+              strokeWidth={1.5}
+              y1={-32}
+              y2={-12}
+            />
+          )}
+
+          <g transform={`translate(0, ${tick.y + offsetText})`}>
+            {lines.map((line, i) => (
+              <text
+                key={i}
+                transform={`rotate(${tickRotation})`}
+                textAnchor="middle"
+                y={typeof tick.value === "number" ? 0 : i * lineHeight}
+                dominantBaseline="middle"
+                style={{
+                  ...theme.axis.ticks.text,
+                  fill: xLabelColor === "null" ? "black" : xLabelColor,
+                  fontSize: "12px",
+                  fontFamily: "Roboto",
+                }}
+              >
+                {line}
+              </text>
+            ))}
+          </g>
+        </g>
+      );
+  };
+
+  const AxisLeftCustomTick = (tick) => {
+    if (
+      !tick.value ||
+      ((isNotDesktopPreview || isNotEditingAndIsMobileCustomizationEnabled) &&
+        hiddenLabels.includes(String(tick.value)))
+    ) {
+      return "";
+    }
+    let tickValue = tick.value;
+    if (layout === "vertical") {
+      const effectiveFormat = customAxisFormat ? customAxisFormat : format;
+
+      tickValue = intl.formatNumber(
+        effectiveFormat.style === "percent" ? tickValue / 100 : tickValue,
+        {
+          ...effectiveFormat,
+        }
+      );
+    }
+    let maxLineLength = 25;
+    if ((editing && previewMode === "Mobile") || (isMobileDevice && !editing)) {
+      maxLineLength = mobileConfigSettings?.mobileMaxTickLength ?? 25;
+    } else if (
+      (editing && previewMode === "Tablet") ||
+      (isTabletDevice && !editing)
+    ) {
+      maxLineLength = mobileConfigSettings?.tabletMaxTickLength ?? 25;
+    } else if (
+      window.matchMedia("(min-width: 768px) and (max-width: 1250px)").matches &&
+      !editing
+    ) {
+      maxLineLength = 15;
+    }
+    const words =
+      typeof tickValue === "string" ? tickValue.split(" ") : [tickValue];
+    const lines: any[] = [];
+    let currentLine = "";
+
+    words.forEach((word) => {
+      if (currentLine.length + String(word).length <= maxLineLength) {
+        currentLine += (currentLine ? " " : "") + word;
+      } else {
+        lines.push(currentLine);
+        currentLine = word;
+      }
+    });
+
+    if (currentLine) {
+      lines.push(currentLine);
+    }
+    let lineHeight = 12;
+    if ((editing && previewMode === "Mobile") || (isMobileDevice && !editing)) {
+      lineHeight = mobileConfigSettings?.mobileYAxisLineHeight ?? 12;
+    } else if (
+      (editing && previewMode === "Tablet") ||
+      (isTabletDevice && !editing)
+    ) {
+      lineHeight = mobileConfigSettings?.tabletYAxisLineHeight ?? 12;
+    }
+
+    return (
+      <g transform={`translate(${tick.x},${tick.y})`}>
+        <line x1={-5} x2={0} y1={0} y2={0} stroke={"#000"} strokeWidth={1} />
+        {lines.map((line, i) => (
+          <text
+            key={line}
+            x={-10}
+            y={typeof tickValue === "number" ? 0 : i * lineHeight}
+            textAnchor="end"
+            dominantBaseline="middle"
+            style={{
+              fill: xLabelColor === "null" ? "black" : xLabelColor,
+              fontSize: "12px",
+              fontFamily: "Roboto",
+            }}
+          >
+            {line}
+          </text>
+        ))}
+      </g>
+    );
   };
 
   const toggle = (id: any) => {
@@ -732,18 +849,18 @@ const Chart = ({
           }
           const value = data.value
             ? intl.formatNumber(
-              format.style === "percent" ? data.value / 100 : data.value,
-              format
-            )
+                format.style === "percent" ? data.value / 100 : data.value,
+                format
+              )
             : "";
           const valueLength = value.length;
           let yPos;
           let xPos;
           if (
-            (layout == "vertical" && height >= LABEL_SKIP_HEIGHT) ||
-            (layout == "horizontal" && width >= LABEL_SKIP_HEIGHT)
+            (layout === "vertical" && width >= LABEL_SKIP_WIDTH) ||
+            (layout === "horizontal" && height >= LABEL_SKIP_HEIGHT)
           ) {
-            if (layout == "vertical") {
+            if (layout === "vertical") {
               const padding = 6; // adjusts position not to be too close to the bar
               yPos = y - padding;
               xPos = x + width / 2 - valueLength * 3.5;
@@ -1079,8 +1196,8 @@ const Chart = ({
   };
 
   const hiddenLabels: any [] = [];
-  if (isMobileCustomizationEnabled) {
-    ticks = parseInt(mobileConfigSettings.yAxisTickValues);
+  if (isNotEditingAndIsMobileCustomizationEnabled || isNotDesktopPreview) {
+    ticks = Number.parseInt(mobileConfigSettings.yAxisTickValues);
     const labels = new Map(Object.entries(mobileConfigSettings?.labels?.xAxis ?? {}));
     for (const [key, value] of labels) {
       if (!value) {
@@ -1091,7 +1208,7 @@ const Chart = ({
 
   return (
     <div style={{ height: height }}>
-      {options && options.data && options.data.length > 0 && (
+      {options?.data && options.data.length > 0 && (
         <>
           <ResponsiveBar
             colorBy={colors.colorBy}
@@ -1154,9 +1271,10 @@ const Chart = ({
                 }
                 : null
             }
+            // @ts-ignore
             axisBottom={
-              isMobileCustomizationEnabled && mobileConfigSettings?.xAxisDisabled === true ? null :
-                layout == "horizontal"
+              (isNotDesktopPreview || isNotEditingAndIsMobileCustomizationEnabled ) && mobileConfigSettings?.xAxisDisabled === true ? null :
+                layout === "horizontal"
                   ? {
                     legend: legends.bottom,
                     legendPosition: "middle",
@@ -1189,9 +1307,11 @@ const Chart = ({
                     renderTick: CustomTick,
                   }
             }
+            // TODO: Check why we are ignoring this
+            // @ts-ignore
             axisLeft={{
               tickSize:
-                (layout == "horizontal" && showTickLine) ||
+                (layout === "horizontal" && showTickLine) ||
                   layout === "vertical"
                   ? 5
                   : 0,
@@ -1200,22 +1320,27 @@ const Chart = ({
               tickValues: ticks,
               legend: legends.left,
               legendPosition: "middle",
-              legendOffset: parseInt(offsetY),
-              format: (value) => {
-                if (!value) return "";
-                if (layout == "vertical") {
-                  const effectiveFormat = customAxisFormat
-                    ? customAxisFormat
-                    : format;
-                  return intl.formatNumber(
-                    effectiveFormat.style === "percent" ? value / 100 : value,
-                    {
-                      ...effectiveFormat,
+              legendOffset: Number.parseInt(offsetY),
+              ...((isNotDesktopPreview || isNotEditingAndIsMobileCustomizationEnabled) ? { renderTick: AxisLeftCustomTick }
+                : {
+                  format: (value) => {
+                    if (!value) return "";
+                    if (layout === "vertical") {
+                      const effectiveFormat = customAxisFormat
+                        ? customAxisFormat
+                        : format;
+                      return intl.formatNumber(
+                        effectiveFormat.style === "percent"
+                          ? value / 100
+                          : value,
+                        {
+                          ...effectiveFormat,
+                        }
+                      );
                     }
-                  );
-                }
-                return value;
-              },
+                    return value;
+                  },
+                }),
             }}
             enableGridY={enableGridY}
             enableGridX={enableGridX}
@@ -1233,6 +1358,7 @@ const Chart = ({
             layers={layers as any}
             onMouseEnter={(_data) => { }}
             onMouseLeave={(_data) => { }}
+            // TODO: Check why we are ignoring this
             // @ts-ignore
             motionStiffness={130 as any}
             motionDamping={15}
@@ -1241,6 +1367,8 @@ const Chart = ({
                 return (
                   <Tooltip
                     intl={intl}
+                    // TODO: Check why we are ignoring this
+                    // @ts-ignore
                     format={format}
                     d={d}
                     tooltip={tooltip}
