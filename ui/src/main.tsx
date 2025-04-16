@@ -10,7 +10,7 @@ const shouldLoadDefaultTheme = !(rawEnv && rawEnv.toString().toLowerCase() === '
 if (shouldLoadDefaultTheme) {
   import('./scss/themes/default/index.scss'); // default theme styles
 }
-import '@devgateway/customizer/dist/css/index.css'; // customizer styles
+import '@devgateway/customizer/dist/index.css'; // customizer styles
 
 createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
