@@ -75,4 +75,4 @@ const SaveComponent = (props) => {
 }
 
 
-export default SaveComponent;
+export default SaveComponent

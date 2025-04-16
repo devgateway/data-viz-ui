@@ -51,8 +51,11 @@ class WPM_Admin {
 		new WPM_Admin_Taxonomies();
 		new WPM_Admin_Settings();
 		new WPM_Admin_Widgets();
+		new WPM_Admin_Newsletter();
+		new WPM_Admin_Gutenberg_Block();
 		new WPM_Admin_Assets();
 		new WPM_Admin_Qtranslate();
+		new WPM_Deactivate_Feedback_Form();
 	}
 
 	/**
@@ -60,7 +63,8 @@ class WPM_Admin {
 	 */
 	public function set_edit_lang() {
 		$user_id = get_current_user_id();
-
+		
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		if ( isset( $_GET['edit_lang'] ) || ! get_user_meta( $user_id, 'edit_lang', true ) ) {
 			update_user_meta( $user_id, 'edit_lang', wpm_get_language() );
 		}
@@ -92,12 +96,12 @@ class WPM_Admin {
 				);
 				wpm_enqueue_js( "
 					$('a.wpm-rating-link').click( function() {
-						$.post('" . wpm()->ajax_url() . "', {action: 'wpm_rated'});
+						$.post('" . esc_js( wpm()->ajax_url() ) . "', {action: 'wpm_rated'});
 						$(this).parent().text($(this).data('rated'));
 					});
 				" );
 			} else {
-				$footer_text = __( 'Thank you for translating with WP Multilang.', 'wp-multilang' );
+				$footer_text = esc_html__( 'Thank you for translating with WP Multilang.', 'wp-multilang' );
 			}
 		}
 

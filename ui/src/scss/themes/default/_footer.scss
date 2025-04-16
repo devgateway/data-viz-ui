@@ -1,39 +1,31 @@
 .container.viz.footer {
-  margin-top: 100px;
-  // background-color: $footer-background;
-  line-height: 16px !important;
-
-  .bottom-bar {
-    border: 1px solid red;
-    background-color: #FFF;
-    border-top: 1px solid #acdef7;
-    color: #ffffff;
-    left: 0;
-    margin-top: -20px;
-    padding: 20px 0;
-    position: absolute;
-    right: 0;
-    text-align: center;
-    width: 100%;
-    p{
-
+  margin: 0 !important;
+  .ui.container.entry-content {
+    width: 100vw;
+    margin: 0 !important;
+    .wp-block-columns {
+      margin: 0;
     }
-    a{
-      color: #acdef7;
+    .ui.fluid.container.content {
+      margin: 0 !important;
     }
-    .license-block{
-      padding-top: 30px;
+  }
+
+  .logos-column {
+    padding: 3vw 10vw;
+    .logos-column-item {
+      margin: 0 4vw;
     }
   }
 
   .footer-cover{
-    border-top: 1px solid $separator-grey;
+    border-top: 1px solid $blue;
     width: 100vw;
     margin-left: calc(-50vw + 50%);
     padding-top: $base-unit * 3;
     padding-bottom: $base-unit * 3;
     a{
-      color: #acdef7;
+      color: #e5f6ff;
     }
     .wp-block-columns{
       margin-bottom: 0;
@@ -41,6 +33,9 @@
     .bottom-bar-container{
       margin: auto;
       max-width: 1300px;
+    }
+    .wp-block-cover__background{
+      background-color: $blue !important;
     }
   }
   .attribution-icon{
@@ -50,9 +45,10 @@
     min-width: 85px;
   }
   .bottom-menu{
-    border-bottom: 1px solid #7498aa;
+    border-bottom: 1px solid #B0CAD8;
     display: inline-block;
     padding-bottom: $base-unit * 2;
+    margin-bottom: 25px !important;
     a{
       margin-right: $base-unit * 2;
       &:last-of-type{
@@ -75,13 +71,11 @@
 
   p {
     font-weight: 400;
-
     color: white;
-    padding: 1rem 0;
+
 
     a {
-      color: #acdef7;
-      text-decoration: none;
+      color: #ffffff;
 
       &:hover {
         color: #f0f0f0;
@@ -93,27 +87,222 @@
     background-color: #175372;
     text-align: center;
   }
-  .license-block{
-    margin-left: -40px;
-    @media only screen and (max-width: 767px){
-      margin-left: 0;
-    }
-    img{
-      margin-right: -50px;
-      margin-top: 4px;
-    }
-    a{
-      color: #acdef7;
-      text-decoration: underline;
-    }
-    p{
-      line-height: 110%;
-    }
-  }
 }
 
-@media print {
+
+
+/* Adjustments for mobile phones for screens from 320px to 480px wide:*/
+@media (max-width: 480px) {
+
   .container.viz.footer {
-    display: none!important;
+
+    .logos-column {
+      padding: 10vw 15vw;
+      .logos-column-item {
+        margin: 10vw 0;
+      }
+    }
+
+    .footer-cover{
+      a {
+        width: 100vw;
+        text-align: center;
+        display: block;
+        margin: 0 0 30px 0;
+      }
+      .stay-connected {
+        justify-self: center;
+        align-self: center;
+        text-align: center;
+        p {
+          padding: 30px 0;
+        }
+        .stay-connected-icon {
+          img {
+            width: 100px !important;
+            height: auto !important;
+            margin-bottom: 15px !important;
+          }
+        }
+        .contact-block {
+          text-align: center;
+          line-height: 2;
+          padding: 10px 0;
+          border-bottom: 1px solid #B0CAD8;
+        }
+      }
+      .creative-commons {
+        .wp-block-column {
+          padding: 0 20px;
+        }
+        .wp-block-image {
+          width: 100vw;
+          margin: 10px 0 30px 0;
+          img {
+            width: 150px !important;
+            text-align: center;
+          }
+        }
+        p {
+          text-align: center;
+          a {
+            display: inline;
+          }
+        }
+      }
+    }
   }
+
+}
+
+
+
+/* Adjustments for tablets for screens from 481px to 782px wide:*/
+@media (min-width: 481px) and (max-width: 782px) {
+  .container.viz.footer {
+
+    .logos-column {
+      padding: 10vw 30vw;
+      .logos-column-item {
+        margin: 8vw 0;
+      }
+    }
+
+    .footer-cover{
+      a {
+        width: 100vw;
+        text-align: center;
+        display: block;
+        margin: 0 0 30px 0;
+      }
+      .stay-connected {
+        justify-self: center;
+        align-self: center;
+        text-align: center;
+        p {
+          padding: 30px 0;
+        }
+        .stay-connected-icon {
+          img {
+            width: 100px !important;
+            height: auto !important;
+            margin-bottom: 15px !important;
+          }
+        }
+        .contact-block {
+          text-align: center;
+          line-height: 2;
+          padding: 10px 0;
+          border-bottom: 1px solid #B0CAD8;
+        }
+        .wp-block-column{
+          min-width: fit-content !important;
+        }
+      }
+      .creative-commons {
+        .wp-block-column {
+          padding: 0 20px;
+        }
+        .wp-block-image {
+          width: 100vw;
+          margin: 10px 0 30px 0;
+          img {
+            width: 150px !important;
+            text-align: center;
+          }
+        }
+        p {
+          text-align: center;
+          a {
+            display: inline;
+          }
+        }
+      }
+    }
+  }
+
+}
+
+
+
+/* Adjustments for laptops for screens from 783px to 1024px wide:*/
+@media (min-width: 782px) and (max-width: 1024px) {
+  .container.viz.footer {
+
+    .logos-column {
+      padding: 5vw 10vw;
+    }
+
+    .footer-cover{
+
+      .bottom-bar-container {
+        display: flex;
+        flex-direction: column;
+
+        .bottom-bar-container-column {
+          display: flex;
+          flex-direction: column;
+          align-content: flex-start;
+          flex-wrap: wrap;
+        }
+
+        .creative-commons {
+          .creative-commons-columns {
+            .creative-commons-column {
+              flex-basis: auto !important;
+              width: auto !important;
+            }
+          }
+        }
+
+        .contact-block {
+          width: 500px;
+        }
+
+      }
+    }
+  }
+
+}
+
+
+
+
+/* Adjustments for desktop for screens from 1025 to 1365px wide:*/
+@media (min-width: 1025px) and (max-width: 1365px) {
+  .container.viz.footer {
+
+    .footer-cover{
+      .creative-commons {
+        .wp-block-spacer {
+          display: none;
+        }
+      }
+    }
+  }
+
+}
+
+
+/* Adjustments for desktop for screens from 1366px to 1920px wide:*/
+@media (min-width: 1366px) and (max-width: 1920px) {
+  .container.viz.footer {
+    .logos-column {
+      padding-left: 15vw;
+      padding-right: 15vw;
+    }
+  }
+
+}
+
+
+/* Adjustments for desktop for screens from 1921px wide and more:*/
+@media (min-width: 1921px) {
+  .container.viz.footer {
+    .logos-column {
+      padding-left: 23vw;
+      padding-right: 23vw;
+    }
+  }
+
 }

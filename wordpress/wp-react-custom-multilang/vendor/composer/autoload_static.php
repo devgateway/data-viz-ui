@@ -24,6 +24,10 @@ class ComposerStaticInit10f68284d303303872430af9e5a79198
         'WPM\\Includes\\Admin\\Settings\\WPM_Settings_Additional' => __DIR__ . '/../..' . '/includes/admin/settings/class-wpm-settings-additional.php',
         'WPM\\Includes\\Admin\\Settings\\WPM_Settings_General' => __DIR__ . '/../..' . '/includes/admin/settings/class-wpm-settings-general.php',
         'WPM\\Includes\\Admin\\Settings\\WPM_Settings_Languages' => __DIR__ . '/../..' . '/includes/admin/settings/class-wpm-settings-languages.php',
+        'WPM\\Includes\\Admin\\Settings\\WPM_Settings_Support' => __DIR__ . '/../..' . '/includes/admin/settings/class-wpm-settings-support.php',
+        'WPM\\Includes\\Admin\\Settings\\WPM_Settings_Premium' => __DIR__ . '/../..' . '/includes/admin/settings/class-wpm-settings-premium.php',
+        'WPM\\Includes\\Admin\\Settings\\WPM_Settings_Upgrade_Pro' => __DIR__ . '/../..' . '/includes/admin/settings/class-wpm-settings-upgradepro.php',
+        'WPM\\Includes\\Admin\\Settings\\WPM_Settings_Auto_Translate' => __DIR__ . '/../..' . '/includes/admin/settings/class-wpm-settings-auto-translate.php',
         'WPM\\Includes\\Admin\\Settings\\WPM_Settings_Page' => __DIR__ . '/../..' . '/includes/admin/settings/class-wpm-settings-page.php',
         'WPM\\Includes\\Admin\\WPM_Admin' => __DIR__ . '/../..' . '/includes/admin/class-wpm-admin.php',
         'WPM\\Includes\\Admin\\WPM_Admin_Assets' => __DIR__ . '/../..' . '/includes/admin/class-wpm-admin-assets.php',
@@ -37,8 +41,13 @@ class ComposerStaticInit10f68284d303303872430af9e5a79198
         'WPM\\Includes\\Admin\\WPM_Admin_Settings' => __DIR__ . '/../..' . '/includes/admin/class-wpm-admin-settings.php',
         'WPM\\Includes\\Admin\\WPM_Admin_Taxonomies' => __DIR__ . '/../..' . '/includes/admin/class-wpm-admin-taxonomies.php',
         'WPM\\Includes\\Admin\\WPM_Admin_Widgets' => __DIR__ . '/../..' . '/includes/admin/class-wpm-admin-widgets.php',
+        'WPM\\Includes\\Admin\\WPM_Admin_Newsletter' => __DIR__ . '/../..' . '/includes/admin/class-wpm-admin-newsletter.php',
+        'WPM\\Includes\\Admin\\WPM_Admin_Gutenberg_Block' => __DIR__ . '/../..' . '/includes/admin/class-wpm-admin-gutenberg-block.php',
+        'WPM\\Includes\\Admin\\WPM_Deactivate_Feedback_Form' => __DIR__ . '/../..' . '/includes/admin/tracking/class-wpm-feedback-form.php',
+        'WPM\\Includes\\Admin\\WPM_Reset_Settings' => __DIR__ . '/../..' . '/includes/admin/class-wpm-reset-settings.php',
         'WPM\\Includes\\Integrations\\WPM_AIOSP' => __DIR__ . '/../..' . '/includes/integrations/class-wpm-aiosp.php',
         'WPM\\Includes\\Integrations\\WPM_Acf' => __DIR__ . '/../..' . '/includes/integrations/class-wpm-acf.php',
+        'WPM\\Includes\\Integrations\\WPM_SCF' => __DIR__ . '/../..' . '/includes/integrations/class-wpm-scf.php',
         'WPM\\Includes\\Integrations\\WPM_Better_Search' => __DIR__ . '/../..' . '/includes/integrations/class-wpm-better-search.php',
         'WPM\\Includes\\Integrations\\WPM_BuddyPress' => __DIR__ . '/../..' . '/includes/integrations/class-wpm-buddypress.php',
         'WPM\\Includes\\Integrations\\WPM_CF7' => __DIR__ . '/../..' . '/includes/integrations/class-wpm-cf7.php',
@@ -53,6 +62,11 @@ class ComposerStaticInit10f68284d303303872430af9e5a79198
         'WPM\\Includes\\Integrations\\WPM_VC' => __DIR__ . '/../..' . '/includes/integrations/class-wpm-vc.php',
         'WPM\\Includes\\Integrations\\WPM_WooCommerce' => __DIR__ . '/../..' . '/includes/integrations/class-wpm-woocommerce.php',
         'WPM\\Includes\\Integrations\\WPM_Yoast_Seo' => __DIR__ . '/../..' . '/includes/integrations/class-wpm-yoast-seo.php',
+        'WPM\\Includes\\Integrations\\WPM_Yoast_Seo_Presenters' => __DIR__ . '/../..' . '/includes/integrations/class-wpm-yoast-seo-presenters.php',
+        'WPM\\Includes\\Integrations\\WPM_Bylaw_Plus' => __DIR__ . '/../..' . '/includes/integrations/class-wpm-bylaw-plus.php',
+        'WPM\\Includes\\Integrations\\WPM_Schema_Saswp' => __DIR__ . '/../..' . '/includes/integrations/class-wpm-schema-and-structured-data.php',
+        'WPM\\Includes\\Integrations\\WPM_Team' => __DIR__ . '/../..' . '/includes/integrations/class-wpm-team.php',
+        'WPM\\Includes\\Integrations\\WPM_Forminator' => __DIR__ . '/../..' . '/includes/integrations/class-wpm-forminator.php',
         'WPM\\Includes\\Libraries\\WPM_Walker_Nav_Menu_Edit' => __DIR__ . '/../..' . '/includes/libraries/class-wpm-walker-nav-menu-edit.php',
         'WPM\\Includes\\Libraries\\WP_Async_Request' => __DIR__ . '/../..' . '/includes/libraries/abstract-wp-async-request.php',
         'WPM\\Includes\\Libraries\\WP_Background_Process' => __DIR__ . '/../..' . '/includes/libraries/abstract-wp-background-process.php',
@@ -82,6 +96,7 @@ class ComposerStaticInit10f68284d303303872430af9e5a79198
             $loader->prefixesPsr0 = ComposerStaticInit10f68284d303303872430af9e5a79198::$prefixesPsr0;
             $loader->classMap = ComposerStaticInit10f68284d303303872430af9e5a79198::$classMap;
 
+            $loader->classMap = apply_filters('wpmpro_autoload_static', $loader->classMap);
         }, null, ClassLoader::class);
     }
 }

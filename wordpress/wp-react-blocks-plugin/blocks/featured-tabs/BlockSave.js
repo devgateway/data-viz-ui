@@ -1,6 +1,5 @@
 const SaveComponent = (props) => {
     const {
-        setAttributes,
         attributes: {
             count,
             type,
@@ -10,12 +9,13 @@ const SaveComponent = (props) => {
             colors,
             useScrolls,
             readMoreLabel,
+            previewMode
         },
     } = props;
 
     const divClass = {};
     const divStyles = {
-        height: height + 'px', // Set the height style
+        height: `${height}px`, // Set the height style
     };
 
     const colorsParams = Object.keys(colors).map(k => colors[k]).join(",");
@@ -33,7 +33,8 @@ const SaveComponent = (props) => {
                 data-read-more-label={readMoreLabel}
                 data-use-scrolls={useScrolls}
                 data-component={"featuredTabs"}
-            ></div>
+                data-preview-mode={previewMode}
+            />
         </div>
     );
 }

@@ -5,7 +5,7 @@
 $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
-return array(
+$class_map_array =  array(
     'WPM\\Includes\\Abstracts\\WPM_Object' => $baseDir . '/includes/abstracts/abstract-wpm-object.php',
     'WPM\\Includes\\Abstracts\\WPM_Widget' => $baseDir . '/includes/abstracts/abstract-wpm-widget.php',
     'WPM\\Includes\\Admin\\Meta_Boxes\\WPM_Meta_Box_Comment_Languages' => $baseDir . '/includes/admin/meta-boxes/class-wpm-meta-box-comment-languages.php',
@@ -13,6 +13,10 @@ return array(
     'WPM\\Includes\\Admin\\Settings\\WPM_Settings_Additional' => $baseDir . '/includes/admin/settings/class-wpm-settings-additional.php',
     'WPM\\Includes\\Admin\\Settings\\WPM_Settings_General' => $baseDir . '/includes/admin/settings/class-wpm-settings-general.php',
     'WPM\\Includes\\Admin\\Settings\\WPM_Settings_Languages' => $baseDir . '/includes/admin/settings/class-wpm-settings-languages.php',
+    'WPM\\Includes\\Admin\\Settings\\WPM_Settings_Support' => $baseDir . '/includes/admin/settings/class-wpm-settings-support.php',
+    'WPM\\Includes\\Admin\\Settings\\WPM_Settings_Premium' => $baseDir . '/includes/admin/settings/class-wpm-settings-premium.php',
+    'WPM\\Includes\\Admin\\Settings\\WPM_Settings_Upgrade_Pro' => $baseDir . '/includes/admin/settings/class-wpm-settings-upgradepro.php',
+    'WPM\\Includes\\Admin\\Settings\\WPM_Settings_Auto_Translate' => $baseDir . '/includes/admin/settings/class-wpm-settings-auto-translate.php',
     'WPM\\Includes\\Admin\\Settings\\WPM_Settings_Page' => $baseDir . '/includes/admin/settings/class-wpm-settings-page.php',
     'WPM\\Includes\\Admin\\WPM_Admin' => $baseDir . '/includes/admin/class-wpm-admin.php',
     'WPM\\Includes\\Admin\\WPM_Admin_Assets' => $baseDir . '/includes/admin/class-wpm-admin-assets.php',
@@ -26,8 +30,13 @@ return array(
     'WPM\\Includes\\Admin\\WPM_Admin_Settings' => $baseDir . '/includes/admin/class-wpm-admin-settings.php',
     'WPM\\Includes\\Admin\\WPM_Admin_Taxonomies' => $baseDir . '/includes/admin/class-wpm-admin-taxonomies.php',
     'WPM\\Includes\\Admin\\WPM_Admin_Widgets' => $baseDir . '/includes/admin/class-wpm-admin-widgets.php',
+    'WPM\\Includes\\Admin\\WPM_Admin_Newsletter' => $baseDir . '/includes/admin/class-wpm-admin-newsletter.php',
+    'WPM\\Includes\\Admin\\WPM_Admin_Gutenberg_Block' => $baseDir . '/includes/admin/class-wpm-admin-gutenberg-block.php',
+    'WPM\\Includes\\Admin\\WPM_Deactivate_Feedback_Form' => $baseDir . '/includes/admin/tracking/class-wpm-feedback-form.php',
+    'WPM\\Includes\\Admin\\WPM_Reset_Settings' => $baseDir . '/includes/admin/class-wpm-reset-settings.php',
     'WPM\\Includes\\Integrations\\WPM_AIOSP' => $baseDir . '/includes/integrations/class-wpm-aiosp.php',
     'WPM\\Includes\\Integrations\\WPM_Acf' => $baseDir . '/includes/integrations/class-wpm-acf.php',
+    'WPM\\Includes\\Integrations\\WPM_SCF' => $baseDir . '/includes/integrations/class-wpm-scf.php',
     'WPM\\Includes\\Integrations\\WPM_Better_Search' => $baseDir . '/includes/integrations/class-wpm-better-search.php',
     'WPM\\Includes\\Integrations\\WPM_BuddyPress' => $baseDir . '/includes/integrations/class-wpm-buddypress.php',
     'WPM\\Includes\\Integrations\\WPM_CF7' => $baseDir . '/includes/integrations/class-wpm-cf7.php',
@@ -42,6 +51,11 @@ return array(
     'WPM\\Includes\\Integrations\\WPM_VC' => $baseDir . '/includes/integrations/class-wpm-vc.php',
     'WPM\\Includes\\Integrations\\WPM_WooCommerce' => $baseDir . '/includes/integrations/class-wpm-woocommerce.php',
     'WPM\\Includes\\Integrations\\WPM_Yoast_Seo' => $baseDir . '/includes/integrations/class-wpm-yoast-seo.php',
+    'WPM\\Includes\\Integrations\\WPM_Yoast_Seo_Presenters' => $baseDir . '/includes/integrations/class-wpm-yoast-seo-presenters.php',
+    'WPM\\Includes\\Integrations\\WPM_Bylaw_Plus' => $baseDir . '/includes/integrations/class-wpm-bylaw-plus.php',
+    'WPM\\Includes\\Integrations\\WPM_Schema_Saswp' => $baseDir . '/includes/integrations/class-wpm-schema-and-structured-data.php',
+    'WPM\\Includes\\Integrations\\WPM_Team' => $baseDir . '/includes/integrations/class-wpm-team.php',
+    'WPM\\Includes\\Integrations\\WPM_Forminator' => $baseDir . '/includes/integrations/class-wpm-forminator.php',
     'WPM\\Includes\\Libraries\\WPM_Walker_Nav_Menu_Edit' => $baseDir . '/includes/libraries/class-wpm-walker-nav-menu-edit.php',
     'WPM\\Includes\\Libraries\\WP_Async_Request' => $baseDir . '/includes/libraries/abstract-wp-async-request.php',
     'WPM\\Includes\\Libraries\\WP_Background_Process' => $baseDir . '/includes/libraries/abstract-wp-background-process.php',
@@ -64,3 +78,6 @@ return array(
     'WPM\\Includes\\WP_Multilang' => $baseDir . '/includes/class-wp-multilang.php',
     'WPM\\Includes\\Widgets\\WPM_Widget_Language_Switcher' => $baseDir . '/includes/widgets/class-wpm-widget-language-switcher.php',
 );
+
+$class_map_array = apply_filters('wpmpro_autoload_classmap', $class_map_array);
+return $class_map_array;

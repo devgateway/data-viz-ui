@@ -4,13 +4,16 @@
 function add_setting_section()
 {
 
-    register_setting('general', // Options group
+    register_setting(
+        'general', // Options group
         'react_ui_url', // Option name/database
         array(
             'show_in_rest' => true,
             'type' => 'string'
-        ));
-    register_setting('general', // Options group
+        )
+    );
+    register_setting(
+        'general', // Options group
         'react_api_url', // Option name/database
         array(
             'show_in_rest' => true,
@@ -29,62 +32,109 @@ function add_setting_section()
         array(
             'show_in_rest' => true,
             'type' => 'string'
-        ));
-    register_setting('general', // Options group
+        )
+    );
+    register_setting(
+        'general', // Options group
         'react_ui_menu_type', // Option name/database
         array(
             'show_in_rest' => true,
             'type' => 'string'
-        ));
+        )
+    );
+    register_setting(
+        'general', // Options group
+        'react_landing_page_url', // Option name/database
+        array(
+            'show_in_rest' => true,
+            'type' => 'string'
+        )
+    );
+    register_setting(
+        'general', // Options group
+        'react_google_analytics', // Option name/database
+        array(
+            'show_in_rest' => true,
+            'type' => 'string'
+        )
+    );
 
     /* Create settings section */
-    add_settings_section('wp-react-section', // Section ID
+    add_settings_section(
+        'wp-react-section', // Section ID
         'WP React Settings', // Section title
         'wp_react_setting_section_header', // Section callback function
         'general'
-    // Settings page slug
+        // Settings page slug
     );
-    add_settings_section('wp-react-search-section', // Section ID
+    add_settings_section(
+        'wp-react-search-section', // Section ID
         'Search Widget Settings', // Section title
         'wp_react_search_setting_section_header', // Section callback function
         'general'
-    // Settings page slug
+        // Settings page slug
     );
-    add_settings_section('wp-react-menu-section', // Section ID
+    add_settings_section(
+        'wp-react-menu-section', // Section ID
         'Menu Settings', // Section title
         'wp_react_menu_setting_section_header', // Section callback function
         'general'
-    // Settings page slug
+        // Settings page slug
+    );
+    add_settings_section(
+        'wp-react-landing-page-section', // Section ID
+        'Landing Page Settings', // Section title
+        'wp_react_landing_page_url_section_header', // Section callback function
+        'general',
     );
 
-    add_settings_field('wp-react-ui-url', // Field ID
+    add_settings_section(
+        'wp-react-google-analytics-section', // Section ID
+        'Website Analytics Code', // Section title
+        'wp_react_google_analytics_section_header', // Section callback function
+        'general',
+    );
+
+    add_settings_field(
+        'wp-react-ui-url', // Field ID
         __('WP React URI'), // Field title
         'wp_react_ui_callback', // Field callback function
         'general', // Settings page slug
         'wp-react-section'
-    // Section ID
+        // Section ID
     );
-    add_settings_field('wp-react-api-url', // Field ID
+    add_settings_field(
+        'wp-react-api-url', // Field ID
         __('WP React API url'), // Field title
         'wp_react_api_url_callback', // Field callback function
         'general', // Settings page slug
         'wp-react-section'
-    // Section ID
+        // Section ID
     );
 
-    add_settings_field('wp-react-ui-search-type', // Field ID
+    add_settings_field(
+        'wp-react-ui-search-type', // Field ID
         __('Type'), // Field title
         'wp_react_ui_search_type_callback', // Field callback function
         'general', // Settings page slug
         'wp-react-search-section'
-    // Section ID
+        // Section ID
     );
-    add_settings_field('wp-react-ui-menu-type', // Field ID
+    add_settings_field(
+        'wp-react-ui-menu-type', // Field ID
         __('Type'), // Field title
         'wp_react_ui_menu_type_callback', // Field callback function
         'general', // Settings page slug
         'wp-react-menu-section'
-    // Section ID
+        // Section ID
+    );
+    add_settings_field(
+        'wp-react-landing-page-url', // Field ID
+        __('Landing Page URL'), // Field title
+        'wp_react_landing_page_url_callback', // Field callback function
+        'general', // Settings page slug
+        'wp-react-landing-page-section'
+        // Section ID
     );
 
     add_settings_field('wp-apache-superset-url', // Field ID
@@ -96,6 +146,14 @@ function add_setting_section()
     );
 
 
+    add_settings_field(
+        'wp-react-google-analytics', // Field ID
+        __('Website Analytics Code'), // Field title
+        'wp_react_google_analytics_callback', // Field callback function
+        'general', // Settings page slug
+        'wp-react-google-analytics-section'
+        // Section ID
+    );
 }
 function wp_react_menu_setting_section_header()
 {
@@ -103,18 +161,18 @@ function wp_react_menu_setting_section_header()
 }
 function wp_react_ui_menu_type_callback()
 {
-    ?>
+?>
     <label for="droid-identification">
         <select id="react_ui_menu_type" class="regular-text" type="text" name="react_ui_menu_type">
-            <option value="classic" <?php echo(get_option('react_ui_menu_type') == 'classic' ? 'selected' : '') ?>>
+            <option value="classic" <?php echo (get_option('react_ui_menu_type') == 'classic' ? 'selected' : '') ?>>
                 Classic
             </option>
-            <option value="floating"<?php echo(get_option('react_ui_menu_type') == 'floating' ? 'selected' : '') ?>>
+            <option value="floating" <?php echo (get_option('react_ui_menu_type') == 'floating' ? 'selected' : '') ?>>
                 Floating
             </option>
         </select>
     </label>
-    <?php
+<?php
 }
 function wp_react_setting_section_header()
 {
@@ -126,23 +184,23 @@ function wp_react_search_setting_section_header()
 }
 function wp_react_ui_callback()
 {
-    ?>
+?>
     <label for="droid-identification">
         <input id="react_ui_url" class="regular-text" type="text" name="react_ui_url"
-               value="<?php echo(get_option('react_ui_url')) ?>">
+            value="<?php echo (get_option('react_ui_url')) ?>">
     </label>
-    <?php
+<?php
 }
 function wp_react_api_url_callback()
 {
-    ?>
+?>
     <label for="droid-identification">
         <input
             id="react_api_url"
             class="regular-text" type="text" name="react_api_url"
-            value="<?php echo(get_option('react_api_url')) ?>">
+            value="<?php echo (get_option('react_api_url')) ?>">
     </label>
-    <?php
+<?php
 }
 function wp_apache_superset_url_callback()
 {
@@ -157,18 +215,52 @@ function wp_apache_superset_url_callback()
 }
 function wp_react_ui_search_type_callback()
 {
-    ?>
+?>
     <label for="droid-identification">
         <select id="react_ui_search_type" class="regular-text" type="text" name="react_ui_search_type">
-            <option value="inline" <?php echo(get_option('react_ui_search_type') == 'inline' ? 'selected' : '') ?>>
+            <option value="inline" <?php echo (get_option('react_ui_search_type') == 'inline' ? 'selected' : '') ?>>
                 Inline
             </option>
-            <option value="floating"<?php echo(get_option('react_ui_search_type') == 'floating' ? 'selected' : '') ?>>
+            <option value="floating" <?php echo (get_option('react_ui_search_type') == 'floating' ? 'selected' : '') ?>>
                 Floating
             </option>
         </select>
     </label>
-    <?php
+<?php
+}
+
+function wp_react_landing_page_url_section_header()
+{
+    echo "<p>Enter the Landing Page URL if it’s different from the current site </p>";
+}
+
+function wp_react_landing_page_url_callback()
+{
+?>
+    <label for="droid-identification">
+        <input
+            id="react_landing_page_url"
+            class="regular-text" type="text" name="react_landing_page_url" placeholder="Landing Page URL"
+            value="<?php echo (get_option('react_landing_page_url')) ?>">
+    </label>
+<?php
+}
+
+function wp_react_google_analytics_section_header()
+{
+    echo "<p>Add the site’s tag id to be used to gather analytics for this website. e.g. G-A1234B6789</p>";
+}
+
+function wp_react_google_analytics_callback()
+{
+?>
+    <label for="droid-identification">
+        <input
+            id="react_google_analytics"
+            class="regular-text" type="text" name="react_google_analytics" placeholder="Google Analytics Code"
+            value="<?php echo (get_option('react_google_analytics')) ?>">
+    </label>
+<?php
 }
 
 function namespace_register_setting_route()
@@ -186,7 +278,9 @@ function show_ui_setting($request)
         "apache_superset_url" => get_option("apache_superset_url"),
         "react_search_type" => get_option("react_ui_search_type"),
         "react_menu_type" => get_option("react_ui_menu_type"),
-        "languages" => wpm_get_lang_option()
+        "languages" => wpm_get_lang_option(),
+        "landing_page_url" => get_option("react_landing_page_url"),
+        "google_analytics_code" => get_option("react_google_analytics"),
     );
 
     $current_name = wpm_translate_value(get_option('blogname'));
@@ -206,7 +300,8 @@ function show_ui_setting($request)
                 'post_type' => array('customize_changeset'),
                 'post_status' => array('auto-draft', 'draft'),
                 'cache_wp_query' => false,
-            ));
+            )
+        );
         $the_query->the_post();
         $changes = json_decode($the_query->post->post_content, true);
         //console.log($the_query->post->post_content);

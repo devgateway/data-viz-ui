@@ -31,27 +31,32 @@ import {isSupersetAPI} from "../commons/APIutils";
 class BlockEdit extends BlockEditWithAPIMetadata {
     constructor(props) {
         super(props);
-        this.ignoreAttributes = ['tooltip']
+        this.ignoreAttributes = ['tooltip'];
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        const {setAttributes, attributes: {type,colorBy,dimension1, dimension2, types, measures, app}} = this.props
-        const {attributes: {type: prevType, dimension2: prevDimension2}} = prevProps
+        const {setAttributes, attributes: {type,colorBy,dimension1, dimension2 }} = this.props
+        const {attributes: {type: prevType }} = prevProps
+        const newPreviewMode = this.state?.previewMode;
 
-        if (type != prevType) {
-            if (type == 'radar') {
-                if (colorBy != 'id') {
+        if (newPreviewMode !== prevState.previewMode) {
+            setAttributes({previewMode: newPreviewMode});
+        }
+
+        if (type !== prevType) {
+            if (type === 'radar') {
+                if (colorBy !== 'id') {
                     setAttributes({colorBy: 'id'})
 
                 }
             }
-            if (type == 'pie') {
+            if (type === 'pie') {
 
-                if (dimension1 != 'none' && dimension2 == 'none' && colorBy != 'index') {
+                if (dimension1 !== 'none' && dimension2 === 'none' && colorBy !== 'index') {
                     setAttributes({colorBy: 'index'})
 
                 }
-                if (dimension1 != 'none' && dimension2 != 'none' && colorBy != 'id') {
+                if (dimension1 !== 'none' && dimension2 !== 'none' && colorBy !== 'id') {
                     setAttributes({colorBy: 'id'})
 
                 }
@@ -491,6 +496,9 @@ class BlockEdit extends BlockEditWithAPIMetadata {
                                     </PanelRow>
                                 </PanelBody>
                                 <MobileConfig
+                                    allMeasures={this.state.measures}
+                                    allDimensions={this.state.dimensions}
+                                    allCategories={this.state.categories}
                                     attributes={this.props.attributes}
                                     setAttributes={setAttributes}>
                                 </MobileConfig>
@@ -526,7 +534,7 @@ class BlockEdit extends BlockEditWithAPIMetadata {
 
                         <div className={className}>
                             {mode == "info" && <div><InnerBlocks template={[['core/image', {}]]}/></div>}
-                            {this.state.react_ui_url && <iframe ref={this.iframe} style={divStyles} scrolling={"no"}
+                            {this.state.react_ui_url && <iframe ref={this.iframe} key={this.state} style={divStyles} scrolling={"no"}
                                                                 src={this.state.react_ui_url + "/embeddable/chart?"}/>}
 
                         </div>

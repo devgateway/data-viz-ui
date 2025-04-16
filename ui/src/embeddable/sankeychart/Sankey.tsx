@@ -86,12 +86,12 @@ const Chart = (props) => {
   }
 
   const legendItems = () => {
-    const chartLegends = props.options.data.nodes.slice()
+    const chartLegends = props?.options?.data?.nodes?.slice()
     if (reverseLegend) {
       chartLegends.reverse()
     }
     return (<>
-      {showLegends && chartLegends.map(legend => {
+      {showLegends && chartLegends?.map(legend => {
         const legendEnabled = filter.indexOf(legend.id) == -1
         return (
           <div className={`legend item ${legendEnabled ? "" : "ignore"}`} onClick={() => toggle(legend.id)}>

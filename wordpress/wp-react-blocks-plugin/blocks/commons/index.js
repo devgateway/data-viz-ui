@@ -33,8 +33,7 @@ export class ComponentWithSettings extends Component {
         }
 
         window.addEventListener("message", (event) => {
-
-            if (event.data.type == 'componentReady' && event.data.value == true) {
+            if (event.data.type === 'componentReady' && event.data.value === true) {
                 if (this.iframe.current) {
                     console.log("-----------Sending message -----------")
                     this.iframe.current.contentWindow.postMessage(({messageType: 'component-attributes', ...this.props.attributes}), "*")
@@ -42,11 +41,16 @@ export class ComponentWithSettings extends Component {
             }
         }, false);
         this.iframe = React.createRef();
+        this.unsubscribe = wp.data.subscribe(() => {
+            const newPreviewMode = wp.data.select("core/editor").getDeviceType();
+            if (newPreviewMode !== this.state.previewMode) {
+                this.setState({previewMode: newPreviewMode });
+            }
+        });
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        if (this.iframe.current) {
-            console.log("-----------Sending message -----------")
+        if (this.iframe.current?.contentWindow) {
             this.iframe.current.contentWindow.postMessage(({messageType: 'component-attributes', ...this.props.attributes}), "*")
         }
     }
@@ -62,9 +66,13 @@ export class ComponentWithSettings extends Component {
             });
         });
     }
+
+    componentWillUnmount() {
+        if (this.unsubscribe) {
+            this.unsubscribe();
+        }
+    }
 }
-
-
 export class BlockEditWithFilters extends ComponentWithSettings {
 
     constructor(props) {
@@ -331,7 +339,7 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
 
         if (app != prevAPP) { //if app changes we shoudl reload metadta
 
-            
+
             if (isSupersetAPI(app, this.state.apps)) { //if app is superset proxy an additional step is added
                 this.loadDatasets(app)
                 if (dvzProxyDatasetId) {
@@ -341,7 +349,7 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
                 this.loadMetadata(app);
             }
         } else {//app wasn't changed
-            
+
             if (dvzProxyDatasetId != prevDvzProxyDatasetId) {
                 this.loadMetadata(app, dvzProxyDatasetId);
             }
@@ -383,7 +391,7 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
             return;
         }
 
-        
+
         const dimensionsUrl = `/api/${app}/dimensions${dvzProxyDatasetId ? `?dvzProxyDatasetId=${dvzProxyDatasetId}` : ''}`
         const measuresUrl = `/api/${app}/measures${dvzProxyDatasetId ? `?dvzProxyDatasetId=${dvzProxyDatasetId}` : ''}`
         const filtersUrl = `/api/${app}/filters${dvzProxyDatasetId ? `?dvzProxyDatasetId=${dvzProxyDatasetId}` : ''}`
@@ -472,7 +480,7 @@ export class BlockEditWithAPIMetadata extends ComponentWithSettings {
                 return response.json();
             })
             .then(data => {
-                
+
                 this.setState({
                     [stateKey]: transformData(data)
                 });
