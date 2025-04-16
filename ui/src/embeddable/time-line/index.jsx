@@ -358,7 +358,7 @@ const TimeLine = (props) => {
     <div
       className={"time line"}
       onMouseLeave={(event) => {
-        let classes = event.target.getAttribute("class");
+        const classes = event.target.getAttribute("class");
         //if event is from link in tooltip, dont hide the tooltip
         if (classes !== "ui fluid container excerpt") {
           setDisplayTooltip(false);

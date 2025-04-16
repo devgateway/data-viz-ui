@@ -9,7 +9,7 @@ import {
 
 
 const SlugPostContainer = () => {
-    const { locale, slug } = useParams();
+    const { lan: locale, slug } = useParams();
     return (
         <ResponsiveContainer>
             <PostProvider
