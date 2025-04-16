@@ -10,6 +10,7 @@ import {
     PostContent
 } from "@devgateway/wp-react-lib";
 import PostIntro from "../connected-templates/PostIntro";
+import { useWindowDimensionsAndDevice } from '@/lib/hooks/window-dimensions';
 
 interface FeaturedTabsProps {
     posts?: any[],
@@ -25,22 +26,41 @@ export interface FeatureTabsProps {
     "data-type": string,
     "data-taxonomy": string,
     "data-categories": string,
-    "data-items": number,
+    "data-items": any,
     "data-color": string,
     "data-read-more-label": string,
     "data-use-scrolls": string,
+    "data-preview-mode": string,
     editing: boolean,
     parent: number,
     unique: number,
     intl: any
 }
 
+interface FeaturedPostProps {
+    post: any;
+    onClick: () => void;
+    active?: boolean;
+    moreLabel: string;
+}
+
+interface GetFigureFromPostProps {
+    post: any;
+}
+
+interface AccordionContentProps {
+    posts: any[];
+    activeItem: string;
+    setActive: (slug: string) => void;
+    color: string;
+}
+
 // Desktop FeaturedPost Component
-const FeaturedPost = ({ post, onClick, active, moreLabel }) => {
+const FeaturedPost: React.FC<FeaturedPostProps> = ({ post, onClick, active, moreLabel }) => {
     const media = post['_embedded'] ? post['_embedded']["wp:featuredmedia"] : null;
 
     return (
-        <div className="cover" style={{ "backgroundImage": 'url(' + (media ? media[0].source_url : '') + ')' }}>
+        <div className="cover" style={{ "backgroundImage": `url(${media ? media[0].source_url : ''})` }}>
             <PostIntro post={post} />
             {!active ?
                 <Label onClick={onClick}><Icon name='search' size="large" /> {moreLabel}</Label> :
@@ -49,7 +69,7 @@ const FeaturedPost = ({ post, onClick, active, moreLabel }) => {
     );
 };
 
-const GetFigureFromPost = ({ post }) => {
+const GetFigureFromPost: React.FC<GetFigureFromPostProps> = ({ post }) => {
     const parser = new DOMParser();
     const doc = parser.parseFromString(post.content.rendered, 'text/html');
     const figureElement = doc.querySelector('figure');
@@ -67,10 +87,10 @@ const GetFigureFromPost = ({ post }) => {
 const FeaturedTabs: React.FC<FeaturedTabsProps> = ({ posts, width, height, color, moreLabel }) => {
     const [active, setActive] = useState<string | null>(null);
     const [visible, setVisible] = useState(false);
-    const [scrollPos, setScrollPos] = useState<any>([]);
+    const [scrollPos, setScrollPos] = useState<[number, number]>([0, 0]);
     const arrayColors = color.split(',');
 
-    const toggleAnimation = (k) => {
+    const toggleAnimation = (k: string) => {
         if (!visible) {
             setActive(k);
             setVisible(true);
@@ -107,7 +127,7 @@ const FeaturedTabs: React.FC<FeaturedTabsProps> = ({ posts, width, height, color
         <Container fluid={true} className="featured tabs" style={{ minHeight: `${height}px` }}>
             {/*  @ts-expect-error */}
             <Grid stackable columns={active != null ? 1 : posts?.length} className="desktop">
-                {posts && posts.map((post, i) => (
+                {posts?.map((post, i) => (
                     <React.Fragment key={post.slug}>
                         <Grid.Column
                             style={active == null ? { display: 'block', visibility: 'visible', backgroundColor: arrayColors[i] } : { display: 'none', visibility: 'hidden' }}
@@ -122,7 +142,7 @@ const FeaturedTabs: React.FC<FeaturedTabsProps> = ({ posts, width, height, color
                             style={active != post.slug ? { display: 'none', visibility: 'hidden' } : { display: 'block', visibility: 'visible' }}
                         >
                             <Segment style={{ "backgroundColor": arrayColors[i] }}>
-                                {post.meta_fields && post.meta_fields.icon &&
+                                {post.meta_fields?.icon &&
                                     <MediaProvider id={post.meta_fields ? post.meta_fields.icon[0] : null}>
                                         <MediaConsumer>
                                             <PostIcon />
@@ -144,12 +164,28 @@ const FeaturedTabs: React.FC<FeaturedTabsProps> = ({ posts, width, height, color
 };
 
 // Mobile AccordionContent Component
-const AccordionContent = ({ posts, activeItem, setActive, color }) => {
+const AccordionContent: React.FC<AccordionContentProps> = ({ posts, activeItem, setActive, color }) => {
     const [activeIndex, setActiveIndex] = useState(posts.findIndex(p => p.slug === activeItem));
-    const [scrollTarget, setScrollTarget] = useState<any>(null);
+    const [scrollTarget, setScrollTarget] = useState<HTMLElement | null>(null);
     const arrayColors = color.split(',');
 
-    const findElementAndAddStyles = (elementClass, containerClass, hasContainerClass) => {
+    const getScreenOrientation = (): string => {
+        return (
+            window.screen.orientation?.type ||
+            (window.innerWidth > window.innerHeight
+                ? "landscape-primary"
+                : "portrait-primary")
+        );
+    };
+    const [orientation, setOrientation] = useState(getScreenOrientation());
+
+    const handleOrientationChange = () => {
+        setTimeout(() => {
+            setOrientation(getScreenOrientation());
+        }, 100);
+    };
+
+    const findElementAndAddStyles = (elementClass: string, containerClass: string, hasContainerClass: string) => {
         const elements = document.querySelectorAll(elementClass);
         elements.forEach((element) => {
             if(element.querySelector(containerClass)) {
@@ -176,7 +212,26 @@ const AccordionContent = ({ posts, activeItem, setActive, color }) => {
         findElementAndAddStyles('.ui.fluid.container.viz.featured.tabs', '.content.active.accordion-post-content .wp-block-columns', 'has-wp-block-columns');
     }, [scrollTarget]);
 
-    const handleClick = (e, titleProps) => {
+    useEffect(() => {
+        if (window.screen.orientation) {
+            window.screen.orientation.addEventListener(
+                "change",
+                handleOrientationChange
+            );
+        }
+        window.addEventListener("resize", handleOrientationChange);
+        return () => {
+            window.removeEventListener("resize", handleOrientationChange);
+            if (window.screen.orientation) {
+                window.screen.orientation.removeEventListener(
+                    "change",
+                    handleOrientationChange
+                );
+            }
+        };
+    }, []);
+
+    const handleClick = (e: React.MouseEvent, titleProps: { index: number }) => {
         const { index } = titleProps;
         const newIndex = activeIndex === index ? -1 : index;
         setActiveIndex(newIndex);
@@ -184,21 +239,21 @@ const AccordionContent = ({ posts, activeItem, setActive, color }) => {
 
         // Set the scroll target after updating the activeIndex
         if (newIndex !== -1) {
-            setScrollTarget(e.currentTarget);
+            setScrollTarget(e.currentTarget as HTMLElement);
         }
     };
 
     return (
         <Accordion fluid styled>
             {posts.map((post, index) => {
-                const iconUrl = post.meta_fields && post.meta_fields.icon ? post.meta_fields.icon[0] : null;
+                const iconUrl = post.meta_fields?.icon ? post.meta_fields.icon[0] : null;
 
                 return (
                     <React.Fragment key={post.id}>
                         <Accordion.Title
                             active={activeIndex === index}
                             index={index}
-                            onClick={handleClick}
+                            onClick={handleClick as any}
                             style={{ backgroundColor: arrayColors[index]  }}
                         >
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
@@ -228,7 +283,7 @@ const AccordionContent = ({ posts, activeItem, setActive, color }) => {
 };
 
 // Wrapper Component for Handling Mobile and Desktop View
-const Wrapper = (props: FeatureTabsProps) => {
+const Wrapper: React.FC<FeatureTabsProps> = (props) => {
     const {
         "data-width": width,
         "data-height": height,
@@ -239,23 +294,20 @@ const Wrapper = (props: FeatureTabsProps) => {
         "data-color": color,
         "data-use-scrolls": useScrolls,
         "data-read-more-label": moreLabel = "READ More",
+        "data-preview-mode": previewMode = "Desktop",
         editing,
         parent,
         unique
     } = props;
     const locale = props.intl.locale;
-    const scrollable = useScrolls == 'true'
+    const scrollable = useScrolls == 'true';
+
+    const { width: deviceWidth} = useWindowDimensionsAndDevice();
 
     // Determine screen width and conditionally render components
-    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
-    useEffect(() => {
-        const handleResize = () => {
-            setIsMobile(window.innerWidth <= 1250);
-        };
-
-        window.addEventListener("resize", handleResize);
-        return () => window.removeEventListener("resize", handleResize);
-    }, []);
+    const isMobile = deviceWidth <= 1250;
+    const isNotDesktopPreview = previewMode !== 'Desktop' && editing;
+    const isMobileRenderMode = isMobile && !editing;
 
     return (
         <Container
@@ -272,7 +324,7 @@ const Wrapper = (props: FeatureTabsProps) => {
                 perPage={items}
             >
                 <PostConsumer>
-                    {isMobile ? (
+                    {(isNotDesktopPreview || isMobileRenderMode) ? (
                         <AccordionContent
                             posts={items}
                             activeItem={items?.[0]?.slug}

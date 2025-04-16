@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Container } from "semantic-ui-react";
 import DataProvider from "../data/DataProvider";
 import DataConsumer from "../data/DataConsumer";
+import getDeviceType from "../../utils/deviceType";
 import { buildDivergingOptions, buildPieOptions } from "./prevalenceBuilder";
 import HalfPie from "./Pie";
 
@@ -16,13 +17,7 @@ import CSVDataFrame from "./CSVDataFrame";
 import ColorProvider from "./colors/ColorProvider";
 import Messages from "./Messages";
 import { connect } from "react-redux";
-import deviceType from '../../utils/deviceType';
-
-
-const isMobile = deviceType() === 'mobile';
-const isTablet = deviceType() === 'tablet';
-const isMidTablet = deviceType() === 'midTablet';
-const isMobileOrTablet = deviceType() === 'mobile' || deviceType() === 'tablet' || deviceType() === 'midTablet';
+import { injectIntl } from "react-intl";
 
 const PieChart = (props) => {
   const { data, legends, colors, height } = props;
@@ -177,9 +172,60 @@ const Chart = (props) => {
     "data-radar-dot-label-offset": radarDotLabelOffset = -12,
     "data-mobile-customization": mobileCustomization = "{}",
     "data-show-percentage": showPercentage = "false",
+    "data-preview-mode": previewMode = "Desktop",
   } = props;
-  const mobileConfigSettings = JSON.parse(decodeURIComponent(mobileCustomization));
-  const isMobileConfigEnabled = (isMobile || isTablet || isMidTablet) && (mobileConfigSettings?.  showCustomization ?? false);
+  const mobileConfigSettings = JSON.parse(
+    decodeURIComponent(mobileCustomization)
+  );
+  const [isMobileOrTablet, setIsMobileOrTablet] = useState(
+    window.innerWidth <= 1250
+  );
+  const isMobileConfigEnabled =
+    isMobileOrTablet && (mobileConfigSettings?.showCustomization ?? false);
+
+  const isTabletEditMode =  (["Tablet"].includes(previewMode) && editing);
+  const isMobileEditMode =  (["Mobile"].includes(previewMode) && editing);
+  const isDesktopEditMode = (["Desktop"].includes(previewMode) && editing);
+
+  const isNotDesktopPreview = isMobileConfigEnabled && previewMode !== "Desktop";
+  const isNotEditingAndIsMobileOrTablet = isMobileConfigEnabled && !editing;
+
+  const getTickRotation = () => {
+    const isTabletViewport = window.matchMedia("(min-width: 768px) and (max-width: 1250px)").matches;
+    const isMobileViewport = window.matchMedia("(max-width: 767px)").matches;
+
+    switch (true) {
+      case isDesktopEditMode:
+        return tickRotation;
+
+      case isTabletEditMode:
+        return isMobileConfigEnabled
+          ? mobileConfigSettings?.tabletXAxisTextRotation ?? tickRotation
+          : tickRotation;
+
+      case isMobileEditMode:
+        return isMobileConfigEnabled
+          ? mobileConfigSettings?.mobileXAxisTextRotation ?? tickRotation
+          : tickRotation;
+
+      case isTabletViewport:
+        return isMobileConfigEnabled
+          ? mobileConfigSettings?.tabletXAxisTextRotation ?? tickRotation
+          : tickRotation;
+
+      case isMobileViewport:
+        return isMobileConfigEnabled
+          ? mobileConfigSettings?.mobileXAxisTextRotation ?? tickRotation
+          : tickRotation;
+
+      default:
+        return tickRotation;
+    }
+  };
+
+  const _tickRotation = getTickRotation();
+
+  const [deviceTickRotation, setTickRotation] = useState(_tickRotation);
 
   const locale = props.intl.locale;
   const ref = useRef(null);
@@ -189,7 +235,7 @@ const Chart = (props) => {
         return value;
       }
       return decodeURIComponent(value);
-    } catch(err) {
+    } catch (err) {
       console.error("error decoding value:" + value);
       return value;
     }
@@ -289,7 +335,7 @@ const Chart = (props) => {
   let selectedMeasures = getSelectedMeasures();
 
   let selectedFormat = getSelectedFormat();
-  let userMeasures = getUserMeasures();
+  const userMeasures = getUserMeasures();
   let leftLegendForSelectedMeasure = left;
   let rightLegendForSelectedMeasure = rightLegend;
 
@@ -312,8 +358,8 @@ const Chart = (props) => {
     }
   }
 
-  let numberFormat = selectedFormat
-      ? {
+  const numberFormat = selectedFormat
+    ? {
         style:
             selectedFormat.style === "compacted"
                 ? "decimal"
@@ -334,7 +380,7 @@ const Chart = (props) => {
 
   const groupTotalFormatObject = parse(groupTotalFormat);
 
-  let groupTotalFormatParsed = {
+  const groupTotalFormatParsed = {
     style:
         groupTotalFormatObject.style === "compacted"
             ? "decimal"
@@ -355,41 +401,34 @@ const Chart = (props) => {
     scheme: scheme,
     colorBy: colorBy,
   };
-  let child = null;
+  const child = null;
   const contentHeight = editing ? height - 80 : height;
 
-  const showXAxisTitle = () => {
-    if(isMobileConfigEnabled) {
-      if(mobileConfigSettings?.showXAxisTitle) {
-        return bottom;
-      } else {
-        return '';
-      }
-    }
-    return bottom;
-  }
+  const showXAxisTitle = () => (
+    (isNotDesktopPreview || isNotEditingAndIsMobileOrTablet) && !mobileConfigSettings?.showXAxisTitle
+      ? ""
+      : bottom
+  );
 
   const showYAxisTitle = () => {
-    if(isMobileConfigEnabled) {
-      if(mobileConfigSettings?.showYAxisTitle) {
+    if (isNotDesktopPreview || isNotEditingAndIsMobileOrTablet) {
+      if (mobileConfigSettings?.showYAxisTitle) {
         return leftLegendForSelectedMeasure;
-      } else {
-        return '';
       }
+      return "";
     }
     return leftLegendForSelectedMeasure;
-  }
+  };
 
   const showRightAxisTitle = () => {
-    if(isMobileConfigEnabled) {
-      if(mobileConfigSettings?.showRightAxisTitle) {
+    if (isNotDesktopPreview || isNotEditingAndIsMobileOrTablet) {
+      if (mobileConfigSettings?.showRightAxisTitle) {
         return rightLegendForSelectedMeasure;
-      } else {
-        return '';
       }
+      return "";
     }
     return rightLegendForSelectedMeasure;
-  }
+  };
 
   const legends = {
     left: showYAxisTitle(),
@@ -400,7 +439,8 @@ const Chart = (props) => {
   const parseBoolean = (str) => {
     if (str === "true" || str === true) {
       return true;
-    } else if (str === "false" || str === false) {
+    }
+    if (str === "false" || str === false) {
       return false;
     }
   };
@@ -419,10 +459,9 @@ const Chart = (props) => {
     if (layout === "horizontal") {
       switchGridLines();
       return "vertical";
-    } else {
-      switchGridLines();
-      return "horizontal";
     }
+    switchGridLines();
+    return "horizontal";
   };
 
   const mobileLayout = () => {
@@ -432,32 +471,83 @@ const Chart = (props) => {
     return layout;
   };
 
-
   const getMarginValue = (mobileEnabled, mobileSetting, defaultValue) => {
-    return mobileEnabled ? parseInt(mobileSetting) ?? defaultValue : defaultValue;
-  }
+    return mobileEnabled
+      ? Number.parseInt(mobileSetting) ?? defaultValue
+      : defaultValue;
+  };
 
-  const getBarPadValueOuterOrInner = (mobileEnabled, mobileSetting, defaultValue) => {
-    return mobileEnabled ? mobileSetting ?? defaultValue: defaultValue;
-  }
+  const getBarPadValueOuterOrInner = (
+    mobileEnabled,
+    mobileSetting,
+    defaultValue
+  ) => {
+    return mobileEnabled ? mobileSetting ?? defaultValue : defaultValue;
+  };
+
+  useEffect(() => {
+    const updateDeviceType = () => {
+      setIsMobileOrTablet(window.innerWidth <= 1250);
+      const rotation = getTickRotation();
+      setTickRotation(rotation);
+    };
+    window.addEventListener("resize", updateDeviceType);
+    setTickRotation(getTickRotation());
+    return () => {
+      window.removeEventListener("resize", updateDeviceType);
+    };
+  }, [
+    editing,
+    previewMode,
+    isMobileConfigEnabled,
+    tickRotation,
+    mobileConfigSettings?.tabletXAxisTextRotation,
+    mobileConfigSettings?.mobileXAxisTextRotation,
+  ]);
+
+  const determineLegendPosition = () => {
+    const isTabletOrMobile = ["tablet", "mobile", "midTablet"].includes(getDeviceType());
+    if (editing && previewMode === "Desktop") {
+      return legendPosition
+    }
+    return isTabletOrMobile ? "bottom" : legendPosition;
+  };
+
 
   const chartProps = {
     app,
+    editing,
     tickColor: decodeURIComponent(tickColor),
-    tickRotation: isMobileConfigEnabled ? mobileConfigSettings.tickRotation ?? tickRotation : tickRotation,
-    layout: isMobileConfigEnabled ? mobileLayout() : layout,
+    tickRotation: deviceTickRotation,
+    layout: (isNotDesktopPreview || isNotEditingAndIsMobileOrTablet) ? mobileLayout() : layout,
     reverse: reverse == true || reverse == "true",
     showLegends: showLegends == true || showLegends == "true",
     legendLabel,
     swap: swap == true || swap == "true",
     showGrid: showGrid == true || showGrid == "true",
     showPercentage: showPercentage == true || showPercentage == "true",
-    marginLeft: getMarginValue(isMobileConfigEnabled, parseInt(mobileConfigSettings?.marginLeft), parseInt(marginLeft)),
-    marginTop: getMarginValue(isMobileConfigEnabled, parseInt(mobileConfigSettings?.marginTop), parseInt(marginTop)),
-    marginRight: getMarginValue(isMobileConfigEnabled, parseInt(mobileConfigSettings?.marginRight), parseInt(marginRight)),
-    marginBottom: getMarginValue(isMobileConfigEnabled, parseInt(mobileConfigSettings?.marginBottom), parseInt(marginBottom)),
+    marginLeft: getMarginValue(
+      (isNotDesktopPreview || isNotEditingAndIsMobileOrTablet),
+      Number.parseInt(mobileConfigSettings?.marginLeft),
+      parseInt(marginLeft)
+    ),
+    marginTop: getMarginValue(
+      (isNotDesktopPreview || isNotEditingAndIsMobileOrTablet),
+      Number.parseInt(mobileConfigSettings?.marginTop),
+      parseInt(marginTop)
+    ),
+    marginRight: getMarginValue(
+      (isNotDesktopPreview || isNotEditingAndIsMobileOrTablet),
+      Number.parseInt(mobileConfigSettings?.marginRight),
+      Number.parseInt(marginRight)
+    ),
+    marginBottom: getMarginValue(
+      (isNotDesktopPreview || isNotEditingAndIsMobileOrTablet),
+      Number.parseInt(mobileConfigSettings?.marginBottom),
+      Number.parseInt(marginBottom)
+    ),
     height: `${contentHeight}px`,
-    legendPosition: isMobileOrTablet ? "bottom" : legendPosition,
+    legendPosition: determineLegendPosition(),
     legends,
     tooltip:
         tooltipEnableMarkdown == true || tooltipEnableMarkdown == "true"
@@ -483,10 +573,18 @@ const Chart = (props) => {
     overrideTickColor: overrideTickColor == true || overrideTickColor == "true",
     fixedMinValue,
     fixedMaxValue,
-    barPadding: getBarPadValueOuterOrInner(isMobileConfigEnabled, mobileConfigSettings?.barPadding, barPadding),
+    barPadding: getBarPadValueOuterOrInner(
+      (isNotDesktopPreview || isNotEditingAndIsMobileOrTablet),
+      mobileConfigSettings?.barPadding,
+      barPadding
+    ),
     barLabelPosition,
     lineLabelPosition,
-    barInnerPadding: getBarPadValueOuterOrInner(isMobileConfigEnabled, mobileConfigSettings?.barInnerPadding, barInnerPadding),
+    barInnerPadding: getBarPadValueOuterOrInner(
+      (isNotDesktopPreview || isNotEditingAndIsMobileOrTablet),
+      mobileConfigSettings?.barInnerPadding,
+      barInnerPadding
+    ),
     xLabelColor: decodeURIComponent(xLabelColor),
     barLabelColor: decodeURIComponent(barLabelColor),
     legendLabelColor: decodeURIComponent(legendLabelColor),
@@ -522,9 +620,13 @@ const Chart = (props) => {
     centerLabelYOffset,
     userMeasures,
     tooltipEnableMarkdown:
-        tooltipEnableMarkdown == true || tooltipEnableMarkdown == "true",
-    yAxisTickValues: isMobileConfigEnabled ? mobileConfigSettings.yAxisTickValues ?? yAxisTickValues : yAxisTickValues,
-    xAxisTickValues: isMobileConfigEnabled ? mobileConfigSettings.xAxisTickValues ?? xAxisTickValues : xAxisTickValues,
+      tooltipEnableMarkdown == true || tooltipEnableMarkdown == "true",
+    yAxisTickValues: (isNotDesktopPreview || isNotEditingAndIsMobileOrTablet)
+      ? mobileConfigSettings.yAxisTickValues ?? yAxisTickValues
+      : yAxisTickValues,
+    xAxisTickValues:(isNotDesktopPreview || isNotEditingAndIsMobileOrTablet)
+      ? mobileConfigSettings.xAxisTickValues ?? xAxisTickValues
+      : xAxisTickValues,
     enableGridY: enableGridY == true || enableGridY == "true",
     enableGridX: enableGridX == true || enableGridX == "true",
     offsetText,
@@ -548,10 +650,11 @@ const Chart = (props) => {
     radarDotLabelOffset,
     sort2Dimension,
     mobileCustomization,
-    dimension1
+    dimension1,
+    previewMode
   };
 
-  let params = {};
+  const params = {};
   const ff = parse(filters) || {};
 
   if (ff && ff.forEach) {
@@ -601,7 +704,8 @@ const Chart = (props) => {
     case "line":
       Chart = Line;
       showNotEnoughParameters =
-          app !== "csv" && (selectedMeasures.length === 0 || dimension1 === "none");
+        app !== "csv" &&
+        (selectedMeasures.length === 0 || dimension1 === "none");
       break;
     case "pie":
       showNotEnoughParameters = app != "csv" && selectedMeasures.length == 0;
@@ -625,7 +729,7 @@ const Chart = (props) => {
     dimensions.push(dimension2);
   }
   const [legendsContainerHeight, setLegendsContainerHeight] = useState(0);
-  const [, setOrientation] = useState(getScreenOrientation());
+  const [orientation, setOrientation] = useState(getScreenOrientation());
 
   function getScreenOrientation() {
     return (
@@ -634,8 +738,7 @@ const Chart = (props) => {
             ? "landscape-primary"
             : "portrait-primary")
     );
-  };
-
+  }
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -660,12 +763,15 @@ const Chart = (props) => {
               height + marginTop + marginBottom + paddingTop + paddingBottom;
 
           // Find the closest '.ui.fluid.container.content' ancestor from the legends container
-          const container = legendsContainer.closest(".ui.fluid.container.content");
+          const container = legendsContainer.closest(
+            ".ui.fluid.container.content"
+          );
 
           if (container) {
             const dataSourceParagraph = container.querySelector(".data-source");
             if (dataSourceParagraph) {
-              const dataSourceRect = dataSourceParagraph.getBoundingClientRect();
+              const dataSourceRect =
+                dataSourceParagraph.getBoundingClientRect();
               const legendsRect = legendsContainer.getBoundingClientRect();
 
               // Ensure elements are visible before adjusting margins
@@ -673,10 +779,14 @@ const Chart = (props) => {
                 if (legendsContainer.textContent.trim() === "") return;
 
                 const legendsMarginBottom = marginBottom; // Legend margin-bottom is already computed
-                const adjustedLegendsBottom = legendsRect.bottom + legendsMarginBottom;
-                const dataSourceStyles = window.getComputedStyle(dataSourceParagraph);
-                const dataSourceMarginTop = parseFloat(dataSourceStyles.marginTop) || 0;
-                const adjustedDataSourceTop = dataSourceRect.top - dataSourceMarginTop;
+                const adjustedLegendsBottom =
+                  legendsRect.bottom + legendsMarginBottom;
+                const dataSourceStyles =
+                  window.getComputedStyle(dataSourceParagraph);
+                const dataSourceMarginTop =
+                  parseFloat(dataSourceStyles.marginTop) || 0;
+                const adjustedDataSourceTop =
+                  dataSourceRect.top - dataSourceMarginTop;
 
                 if (adjustedLegendsBottom > adjustedDataSourceTop) {
                   let overlap = adjustedLegendsBottom - adjustedDataSourceTop;
@@ -700,14 +810,15 @@ const Chart = (props) => {
           const chartContainer = legendsContainer.closest(".chart.container");
           if (chartContainer) {
             const chartContainerRect = chartContainer.getBoundingClientRect();
-            const chartContainerStyles = window.getComputedStyle(chartContainer);
+            const chartContainerStyles =
+              window.getComputedStyle(chartContainer);
             const chartContainerMarginBottom =
-                parseFloat(chartContainerStyles.marginBottom) || 0;
+              Number.parseFloat(chartContainerStyles.marginBottom) || 0;
             const adjustedChartContainerBottom =
                 chartContainerRect.bottom + chartContainerMarginBottom;
 
             const legendsRect = legendsContainer.getBoundingClientRect();
-            const legendsMarginTop = parseFloat(styles.marginTop) || 0;
+            const legendsMarginTop = Number.parseFloat(styles.marginTop) || 0;
             const adjustedLegendsTop = legendsRect.top - legendsMarginTop;
 
             if (adjustedLegendsTop < adjustedChartContainerBottom) {
@@ -731,31 +842,39 @@ const Chart = (props) => {
 
   useEffect(() => {
     const handleResize = () => {
-      setTimeout(() => {
-        setOrientation(getScreenOrientation());
-      }, 100);
+        setTimeout(() => {
+            setOrientation(getScreenOrientation());
+        }, 100);
     };
-    if(window.screen.orientation) {
-      window.screen.orientation.addEventListener("change", handleResize);
+
+    if (window.screen.orientation) {
+        window.screen.orientation.addEventListener("change", handleResize);
     } else {
-      window.addEventListener("resize", handleResize);
+        window.addEventListener("resize", handleResize);
     }
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+    return () => {
+        if (window.screen.orientation) {
+            window.screen.orientation.removeEventListener("change", handleResize);
+        } else {
+            window.removeEventListener("resize", handleResize);
+        }
+    };
+}, []);
+
 
   return (
-      <div ref={ref}>
-        <Container
-            className={"chart container"}
-            style={{
-              minHeight:
-                  type === "pie" && window.innerWidth <= 480
-                      ? `${parseInt(height) + parseInt(legendsContainerHeight) * 0.5}px`
-                      : `${parseInt(height) + parseInt(legendsContainerHeight)}px`,
-            }}
-            fluid={true}
-        >
-          <DataProvider
+    <div ref={ref} key={orientation + Math.random()}>
+      <Container
+        className={"chart container"}
+        style={{
+          minHeight:
+            type === "pie" && window.innerWidth <= 480
+              ? `${parseInt(height) + parseInt(legendsContainerHeight) * 0.5}px`
+              : `${parseInt(height) + parseInt(legendsContainerHeight)}px`,
+        }}
+        fluid={true}
+      >
+        <DataProvider
               editing={editing}
               style={{ height: `${contentHeight}px` }}
               params={params}
@@ -842,4 +961,4 @@ const mapStateToProps = (state, ownProps) => {
   }
 };
 const mapActionCreators = {};
-export default connect(mapStateToProps, mapActionCreators)(Chart);
+export default connect(mapStateToProps, mapActionCreators)(injectIntl(Chart));

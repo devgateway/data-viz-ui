@@ -1,4 +1,4 @@
-/* eslint-disable no-debugger */
+
 import { Config } from '@/conf'
 import {get} from '../../api/commons'
 const API_ROOT = process.env.VITE_REACT_APP_API_ROOT
@@ -19,6 +19,5 @@ export const getCategories=({app, params})=>{
 
 export const getData = ({source, app, params}) => {
     const finalUrl = `${API_ROOT ? API_ROOT: ''}/api/${app}/stats/${source}${params? '?' + queryParams(params) : ''}`;
-    console.log("data==>", finalUrl);
     return get(finalUrl)
 }

@@ -1,4 +1,3 @@
-
 body {
   background-color: transparent !important;
 }
@@ -7,14 +6,49 @@ body {
   position: relative;
   background-color: transparent;
   overflow: hidden;
+
+  .legend-title-container {
+    @media screen and (max-width: 768px) {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      margin-bottom: 1rem;
+
+      .vertical-spacer {
+        display: none;
+      }
+    }
+
+  }
+
+  .legend-container {
+    @media screen and (min-width: 1024px) {
+      display: flex !important;
+      flex-direction: row !important;
+    }
+  }
+
+  .legend-items-container {
+    @media screen and (max-width: 768px) {
+      display: flex !important;
+      flex-direction: row !important;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+  }
+
   .legend {
 
     background-color: #FFF;
     margin-top: 4px;
     overflow: hidden;
+    display: visible;
+
     @media only screen and (max-width: 414px) {
       margin-top: 10px;
     }
+
+
 
     ul {
       list-style: none;
@@ -22,11 +56,24 @@ body {
       margin: 0 0 0 10px;
       width: 100%;
 
+      @media only screen and (max-width: 480px) {
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: column;
+      }
+
       li {
         display: inline-flex;
         float: left;
         margin-bottom: 10px;
         margin-right: 10px;
+
+        @media screen and (max-width: 480px) {
+          flex: 1 1 20%;
+          /* Adjusts the item size to fill available space */
+          min-width: 130px;
+          /* Minimum width to prevent items from getting too small */
+        }
 
         .legend-label {
           color: #66676d;
@@ -59,13 +106,12 @@ body {
 
   .control.panel {
     position: absolute;
-    bottom: 8vh;
+    bottom: 1rem;
     margin-left: 0.5vw;
 
     .reset,
     .zoom {
-      padding: 0.2vw;
-      margin-top: 0.2vw;
+      margin-top: 0.1vw;
       height: auto !important;
       width: auto !important;
     }
@@ -130,7 +176,8 @@ body {
 
   .map-label {
     fill: #595959;
-    @media print{
+
+    @media print {
       font-size: 14px;
       font-weight: 600 !important;
     }
@@ -138,7 +185,7 @@ body {
 
 
   .map-label-bg {
-    fill:  #fff6e1;
+    fill: #fff6e1;
   }
 
   .map-label-no-bg {
@@ -146,7 +193,7 @@ body {
   }
 
   .map-label-value {
-    font-weight: bold;
+    font-weight: 700;
   }
 
   .big.numeric.label {
@@ -172,20 +219,24 @@ body {
     font-size: 14px;
     color: #66676d;
     font-weight: bold;
-    @media print{
-      white-space:nowrap;
+
+    @media print {
+      white-space: nowrap;
     }
   }
 
   .footnote {
 
     margin: 0;
-    min-height: none;
+
+    @media screen {}
+
+    min-height: 0;
     padding: 0;
     text-align: left;
     width: auto;
 
-    @media print{
+    @media print {
       padding-left: 10px;
     }
 
@@ -209,35 +260,48 @@ body {
     font-weight: bold;
     margin-right: 10px;
     white-space: nowrap;
+    margin-left: 0.3rem !important;
   }
 
-  .vertical-spacer{
+  .vertical-spacer {
     color: #dadada;
     font-weight: bold;
     margin-top: -3px;
   }
 
   .highlighted-loc-info {
-    width: 20%;
-	  border-radius: 5px;
-	  padding: 5px;
+    border-radius: 5px;
+    padding: 5px;
+
     span {
       font-weight: bold;
     }
-    top: 45px;
+
     right: 15px;
     position: absolute;
+
+    @media screen and (max-width: 480px) {
+      width: 45%;
+    }
+
+    @media screen and (min-width: 1025px) {
+      top: 45px;
+      width: 20%;
+    }
   }
 
   .measure-selector {
     margin-top: 5px;
+
     .label {
       font-weight: bold;
     }
+
     ul {
       margin: 5px auto 0 $base-unit;
       overflow: hidden;
     }
+
     li {
       display: inline-flex;
       float: left;
@@ -247,8 +311,9 @@ body {
       padding: 5px 5px 5px 0px;
       color: #66676d;
       cursor: pointer;
-      @media print{
-        white-space:nowrap;
+
+      @media print {
+        white-space: nowrap;
       }
 
       input[type=radio] {
@@ -261,4 +326,10 @@ body {
 
 
 
+}
+
+.wp-data-viz-map {
+  @media only screen and (max-width: 768px) {
+    margin-left: -10px;
+  }
 }
