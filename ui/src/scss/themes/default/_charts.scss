@@ -23,7 +23,7 @@
   .body {
     position: relative;
     height: 100%;
-    padding: 5px;
+    //padding: 5px;
     margin: 0px;
 
     .ui.container.entry-content {
@@ -38,6 +38,7 @@
 
       text {
         font-size: 13px !important;
+        fill: #000000 !important;
       }
     }
   }
@@ -82,6 +83,7 @@
         padding: 0px 5px;
         line-height: 20px;
         height: 20px;
+        white-space: nowrap;
 
       }
     }
@@ -94,15 +96,27 @@
     font-size: 14px;
   }
 
-  .legends.container.top, .legends.container.left, .legends.container.right, .legends.container.bottom {
+  .legends.container.top,
+  .legends.container.left,
+  .legends.container.right,
+  .legends.container.bottom {
+    display: flex; /* Use flexbox layout to allow better spacing */
+    flex-direction: column; /* Arrange legend items in a column */
+    gap: 8px;
+
     .legend.item {
+      display: flex; /* Use flexbox layout for legend items */
+      align-items: center; /* Center the items vertically */
+      margin-bottom: 12px; /* Add space below each item */
+
       .checkmark-with-bg, .checkmark {
         height: 18px;
         width: 18px;
-        margin-right: 4px;
+        margin-right: 8px; /* Increase right margin for spacing between checkmark and label */
         border: 1px solid #8c8f94;
         border-radius: 4px;
         cursor: pointer;
+        flex-shrink: 0; /* Prevent the checkmark from shrinking */
       }
 
       input:checked ~ .checkmark:after, input:checked ~ .checkmark-with-bg:after {
@@ -142,6 +156,9 @@
 
       .label {
         cursor: pointer;
+        flex-grow: 1; /* Allow the label to fill the space */
+        margin-left: 4px; /* Ensure some spacing between the checkmark and the label */
+        white-space: nowrap;
       }
     }
   }
@@ -157,13 +174,14 @@
   .legends.container.right {
     position: absolute;
     bottom: 50px;
-    right: 10px;
+    right: -20px;
 
     .legend.item {
       margin: 2px;
       padding: 3px;
       text-align: left;
       display: flex;
+      align-items: center; /* Center items vertically */
       line-height: 28px !important;
 
       input[type=checkbox], input[type=radio] {
@@ -171,16 +189,25 @@
       }
 
       label {
-        padding: 0px 5px;
+        padding: 0 5px;
         line-height: 20px;
         height: 20px;
-
+        display: flex;
+        align-items: center;
+        flex-grow: 0;
+        flex-shrink: 0;
+        flex-basis: auto;
+        align-items: center;
+        white-space: nowrap;
       }
+
       .legend-title {
-        padding-left: 0px;
+        padding-left: 0;
+        font-weight: bold; /* Optional: make the title bold */
       }
     }
   }
+
 
   .legends.container.top {
     position: absolute;
@@ -189,20 +216,23 @@
     display: flex;
     justify-content: flex-start;
     flex-direction: row;
-    //flex-wrap: wrap;
 
     .legend-sections {
       display: flex;
+      //flex-direction: column;
+
       .title-section {
         display: flex;
         position: relative;
       }
-      .items-section{
-      display: flex;
-      position: relative !important;
-      flex-wrap: wrap !important;
+
+      .items-section {
+        display: flex;
+        position: relative !important;
+        flex-wrap: wrap;
+      }
     }
-    }
+
     .legend.item {
       margin: 2px;
       padding: 3px;
@@ -221,7 +251,6 @@
         white-space: nowrap;
       }
 
-
     }
 
     .legend.item.overlay {
@@ -233,26 +262,44 @@
     display: flex;
     justify-content: flex-start;
     flex-direction: row;
-    //flex-wrap: wrap;
+    margin-bottom: 1rem !important;
+    justify-content: space-around;
 
     .legend-sections {
       display: flex;
+      @media screen and (max-width: 1024px) {
+        flex-direction: column;
+      }
+
       .title-section {
         display: flex;
         position: relative;
       }
-      .items-section{
-      display: flex;
-      position: relative !important;
-      flex-wrap: wrap !important;
+
+      .items-section {
+        display: flex;
+        position: relative !important;
+        flex-wrap: wrap !important;
+        @media screen and (max-width: 1024px) {
+          gap: 10px !important;
+        }
+      }
     }
-    }
+
     .legend.item {
-      margin: 2px;
+      margin: 6px;
       padding: 3px;
       text-align: left;
       display: flex;
       line-height: 28px !important;
+      @media screen and (max-width: 1024px) {
+        min-width: 150px;
+        flex-basis: 25%;
+        flex: 1;
+        justify-content: flex-start;
+        padding: 5px !important;
+        box-sizing: border-box; /* Ensure padding doesn't affect overall width */
+      }
 
       input[type=checkbox], input[type=radio] {
         display: none;
@@ -318,9 +365,16 @@
     }
   }
 
+  .radar {
+    svg text{
+
+    }
+
+  }
 }
 
 .chart.tooltip {
+  max-width: 500px !important;
   padding: 15px;
   border-radius: 4px;
   opacity: 1;
@@ -353,3 +407,64 @@
   margin-bottom: 20px;
 }
 
+
+/* Adjustments for mobile phones for screens from 320px to 480px wide:*/
+@media (max-width: 480px) {
+
+  .chart.container {
+    position: relative;
+    .legends.container {
+      margin-left: -5px !important;
+      width: 100% !important;
+    }
+    .legends.container.top {
+      .legend-sections {
+        flex-direction: column;
+        transform: translateY(-20px);
+        .legend.item {
+          .legend-title {
+            padding-left: 0 !important;
+          }
+        }
+      }
+    }
+    .pie-chart {
+      height: 360px !important;
+      margin-top: 30px !important;
+      .legends.container {
+        margin: 0 0 0 -5px !important;
+        .legend.item {
+          min-width: 100% !important;
+        }
+      }
+    }
+  }
+
+  .pie-chart {
+    svg {
+      text {
+        font-weight: 600 !important;
+      }
+    }
+  }
+
+}
+
+/* Adjustments for screens smaller than 1365px wide:*/
+@media (max-width: 1365px) {
+
+  .chart.container {
+    .legends.container.top {
+      .legend-sections {
+        flex-direction: column;
+        transform: translateY(-20px);
+        .legend.item {
+          .legend-title {
+            padding-left: 0 !important;
+          }
+        }
+      }
+    }
+  }
+
+}

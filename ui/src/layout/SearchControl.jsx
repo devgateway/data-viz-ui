@@ -1,153 +1,109 @@
-import React, { useEffect, useState } from "react";
-import * as ReactDOM from "react-dom";
-import { utils, SearchProvider, SearchConsumer } from "@devgateway/wp-react-lib";
+import React, { useEffect, useState, useRef } from "react";
+import { utils, SearchConsumer, SearchProvider } from "@devgateway/wp-react-lib";
 import CustomSemanticSearch from "./CustomSemanticSearch";
+import { createPortal } from "react-dom";
 import { Icon } from "semantic-ui-react";
 import { IntlProvider, injectIntl } from "react-intl";
 
-const ResultRenderer = injectIntl(
-  ({
-    ID,
-    title,
-    slug,
-    parent_title,
-    parent_slug,
-    parent_link,
-    extract,
-    type,
-    link,
-    terms,
-    subtype,
-    bread_crumbs = [],
-    metadata: { redirect_url },
-    intl: { locale },
-  }) => {
-    let target = parent_link
-      ? utils.replaceLink(parent_link, locale) + `#${slug}`
-      : utils.replaceLink(link, locale);
-    target = redirect_url ? redirect_url + `#${slug}` : target;
+// Utility function to highlight search terms
+const boldSearchTerm = (text, searchTerm) => {
+  if (!searchTerm) return text;
+  const regex = new RegExp(`(${searchTerm})`, 'gi');
+  return text.replace(regex, '<strong>$1</strong>');
+}
 
-    return (
+// ResultRenderer component with highlighting
+const ResultRenderer = injectIntl(({
+  ID,
+  title,
+  slug,
+  parent_title,
+  parent_slug,
+  parent_link,
+  extract,
+  type,
+  link,
+  terms,
+  subtype,
+  bread_crumbs = [],
+  metadata: { redirect_url },
+  intl: { locale },
+  searchTerm, // Added searchTerm prop
+}) => {
+  let target = parent_link
+    ? utils.replaceLink(parent_link, locale) + `#${slug}`
+    : utils.replaceLink(link, locale);
+  target = redirect_url ? redirect_url + `#${slug}` : target;
+  
+
+ 
+
+  const boldedTitle = boldSearchTerm(String(title), searchTerm);
+  const boldedExtract = boldSearchTerm(extract, searchTerm);
+
+
+  return (
+    <div
+      className="search-results-wrapper searching-results"
+      style={{ display: "flex", flexDirection: "column" }}
+    >
       <div
-        className="search-results-wrapper searching-results"
-        style={{ display: "flex", flexDirection: "column" }}
+        className={"has-standard-12-font-size"}
+        onClick={(e) => (document.location.href = target)}
       >
-        <div
-          className={"has-standard-12-font-size"}
-          onClick={(e) => (document.location.href = target)}
-        >
-          <h5 className="breadcrumbs-search">
-            {bread_crumbs && bread_crumbs.length > 0
-              ? `${bread_crumbs.join(" / ")}`
-              : ""}{" "}
-          </h5>
-          <div className={"has-standard-14-font-size"}>
-            <h4 className="search-title">{title}</h4>
-          </div>
-          <div
-            className="search-content"
+        <h5
+          className="breadcrumbs-search"
+          dangerouslySetInnerHTML={{
+            __html:
+              bread_crumbs && bread_crumbs.length > 0
+                ? boldSearchTerm(bread_crumbs.join(" / "), searchTerm)
+                : "",
+          }}
+        />
+        <div className={"has-standard-14-font-size"}>
+          <h4
+            className="search-title"
             dangerouslySetInnerHTML={{
-              __html: utils.replaceHTMLinks(extract, locale),
+              __html: boldedTitle
             }}
           />
         </div>
+        <div
+          className="search-content"
+          dangerouslySetInnerHTML={{
+            __html:  utils.replaceHTMLinks(boldedExtract, locale)
+          }}
+        />
       </div>
-    );
-  }
+    </div>
+  );
+}
 );
 
-const replaceString = (content, words) => {
-  const regex = RegExp(words, "gi");
-  let newHTML = content;
-  const instances = [...newHTML.matchAll(regex)];
-  let shift = 0;
-  const lengthBeforeChange = newHTML.length;
-  instances.forEach((instance) => {
-    const replacement =
-      "<b>" +
-      newHTML.substring(
-        instance.index + shift,
-        instance.index + shift + words.length
-      ) +
-      "</b>";
-    newHTML =
-      newHTML.substring(0, instance.index + shift) +
-      replacement +
-      newHTML.substring(instance.index + words.length + shift);
-    shift = newHTML.length - lengthBeforeChange;
-  });
-
-  return newHTML;
-};
-
-const searchTextHandler = (words) => {
-  let searchedPara = document.querySelector(".results");
-  const searchResultHeading =
-    (searchedPara =
-    searchedPara =
-      document.querySelectorAll("H5"));
-  const searchResult =
-    (searchedPara =
-    searchedPara =
-      document.querySelectorAll(".search-content"));
-  for (let i = 0; i < searchResult.length; i++) {
-    if (searchResult[i]) {
-      searchResult[i].innerHTML = replaceString(
-        searchResult[i].textContent,
-        words
-      );
-    }
-  }
-
-  for (let i = 0; i < searchResultHeading.length; i++) {
-    if (searchResultHeading[i]) {
-      searchResultHeading[i].innerHTML = replaceString(
-        searchResultHeading[i].textContent,
-        words
-      );
-    }
-  }
-};
-
-const SearchControl = ({ onSearch, perPage, loading, results, meta, intl }) => {
+// FloatSearchResults component with highlighting
+const FloatSearchResults = ({ results, meta, perPage, intl, searchTerm }) => {
   const total = meta ? meta["x-wp-total"] : 0;
   const totalPages = meta ? meta["x-wp-totalpages"] : 0;
 
-  const [searchTerm, setSearchTerm] = useState("");
-
-  useEffect(() => {
-    const delayDebounceFn = setTimeout(() => {
-      onSearch(searchTerm);
-    }, 300);
-
-    return () => clearTimeout(delayDebounceFn);
-  }, [searchTerm]);
-
-  useEffect(() => searchTextHandler(searchTerm), [results]);
   return (
-    <CustomSemanticSearch
-      value={searchTerm}
-      loading={loading}
-      placeholder={intl.formatMessage({
-        id: "search.placeholder",
-        defaultMessage: "Search...",
-      })}
-      onResultSelect={(e, data) => null}
-      total={total}
-      perPage={perPage}
-      totalPages={totalPages}
-      onSearchChange={(a, b) => {
-        setSearchTerm(b.value);
-      }}
-      searchTextHandler={searchTextHandler}
-      resultRenderer={ResultRenderer}
-      results={results}
-      showNoResults={false}
-      intl={intl}
-    />
+    <div id="float-results-container">
+      <span className="float-results-header">
+        {intl.formatMessage(
+          {
+            id: "search.results.summary",
+            defaultMessage: "{count} of {total} Results",
+          },
+          { count: total < perPage ? total : perPage, total: total }
+        )}
+      </span>
+      {results.map((r) => (
+        <ResultRenderer key={r.ID} {...r} searchTerm={searchTerm} />
+      ))}
+    </div>
   );
 };
 
+// FloatSearchInput component
 const FloatSearchInput = ({
   onSearch,
   perPage,
@@ -175,33 +131,7 @@ const FloatSearchInput = ({
   );
 };
 
-const FloatSearchResults = ({ results, meta, perPage, intl }) => {
-  const total = meta ? meta["x-wp-total"] : 0;
-  const totalPages = meta ? meta["x-wp-totalpages"] : 0;
-
-  useEffect(() => {
-    const searchWords = document.querySelector(".input.search").value;
-    searchTextHandler(searchWords);
-  }, [results]);
-
-  return (
-    <div>
-      <span className="float-results-header">
-        {intl.formatMessage(
-          {
-            id: "search.results.summary",
-            defaultMessage: "{count} of {total} Results",
-          },
-          { count: total < perPage ? total : perPage, total: total }
-        )}
-      </span>
-      {results.map((r) => (
-        <ResultRenderer {...r} />
-      ))}
-    </div>
-  );
-};
-
+// FloatingSearchController component
 const FloatingSearchController = ({
   onSearch,
   onSetSelected,
@@ -211,145 +141,139 @@ const FloatingSearchController = ({
   meta,
   locale,
   intl,
+  searchTerm, // Added search from SearchConsumer
 }) => {
   const [showSearchInput, setShowSearchInput] = useState(false);
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    const newContainer = document.createElement("div");
+    newContainer.setAttribute("id", "float-input-container");
+    newContainer.setAttribute("class", "input container");
+    newContainer.style.display = "none"; // Hide container by default
+    const rootElement = document.getElementById("root");
+    if (rootElement) {
+      rootElement.appendChild(newContainer);
+      containerRef.current = newContainer;
+    }
+    return () => {
+      if (containerRef.current && containerRef.current.parentNode) {
+        containerRef.current.parentNode.removeChild(containerRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (containerRef.current) {
+      containerRef.current.style.display = showSearchInput ? "block" : "none";
+    }
+  }, [showSearchInput]);
 
   const show = () => {
     onSetSelected(null);
     setShowSearchInput(true);
   };
-  const hidde = (e) => {
+
+  const hide = () => {
     setShowSearchInput(false);
   };
 
-  const addListenerToHeaderElements = () => {
-    const itemWithChildren = document.getElementsByClassName("has-child-items");
-    if (itemWithChildren.length > 0) {
-      const itemElement = itemWithChildren[0];
-      const spans = itemElement.getElementsByTagName("span");
-      if (spans.length > 0) {
-        spans[0].addEventListener("mouseover", hidde);
-      }
-    }
-  };
-  const removeListenerToHeaderElements = () => {
-    const itemWithChildren = document.getElementsByClassName("has-child-items");
-    if (itemWithChildren.length > 0) {
-      const itemElement = itemWithChildren[0];
-      const spans = itemElement.getElementsByTagName("span");
-      if (spans.length > 0) {
-        spans[0].removeEventListener("mouseover", hidde);
-      }
-    }
-  };
-
-  useEffect(() => {
-    if (showSearchInput) {
-      addListenerToHeaderElements();
-      let element = document.getElementById("float-input-container");
-      if (element) {
-        element.style.display = "block";
-      } else {
-        element = document
-          .getElementById("root")
-          .appendChild(document.createElement("div"));
-        element.setAttribute("id", "float-input-container");
-        element.setAttribute("class", "input container");
-        element.onmouseleave = () => {
-          hidde();
-        };
-      }
-      ReactDOM.render(
-        <FloatSearchInput
-          onSearch={onSearch}
-          perPage={perPage}
-          loading={loading}
-          results={results}
-          meta={meta}
-          intl={intl}
-        ></FloatSearchInput>,
-        document.getElementById("float-input-container")
-      );
-    } else {
-      if (document.getElementById("float-input-container")) {
-        removeListenerToHeaderElements();
-        const exitingElement = document.getElementById("float-input-container");
-        exitingElement.style.display = "none";
-        //document.getElementById("root").removeChild(document.getElementById("float-input-container"))
-      }
-    }
-  }, [showSearchInput]);
-  useEffect(() => {
-    if (results && results.length > 0) {
-      let element = document.getElementById("float-results-container");
-      if (element) {
-      }
-      if (!element) {
-        element = document
-          .getElementById("float-input-container")
-          .appendChild(document.createElement("div"));
-        element.setAttribute("id", "float-results-container");
-        element.setAttribute("class", "results container");
-        element.setAttribute("class", "results container");
-        //element.onmouseleave = () => {hidde()}
-      }
-      const element2 = document.getElementById("ui-float-search");
-      element2.classList.add("ui-float-search-active");
-
-      ReactDOM.render(
-        <IntlProvider locale={locale}>
-          <FloatSearchResults
-            results={results}
-            meta={meta}
-            perPage={perPage}
-            intl={intl}
-          />
-        </IntlProvider>,
-        document.getElementById("float-results-container")
-      );
-    }
-  }, [meta, results]);
-
-  useEffect(() => {
-    if (showSearchInput) {
-      const element = document.getElementById("ui-float-search");
-      element.classList.add("ui-float-search-active");
-    } else {
-      const element = document.getElementById("ui-float-search");
-      element.classList.remove("ui-float-search-active");
-    }
-  });
-
   return (
-    <div
-      id={"ui-float-search"}
-      className={"ui float-search"}
-      onMouseOver={(e) => show()}
-    >
-      {/*{results?results.length:0}*/}
-      <Icon name={"search"} size={"small"}></Icon>
-    </div>
+    <>
+      <div
+        id="ui-float-search"
+        className="ui float-search"
+        onMouseOver={show}
+      >
+        <Icon name="search" size="small" />
+      </div>
+      {containerRef.current &&
+        createPortal(
+          showSearchInput ? (
+            <div onMouseLeave={hide}>
+              <div className="float-search-container">
+                <FloatSearchInput
+                  onSearch={onSearch}
+                  perPage={perPage}
+                  loading={loading}
+                  results={results}
+                  meta={meta}
+                  intl={intl}
+                  searchTerm={searchTerm}
+                />
+              </div>
+              {results && results.length > 0 && (
+                <IntlProvider locale={locale}>
+                  <FloatSearchResults
+                    results={results}
+                    meta={meta}
+                    perPage={perPage}
+                    intl={intl}
+                    searchTerm={searchTerm} // Pass search term
+                  />
+                </IntlProvider>
+              )}
+            </div>
+          ) : null,
+          containerRef.current
+        )}
+    </>
   );
 };
 
+// SearchControl component
+const SearchControl = ({ onSearch, perPage, loading, results, meta, intl }) => {
+  const total = meta ? meta["x-wp-total"] : 0;
+  const totalPages = meta ? meta["x-wp-totalpages"] : 0;
+  const [searchTerm, setSearchTerm] = useState("");
+
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      onSearch(searchTerm);
+    }, 300);
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchTerm]);
+
+  const enhancedResultRenderer = (props) => (
+    <ResultRenderer {...props} searchTerm={searchTerm} />
+  );
+
+  return (
+    <CustomSemanticSearch
+      value={searchTerm}
+      loading={loading}
+      placeholder={intl.formatMessage({
+        id: "search.placeholder",
+        defaultMessage: "Search...",
+      })}
+      onResultSelect={(e, data) => null}
+      total={total}
+      perPage={perPage}
+      totalPages={totalPages}
+      onSearchChange={(a, b) => {
+        setSearchTerm(b.value);
+      }}
+      resultRenderer={enhancedResultRenderer} // Use wrapper to pass searchTerm
+      results={results}
+      showNoResults={false}
+      intl={intl}
+      searchTerm={searchTerm}
+    />
+  );
+};
+
+// Main SearchComponent
 const SearchComponent = injectIntl((props) => {
   const { intl, onSetSelected } = props;
   const [query, setQuery] = useState("");
+  const [isSmallScreen, setIsSmallScreen] = useState(false); // Track small screen
 
-  const [isSmallScreen, setIsSmallScreen] = useState(false); // State to track small screen
   useEffect(() => {
-    // Function to update isSmallScreen state
     const updateScreenSize = () => {
       setIsSmallScreen(window.innerWidth <= 1365); // Check if width is 1365px or lower
     };
-
-    // Initial check
     updateScreenSize();
-
-    // Event listener for window resize
     window.addEventListener("resize", updateScreenSize);
-
-    // Cleanup
     return () => window.removeEventListener("resize", updateScreenSize);
   }, []);
 
@@ -360,6 +284,7 @@ const SearchComponent = injectIntl((props) => {
         onSearch={setQuery}
         perPage={5}
         {...props}
+        searchTerm={query}
       />
     ) : (
       <SearchControl
@@ -367,8 +292,9 @@ const SearchComponent = injectIntl((props) => {
         onSearch={setQuery}
         perPage={5}
         {...props}
-      ></SearchControl>
+      />
     );
+
   return (
     <SearchProvider search={query} perPage={5} locale={intl.locale}>
       <SearchConsumer>{component}</SearchConsumer>

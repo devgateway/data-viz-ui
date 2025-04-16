@@ -30,10 +30,11 @@ const Measures = asyncComponent(() => import('./measures'))
 const Menu = asyncComponent(() => import('./menu'))
 const ChildPagesMenu = asyncComponent(() => import('./child-page-menu'))
 const NewMap = asyncComponent(() => import('./d3Map'))
-const ParallaxContainer = asyncComponent(() => import('./parallax'))
-const Wrapped = asyncComponent(() => import('./wrapped'))
-const SankeyChart = asyncComponent(() => import('./sankeychart'))
-const DataLabel = asyncComponent(() => import('./datalabel'))
+const ParallaxContainer = asyncComponent(() => import('./parallax/'))
+const Wrapped = asyncComponent(() => import('./wrapped/'))
+const SankeyChart = asyncComponent(() => import('./sankeychart/'))
+const DataLabel = asyncComponent(() => import('./datalabel/'))
+const Body = asyncComponent(() => import('./body/'))
 let reducerList = {data, embeddable}
 
 
@@ -86,13 +87,9 @@ export const getComponentByNameIgnoreCase = (name) => {
     if (k.length > 0) {
         return injectIntl(components[k])
     } else {
-
         const customComponent = customizer.getComponentByNameIgnoreCase(name)
         if (customComponent) {
             return injectIntl(customComponent)
         }
     }
 }
-
-
-

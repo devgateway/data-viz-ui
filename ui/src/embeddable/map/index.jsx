@@ -10,12 +10,12 @@ import { SettingProvider } from '@devgateway/wp-react-lib';
 import {SettingsConsumer} from '@devgateway/wp-react-lib';
 
 const countries = [
-    { label: 'KENYA', value: 'KEN', center: [35.8166634, 0.1], scale: 2000}, 
-    { label: 'Nigeria', value: 'NGA', center: [7.491302, 9.072264], scale: 2000}, 
+    { label: 'KENYA', value: 'KEN', center: [35.8166634, 0.1], scale: 2000},
+    { label: 'Nigeria', value: 'NGA', center: [7.491302, 9.072264], scale: 2000},
     { label: 'South Africa', value: 'ZAF', center: [24.676997, -28.48322], scale: 2000 },
     { label: 'West Africa', value: 'West Africa', center: [-7.293255, 13.905720], scale: 1500 },
     { label: 'Africa', value: 'Africa', center: [13.134227,-11.523088], scale: 550 },
-    { label: 'Ethiopia', value: 'ETH', center: [35.8166634, 1.7], scale: 2000}, 
+    { label: 'Ethiopia', value: 'ETH', center: [35.8166634, 1.7], scale: 2000},
     { label: 'Zambia', value: 'ZMB', center: [26.459455, -14.668135], scale: 2000},
     { label: 'Democratic Republic of the Congo', value: 'DRC', center: [23.174338, -5.837475], scale: 1250},
     { label: 'World', value: 'World', center: [0, 20.050043], scale: 150}
@@ -48,19 +48,19 @@ const MapEntry = (props) => {
         "data-national-average-label": nationalAverageLabel = 'National Prevalence Avg',
         "data-legend-title": legendTitle = 'Tobacco Prevalence Rate',
         "data-legend-breaks": legendBreaks = '[]',
-        "data-zoom-enabled": zoomEnabled = false, 
+        "data-zoom-enabled": zoomEnabled = false,
         "data-show-legend-labels": showLegendLabels = false,
-        "data-map-file": mapFile = 'africa-geojson-tanzania-others-en-v2.json',
+        "data-map-file": mapFile,
         "data-mapping-field": mappingField = 'zone',
         "data-map-label-field": mapLabelField = "admin",
-        "data-has-multiple-measures": hasMultipleMeasures = "false",         
-         topoJSONField = "collection",        
-        'data-map-center': mapCenter = 'NGA', //country        
+        "data-has-multiple-measures": hasMultipleMeasures = "false",
+         topoJSONField = "collection",
+        'data-map-center': mapCenter = 'NGA', //country
         "data-map-label-show-value": mapLabelShowValue = "false",
         "data-show-tooltip": showTooltip = "true",
         "data-measure-selector-label": measureSelectorLabel = "",
         "data-value-format": valueFormat = "",
-        "data-show-overall-value": showOverallValue = "false",        
+        "data-show-overall-value": showOverallValue = "false",
         "data-auto-generate-breaks": autoGenerateBreaks = "false",
         "data-number-of-breaks": numberOfBreaks = 5,
         "data-scheme": colorScheme = "reds",
@@ -105,11 +105,11 @@ const MapEntry = (props) => {
         'data-custom-measure-labels': customMeasureLabels = "{}",
         'data-show-shading-layer-labels': showShadingLayerLabels = "ifUnitHasData",
         "data-dvz-proxy-dataset-id": dvzProxyDatasetId,
-        intl, 
+        intl,
         settings
-    } = props  
+    } = props
 
-    
+
 
     const decode = (value) => {
         if (editing) {
@@ -122,11 +122,11 @@ const MapEntry = (props) => {
         try {
           if (value) {
             return JSON.parse(decode(value));
-          }      
+          }
         } catch (error) {
           console.error("error parsing value:" + value);
         }
-    
+
         return null;
     }
 
@@ -136,20 +136,20 @@ const MapEntry = (props) => {
             if (b.min) {
                 b.min =  parseFloat(b.min);
             }
-            
+
             if (b.max) {
                 b.max =  parseFloat(b.max);
-            }    
-    
+            }
+
             b.color = decodeURIComponent(b.color);
-            return b;    
+            return b;
         })
 
         return legendBreaksNew;
     }
 
     const getFilters = (filters) => {
-        const ff = parse(filters)  || []  
+        const ff = parse(filters)  || []
         let params = {};
         if (ff && ff.forEach) {
             ff.forEach(f => {
@@ -177,10 +177,10 @@ const MapEntry = (props) => {
         l.fontColor = decodeURIComponent(l.fontColor)
         return l
     })
-    
-    const country = countries.find(c => c.value === mapCenter)   
 
-    const multipleMeasures = hasMultipleMeasures == true || hasMultipleMeasures == "true"    
+    const country = countries.find(c => c.value === mapCenter)
+
+    const multipleMeasures = hasMultipleMeasures == true || hasMultipleMeasures == "true"
 
     const levels = [dimension1, dimension2]
     const source = levels.filter(l => l != 'none' && l != null).join('/')
@@ -188,7 +188,7 @@ const MapEntry = (props) => {
     const mapProps = {
         unique,
         editing,
-        source: '/' + mapFile,
+        source: `/${mapFile}`,
         center: country.center,
         scale: country.scale,
         measures,
@@ -251,22 +251,22 @@ const MapEntry = (props) => {
         labelsExclusionList: labelsExclusionList.split(',').map(l => l.trim()),
         showShadingLayerLabels,
         dvzProxyDatasetId,
-    } 
-      
+    }
+
     const measureLabels = parse(customMeasureLabels) || {}
-    const DataFrame = app === "csv" ? MapCSVDataFrame : MapDataFrame;   
-    const measuresCSV = editing ? (parse(measures) || []).join(',') : measures  
-    
+    const DataFrame = app === "csv" ? MapCSVDataFrame : MapDataFrame;
+    const measuresCSV = editing ? (parse(measures) || []).join(',') : measures
+
     const params = getFilters(filters)
     if (dvzProxyDatasetId) {
         params.dvzProxyDatasetId = dvzProxyDatasetId;
-    }    
+    }
 
     return (
         <SettingProvider locale={intl.locale} changeUUID={unique}>
                 <SettingsConsumer>
 
-    <DataProvider 
+    <DataProvider
         params={params}
         app={app}
         csv={decodeURIComponent(csv)}

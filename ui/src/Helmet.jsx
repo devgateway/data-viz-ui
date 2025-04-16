@@ -1,5 +1,6 @@
 import React from 'react';
 import { Helmet, HelmetProvider } from "react-helmet-async";
+import HTMLReactParser from 'html-react-parser';
 
 console.log("env==>",process.env)
 
@@ -39,13 +40,10 @@ const helmetContext = {}
 
 const HelmetMetadata = ({pages = {}, locale}) => {
 
-    const {yoast_head_json} = pages[0];
-
-
     return (
         <HelmetProvider context={helmetContext}>
             <Helmet>
-                {/* {ReactHtmlParser(pages[0].yoast_head)} */}
+                {pages[0] && pages[0].yoast_head && HTMLReactParser(pages[0].yoast_head)}
             </Helmet>
         </HelmetProvider>
 
