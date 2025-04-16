@@ -27,7 +27,7 @@ COPY --from=customizer /tmp/work /example/custom/ui-customizer
 COPY ui .
 
 # Install deps
-RUN npm install
+RUN npm install react-compiler-runtime &&  npm install -f
 
 # Optional dependency for platform-specific build
 RUN npm install @rollup/rollup-linux-arm64-gnu || true
