@@ -46,6 +46,7 @@ const Diverging = (props) => {
       ></Diverging>
   );
 };
+
 const Chart = (props) => {
   let {
     parent,
@@ -342,7 +343,7 @@ const Chart = (props) => {
   /*Decoding tooltip string*/
   let tooltipForSelectedMeasure = decode(tooltip);
 
-  if (injectedMeasures) {
+  if (injectedMeasures && selectedMeasures.length > 0) {
     const selected = Object.keys(injectedMeasures[app].measures)
         .map((s) => ({ value: s, ...injectedMeasures[app].measures[s] }))
         .filter((m) => m.selected)
@@ -956,9 +957,8 @@ const mapStateToProps = (state, ownProps) => {
     return {
       injectedMeasures: injectedMeasures,
     };
-  } else {
-    return {};
   }
+  return {};
 };
 const mapActionCreators = {};
-export default connect(mapStateToProps, mapActionCreators)(injectIntl(Chart));
+export default connect(mapStateToProps, mapActionCreators)(Chart);
