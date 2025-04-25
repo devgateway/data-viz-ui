@@ -11,6 +11,7 @@ import {
 } from "@devgateway/wp-react-lib";
 import PostIntro from "../connected-templates/PostIntro";
 import { useWindowDimensionsAndDevice } from '@/lib/hooks/window-dimensions';
+import { connect } from 'react-redux';
 
 interface FeaturedTabsProps {
     posts?: any[],
@@ -31,6 +32,7 @@ export interface FeatureTabsProps {
     "data-read-more-label": string,
     "data-use-scrolls": string,
     "data-preview-mode": string,
+    pageModuleProps: any,
     editing: boolean,
     parent: number,
     unique: number,
@@ -284,7 +286,7 @@ const AccordionContent: React.FC<AccordionContentProps> = ({ posts, activeItem, 
 
 // Wrapper Component for Handling Mobile and Desktop View
 const Wrapper: React.FC<FeatureTabsProps> = (props) => {
-    const {
+    let {
         "data-width": width,
         "data-height": height,
         "data-type": type,
@@ -297,9 +299,16 @@ const Wrapper: React.FC<FeatureTabsProps> = (props) => {
         "data-preview-mode": previewMode = "Desktop",
         editing,
         parent,
-        unique
+        unique,
+        pageModuleProps
     } = props;
     const locale = props.intl.locale;
+
+    if(pageModuleProps?.editing  && pageModuleProps?.previewMode) {
+        editing = pageModuleProps.editing;
+        previewMode = pageModuleProps.previewMode;
+    }
+
     const scrollable = useScrolls == 'true';
 
     const { width: deviceWidth} = useWindowDimensionsAndDevice();
@@ -345,4 +354,17 @@ const Wrapper: React.FC<FeatureTabsProps> = (props) => {
     );
 };
 
-export default Wrapper;
+const mapStateToProps = (state, _ownProps) => {
+  const pageModuleProps = state.getIn([
+    "data",
+    "pageModuleProps"
+  ]);
+  const _props: { pageModuleProps?: Record<string, unknown> } = {};
+  if(pageModuleProps) {
+    _props.pageModuleProps = pageModuleProps;
+  }
+  return _props;
+};
+const mapActionCreators = {};
+export default connect(mapStateToProps, mapActionCreators)(Wrapper);
+
