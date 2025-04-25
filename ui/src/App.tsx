@@ -56,7 +56,7 @@ const PreviewComponentParameterParser = () => {
             Object.keys(data).forEach(k => {
                 newPrams["data-" + k.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()] = typeof data[k] == 'object' ? JSON.stringify(data[k]) : data[k]
             })
-            
+
             setParams(newPrams)
         }
     };
@@ -74,7 +74,6 @@ const PreviewComponentParameterParser = () => {
             window.removeEventListener('message', readMessage);
         };
     }, []);
-
     return (
         <div>
             <Container fluid={true} className={"editing"}>
@@ -92,7 +91,7 @@ const PreviewComponentParameterParser = () => {
 const InjectTitle = injectIntl((props) => {
 
     // @ts-expect-error description
-    document.title = props.settings.description   
+    document.title = props.settings.description
     return <></>
 });
 
