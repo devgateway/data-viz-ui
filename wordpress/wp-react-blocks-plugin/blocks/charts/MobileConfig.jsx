@@ -297,6 +297,7 @@ const MobileConfig = (props) => {
       dimension1,
       yAxisTickValues,
       xAxisTickValues,
+      tickRotation
     },
     allMeasures,
     allCategories,
@@ -305,24 +306,37 @@ const MobileConfig = (props) => {
 
   const [xAxisLabels, setXAxisLabels] = useState([]);
 
+  const onIntervalChange = (value, prop, intervalProp, mobileCustomizationObject) => {
+    const newObject = Object.assign({}, mobileCustomizationObject);
+    if (newObject) {
+      newObject[prop] = value;
+      newObject[intervalProp] = true;
+    }
+    setAttributes({ mobileCustomization: newObject });
+  };
+
   useEffect(() => {
+    const updatedMobileCustomization = { ...mobileCustomization };
+
     if (!mobileCustomization.yAxisIntervalUserModified) {
-      setAttributes({
-        mobileCustomization: {
-          ...mobileCustomization,
-          yAxisTickValues: yAxisTickValues,
-        },
-      });
+      updatedMobileCustomization.yAxisTickValues = yAxisTickValues;
     }
+
     if (!mobileCustomization.xAxisIntervalUserModified) {
-      setAttributes({
-        mobileCustomization: {
-          ...mobileCustomization,
-          xAxisTickValues: xAxisTickValues,
-        },
-      });
+      updatedMobileCustomization.xAxisTickValues = xAxisTickValues;
     }
-  }, [yAxisTickValues, xAxisTickValues]);
+
+    if (!mobileCustomization.mobileXAxisTextRotationModified) {
+      updatedMobileCustomization.mobileXAxisTextRotation = tickRotation;
+    }
+
+    if (!mobileCustomization.tabletXAxisTextRotationModified) {
+      updatedMobileCustomization.tabletXAxisTextRotation = tickRotation;
+    }
+
+    setAttributes({ mobileCustomization: updatedMobileCustomization });
+  }, [yAxisTickValues, xAxisTickValues, tickRotation]);
+
 
 useEffect(() => {
   let labels = [];
@@ -367,6 +381,7 @@ useEffect(() => {
       },
     });
   };
+
 
   const setInitialTogle = (initialToggleState, label, axis) => {
     // initial toggle state is false
@@ -478,14 +493,18 @@ useEffect(() => {
                 <PanelRow>
                   <AnglePickerControl
                     label={__("X Axis Text Rotation")}
-                    value={mobileCustomization.tabletXAxisTextRotation}
+                    value={
+                      !mobileCustomization?.tabletXAxisTextRotationModified
+                        ? tickRotation
+                        : mobileCustomization.tabletXAxisTextRotation
+                    }
                     onChange={(value) =>
-                      setAttributes({
-                        mobileCustomization: {
-                          ...mobileCustomization,
-                          tabletXAxisTextRotation: value,
-                        },
-                      })
+                      onIntervalChange(
+                        value,
+                        "tabletXAxisTextRotation",
+                        "tabletXAxisTextRotationModified",
+                        mobileCustomization
+                      )
                     }
                   />
                 </PanelRow>
@@ -534,14 +553,18 @@ useEffect(() => {
                 <PanelRow>
                   <AnglePickerControl
                     label={__("X Axis Text Rotation")}
-                    value={mobileCustomization.mobileXAxisTextRotation}
+                    value={
+                      !mobileCustomization?.mobileXAxisTextRotationModified
+                        ? tickRotation
+                        : mobileCustomization.mobileXAxisTextRotation
+                    }
                     onChange={(value) =>
-                      setAttributes({
-                        mobileCustomization: {
-                          ...mobileCustomization,
-                          mobileXAxisTextRotation: value,
-                        },
-                      })
+                      onIntervalChange(
+                        value,
+                        "mobileXAxisTextRotation",
+                        "mobileXAxisTextRotationModified",
+                        mobileCustomization
+                      )
                     }
                   />
                 </PanelRow>

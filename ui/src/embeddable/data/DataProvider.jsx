@@ -37,8 +37,6 @@ class DataProvider extends React.Component {
     componentDidUpdate(prevProps, prevState, snapshot) {
         const {app, filters, apply, source, store, params, csv, group, autoApply, editing} = this.props
 
-        debugger; // eslint-disable-line no-debugger
-
         let doApply = false
 
         if (apply !== undefined  && apply !== null && apply !=prevProps.apply) {
@@ -88,7 +86,7 @@ class DataProvider extends React.Component {
 
     render() {
         const {data, style, loading, time, error, editing, isSvg} = this.props
-           
+
 
         if ((loading && this.state.showLoading && !editing)) {
             const foreignObjectStyle = {
@@ -105,7 +103,7 @@ class DataProvider extends React.Component {
                 textAlign: "center",
                 margin: "30px"
             })
-            
+
 
             const spinner = <Segment basic={true} padded={true} style={segmentStyle}>
                     <Dimmer active inverted style={{ background: "transparent" }} >
@@ -124,7 +122,7 @@ class DataProvider extends React.Component {
                     {spinner}
                 </Container>)
             }
-           
+
         } else if (!error) {
             return <DataContext.Provider value={data}>{this.props.children}</DataContext.Provider>
         } else if (error) {
@@ -140,7 +138,7 @@ class DataProvider extends React.Component {
                     <p>Can't find this page</p>
                 </Segment>
             </Container>
-        }   
+        }
     }
 }
 

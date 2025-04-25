@@ -8,6 +8,7 @@ import {
     MediaConsumer,
     MediaProvider
 } from "@devgateway/wp-react-lib";
+import { connect } from 'react-redux';
 import PostIntro from "../connected-templates/PostIntro";
 
 export interface VerticalFeaturedTabsProps {
@@ -24,6 +25,7 @@ export interface VerticalFeaturedTabsProps {
     parent: string;
     unique: string;
     intl: any;
+    pageModuleProps: any;
 }
 
 interface AccordionContentProps {
@@ -369,7 +371,7 @@ const FeaturedTabs: React.FC<FeaturedTabsProps> = ({
 };
 
 const Wrapper: React.FC<VerticalFeaturedTabsProps> = (props) => {
-  const {
+  let {
     "data-height": height,
     "data-type": type,
     "data-taxonomy": taxonomy,
@@ -382,7 +384,13 @@ const Wrapper: React.FC<VerticalFeaturedTabsProps> = (props) => {
     editing,
     parent,
     unique,
+    pageModuleProps
   } = props;
+
+  if (pageModuleProps?.previewMode &&  pageModuleProps?.editing) {
+    previewMode = pageModuleProps.previewMode;
+    editing = pageModuleProps.editing;
+}
 
   const locale = props.intl.locale;
   const dataCategories = categories ? categories : "[]";
@@ -489,4 +497,17 @@ const Wrapper: React.FC<VerticalFeaturedTabsProps> = (props) => {
   );
 };
 
-export default Wrapper
+const mapStateToProps = (state, _ownProps) => {
+  const pageModuleProps = state.getIn([
+    "data",
+    "pageModuleProps"
+  ]);
+  const _props = {};
+  if(pageModuleProps) {
+    _props.pageModuleProps = pageModuleProps;
+  }
+  return _props;
+};
+const mapActionCreators = {};
+export default connect(mapStateToProps, mapActionCreators)(Wrapper);
+

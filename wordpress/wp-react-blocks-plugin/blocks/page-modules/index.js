@@ -7,12 +7,17 @@ import {ComponentWithSettings} from "../commons";
 
 
 const SaveComponent = (props) => {
-    const {navLabel, topTopLabel} = props.attributes;
-    return (<div className={"viz-component"} data-component={"pageModules"} data-nav-label={navLabel}
-                 data-to-top-label={topTopLabel}>
-        </div>
-    );
-}
+  const { navLabel, topTopLabel, previewMode } = props.attributes;
+  return (
+    <div
+      className={"viz-component"}
+      data-component={"pageModules"}
+      data-nav-label={navLabel}
+      data-to-top-label={topTopLabel}
+      data-preview-mode={previewMode}
+    />
+  );
+};
 
 class Edit extends ComponentWithSettings {
     constructor(props) {
@@ -23,14 +28,26 @@ class Edit extends ComponentWithSettings {
         super.componentDidMount();
     }
 
-    render() {
+    componentWillUnmount() {
+        if (this.unsubscribe) {
+            this.unsubscribe()
+        }
+    }
 
-        const {attributes: {width, height, navLabel, topTopLabel}, toggleSelection, setAttributes} = this.props;
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        const newPreviewMode = this.state?.previewMode ?? 'Desktop';
+        if (newPreviewMode !== prevState.previewMode) {
+            this.props.setAttributes({previewMode: newPreviewMode})
+        }
+    }
+
+    render() {
+        const {attributes: {width, height, navLabel, topTopLabel, previewMode}, toggleSelection, setAttributes} = this.props;
         const urlParams = new URLSearchParams(window.location.search);
         const parent = urlParams.get('post');
-        const queryString = `editing=true&parent=${parent}&data-nav-label=${navLabel}&data-to-top-label=${topTopLabel}`;
+        const queryString = `editing=true&parent=${parent}&data-nav-label=${navLabel}&data-to-top-label=${topTopLabel}&data-preview-mode=${previewMode}`;
         const divClass = ""
-        const divStyles = {height: height + 'px', width: '100%'}
+        const divStyles = {height: `${height}px`, width: '100%'}
 
         return (
             <div>
@@ -101,7 +118,7 @@ class Edit extends ComponentWithSettings {
     }
 }
 
-registerBlockType(process.env.BLOCKS_NS + '/page-modules',
+registerBlockType(`${process.env.BLOCKS_NS}/page-modules`,
     {
         title: __('Page Modules',"dg"),
         icon: Generic,
@@ -126,6 +143,10 @@ registerBlockType(process.env.BLOCKS_NS + '/page-modules',
             navLabel: {
                 type: 'String',
                 default: "Sections",
+            },
+            previewMode: {
+                type: 'string',
+                default: 'Desktop'
             }
         }
         ,

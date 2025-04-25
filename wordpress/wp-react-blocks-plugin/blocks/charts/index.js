@@ -517,6 +517,8 @@ registerBlockType(process.env.BLOCKS_NS + '/chart',
                     mobileMaxTickLength: 25,
                     tabletYAxisLineHeight: 12,
                     tabletMaxTickLength: 25,
+                    mobileXAxisTextRotationModified: false,
+                    tabletXAxisTextRotationModified: false,
                 }
             },
             reverseLegend: {

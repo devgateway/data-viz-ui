@@ -5,6 +5,7 @@ import DataConsumer from "../data/DataConsumer";
 import getDeviceType from "../../utils/deviceType";
 import { buildDivergingOptions, buildPieOptions } from "./prevalenceBuilder";
 import HalfPie from "./Pie";
+import * as Immutable from 'immutable';
 
 import Radar from "./Radar";
 import Bar from "./Bar";
@@ -174,7 +175,9 @@ const Chart = (props) => {
     "data-mobile-customization": mobileCustomization = "{}",
     "data-show-percentage": showPercentage = "false",
     "data-preview-mode": previewMode = "Desktop",
+    pageModuleProps
   } = props;
+  const originalEditValue = editing;
   const mobileConfigSettings = JSON.parse(
     decodeURIComponent(mobileCustomization)
   );
@@ -183,6 +186,11 @@ const Chart = (props) => {
   );
   const isMobileConfigEnabled =
     isMobileOrTablet && (mobileConfigSettings?.showCustomization ?? false);
+
+  if(pageModuleProps?.previewMode && pageModuleProps?.editing) {
+    previewMode = pageModuleProps.previewMode;
+    editing = pageModuleProps.editing;
+  }
 
   const isTabletEditMode =  (["Tablet"].includes(previewMode) && editing);
   const isMobileEditMode =  (["Mobile"].includes(previewMode) && editing);
@@ -232,12 +240,12 @@ const Chart = (props) => {
   const ref = useRef(null);
   const decode = (value) => {
     try {
-      if (editing) {
+      if (originalEditValue) {
         return value;
       }
       return decodeURIComponent(value);
     } catch (err) {
-      console.error("error decoding value:" + value);
+      console.error(`error decoding value:${value}`);
       return value;
     }
   };
@@ -246,7 +254,7 @@ const Chart = (props) => {
     try {
       return JSON.parse(decode(value));
     } catch (error) {
-      console.error("error parsing value:" + value);
+      console.error(`error parsing value:${value}`);
     }
 
     return null;
@@ -260,38 +268,37 @@ const Chart = (props) => {
     return parse(measures);
   };
   const getSelectedFormat = () => {
-    if (measuresObject[app]) {
-      let format = measuresObject[app].format;
+    if (measuresObject?.[app]) {
+      let format = measuresObject?.[app]?.format;
       if (!format) {
-        const keys = Object.keys(measuresObject[app]);
+        const keys = Object.keys(measuresObject?.[app]);
         for (let i = 0; i < keys.length; i++) {
           if (
-              measuresObject[app][keys[i]].selected &&
-              measuresObject[app][keys[i]].format
+              measuresObject?.[app][keys[i]].selected &&
+              measuresObject?.[app][keys[i]].format
           ) {
-            format = measuresObject[app][keys[i]].format;
+            format = measuresObject?.[app][keys[i]].format;
             break;
           }
         }
       }
 
       return format;
-    } else {
-      return measuresObject && measuresObject["csv"]
-          ? measuresObject["csv"].format
-          : null;
     }
+    return measuresObject?.["csv"]
+        ? measuresObject["csv"].format
+        : null;
   };
 
   const getCustomAxisFormat = () => {
     let format = null;
-    if (measuresObject[app]) {
+    if (measuresObject?.[app]) {
       const useCustomAxisFormat = measuresObject[app].useCustomAxisFormat;
       if (useCustomAxisFormat && measuresObject[app].customFormat) {
         format = measuresObject[app].customFormat;
       }
     } else {
-      if (measuresObject && measuresObject["csv"]) {
+      if (measuresObject?.["csv"]) {
         const useCustomAxisFormat = measuresObject["csv"].useCustomAxisFormat;
         if (useCustomAxisFormat && measuresObject["csv"].customFormat) {
           format = measuresObject["csv"].customFormat;
@@ -303,7 +310,7 @@ const Chart = (props) => {
   };
 
   const getSelectedMeasures = () => {
-    if (measuresObject[app]) {
+    if (measuresObject?.[app]) {
       return Object.keys(measuresObject[app])
           .map((s) => ({ value: s, ...measuresObject[app][s] }))
           .filter((m) => m.selected)
@@ -313,7 +320,7 @@ const Chart = (props) => {
   };
   const getCustomLabels = () => {
     const customLabels = {};
-    if (measuresObject[app]) {
+    if (measuresObject?.[app]) {
       const hasCustomLabels = Object.keys(measuresObject[app])
           .map((s) => ({ value: s, ...measuresObject[app][s] }))
           .filter((m) => m.selected && m.hasCustomLabel);
@@ -324,7 +331,7 @@ const Chart = (props) => {
     return customLabels;
   };
   const getUserMeasures = () => {
-    if (measuresObject[app]) {
+    if (measuresObject?.[app]) {
       return Object.keys(measuresObject[app]).filter(
           (k) => measuresObject[app][k].allowSelection
       );
@@ -383,17 +390,17 @@ const Chart = (props) => {
 
   const groupTotalFormatParsed = {
     style:
-        groupTotalFormatObject.style === "compacted"
+        groupTotalFormatObject?.style === "compacted"
             ? "decimal"
-            : groupTotalFormatObject.style,
+            : groupTotalFormatObject?.style,
     notation:
-        groupTotalFormatObject.style === "compacted" ? "compact" : "standard",
-    currency: groupTotalFormatObject.currency,
+        groupTotalFormatObject?.style === "compacted" ? "compact" : "standard",
+    currency: groupTotalFormatObject?.currency,
     minimumFractionDigits: parseInt(
-        groupTotalFormatObject.minimumFractionDigits
+        groupTotalFormatObject?.minimumFractionDigits
     ),
     maximumFractionDigits: parseInt(
-        groupTotalFormatObject.maximumFractionDigits
+        groupTotalFormatObject?.maximumFractionDigits
     ),
   };
   const [mode, setMode] = useState(editMode);
@@ -942,7 +949,7 @@ const Chart = (props) => {
               >
                 <PostContent
                     post={{ content: { rendered: childContent } }}
-                ></PostContent>
+                />
               </Container>
           )}
         </Container>
@@ -953,12 +960,18 @@ const Chart = (props) => {
 const mapStateToProps = (state, ownProps) => {
   const { "data-app": app, "data-group": group } = ownProps;
   const injectedMeasures = state.getIn(["data", "measures", app, group]);
-  if (injectedMeasures) {
-    return {
-      injectedMeasures: injectedMeasures,
-    };
+  const pageModuleProps = state.getIn([
+    "data",
+    "pageModuleProps"
+  ]);
+  const _props = {};
+  if(injectedMeasures && Object.keys(injectedMeasures).length > 0) {
+    _props.injectedMeasures = injectedMeasures ?? {};
   }
-  return {};
+  if(pageModuleProps) {
+    _props.pageModuleProps = pageModuleProps;
+  }
+  return _props;
 };
 const mapActionCreators = {};
 export default connect(mapStateToProps, mapActionCreators)(Chart);

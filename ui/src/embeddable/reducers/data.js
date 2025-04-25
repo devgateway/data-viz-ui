@@ -8,6 +8,8 @@ const LOAD_DATA_ERROR = 'LOAD_DATA_ERROR'
 const LOAD_CATEGORIES = 'LOAD_CATEGORIES'
 const LOAD_CATEGORIES_DONE = 'LOAD_CATEGORIES_DONE'
 const LOAD_CATEGORIES_ERROR = 'LOAD_CATEGORIES_ERROR'
+const SET_PAGE_MODULE_PROPS = 'SET_PAGE_MODULE_PROPS'
+const LOAD_PAGE_MODULE_PROPS = 'LOAD_PAGE_MODULE_PROPS'
 
 
 const SET_FILTER = 'SET_FILTER'
@@ -111,6 +113,10 @@ export const getData = ({app, group, source, store, params}) => (dispatch, getSt
 
 }
 
+export const setPageModuleProps = ({ data }) => (dispatch, getState) => {
+    dispatch({type: SET_PAGE_MODULE_PROPS, data})
+}
+
 export default (state = initialState, action) => {
 
     switch (action.type) {
@@ -138,7 +144,11 @@ export default (state = initialState, action) => {
                 .setIn(['filters-settings', app, group, "apply"], null)
         }
 
-
+        case SET_PAGE_MODULE_PROPS: {
+            const {data} = action
+            return state
+                    .setIn(['pageModuleProps'], data)
+        }
         case LOAD_CATEGORIES: {
             const {data, app, dvzProxyDatasetId} = action
             const path = ["categories", app]
@@ -177,7 +187,6 @@ export default (state = initialState, action) => {
         }
         case SET_APPLY: {
             const {app, group} = action
-            debugger // eslint-disable-line
             return state.setIn(['filters-settings', app, group, "apply"], new Date().getTime())
         }
 
