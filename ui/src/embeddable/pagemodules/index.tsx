@@ -1,19 +1,21 @@
 import { Container, Image, Menu } from "semantic-ui-react";
 import { InView } from "react-intersection-observer";
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { MediaConsumer, MediaProvider, PageConsumer, PageProvider, PostContent } from "@devgateway/wp-react-lib";
 
 import { injectIntl } from "react-intl";
+import { connect } from "react-redux";
+import { setPageModuleProps} from '../reducers/data';
 import FloatingNavigator from './FloatingNavigator'
 
 const decodeHtmlEntity = function (str: string) {
-    if (str) {
-        return str.toString().replace(/&#(\d+);/g, function (match, dec) {
-            return String.fromCharCode(dec);
-        });
-    }
+  if (str) {
+    return str.toString().replace(/&#(\d+);/g, function (match, dec) {
+      return String.fromCharCode(dec);
+    });
+  }
 
-    return ''
+  return "";
 };
 
 interface SectionHeaderProps {
@@ -42,7 +44,7 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({ title, subtitle, i
     </Menu>
 }
 
-const MediaImage = (props) => <img src={props.media && props.media.guid ? props.media.guid.rendered : null} />
+const MediaImage = (props) => <img src={props.media?.guid ? props.media.guid.rendered : null} alt="" />
 
 
 interface ModuleProps {
@@ -52,9 +54,9 @@ interface ModuleProps {
 }
 const Module: React.FC<ModuleProps> = ({ page, locale }) => {
     return (
-        <Container fluid={true} className={"section " + page.slug} id={page.id}>
-            <div id={`${page.slug}`}></div>
-            <MediaProvider id={page.meta_fields && page.meta_fields.icon ? page.meta_fields.icon[0] : null}>
+        <Container fluid={true} className={`section ${page.slug}`} id={page.id}>
+            <div id={`${page.slug}`} />
+            <MediaProvider id={page.meta_fields?.icon ? page.meta_fields.icon[0] : null}>
                 <MediaConsumer>
                     <SectionHeader title={decodeHtmlEntity(page.title.rendered)} subtitle={decodeHtmlEntity(page.meta_fields.subtitle)} />
                 </MediaConsumer>
@@ -97,7 +99,7 @@ const PageIterator: React.FC<PageIteratorProps> = ({ pages, locale, editing, nav
         id: p.id,
         label: p.meta_fields.label ? p.meta_fields.label : p.title.rendered,
         iconComponent: (
-            <MediaProvider id={p.meta_fields && p.meta_fields.icon ? p.meta_fields.icon[0] : null}>
+            <MediaProvider id={p.meta_fields?.icon ? p.meta_fields.icon[0] : null}>
                 <MediaConsumer>
                     <MediaImage />
                 </MediaConsumer>
@@ -138,6 +140,7 @@ export interface PageModuleProps {
     "data-items": string,
     "data-nav-label": string,
     "data-to-top-label": string,
+    "data-preview-mode": string,
     editing: string,
     parent: string,
     unique: string,
@@ -145,32 +148,73 @@ export interface PageModuleProps {
 }
 
 
-const Root = (props: PageModuleProps) => {
+const Root = (props) => {
+  const {
+    navTitle,
+    toTopLabel,
+    editing,
+    parent,
+    unique,
+    locale,
+    onLoadPageModule
+  } = props;
 
-    const {
-        "data-type": type,
-        "data-taxonomy": taxonomy,
-        "data-categories": categories,
-        "data-items": items,
+
+
+  useEffect(() => {
+    onLoadPageModule({ data: props})
+  }, [props]);
+
+
+  return (
+    <Container className="viz dashboard green" fluid={true}>
+      {props.parent && (
+        <PageProvider
+          locale={locale}
+          parent={props.parent}
+          store={`modules_${parent}_${unique}`}
+          perPage={100}
+        >
+          <PageConsumer>
+            <PageIterator
+              toTopLabel={toTopLabel}
+              navTitle={navTitle}
+              editing={editing === "true"}
+              locale={locale}
+            />
+          </PageConsumer>
+        </PageProvider>
+      )}
+    </Container>
+  );
+};
+
+const mapStateToProps = (_state, ownProps: PageModuleProps) => {
+    let {
         "data-nav-label": navTitle = "Sections",
         "data-to-top-label": toTopLabel = "TO THE TOP",
-        editing, parent, unique,
+        "data-preview-mode": previewMode = "Desktop",
+        editing,
+        parent,
+        unique,
         intl: { locale }
-    } = props
+      } = ownProps;
+      if(previewMode === "undefined") {
+        previewMode = "Desktop";
+      }
+      return {
+        navTitle,
+        toTopLabel,
+        previewMode,
+        editing,
+        parent,
+        unique,
+        locale
+      }
+};
 
+const mapActionCreators = {
+    onLoadPageModule: setPageModuleProps
+};
 
-    return (<Container className="viz dashboard green" fluid={true}>
-
-        {props.parent &&
-            <PageProvider locale={locale} parent={props.parent} store={"modules_" + parent + "_" + unique} perPage={100}>
-                <PageConsumer>
-                    <PageIterator toTopLabel={toTopLabel} navTitle={navTitle} editing={editing === "true"}
-                        locale={locale}></PageIterator>
-                </PageConsumer>
-            </PageProvider>}
-
-    </Container>)
-}
-
-
-export default injectIntl(Root)
+export default connect(mapStateToProps, mapActionCreators)(injectIntl(Root));

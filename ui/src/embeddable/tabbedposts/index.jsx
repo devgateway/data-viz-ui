@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Button, Container, Grid, Label, Menu, Accordion, Icon } from 'semantic-ui-react';
 import { MediaConsumer, MediaProvider, PostConsumer, PostIcon, PostLabel, PostProvider } from "@devgateway/wp-react-lib";
 import { injectIntl } from "react-intl";
+import { connect } from "react-redux";
 import PostIntro from "../connected-templates/PostIntro";
 import { useWindowDimensionsAndDevice } from '@/lib/hooks/window-dimensions';
 
@@ -395,7 +396,7 @@ const GridTabbedView = ({ posts, showLabels, showIcons, height }) => {
 };
 
 const Wrapper = (props) => {
-    const {
+    let {
         "data-type": type,
         "data-taxonomy": taxonomy,
         "data-categories": categories,
@@ -406,8 +407,13 @@ const Wrapper = (props) => {
         "data-show-labels": showLabels,
         "data-height": height,
         "data-preview-mode": previewMode = 'Desktop',
+        pageModuleProps,
         parent, editing, unique
     } = props;
+    if (pageModuleProps?.previewMode &&  pageModuleProps?.editing) {
+        previewMode = pageModuleProps.previewMode;
+        editing = pageModuleProps.editing;
+    }
     const locale = props.intl.locale;
 
     const scrollable = useScrolls === 'true';
@@ -448,4 +454,16 @@ const Wrapper = (props) => {
     );
 };
 
-export default injectIntl(Wrapper);
+const mapStateToProps = (state, ownProps) => {
+  const pageModuleProps = state.getIn([
+    "data",
+    "pageModuleProps"
+  ]);
+  const _props = {};
+  if(pageModuleProps) {
+    _props.pageModuleProps = pageModuleProps;
+  }
+  return _props;
+};
+const mapActionCreators = {};
+export default connect(mapStateToProps, mapActionCreators)(injectIntl(Wrapper));
