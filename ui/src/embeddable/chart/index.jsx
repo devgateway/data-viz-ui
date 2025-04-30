@@ -350,7 +350,7 @@ const Chart = (props) => {
   /*Decoding tooltip string*/
   let tooltipForSelectedMeasure = decode(tooltip);
 
-  if (injectedMeasures && selectedMeasures.length > 0) {
+  if (injectedMeasures?.[app]) {
     const selected = Object.keys(injectedMeasures[app].measures)
         .map((s) => ({ value: s, ...injectedMeasures[app].measures[s] }))
         .filter((m) => m.selected)
