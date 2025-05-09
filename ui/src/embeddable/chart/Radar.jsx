@@ -2,10 +2,13 @@ import React, { useState } from "react";
 import { injectIntl } from "react-intl";
 import { ResponsiveRadar } from "@nivo/radar";
 import Legends from "./Legends.jsx";
+import deviceType from "@/utils/deviceType";
+import _ from "lodash";
 
 const DEFAULT_COLOR = "none";
 
 const Chart = ({
+  editing,
   legends,
   marginLeft,
   marginTop,
@@ -21,7 +24,6 @@ const Chart = ({
   legendCheckBack,
   legendLabelBack,
   legendLabelColor,
-
   colorGenerator,
   reverseLegend,
   radarCurve,
@@ -34,29 +36,191 @@ const Chart = ({
   radarDotSize,
   radarEnableDotLabel,
   radarDotLabelOffset,
+  mobileCustomization,
+  previewMode,
 }) => {
-  //Lenged Toggler filter
   const [filter, setFilter] = useState([]);
-  const applyFilter = (values) => {
-    return values ? values.filter((d) => filter.indexOf(d) === -1) : [];
-  };
-  const toggle = (id) => {
-    const newFilter = filter.slice();
-    if (newFilter.indexOf(id) > -1) {
-      const index = newFilter.indexOf(id);
-      newFilter.splice(index, 1);
-    } else {
-      newFilter.push(id);
-    }
-    setFilter(newFilter);
-  };
 
-  if (!options || !options.data) {
-    //no data yet
-    return null;
+  const isMobileDevice = deviceType() === "mobile";
+  const isTabletDevice = ["tablet", "midTablet"].includes(deviceType());
+  const isMobileOrTablet = isMobileDevice || isTabletDevice;
+
+  const mobileConfigSettings = React.useMemo(
+    () => JSON.parse(decodeURIComponent(mobileCustomization)),
+    [mobileCustomization]
+  );
+  const isMobileCustomizationEnabled =
+    isMobileOrTablet && (mobileConfigSettings?.showCustomization ?? false);
+  const isNotDesktopPreview =
+    isMobileCustomizationEnabled && previewMode !== "Desktop";
+  const isNotEditingAndIsMobileCustomizationEnabled =
+    !editing && isMobileCustomizationEnabled;
+
+  if (!options || !options.data) return null;
+
+  const applyFilter = (keys) => keys.filter((k) => !filter.includes(k));
+  const toggle = (id) =>
+    setFilter((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
+
+  // determines max chars per line
+  function getMaxLineLength({
+    tickValue,
+    editing,
+    previewMode,
+    isMobileDevice,
+    isTabletDevice,
+    mobileConfigSettings,
+    isNotDesktopPreview,
+    isNotEditingAndIsMobileCustomizationEnabled,
+  }) {
+    let maxLineLength = 25;
+    if (isNotDesktopPreview || isNotEditingAndIsMobileCustomizationEnabled) {
+      if (
+        (editing && previewMode === "Mobile") ||
+        (isMobileDevice && !editing)
+      ) {
+        maxLineLength = mobileConfigSettings?.mobileMaxTickLength ?? 25;
+      } else if (
+        (editing && previewMode === "Tablet") ||
+        (isTabletDevice && !editing)
+      ) {
+        maxLineLength = mobileConfigSettings?.tabletMaxTickLength ?? 25;
+      } else if (
+        !editing &&
+        window.matchMedia("(min-width: 768px) and (max-width: 1250px)").matches
+      ) {
+        maxLineLength = 15;
+      }
+    }
+    return maxLineLength;
   }
 
-  //margin settings
+  // word-wrap helper
+  const wrapText = (text, maxLen) => {
+    const words = String(text).split(" ");
+    const lines = [];
+    let line = "";
+    words.forEach((w) => {
+      if (`${line} ${w}`.trim().length <= maxLen) {
+        line = (line ? `${line} ` : "") + w;
+      } else {
+        lines.push(line);
+        line = w;
+      }
+    });
+    if (line) lines.push(line);
+    return lines;
+  };
+
+  // ─── radial‐value tick layer ────────────────────────────────────────────
+  const customLayer = ({ centerX, centerY, radiusScale }) => {
+    const ticks = radiusScale.ticks(radarGridLevels).filter((t) => t > 0);
+    const lineH = isMobileDevice
+      ? mobileConfigSettings.mobileYAxisLineHeight ?? 12
+      : isTabletDevice
+      ? mobileConfigSettings.tabletYAxisLineHeight ?? 12
+      : 12;
+
+    return (
+      <g>
+        {ticks.map((tick, i) => {
+          const r = radiusScale(tick);
+          const x = centerX + r * Math.sin(0) + 7;
+          const y = centerY - r * Math.cos(0);
+
+          const label = intl.formatNumber(
+            format.style === "percent" ? tick / 100 : tick,
+            format
+          );
+
+          // compute max length dynamically
+          const maxLen = getMaxLineLength({
+            tickValue: tick,
+            editing,
+            previewMode,
+            isMobileDevice,
+            isTabletDevice,
+            mobileConfigSettings,
+            isNotDesktopPreview,
+            isNotEditingAndIsMobileCustomizationEnabled,
+          });
+          const lines = wrapText(label, maxLen);
+
+          return (
+            <g key={i}>
+              <line
+                x1={x - 7}
+                y1={y - 4}
+                x2={x - 3}
+                y2={y - 4}
+                stroke="rgb(51,51,51)"
+                strokeWidth={1}
+              />
+              {lines.map((ln, j) => (
+                <text
+                  key={j}
+                  x={x}
+                  y={y + j * lineH}
+                  fontFamily="sans-serif"
+                  fontSize="11px"
+                  fill="rgb(51,51,51)"
+                >
+                  {ln}
+                </text>
+              ))}
+            </g>
+          );
+        })}
+      </g>
+    );
+  };
+
+  // ─── override built-in "layers" labels via gridLabel ─────────────────
+  const customGridLabel = ({ id, x, y }) => {
+    // compute max length dynamically
+    const maxLen = getMaxLineLength({
+      tickValue: id,
+      editing,
+      previewMode,
+      isMobileDevice,
+      isTabletDevice,
+      mobileConfigSettings,
+      isNotDesktopPreview,
+      isNotEditingAndIsMobileCustomizationEnabled,
+    });
+    const lines = wrapText(id, maxLen);
+
+    const lineH = isMobileDevice
+      ? mobileConfigSettings.mobileXAxisLineHeight ?? 12
+      : isTabletDevice
+      ? mobileConfigSettings.tabletXAxisLineHeight ?? 12
+      : 12;
+
+    const anchor = x > 5 ? "start" : x < -5 ? "end" : "middle";
+    return (
+      <g transform={`translate(${x}, ${y})`}>
+        <text
+          textAnchor={anchor}
+          alignmentBaseline="middle"
+          style={{
+            fontFamily: "sans-serif",
+            fontSize: "11px",
+            fill: "#333",
+            pointerEvents: "none",
+          }}
+        >
+          {lines.map((ln, j) => (
+            <tspan key={j} x={0} dy={j === 0 ? 0 : `${lineH}px`}>
+              {ln}
+            </tspan>
+          ))}
+        </text>
+      </g>
+    );
+  };
+
   const margins = {
     top: marginTop,
     right: marginRight,
@@ -64,157 +228,78 @@ const Chart = ({
     left: marginLeft,
   };
 
-  //Legends model
-  const chartLegends = options.keys.map((k) => {
-    let theColor;
-    let enabled = true;
-    if (filter.indexOf(k) > -1) {
-      enabled = false;
-      theColor = DEFAULT_COLOR;
-    } else {
-      theColor = colorGenerator.getColorByKey(k);
-    }
-    return {
-      enabled: enabled,
-      color: theColor,
-      id: k,
-      label: k,
-    };
-  });
-
-  const customLayer = (props) => {
-    return (
-      <g>
-        <line
-          strokeWidth={1}
-          style={{ strokeDasharray: "4,4", stroke: "rgb(51, 51, 51)" }}
-          x1={props.centerX}
-          y1={props.centerY}
-          x2={props.centerX + props.radiusScale(70) * Math.sin(0)}
-          y2={0}
-        ></line>
-        {props.radiusScale
-          .ticks(radarGridLevels)
-          .filter((t) => t > 0)
-          .map((tick, index) => {
-            const r = props.radiusScale(tick);
-            const x = props.centerX + r * Math.sin(0) + 7;
-            const y = props.centerY - r * Math.cos(0);
-            return (
-              <g>
-                <line
-                  strokeWidth={1}
-                  style={{ stroke: "rgb(51, 51, 51)" }}
-                  x1={x - 7}
-                  y1={y - 4}
-                  x2={x - 3}
-                  y2={y - 4}
-                ></line>
-
-                <text
-                  x={x}
-                  y={y}
-                  style={{
-                    "font-family": "sans-serif",
-                    "font-size": "11px",
-                    fill: "rgb(51, 51, 51)",
-                  }}
-                >
-                  {intl.formatNumber(
-                    format.style === "percent" ? tick / 100 : tick,
-                    format
-                  )}
-                </text>
-              </g>
-            );
-          })}
-      </g>
-    );
-  };
+  const chartLegends = options.keys.map((k) => ({
+    id: k,
+    label: k,
+    color: filter.includes(k) ? DEFAULT_COLOR : colorGenerator.getColorByKey(k),
+    enabled: !filter.includes(k),
+  }));
 
   return (
-    <div style={{ height: height }} className={"radar"}>
-      {options && options.data && options.data.length > 0 && (
-        <>
-          <ResponsiveRadar
-            data={options.data}
-            keys={applyFilter(options.keys)}
-            indexBy={options.indexBy}
-            colors={(d) => {
-              const color = colorGenerator.getColor(d.key, d);
-              return color;
-            }}
-            tooltipFormat={(d) => {
-              return intl.formatNumber(
-                format.style === "percent" ? d / 100 : d,
-                format
-              );
-            }}
-            borderColor={{ from: "color" }}
-            curve={radarCurve}
-            fillOpacity={radarFillOpacity}
-            borderWidth={radarBorderWidth}
-            gridLevels={radarGridLevels}
-            gridShape={radarGridShape}
-            gridLabelOffset={parseInt(radarGridLabelOffset)}
-            enableDots={radarEnableDots}
-            dotSize={radarDotSize}
-            //dotColor={"#CCC"}
-            //dotBorderColor={{from: 'color'}}
-            dotBorderWidth={2}
-            enableDotLabel={radarEnableDotLabel}
-            dotLabelYOffset={radarDotLabelOffset}
-            dotLabel={(d) => {
-              return intl.formatNumber(
-                format.style === "percent" ? d.value / 100 : d.value,
-                format
-              );
-            }}
-            blendMode="multiply"
-            motionConfig="wobbly"
-            margin={margins}
-            animate={true}
-            theme={{
-              tooltip: {
-                basic: {
-                  whiteSpace: "pre",
-                  display: "flex",
-                  alignItems: "center",
-                },
-                container: {
-                  background: "#EEE",
-                  boxShadow: "",
-                },
-                table: {},
-                tableCell: { padding: "3px 5px" },
-              },
-            }}
-            layers={[
-              "grid",
-              "layers",
-              "slices",
-              customLayer,
-              "dots",
-              "axes",
-              "legends",
-              "mesh",
-              "annotations",
-            ]}
-          />
-          <Legends
-            filter={filter}
-            showLegends={showLegends}
-            chartLegends={chartLegends}
-            legendLabel={legendLabel}
-            legendPosition={legendPosition}
-            legendCheckBack={legendCheckBack}
-            legendLabelBack={legendLabelBack}
-            legendLabelColor={legendLabelColor}
-            onToggle={toggle}
-            reverseLegend={reverseLegend}
-          ></Legends>
-        </>
-      )}
+    <div style={{ height }} className="radar">
+      <ResponsiveRadar
+        data={options.data}
+        keys={applyFilter(options.keys)}
+        indexBy={options.indexBy}
+        margin={margins}
+        curve={radarCurve}
+        maxValue="auto"
+        valueFormat={(v) =>
+          intl.formatNumber(format.style === "percent" ? v / 100 : v, format)
+        }
+        borderColor={{ from: "color" }}
+        gridLevels={radarGridLevels}
+        gridShape={radarGridShape}
+        gridLabelOffset={Number.parseInt(radarGridLabelOffset, 10)}
+        gridLabel={customGridLabel}
+        enableDots={radarEnableDots}
+        dotSize={radarDotSize}
+        dotBorderWidth={2}
+        enableDotLabel={radarEnableDotLabel}
+        dotLabelYOffset={radarDotLabelOffset}
+        dotLabel={(d) =>
+          intl.formatNumber(
+            format.style === "percent" ? d.value / 100 : d.value,
+            format
+          )
+        }
+        fillOpacity={radarFillOpacity}
+        borderWidth={radarBorderWidth}
+        blendMode="multiply"
+        motionConfig="wobbly"
+        theme={{
+          tooltip: {
+            basic: { background: "#EEE", whiteSpace: "pre", display: "flex" },
+            tableCell: { padding: "3px 5px" },
+          },
+        }}
+        layers={[
+          "grid",
+          customLayer,
+          "markers",
+          "areas",
+          "lines",
+          "layers",
+          "slices",
+          "dots",
+          "axes",
+          "legends",
+          "mesh",
+          "annotations",
+        ]}
+      />
+      <Legends
+        filter={filter}
+        showLegends={showLegends}
+        chartLegends={chartLegends}
+        legendLabel={legendLabel}
+        legendPosition={legendPosition}
+        legendCheckBack={legendCheckBack}
+        legendLabelBack={legendLabelBack}
+        legendLabelColor={legendLabelColor}
+        onToggle={toggle}
+        reverseLegend={reverseLegend}
+      />
     </div>
   );
 };

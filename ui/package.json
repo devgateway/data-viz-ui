@@ -4,7 +4,7 @@
   "version": "2.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host",
     "build": "NODE_ENV=production vite build",
     "lint": "eslint .",
     "lint:fix": "eslint ./src --fix",
