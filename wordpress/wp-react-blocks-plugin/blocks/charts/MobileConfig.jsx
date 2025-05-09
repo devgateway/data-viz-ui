@@ -98,6 +98,172 @@ const MarginSection = ({
   );
 };
 
+const RadarMarginSection = ({
+  setAttributes,
+  attributes: { mobileCustomization },
+}) => {
+  const {
+    mobileMarginBottom,
+    mobileMarginLeft,
+    mobileMarginRight,
+    mobileMarginTop,
+    tabletMarginBottom,
+    tabletMarginLeft,
+    tabletMarginRight,
+    tabletMarginTop
+  } = mobileCustomization;
+
+  console.log("mobileCustomization", mobileCustomization);
+  return (
+    <>
+      <PanelBody initialOpen={false} title={__("Mobile Margins")}>
+        <PanelRow>
+          <RangeControl
+            label={__(
+              "Mobile Margin Bottom (space between chart area and bottom border)"
+            )}
+            value={mobileMarginBottom}
+            onChange={(marginBottom) =>
+              setAttributes({
+                mobileCustomization: {
+                  ...mobileCustomization,
+                  mobileMarginBottom: marginBottom,
+                },
+              })
+            }
+            min={-500}
+            max={500}
+          />
+        </PanelRow>
+        <PanelRow>
+          <RangeControl
+            label={__(
+              "Mobile Margin Left (space between chart area and left border)"
+            )}
+            value={mobileMarginLeft}
+            onChange={(marginLeft) =>
+              setAttributes({
+                mobileCustomization: {
+                  ...mobileCustomization,
+                  mobileMarginLeft: marginLeft
+                },
+              })
+            }
+            step={1}
+            min={-500}
+            max={500}
+          />
+        </PanelRow>
+        <PanelRow>
+          <RangeControl
+            label={__("Mobile Margin Right")}
+            value={mobileMarginRight}
+            onChange={(marginRight) =>
+              setAttributes({
+                mobileCustomization: {
+                  ...mobileCustomization,
+                  mobileMarginRight: marginRight,
+                },
+              })
+            }
+            min={-500}
+            max={500}
+          />
+        </PanelRow>
+        <PanelRow>
+          <RangeControl
+            label={__("Mobile Margin Top")}
+            value={mobileMarginTop}
+            onChange={(marginTop) =>
+              setAttributes({
+                mobileCustomization: {
+                  ...mobileCustomization,
+                  mobileMarginTop: marginTop,
+                },
+              })
+            }
+            min={-500}
+            max={500}
+          />
+        </PanelRow>
+      </PanelBody>
+
+      <PanelBody initialOpen={false} title={__("Tablet Margins")}>
+        <PanelRow>
+          <RangeControl
+            label={__(
+              "Tablet Margin Bottom (space between chart area and bottom border)"
+            )}
+            value={tabletMarginBottom}
+            onChange={(marginBottom) =>
+              setAttributes({
+                mobileCustomization: {
+                  ...mobileCustomization,
+                  tabletMarginBottom: marginBottom,
+                },
+              })
+            }
+            min={-500}
+            max={500}
+          />
+        </PanelRow>
+        <PanelRow>
+          <RangeControl
+            label={__(
+              "Tablet Margin Left (space between chart area and left border)"
+            )}
+            value={tabletMarginLeft}
+            onChange={(marginLeft) =>
+              setAttributes({
+                mobileCustomization: {
+                  ...mobileCustomization,
+                  tabletMarginLeft: marginLeft,
+                },
+              })
+            }
+            step={1}
+            min={-500}
+            max={500}
+          />
+        </PanelRow>
+        <PanelRow>
+          <RangeControl
+            label={__("Tablet Margin Right")}
+            value={tabletMarginRight}
+            onChange={(marginRight) =>
+              setAttributes({
+                mobileCustomization: {
+                  ...mobileCustomization,
+                  tabletMarginRight: marginRight,
+                },
+              })
+            }
+            min={-500}
+            max={500}
+          />
+        </PanelRow>
+        <PanelRow>
+          <RangeControl
+            label={__("Tablet Margin Top")}
+            value={tabletMarginTop}
+            onChange={(marginTop) =>
+              setAttributes({
+                mobileCustomization: {
+                  ...mobileCustomization,
+                  tabletMarginTop: marginTop,
+                },
+              })
+            }
+            min={-500}
+            max={500}
+          />
+        </PanelRow>
+      </PanelBody>
+    </>
+  );
+};
+
+
 const PaddingSection = ({
   setAttributes,
   attributes: { mobileCustomization, barPadding, barInnerPadding },
@@ -285,10 +451,11 @@ const IntervalsSection = ({
   );
 };
 
-const RadarSection = ({
-  setAttributes,
-  attributes: { mobileCustomization },
-}) => {
+const RadarSection = (props) => {
+  const {
+    setAttributes,
+    attributes: { mobileCustomization },
+  } = props;
   return (
     <PanelBody initialOpen={false} title={__("Radar Settings")}>
       <PanelBody initialOpen={false} title={__("Tablet")}>
@@ -332,6 +499,7 @@ const RadarSection = ({
             max={500}
           />
         </PanelRow>
+
       </PanelBody>
       <PanelBody initialOpen={false} title={__("Mobile")}>
         <PanelRow>
@@ -374,6 +542,9 @@ const RadarSection = ({
             max={500}
           />
         </PanelRow>
+      </PanelBody>
+      <PanelBody initialOpen={false} title={__("Margins")}>
+        <RadarMarginSection {...props} />
       </PanelBody>
     </PanelBody>
   );
@@ -494,6 +665,7 @@ useEffect(() => {
   };
 
   const isBarOrLineOrPieOrRadar = ["bar", "line", "pie", "radar"].includes(type);
+  const isBarOrLineOrPie = ["bar", "line", "pie"].includes(type);
 
   const isRadar = type === "radar";
 
@@ -685,7 +857,7 @@ useEffect(() => {
             </>
           )}
           { isRadar && <RadarSection {...props} />}
-          <MarginSection {...props} />
+          { isBarOrLineOrPie  && <MarginSection {...props} />}
           {type === "bar" && <PaddingSection {...props} />}
         </>
       )}
