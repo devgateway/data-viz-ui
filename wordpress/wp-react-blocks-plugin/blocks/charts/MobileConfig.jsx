@@ -285,6 +285,100 @@ const IntervalsSection = ({
   );
 };
 
+const RadarSection = ({
+  setAttributes,
+  attributes: { mobileCustomization },
+}) => {
+  return (
+    <PanelBody initialOpen={false} title={__("Radar Settings")}>
+      <PanelBody initialOpen={false} title={__("Tablet")}>
+        <PanelRow>
+          <RangeControl
+            label={__("Tablet Y Axis Line Height")}
+            value={
+              !mobileCustomization?.tabletYAxisLineHeight
+                ? 12
+                : mobileCustomization.tabletYAxisLineHeight
+            }
+            onChange={(value) =>
+              setAttributes({
+                mobileCustomization: {
+                  ...mobileCustomization,
+                  tabletYAxisLineHeight: value,
+                },
+              })
+            }
+            min={0}
+            max={500}
+          />
+        </PanelRow>
+        <PanelRow>
+          <RangeControl
+            label={__("Tablet Max Tick Word Length")}
+            value={
+              !mobileCustomization?.tabletMaxTickLength
+                ? 25
+                : mobileCustomization.tabletMaxTickLength
+            }
+            onChange={(value) =>
+              setAttributes({
+                mobileCustomization: {
+                  ...mobileCustomization,
+                  tabletMaxTickLength: value,
+                },
+              })
+            }
+            min={0}
+            max={500}
+          />
+        </PanelRow>
+      </PanelBody>
+      <PanelBody initialOpen={false} title={__("Mobile")}>
+        <PanelRow>
+          <RangeControl
+            label={__("Mobile Y Axis Line Height")}
+            value={
+              !mobileCustomization?.mobileYAxisLineHeight
+                ? 12
+                : mobileCustomization.mobileYAxisLineHeight
+            }
+            onChange={(value) =>
+              setAttributes({
+                mobileCustomization: {
+                  ...mobileCustomization,
+                  mobileYAxisLineHeight: value,
+                },
+              })
+            }
+            min={0}
+            max={500}
+          />
+        </PanelRow>
+        <PanelRow>
+          <RangeControl
+            label={__("Mobile Max Tick Word Length.")}
+            value={
+              !mobileCustomization?.mobileMaxTickLength
+                ? 25
+                : mobileCustomization.mobileMaxTickLength
+            }
+            onChange={(value) =>
+              setAttributes({
+                mobileCustomization: {
+                  ...mobileCustomization,
+                  mobileMaxTickLength: value,
+                },
+              })
+            }
+            min={0}
+            max={500}
+          />
+        </PanelRow>
+      </PanelBody>
+    </PanelBody>
+  );
+};
+
 const MobileConfig = (props) => {
   const {
     setAttributes,
@@ -399,7 +493,9 @@ useEffect(() => {
     return true;
   };
 
-  const isBarOrLineOrPie = ["bar", "line", "pie"].includes(type);
+  const isBarOrLineOrPieOrRadar = ["bar", "line", "pie", "radar"].includes(type);
+
+  const isRadar = type === "radar";
 
   const isBarOrLine = ["bar", "line"].includes(type);
   return (
@@ -416,7 +512,7 @@ useEffect(() => {
           }
         />
       </PanelRow>
-      {isBarOrLineOrPie && mobileCustomization?.showCustomization && (
+      {isBarOrLineOrPieOrRadar && mobileCustomization?.showCustomization && (
         <>
           {isBarOrLine && (
             <>
@@ -588,6 +684,7 @@ useEffect(() => {
               <TitleSection {...props} />
             </>
           )}
+          { isRadar && <RadarSection {...props} />}
           <MarginSection {...props} />
           {type === "bar" && <PaddingSection {...props} />}
         </>
