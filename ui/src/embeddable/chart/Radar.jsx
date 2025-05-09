@@ -55,7 +55,6 @@ const Chart = ({
     isMobileCustomizationEnabled && previewMode !== "Desktop";
   const isNotEditingAndIsMobileCustomizationEnabled =
     !editing && isMobileCustomizationEnabled;
-
   if (!options || !options.data) return null;
 
   const applyFilter = (keys) => keys.filter((k) => !filter.includes(k));
@@ -221,11 +220,43 @@ const Chart = ({
     );
   };
 
+  const deviceTypeMarginValueMap = () => {
+    const isConcreteMobile =
+      (!editing && isMobileDevice && isMobileCustomizationEnabled) ||
+      (editing && previewMode === "Mobile" && isMobileCustomizationEnabled);
+    const isConcreteTablet =
+      (!editing && isTabletDevice && isMobileCustomizationEnabled) ||
+      (editing && previewMode === "Tablet" && isMobileCustomizationEnabled);
+    const deviceMap = {
+      mobile: {
+        marginLeft: mobileConfigSettings?.mobileMarginLeft,
+        marginTop: mobileConfigSettings?.mobileMarginTop,
+        marginRight: mobileConfigSettings?.mobileMarginRight,
+        marginBottom: mobileConfigSettings?.mobileMarginBottom,
+      },
+      tablet: {
+        marginLeft: mobileConfigSettings?.tabletMarginLeft,
+        marginTop: mobileConfigSettings?.tabletMarginTop,
+        marginRight: mobileConfigSettings?.tabletMarginRight,
+        marginBottom: mobileConfigSettings?.tabletMarginBottom,
+      },
+    };
+    if (isConcreteMobile) {
+      return deviceMap.mobile;
+    }
+    if (isConcreteTablet) {
+      return deviceMap.tablet;
+    }
+    return { marginLeft, marginTop, marginRight, marginBottom };
+  };
+
+  const radarMarginVals = deviceTypeMarginValueMap();
+
   const margins = {
-    top: marginTop,
-    right: marginRight,
-    bottom: marginBottom,
-    left: marginLeft,
+    top: radarMarginVals.marginTop,
+    right: radarMarginVals.marginRight,
+    bottom: radarMarginVals.marginBottom,
+    left: radarMarginVals.marginLeft,
   };
 
   const chartLegends = options.keys.map((k) => ({
