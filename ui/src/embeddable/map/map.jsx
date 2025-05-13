@@ -197,7 +197,7 @@ class Map extends React.Component {
     //map variables
     this.mapPosition = null;
     this.zooming = false;
-    this.translateValue = deviceTranslateMap[getDeviceCategory()]
+    this.translateValue = deviceTranslateMap[getDeviceCategory()];
     this.projection = d3
       .geoMercator()
       .scale(props.scale)
@@ -224,10 +224,9 @@ class Map extends React.Component {
     };
   }
 
-
   componentDidMount() {
-    window.addEventListener('scroll', this.handleScroll, { passive: true });
-    window.addEventListener('touchmove', this.handleScroll, { passive: true });
+    window.addEventListener("scroll", this.handleScroll, { passive: true });
+    window.addEventListener("touchmove", this.handleScroll, { passive: true });
     this.loadLayers();
     this.tooltip = d3
       .select("body")
@@ -240,23 +239,23 @@ class Map extends React.Component {
     console.log(error);
   }
 
+  handleScroll = () => {
+    // adds debounce to scroll to prevent event from rerendering the map too often
+    let scrollTimeout = null;
+    clearTimeout(scrollTimeout);
+    scrollTimeout = setTimeout(() => {
+      const labelsExist =
+        d3.select(this.getMapId()).selectAll(".map-labels-container").size() >
+        0;
+      if (!labelsExist) {
+        this.updateFeatures(this.getFeatures(), false);
+      }
+    }, 300);
+  };
 
-handleScroll = () => {
-  // adds debounce to scroll to prevent event from rerendering the map too often
-  let scrollTimeout = null;
-  clearTimeout(scrollTimeout);
-  scrollTimeout = setTimeout(() => {
-    const labelsExist = d3.select(this.getMapId()).selectAll(".map-labels-container").size() > 0;
-    if (!labelsExist) {
-      this.updateFeatures(this.getFeatures(), false);
-    }
-  }, 300);
-}
-
-
-componentWillUnmount() {
-  window.removeEventListener('scroll', this.handleScroll);
-}
+  componentWillUnmount() {
+    window.removeEventListener("scroll", this.handleScroll);
+  }
 
   loadLayers() {
     const { source, mainLayerId, enabledLayers } = this.props;
@@ -276,7 +275,7 @@ componentWillUnmount() {
               .catch(function (error) {
                 resolve({ id: l.id, url: null, index: l.index });
               });
-          }),
+          })
         );
       });
 
@@ -289,7 +288,7 @@ componentWillUnmount() {
                 d3.json(m.url).then((data) => {
                   resolve({ id: m.id, data, index: m.index });
                 });
-              }),
+              })
             );
           }
         });
@@ -318,7 +317,7 @@ componentWillUnmount() {
     if (layers) {
       layer =
         layers.filter(
-          (layer) => layer.id == mainLayerId || layer.id == null,
+          (layer) => layer.id == mainLayerId || layer.id == null
         )[0] || layers[0];
     }
     return layer ? layer.data : null;
@@ -338,11 +337,14 @@ componentWillUnmount() {
       //Reset zoom when filters is applied
       if (prevAppliedFilters) {
         Object.keys(prevAppliedFilters).forEach((k) => {
-          if (prevAppliedFilters[k] != null && prevAppliedFilters[k] instanceof Array) {
+          if (
+            prevAppliedFilters[k] != null &&
+            prevAppliedFilters[k] instanceof Array
+          ) {
             prevAppliedItems.push(
               ...prevAppliedFilters[k].filter(
-                (v) => v != Number.MIN_SAFE_INTEGER,
-              ),
+                (v) => v != Number.MIN_SAFE_INTEGER
+              )
             );
           }
         });
@@ -351,9 +353,9 @@ componentWillUnmount() {
         Object.keys(appliedFilters).forEach((k) => {
           if (appliedFilters[k] != null && appliedFilters[k] instanceof Array) {
             appliedItems.push(
-              ...appliedFilters[k].filter((v) => v != Number.MIN_SAFE_INTEGER),
+              ...appliedFilters[k].filter((v) => v != Number.MIN_SAFE_INTEGER)
             );
-        }
+          }
         });
       }
       //filters reset
@@ -438,79 +440,56 @@ componentWillUnmount() {
     this.fullView();
   }
 
-  resizeLabels() {
+  resizeLabels(transform) {
     const { labelFontSize, mapLabelField } = this.props;
-    // Invert the font size and label box width and height
 
+    d3.select(this.getMapId())
+      .selectAll(".map-labels-container")
+      .each((d, i, nodes) => {
+        const fo = d3.select(nodes[i]);
+        const div = fo.select("div");
+        const scale = transform.k > 1 ? transform.k : 1;
+        const newSize = labelFontSize / scale;
 
-    const labels = d3
-      .select(this.getMapId())
-      .select("svg")
-      .select("g")
-      .selectAll(".map-labels-container");
-
-      labels.each((d, i, nodes) => {
-        const label = d3.select(nodes[i]);
-        const transform = d3.zoomTransform(label.node());
+        div.style("font-size", `${newSize}px`);
 
         const position = this.getLabelPosition(d);
-        let boxWidth = this.getLabelBoxWidth(d);
-        let boxHeight = this.getLabelBoxHeight(d);
+        const boxWidth = this.getLabelBoxWidth(d) / scale;
+        const x = position[0] - boxWidth / 2;
+        const yOffset = transform.k > 1 ? 10 / transform.k : 10;
+        const y = position[1] - yOffset;
 
-        if (d.properties[mapLabelField]) {
-          boxWidth = transform.k > 1 ? boxWidth / transform.k : boxWidth;
-          boxHeight = transform.k > 1 ? boxHeight / transform.k : boxHeight;
-        }
-
-        const scalingFactor = Math.pow(transform.k, 0.5);
-
-        label
-          .attr("x", position[0] - boxWidth / 2)
-          .attr("y", position[1] - (transform.k > 1 ? 10 / transform.k : 10))
-          .attr("width", boxWidth)
-          .attr("height", boxHeight)
-          .attr(
-            "font-size",
-            (transform.k > 1 ? labelFontSize / scalingFactor : labelFontSize) + "px"
-          );
+        fo.attr("x", x)
+          .attr("y", y)
+          .attr("width", this.getLabelBoxWidth(d) / scale)
+          .attr("height", this.getLabelBoxHeight(d) / scale);
       });
   }
 
-  resizePointLabels() {
-    const { labelFontSize, mapLabelField } = this.props;
-    // Invert the font size and label box width and height
-    const labels = d3
-      .select(this.getMapId())
-      .select("svg")
-      .select("g")
-      .selectAll(".point-labels-container");
+  resizePointLabels(transform) {
+    const { labelFontSize } = this.props;
+    d3.select(this.getMapId())
+      .selectAll(".point-labels-container")
+      .each((d, i, nodes) => {
+        const fo = d3.select(nodes[i]);
+        const div = fo.select("div");
+        const scale = transform.k > 1 ? transform.k : 1;
+        const newSize = labelFontSize / scale;
+        div.style("font-size", `${newSize}px`);
 
-    labels.each((d, i, nodes) => {
-      const label = d3.select(nodes[i]);
-      const transform = d3.zoomTransform(label.node()); // Get the current zoom transform directly
-
-      let boxWidth = this.getLabelBoxWidth(d) + 20;
-      boxWidth = transform.k > 1 ? boxWidth / transform.k : boxWidth;
-      const position = this.projection([
-        d.geometry.coordinates[1],
-        d.geometry.coordinates[0],
-      ]);
-
-      let adjustment = this.getLabelBoxHeight(d) / 2;
-      adjustment = transform.k > 1 ? adjustment / transform.k : adjustment;
-
-      const width = this.getLabelBoxWidth(d) + 30;
-      const fontSize =
-        transform.k > 1 ? labelFontSize / transform.k : labelFontSize;
-
-      label
-        .attr("x", position[0] - boxWidth / 2)
-        .attr("y", position[1] - adjustment)
-        .attr("width", width)
-        .attr("font-size", fontSize + "px");
-      // If height adjustment is needed, you can uncomment and adjust the following line similarly
-      // .attr("height", height / transform.k);
-    });
+        const pos = this.projection([
+          d.geometry.coordinates[1],
+          d.geometry.coordinates[0],
+        ]);
+        const width = (this.getLabelBoxWidth(d) + 20) / scale;
+        const height = this.getLabelBoxHeight(d) / scale;
+        const x = pos[0] - width / 2;
+        const y = pos[1] - height / 2;
+        fo.attr("x", x)
+          .attr("y", y)
+          .attr("width", width)
+          .attr("height", height);
+      });
   }
 
   resizeCircles(transform) {
@@ -541,15 +520,19 @@ componentWillUnmount() {
       const parentWindow = window.parent;
       parentWindow.postMessage(
         { type: "map", value: JSON.stringify(this.mapPosition) },
-        "*",
+        "*"
       );
     }
   }
 
   classColor(d) {
     let { zoomEnabled } = this.props;
-    if(!zoomEnabled) {
-      zoomEnabled = ['mobile', 'tablet', 'midTablet'].includes(getDeviceCategory()) ? true: false;
+    if (!zoomEnabled) {
+      zoomEnabled = ["mobile", "tablet", "midTablet"].includes(
+        getDeviceCategory()
+      )
+        ? true
+        : false;
     }
     if (zoomEnabled) {
       return "active zoom-enabled";
@@ -596,7 +579,7 @@ componentWillUnmount() {
             parseFloat(range.substr(0, range.indexOf("-") - 1)) +
             (i > 0 ? adjustment : 0);
           legendBreak.max = parseFloat(
-            range.substr(range.indexOf("-") + 2, range.length),
+            range.substr(range.indexOf("-") + 2, range.length)
           );
           legendBreak.color = colors[i];
           generatedBreaks.push(legendBreak);
@@ -690,7 +673,7 @@ componentWillUnmount() {
     }
 
     const layerProps = this.props.enabledLayers.filter(
-      (l) => l.id === d.properties.layerId,
+      (l) => l.id === d.properties.layerId
     )[0];
     if (layerProps && layerProps.bgColor && layerProps.bgColor != "undefined") {
       return layerProps.bgColor;
@@ -766,7 +749,7 @@ componentWillUnmount() {
             return !labelsExclusionList.includes(f.properties[mapLabelField]);
           }
           return true;
-        }),
+        })
       )
       .enter()
       .append("foreignObject")
@@ -776,9 +759,8 @@ componentWillUnmount() {
         if (d.properties[mapLabelField]) {
           const boxWidth = this.getLabelBoxWidth(d);
           return position[0] - boxWidth / 2;
-        } else {
-          return position[0];
         }
+        return position[0];
       })
       .attr("y", (d) => {
         const position = this.getLabelPosition(d);
@@ -786,24 +768,24 @@ componentWillUnmount() {
       })
       .attr("width", (d) => this.getLabelBoxWidth(d))
       .attr("height", (d) => this.getLabelBoxHeight(d))
-      .attr("font-size", (d, i) => labelFontSize + "px")
+      .attr("font-size", (d, i) => `${labelFontSize}px`)
       .attr("overflow", "visible")
       .attr("opacity", 1)
       .style("display", (d) => {
         if (
-          showAdminUnitLabel == SHOW_ALL ||
-          (showAdminUnitLabel == SHOW_IF_HAS_DATA && d.properties.hasDataRow)
+          showAdminUnitLabel === SHOW_ALL ||
+          (showAdminUnitLabel === SHOW_IF_HAS_DATA && d.properties.hasDataRow)
         ) {
           return "block";
-        } else {
-          return "none";
         }
+        return "none";
       })
       .attr("pointer-events", mapType == "POINTS_MAP" ? "none" : "all")
       .on("mouseover", this.showTooltip)
       .on("mousemove", this.mousemove)
       .on("mouseout", this.mouseout)
       .append("xhtml:div")
+      .style("font-size", (d) => `${labelFontSize}px`)
       .style("color", (d, i) => labelFontColor)
       .style("font-weight", (d) => labelFontWeight)
       .style("background-color", (d) => {
@@ -860,7 +842,7 @@ componentWillUnmount() {
                 measure: this.getSelectedMeasure(),
                 ...variables,
               },
-              intl,
+              intl
             ) +
             "</span>";
         } else {
@@ -894,7 +876,7 @@ componentWillUnmount() {
       (f) =>
         f.geometry &&
         f.geometry &&
-        (f.geometry.type == "Polygon" || f.geometry.type == "MultiPolygon"),
+        (f.geometry.type == "Polygon" || f.geometry.type == "MultiPolygon")
     );
 
     if (polygons.length > 0) {
@@ -998,12 +980,12 @@ componentWillUnmount() {
     let points = [];
     if (showShadingLayerLabels == SHOW_ALL) {
       points = sortedFeatures.filter(
-        (f) => f.geometry && f.geometry.type == "Point",
+        (f) => f.geometry && f.geometry.type == "Point"
       );
     } else if (showShadingLayerLabels == SHOW_IF_HAS_DATA) {
       points = sortedFeatures.filter(
         (p) =>
-          p.geometry && p.geometry.type == "Point" && p.properties.hasDataRow,
+          p.geometry && p.geometry.type == "Point" && p.properties.hasDataRow
       );
     }
 
@@ -1053,7 +1035,7 @@ componentWillUnmount() {
               locationName: d.properties[this.props.mapLabelField],
             },
             intl,
-            noDataText,
+            noDataText
           );
         })
         .on("mouseover", (event, d, i) => {
@@ -1087,7 +1069,7 @@ componentWillUnmount() {
             f.properties.LATITUDE &&
             f.properties.LONGITUDE &&
             valuesToMatchArr.filter(
-              (v) => v.trim().toLowerCase() == fiedValue.trim().toLowerCase(),
+              (v) => v.trim().toLowerCase() == fiedValue.trim().toLowerCase()
             ).length > 0
           );
         });
@@ -1105,7 +1087,7 @@ componentWillUnmount() {
             !f.properties.LATITUDE &&
             !f.properties.LONGITUDE &&
             valuesToMatchArr.filter(
-              (v) => v.trim().toLowerCase() == fiedValue.trim().toLowerCase(),
+              (v) => v.trim().toLowerCase() == fiedValue.trim().toLowerCase()
             ).length > 0
           );
         });
@@ -1185,14 +1167,14 @@ componentWillUnmount() {
     const height = this.getHeight();
     const scale = Math.min(
       8,
-      0.9 / Math.max((x1 - x0) / width, (y1 - y0) / height),
+      0.9 / Math.max((x1 - x0) / width, (y1 - y0) / height)
     );
     const translate = [width / 2 - (x0 + x1) / 2, height / 2 - (y0 + y1) / 2];
 
     if (immediate) {
       svg.call(
         this.zoom.transform,
-        d3.zoomIdentity.translate(translate[0], translate[1]).scale(scale),
+        d3.zoomIdentity.translate(translate[0], translate[1]).scale(scale)
       );
     } else {
       svg
@@ -1200,7 +1182,7 @@ componentWillUnmount() {
         .duration(450)
         .call(
           this.zoom.transform,
-          d3.zoomIdentity.translate(translate[0], translate[1]).scale(scale),
+          d3.zoomIdentity.translate(translate[0], translate[1]).scale(scale)
         )
         .on("end", callback);
     }
@@ -1248,7 +1230,11 @@ componentWillUnmount() {
       noDataText,
     } = this.props;
 
-    zoomEnabled = ['mobile', 'tablet', 'midTablet'].includes(getDeviceCategory()) ? true: false;
+    zoomEnabled = ["mobile", "tablet", "midTablet"].includes(
+      getDeviceCategory()
+    )
+      ? true
+      : false;
 
     if (
       (showTooltip && d.properties.value != null) ||
@@ -1322,7 +1308,7 @@ componentWillUnmount() {
                     breakdownFormat,
                     vars,
                     intl,
-                    noDataText,
+                    noDataText
                   );
                 });
               }
@@ -1343,7 +1329,7 @@ componentWillUnmount() {
             }
 
             const tooltips = customTooltips.filter(
-              (t) => t.location === d.properties[mappingField],
+              (t) => t.location === d.properties[mappingField]
             );
             tooltips.forEach((t) => {
               if (!html.endsWith("<hr>")) {
@@ -1537,7 +1523,7 @@ componentWillUnmount() {
 
       if (transformedData.measures && transformedData.measures.length > 1) {
         filterLocationsData = transformedData.locationsData.filter(
-          (d) => d.measure === this.getSelectedMeasure(),
+          (d) => d.measure === this.getSelectedMeasure()
         );
       }
 
@@ -1619,8 +1605,7 @@ componentWillUnmount() {
 
       const featureToCenterOn = features.filter(
         (d) =>
-          d.properties != null &&
-          d.properties[mappingField] == selectedLocation,
+          d.properties != null && d.properties[mappingField] == selectedLocation
       )[0];
 
       if (
@@ -1674,14 +1659,16 @@ componentWillUnmount() {
   d3Map(features, filterUpdated) {
     let { zoomEnabled, mapContainerBgColor, mapPosition, editing, mapType } =
       this.props;
-      if(!zoomEnabled) {
-        zoomEnabled = ['mobile', 'tablet'].includes(getDeviceCategory()) ? true: false;
-      }
+    if (!zoomEnabled) {
+      zoomEnabled = ["mobile", "tablet"].includes(getDeviceCategory())
+        ? true
+        : false;
+    }
     const breaks = this.getBreaks();
     const container = d3.select(this.getMapId());
     let svg = container.select("svg");
     let containerWidth = this.getWidth();
-    if(containerWidth === 0) {
+    if (containerWidth === 0) {
       containerWidth = window.innerWidth + deviceMapWidth[getDeviceCategory()];
     } else {
       containerWidth += deviceMapWidth[getDeviceCategory()];
@@ -1695,12 +1682,9 @@ componentWillUnmount() {
     }
 
     svg
-      .attr(
-        "style",
-        `background-color:${mapContainerBgColor};`,
-      )
+      .attr("style", `background-color:${mapContainerBgColor};`)
       .attr("viewBox", `0 0 ${containerWidth} ${containerHeight}`)
-      .attr("preserveAspectRatio", "xMidYMid meet")
+      .attr("preserveAspectRatio", "xMidYMid meet");
 
     svg
       .append("g")
@@ -1723,7 +1707,7 @@ componentWillUnmount() {
           this.zoom.transform,
           d3.zoomIdentity
             .translate(this.mapPosition.x, this.mapPosition.y)
-            .scale(this.mapPosition.k),
+            .scale(this.mapPosition.k)
         );
     }
 
@@ -1741,28 +1725,28 @@ componentWillUnmount() {
           this.zoom.transform,
           d3.zoomIdentity
             .translate(mapPosition.x, mapPosition.y)
-            .scale(mapPosition.k),
+            .scale(mapPosition.k)
         );
-        if(mapType === 'POINTS_MAP') {
-          const deviceTranslates = {
-            'mobile': 100,
-            'tablet': 0,
-            'midTablet': 0,
-            'desktop': 0,
-            'laptop': 0,
-            'wide': 0
-          }
-          const translateVal = deviceTranslates[getDeviceCategory()];
-          svg
+      if (mapType === "POINTS_MAP") {
+        const deviceTranslates = {
+          mobile: 100,
+          tablet: 0,
+          midTablet: 0,
+          desktop: 0,
+          laptop: 0,
+          wide: 0,
+        };
+        const translateVal = deviceTranslates[getDeviceCategory()];
+        svg
           .transition()
           .duration(300)
           .call(
             this.zoom.transform,
             d3.zoomIdentity
               .translate(mapPosition.x + translateVal, mapPosition.y)
-              .scale(mapPosition.k),
+              .scale(mapPosition.k)
           );
-        }
+      }
     }
 
     if (zoomEnabled || editing) {
@@ -1786,11 +1770,10 @@ componentWillUnmount() {
           d3.zoomIdentity
             .translate(containerWidth / 2, containerHeight / 2)
             .scale(12)
-            .translate(-centerx[0], -centerx[1]),
+            .translate(-centerx[0], -centerx[1])
         );
     }
   }
-
 
   getAvg() {
     const { transformedData } = this.props;
@@ -1823,12 +1806,12 @@ componentWillUnmount() {
     let filterLocationsData = transformedData.locationsData;
     if (transformedData.measures && transformedData.measures.length > 1) {
       filterLocationsData = transformedData.locationsData.filter(
-        (d) => d.measure === this.getSelectedMeasure(),
+        (d) => d.measure === this.getSelectedMeasure()
       );
     }
 
     const dataItem = filterLocationsData.find(
-      (d) => d.label === highlightedLocation,
+      (d) => d.label === highlightedLocation
     );
     return dataItem;
   }
@@ -1875,7 +1858,7 @@ componentWillUnmount() {
     );
   }
 
-  noMapSelected(){
+  noMapSelected() {
     return (
       <Message icon warning>
         <Icon name="map outline" />
@@ -1885,7 +1868,7 @@ componentWillUnmount() {
         </Message.Content>
       </Message>
     );
-  };
+  }
 
   render() {
     let {
@@ -1907,8 +1890,10 @@ componentWillUnmount() {
       noDataText,
     } = this.props;
 
-    if(!zoomEnabled) {
-      zoomEnabled = !!['mobile', 'tablet', 'midTablet'].includes(getDeviceCategory());
+    if (!zoomEnabled) {
+      zoomEnabled = !!["mobile", "tablet", "midTablet"].includes(
+        getDeviceCategory()
+      );
     }
     const nationalAverage = this.getAvg();
     const filters = this.getFilters();
@@ -1925,87 +1910,87 @@ componentWillUnmount() {
 
     const MapLegendComponent = () => (
       <Container fluid className={"footnote "}>
-      {
-        <Grid columns={2}>
-          {app !== "csv" && showOverallValue && (
-            <Grid.Column textAlign={"left"} width={4}>
-              <div className="national-average-div">
-                <span className="national-avg-label">
-                  {nationalAverageLabel}
-                </span>
-                <span className="national-avg-value">
-                  {formatContent(
-                    valueFormat,
-                    { value: nationalAverage },
-                    intl,
-                    noDataText,
-                  )}
-                </span>
-              </div>
+        {
+          <Grid columns={2}>
+            {app !== "csv" && showOverallValue && (
+              <Grid.Column textAlign={"left"} width={4}>
+                <div className="national-average-div">
+                  <span className="national-avg-label">
+                    {nationalAverageLabel}
+                  </span>
+                  <span className="national-avg-value">
+                    {formatContent(
+                      valueFormat,
+                      { value: nationalAverage },
+                      intl,
+                      noDataText
+                    )}
+                  </span>
+                </div>
+              </Grid.Column>
+            )}
+            <Grid.Column
+              textAlign={"right"}
+              width={app !== "csv" && showOverallValue ? 12 : 16}
+            >
+              <Legend
+                filteredBreaks={this.getBreaks()}
+                formattedLegendTitle={formatContent(
+                  legendTitle,
+                  { ...filters },
+                  intl,
+                  noDataText
+                )}
+                selectedMeasure={this.state.selectedMeasure}
+                {...this.props}
+              />
             </Grid.Column>
-          )}
-          <Grid.Column
-            textAlign={"right"}
-            width={app !== "csv" && showOverallValue ? 12 : 16}
-          >
-            <Legend
-              filteredBreaks={this.getBreaks()}
-              formattedLegendTitle={formatContent(
-                legendTitle,
-                { ...filters },
-                intl,
-                noDataText,
-              )}
-              selectedMeasure={this.state.selectedMeasure}
-              {...this.props}
-            />
-          </Grid.Column>
-        </Grid>
-      }
-      <div className="measure-selector">
-        <ul>
-          {measureSelectorLabel && (
-            <li>
-              <span className="label">{measureSelectorLabel}</span>
-            </li>
-          )}
-          {transformedData &&
-            transformedData.measures &&
-            transformedData.measures.length > 1 &&
-            transformedData.measures.map((measure) => {
-              return (
-                <li
-                  onClick={this.selectedMeasureChanged.bind(
-                    this,
-                    measure,
-                  )}
-                >
-                  <input
-                    checked={this.getSelectedMeasure() === measure}
-                    type="radio"
-                    value={measure}
-                  />
-                  <label>
-                    {transformedData.measureLabelMap[measure] ||
-                      measure}
-                  </label>
-                </li>
-              );
-            })}
-        </ul>
-      </div>
-    </Container>
-    )
+          </Grid>
+        }
+        <div className="measure-selector">
+          <ul>
+            {measureSelectorLabel && (
+              <li>
+                <span className="label">{measureSelectorLabel}</span>
+              </li>
+            )}
+            {transformedData &&
+              transformedData.measures &&
+              transformedData.measures.length > 1 &&
+              transformedData.measures.map((measure) => {
+                return (
+                  <li onClick={this.selectedMeasureChanged.bind(this, measure)}>
+                    <input
+                      checked={this.getSelectedMeasure() === measure}
+                      type="radio"
+                      value={measure}
+                    />
+                    <label>
+                      {transformedData.measureLabelMap[measure] || measure}
+                    </label>
+                  </li>
+                );
+              })}
+          </ul>
+        </div>
+      </Container>
+    );
 
     return (
       <div className="map component wp-data-viz-map" ref={this.mapContainer}>
-        {this.state.layersLoading && ( editing ? this.noMapSelected(): this.renderLoader())}
+        {this.state.layersLoading &&
+          (editing ? this.noMapSelected() : this.renderLoader())}
         {!this.state.layersLoading && (
           <>
-           { !isMobileOrTablet && <MapLegendComponent />}
+            {!isMobileOrTablet && <MapLegendComponent />}
             <div
               className={"map wrapper scaling-svg-container " + unique}
-              style={{ height: this.props.height - deviceMapHeight[getDeviceCategory()] + "px" }}
+              style={{
+                height:
+                  this.props.height -
+                  deviceMapHeight[getDeviceCategory()] +
+                  "px",
+              }}
             >
               {highlightedLocData && highlightedLocData.value && (
                 <div
@@ -2022,7 +2007,7 @@ componentWillUnmount() {
                         measureName: highlightedLocData.measure,
                       },
                       intl,
-                      noDataText,
+                      noDataText
                     )}
                   </span>
                 </div>
