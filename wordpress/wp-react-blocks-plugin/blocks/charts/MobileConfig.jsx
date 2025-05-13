@@ -113,7 +113,6 @@ const RadarMarginSection = ({
     tabletMarginTop
   } = mobileCustomization;
 
-  console.log("mobileCustomization", mobileCustomization);
   return (
     <>
       <PanelBody initialOpen={false} title={__("Mobile Margins")}>
