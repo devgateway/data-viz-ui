@@ -5,3 +5,6 @@ wordpress/uploads/
 node_modules
 /wordpress/wp-react-blocks-plugin/blocks/build/
 /wordpress/wp-react-blocks-plugin/blocks/node_modules/
+.vscode/
+.DS_Store
+.idea/
