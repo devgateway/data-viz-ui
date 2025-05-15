@@ -6,7 +6,7 @@ import { useTheme } from "@nivo/core";
 import { line } from "d3-shape";
 import LineLayer from "./LineLayer";
 import Papa from "papaparse";
-import FlexWrapDetector from '@/layout/FlexWrapDetector';
+import FlexWrapDetector from '../../layout/FlexWrapDetector';
 import deviceType from '@/utils/deviceType';
 
 const POSITION_MIDDLE = "middle";
