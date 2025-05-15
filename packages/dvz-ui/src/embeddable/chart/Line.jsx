@@ -4,7 +4,7 @@ import { ResponsiveLine } from "@nivo/line";
 import Tooltip from "./Tooltip";
 import { area, line } from "d3-shape";
 import { useTheme } from "@nivo/core";
-import FlexWrapDetector from "@/layout/FlexWrapDetector";
+import FlexWrapDetector from "../../layout/FlexWrapDetector";
 import deviceType from '@/utils/deviceType'
 
 const ZERO_LINE_COLOR = "#66676d";
