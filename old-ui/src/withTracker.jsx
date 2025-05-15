@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import ReactGA from "react-ga4";
 import { useLocation } from 'react-router-dom';
-import { Config } from './conf';
+import { Config } from '../../packages/dvz-ui/src/conf';
 import { SettingsContext } from '@devgateway/wp-react-lib';
 
 
