@@ -1,16 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { Provider } from 'react-redux'
 import { Route, Routes, Navigate, useLocation, useParams, createBrowserRouter, createRoutesFromElements, RouterProvider } from 'react-router-dom';
-import { store } from './redux/store'
-import messages_en from "./translations/en.json";
-import messages_fr from "./translations/fr.json";
-import messages_am from './translations/af.json';
+import { store } from '../../packages/dvz-ui/src/redux/store'
+import messages_en from "../../packages/dvz-ui/src/translations/en.json";
+import messages_fr from "../../packages/dvz-ui/src/translations/fr.json";
+import messages_am from '../../packages/dvz-ui/src/translations/af.json';
 import { updateIntl } from '@/lib/react-intl-redux';
 import { injectIntl, IntlProvider } from "react-intl";
-import ResponsiveContainer from './layout'
-import { getComponentByNameIgnoreCase } from "./embeddable";
+import ResponsiveContainer from '../../packages/dvz-ui/src/layout'
+import { getComponentByNameIgnoreCase } from "../../packages/dvz-ui/src/embeddable";
 import Helmet from './Helmet';
-
 import {
     AppContextProvider,
     Category,
@@ -23,14 +22,14 @@ import {
 import queryString from "query-string";
 import ScrollToTop from "./ScrollTop";
 import { Container, Segment } from "semantic-ui-react";
-import CustomizerWrapper from "./layout/Customizer";
-import PreviewPageContainer from './layout/containers/PreviewPageContainer';
-import PreviewTypeContainer from './layout/containers/PreviewTypeContainer';
-import SlugContainer from './layout/containers/SlugContainer';
-import SlugPostContainer from './layout/containers/SlugPostContainer';
+import CustomizerWrapper from "../../packages/dvz-ui/src/layout/Customizer";
+import PreviewPageContainer from '../../packages/dvz-ui/src/layout/containers/PreviewPageContainer';
+import PreviewTypeContainer from '../../packages/dvz-ui/src/layout/containers/PreviewTypeContainer';
+import SlugContainer from '../../packages/dvz-ui/src/layout/containers/SlugContainer';
+import SlugPostContainer from '../../packages/dvz-ui/src/layout/containers/SlugPostContainer';
 import withTracker from './withTracker';
-import { Config } from './conf';
-import useDynamicFavicon from './layout/FavIcon';
+import { Config } from '../../packages/dvz-ui/src/conf';
+import useDynamicFavicon from '../../packages/dvz-ui/src/layout/FavIcon';
 
 
 
