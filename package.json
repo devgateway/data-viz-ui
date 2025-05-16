@@ -2,14 +2,16 @@
   "name": "data-viz-front",
   "version": "1.0.0",
   "description": "",
+  "workspaces": [
+    "packages/*",
+    "packages/react-lib/*",
+    "example"
+  ],
   "scripts": {
     "build": "pnpm recursive run build"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "packageManager": "pnpm@10.10.0",
-  "devDependencies": {
-    "concurrently": "^9.1.2"
-  }
+  "packageManager": "pnpm@10.10.0"
 }
