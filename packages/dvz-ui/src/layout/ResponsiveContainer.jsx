@@ -3,7 +3,7 @@ import React from 'react'
 import {Container,} from 'semantic-ui-react'
 import PropTypes from 'prop-types'
 import {SettingsConsumer} from '@devgateway/wp-react-lib'
-import {Media} from "../AppMedia.js"
+import {Media} from "@/utils/AppMedia"
 import Footer from "./Footer.jsx";
 import Header from "./Header.jsx";
 import TopNavigator from "./TopNavigator.jsx";
