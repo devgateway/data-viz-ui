@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect, useImperativeHandle, useState, useRef} from 'react'
 import {Button, Container, Dropdown, Form, Grid, Input, Label, Message, TextArea, Icon} from 'semantic-ui-react'
-import countryOptions from '../../../../../old-ui/src/countries'
+import countryOptions from '@/utils/countries';
 import {reset, sendShowCaseForm} from "../reducers/embeddable";
 import {connect} from "react-redux";
 import {useDropzone} from "react-dropzone";
