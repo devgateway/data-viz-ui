@@ -2,7 +2,6 @@ import React, { lazy } from 'react'
 import data from './reducers/data'
 import embeddable from './reducers/embeddable'
 import { injectIntl } from "react-intl";
-import * as customizer from "@devgateway/customizer";
 
 // components
 const PageGallery = lazy(() => import("./pagegallery"));
@@ -95,8 +94,5 @@ export const getComponentByNameIgnoreCase = (name: string) => {
         const Component = components[k]
         return React.memo(injectIntl(Component))
     }
-    const customComponent = customizer.getComponentByNameIgnoreCase(name)
-    if (customComponent) {
-        return injectIntl(customComponent)
-    }
+    return null
 }
