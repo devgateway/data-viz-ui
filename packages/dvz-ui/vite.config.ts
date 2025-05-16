@@ -18,7 +18,7 @@ export default defineConfig({
             tsconfigPath: './tsconfig.json',
             include: ['./src/**/*'],
         }),
-        tsconfigPaths(),
+        // tsconfigPaths(),
     ],
     resolve: {
         alias: {
@@ -37,18 +37,7 @@ export default defineConfig({
 
 
             },
-            name: '@devgateway/dvz-ui',
-            formats: ['es', 'cjs'],
-            fileName: (format, entryName) => {
-                if (format === 'es') {
-                    return `esm/${entryName}.js`;
-                }
-
-                if (format === 'cjs') {
-                    return `cjs/${entryName}.js`;
-                }
-                return entryName;
-            }
+            name: '@devgateway/dvz-ui'
 
         },
         commonjsOptions: {
@@ -56,20 +45,41 @@ export default defineConfig({
             exclude: ['node_modules'],
         },
         rollupOptions: {
-            external: [...Object.keys(packageJson.dependencies || {}), ...Object.keys(packageJson.devDependencies || {}), 'react', 'react/jsx-runtime', 'react-dom'],
+            external: [...Object.keys(packageJson.dependencies || {}), ...Object.keys(packageJson.devDependencies || {}), 'react', 'react/jsx-runtime', 'react-dom', 'react-dom/client', 'react-router-dom', 'core-js'],
             input: {
                 main: resolve(__dirname, 'src/index.ts'),
                 "styles.css": resolve(__dirname, 'src/scss/themes/default/index.scss'),
             },
             plugins: [preserveDirectives()],
-            output: {
-                preserveModules: true,
-                globals: {
-                    react: 'React',
-                    'react/jsx-runtime': 'jsxRuntime',
-                    'react-dom': 'ReactDOM',
+            output: [
+                {
+                    dir: "dist/cjs",
+                    format: "cjs",
+                    sourcemap: false,
+                    exports: "named",
+                    preserveModules: true,
+                    preserveModulesRoot: "src",
+                    entryFileNames: `[name].js`,
+                    globals: {
+                        react: 'React',
+                        'react/jsx-runtime': 'jsxRuntime',
+                        'react-dom': 'ReactDOM',
+                    },
                 },
-            },
+                {
+                    dir: "dist/esm",
+                    format: "esm",
+                    sourcemap: false,
+                    entryFileNames: `[name].js`,
+                    preserveModules: true,
+                    preserveModulesRoot: "src",
+                    globals: {
+                        react: 'React',
+                        'react/jsx-runtime': 'jsxRuntime',
+                        'react-dom': 'ReactDOM',
+                    },
+                }
+            ]
         }
     },
     css: {
