@@ -10,7 +10,7 @@ import FloatingNavigator from './FloatingNavigator'
 
 const decodeHtmlEntity = function (str: string) {
   if (str) {
-    return str.toString().replace(/&#(\d+);/g, function (match, dec) {
+    return str.toString().replace(/&#(\d+);/g, function (_, dec) {
       return String.fromCharCode(dec);
     });
   }
@@ -18,7 +18,7 @@ const decodeHtmlEntity = function (str: string) {
   return "";
 };
 
-interface SectionHeaderProps {
+export interface SectionHeaderProps {
     title: string,
     subtitle: string,
     icon?: string,
@@ -52,7 +52,7 @@ interface ModuleProps {
     locale: string,
     onVisibilityUpdate: any
 }
-const Module: React.FC<ModuleProps> = ({ page, locale }) => {
+const Module: React.FC<ModuleProps> = ({ page }) => {
     return (
         <Container fluid={true} className={`section ${page.slug}`} id={page.id}>
             <div id={`${page.slug}`} />
@@ -78,6 +78,7 @@ const PageIterator: React.FC<PageIteratorProps> = ({ pages, locale, editing, nav
     const [modules, setModules] = useState<any>([]);
 
     const onVisibilityUpdate = useCallback((id, {
+        // @ts-ignore
         direction = 'down',
         onScreen,
     }) => {

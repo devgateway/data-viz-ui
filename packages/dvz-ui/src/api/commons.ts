@@ -29,7 +29,6 @@ export const post = (url : string, params : Record<string, unknown>, isBlob = fa
     })
 }
  
-// @ts-expect-error
 export const get = (url: string, params = {}) => {
     return new Promise((resolve, reject) => {
 

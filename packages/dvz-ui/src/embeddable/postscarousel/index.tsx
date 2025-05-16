@@ -58,7 +58,7 @@ const _Carousel = (props) => {
 }
 
 
-interface PostCarouselProps {
+export interface PostCarouselProps {
     "data-type": string,
     "data-taxonomy": string,
     "data-categories": string,
