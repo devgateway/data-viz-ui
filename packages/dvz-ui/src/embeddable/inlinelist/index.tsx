@@ -5,7 +5,7 @@ import PostIntro from "../connected-templates/PostIntro";
 import { useParams } from 'react-router-dom';
 import PostContent from '../connected-templates/PostContent';
 
-interface ListOfPostProps {
+export interface ListOfPostProps {
     posts: any[],
     showIcons: boolean,
     showContentToggle: boolean,
@@ -131,7 +131,7 @@ const ListOfPost: React.FC<ListOfPostProps> = (props) => {
 
 }
 
-interface InlineListProps {
+export interface InlineListProps {
     "data-width"?: string,
     "data-height"?: string,
     "data-type"?: string,

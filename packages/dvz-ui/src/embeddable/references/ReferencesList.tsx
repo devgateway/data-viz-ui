@@ -27,7 +27,6 @@ const decodeContent = (content) => {
     return result
 }
 const References = ({
-    random,
     editing = false,
     "data-columns": cols = 3,
     "data-height": height = 1000,
@@ -100,7 +99,7 @@ const References = ({
 }
 
 
-const mapStateToProps = (state, ownProps) => {
+const mapStateToProps = (state: any, _ownProps: any) => {
     return { random: state.getIn(["embeddable", "random"]) }
 }
 

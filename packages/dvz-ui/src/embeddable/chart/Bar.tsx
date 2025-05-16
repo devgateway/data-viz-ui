@@ -1,8 +1,8 @@
 import React, { Fragment, useEffect, useState } from "react";
 import Tooltip from "./Tooltip";
 import { ResponsiveBar } from "@nivo/bar";
+import { useTheme } from '@nivo/theming';
 import { injectIntl } from "react-intl";
-import { useTheme } from "@nivo/core";
 import { line } from "d3-shape";
 import LineLayer from "./LineLayer";
 import Papa from "papaparse";

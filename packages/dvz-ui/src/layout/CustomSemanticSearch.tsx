@@ -19,17 +19,11 @@ const boldSearchTerm = (text, searchTerm) => {
   
 
 const ResultRenderer = injectIntl(({
-    ID,
     title,
     slug,
-    parent_title,
-    parent_slug,
     parent_link,
     extract,
-    type,
     link,
-    terms,
-    subtype,
     searchTerm,
     metadata,
     bread_crumbs = [],
@@ -45,7 +39,7 @@ const ResultRenderer = injectIntl(({
 
     return (
         <div className="search-results-wrapper searching-results" style={{ display: 'flex', flexDirection: 'column' }}>
-            <div className={"has-standard-12-font-size"} onClick={e => document.location.href = target}>
+            <div className={"has-standard-12-font-size"} onClick={() => document.location.href = target}>
                 <h5 className="breadcrumbs-search"
                     dangerouslySetInnerHTML={{ __html: Array.isArray(bread_crumbs) && bread_crumbs.length > 0 ? boldSearchTerm(bread_crumbs.join(' / '), searchTerm) : '' }}
                 />
@@ -58,7 +52,7 @@ const ResultRenderer = injectIntl(({
 })
 
 const CustomSearch = (props) => {
-    const { results, resultRenderer, onSearchChange, value, showNoResults, onResultSelect, loading, placeholder, perPage, total, searchTerm } = props;
+    const { results, onSearchChange, value, showNoResults, onResultSelect, loading, placeholder, perPage, total, searchTerm } = props;
     const intl = useIntl()
     const [searchClasses, setSearchClasses] = React.useState('');
     const [focus, setFocus] = React.useState(false);
@@ -136,7 +130,7 @@ const CustomSearch = (props) => {
         }
     };
 
-    const { aligned, category, className, fluid, size, searchTextHandler } = props;
+    const { aligned, category, className, fluid, size } = props;
 
 
     const classes = clsx(
