@@ -1,5 +1,7 @@
 import React, {LegacyRef, useRef, useState} from 'react';
-import "jspdf/dist/polyfills.es.js";
+// TODO: Commented out for now because it's not needed for the build and it is generating polyfills in the dist folder. I don't see why it is needed in this component
+// import "jspdf/dist/polyfills.es.js";
+// import { jsPDF } from "jspdf";
 import {Button, Container} from "semantic-ui-react";
 
 interface DownloadableContentProps {
