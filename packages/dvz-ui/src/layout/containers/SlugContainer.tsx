@@ -6,7 +6,7 @@ import {
 import React from 'react'
 import { useParams } from 'react-router-dom';
 import ResponsiveContainer from '../ResponsiveContainer';
-import Helmet from "@/Helmet";
+// import Helmet from "@/components/Helmet";
 
 const SlugContainer = () => {
     const { lan: locale ,slug } = useParams();
@@ -18,7 +18,7 @@ const SlugContainer = () => {
             <ResponsiveContainer>
                 <PageConsumer>
 
-                    <Helmet locale={locale}></Helmet>
+                    {/* <Helmet locale={locale}></Helmet> */}
                     <Page></Page>
                 </PageConsumer>
             </ResponsiveContainer>

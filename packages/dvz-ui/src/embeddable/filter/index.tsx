@@ -138,6 +138,7 @@ export interface ListFilterDropDownProps {
   allNoneSameBehaviour: boolean;
   closeOnSelect: boolean;
   hiddenFilters: any[];
+  autoApply: boolean;
 }
 
 const ListFilterDropDown = connect(
