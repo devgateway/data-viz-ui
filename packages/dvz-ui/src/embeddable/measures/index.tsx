@@ -3,7 +3,7 @@ import { Container } from "semantic-ui-react";
 import { cleanMeasures, setMeasures } from "../reducers/data";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 
-interface MeasuresProps {
+export interface MeasuresProps {
     parent?: string,
     editing?: boolean,
     unique?: string,
@@ -58,8 +58,8 @@ const Measures: React.FC<MeasuresProps> = (props) => {
         const items = groups[app];
         return <Container className={"measures group"} fluid>
             {label && <span>{label}</span>}
-            {items.map(i => {
-                return (<div key={i.idx} className={"inputs lists"} onClick={e => dispatch(actions.onChange({ app, group, mGroup: i }))}>
+            {items.map((i: any) => {
+                return (<div key={i.idx} className={"inputs lists"} onClick={() => dispatch(actions.onChange({ app, group, mGroup: i }))}>
                     <input readOnly checked={(selected && selected.idx == i.idx) ? true : false}
                         type="radio" />
                     <span>{i.label}</span>
