@@ -3,14 +3,29 @@
   "version": "1.0.0",
   "main": "dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "concurrently \"tsc --watch\" \"vite build --watch\"",
+    "build": "vite build"
   },
-  "keywords": [],
-  "author": "",
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "data-viz",
+    "react",
+    "typescript",
+    "devgateway",
+    "data-visualization",
+    "react-components",
+    "react-library",
+    "react-ui-library",
+    "react-ui-components"
+  ],
+  "author": "Timothy Mugo",
   "license": "ISC",
   "description": "",
   "dependencies": {
     "@artsy/fresnel": "^8.1.0",
+    "@devgateway/wp-react-lib": "workspace:*",
     "@nivo/bar": "^0.96.0",
     "@nivo/bump": "^0.96.0",
     "@nivo/colors": "^0.96.0",
@@ -24,6 +39,7 @@
     "@react-spring/web": "^10.0.0",
     "@reduxjs/toolkit": "^2.8.2",
     "@superset-ui/embedded-sdk": "^0.1.3",
+    "clsx": "^2.1.1",
     "d3": "^7.9.0",
     "d3-shape": "^3.2.0",
     "file-saver": "^2.0.5",
@@ -32,6 +48,7 @@
     "html-react-parser": "^5.2.5",
     "immutable": "^5.1.2",
     "jspdf": "^3.0.1",
+    "lodash": "^4.17.21",
     "papaparse": "^5.5.2",
     "pure-react-carousel": "^1.32.0",
     "query-string": "^9.1.2",
@@ -61,6 +78,7 @@
     "@stylistic/eslint-plugin-js": "^4.2.0",
     "@types/d3": "^7.4.3",
     "@types/file-saver": "^2.0.7",
+    "@types/lodash": "^4.17.16",
     "@types/node": "^22.15.18",
     "@types/papaparse": "^5.3.16",
     "@types/react": "^18.3.11",
@@ -69,6 +87,7 @@
     "@types/uuid": "^10.0.0",
     "@vitejs/plugin-react-swc": "^3.9.0",
     "autoprefixer": "^10.4.21",
+    "concurrently": "^9.1.2",
     "eslint": "^9.26.0",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-compiler": "^19.1.0-rc.2",
@@ -76,12 +95,41 @@
     "eslint-plugin-react-refresh": "^0.4.20",
     "eslint-plugin-unused-imports": "^4.1.4",
     "globals": "^16.1.0",
+    "prop-types": "^15.8.1",
     "react-compiler-runtime": "^19.0.0-beta-a7bf2bd-20241110",
+    "rollup-plugin-preserve-directives": "^0.4.0",
     "sass-embedded": "^1.89.0",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.32.1",
+    "unbuild": "^3.5.0",
     "vite": "^6.3.5",
+    "vite-plugin-dts": "^4.5.4",
     "vite-plugin-env-compatible": "^2.0.1",
-    "vite-plugin-eslint": "^1.8.1"
+    "vite-plugin-eslint": "^1.8.1",
+    "vite-tsconfig-paths": "^5.1.4"
+  },
+  "peerDependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./conf": {
+      "types": "./dist/conf/index.d.ts",
+      "require": "./dist/conf/index.js",
+      "default": "./dist/conf/index.js"
+    },
+    "./embeddable": {
+      "types": "./dist/embeddable/index.d.ts",
+      "require": "./dist/embeddable/index.js",
+      "default": "./dist/embeddable/index.js"
+    }
   }
 }
