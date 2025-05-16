@@ -42,13 +42,10 @@ const BigNumberTrend = lazy(() => import("./big-number-trend"));
 
 let reducerList = { data, embeddable };
 
-if (customizer.Reducers) {
-    reducerList = { ...reducerList, ...customizer.Reducers }
-}
 
 export const reducers = reducerList;
 
-const components = {
+export const components = {
     pageGallery: PageGallery,
     postsCarousel: PostsCarousel,
     chart: Chart,
