@@ -1,7 +1,9 @@
 {
-  "name": "@devgateway/dvz-ui",
+  "name": "@devgateway/dvz-ui-react",
   "version": "1.0.0",
-  "main": "dist/esm/main.js",
+  "main": "dist/cjs/main.js",
+  "module": "dist/esm/main.js",
+  "types": "dist/types/index.d.ts",
   "scripts": {
     "dev": "concurrently \"tsc --watch\" \"vite build --watch\"",
     "build": "rm -rf dist && vite build"
@@ -35,6 +37,7 @@
     "@nivo/radar": "^0.96.0",
     "@nivo/sankey": "^0.96.0",
     "@nivo/sunburst": "^0.96.0",
+    "@nivo/theming": "^0.96.0",
     "@react-spring/parallax": "^10.0.0",
     "@react-spring/web": "^10.0.0",
     "@reduxjs/toolkit": "^2.8.2",
@@ -59,7 +62,7 @@
     "react-helmet-async": "^2.0.5",
     "react-intersection-observer": "^9.16.0",
     "react-intl": "^7.1.11",
-    "react-is": "^19.1.0",
+    "react-is": "^18.3.1",
     "react-markdown": "^10.1.0",
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.6.0",
@@ -117,19 +120,19 @@
   },
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "require": "./dist/index.js",
-      "default": "./dist/index.js"
+      "types": "./dist/types/index.d.ts",
+      "require": "./dist/cjs/main.js",
+      "import": "./dist/esm/main.js"
     },
     "./conf": {
       "types": "./dist/conf/index.d.ts",
       "require": "./dist/conf/index.js",
       "default": "./dist/conf/index.js"
     },
-    "./embeddable/*": {
-      "types": "./dist/embeddable/[name].d.ts",
-      "require": "./dist/embeddable/[name].js",
-      "default": "./dist/embeddable/[name].js"
+    "./embeddable": {
+      "types": "./dist/types/embeddable/index.d.ts",
+      "require": "./dist/cjs/embeddable/index.js",
+      "import": "./dist/esm/embeddable/index.js"
     }
   }
 }

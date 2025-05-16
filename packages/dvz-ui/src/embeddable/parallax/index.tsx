@@ -11,7 +11,7 @@ interface ListOfPostProps {
     configuration: any[]
 }
 
-const ListOfPost = ({posts, locale, configuration}: ListOfPostProps) => {
+const ListOfPost = ({posts, configuration}: ListOfPostProps) => {
 
 
     const toProps = (conf) => {
@@ -50,24 +50,34 @@ const ListOfPost = ({posts, locale, configuration}: ListOfPostProps) => {
 
 }
 
+export interface ParallaxProps {
+    "data-width": number,
+    "data-height": number,
+    "data-type": string,
+    "data-taxonomy": string,
+    "data-categories": string,
+    "data-count": number,
+    "data-horizontal": boolean,
+    "data-scrolls": number,
+    "data-configuration": string,
+    parent: string,
+    editing: boolean,
+    component: string,
+    unique: string
+}
 
-const Root = (props) => {
+const Root = (props: ParallaxProps) => {
 
     
     const [random, setRandomStore] = useState(Math.random() * (99999 - 1) + 1);
     const {
-        "data-width": width,
         "data-height": height,
         "data-type": type,
         "data-taxonomy": taxonomy,
         "data-categories": categories,
-        "data-count": count,
-        "data-horizontal": horizontal = false,
         "data-scrolls": scrolls,
         "data-configuration": config,
         parent,
-        editing,
-        component,
         unique
     } = props
 

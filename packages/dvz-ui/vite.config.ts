@@ -2,7 +2,6 @@ import { defineConfig } from 'vite';
 import { resolve } from 'path';
 import react from '@vitejs/plugin-react-swc';
 import dts from 'vite-plugin-dts';
-import path from 'path';
 import tsconfigPaths from 'vite-tsconfig-paths';
 import * as packageJson from './package.json';
 import preserveDirectives from "rollup-plugin-preserve-directives";
@@ -18,20 +17,20 @@ export default defineConfig({
             tsconfigPath: './tsconfig.json',
             include: ['./src/**/*'],
         }),
-        // tsconfigPaths(),
+        tsconfigPaths(),
     ],
-    resolve: {
-        alias: {
-            "@": path.resolve(__dirname, "./src"),
-        },
-    },
+    // resolve: {
+    //     alias: {
+    //         "@": path.resolve(__dirname, "./src"),
+    //     },
+    // },
     build: {
         copyPublicDir: false,
         cssCodeSplit: true,
         lib: {
             entry: {
                 "index.css": resolve(__dirname, 'src/scss/themes/default/index.scss'),
-                main: resolve(__dirname, 'src/index.ts'),
+                // index: resolve(__dirname, 'src/index.ts'),
                 // Button: resolve(__dirname, 'src/components/ui/Button/index.tsx'),
                 // Card: resolve(__dirname, 'src/components/ui/Card/index.tsx'),
 
@@ -47,7 +46,7 @@ export default defineConfig({
         rollupOptions: {
             external: [...Object.keys(packageJson.dependencies || {}), ...Object.keys(packageJson.devDependencies || {}), 'react', 'react/jsx-runtime', 'react-dom', 'react-dom/client', 'react-router-dom', 'core-js'],
             input: {
-                main: resolve(__dirname, 'src/index.ts'),
+                index: resolve(__dirname, 'src/index.ts'),
                 "styles.css": resolve(__dirname, 'src/scss/themes/default/index.scss'),
             },
             plugins: [preserveDirectives()],
@@ -55,8 +54,7 @@ export default defineConfig({
                 {
                     dir: "dist/cjs",
                     format: "cjs",
-                    sourcemap: false,
-                    exports: "named",
+                    sourcemap: false, 
                     preserveModules: true,
                     preserveModulesRoot: "src",
                     entryFileNames: `[name].js`,

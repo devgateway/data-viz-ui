@@ -11,5 +11,4 @@ function defaultSelector(state: any) {
 
 const mapStateToProps = (state: any, { intlSelector = defaultSelector }) =>
   intlSelector(state)
-
-export default connect(mapStateToProps)(IntlProvider)
+export default connect(mapStateToProps)(IntlProvider) as React.ComponentType<any>

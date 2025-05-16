@@ -16,12 +16,12 @@
 
     /* Linting */
     "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
+    "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true,
     "allowJs": true,
     "noImplicitAny": false,
     "baseUrl": ".",
+    "noUnusedLocals": false,
     "paths": {
       "@/*": ["./src/*"] 
     }
@@ -30,5 +30,8 @@
   "exclude": [
     "node_modules",
     "dist"
+  ],
+  "references": [
+    { "path": "./tsconfig.node.json" }
   ]
 }

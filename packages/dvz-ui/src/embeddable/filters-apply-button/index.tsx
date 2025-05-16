@@ -43,7 +43,7 @@ const FiltersResetComponent = (props) => {
     return (
         <Container fluid={true}
                    className={`data-filters-apply ignore ${enabled ? '' : "disabled"} ${editing ? 'editing' : ''}`}
-                   onClick={e => {
+                   onClick={() => {
                        if (enabled) {
                            onApply({app, group})
                        }
@@ -57,7 +57,7 @@ const FiltersResetComponent = (props) => {
 };
 
 
-const mapStateToProps = (state, ownProps) => {
+const mapStateToProps = (state: any, ownProps: any) => {
     const {
         "data-group": group,
         "data-app": app = "csv",
