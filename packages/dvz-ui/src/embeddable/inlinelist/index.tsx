@@ -2,7 +2,7 @@ import React, { RefObject, useEffect, useState } from 'react'
 import { Container, Grid, Label } from 'semantic-ui-react'
 import { MediaConsumer, MediaProvider, PostConsumer, PostIcon, PostProvider, utils } from "@devgateway/wp-react-lib";
 import PostIntro from "../connected-templates/PostIntro";
-import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router';
 import PostContent from '../connected-templates/PostContent';
 
 export interface ListOfPostProps {
@@ -13,20 +13,20 @@ export interface ListOfPostProps {
     locale: string
 }
 
-const ListOfPost: React.FC<ListOfPostProps> = (props) => {
+const ListOfPost = React.forwardRef<HTMLDivElement, ListOfPostProps>((props, ref) => {
     const { posts, showIcons, showContentToggle, contentToggleHPosition, locale } = props
     const [toggleState, setToggleState] = useState({});
-    const postTopRef: RefObject<HTMLDivElement> = React.createRef();
+    const postTopRef = ref as RefObject<HTMLDivElement>;
+
     useEffect(() => {
         window.setTimeout(() => {
             if (window.location.hash) {
-                const element = document.getElementById(window.location.hash.substr(1));
+                const element = document.getElementById(window.location.hash.substring(1));
                 if (element) {
                     element.scrollIntoView({ behavior: "auto", block: "start" });
                 }
             }
-        }, 0
-        )
+        }, 0)
     }, [posts])
 
     const getBody = (post) => {
@@ -34,14 +34,15 @@ const ListOfPost: React.FC<ListOfPostProps> = (props) => {
         const content = contentParts.length > 1 ? contentParts[1] : contentParts[0]
         return content
     }
-    const getContentToggle = (slug) => {
-        const show = toggleState[slug] || false;
+
+    const getContentToggle = (slug: string) => {
+        const show = toggleState[slug] ?? false;
         const linkText = show ? 'Read less' : 'Read more';
         return (
             <div>
                 <div style={{ position: 'relative', left: contentToggleHPosition + '%' }}>
                     <a className="link" onClick={() => {
-                        if (postTopRef.current && show) {
+                        if (postTopRef?.current && show) {
                             postTopRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
                             postTopRef.current.scrollTop = 0; // scroll postTopRef back to top
                         }
@@ -49,7 +50,6 @@ const ListOfPost: React.FC<ListOfPostProps> = (props) => {
                     }}>
                         {linkText}
                     </a>
-
                 </div>
             </div>
         )
@@ -117,7 +117,7 @@ const ListOfPost: React.FC<ListOfPostProps> = (props) => {
                                         </>
                                     )}
                                     {!showContentToggle && (
-                                        <a href={utils.replaceLink(p.link)} className="link">
+                                        <a href={utils.replaceLink(p.link, locale)} className="link">
                                             Read More
                                         </a>
                                     )}
@@ -129,7 +129,7 @@ const ListOfPost: React.FC<ListOfPostProps> = (props) => {
         </Container>
     )
 
-}
+});
 
 export interface InlineListProps {
     "data-width"?: string,
@@ -184,7 +184,7 @@ const Root: React.FC<InlineListProps> = (props) => {
             >
                 <PostConsumer>
                     {/* @ts-expect-error Posts are retrived from Wordpress */}
-                    <ListOfPost locale={locale ?? 'en'} showIcons={showIcons === "true"} showContentToggle={showContentToggle === "true"} contentToggleHPosition={contentToggleHPosition}/>
+                    <ListOfPost locale={locale ?? 'en'} showIcons={showIcons === "true"} showContentToggle={showContentToggle === "true"} contentToggleHPosition={contentToggleHPosition} />
                 </PostConsumer>
             </PostProvider>
         </Container>

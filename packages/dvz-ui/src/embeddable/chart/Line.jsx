@@ -3,7 +3,7 @@ import { injectIntl } from "react-intl";
 import { ResponsiveLine } from "@nivo/line";
 import Tooltip from "./Tooltip";
 import { area, line } from "d3-shape";
-import { useTheme } from "@nivo/core";
+import { useTheme } from "@nivo/theming";
 import FlexWrapDetector from "../../layout/FlexWrapDetector";
 import deviceType from '@/utils/deviceType'
 

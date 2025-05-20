@@ -9,7 +9,9 @@ import {
 
 import type { Route } from "./+types/root";
 import "./app.css";
+import 'semantic-ui-css/semantic.min.css';
 import "@devgateway/dvz-ui-react/dist/esm/styles.css";
+
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -17,10 +19,6 @@ export const links: Route.LinksFunction = () => [
     rel: "preconnect",
     href: "https://fonts.gstatic.com",
     crossOrigin: "anonymous",
-  },
-  {
-    rel: "stylesheet",
-    href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
   },
   {
     rel: "stylesheet",

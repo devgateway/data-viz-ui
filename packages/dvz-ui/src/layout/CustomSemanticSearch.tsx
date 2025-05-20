@@ -5,7 +5,7 @@ import {
     useKeyOnly,
     useValueAndKey,
 } from 'semantic-ui-react/src/lib/classNameBuilders';
-import { partitionHTMLProps, htmlInputAttrs, } from 'semantic-ui-react/src/lib/htmlPropsUtils';
+import { partitionHTMLProps, htmlInputAttrs } from "@/utils/semanticUtils";
 import getUnhandledProps from 'semantic-ui-react/src/lib/getUnhandledProps';
 import { injectIntl, useIntl } from "react-intl";
 import { utils } from "@devgateway/wp-react-lib";
@@ -16,7 +16,7 @@ const boldSearchTerm = (text, searchTerm) => {
     const regex = new RegExp(`(${searchTerm})`, 'gi');
     return text.replace(regex, '<strong>$1</strong>');
 }
-  
+
 
 const ResultRenderer = injectIntl(({
     title,

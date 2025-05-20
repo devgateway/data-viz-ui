@@ -81,6 +81,7 @@
     "@eslint/js": "^9.26.0",
     "@stylistic/eslint-plugin-js": "^4.2.0",
     "@types/d3": "^7.4.3",
+    "@types/d3-shape": "^3.1.7",
     "@types/file-saver": "^2.0.7",
     "@types/lodash": "^4.17.16",
     "@types/node": "^22.15.18",
@@ -140,6 +141,11 @@
       "types": "./dist/types/tracker/index.d.ts",
       "require": "./dist/cjs/tracker/index.js",
       "import": "./dist/esm/tracker/index.js"
+    },
+    "./layout": {
+      "types": "./dist/types/layout/index.d.ts",
+      "require": "./dist/cjs/layout/index.js",
+      "import": "./dist/esm/layout/index.js"
     }
   }
 }

@@ -1,5 +1,5 @@
 import React from 'react';
-import type { Route } from '../+types/root';
+import type { Route } from './+types/embeddable';
 import PreviewComponent from "~/pages/PreviewComponent";
 
 export function meta({ }: Route.MetaArgs) {
@@ -11,6 +11,7 @@ export function meta({ }: Route.MetaArgs) {
 
 
 const Embeddable = () => {
+    console.log("Embeddable")
     return (
         <div>
             <PreviewComponent />

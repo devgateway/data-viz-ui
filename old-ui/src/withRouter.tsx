@@ -3,7 +3,7 @@ import {
     useLocation,
     useNavigate,
     useParams,
-} from "react-router-dom";
+} from "react-router";
 
 export function withRouter(Component: React.FC | React.ComponentClass) {
     function ComponentWithRouterProp(props) {
