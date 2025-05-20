@@ -1,4 +1,4 @@
-import Immutable from 'immutable'
+import * as Immutable from 'immutable'
 import {sendShowCase, subscribe} from "./embeddable-api";
 
 const SHOW_CASE_SEND = "SEND_SHOW_CASE"
@@ -91,7 +91,7 @@ export default (state = initialState, action) => {
         }
         case NEWS_LETTER_SET_EMAIL: {
             const {eMail} = action
-            
+
             return state.setIn(['newsletter', 'email'], eMail)
         }
 
