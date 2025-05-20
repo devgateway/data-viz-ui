@@ -1,18 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router';
+import { useLocation, useParams } from 'react-router';
 import { getComponentByNameIgnoreCase } from '@devgateway/dvz-ui-react/embeddable';
-import { useParams } from 'react-router';
 import { Container, Segment } from 'semantic-ui-react';
 import queryString from 'querystring';
-// @ts-ignore
 import { SettingsConsumer } from '@devgateway/wp-react-lib';
 
 
 const PreviewComponentParameterParser = () => {
     const urlParams = useParams();
     const location = useLocation();
-
-    const [UIComponent] = useState(() => getComponentByNameIgnoreCase(urlParams.name ? urlParams.name : ''));
+    console.log("urlParams", urlParams)
+    console.log("location", location)
+    const [UIComponent] = useState(() => getComponentByNameIgnoreCase(urlParams.name ?? ''));
 
 
     const [params, setParams] = useState(queryString.parse(location.search))

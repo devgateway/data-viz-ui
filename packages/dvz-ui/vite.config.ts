@@ -18,6 +18,7 @@ export default defineConfig({
             include: ['./src/**/*'],
         }),
         tsconfigPaths(),
+
     ],
     // resolve: {
     //     alias: {
@@ -30,6 +31,7 @@ export default defineConfig({
         lib: {
             entry: {
                 "index.css": resolve(__dirname, 'src/scss/themes/default/index.scss'),
+
                 // index: resolve(__dirname, 'src/index.ts'),
                 // Button: resolve(__dirname, 'src/components/ui/Button/index.tsx'),
                 // Card: resolve(__dirname, 'src/components/ui/Card/index.tsx'),
@@ -48,13 +50,14 @@ export default defineConfig({
             input: {
                 index: resolve(__dirname, 'src/index.ts'),
                 "styles.css": resolve(__dirname, 'src/scss/themes/default/index.scss'),
+                "tracker/index": resolve(__dirname, 'src/tracker/index.ts'),
             },
             plugins: [preserveDirectives()],
             output: [
                 {
                     dir: "dist/cjs",
                     format: "cjs",
-                    sourcemap: false, 
+                    sourcemap: false,
                     preserveModules: true,
                     preserveModulesRoot: "src",
                     entryFileNames: `[name].js`,

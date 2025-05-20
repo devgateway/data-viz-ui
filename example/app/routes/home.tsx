@@ -1,5 +1,5 @@
 import type { Route } from "./+types/home";
-import PreviewComponent from "~/pages/PreviewComponent";
+
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -9,7 +9,7 @@ export function meta({}: Route.MetaArgs) {
 }
 
 const Home = () => {
-  return <PreviewComponent />;
+  return <div>Home</div>;
 };
 
 export default Home;

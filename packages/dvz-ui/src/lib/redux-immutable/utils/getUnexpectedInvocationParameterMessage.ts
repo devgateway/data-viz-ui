@@ -1,4 +1,4 @@
-import Immutable from "immutable";
+import * as Immutable from "immutable";
 import { Action } from "redux";
 import { getStateName } from "./getStateName";
 
