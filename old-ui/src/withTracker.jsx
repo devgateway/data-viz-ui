@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import ReactGA from "react-ga4";
-import { useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router';
 import { Config } from '../../packages/dvz-ui/src/conf';
 import { SettingsContext } from '@devgateway/wp-react-lib';
 
@@ -20,10 +20,10 @@ const withTracker = (WrappedComponent, options = {}) => {
                 const page = location.pathname;
                 ReactGA.send({ hitType: "pageview", page });
             }
-           
+
         }, [location.pathname]);
 
-        
+
         return <WrappedComponent {...props} />;
     };
 

@@ -4,7 +4,7 @@ import {
     Page
 } from "@devgateway/wp-react-lib"
 import React from 'react'
-import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router';
 import ResponsiveContainer from '../ResponsiveContainer';
 // import Helmet from "@/components/Helmet";
 
