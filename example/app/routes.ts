@@ -9,11 +9,13 @@ export default [
             route(":parent/:slug", "./routes/parent-slug.tsx"),
             // route(":lan/category/:slug", "./routes/category.tsx"),
             route("embeddable/:name", "./routes/embeddable.tsx"),
+            route("*", "./routes/loader.tsx")
             // route(":lan/preview/page/:id", "./routes/previewPage.tsx"),
             // route(":lan/preview/:type/:id", "./routes/previewType.tsx"),
             // route(":lan/:year/:month/:day/:slug", "./routes/slugPost.tsx"),
             // route(":lan/:parent/:year/:month/:day/:slug", "./routes/slugPost.tsx"),
         ]),
+
         // route("*", "./routes/not-found.tsx")
 
     ]),
