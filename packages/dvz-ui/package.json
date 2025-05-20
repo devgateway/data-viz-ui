@@ -137,6 +137,7 @@
       "import": "./dist/esm/embeddable/index.js"
     },
     "./dist/esm/styles.css": "./dist/esm/styles.css",
+    "./dist/esm/common.css": "./dist/esm/common.css",
     "./tracker": {
       "types": "./dist/types/tracker/index.d.ts",
       "require": "./dist/cjs/tracker/index.js",

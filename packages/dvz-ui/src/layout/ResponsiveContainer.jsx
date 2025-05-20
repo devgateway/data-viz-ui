@@ -7,7 +7,7 @@ import {Media} from "@/utils/AppMedia"
 import Footer from "./Footer.jsx";
 import Header from "./Header.jsx";
 import TopNavigator from "./TopNavigator.jsx";
-import CustomizerWrapper from "./Customizer.jsx";
+import { CustomizerWrapper } from "./Customizer";
 
 
 const DesktopContainer = ({ children, fixed }) => {

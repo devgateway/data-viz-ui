@@ -153,34 +153,30 @@ const CustomSearch = (props) => {
         htmlProps: htmlInputAttrs,
     });
 
-    console.log("classes", classes);
-
 
     return (
-        <>
 
-            <Search
-                {...rest}
-                className={classes}
-                onBlur={handleBlur}
-                size="mini"
-                aligned
-                placeholder={placeholder}
-                onFocus={handleFocus}
-                onMouseDown={handleMouseDown}
-                resultRenderer={(res) => renderResults(res)}
-                onSearchChange={onSearchChange}
-                results={augmentedResults}
-                input={renderSearchInput()}
-                value={value}
-                showNoResults={showNoResults}
-                onResultSelect={onResultSelect}
-                loading={loading}
-                header={renderHeader()}
+        <Search
+            {...rest}
+            className={classes}
+            onBlur={handleBlur}
+            size="mini"
+            aligned="right"
+            placeholder={placeholder}
+            onFocus={handleFocus}
+            onMouseDown={handleMouseDown}
+            resultRenderer={(res) => renderResults(res)}
+            onSearchChange={onSearchChange}
+            results={augmentedResults}
+            input={renderSearchInput()}
+            value={value}
+            showNoResults={showNoResults}
+            onResultSelect={onResultSelect}
+            loading={loading}
+            header={renderHeader()}
 
-            >
-            </Search>
-        </>
+        >
+        </Search>
 
     );
 };
