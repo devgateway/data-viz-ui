@@ -6,28 +6,7 @@ const settingMappings = {
 }
 
 
-/*
-  const readCustomizationMessage = (event) => {
-            console.log("-------------------------------reading customizer message ----------------------------------------")
-            const data = JSON.parse(event.data);
-
-            const newSettings = {...customization}
-
-            if (settingMappings[data.property]) {
-                newSettings[settingMappings[data.property]] = data.value;
-            } else {
-                if (data.property.indexOf('menu')>-1){
-                    if (!newSettings["menu_settings"]){
-                        newSettings["menu_settings"]={}
-                    }
-                    newSettings["menu_settings"][data.property] = data.value;
-                }
-            }
-
-            window.settings=newSettings;
-        };
-* */
-const CustomizerWrapper = (props) => {
+export const CustomizerWrapper = (props) => {
 
 
     const [customization, setCustomization] = useState(props.settings)
@@ -69,6 +48,4 @@ const CustomizerWrapper = (props) => {
         settings: {...customization},
         key: `customizer-child-${index}`
     })))
-}
-
-export default CustomizerWrapper
+};

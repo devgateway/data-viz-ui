@@ -50,6 +50,7 @@ export default defineConfig({
             input: {
                 index: resolve(__dirname, 'src/index.ts'),
                 "styles.css": resolve(__dirname, 'src/scss/themes/default/index.scss'),
+                "common.css": resolve(__dirname, 'src/scss/common.scss'),
                 "tracker/index": resolve(__dirname, 'src/tracker/index.ts'),
                 "layout/index": resolve(__dirname, 'src/layout/index.ts'),
             },
