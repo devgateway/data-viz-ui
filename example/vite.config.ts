@@ -12,9 +12,11 @@ export default defineConfig({
     nodePolyfills({
       include: ["querystring"]
     }),
+    // @ts-ignore
     Environment({
       prefix: "VITE_",
     }),
+    // @ts-ignore
     commonjs(),
   ],
   optimizeDeps: {
