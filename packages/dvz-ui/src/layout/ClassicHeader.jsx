@@ -2,7 +2,7 @@ import { Container, Image, Menu } from "semantic-ui-react";
 import React, { useEffect, useState } from "react";
 import { MediaConsumer, MediaProvider, MenuConsumer, MenuProvider, utils } from "@devgateway/wp-react-lib";
 import { injectIntl } from "react-intl";
-import { useParams, Link, NavLink } from "react-router-dom";
+import { useParams, Link, NavLink } from "react-router";
 import SearchControl from "./SearchControl";
 import LangSwitcher from "./LangSwitcher";
 

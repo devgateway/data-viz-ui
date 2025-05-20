@@ -4,7 +4,7 @@ import {MediaConsumer, MediaProvider, MenuConsumer, MenuProvider} from "@devgate
 import {injectIntl} from "react-intl";
 import SearchControl from "./SearchControl.jsx";
 import LangSwitcher from "./LangSwitcher.jsx";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 
 const getPath = (menu, locationParams) => {
     const path = [];
@@ -42,7 +42,7 @@ const FloatingMenu = (props) => {
 
     return menu.items.filter(i => i.url != "#wpm-languages")
         .map((i) => {
-            
+
             return (<Menu.Item
                 className={`divided ${i.child_items ? 'has-child-items' : ''} ${selected && selected.ID == i.ID ? 'selected' : ''}  ${active == i.slug ? "active" : ""}`}>
                 {!i.child_items &&

@@ -5,7 +5,7 @@ import {
     PostConsumer,
     Post
 } from "@devgateway/wp-react-lib"
-import { useParams, useLocation } from 'react-router-dom'
+import { useParams, useLocation } from 'react-router'
 
 const PreviewTypeContainer = () => {
     const location = useLocation();

@@ -5,7 +5,7 @@ import {
     PageConsumer,
     Page
 } from "@devgateway/wp-react-lib"
-import { useLocation, useParams } from 'react-router-dom'
+import { useLocation, useParams } from 'react-router'
 
 const PreviewPageContainer = () => {
     const location = useLocation();

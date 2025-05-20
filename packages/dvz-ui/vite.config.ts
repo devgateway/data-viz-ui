@@ -51,6 +51,7 @@ export default defineConfig({
                 index: resolve(__dirname, 'src/index.ts'),
                 "styles.css": resolve(__dirname, 'src/scss/themes/default/index.scss'),
                 "tracker/index": resolve(__dirname, 'src/tracker/index.ts'),
+                "layout/index": resolve(__dirname, 'src/layout/index.ts'),
             },
             plugins: [preserveDirectives()],
             output: [

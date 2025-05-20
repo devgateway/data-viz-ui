@@ -24,7 +24,7 @@ interface LayoutProps {
     children: React.DetailedReactHTMLElement<any, HTMLElement>;
 }
 
-const Layout = ({ children }: LayoutProps) => {
+const Layout = () => {
     const pathParams = useParams();
     const defaultLocale = "en";
     const locale = pathParams.lan;
@@ -38,8 +38,8 @@ const Layout = ({ children }: LayoutProps) => {
         }
 
 
-        window.setTimeout(() => {
-            if (window.location.hash) {
+        window && window.setTimeout(() => {
+            if (window && window.location.hash) {
                 const element = document.getElementById(window.location.hash.substring(1));
                 if (element) {
                     element.scrollIntoView({ behavior: "auto", block: "start" });
@@ -53,7 +53,7 @@ const Layout = ({ children }: LayoutProps) => {
         store.dispatch(updateIntl({ locale, formats: {}, messages: messages[locale as Locale ?? 'en'] }));
     }, []);
 
-    const urlParams = new URLSearchParams(window.location.search);
+    const urlParams = new URLSearchParams(window && window.location.search);
     const customize_changeset_uuid = urlParams.get('customize_changeset_uuid');
 
 
@@ -73,7 +73,7 @@ const Layout = ({ children }: LayoutProps) => {
                 <AppContextProvider getComponent={getComponentByNameIgnoreCase} store={store} locale={locale}>
                     <SettingProvider locale={locale} changeUUID={customize_changeset_uuid}>
                         <SettingsConsumer>
-                            {children}
+                            <Outlet />
                         </SettingsConsumer>
                     </SettingProvider>
                 </AppContextProvider>
