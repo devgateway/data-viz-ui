@@ -1,5 +1,5 @@
 import { Action, ReducersMapObject } from "redux";
-import Immutable from "immutable";
+import * as Immutable from "immutable";
 import { getUnexpectedInvocationParameterMessage } from "./utils";
 
 export const combineReducers = <S extends Immutable.Map<string, any>>(
@@ -8,13 +8,13 @@ export const combineReducers = <S extends Immutable.Map<string, any>>(
 ): ((inputState: S | undefined, action: Action) => S) => {
   const reducerKeys = Object.keys(reducers);
 
-   
+
   return (inputState: S | undefined, action: Action): S => {
     if (typeof inputState === "undefined") {
       inputState = getDefaultState();
     }
 
-     
+
     if (process.env.NODE_ENV !== "production") {
       const warningMessage = getUnexpectedInvocationParameterMessage(
         inputState,
@@ -23,7 +23,7 @@ export const combineReducers = <S extends Immutable.Map<string, any>>(
       );
 
       if (warningMessage) {
-         
+
         console.error(warningMessage);
       }
     }
