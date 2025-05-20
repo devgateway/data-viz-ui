@@ -1,4 +1,5 @@
-import Immutable, { Record } from 'immutable'
+import * as Immutable from 'immutable';
+import { Record } from 'immutable';
 import createRootReducer from "./reducer";
 import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit';
 
