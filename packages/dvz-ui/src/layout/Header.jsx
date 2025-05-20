@@ -8,7 +8,7 @@ import {
     utils,
 } from "@devgateway/wp-react-lib";
 import { injectIntl } from "react-intl";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 import SearchComponent from "./SearchControl";
 import LangSwitcher from "./LangSwitcher";
 
@@ -48,9 +48,10 @@ const BreadCrumbs = injectIntl(({ menu, intl }) => {
         <React.Fragment>
             {path
                 .filter((i) => i.url != "#wpm-languages")
-                .map((i) =>
+                .map((i, index) =>
                     !i.child_items ? (
                         <a
+                            key={index}
                             className={i.slug == params.slug ? "active" : ""}
                             href={utils.replaceLink(i.url, intl.locale)}
                         >
@@ -58,7 +59,7 @@ const BreadCrumbs = injectIntl(({ menu, intl }) => {
                             {i.post_title}
                         </a>
                     ) : (
-                        <span>{i.post_title} </span>
+                        <span key={index}>{i.post_title} </span>
                     )
                 )}
         </React.Fragment>

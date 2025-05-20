@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Provider } from 'react-redux'
-import { Route, Routes, Navigate, useLocation, useParams, createBrowserRouter, createRoutesFromElements, RouterProvider } from 'react-router-dom';
+import { Route, Routes, Navigate, useLocation, useParams, createBrowserRouter, createRoutesFromElements, RouterProvider } from 'react-router';
 import { store } from '../../packages/dvz-ui/src/redux/store'
 import messages_en from "../../packages/dvz-ui/src/translations/en.json";
 import messages_fr from "../../packages/dvz-ui/src/translations/fr.json";
