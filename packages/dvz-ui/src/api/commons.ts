@@ -28,29 +28,24 @@ export const post = (url : string, params : Record<string, unknown>, isBlob = fa
             })
     })
 }
- 
-export const get = (url: string, params = {}) => {
-    return new Promise((resolve, reject) => {
 
-        fetch(url,{ headers: {
+export const get = async <T extends any>(url: string, params = {}): Promise<T> => {
+    try {
+        const response = await fetch(url, {
+            headers: {
                 Accept: 'application/json',
                 'Content-Type': 'application/json'
-            },
-        })
-            .then(
-                function (response) {
-                    if (response.status !== 200) {
-                        reject(response)
-                    }
-                    response.json().then(function (data) {
-                        resolve(data)
-                    })
-                }
-            )
-            .catch(function (err) {
-                reject(err)
-            })
-    })
+            }
+        });
+
+        if (!response.ok) {
+            throw response;
+        }
+
+        return await response.json();
+    } catch (error) {
+        throw error;
+    }
 }
 
 export const queryParams = (params : any) => {
