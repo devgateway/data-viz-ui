@@ -10,6 +10,7 @@ import {
   useParams,
   type LoaderFunctionArgs,
 } from "react-router";
+import './embeddable';
 import type { Route } from "./+types/root";
 import { getSettings } from "@devgateway/wp-react-lib/api";
 import "./app.css";
