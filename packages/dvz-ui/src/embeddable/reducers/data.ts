@@ -1,5 +1,5 @@
 import * as api from './data-api'
-import * as Immutable from 'immutable'
+import { Map, fromJS } from 'immutable'
 import Papa from 'papaparse'
 
 const LOAD_DATA = 'LOAD_DATA'
@@ -18,15 +18,15 @@ const SET_INITIAL_FILTER = 'SET_INITIAL_FILTER'
 const SET_APPLY = 'SET_APPLY'
 
 const CLEAN_FILTER = 'CLEAN_FILTER'
-const initialState = Immutable.Map({mode: 'info'})
+const initialState = Map({mode: 'info'})
 
 const SET_MEASURES = 'SET_MEASURES'
 const CLEAN_MEASURES = 'CLEAN_MEASURES'
 
-export const cleanMeasures = ({app, group}) => (dispatch, getState) => {
+export const cleanMeasures = ({app, group}: {app: string, group: string}) => (dispatch, getState) => {
     dispatch({type: CLEAN_MEASURES, app, group})
 }
-export const setMeasures = ({app, group, mGroup}) => (dispatch, getState) => {
+export const setMeasures = ({app, group, mGroup}: {app: string, group: string, mGroup: any}) => (dispatch, getState) => {
 
     const measures = Object.keys(mGroup.measures).filter(k => mGroup.measures[k].selected)
 
@@ -39,10 +39,10 @@ export const setMeasures = ({app, group, mGroup}) => (dispatch, getState) => {
     newMgroup[app].format = mGroup.format
     dispatch({type: SET_MEASURES, app, group, measure: newMgroup})
 }
-export const setFilter = ({app, group, param, value, autoApply}) => (dispatch, getState) => {
+export const setFilter = ({app, group, param, value, autoApply}: {app: string, group: string, param: string, value: any, autoApply: boolean}) => (dispatch, getState) => {
     dispatch({type: SET_FILTER, app, group, param, value, autoApply})
 }
-export const cleanFilter = ({app, group}) => (dispatch, getState) => {
+export const cleanFilter = ({app, group}: {app: string, group: string}) => (dispatch, getState) => {
 
     dispatch({type: CLEAN_FILTER, app, group})
     //dispatch({type: CLEAN_MEASURES, app, group})
@@ -59,7 +59,7 @@ export const getCategories = (props) => (dispatch, getState) => {
     const {app, params} = props
     dispatch({type: LOAD_CATEGORIES, params, app, dvzProxyDatasetId: params.dvzProxyDatasetId})
     api.getCategories({app, params})
-        .then(data => {
+        .then((data: any) => {
             data.appliedFilters = params
             return dispatch({type: LOAD_CATEGORIES_DONE, app, data, dvzProxyDatasetId: params.dvzProxyDatasetId})
         })
@@ -80,7 +80,7 @@ export const setData = ({app, group, csv, store, params}) => (dispatch, getState
 
     const data = Papa.parse(csv, {header: true, dynamicTyping: true});
 
-    const filtered = data.data.filter(d => {
+    const filtered = data.data.filter((d: any) => {
         let filtered = false
         Object.keys(params).forEach(k => {
             const field = k
@@ -170,7 +170,7 @@ export default (state = initialState, action) => {
             }
 
             return state.setIn([...path, "loading"], false)
-                .setIn([...path, "items"], Immutable.fromJS(data))
+                .setIn([...path, "items"], fromJS(data))
         }
         case LOAD_CATEGORIES_ERROR: {
             const {data, app, dvzProxyDatasetId} = action
