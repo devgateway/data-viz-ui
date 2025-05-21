@@ -6,14 +6,17 @@ export default [
         ...prefix(":lan", [
             index("./routes/home.tsx"),
             route(":slug", "./routes/slug.tsx"),
-            route(":parent/:slug", "./routes/parent-slug.tsx"),
+            route(":parent/:slug", "./routes/slug.tsx", {
+                id: "parent_slug"
+            }),
             // route(":lan/category/:slug", "./routes/category.tsx"),
             route("embeddable/:name", "./routes/embeddable.tsx"),
-            route("*", "./routes/loader.tsx")
-            // route(":lan/preview/page/:id", "./routes/previewPage.tsx"),
-            // route(":lan/preview/:type/:id", "./routes/previewType.tsx"),
-            // route(":lan/:year/:month/:day/:slug", "./routes/slugPost.tsx"),
-            // route(":lan/:parent/:year/:month/:day/:slug", "./routes/slugPost.tsx"),
+            route("preview/page/:id", "./routes/previewPage.tsx"),
+            route("preview/:type/:id", "./routes/previewType.tsx"),
+            route(":year/:month/:day/:slug", "./routes/slugPost.tsx"),
+            route("parent/:year/:month/:day/:slug", "./routes/slugPost.tsx", {
+                id: "parent_slug_with_year_month_day"
+            }),
         ]),
 
         // route("*", "./routes/not-found.tsx")
