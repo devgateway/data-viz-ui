@@ -1,5 +1,4 @@
 import { type RouteConfig, route, layout, prefix, index } from "@react-router/dev/routes";
-import { redirect } from 'react-router';
 
 export default [
     layout("./components/layout/index.tsx", [
@@ -9,7 +8,7 @@ export default [
             route(":parent/:slug", "./routes/slug.tsx", {
                 id: "parent_slug"
             }),
-            // route(":lan/category/:slug", "./routes/category.tsx"),
+            route("category/:slug", "./routes/category.tsx"),
             route("embeddable/:name", "./routes/embeddable.tsx"),
             route("preview/page/:id", "./routes/previewPage.tsx"),
             route("preview/:type/:id", "./routes/previewType.tsx"),
