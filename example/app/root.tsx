@@ -11,6 +11,7 @@ import {
   type LoaderFunctionArgs,
 } from "react-router";
 import type { Route } from "./+types/root";
+import { getSettings } from "@devgateway/wp-react-lib/api";
 import "./app.css";
 import 'semantic-ui-css/semantic.min.css';
 import "@devgateway/dvz-ui-react/dist/esm/styles.css";
@@ -19,13 +20,14 @@ import { injectIntl } from "react-intl";
 import Loading from "./components/layout/Loading";
 
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request }: Route.ClientLoaderArgs) {
   const url = new URL(request.url);
   const pathname = url.pathname;
   const segments = pathname.split('/').filter(Boolean); // Split path and remove empty segments
   const firstSegment = segments[0];
   const DEFAULT_LOCALE = "en";
   const SUPPORTED_LOCALES = ["en", "fr"];
+
 
   // Check if the first segment is a supported locale
   const hasValidLocale = SUPPORTED_LOCALES.includes(firstSegment as any);
