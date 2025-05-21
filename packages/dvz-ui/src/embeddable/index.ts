@@ -40,6 +40,9 @@ const SupersetDashboard = lazy(() => import("./superset-dashboard/index"));
 const BigNumber = lazy(() => import("./big-number/index"));
 const BigNumberTrend = lazy(() => import("./big-number-trend/index"));
 
+
+
+
 let reducerList = { data, embeddable };
 
 
@@ -84,6 +87,24 @@ export const components = {
     redirect: () => null
 }
 
+export const customizer = {
+    components: {},
+    registerCustomEmbeddables: (components: Record<string, React.ComponentType<any>>) => {
+        for (const [key, value] of Object.entries(components)) {
+            customizer.components[key] = value
+        }
+
+    },
+    getComponentByNameIgnoreCase : (name: string) => {
+        const k = Object.keys(customizer.components).find(value => value.toLowerCase() === name.toLowerCase())
+        if (k) {
+            const Component = customizer.components[k]
+            return React.memo(injectIntl(Component))
+        }
+        return null
+    }
+}
+
 export const getComponentByNameIgnoreCase = (name: string) => {
 
     const k = Object.keys(components).find(value => value.toLowerCase() === name.toLowerCase())
@@ -91,5 +112,11 @@ export const getComponentByNameIgnoreCase = (name: string) => {
         const Component = components[k]
         return React.memo(injectIntl(Component))
     }
+
+    const customComponent = customizer.getComponentByNameIgnoreCase(name)
+    if (customComponent) {
+        return React.memo(injectIntl(customComponent))
+    }
+
     return null
 }
