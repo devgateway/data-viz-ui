@@ -1,8 +1,8 @@
-
 export {
     getComponentByNameIgnoreCase,
     components,
-    reducers
+    reducers,
+    customizer
 } from "./embeddable/index";
 // export * from "./conf";
 // export * from "./layout";
