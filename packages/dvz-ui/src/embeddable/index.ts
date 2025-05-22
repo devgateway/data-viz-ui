@@ -2,6 +2,7 @@ import React, { lazy } from 'react'
 import data from './reducers/data'
 import embeddable from './reducers/embeddable'
 import { injectIntl } from "react-intl";
+import Immutable from 'immutable';
 
 // components
 const PageGallery = lazy(() => import("./pagegallery/index"));
@@ -18,7 +19,7 @@ const VerticalFeaturedTabs = lazy(() => import("./vertical-featuredtabs/index"))
 const InlineList = lazy(() => import("./inlinelist/index"));
 const AgreeAndDownload = lazy(() => import("./agree-and-download/index"));
 const DownloadPdf = lazy(() => import("./downloadPDF/index"));
-const Map = lazy(() => import("./map/index"));
+const MapView = lazy(() => import("./map/index"));
 const DataFiltersReset = lazy(() => import("./filter-reset-button/index"));
 const DataFiltersApply = lazy(() => import("./filters-apply-button/index"));
 const Tooltip = lazy(() => import("./tooltip/index"));
@@ -41,13 +42,6 @@ const BigNumber = lazy(() => import("./big-number/index"));
 const BigNumberTrend = lazy(() => import("./big-number-trend/index"));
 
 
-
-
-let reducerList = { data, embeddable };
-
-
-export const reducers = reducerList;
-
 export const components = {
     pageGallery: PageGallery,
     postsCarousel: PostsCarousel,
@@ -62,7 +56,7 @@ export const components = {
     inlineList: InlineList,
     download: Download,
     downloadPdf: DownloadPdf,
-    map: Map,
+    map: MapView,
     dataFiltersReset: DataFiltersReset,
     dataFiltersApply: DataFiltersApply,
     tooltip: Tooltip,
@@ -89,11 +83,13 @@ export const components = {
 
 export const customizer = {
     components: {},
+    reducers: {} as Record<string, (state: Immutable.MapOf<{
+        mode: string;
+    }> | undefined, action: any) => any>,
     registerCustomEmbeddables: (components: Record<string, React.ComponentType<any>>) => {
         for (const [key, value] of Object.entries(components)) {
             customizer.components[key] = value
         }
-
     },
     getComponentByNameIgnoreCase : (name: string) => {
         const k = Object.keys(customizer.components).find(value => value.toLowerCase() === name.toLowerCase())
@@ -102,6 +98,16 @@ export const customizer = {
             return React.memo(injectIntl(Component))
         }
         return null
+    },
+    registerCustomReducers: (reducers: (state: Immutable.MapOf<{
+        mode: string;
+    }> | undefined, action: any) => any) => {
+        for (const [key, value] of Object.entries(reducers)) {
+            customizer.reducers[key] = value
+        }
+    },
+    getReducers: () => {
+        return customizer.reducers
     }
 }
 
@@ -120,3 +126,5 @@ export const getComponentByNameIgnoreCase = (name: string) => {
 
     return null
 }
+
+export const reducers =  { data, embeddable, ...customizer.getReducers() };
