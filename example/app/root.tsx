@@ -5,14 +5,10 @@ import {
   Outlet,
   redirect,
   Scripts,
-  ScrollRestoration,
-  useNavigate,
-  useParams,
-  type LoaderFunctionArgs,
+  ScrollRestoration
 } from "react-router";
 import './embeddable';
 import type { Route } from "./+types/root";
-import { getSettings } from "@devgateway/wp-react-lib/api";
 import "./app.css";
 import 'semantic-ui-css/semantic.min.css';
 import "@devgateway/dvz-ui-react/dist/esm/styles.css";
