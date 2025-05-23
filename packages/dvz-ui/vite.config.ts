@@ -46,7 +46,7 @@ export default defineConfig({
             exclude: ['node_modules'],
         },
         rollupOptions: {
-            external: [...Object.keys(packageJson.dependencies || {}), ...Object.keys(packageJson.devDependencies || {}), 'react', 'react/jsx-runtime', 'react-dom', 'react-dom/client', 'react-router-dom', 'core-js'],
+            external: [...Object.keys(packageJson.dependencies || {}), ...Object.keys(packageJson.devDependencies || {}), 'react', 'react/jsx-runtime', 'react-dom', 'react-dom/client', 'core-js'],
             input: {
                 index: resolve(__dirname, 'src/index.ts'),
                 "styles.css": resolve(__dirname, 'src/scss/themes/default/index.scss'),
