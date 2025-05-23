@@ -9,7 +9,8 @@
     "build": "rm -rf dist && vite build"
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md"
   ],
   "keywords": [
     "data-viz",
@@ -23,8 +24,14 @@
     "react-ui-components"
   ],
   "author": "Timothy Mugo",
-  "license": "ISC",
-  "description": "",
+  "license": "MIT",
+  "description": "A modular, embeddable React component library for data visualization and UI, built with TypeScript. Provides reusable components for charts, maps, dashboards, and more, with built-in support for internationalization and Redux integration.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/devgateway/data-viz-ui.git"
+  },
+  "homepage": "https://github.com/devgateway/data-viz-ui/tree/main/packages/dvz-ui",
+  "bugs": "https://github.com/devgateway/data-viz-ui/issues",
   "dependencies": {
     "@artsy/fresnel": "^8.1.0",
     "@devgateway/wp-react-lib": "workspace:*",
