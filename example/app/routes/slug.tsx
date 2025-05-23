@@ -1,9 +1,41 @@
 import React from "react";
 import { SlugContainer } from "@devgateway/dvz-ui-react/layout";
 import type { Route } from "./+types/slug";
+import { getPages } from "@devgateway/wp-react-lib/api";
+import { getMetaSeo } from "~/utils/meta-seo";
+
+export async function clientLoader({ request, params}: Route.ClientLoaderArgs) {
+  const posts = await getPages({
+    slug: params.slug,
+    locale: params.lan,
+  });
+
+  const findPost = posts.data.find(post => post.slug === params.slug);
+  if (!findPost) {
+    return {
+      post: null,
+    }
+  }
+
+  return {
+    post: findPost,
+  }
+}
+
+export function meta({ data }: Route.MetaArgs): Route.MetaDescriptors {
+  const post = data.post;
+  const yoastHead = post?.yoast_head_json ?? {};
+  if (!post || !yoastHead) {
+    return [
+      { title: "Page not found" },
+      { name: "description", content: "Page not found" },
+    ];
+  }
+
+  return getMetaSeo(post, yoastHead);
+}
 
 const SlugRoute = (props: Route.ComponentProps) => {
-  // const { lan, slug, parent } = params;
   return <SlugContainer />;
 };
 
