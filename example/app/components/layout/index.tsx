@@ -8,9 +8,10 @@ import {
     afrikaansTranslations,
     getComponentByNameIgnoreCase
 } from '@devgateway/dvz-ui-react';
-import { IntlProvider } from 'react-intl';
+import { injectIntl, IntlProvider } from 'react-intl';
 import { AppContextProvider, SettingProvider, SettingsConsumer } from '@devgateway/wp-react-lib';
 import { Provider } from 'react-redux';
+import { CustomizerWrapper } from '@devgateway/dvz-ui-react/layout';
 
 type Locale = 'en' | 'fr' | 'am';
 
@@ -19,6 +20,13 @@ const messages: Record<Locale, any> = {
     'fr': frenchTranslations.default,
     'am': afrikaansTranslations.default
 };
+
+const InjectTitle = injectIntl((props) => {
+
+    // @ts-expect-error description
+    document.title = props.settings.description
+    return <></>
+});
 
 interface LayoutProps {
     children: React.DetailedReactHTMLElement<any, HTMLElement>;
@@ -73,6 +81,9 @@ const Layout = () => {
                 <AppContextProvider getComponent={getComponentByNameIgnoreCase} store={store} locale={locale}>
                     <SettingProvider locale={locale} changeUUID={customize_changeset_uuid}>
                         <SettingsConsumer>
+                            <CustomizerWrapper>
+                                <InjectTitle />
+                            </CustomizerWrapper>
                             <Outlet />
                         </SettingsConsumer>
                     </SettingProvider>
