@@ -3,6 +3,8 @@ name: Release NPM Packages
 on:
   workflow_dispatch:
   push:
+    paths-ignore:
+    - "example/**"
     branches:
     - main
 
