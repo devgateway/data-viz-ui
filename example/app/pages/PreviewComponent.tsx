@@ -1,30 +1,29 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation, useParams } from 'react-router';
+import { useLocation, useParams, useSearchParams } from 'react-router';
 import { getComponentByNameIgnoreCase } from '@devgateway/dvz-ui-react/embeddable';
 import { Container, Segment } from 'semantic-ui-react';
-import queryString from 'querystring';
 import { SettingsConsumer } from '@devgateway/wp-react-lib';
 
 
 const PreviewComponentParameterParser = () => {
     const urlParams = useParams();
     const location = useLocation();
-    console.log("urlParams", urlParams)
-    console.log("location", location)
+
     const [UIComponent] = useState(() => getComponentByNameIgnoreCase(urlParams.name ?? ''));
 
 
-    const [params, setParams] = useState(queryString.parse(location.search))
+    let [params, setParams] = useSearchParams();
     const readMessage = (event: MessageEvent) => {
         const data = event.data
         if (data.messageType && data.messageType == 'component-attributes') {
 
-            const newPrams = { ...params }
+            const newParams = new URLSearchParams(params);
             Object.keys(data).forEach(k => {
-                newPrams["data-" + k.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()] = typeof data[k] == 'object' ? JSON.stringify(data[k]) : data[k]
-            })
-
-            setParams(newPrams)
+                const key = "data-" + k.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+                const value = typeof data[k] === 'object' ? JSON.stringify(data[k]) : data[k];
+                newParams.set(key, value);
+            });
+            setParams(newParams);
         }
     };
 
