@@ -13,7 +13,6 @@ import "./app.css";
 import 'semantic-ui-css/semantic.min.css';
 import "@devgateway/dvz-ui-react/dist/esm/styles.css";
 import "@devgateway/dvz-ui-react/dist/esm/common.css";
-import { injectIntl } from "react-intl";
 import Loading from "./components/layout/Loading";
 
 
@@ -57,7 +56,7 @@ export function HydrateFallback() {
 }
 
 
-export function Layout({ children }: { children: React.ReactNode }) {
+export function Layout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
       <head>
@@ -75,32 +74,17 @@ export function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
-const InjectTitle = injectIntl((props) => {
-
-  // @ts-expect-error description
-  document.title = props.settings.description
-  return <></>
-});
-
-
 export default function App() {
   if (typeof window === 'undefined') {
     return <Loading />
   }
 
   return (
-    <>
-      {/* <ScrollToTop /> */}
-      {/* <CustomizerWrapper>
-        <InjectTitle />
-      </CustomizerWrapper> */}
-
-      <Outlet />
-    </>
+    <Outlet/>
   );
 }
 
-export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
+export function ErrorBoundary({ error }: Readonly<Route.ErrorBoundaryProps>) {
   let message = "Oops!";
   let details = "An unexpected error occurred.";
   let stack: string | undefined;
