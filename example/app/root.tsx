@@ -32,7 +32,7 @@ export async function loader({ request }: Route.ClientLoaderArgs) {
   // If no locale is present, redirect to the default locale
   if (!hasValidLocale) {
     const newPath = `/${DEFAULT_LOCALE}${pathname === '/' ? '' : pathname}`;
-    return redirect(newPath, { status: 307 }); // 307 preserves the HTTP method
+    return redirect(newPath, { status: 200 }); // 307 preserves the HTTP method
   }
 
   // If locale is valid, proceed without redirection
