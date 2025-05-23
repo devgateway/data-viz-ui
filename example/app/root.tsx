@@ -5,7 +5,7 @@ import {
   Outlet,
   redirect,
   Scripts,
-  ScrollRestoration
+  ScrollRestoration,
 } from "react-router";
 import './embeddable';
 import type { Route } from "./+types/root";
@@ -84,6 +84,9 @@ const InjectTitle = injectIntl((props) => {
 
 
 export default function App() {
+  if (typeof window === 'undefined') {
+    return <Loading />
+  }
 
   return (
     <>
