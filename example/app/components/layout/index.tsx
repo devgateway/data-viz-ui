@@ -10,7 +10,10 @@ import {
 } from '@devgateway/dvz-ui-react';
 import { IntlProvider } from 'react-intl';
 import { AppContextProvider, SettingProvider, SettingsConsumer } from '@devgateway/wp-react-lib';
-import { Provider } from 'react-redux'
+import { Provider } from 'react-redux';
+import { createHead, UnheadProvider } from '@unhead/react/client';
+
+const head = createHead();
 
 type Locale = 'en' | 'fr' | 'am';
 
@@ -69,15 +72,18 @@ const Layout = () => {
 
     return (
         <Provider store={store}>
-            <IntlProvider key={locale} locale={locale} messages={messages[locale as Locale]}>
-                <AppContextProvider getComponent={getComponentByNameIgnoreCase} store={store} locale={locale}>
-                    <SettingProvider locale={locale} changeUUID={customize_changeset_uuid}>
-                        <SettingsConsumer>
-                            <Outlet />
-                        </SettingsConsumer>
-                    </SettingProvider>
-                </AppContextProvider>
-            </IntlProvider>
+            <UnheadProvider head={head}>
+                <IntlProvider key={locale} locale={locale} messages={messages[locale as Locale]}>
+                    <AppContextProvider getComponent={getComponentByNameIgnoreCase} store={store} locale={locale}>
+                        <SettingProvider locale={locale} changeUUID={customize_changeset_uuid}>
+                            <SettingsConsumer>
+                                <Outlet />
+                            </SettingsConsumer>
+                        </SettingProvider>
+                    </AppContextProvider>
+                </IntlProvider>
+            </UnheadProvider>
+
         </Provider>
     );
 }

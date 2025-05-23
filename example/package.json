@@ -6,6 +6,7 @@
     "build": "tsc && react-router build",
     "dev": "react-router dev",
     "start": "react-router-serve ./build/server/index.js",
+    "serve": "vite preview",
     "typecheck": "react-router typegen && tsc"
   },
   "dependencies": {
