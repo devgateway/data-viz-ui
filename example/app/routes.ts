@@ -16,6 +16,9 @@ export default [
             route("parent/:year/:month/:day/:slug", "./routes/slugPost.tsx", {
                 id: "parent_slug_with_year_month_day"
             }),
+            route("/.well-known/appspecific/com.chrome.devtools.json", "./routes/devtools.tsx", {
+                id: "devtools"
+            })
         ]),
 
         // route("*", "./routes/not-found.tsx")

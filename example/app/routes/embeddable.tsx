@@ -4,14 +4,13 @@ import PreviewComponent from "~/pages/PreviewComponent";
 
 export function meta({ }: Route.MetaArgs) {
     return [
-        { title: "New React Router App" },
-        { name: "description", content: "Welcome to React Router!" },
+        { title: "Data Viz Embeddable" },
+        { name: "description", content: "Data Viz Embeddable" },
     ];
 }
 
 
 const Embeddable = () => {
-    console.log("Embeddable")
     return (
         <div>
             <PreviewComponent />
