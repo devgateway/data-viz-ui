@@ -1,12 +1,16 @@
-import React from "react";
-import { SlugContainer } from "@devgateway/dvz-ui-react/layout";
+import React, { lazy} from "react";
 import type { Route } from "./+types/slug";
 import { getPages } from "@devgateway/wp-react-lib/api";
 import { getMetaSeo } from "~/utils/meta-seo";
 
-export async function clientLoader({ request, params}: Route.ClientLoaderArgs) {
+const SlugContainer = lazy(async () => {
+  const module = await import('@devgateway/dvz-ui-react/layout');
+  return { default: module.SlugContainer };
+});
+
+export async function loader({ request, params}: Route.LoaderArgs) {
   const posts = await getPages({
-    slug: params.slug,
+    slug: params.slug ?? "home",
     locale: params.lan,
   });
 
