@@ -5,6 +5,11 @@ import ResponsiveContainer from "@devgateway/dvz-ui-react/layout";
 import { useParams } from "react-router";
 import { getPages } from "@devgateway/wp-react-lib/api";
 import { getMetaSeo } from "../utils/meta-seo";
+import Loading from "~/components/layout/Loading";
+
+export function HydrateFallback() {
+  return <Loading />
+}
 
 
 export async function clientLoader({ request, params}: Route.ClientLoaderArgs) {
@@ -26,12 +31,12 @@ export async function clientLoader({ request, params}: Route.ClientLoaderArgs) {
 }
 
 export function meta({ data }: Route.MetaArgs): Route.MetaDescriptors {
-  const post = data.post;
+  const post = data?.post;
   const yoastHead = post?.yoast_head_json ?? {};
   if (!post || !yoastHead) {
     return [
-      { title: "Page not found" },
-      { name: "description", content: "Page not found" },
+      { title: "Home" },
+      { name: "description", content: "Home" },
     ];
   }
 
