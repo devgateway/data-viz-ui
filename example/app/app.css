@@ -1,0 +1,9 @@
+/* Your Global Custom CSS code here */
+
+.h-screen {
+  height: 100vh;
+}
+
+.w-screen {
+  width: 100vw;
+}

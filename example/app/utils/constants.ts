@@ -1,0 +1,1 @@
+export const DEFAULT_LOCALE = import.meta.env.VITE_REACT_APP_DEFAULT_LOCALE ?? "en";

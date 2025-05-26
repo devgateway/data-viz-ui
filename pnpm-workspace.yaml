@@ -1,0 +1,4 @@
+packages:
+- packages/*
+- packages/react-lib/*
+- example
