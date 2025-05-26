@@ -2,11 +2,18 @@ import React, { lazy} from "react";
 import type { Route } from "./+types/slug";
 import { getPages } from "@devgateway/wp-react-lib/api";
 import { getMetaSeo } from "~/utils/meta-seo";
+import Loading from "~/components/layout/Loading";
 
 const SlugContainer = lazy(async () => {
   const module = await import('@devgateway/dvz-ui-react/layout');
   return { default: module.SlugContainer };
 });
+
+
+export function HydrateFallback() {
+  return <Loading />
+}
+
 
 export async function loader({ request, params}: Route.LoaderArgs) {
   const posts = await getPages({
