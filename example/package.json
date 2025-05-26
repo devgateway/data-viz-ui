@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "tsc && react-router build",
+    "build": "pnpm run typecheck && react-router build",
     "dev": "react-router dev",
     "start": "react-router-serve ./build/server/index.js",
     "serve": "vite preview",
