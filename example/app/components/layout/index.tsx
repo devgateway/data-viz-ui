@@ -60,7 +60,7 @@ const Layout = () => {
     useEffect(() => {
         // This effect runs on every update, equivalent to componentDidUpdate
         store.dispatch(updateIntl({ locale, formats: {}, messages: messages[locale as Locale ?? 'en'] }));
-    }, []);
+    }, [locale]);
 
     const urlParams = new URLSearchParams(window && window.location.search);
     const customize_changeset_uuid = urlParams.get('customize_changeset_uuid');
