@@ -255,7 +255,7 @@ const MenuItems = injectIntl(
     }
 );
 
-const Header = ({ intl, settings }) => {
+const Header = ({ intl, settings = {} }) => {
     const [selected, setSelected] = useState();
     const [isMenuVisible, setMenuVisible] = useState(false);
     const [isSmallScreen, setIsSmallScreen] = useState(false);
