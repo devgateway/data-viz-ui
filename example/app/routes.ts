@@ -2,6 +2,9 @@ import { type RouteConfig, route, layout, prefix, index } from "@react-router/de
 
 export default [
     layout("./components/layout/index.tsx", [
+        index("./routes/home.tsx", {
+            id: "home_index"
+        }),
         ...prefix(":lan", [
             index("./routes/home.tsx"),
             route(":slug", "./routes/slug.tsx"),
