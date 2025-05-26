@@ -3,11 +3,8 @@ import {
   Links,
   Meta,
   Outlet,
-  redirect,
   Scripts,
   ScrollRestoration,
-  useParams,
-  Navigate
 } from "react-router";
 import './embeddable';
 import type { Route } from "./+types/root";
@@ -16,29 +13,6 @@ import 'semantic-ui-css/semantic.min.css';
 import "@devgateway/dvz-ui-react/dist/esm/styles.css";
 import "@devgateway/dvz-ui-react/dist/esm/common.css";
 import Loading from "./components/layout/Loading";
-
-
-export async function loader({ request }: Route.ClientLoaderArgs) {
-  const url = new URL(request.url);
-  const pathname = url.pathname;
-  const segments = pathname.split('/').filter(Boolean); // Split path and remove empty segments
-  const firstSegment = segments[0];
-  const DEFAULT_LOCALE = "en";
-  const SUPPORTED_LOCALES = ["en", "fr"];
-
-
-  // Check if the first segment is a supported locale
-  const hasValidLocale = SUPPORTED_LOCALES.includes(firstSegment as any);
-
-  // If no locale is present, redirect to the default locale
-  if (!hasValidLocale) {
-    const newPath = `/${DEFAULT_LOCALE}${pathname === '/' ? '' : pathname}`;
-    return redirect(newPath, { status: 200 }); // 307 preserves the HTTP method
-  }
-
-  // If locale is valid, proceed without redirection
-  return null;
-}
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
