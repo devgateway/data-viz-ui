@@ -38,3 +38,4 @@
 - *(DVIZ-43)* Configure dvz-ui for release
 - *(DVIZ-43)* Add home index route and loading fallback component
 - *(DVIZ-43)* implement default locale constant and enhance routing with loading fallbacks
+- *(DVIZ-43): enable custom header and footer
