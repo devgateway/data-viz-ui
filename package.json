@@ -8,7 +8,8 @@
     "example"
   ],
   "scripts": {
-    "build": "pnpm --filter @devgateway/* build"
+    "build": "pnpm --filter @devgateway/* build",
+    "version": "changeset version"
   },
   "keywords": [],
   "author": "",
