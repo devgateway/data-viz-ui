@@ -36,3 +36,5 @@
 - *(DVIZ-43)* Configure github actions
 - *(DVIZ-43)* Remove old-ui folder
 - *(DVIZ-43)* Configure dvz-ui for release
+- *(DVIZ-43)* Add home index route and loading fallback component
+- *(DVIZ-43)* implement default locale constant and enhance routing with loading fallbacks

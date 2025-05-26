@@ -6,6 +6,7 @@ import { useParams } from "react-router";
 import { getPages } from "@devgateway/wp-react-lib/api";
 import { getMetaSeo } from "../utils/meta-seo";
 import Loading from "~/components/layout/Loading";
+import { DEFAULT_LOCALE } from "~/utils/constants";
 
 export function HydrateFallback() {
   return <Loading />
@@ -48,7 +49,7 @@ const Home = ({
   loaderData
 }: Route.ComponentProps) => {
   const params = useParams();
-  const locale = params.lan ?? "en";
+  const locale = params.lan ?? DEFAULT_LOCALE;
 
   return (
     <PageProvider
