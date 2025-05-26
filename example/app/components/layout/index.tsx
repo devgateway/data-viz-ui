@@ -12,6 +12,7 @@ import { injectIntl, IntlProvider } from 'react-intl';
 import { AppContextProvider, SettingProvider, SettingsConsumer } from '@devgateway/wp-react-lib';
 import { Provider } from 'react-redux';
 import { CustomizerWrapper } from '@devgateway/dvz-ui-react/layout';
+import { DEFAULT_LOCALE } from '~/utils/constants';
 
 type Locale = 'en' | 'fr' | 'am';
 
@@ -34,7 +35,7 @@ interface LayoutProps {
 
 const Layout = () => {
     const pathParams = useParams();
-    const defaultLocale = "en";
+    const defaultLocale = DEFAULT_LOCALE;
     const locale = pathParams.lan;
 
     useEffect(() => {
