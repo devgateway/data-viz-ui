@@ -1,17 +1,18 @@
-# Welcome to React Router!
+# Welcome to dvz-ui Example Project
 
-A modern, production-ready template for building full-stack React applications using React Router.
+This project demonstrates the integration of `dvz-ui` with a React application, providing a modern UI component library for building dynamic and responsive user interfaces.
 
 [![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/remix-run/react-router-templates/tree/main/default)
 
 ## Features
 
+- 🌟 Pre-built components from `dvz-ui` for rapid development
 - 🚀 Server-side rendering
 - ⚡️ Hot Module Replacement (HMR)
 - 📦 Asset bundling and optimization
 - 🔄 Data loading and mutations
 - 🔒 TypeScript by default
-- 📖 [React Router docs](https://reactrouter.com/)
+- 📖 [dvz-ui documentation](https://example.com/dvz-ui-docs)
 
 ## Getting Started
 
