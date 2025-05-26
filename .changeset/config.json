@@ -7,7 +7,8 @@
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
   "ignore": [
-    "example"
+    "example",
+    "@devgateway/wp-react-lib"
   ],
   "changelog": [
     "@changesets/changelog-github",
