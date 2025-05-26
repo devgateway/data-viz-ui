@@ -6,6 +6,8 @@ import {
   redirect,
   Scripts,
   ScrollRestoration,
+  useParams,
+  Navigate
 } from "react-router";
 import './embeddable';
 import type { Route } from "./+types/root";
