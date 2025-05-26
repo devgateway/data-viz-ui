@@ -12,7 +12,8 @@ The data-viz-front submodule offers a set of embeddable React components that ca
 - Intellij IDEA/ Visual Studio Code / WebStorm
 
 
-Contributing
+## Contributing
+
 For details about how to send pull requests, please read CONTRIBUTING.md.
 
 ## Author
