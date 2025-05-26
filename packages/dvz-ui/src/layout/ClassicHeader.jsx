@@ -61,7 +61,7 @@ const MenuItems = injectIntl(({
 }) => {
 
     const params = useParams()
-    useEffect((e) => {
+    useEffect(() => {
         if (!selected) {
             const pathSelected = getPath(menu, params)
             const items = pathSelected.filter(i => i.menu_item_parent == 0)
