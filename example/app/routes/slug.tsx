@@ -15,7 +15,7 @@ export function HydrateFallback() {
 }
 
 
-export async function loader({ request, params}: Route.LoaderArgs) {
+export async function clientLoader({ request, params}: Route.ClientLoaderArgs) {
   const posts = await getPages({
     slug: params.slug ?? "home",
     locale: params.lan,
@@ -34,7 +34,7 @@ export async function loader({ request, params}: Route.LoaderArgs) {
 }
 
 export function meta({ data }: Route.MetaArgs): Route.MetaDescriptors {
-  const post = data.post;
+  const post = data?.post;
   const yoastHead = post?.yoast_head_json ?? {};
   if (!post || !yoastHead) {
     return [
@@ -46,7 +46,7 @@ export function meta({ data }: Route.MetaArgs): Route.MetaDescriptors {
   return getMetaSeo(post, yoastHead);
 }
 
-const SlugRoute = (props: Route.ComponentProps) => {
+const SlugRoute = ({ loaderData }: Route.ComponentProps) => {
   return <SlugContainer />;
 };
 
