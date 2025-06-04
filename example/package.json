@@ -5,22 +5,23 @@
   "scripts": {
     "build": "pnpm run typecheck && react-router build",
     "dev": "react-router dev",
-    "start": "react-router-serve ./build/server/index.js",
+    "start": "PORT=4173 react-router-serve ./build/server/index.js",
     "serve": "vite preview",
     "typecheck": "react-router typegen && tsc"
   },
   "dependencies": {
     "@devgateway/dvz-ui-react": "workspace:*",
     "@devgateway/wp-react-lib": "workspace:*",
-    "@react-router/node": "^7.5.3",
-    "@react-router/serve": "^7.5.3",
+    "@react-router/node": "^7.6.0",
+    "@react-router/serve": "^7.6.0",
+    "immutable": "^5.1.2",
     "isbot": "^5.1.27",
     "lodash": "^4.17.21",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-intl": "^7.1.11",
     "react-redux": "^9.2.0",
-    "react-router": "^7.5.3",
+    "react-router": "^7.6.0",
     "semantic-ui-css": "^2.5.0",
     "semantic-ui-react": "3.0.0-beta.2"
   },
@@ -36,5 +37,6 @@
     "vite-plugin-env-compatible": "^2.0.1",
     "vite-plugin-node-polyfills": "^0.23.0",
     "vite-tsconfig-paths": "^5.1.4"
-  }
+  },
+  "packageManager": "pnpm@10.10.0+sha512.d615db246fe70f25dcfea6d8d73dee782ce23e2245e3c4f6f888249fb568149318637dca73c2c5c8ef2a4ca0d5657fb9567188bfab47f566d1ee6ce987815c39"
 }
