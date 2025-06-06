@@ -31,6 +31,27 @@ export async function clientLoader({ request, params}: Route.ClientLoaderArgs) {
   }
 }
 
+
+
+
+// export async function loader({ request, params}: Route.LoaderArgs) {
+//   const posts = await getPages({
+//     slug: "home",
+//     locale: params.lan,
+//   });
+//
+//   const findPost = posts.data.find(post => post.slug === "home");
+//   if (!findPost) {
+//     return {
+//       post: null,
+//     }
+//   }
+//
+//   return {
+//     post: findPost,
+//   }
+// }
+
 export function meta({ data }: Route.MetaArgs): Route.MetaDescriptors {
   const post = data?.post;
   const yoastHead = post?.yoast_head_json ?? {};
