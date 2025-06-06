@@ -76,10 +76,14 @@ const Layout = () => {
         return <Navigate to={defaultLocale}></Navigate>
     }
 
+    console.log("----------locale-----------");
+    console.log(locale);
+    console.log("----------locale-----------");
+
     return (
         <Provider store={store}>
             <IntlProvider key={locale} locale={locale} messages={messages[locale as Locale]}>
-                <AppContextProvider getComponent={getComponentByNameIgnoreCase} store={store} locale={locale}>
+                <AppContextProvider getComponent={getComponentByNameIgnoreCase} store={store} locale={"en"}>
                     <SettingProvider locale={locale} changeUUID={customize_changeset_uuid}>
                         <SettingsConsumer>
                             <CustomizerWrapper>
