@@ -6,19 +6,21 @@ import {
 import React from 'react'
 import { useParams } from 'react-router';
 import ResponsiveContainer from '../ResponsiveContainer';
-// import Helmet from "@/components/Helmet";
 
-const SlugContainer = () => {
+interface SlugContainerProps {
+    header?: React.ReactNode;
+    footer?: React.ReactNode;
+}
+
+const SlugContainer = ({ header, footer }: SlugContainerProps) => {
     const { lan: locale ,slug } = useParams();
     return (
         <PageProvider
             locale={locale}
             slug={slug}
             store={slug}>
-            <ResponsiveContainer>
+            <ResponsiveContainer header={header} footer={footer}>
                 <PageConsumer>
-
-                    {/* <Helmet locale={locale}></Helmet> */}
                     <Page></Page>
                 </PageConsumer>
             </ResponsiveContainer>
