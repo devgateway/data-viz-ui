@@ -1,5 +1,13 @@
 # @devgateway/dvz-ui-react
 
+## 1.0.4
+
+### Patch Changes
+
+- [#17](https://github.com/devgateway/data-viz-ui/pull/17) [`486c7da`](https://github.com/devgateway/data-viz-ui/commit/486c7daff5b4e8736f9f15ae5a44249fce1298a3) Thanks [@timothygachengo](https://github.com/timothygachengo)! - # Changes
+
+  - Add `header` and `footer` props in the PreviewPageContainers, PreviewTypeContainers, SlugContainer and SlugPostContainer to be injected in the `ResponsiveContainer` component.
+
 ## 1.0.3
 
 ### Patch Changes
