@@ -7,7 +7,12 @@ import {
 } from "@devgateway/wp-react-lib"
 import { useParams, useLocation } from 'react-router'
 
-const PreviewTypeContainer = () => {
+interface PreviewTypeContainerProps {
+    header?: React.ReactNode;
+    footer?: React.ReactNode;
+}
+
+const PreviewTypeContainer = ({ header, footer }: PreviewTypeContainerProps) => {
     const location = useLocation();
     const props = useParams();
 
@@ -17,7 +22,7 @@ const PreviewTypeContainer = () => {
     const previewNonce = searchParams.get("_wpnonce");
 
     return (
-        <ResponsiveContainer>
+        <ResponsiveContainer header={header} footer={footer}>
             <PostProvider type={type}
                 store={"preview"}
                 perPage={1}
