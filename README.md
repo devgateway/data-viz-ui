@@ -8,8 +8,28 @@ The data-viz-front submodule offers a set of embeddable React components that ca
 
 - Docker
 - NodeJS v22+
-- PNPM
+- PNPM v9+
 - Intellij IDEA/ Visual Studio Code / WebStorm
+
+## Setup
+
+- Clone the repo
+
+```bash
+git clone --recurse-submodules git@github.com:devgateway/data-viz-ui.git
+```
+
+- Install
+
+```bash
+pnpm install
+```
+
+- Run the example project
+
+```bash
+cd example && pnpm run dev
+```
 
 
 ## Contributing
