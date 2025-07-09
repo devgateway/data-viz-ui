@@ -1,5 +1,12 @@
 # @devgateway/dvz-ui-react
 
+## 1.0.5
+
+### Patch Changes
+
+- [`23c615b`](https://github.com/devgateway/data-viz-ui/commit/23c615b94a8cfd344bc70baee803d0219205721b) Thanks [@sdimunzio](https://github.com/sdimunzio)! - Updating repo history in order to prepare it for public access
+  - Removed the Wordpress, custom and pre-render folders from git.
+
 ## 1.0.4
 
 ### Patch Changes
