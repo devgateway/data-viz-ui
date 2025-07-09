@@ -1,5 +1,11 @@
 # @devgateway/dvz-ui-react
 
+## 1.0.6
+
+### Patch Changes
+
+- [#24](https://github.com/devgateway/data-viz-ui/pull/24) [`0c81a74`](https://github.com/devgateway/data-viz-ui/commit/0c81a742d54f194172a36e3f937da62e7540cfbf) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Update wp-react-lib
+
 ## 1.0.5
 
 ### Patch Changes
