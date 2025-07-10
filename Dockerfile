@@ -18,8 +18,9 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod
 
 FROM base AS build-env
 COPY . /app/
-COPY --from=development-dependencies-env /app/node_modules /app/node_modules
 WORKDIR /app
+COPY --from=production-dependencies-env /app/node_modules /app/node_modules
+COPY --from=development-dependencies-env /app/node_modules /app/node_modules
 
 # Replace the placeholders with actual values or environment variables
 ARG VITE_REACT_APP_WP_API_URL
@@ -32,6 +33,8 @@ ARG VITE_REACT_APP_WP_HOSTS
 ARG VITE_REACT_APP_API_ROOT
 ARG VITE_REACT_APP_WP_SEARCH_END_POINT
 
+RUN pnpm run build
+
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
 #    VITE_REACT_APP_WP_STYLES=${VITE_REACT_APP_WP_STYLES:-"http://0.0.0.0/wp/wp-json"} \
 #    VITE_REACT_APP_DEFAULT_LOCALE=${VITE_REACT_APP_DEFAULT_LOCALE:-"en"} \
@@ -40,12 +43,12 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
 #    VITE_REACT_APP_API_ROOT=${VITE_REACT_APP_API_ROOT:-"http://0.0.0.0"} \
 #    VITE_REACT_APP_WP_SEARCH_END_POINT=${VITE_REACT_APP_WP_SEARCH_END_POINT:-"/dg/v1/search"} \
 #    VITE_REACT_APP_WP_STYLES="http://localhost/wp/wp-admin/load-styles.php?c=1&dir=ltr&load%5Bchunk_0%5D=dashicons,admin-bar,buttons,media-views,editor-buttons,wp-components,wp-block-editor,wp-nux,wp-editor,wp-block-library,wp-block-&load%5Bchunk_1%5D=library-theme,wp-edit-blocks,wp-edit-post,wp-format-library,wp-block-directory,common,forms,admin-menu,dashboard,list-tables,edi&load%5Bchunk_2%5D=t,revisions,media,themes,about,nav-menus,wp-pointer,widgets,site-icon,l10n,wp-auth-check&ver=5.5.6"\
-    pnpm run build
+    pnpm run build:example
 
 
-FROM base
+FROM base AS runtime
 COPY ./package.json pnpm-lock.yaml /app/
 COPY --from=production-dependencies-env /app/node_modules /app/node_modules
-COPY --from=build-env /app/build /app/build
-WORKDIR /app
+COPY --from=build-env /app/example/build/ /app/example/build/
+WORKDIR /app/example
 CMD ["pnpm", "run", "start"]
