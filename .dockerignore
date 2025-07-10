@@ -1,0 +1,16 @@
+node_modules
+.git
+.changeset
+.gitignore
+README.md
+.env
+.nyc_output
+coverage
+.vscode
+dist/
+build/
+CHANEGELOG.md
+README.md
+.github/
+react-lib/
+!react-lib/wp-react-lib
