@@ -31,7 +31,7 @@ export default defineConfig({
         lib: {
             entry: {
                 "index.css": resolve(__dirname, 'src/scss/themes/default/index.scss'),
-
+                "common.css": resolve(__dirname, 'src/scss/common.scss'),
                 // index: resolve(__dirname, 'src/index.ts'),
                 // Button: resolve(__dirname, 'src/components/ui/Button/index.tsx'),
                 // Card: resolve(__dirname, 'src/components/ui/Card/index.tsx'),
