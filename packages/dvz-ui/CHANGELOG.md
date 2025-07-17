@@ -1,5 +1,14 @@
 # @devgateway/dvz-ui-react
 
+## 1.0.7
+
+### Patch Changes
+
+- [#29](https://github.com/devgateway/data-viz-ui/pull/29) [`ae3acd8`](https://github.com/devgateway/data-viz-ui/commit/ae3acd87ca119fc5c45e7e40f162ee0e97123f26) Thanks [@timothygachengo](https://github.com/timothygachengo)! - ## Fixes
+
+  - Add missing stylesheet
+  - Migrate `useKeyOnly, useValueAndKey, getUnhandledProps` from semantic-ui-react to the repo to prevent semantic-react from being bundled.
+
 ## 1.0.6
 
 ### Patch Changes
