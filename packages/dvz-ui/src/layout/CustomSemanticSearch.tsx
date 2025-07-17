@@ -1,12 +1,7 @@
 import { Search, Segment, Input } from "semantic-ui-react";
 import React from "react";
 import clsx from "clsx";
-import {
-    useKeyOnly,
-    useValueAndKey,
-} from 'semantic-ui-react/src/lib/classNameBuilders';
-import { partitionHTMLProps, htmlInputAttrs } from "@/utils/semanticUtils";
-import getUnhandledProps from 'semantic-ui-react/src/lib/getUnhandledProps';
+import { partitionHTMLProps, htmlInputAttrs, useKeyOnly, useValueAndKey, getUnhandledProps } from "@/utils/semanticUtils";
 import { injectIntl, useIntl } from "react-intl";
 import { utils } from "@devgateway/wp-react-lib";
 
