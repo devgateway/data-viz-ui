@@ -2,7 +2,7 @@ import React, {useState} from 'react'
 import {ResponsiveBar} from '@nivo/bar'
 import {injectIntl} from 'react-intl';
 
-import {useTheme} from '@nivo/core'
+import {useTheme} from '@nivo/theming'
 
 const CustomTick = (tick, colors) => {
     const theme = useTheme()
