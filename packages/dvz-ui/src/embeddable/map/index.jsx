@@ -1,33 +1,29 @@
-
 import React from 'react';
-import { connect } from "react-redux";
+import {connect} from "react-redux";
 import DataProvider from "../data/DataProvider";
 import DataConsumer from "../data/DataConsumer";
 import Map from './map';
 import MapDataFrame from './MapDataFrame';
 import MapCSVDataFrame from './MapCSVDataFrame';
-import { SettingProvider } from '@devgateway/wp-react-lib';
-import {SettingsConsumer} from '@devgateway/wp-react-lib';
+
 
 const countries = [
-    { label: 'KENYA', value: 'KEN', center: [35.8166634, 0.1], scale: 2000},
-    { label: 'Nigeria', value: 'NGA', center: [7.491302, 9.072264], scale: 2000},
-    { label: 'South Africa', value: 'ZAF', center: [24.676997, -28.48322], scale: 2000 },
-    { label: 'West Africa', value: 'West Africa', center: [-7.293255, 13.905720], scale: 1500 },
-    { label: 'Africa', value: 'Africa', center: [13.134227,-11.523088], scale: 550 },
-    { label: 'Ethiopia', value: 'ETH', center: [35.8166634, 1.7], scale: 2000},
-    { label: 'Zambia', value: 'ZMB', center: [26.459455, -14.668135], scale: 2000},
-    { label: 'Democratic Republic of the Congo', value: 'DRC', center: [23.174338, -5.837475], scale: 1250},
-    { label: 'World', value: 'World', center: [0, 20.050043], scale: 150}
+    {label: 'KENYA', value: 'KEN', center: [35.8166634, 0.1], scale: 2000},
+    {label: 'Nigeria', value: 'NGA', center: [7.491302, 9.072264], scale: 2000},
+    {label: 'South Africa', value: 'ZAF', center: [24.676997, -28.48322], scale: 2000},
+    {label: 'West Africa', value: 'West Africa', center: [-7.293255, 13.905720], scale: 1500},
+    {label: 'Africa', value: 'Africa', center: [13.134227, -11.523088], scale: 550},
+    {label: 'Ethiopia', value: 'ETH', center: [35.8166634, 1.7], scale: 2000},
+    {label: 'Zambia', value: 'ZMB', center: [26.459455, -14.668135], scale: 2000},
+    {label: 'Democratic Republic of the Congo', value: 'DRC', center: [23.174338, -5.837475], scale: 1250},
+    {label: 'World', value: 'World', center: [0, 20.050043], scale: 150}
 ]
 
 const MapWrapper = (props) => {
     return (
-        <SettingProvider locale={props.intl.locale} changeUUID={props.unique}>
-            <SettingsConsumer>
-                <MapEntry {...props} />
-            </SettingsConsumer>
-        </SettingProvider>
+
+        <MapEntry {...props} />
+
     );
 }
 
@@ -42,7 +38,7 @@ const MapEntry = (props) => {
         'data-dimension2': dimension2 = '',
         "data-measures": measures = '["prevalenceSmokeAny"]',
         "data-height": height = 600,
-          width = 960,
+        width = 960,
         "data-data-source-text": dataSourceText = 'NIDS',
         "data-data-source-label": dataSourceLabel = 'Source',
         "data-national-average-label": nationalAverageLabel = 'National Prevalence Avg',
@@ -54,7 +50,7 @@ const MapEntry = (props) => {
         "data-mapping-field": mappingField = 'zone',
         "data-map-label-field": mapLabelField = "admin",
         "data-has-multiple-measures": hasMultipleMeasures = "false",
-         topoJSONField = "collection",
+        topoJSONField = "collection",
         'data-map-center': mapCenter = 'NGA', //country
         "data-map-label-show-value": mapLabelShowValue = "false",
         "data-show-tooltip": showTooltip = "true",
@@ -69,11 +65,11 @@ const MapEntry = (props) => {
         "data-map-symbols": mapSymbols = '[]',
         "data-tooltip-theme": tooltipTheme = "map-tooltip-dark",
         "data-label-font-size": labelFontSize = 12,
-        "data-label-font-weight" :labelFontWeight = "normal",
+        "data-label-font-weight": labelFontWeight = "normal",
         "data-label-font-color": labelFontColor = "#595959",
         "data-legend-font-size": legendFontSize = 12,
-        "data-legend-font-weight" : legendFontWeight = "normal",
-        "data-custom-tooltips" : customTooltips = '[]',
+        "data-legend-font-weight": legendFontWeight = "normal",
+        "data-custom-tooltips": customTooltips = '[]',
         'data-format-style': style = "decimal",
         "data-decimals": decimals = "2",
         'data-currency': currency = "",
@@ -83,7 +79,7 @@ const MapEntry = (props) => {
         'data-map-boundary-color': mapBoundaryColor = '#000',
         'data-map-focus-boundary-color': mapFocusBoundaryColor = '#000',
         'data-highlighted-location': highlightedLocation = '',
-        'data-tooltip-format' : tooltipFormat = '{locationName} %({value},2) \n {label}: %({value},2)',
+        'data-tooltip-format': tooltipFormat = '{locationName} %({value},2) \n {label}: %({value},2)',
         'data-show-no-data-tooltip': showNoDataTooltip = "false",
         'data-map-container-bg-color': mapContainerBgColor = '#fff',
         'data-map-position': mapPosition = '{}',
@@ -98,7 +94,7 @@ const MapEntry = (props) => {
         'data-default-point-color': defaultPointColor = '#FFFF00',
         'data-aggregation-formula': aggregationFormula = 'COUNT',
         'data-zoom-level-to-show-points': zoomLevelToShowPoints = 2,
-        'data-zoom-on-filter': zoomOnFilter =  "false",
+        'data-zoom-on-filter': zoomOnFilter = "false",
         'data-zoom-on-filter-field': zoomOnFilterField = "",
         'data-no-data-text': noDataText = "No Data",
         'data-labels-exclusion-list': labelsExclusionList = "",
@@ -110,7 +106,6 @@ const MapEntry = (props) => {
     } = props
 
 
-
     const decode = (value) => {
         if (editing) {
             return value
@@ -120,11 +115,11 @@ const MapEntry = (props) => {
 
     const parse = (value) => {
         try {
-          if (value) {
-            return JSON.parse(decode(value));
-          }
+            if (value) {
+                return JSON.parse(decode(value));
+            }
         } catch (error) {
-          console.error("error parsing value:" + value);
+            console.error("error parsing value:" + value);
         }
 
         return null;
@@ -134,11 +129,11 @@ const MapEntry = (props) => {
         let legendBreaksNew = parse(legendBreaks) || []
         legendBreaksNew = legendBreaksNew.map((b) => {
             if (b.min) {
-                b.min =  parseFloat(b.min);
+                b.min = parseFloat(b.min);
             }
 
             if (b.max) {
-                b.max =  parseFloat(b.max);
+                b.max = parseFloat(b.max);
             }
 
             b.color = decodeURIComponent(b.color);
@@ -149,7 +144,7 @@ const MapEntry = (props) => {
     }
 
     const getFilters = (filters) => {
-        const ff = parse(filters)  || []
+        const ff = parse(filters) || []
         let params = {};
         if (ff && ff.forEach) {
             ff.forEach(f => {
@@ -227,7 +222,7 @@ const MapEntry = (props) => {
         format: numberFormat,
         tooltipFontSize,
         showAdminUnitLabel,
-        mapNoDataColor:decodeURIComponent(mapNoDataColor),
+        mapNoDataColor: decodeURIComponent(mapNoDataColor),
         mapBoundaryColor: decodeURIComponent(mapBoundaryColor),
         mapFocusBoundaryColor: decodeURIComponent(mapFocusBoundaryColor),
         highlightedLocation,
@@ -245,7 +240,7 @@ const MapEntry = (props) => {
         mapType,
         defaultPointColor: decodeURIComponent(defaultPointColor),
         zoomLevelToShowPoints,
-        zoomOnFilter : zoomOnFilter == true || zoomOnFilter == "true",
+        zoomOnFilter: zoomOnFilter == true || zoomOnFilter == "true",
         zoomOnFilterField: zoomOnFilterField,
         noDataText,
         labelsExclusionList: labelsExclusionList.split(',').map(l => l.trim()),
@@ -263,26 +258,26 @@ const MapEntry = (props) => {
     }
 
     return (
-        <SettingProvider locale={intl.locale} changeUUID={unique}>
-                <SettingsConsumer>
 
-    <DataProvider
-        params={params}
-        app={app}
-        csv={decodeURIComponent(csv)}
-        group={group}
-        editing={editing}
-        store={[app, unique, ...source.split("/")]} source={source}>
-        <DataConsumer>
-            <DataFrame measures={measuresCSV} multipleMeasures = {multipleMeasures} mapType={mapType} aggregationFormula={aggregationFormula} customMeasureLabels={measureLabels}>
-                <Map  {...mapProps} />
-            </DataFrame>
-        </DataConsumer>
+        <DataProvider
+            params={params}
+            app={app}
+            csv={decodeURIComponent(csv)}
+            group={group}
+            editing={editing}
+            store={[app, unique, ...source.split("/")]} source={source}>
+            <DataConsumer>
+                <DataFrame measures={measuresCSV} multipleMeasures={multipleMeasures} mapType={mapType}
+                           aggregationFormula={aggregationFormula} customMeasureLabels={measureLabels}>
+                    <Map  {...mapProps} />
+                </DataFrame>
+            </DataConsumer>
 
-    </DataProvider>
-    </SettingsConsumer>
-    </SettingProvider>
-    );
+        </DataProvider>
+
+
+    )
+        ;
 
 };
 

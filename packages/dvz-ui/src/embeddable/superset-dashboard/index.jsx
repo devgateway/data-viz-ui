@@ -1,15 +1,10 @@
 import React from 'react';
 import {connect} from "react-redux";
 
-import { SettingProvider } from '@devgateway/wp-react-lib';
-import {SettingsConsumer} from '@devgateway/wp-react-lib';
-
 const SupersetDashboardWrapper = (props) => {
-  return (<SettingProvider locale={props.intl.locale} changeUUID={props.unique}>
-            <SettingsConsumer>
+  return (
                 <SupersetDashboard {...props} />
-            </SettingsConsumer>
-            </SettingProvider>);
+           );
 }
     
 const SupersetDashboard = (props) => {

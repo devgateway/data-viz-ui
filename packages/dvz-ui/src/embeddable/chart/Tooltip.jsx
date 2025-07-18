@@ -64,13 +64,22 @@ const Tooltip = ({ tooltip, d, intl, tooltipEnableMarkdown }) => {
     (d.datum ? d.datum.value : null) ||
     (d.point ? d.point.data.y : null);
   if (data) {
-    const vars = data.variables ? data.variables[d.id] || data.variables : data;
+    
+    let vars;
+    if (data.variables) {
+      vars = typeof data.variables[d.id] === 'object'
+        ? data.variables[d.id]
+        : data.variables;
+    } else {
+      vars = data;
+    }
 
     const params = {
       field: d.point ? d.point.serieId : d.id,
       ...vars,
       value: current,
     };
+    
     if (data.measureFieldName) {
       params.populationValue =
         data.variables[data.measureFieldName + "Population"];
