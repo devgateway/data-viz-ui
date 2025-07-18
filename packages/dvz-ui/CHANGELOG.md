@@ -1,5 +1,11 @@
 # @devgateway/dvz-ui-react
 
+## 1.1.1
+
+### Patch Changes
+
+- [#32](https://github.com/devgateway/data-viz-ui/pull/32) [`18eac8d`](https://github.com/devgateway/data-viz-ui/commit/18eac8d657e5867d8898ede72d2f30563d7e5440) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Fix Nivo Imports
+
 ## 1.1.0
 
 ### Minor Changes
