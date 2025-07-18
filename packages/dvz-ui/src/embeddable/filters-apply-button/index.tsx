@@ -21,17 +21,30 @@ const FiltersResetComponent = (props) => {
     const [enabled, setEnabled] = useState(false)
     const [selectedFilters, setSelectedFilters] = useState(initialFilters)
 
-    console.log(apply)
-
-    useEffect(() => {
-        Object.keys(selectedFilters).forEach(k => {
-            if (selectedFilters[k].length != filters[k].filter(v => v != Number.MIN_SAFE_INTEGER).length) {
-                setEnabled(true);
+    
+    const filtersChanged = (filters, selectedFilters) => {    
+        for (let k in selectedFilters) {
+            if (filters[k].length !== selectedFilters[k].length) {
+                return true;
             }
-        })
-        setSelectedFilters(filters)
-    }, [filters])
+            for (let i = 0; i < filters[k].length; i++) {                
+                if (filters[k][i] !== selectedFilters[k][i]) {
+                    return true;
+                }
+            }
+        }
 
+        return false;        
+    }
+
+    useEffect(() => {   
+       const changed = filtersChanged(filters, selectedFilters); 
+       if (changed) {
+           setEnabled(changed);           
+        }
+        setSelectedFilters(filters)
+       
+    }, [filters])
 
     useEffect(() => {
         if (apply != null) {
@@ -43,7 +56,7 @@ const FiltersResetComponent = (props) => {
     return (
         <Container fluid={true}
                    className={`data-filters-apply ignore ${enabled ? '' : "disabled"} ${editing ? 'editing' : ''}`}
-                   onClick={() => {
+                   onClick={e => {
                        if (enabled) {
                            onApply({app, group})
                        }
@@ -57,7 +70,7 @@ const FiltersResetComponent = (props) => {
 };
 
 
-const mapStateToProps = (state: any, ownProps: any) => {
+const mapStateToProps = (state, ownProps) => {
     const {
         "data-group": group,
         "data-app": app = "csv",

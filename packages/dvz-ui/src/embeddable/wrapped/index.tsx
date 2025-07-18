@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import * as external from "@devgateway/customizer";
 
 const Root = (props) => {
     const [random, setRandomStore] = useState(Math.random() * (99999 - 1) + 1);
@@ -11,13 +12,11 @@ const Root = (props) => {
     let C2: React.FC = () => {
         return <div>Not found</div>
     }
-
-    C2 = React.lazy(() => import('../' + name + '/'))
-    // if (external[name]) {
-    //     C2 = external[name]
-    // } else {
-        
-    // }
+    if (external[name]) {
+        C2 = external[name]
+    } else {
+        C2 = React.lazy(() => import('../' + name + '/'))
+    }
     return (<div style={{width: '100%', height: height + "px"}} className={"parallax-container"}>
 
         {/* <React.Suspense> */}

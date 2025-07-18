@@ -3,8 +3,8 @@ import { injectIntl } from "react-intl";
 import { ResponsiveLine } from "@nivo/line";
 import Tooltip from "./Tooltip";
 import { area, line } from "d3-shape";
-import { useTheme } from "@nivo/theming";
-import FlexWrapDetector from "../../layout/FlexWrapDetector";
+import { useTheme } from "@nivo/core";
+import FlexWrapDetector from "@/layout/FlexWrapDetector";
 import deviceType from '@/utils/deviceType'
 
 const ZERO_LINE_COLOR = "#66676d";
@@ -102,7 +102,9 @@ const Chart = ({
   minMaxClamp,
   reverseLegend,
   customAxisFormat,
-  mobileCustomization
+  mobileCustomization,
+  lineCurve,
+  customLabels  
 }) => {
   const mobileConfigSettings = JSON.parse(decodeURIComponent(mobileCustomization));
   const isMobileConfigEnabled = isMobileOrTablet && (mobileConfigSettings?.showCustomization ?? false);
@@ -117,9 +119,12 @@ const Chart = ({
 
   const chartLegends = options.data.map((d) => ({
     id: d.id,
-    label: d.id,
+    label: customLabels && customLabels[d.id] ? customLabels[d.id] : (d.label || d.id),
     color: colorGenerator.getColor(d.id, d),
   }));
+
+
+  console.log(lineCurve)
 
   const legendItems = () => {
     if (reverseLegend) {
@@ -299,6 +304,7 @@ const Chart = ({
         <g transform={`translate(${tick.x},${tick.y + 30})`}>
           {showTickLine && (
             <line
+
               stroke={overrideTickColor ? tickColor : DEFAULT_TICK_BG_COLOR}
               strokeWidth={1.5}
               y1={-32}
@@ -453,7 +459,7 @@ const Chart = ({
   }
 
   let values = [];
-  options.data.forEach((item) => {
+  applyFilter(options.data).forEach((item) => {
     if (item.data) {
       values = [...values, ...item.data.map((it) => it.y)];
     }
@@ -462,7 +468,8 @@ const Chart = ({
   const getMinMaxFromData = () => {
     if (groupMode === "stacked") {
       const flattenedData = [];
-      options.data.forEach((d) => {
+      const filteredData = applyFilter(options.data)
+      filteredData.forEach((d) => {
         flattenedData.push(...d.data);
       });
 
@@ -556,11 +563,13 @@ const Chart = ({
   }
 
   if (options?.data && hasData > 0) {
+    let filteredData = applyFilter(options.data)
     return (
       <div style={{ height: height }}>
         <ResponsiveLine
+        curve={lineCurve}
           key={new Date()}
-          data={applyFilter(options.data)}
+          data={filteredData}
           margin={margins}
           xScale={{ type: "point" }}
           yScale={{
@@ -656,7 +665,7 @@ const Chart = ({
           pointSize={10}
           pointBorderWidth={2}
           pointBorderColor={{ from: "serieColor" }}
-          useMesh={true}
+          useMesh={filteredData.length > 0 && filteredData[0].data.length > 0}
         />
 
         {(legendPosition === "top" || legendPosition === "bottom") && (

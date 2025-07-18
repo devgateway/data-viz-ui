@@ -1,6 +1,6 @@
 import React, { useState} from "react";
 import {MenuProvider, MenuConsumer} from "@devgateway/wp-react-lib";
-import {injectIntl, WithIntlProps, WrappedComponentProps} from "react-intl";
+import {injectIntl} from "react-intl";
 import {Container, Menu} from "semantic-ui-react";
 import {decode} from "../utils/parseUtils";
 
@@ -14,22 +14,23 @@ const localReplaceLink = (url, locale) => {
     return ""
 }
 
-export interface MenuChildProps extends WrappedComponentProps<"intl"> {
-    menu?: any,
-    locale?: string,
-    match?: any,
-    selected?: any,
-    active?: any,
-    showIcons?: boolean,
-    onSetSelected?: any
+interface MenuChildProps {
+    menu: any,
+    locale: string,
+    match: any,
+    selected: any,
+    active: any,
+    showIcons: boolean,
+    onSetSelected: any
 }
 
-const MenuChild: React.FC<WithIntlProps<MenuChildProps>> = injectIntl((props) => {
+const MenuChild = injectIntl((props: any) => {
+
     const {menu, locale, match, selected, active, showIcons, onSetSelected} = props
     
     return <>
 
-        {menu && menu.items.map((item, _index) => (<Menu.Item
+        {menu && menu.items.map((item, index) => (<Menu.Item
             className={`divided ${item.child_items ? 'has-child-items' : ''} 
                     ${selected && selected.ID == item.ID ? 'selected' : ''}  
                     ${active == item.slug ? "active" : ""}`}>
@@ -37,7 +38,7 @@ const MenuChild: React.FC<WithIntlProps<MenuChildProps>> = injectIntl((props) =>
 
             <span><a href={localReplaceLink(item.url,locale)}>{item.title}</a></span>
 
-            {item.child_items && item.child_items.map((_child, _index) => {
+            {item.child_items && item.child_items.map((child, index) => {
                 return <Menu.Item> </Menu.Item>
             })}
         </Menu.Item>))}
@@ -78,7 +79,7 @@ const InlineMenu = (props) => {
             </Menu.Item>
             <MenuProvider slug={name} locale={locale}>
                 <MenuConsumer>
-                    <MenuChild  onSetSelected={setSelected}></MenuChild>
+                    <MenuChild onSetSelected={setSelected}></MenuChild>
                 </MenuConsumer>
             </MenuProvider>
         </Menu>}
