@@ -2,7 +2,7 @@ import React, { Fragment, useEffect, useState } from "react";
 import Tooltip from "./Tooltip";
 import { ResponsiveBar } from "@nivo/bar";
 import { injectIntl } from "react-intl";
-import { useTheme } from "@nivo/core";
+import { useTheme } from '@nivo/theming';
 import { line } from "d3-shape";
 import LineLayer from "./LineLayer";
 import Papa from "papaparse";
@@ -1026,7 +1026,7 @@ const Chart = ({
   }
 
 
- 
+
 
   const getValuesFromData = () => {
     const values: number [] = [];
@@ -1038,7 +1038,7 @@ const Chart = ({
         if (c.high) {
           values.push(parseFloat(c.high));
         }
-      });    
+      });
 
       if (options.data) {
         const filteredData = applyFilter(options.data, false)
@@ -1061,14 +1061,14 @@ const Chart = ({
 
   const getMaxValueFromData = () => {
     const filteredData = applyFilter(options.data, false)
-    const filteredKeys = applyFilter(options.keys, true)     
+    const filteredKeys = applyFilter(options.keys, true)
     if (
       (groupMode === "stacked" && maxValue !== "fixed") ||
       (maxValue === "fixed" && fixedMaxValue === null) ||
       // @ts-ignore
       fixedMaxValue === ""
     ) {
-      
+
       let keys = filteredKeys.length > 0 ? filteredKeys : options.keys;
       return (
         Math.max(
