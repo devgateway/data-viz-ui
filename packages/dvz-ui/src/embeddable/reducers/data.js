@@ -1,5 +1,5 @@
 import * as api from './data-api'
-import Immutable from 'immutable'
+import * as Immutable from 'immutable'
 import Papa from 'papaparse'
 
 const LOAD_DATA = 'LOAD_DATA'
