@@ -2,7 +2,7 @@ import React, { lazy } from 'react'
 import data from './reducers/data'
 import embeddable from './reducers/embeddable'
 import { injectIntl } from "react-intl";
-import Immutable from 'immutable';
+import * as Immutable from 'immutable';
 
 // components
 const PageGallery = lazy(() => import("./pagegallery"));
