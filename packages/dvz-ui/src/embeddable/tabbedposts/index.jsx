@@ -354,12 +354,6 @@ const SingleTabbedView = ({ posts, showLabels, height }) => {
         }, 0);
     }, [posts]);
 
-    useEffect(() => {
-        if (activeItem) {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-    }, [activeItem]);
-
     return (
         <React.Fragment>
             {posts.map((p) => (

@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from "react-redux";
 import { Container, Icon } from "semantic-ui-react";
 import { cleanFilter } from "../reducers/data";
+import {applyFilter} from "../reducers/data";
 
 
 const FiltersResetComponent = (props) => {
@@ -10,6 +11,7 @@ const FiltersResetComponent = (props) => {
         initialFilters,
         "data-group": group,
         onClean,
+        onApply,
         "data-app": app = "csv",
         "data-reset-label": resetLabel = "Reset All Filters"
     } = props
@@ -43,7 +45,11 @@ const FiltersResetComponent = (props) => {
 
 
     return (
-        <Container fluid={true} className={`data-filters-reset ignore ${enabled ? '' : "disabled"}`} onClick={e => onClean({ app, group })}>
+        <Container fluid={true} className={`data-filters-reset ignore ${enabled ? '' : "disabled"}`} 
+        onClick={e => { 
+        onClean({ app, group })
+        onApply({ app, group })
+        }}>
             <span>{resetLabel}</span>
             <span><Icon name="undo alternate" className="custom-undo-icon" /></span>
         </Container>
@@ -64,7 +70,8 @@ const mapStateToProps = (state, ownProps) => {
     }
 }
 const mapActionCreators = {
-    onClean: cleanFilter
+    onClean: cleanFilter,
+    onApply: applyFilter
 };
 
 export default connect(mapStateToProps, mapActionCreators)(FiltersResetComponent)

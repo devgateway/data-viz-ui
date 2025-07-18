@@ -29,6 +29,7 @@ class DataLayer extends React.Component {
         this.create = this.create.bind(this)
         this.showToolTip = this.showToolTip.bind(this)
         this.moveToolTip = this.moveToolTip.bind(this)
+        this.resize = this.resize.bind(this)
         this.gRef = React.createRef();
     }
 
@@ -72,40 +73,57 @@ class DataLayer extends React.Component {
             measures,
             projection,
             id,
+            format,
+            intl,
             useBreaks,
             breaks,
             pointDimensionStyles = [],
             pointStyleBy,
             dimension2,
-            visible = true
+            visible = true,
+            showDim2OnLegends,
+            dim2LegendLabel
         } = this.props
 
-        
+
+        const numberFormat = {
+            style: (format.style === 'compacted') ? 'decimal' : format.style,
+            notation: (format.style === 'compacted') ? 'compact' : "standard",
+            currency: format.currency,
+            minimumFractionDigits: parseInt(format.minimumFractionDigits),
+            maximumFractionDigits: parseInt(format.maximumFractionDigits)
+        }
         const sizeScale = d3.scaleThreshold()
-          .domain(breaks.map(d => d.end))
-          .range(breaks.map(d => d.size));
+            .domain(breaks.map(d => d.end))
+            .range(breaks.map(d => markSizeScale + d.size));
 
         const colorScale = d3.scaleThreshold()
-          .domain(breaks.map(d => d.end))
-          .range(breaks.map(d => d.color));
+            .domain(breaks.map(d => d.end))
+            .range(breaks.map(d => d.color));
 
         const borderScale = d3.scaleThreshold()
-          .domain(breaks.map(d => d.end))
-          .range(breaks.map(d => d.borderColor));
+            .domain(breaks.map(d => d.end))
+            .range(breaks.map(d => d.borderColor));
 
         let points = []
-        const g = d3.select(this.gRef.current)       
-        if (app != 'csv' && data && data.children) {            
-            points = data.children.map((d) => {                
+        const g = d3.select(this.gRef.current)
+
+        if (app != 'csv' && data && data.children) {
+
+
+            points = data.children.map((d) => {
                 const latLong = d.value.split(',')
                 let pointStyle = {color: markFillColor, size: markSizeScale, border: markBorderColor}
                 let value = 1
                 if (pointStyleBy === "measure") {
                     value = d[measures[0]]
+
                     pointStyle = {color: colorScale(value), size: sizeScale(value), border: borderScale(value)}
+
                 } else if (pointStyleBy === "dimension") {
-                    if (d.children) {
+                    if (d.children && showDim2OnLegends) {
                         value = d.children[0].value
+
                         pointStyle = {
                             color: pointDimensionStyles[value + '_color'] || markFillColor,
                             size: pointDimensionStyles[value + '_size'] || markSizeScale,
@@ -117,6 +135,9 @@ class DataLayer extends React.Component {
                     x: latLong[0], y: latLong[1], value, metadata: d, pointStyle
                 }
             })
+
+            points.sort((a, b) => a.pointStyle.size - b.pointStyle.size)
+
         } else if (app == 'csv') {
 
             const latField = data.meta.fields[0]
@@ -126,7 +147,7 @@ class DataLayer extends React.Component {
             points = data.data.map((d) => {
                 let pointStyle = {color: markFillColor, size: markSizeScale, border: markBorderColor}
                 return {
-                    x: d[latField], y: d[longField], value: d[valueField], meta:d, pointStyle
+                    x: d[latField], y: d[longField], value: d[valueField], meta: d, pointStyle
                 }
             })
 
@@ -137,19 +158,26 @@ class DataLayer extends React.Component {
         const getTooltipVariables = (d) => {
             const {pointStyleBy, dimension2} = this.props
             const dimensionVariable = {}
-            if (pointStyleBy === 'dimension' && dimension2 != 'none') {
+            if (dimension2 != 'none') {
                 dimensionVariable[dimension2] = d.metadata.children[0].value
             }
             return {...dimensionVariable, ...d, ...d.metadata}
         }
 
         const k = this.props.transform ? this.props.transform.k : 1
-        g.attr("class", "lat-long " + id)
-        g.selectAll(".latLong").remove()
-        g.selectAll(".latLong")
+
+        g.attr("class", "zoomable lat-long " + id)
+        g.selectAll(".point-group").remove()
+
+
+        const pointGroups = g.selectAll(".point-group")
             .data(points)
             .enter()
-            .append("circle")
+            .append("g")
+            .attr("class", "point-group")
+
+
+        pointGroups.append("circle")
             .attr("cx", function (d) {
                 return projection([d.y, d.x])[0];
             })
@@ -170,6 +198,28 @@ class DataLayer extends React.Component {
             this.hiddenToolTip(event)
         })
 
+        pointGroups.append("text")
+            .attr("class", "point-label")
+            .attr("text-anchor", "middle")
+            .attr("dominant-baseline", "middle")
+            .attr("x", d => projection([d.y, d.x])[0])
+            .attr("y", d => projection([d.y, d.x])[1])
+            .attr("font-size", d => {
+                return (markerLabelSize * (10 / k)) + "px"
+            })
+            .attr("fill", "#EEE")
+            .text(d => {
+                //eslint-disable-next-line
+
+                return intl.formatNumber(d.value, numberFormat)
+
+            }).on("mouseenter", (event, d) => {
+            this.showToolTip(tooltip, getTooltipVariables(d), d.pointStyle.color, event)
+        }).on("mousemove", (event, d) => {
+            this.moveToolTip(event)
+        }).on("mouseleave", (event, d) => {
+            this.hiddenToolTip(event)
+        })
 
         if (this.props.transform) {
             g.attr("transform", this.props.transform)
@@ -178,9 +228,48 @@ class DataLayer extends React.Component {
 
     }
 
+
     componentDidUpdate(prevProps, prevState, snapshot) {
-        const {projection} = this.props
-        this.create()
+        const {editing, selectedItem, onZoomToPoint,data} = this.props
+        const g = d3.select(this.gRef.current)
+
+        if (editing || JSON.stringify(prevProps.data) !== JSON.stringify(data)) {
+            this.create()
+
+        }
+        if (prevProps.visible != this.props.visible) {
+
+            const g = d3.select(this.gRef.current)
+            g.style("display", this.props.visible ? "block" : "none")
+
+        }
+
+        if (selectedItem != null && this.props.selectedItem != prevProps.selectedItem) {
+            const selection = g.selectAll(".point-group circle");
+            const filtered = selection.filter(d => {
+                return d.metadata.children.find(d => d.value == selectedItem) != undefined
+            })
+
+            onZoomToPoint({x: filtered.datum().x, y: filtered.datum().y})
+
+
+        }
+
+        this.resize()
+
+    }
+
+    resize() {
+        const {markerLabelSize} = this.props
+        const g = d3.select(this.gRef.current)
+        const k = this.props.transform ? this.props.transform.k : 1
+
+        if (g) {
+            g.selectAll(".point-group circle").attr("r", e => e.pointStyle.size * 1 / k)
+            g.selectAll(".point-group text.point-label").attr("font-size", d => {
+                return (markerLabelSize * (10 / k)) + "px"
+            })
+        }
     }
 
     componentDidMount() {
@@ -200,29 +289,42 @@ class DataLayer extends React.Component {
 
 }
 
+
 const DataWrapper = (props) => {
     const {
-        id, unique, filters, csv, app, group = "default", apiJoinAttribute, editing, dimension2, pointStyleBy,
-        dvzProxyDatasetId, settings
+        id,
+        unique,
+        filters,
+        csv,
+        app,
+        group = "default",
+        apiJoinAttribute,
+        editing,
+        dimension2,
+        pointStyleBy,
+        dvzProxyDatasetId,
+        settings,
+        waitForFilters
     } = props
 
-    const secondDimension = pointStyleBy === "dimension" && dimension2 != 'none' ? "/" + dimension2 : ''
+    const secondDimension = dimension2 != 'none' ? "/" + dimension2 : ''
     const params = {}
     const ff = filters || {}
     if (ff && ff.forEach) {
         ff.forEach(f => {
-            if (f.value != null && f.value.filter(v => v != null && v.toString().trim() != "").length > 0)
-                params[f.param] = f.value
+            if (f.value != null && f.value.filter(v => v != null && v.toString().trim() != "").length > 0) params[f.param] = f.value
         })
     }
 
     if (dvzProxyDatasetId) {
         params.dvzProxyDatasetId = dvzProxyDatasetId;
-    }    
+    }
+
 
     return (<DataProvider
         editing={editing}
         params={params}
+        waitForFilters={waitForFilters}
         app={app}
         csv={decodeURIComponent(csv)}
         group={group}

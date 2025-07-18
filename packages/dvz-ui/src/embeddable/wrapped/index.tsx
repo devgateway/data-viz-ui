@@ -16,7 +16,7 @@ const Root = (props) => {
     // if (external[name]) {
     //     C2 = external[name]
     // } else {
-        
+
     // }
     return (<div style={{width: '100%', height: height + "px"}} className={"parallax-container"}>
 

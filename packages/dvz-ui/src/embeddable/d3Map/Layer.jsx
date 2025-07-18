@@ -1,7 +1,8 @@
 import React from 'react';
-import { createRoot } from 'react-dom/client';
+import {createRoot} from 'react-dom/client';
 import * as d3 from 'd3' // d3 plugin
 import Tooltip from "./Tooltip";
+import * as utils from './Utils'
 
 class BaseLayer extends React.Component {
 
@@ -19,21 +20,18 @@ class BaseLayer extends React.Component {
     }
 
     loadJSON(url) {
-
-        return new Promise((resolve, reject) => {
-            d3.json(url).then(function (us, error) {
-                if (error) {
-                    console.log("Error loading JSON: " + error)
-                }
-                ;
-                resolve(us)
-            }.bind(this));
-        })
+        return utils.loadJSON(url)
     }
 
 
     createLayer(json) {
         alert("please implement createLayer")
+    }
+
+    applyInitialTransform() {
+        const {editing, initialPosition, width, height} = this.props
+        d3.select(this.gRef.current).attr("transform", `translate(${initialPosition.x},${initialPosition.y}) scale(${initialPosition.k})`);
+
     }
 
     create() {
@@ -54,8 +52,6 @@ class BaseLayer extends React.Component {
 
     showToolTip(content, data, color, event) {
         if (data) {
-            //eslint-disable-next-line
-            debugger;
             const tip = d3.select("body").append("div")
                 .attr("class", "d3MapTooltip")
                 .style("position", "absolute")
@@ -65,7 +61,7 @@ class BaseLayer extends React.Component {
                 .style("top", (window.event.pageY - 50) + "px")
             const root = createRoot(tip._groups[0][0]);
             root.render(<Tooltip intl={this.props.intl} tooltip={content} data={data}
-                                     tooltipEnableMarkdown={false}/>)
+                                 tooltipEnableMarkdown={false}/>)
         }
     }
 
@@ -83,10 +79,11 @@ class BaseLayer extends React.Component {
 
 
     componentDidMount() {
-        this.create()
-        if (this.props.zoom && this.props.current) {
-            this.props.zoom.current.fullView()
+        //eslint-disable-next-line
+        if (this.props.zoom && this.gRef.current) {
+            this.applyInitialTransform()
         }
+        this.create()
     }
 
     render() {
