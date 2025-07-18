@@ -9,31 +9,42 @@ import ZoomControl from "./ZoomControl";
 import ProjectedContainer from "./ProjectedContainer";
 import Legends from "./Legends"
 import FlowLayer from "./FlowLayer";
-import { SettingProvider } from '@devgateway/wp-react-lib';
-import {SettingsConsumer} from '@devgateway/wp-react-lib';
 
 
 const MapWrapper = (props) => {
     const {
         unique,
         editing,
+        "data-identifier": identifier,
         "data-group": group,
         "data-layers": dataLayers = '[]',
         "data-height": height = 400,
         "data-width": width = 1000,
         "data-back-ground-color": bgColorParam = '#88e8dc',
-        "data-map-position": paramMapPosition = '{}',
+        "data-map-position": dataMapPosition = '{}',
         "data-projection": projectionName = "geoMercator",
         "data-zoom-enabled": zoomEnabled = true,
         "data-rotation-enabled": rotationEnabled = false,
+        "data-wait-for-filters": waitForFilters = "false",
         intl
     } = props
 
+    const [paramMapPosition, setParamMapPosition] = useState(parse(dataMapPosition, editing), [])
 
     const [layers, setLayers] = useState(parse(dataLayers), [])
     const ref = useRef(null);
     const zoomRef = useRef(null);
     const [transform, setTransform] = useState(null)
+
+    const [selectedItem, setSelectedItem] = useState(null)
+    const [selectedPoint, setSelectedPoint] = useState(null)
+
+    useEffect(() => {
+        const newPosition = parse(dataMapPosition, editing)
+        if (!compareJsonProps(paramMapPosition, newPosition)) {
+            setParamMapPosition(newPosition)
+        }
+    }, [dataMapPosition])
 
     useEffect(() => {
         const newLayers = parse(dataLayers)
@@ -51,62 +62,98 @@ const MapWrapper = (props) => {
         setLayers(newLayers)
     }
 
+    const togglePatterns = (id) => {
+        const newLayers = layers.slice()
+        const ly = newLayers.find(l => l.id == id);
+
+        if (ly) {
+            ly.patternsVisible = ly.patternsVisible == null ? false : !ly.patternsVisible;
+        }
+
+        setLayers(newLayers)
+    }
+
+    const zoomToPoint = (xy) => {
+        setSelectedPoint(xy)
+    }
+
+    const toggleColorLayer = (id) => {
+        const newLayers = layers.slice()
+        const ly = newLayers.find(l => l.id == id);
+
+        if (ly) {
+            ly.colorLayerVisible = ly.colorLayerVisible == null ? false : !ly.colorLayerVisible;
+        }
+
+        setLayers(newLayers)
+    }
+
 
     return (
         <div ref={ref} className={"d3map-container"}>
-             <SettingProvider locale={intl.locale} changeUUID={unique}>
-                <SettingsConsumer>
-                <ProjectedContainer backgroundColor={decode(bgColorParam)}
-                                    height={height}
-                                    width={width}
-                                    projectionName={projectionName}
-                                    editing={editing} initialPosition={parse(paramMapPosition, editing)}>
-                   
-                    <Map rotationEnabled={parse(rotationEnabled, editing)}>
-                        {layers && layers.filter(l => l.visible != false).map((layer, i) => {
-                            if (layer.type === 'base') {
-                                return <BaseLayer transform={transform} intl={intl} zoom={zoomRef} unique={unique}
-                                                  key={i} {...layer} />
-                            }
-                            if (layer.type === 'data') {
-                                return <DataLayer  onLayerCreated={e => {
+            <ProjectedContainer backgroundColor={decode(bgColorParam)}
+                                height={height}
+                                width={width}
+                                projectionName={projectionName}
+                                editing={editing} initialPosition={paramMapPosition}>
 
-                                }
-                                } transform={transform} intl={intl}
-                                                  group={group} zoom={zoomRef}
-                                                  unique={unique}
-                                                  key={i} {...layer} 
-                                                  settings={props.wordress}
-                                                  />
+                <Map rotationEnabled={parse(rotationEnabled, editing)}>
+                    {layers.map((layer, i) => {
+                        if (layer.type === 'base') {
+                            return <BaseLayer transform={transform} intl={intl} zoom={zoomRef} unique={unique}
+                                              key={i} {...layer} />
+                        }
+                        if (layer.type === 'data') {
+                            return <DataLayer
+                                editing={editing}
+                                onLayerCreated={e => {
+                                }}
+                                transform={transform}
+                                intl={intl}
+                                group={group} zoom={zoomRef}
+                                unique={unique}
+                                key={i} {...layer}
+                                settings={props.wordress}
+                                togglePatterns={togglePatterns}
+                                initialPosition={paramMapPosition}
+                                waitForFilters={waitForFilters == "true" || waitForFilters == true}
+                            />
 
-                            }
-                            if (layer.type === 'flow') {
-                                return <FlowLayer transform={transform} intl={intl} group={group} zoom={zoomRef}
-                                                  unique={unique}
-                                                  key={i} {...layer} />
-                            }
-                            if (layer.type === 'dataPoints') {
-                                return <LatLongLayer transform={transform} intl={intl} group={group} zoom={zoomRef}
-                                                     unique={unique}
-                                                     key={i} {...layer} />
-                            }
+                        }
+                        if (layer.type === 'flow') {
+                            return <FlowLayer transform={transform} intl={intl} group={group} zoom={zoomRef}
+                                              unique={unique}
+                                              key={i} {...layer}
+                                              waitForFilters={waitForFilters == "true" || waitForFilters == true}
+                            />
+                        }
+                        if (layer.type === 'dataPoints') {
+                            return <LatLongLayer onZoomToPoint={zoomToPoint} selectedItem={selectedItem}
+                                                 transform={transform} intl={intl}
+                                                 group={group} zoom={zoomRef}
+                                                 unique={unique}
+                                                 key={i} {...layer}
+                                                 waitForFilters={waitForFilters == "true" || waitForFilters == true}
+                            />
+                        }
 
-                        })}
+                    })}
 
 
-                    </Map>
+                </Map>
 
-                    <Legends patternsData={null} layers={layers} group={group} onItemClick={toggleLayerView}></Legends>
+                <Legends selectedItem={selectedItem} d2Click={e => setSelectedItem(e)} patternsData={null} layers={layers} group={group}
+                         onItemClick={toggleLayerView} toggleColorLayer={toggleColorLayer}></Legends>
 
 
-                    <ZoomControl rootationEmabled={parse(rotationEnabled, editing)}
-                                 zoomEnabled={parse(zoomEnabled, editing)} onZoomed={setTransform} width={width}
-                                 height={height} ref={zoomRef} group={group}
-                                 editing={editing}/>
+                <ZoomControl
+                        selectedPoint={selectedPoint}
+                        rootationEmabled={parse(rotationEnabled, editing)}
+                             zoomEnabled={parse(zoomEnabled, editing)} onZoomed={setTransform} width={width}
+                             height={height} ref={zoomRef} group={group} identifier={identifier}
+                             editing={editing}/>
 
-                </ProjectedContainer>
-               </SettingsConsumer>
-                </SettingProvider>
+            </ProjectedContainer>
 
         </div>
     );

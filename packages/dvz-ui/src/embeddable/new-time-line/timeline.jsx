@@ -1,3 +1,4 @@
+import 'pure-react-carousel/dist/react-carousel.es.css';
 import React, {useEffect, useRef, useState} from "react";
 import * as d3 from 'd3'
 
@@ -116,10 +117,10 @@ const TimeLine = ({
 
         const onMouseOver = (d, i) => {
             const offset = 30
-            const position = [d.event.pageX + offset, d.event.pageY - offset]
+            const position = [d3.event.pageX + offset, d3.event.pageY - offset]
             const tooltipWidth =  600
-            if ((d.event.pageX + tooltipWidth + offset) > window.innerWidth) {
-                position[0] = d.event.pageX - tooltipWidth - offset
+            if ((d3.event.pageX + tooltipWidth + offset) > window.innerWidth) {
+                position[0] = d3.event.pageX - tooltipWidth - offset
             }
 
             setDisplayTooltip(true)
