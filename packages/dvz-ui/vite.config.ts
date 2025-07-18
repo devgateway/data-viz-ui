@@ -7,6 +7,7 @@ import * as packageJson from './package.json';
 import preserveDirectives from "rollup-plugin-preserve-directives";
 import autoprefixer from 'autoprefixer';
 
+
 // https://vite.dev/config/
 export default defineConfig({
     plugins: [
@@ -46,7 +47,16 @@ export default defineConfig({
             exclude: ['node_modules'],
         },
         rollupOptions: {
-            external: [...Object.keys(packageJson.dependencies || {}), ...Object.keys(packageJson.devDependencies || {}), 'react', 'react/jsx-runtime', 'react-dom', 'react-dom/client', 'core-js'],
+            external: [
+                ...Object.keys(packageJson.dependencies || {}),
+                ...Object.keys(packageJson.devDependencies || {}),
+                'lodash',
+                'react',
+                'react/jsx-runtime',
+                'react-dom',
+                'react-dom/client',
+                'core-js'
+            ],
             input: {
                 index: resolve(__dirname, 'src/index.ts'),
                 "styles.css": resolve(__dirname, 'src/scss/themes/default/index.scss'),
@@ -68,6 +78,7 @@ export default defineConfig({
                         'react/jsx-runtime': 'jsxRuntime',
                         'react-dom': 'ReactDOM',
                     },
+                    exports: "named"
                 },
                 {
                     dir: "dist/esm",
@@ -81,6 +92,7 @@ export default defineConfig({
                         'react/jsx-runtime': 'jsxRuntime',
                         'react-dom': 'ReactDOM',
                     },
+                    exports: "named"
                 }
             ]
         }

@@ -122,7 +122,7 @@ const Filters = (props: FiltersProps) => {
   useEffect(() => {
     const fetchYears = async () => {
       const response = await getYearRange();
-      const data = response.data;
+      const data = (response as any).data;
       const yearOptions = data.map((year: any) => ({
         key: year,
         value: year,
@@ -273,7 +273,7 @@ const PostsWithFilters = (props: PostsWithFiltersProps) => {
                 showCategoryFilter={showCategoryFilterValue}
                 categoryPlaceholder={categoryPlaceholder}
                 showDateFilter={showDateFilterValue}
-                categories={categories}
+                categories={categories || []}
                 categoriesToBeShown={selectedCategoryIds}
                 selectedCategory={selectedCategory}
                 setSelectedCategory={setSelectedCategory}

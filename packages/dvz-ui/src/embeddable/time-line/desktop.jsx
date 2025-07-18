@@ -1,10 +1,8 @@
 import { PostConsumer, PostProvider } from "@devgateway/wp-react-lib";
 import PostIntro from "../connected-templates/PostIntro";
-import "pure-react-carousel/dist/react-carousel.es.css";
 import React, { useEffect, useRef, useState } from "react";
 import { Container } from "semantic-ui-react";
 import * as d3 from "d3";
-import getDeviceType from "../../utils/deviceType";
 
 const visibleStyle = {
   visibility: "visible",
