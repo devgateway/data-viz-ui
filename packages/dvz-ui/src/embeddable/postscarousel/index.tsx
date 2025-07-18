@@ -1,5 +1,5 @@
-import React from "react";
 import { PostConsumer, PostIntro, PostProvider } from "@devgateway/wp-react-lib";
+import React from "react";
 import { Container } from "semantic-ui-react";
 import { CarouselProvider, DotGroup, Slide, Slider } from "pure-react-carousel";
 
@@ -58,7 +58,7 @@ const _Carousel = (props) => {
 }
 
 
-export interface PostCarouselProps {
+interface PostCarouselProps {
     "data-type": string,
     "data-taxonomy": string,
     "data-categories": string,

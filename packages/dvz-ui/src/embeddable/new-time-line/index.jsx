@@ -7,7 +7,7 @@ import TimeLine from "./timeline";
 
 
 const Carousel = (props) => {
-    
+
     let i = 0
     const {posts, height, interval, autoSwitch,currentSlide} = props
     return (<CarouselProvider currentSlide={currentSlide}
@@ -48,7 +48,7 @@ const Component = (props) => {
     const [currentSlide,setCurrentSlide]=useState([0])
 
     const decode = (value) => {
-        
+
         if (editing) {
             return value
         }

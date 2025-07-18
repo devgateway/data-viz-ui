@@ -5,6 +5,7 @@ import DataConsumer from "../data/DataConsumer.jsx";
 import {PostContent} from "@devgateway/wp-react-lib";
 import {connect} from "react-redux";
 import {alphaSort} from "../utils/common.js";
+import template from 'string-template';
 
 
 const Chart = (props) => {
@@ -29,7 +30,10 @@ const Chart = (props) => {
         'data-percent-font-size': percentFontSize = 20,        
         'data-label': label = '',
         'data-dimension1': dimension1,
-        'data-show-percentage-change': showPercentageChange = 'false'
+        'data-show-percentage-change': showPercentageChange = 'false',
+        "data-wait-for-filters": waitForFilters = "false",
+        "data-no-data-text": noDataText = "-"
+
     } = props
 
  
@@ -97,6 +101,7 @@ const Chart = (props) => {
                 group={group}
                 csv={csv}
                 editing={editing}
+                waitForFilters={waitForFilters === "true"}
                 store={[app, unique, ...dimensions]} source={dimensions.join("/")}>               
                     <DataConsumer>
                         <DataFrame
@@ -105,13 +110,16 @@ const Chart = (props) => {
                           intl={intl}
                           app={app}                          
                           format={numberFormat}
+                          dimension1={dimension1}
                           measure={parse(measures)[0] || null}
                             label={label}
                             bigNumberFontSize={bigNumberFontSize}
                             textColor={textColor}
                             labelFontSize={labelFontSize}
                             percentFontSize={percentFontSize}
-                            showPercentageChange={showPercentageChange == 'true' || showPercentageChange == true} >
+                            showPercentageChange={showPercentageChange == 'true' || showPercentageChange == true} 
+                            noDataText={noDataText}
+                            >
                        </DataFrame>
                     </DataConsumer>                
             </DataProvider>           
@@ -122,46 +130,66 @@ const Chart = (props) => {
 }
 
 const DataFrame = (props) => {
-    const { editing, app, measure, data, format, label, textColor, bigNumberFontSize, percentFontSize, labelFontSize, showPercentageChange, intl } = props
+    const { editing, app, measure, dimension1, data, format, label, textColor, bigNumberFontSize, 
+        percentFontSize, labelFontSize, showPercentageChange, intl, noDataText} = props
     let dataItems = [];
     let dimensionField
     let measureField
+
     if (app =="csv") {        
         const { data: json, meta: { fields } } = data
         dimensionField = fields[0];
-        measureField = fields[1];
+        measureField = fields[1];        
         dataItems = data.data.map(d => {
             return {
                 value: d[dimensionField],
-                [measureField]: d[measureField]
+                [measureField]: d[measureField],
+                [dimensionField]: d[dimensionField]               
             }
         })
-    } else {
+    } else {      
         dataItems = !data.children  || data.children.length == 0 ? [] : data.children
         measureField = measure;
+        dimensionField = dimension1;
+       
+        dataItems = dataItems.map(d => {
+            return {
+                value: d.value,
+                [measureField]: d[measureField],
+                [dimensionField]:d.value                
+            }
+        })
    }
     
-    if (dataItems.length == 0) {
-       return null
-    } 
-
-    dataItems = dataItems.sort((a, b) => {
-        return alphaSort(false, intl.locale, a.value, b.value)
-    })    
-
-    let currentValue = dataItems[dataItems.length - 1][measureField]   
-    let previousValue 
-    if (dataItems.length > 1) {
-        previousValue = dataItems[dataItems.length - 2][measureField]
-    }    
-
-    const formattedNumber = intl.formatNumber(format.style === 'percent' ? currentValue / 100 : currentValue, { ...format })
+    let currentValue = null
+    let previousValue = null
     let percentChange;
     let percentChangeFormatted;
-    if (previousValue) {
-        percentChange = ((currentValue - previousValue) / previousValue)
-        percentChangeFormatted = intl.formatNumber(percentChange, { style: 'percent', minimumFractionDigits: 2, maximumFractionDigits: 2 })
-    }
+    let formattedNumber
+
+    if (dataItems.length > 0) {
+        dataItems = dataItems.sort((a, b) => {
+            return alphaSort(false, intl.locale, a.value, b.value)
+        })
+
+        currentValue = dataItems[dataItems.length - 1][measureField]
+
+        if (dataItems.length > 1) {
+            previousValue = dataItems[dataItems.length - 2][measureField]
+        }
+
+
+        formattedNumber = intl.formatNumber(format.style === 'percent' ? currentValue / 100 : currentValue, { ...format })
+
+        if (previousValue) {
+            percentChange = ((currentValue - previousValue) / previousValue)
+            percentChangeFormatted = intl.formatNumber(percentChange, { style: 'percent', minimumFractionDigits: 2, maximumFractionDigits: 2 })
+        } 
+    } 
+
+    if (currentValue == null) {
+       formattedNumber = noDataText;
+    }   
 
     const numberStyle = {
         color: decodeURIComponent(textColor),
@@ -176,8 +204,9 @@ const DataFrame = (props) => {
         fontSize: labelFontSize + 'px'        
     }
 
-    return <div className="trend">
-        <div className="label" style={labelStyle}>{label}</div>
+    return <div className="trend">       
+           <div className="label" style={labelStyle}>{template(label, dataItems[dataItems.length - 1])}</div>      
+
         <div className="number-and-icon">
             <span className="number" style={numberStyle}>{formattedNumber}</span>
             {percentChange &&

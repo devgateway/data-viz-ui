@@ -28,7 +28,7 @@ class CustomColors extends Colors {
     //1 dimension by id == by measure
     if (app != "csv") {
       const mapByDimension = (whichDimension) => {
-        items = [...dimensionsMetadata][whichDimension].items;
+        items = [...dimensionsMetadata][whichDimension] ? [...dimensionsMetadata][whichDimension].items : [];
         if (manualColors != null && manualColors != undefined) {
           Object.keys(manualColors).forEach((k) => {
             const vals = items.filter((i) => i.code === k);
@@ -71,7 +71,7 @@ class CustomColors extends Colors {
       };
 
       let items = [];
-      const whichDimension = type == "line" ? 1 : colorBy === "index" ? 0 : 1;
+      const whichDimension = colorBy === "index" ? 0 : 1;
 
       if (!dimensionsMetadata) {
         mapByMeasure();

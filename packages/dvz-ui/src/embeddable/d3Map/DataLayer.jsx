@@ -7,6 +7,7 @@ import * as d3 from "d3";
 import {injectIntl} from "react-intl";
 
 import BreaksStyles from "./BreaksStyles.js";
+import GradientColors from "@/embeddable/d3Map/GradientColors.js";
 
 
 const toGenericID = (key) => {
@@ -38,10 +39,117 @@ const getFilters = (filters) => {
 class DataLayer extends BaseLayer {
     constructor() {
         super();
-        this.createDataLayer = this.createDataLayer.bind(this)
+
+        this.state = {geoJson: null, json: null}
+        this.getTooltipVariables = this.getTooltipVariables.bind(this)
+        this.resize = this.resize.bind(this)
+        this.createLayer = this.createLayer.bind(this)
+        this.createCentroids = this.createCentroids.bind(this)
+        this.createPatterns = this.createPatterns.bind(this)
+        this.createPaths = this.createPaths.bind(this)
 
     }
 
+
+    createLayer(json) {
+        //eslint-disable-next-line
+        const joined = this.joinData(json, this.props.app, this.props.featureJoinAttribute, this.props.data, this.props.measures, this.props.patternDiscriminator)
+        this.createDataLayer(joined)
+
+    }
+
+
+    resize() {
+        const {
+            markerLabelSize,
+            markFillColor,
+            markBorderColor,
+            markSizeScale,
+            measures,
+            data,
+            breaks,
+            gradientScheme,
+            gradientReverse
+
+        } = this.props
+        const brStyles = new BreaksStyles({
+            breaks: breaks,
+            defaultFillColor: markFillColor,
+            defaultBorderColor: markBorderColor,
+            defaultSize: markSizeScale
+        })
+
+        const gradientColors = new GradientColors({
+            data: data.children,
+            measure: measures[0],
+            defaultFillColor: markFillColor,
+            gradientScheme: gradientScheme,
+            gradientReverse: gradientReverse
+        })
+        const k = this.props.transform ? this.props.transform.k : 1
+
+        this.g.selectAll(".centroids .point").attr('r', d => {
+            return brStyles.getSize(d.properties._value) * 1 / k
+        })
+
+        this.g.selectAll(".centroids .point-label")
+            .attr("font-size", d => {
+                return (markerLabelSize * (1 / k)) + "px"
+            })
+
+
+        const patternWidth = 10 * 1 / k
+        const patternHeight = 10 * 1 / k
+
+
+        /*
+                this.g.selectAll("defs").selectAll("pattern").each(function(d, i) {
+                    const pattern = d3.select(this);
+                    console.log(d.type)
+                    if (d.type == 'lines' || d.type == 'squares') {
+                        pattern.attr('width', patternWidth / 2)
+                        pattern.attr('height', patternHeight / 2)
+                    }
+                    if (d.type == 'dots') {
+                        pattern
+                            .attr("cx", patternWidth / 2)
+                            .attr("cy", patternHeight / 2)
+                            .attr('r', patternWidth / 2.5)
+                    }
+                    if (d.type == 'triangle') {
+                        pattern.attr("points", `${patternWidth / 2} 0, 0 ${patternWidth}, ${patternWidth}  ${patternWidth} `)
+                    }
+
+                })
+
+
+
+                this.g.selectAll(".shape-pattern")
+                    .attr("style", () => {
+                        return "none;;"
+                    })
+                    .attr("style", (p) => {
+                        return "none;fill:url(#" + toId(p) + ");"
+                    })
+        */
+
+    }
+
+
+    getTooltipVariables(d) {
+        const {apiJoinAttribute} = this.props
+        if (d.properties._value) {
+            const variables = {
+                ...d.properties, meta: {
+                    [apiJoinAttribute]: d.properties.meta ? d.properties.meta.value : '', ...d.properties.meta,
+                    value: d.properties._value
+                }
+            }
+            return variables
+        }
+        return {}
+
+    }
 
     createDataLayer(json) {
         const {
@@ -72,14 +180,196 @@ class DataLayer extends BaseLayer {
             patternDiscriminator,
             patternDiscriminatorLabel,
             breaks,
+            gradientScheme,
+            gradientReverse,
             patterns,
             projection,
             useBreaks,
+            useGradients,
             useCentroidPoint,
             usePattern,
-
+            waitForFilters,
             intl,
+            patternsVisible = true,
+            togglePatterns,
+            colorLayerVisible = true,
+            visible
 
+        } = this.props
+
+
+        if (this.gRef && this.gRef.current) {
+            //eslint-disable-next-line
+            debugger;
+
+            this.g = d3.select(this.gRef.current.parentNode)
+
+            this.g.attr("class", "base-layer") //add unique name
+            const filteredData = json.features.filter(f => f.properties._value != null)
+
+            //call create path on base layer
+            this.createPaths(json)
+
+            if (!useCentroidPoint) {
+                this.createColors(filteredData)
+                //this.createLabels(json)
+            }
+            if (usePattern) {
+                this.createPatterns(json)
+            }
+            if (labelField != 'none') {
+                this.createLabels(json)
+            }
+            if (useCentroidPoint) {
+                this.createCentroids(filteredData)
+            }
+
+
+        }
+
+
+    }
+
+
+    createColors(filteredData) {
+        const {
+            app,
+            svg,
+            format,
+            id,
+            file,
+            path,
+            onLayerCreated,
+            labelFilter = [],
+            labelField,
+            labelFontSize,
+            labelColor,
+            fillColor,
+            borderColor,
+            tooltip,
+            markFillColor,
+            markLabelColor,
+            markBorderColor,
+            markSizeScale,
+            markerLabelSize,
+            featureJoinAttribute,
+            apiJoinAttribute,
+            measures,
+            editing,
+            data,
+            patternDiscriminator,
+            patternDiscriminatorLabel,
+            breaks,
+            gradientScheme,
+            gradientReverse,
+            patterns,
+            projection,
+            useBreaks,
+            useGradients,
+            useCentroidPoint,
+            usePattern,
+            waitForFilters,
+            intl,
+            patternsVisible = true,
+            togglePatterns,
+            colorLayerVisible = true,
+            visible
+
+        } = this.props
+
+        const brStyles = new BreaksStyles({
+            breaks: breaks,
+            defaultFillColor: markFillColor,
+            defaultBorderColor: markBorderColor,
+            defaultSize: markSizeScale
+        })
+        const gradientColors = new GradientColors({
+            data: data.children,
+            measure: measures[0],
+            defaultFillColor: markFillColor,
+            gradientScheme: gradientScheme,
+            gradientReverse: gradientReverse
+        })
+        if (this.g) {
+
+            //eslint-disable-next-line
+            debugger;
+            this.g.selectAll("path")
+                .attr("fill", d => {
+                    if (!d || !d.properties || !d.properties._value) {
+                        return fillColor
+                    }
+                    return useGradients ? gradientColors.getColor(d.properties._value) : brStyles.getColor(d.properties._value)
+                })
+                .attr("stroke", borderColor)
+                .attr("id", "state-borders")
+                .attr("d", path).on("mouseenter", (d, p) => {
+                if (p.properties._value) {
+                    this.showToolTip(tooltip, this.getTooltipVariables(p), useGradients ? gradientColors.getColor(p.properties._value) : brStyles.getColor(p.properties._value), p)
+                }
+            })
+                .on("mouseleave", (d) => {
+                    this.hiddenToolTip(d)
+                })
+                .on("mousemove", (d) => {
+                    this.moveToolTip(d)
+                })
+
+            if (!colorLayerVisible) {
+                this.g.selectAll(".borders").style("fill", this.props.fillColor)
+                //this.g.selectAll(".centroids").style("display", this.props.colorLayerVisible ? "block" : "none")
+            }
+
+
+            this.g.attr("transform", this.props.transform);
+
+        }
+
+    }
+
+    createCentroids(filteredData) {
+        const {
+            app,
+            svg,
+            format,
+            id,
+            file,
+            path,
+            onLayerCreated,
+            labelFilter = [],
+            labelField,
+            labelFontSize,
+            labelColor,
+            fillColor,
+            borderColor,
+            tooltip,
+            markFillColor,
+            markLabelColor,
+            markBorderColor,
+            markSizeScale,
+            markerLabelSize,
+            featureJoinAttribute,
+            apiJoinAttribute,
+            measures,
+            editing,
+            data,
+            patternDiscriminator,
+            patternDiscriminatorLabel,
+            breaks,
+            gradientScheme,
+            gradientReverse,
+            patterns,
+            projection,
+            useBreaks,
+            useGradients,
+            useCentroidPoint,
+            usePattern,
+            waitForFilters,
+            intl,
+            patternsVisible = true,
+            togglePatterns,
+            colorLayerVisible = true,
+            visible
 
         } = this.props
 
@@ -91,8 +381,17 @@ class DataLayer extends BaseLayer {
             defaultSize: markSizeScale
         })
 
-        if (this.gRef && this.gRef.current) {
-            this.g = d3.select(this.gRef.current)
+        const gradientColors = new GradientColors({
+            data: data.children,
+            measure: measures[0],
+            defaultFillColor: markFillColor,
+            gradientScheme: gradientScheme,
+            gradientReverse: gradientReverse
+        })
+
+        if (this.g) {
+
+
             const numberFormat = {
                 style: (format.style === 'compacted') ? 'decimal' : format.style,
                 notation: (format.style === 'compacted') ? 'compact' : "standard",
@@ -101,160 +400,234 @@ class DataLayer extends BaseLayer {
                 maximumFractionDigits: parseInt(format.maximumFractionDigits)
             }
 
-            const filteredData = json.features.filter(f => f.properties._value != null)
 
-
-            const getTooltipVariables = (d) => {
-                if (d.properties._value) {
-                    const variables = {
-                        ...d.properties, meta: {
-                            [apiJoinAttribute]: d.properties.meta ? d.properties.meta.value : '', ...d.properties.meta,
-                            value: d.properties._value
-                        }
-                    }
-                    return variables
-                }
-                return {}
-
-            }
-
-            this.g.attr("class", "base-layer") //add unique name
-            this.createPaths(json)
-
-            this.g.selectAll(".point").remove()
-            this.g.selectAll(".point-label").remove()
-            this.g.selectAll(".shape-pattern").remove()
-
-            this.g.selectAll("defs").remove()
             const k = this.props.transform ? this.props.transform.k : 1
 
-            const patternWidth = 10 * 1 / k
-            const patternHeight = 10 * 1 / k
+            this.g.selectAll(".centroids").remove()
+
+            const pointsGroup = this.g.selectAll("centroids")
+                .data(filteredData)
+                .enter()
+                .append("g")
+                .attr("class", "centroids")
 
 
-            const defs = this.g.append("defs")
-            let patternsData = []
-            if (app == "csv" && patternDiscriminator != 'none') {
-                patternsData = [...new Set(data.data.map(d => d[patternDiscriminator]))].map(key => {
-                    return {
-                        key: key,
-                        type: patterns[key + "_symbol"],
-                        color: patterns[key + "_color"],
-                        rotation: patterns[key + "_rotation"]
+            pointsGroup.append("circle")
+                .attr("fill", d => useGradients ? gradientColors.getColor(d.properties._value) : brStyles.getColor(d.properties._value, true))
+                .attr("stroke", markBorderColor)
+                .attr("class", "point")
+                .attr("stroke-width", 2)
+                .style("vector-effect", "non-scaling-stroke")
+                .attr("cx", d => path.centroid(d)[0])
+                .attr("cy", d => path.centroid(d)[1])
+                .attr('r', d => {
+                    return brStyles.getSize(d.properties._value) * 1 / k
+                }).on("mouseenter", (d, p) => {
+                if (p.properties._value) {
+
+                    const variables = {
+                        ...p.properties, meta: {
+                            [apiJoinAttribute]: p.properties.meta ? p.properties.meta.value : '', ...p.properties.meta,
+                            value: p.properties._value
+                        }
                     }
-                })
-            } else if (patternDiscriminator != 'none') {
-
-                const types = data.metadata.types.filter(d => d.dimension == patternDiscriminator)
-
-                debugger; //eslint-disable-line
-                patternsData = types && types.length > 0 ? types[0].items.map(item => {
-                    const key = item.value
-                    return {
-                        key: key,
-                        type: patterns[key + "_symbol"],
-                        color: patterns[key + "_color"],
-                        rotation: patterns[key + "_rotation"]
-                    }
-
-                }) : []
-            }
-
-
-            defs.selectAll("pattern").remove()
-            defs.selectAll("pattern")
-                .data(patternsData).enter()
-                .append("pattern")
-                .attr('id', d => toId(d.key))
-                .attr('patternUnits', 'userSpaceOnUse')
-                .attr('width', patternWidth)
-                .attr('height', patternHeight)
-                .attr("x", 0).attr("y", 0)
-                .attr("patternTransform", d => `rotate(${d.rotation})`)
-
-            patternsData.forEach(d => {
-                if (d.type === 'lines') {
-                    defs.select("#" + toId(d.key))
-                        .append("rect")
-                        .attr("x", .05)
-                        .attr('width', patternWidth / 2)
-                        .attr('height', patternHeight)
-                        .attr("opacity", 1)
-                        .attr('fill', d.color)
-                }
-                if (d.type === 'squares') {
-                    defs.select("#" + toId(d.key))
-                        .append("rect")
-                        .attr('width', patternWidth / 2)
-                        .attr('height', patternHeight / 2)
-                        .attr('fill', d.color)
-                        .attr("opacity", 1)
-                        .attr("stroke-width", 1)
-
-                }
-                if (d.type === 'dots') {
-                    defs.select("#" + toId(d.key))
-                        .append("circle")
-                        .attr("cx", patternWidth / 2)
-                        .attr("cy", patternHeight / 2)
-                        .attr('r', patternWidth / 2.5)
-                        .attr('fill', d.color)
-                        .attr("opacity", 1)
-                        .attr("stroke-width", 1)
-
-                }
-                if (d.type === 'triangle') {
-                    defs.select("#" + toId(d.key))
-                        .append("polygon")
-                        .attr("points", `${patternWidth / 2} 0, 0 ${patternWidth}, ${patternWidth}  ${patternWidth} `)
-                        .attr('fill', d.color)
-                        .attr("opacity", 1)
-                        .attr("stroke-width", 1)
-
+                    this.showToolTip(tooltip, variables, useGradients ? gradientColors.getColor(p.properties._value) : brStyles.getColor(p.properties._value))
                 }
             })
-
-
-            if (!useCentroidPoint) {
-                this.g.selectAll("path")
-                    .attr("fill", d => {
-                        if (!d || !d.properties || !d.properties._value) {
-                            return fillColor
-                        }
-                        return brStyles.getColor(d.properties._value)
-                    })
-                    .attr("stroke", borderColor)
-                    .attr("id", "state-borders")
-                    .attr("d", path).on("mouseenter", (d, p) => {
-
-                    if (p.properties._value) {
-                        this.showToolTip(tooltip, getTooltipVariables(p), brStyles.getColor(p.properties._value), p)
-                    }
+                .on("mouseleave", (d) => {
+                    this.hiddenToolTip()
                 })
-                    .on("mouseleave", (d) => {
-                        this.hiddenToolTip(d)
-                    })
-                    .on("mousemove", (d) => {
-                        this.moveToolTip(d)
-                    })
 
-                this.createLabels(json)
+
+            pointsGroup.append("text")
+                .attr("class", "point-label")
+                .attr("x", d => path.centroid(d)[0])
+                .attr("y", d => path.centroid(d)[1])
+                .attr("font-size", d => {
+                    return (markerLabelSize * (1 / k)) + "px"
+                })
+                .attr("text-anchor", "middle")
+                .attr("dominant-baseline", "middle")
+                .style("pointer-events", "none")
+                .attr("fill", markLabelColor)
+                .text(d => {
+                    return intl.formatNumber(format.style === 'percent' ? d.properties._value / 100 : d.properties._value, numberFormat)
+
+                }).on("mouseover", (d) => {
+
+            });
+
+            if (!colorLayerVisible) {
+                this.g.selectAll(".centroids").style("display", "none")
+            }
+        }
+
+    }
+
+    createPatterns(json) {
+        const {
+            app,
+            svg,
+            format,
+            id,
+            file,
+            path,
+            onLayerCreated,
+            labelFilter = [],
+            labelField,
+            labelFontSize,
+            labelColor,
+            fillColor,
+            borderColor,
+            tooltip,
+            markFillColor,
+            markLabelColor,
+            markBorderColor,
+            markSizeScale,
+            markerLabelSize,
+            featureJoinAttribute,
+            apiJoinAttribute,
+            measures,
+            editing,
+            data,
+            patternDiscriminator,
+            patternDiscriminatorLabel,
+            breaks,
+            gradientScheme,
+            gradientReverse,
+            patterns,
+            projection,
+            useBreaks,
+            useGradients,
+            useCentroidPoint,
+            usePattern,
+            waitForFilters,
+            intl,
+            patternsVisible = true,
+            togglePatterns,
+            colorLayerVisible = true,
+            visible
+
+        } = this.props
+
+
+        const brStyles = new BreaksStyles({
+            breaks: breaks,
+            defaultFillColor: markFillColor,
+            defaultBorderColor: markBorderColor,
+            defaultSize: markSizeScale
+        })
+
+        const k = this.props.transform ? this.props.transform.k : 1
+        const patternWidth = 10 * 1 / k
+        const patternHeight = 10 * 1 / k
+        let patternsData = []
+        if (app == "csv" && patternDiscriminator != 'none') {
+            patternsData = [...new Set(data.data.map(d => d[patternDiscriminator]))].map(key => {
+                return {
+                    key: key,
+                    type: patterns[key + "_symbol"],
+                    color: patterns[key + "_color"],
+                    rotation: patterns[key + "_rotation"]
+                }
+            })
+        } else if (patternDiscriminator != 'none') {
+            const types = data.metadata ? data.metadata.types.filter(d => d.dimension == patternDiscriminator) : []
+            patternsData = types && types.length > 0 ? types[0].items.map(item => {
+                const key = item.value
+                return {
+                    key: key,
+                    type: patterns[key + "_symbol"],
+                    color: patterns[key + "_color"],
+                    rotation: patterns[key + "_rotation"]
+                }
+
+            }) : []
+        }
+
+
+        this.g.selectAll("defs").remove()
+        const defs = this.g.append("defs")
+        defs.selectAll("pattern").remove()
+
+        defs.selectAll("pattern")
+            .data(patternsData)
+            .enter()
+            .append("pattern")
+            .attr('id', d => toId(d.key))
+            .attr('patternUnits', 'userSpaceOnUse')
+            .attr('width', patternWidth)
+            .attr('height', patternHeight)
+            .attr("x", 0)
+            .attr("y", 0)
+            .attr("patternTransform", d => `rotate(${d.rotation})`)
+
+        patternsData.forEach(d => {
+            if (d.type === 'lines') {
+                defs.select("#" + toId(d.key))
+                    .append("rect")
+                    .attr("x", .05)
+                    .attr('width', patternWidth / 2)
+                    .attr('height', patternHeight)
+                    .attr("opacity", 1)
+                    .attr('fill', d.color)
+            }
+            if (d.type === 'squares') {
+                defs.select("#" + toId(d.key))
+                    .append("rect")
+                    .attr('width', patternWidth / 2)
+                    .attr('height', patternHeight / 2)
+                    .attr('fill', d.color)
+                    .attr("opacity", 1)
+                    .attr("stroke-width", 1)
 
             }
+            if (d.type === 'dots') {
+                defs.select("#" + toId(d.key))
+                    .append("circle")
+                    .attr("cx", patternWidth / 2)
+                    .attr("cy", patternHeight / 2)
+                    .attr('r', patternWidth / 2.5)
+                    .attr('fill', d.color)
+                    .attr("opacity", 1)
+                    .attr("stroke-width", 1)
+
+            }
+            if (d.type === 'triangle') {
+                defs.select("#" + toId(d.key))
+                    .append("polygon")
+                    .attr("points", `${patternWidth / 2} 0, 0 ${patternWidth}, ${patternWidth}  ${patternWidth} `)
+                    .attr('fill', d.color)
+                    .attr("opacity", 1)
+                    .attr("stroke-width", 1)
+
+            }
+        })
+
+        patternsData = patternsData.filter(p => {
+            return p.type != undefined
+        }).sort((a, b) => {
+            return new Intl.Collator(intl.locale, {caseFirst: 'upper', numeric: true, sensitivity: 'variant'})
+                .compare(a.key, b.key);
+        })
 
 
-            if (usePattern && json && json.features) {
+        if (usePattern && json && json.features) {
+            this.g.selectAll(".shape-pattern").remove()
 
-                debugger;// eslint-disable-line
-
+            if (patternsVisible) {
                 json.features.forEach(d => {
                     let patterns = []
                     if (d.properties && d.properties.meta) {
                         patterns = (app != "csv") ? d.properties.meta[patternDiscriminator] ? d.properties.meta[patternDiscriminator] : [] : [d.properties.meta[patternDiscriminator]]
                         if (patterns && patterns.length > 0) {
+
                             patterns.forEach(p => {
+                                //eslint-disable-next-line
+
                                 this.g.append("path")
                                     .attr("d", path(d))
+                                    .datum(p)
                                     .attr("class", "shape-pattern")
                                     .attr("opacity", d => {
                                         if (useBreaks) {
@@ -269,7 +642,7 @@ class DataLayer extends BaseLayer {
                                         return "none;fill:url(#" + toId(p) + ");"
                                     })
                                     .on("mouseenter", () => {
-                                        this.showToolTip(tooltip, getTooltipVariables(d), brStyles.getColor(d.properties._value))
+                                        this.showToolTip(tooltip, this.getTooltipVariables(d), useGradients ? gradientColors.getColor(d.properties._value) : brStyles.getColor(d.properties._value))
                                     }).on("mousemove", (d) => {
                                     this.moveToolTip()
                                 }).on("mouseleave", (d) => {
@@ -282,21 +655,30 @@ class DataLayer extends BaseLayer {
                     }
 
                 })
+            }
 
-                /*Adding patterns to legends*/
-                    debugger; //eslint-disable-line
-                patternsData = patternsData.filter(p => {
-                    return p.type != undefined
-                }).sort((a, b) => {
-                    return new Intl.Collator(intl.locale, {caseFirst: 'upper', numeric: true, sensitivity: 'variant'})
-                        .compare(a.key, b.key);
-                })
+            /*Adding patterns to legends*/
+            /**/
+            d3.select(this.gRef.current.parentNode.parentNode)
+                .select(`.layer_${toGenericID(id)}`)
+                .select("svg").remove()
+
+            //eslint-disable-next-line
+            debugger;
+
+            const legendsSVG = d3.select(this.gRef.current.parentNode.parentNode)
+                .select(`.layer_${toGenericID(id)}`).append("svg")
 
 
-                d3.select(this.gRef.current.parentNode.parentNode).select(`.layer_${toGenericID(id)}`).select("svg").remove()
-                const g = d3.select(this.gRef.current.parentNode.parentNode).select(`.layer_${toGenericID(id)}`).append("svg")
-                const defs = g.append("defs")
-                defs.selectAll("pattern").remove()
+            legendsSVG.attr("height", 30 + ((patternsData.length * 23)) + "px")
+            const g = legendsSVG.append("svg").append("g")
+
+
+            const defs = g.append("defs")
+
+            defs.selectAll("pattern").remove()
+
+            if (patternsVisible) {
                 defs.selectAll("pattern")
                     .data(patternsData).enter()
                     .append("pattern")
@@ -349,23 +731,46 @@ class DataLayer extends BaseLayer {
                     }
                 })
 
-                g.attr("width", "150px")
-                    .attr("height", patternsData.length * 30 + "px")
+            }
 
-                g.append("text")
-                    .attr("class", "patterns-title")
-                    .attr("y", 5)
-                    .attr("x", 12)
-                    .text(a => app === 'csv' ? patternDiscriminator : patternDiscriminatorLabel)
 
+            let patternCheckbox = patternsVisible ? "☑ " : "☐ ";
+
+            g.append("text")
+                .attr("class", "patterns-checkbox")
+                .attr("x", 10)
+                .attr("y", 20)
+
+                .text(a => patternCheckbox)
+
+                .attr("font-size", "22px")
+                .on("click", () => {
+                    if (togglePatterns) {
+                        togglePatterns(id)
+                    }
+                })
+
+            g.append("text")
+                .attr("class", "patterns-title")
+                .attr("x", 25)
+                .attr("y", 7)
+                .text(a => app === 'csv' ? patternDiscriminator : patternDiscriminatorLabel)
+                .on("click", () => {
+                    if (togglePatterns) {
+                        togglePatterns(id)
+                    }
+                })
+
+
+            if (patternsVisible) {
                 g.selectAll(".legend-squares")
                     .data(patternsData)
                     .enter()
                     .append("rect")
-                    .attr("width", 18)
-                    .attr("height", 18)
-                    .attr("y", (d, i) => (i * 22) + 25)
-                    .attr("x", 20)
+                    .attr("width", 15)
+                    .attr("height", 15)
+                    .attr("y", (d, i) => (i * 22) + 30)
+                    .attr("x", 15)
                     .attr("stroke", borderColor)
                     .attr("style", (d) => {
                         return "none;fill:url(#" + 'l_' + toId(d.key) + ");"
@@ -377,167 +782,131 @@ class DataLayer extends BaseLayer {
                     .enter()
                     .append("text")
                     .attr("class", "patterns-labels")
-                    .attr("y", (d, i) => (i * 22) + 25)
-                    .attr("x", 40)
+                    .attr("y", (d, i) => (i * 22) + 30)
+                    .attr("x", 32)
                     .text(d => d.key)
-
             }
-            if (useCentroidPoint) {
-                this.createLabels(json)
-
-
-                this.g.selectAll(".point")
-                    .data(filteredData)
-                    .enter()
-                    .append("circle")
-                    .attr("fill", d => brStyles.getColor(d.properties._value, true))
-                    .attr("stroke", markBorderColor)
-                    .attr("class", "point")
-                    .attr("stroke-width", 2)
-                    .style("vector-effect", "non-scaling-stroke")
-                    .attr("cx", d => path.centroid(d)[0])
-                    .attr("cy", d => path.centroid(d)[1])
-                    .attr('r', d => {
-                        return brStyles.getSize(d.properties._value) * 1 / k
-                    })
-                    //.attr("transform", this.props.transform)
-                    .on("mouseenter", (d, p) => {
-                        //eslint-disable-next-line
-
-                        if (p.properties._value) {
-
-                            const variables = {
-                                ...p.properties, meta: {
-                                    [apiJoinAttribute]: p.properties.meta ? p.properties.meta.value : '', ...p.properties.meta,
-                                    value: p.properties._value
-                                }
-                            }
-                            this.showToolTip(tooltip, variables, brStyles.getColor(p.properties._value))
-                        }
-                    })
-                    .on("mouseleave", (d) => {
-                        this.hiddenToolTip()
-                    })
-
-
-                this.g.selectAll(".point-label").data(filteredData)
-                    .enter()
-                    .append("text")
-                    .attr("class", "point-label")
-                    .attr("x", d => path.centroid(d)[0])
-                    .attr("y", d => path.centroid(d)[1])
-                    .attr("font-size", d => {
-                        return (markerLabelSize * (1 / k)) + "px"
-                    })
-                    .attr("fill", markLabelColor)
-                    .text(d => {
-                        return intl.formatNumber(format.style === 'percent' ? d.properties._value / 100 : d.properties._value, numberFormat)
-
-                    }).on("mouseover", (d) => {
-
-                });
-            } //Map Shapes
-
-
         }
-
 
     }
 
 
-    create() {
+    joinData(json, app, featureJoinAttribute, data, measures, patternDiscriminator) {
 
-
-        const {
-            app,
-            name,
-            file,
-            path,
-            zoom,
-            labelFilter = [],
-            labelField,
-            labelFontSize,
-            labelColor,
-            fillColor,
-            borderColor,
-            featureJoinAttribute,
-            editing,
-            data,
-            measures,
-            patternDiscriminator
-        } = this.props
-
-        if (file != "none") {
-            this.loadJSON(file).then(json => {
-                const features = json.features.map(d => {
-
-
-                    const joinValue = d.properties[featureJoinAttribute]
-
-                    if (app != 'csv' && data && data.children) {
-                        const values = data.children.filter(d => {
-                           return d.value == joinValue
-                        })
-
-                        if (values.length > 0) {
-                            const measureValue = (values[0][measures[0]])
-                            d.properties.meta = values[0]
-                            d.properties._value = measureValue
-                            if (patternDiscriminator && patternDiscriminator != 'none') {
-                                const patternsValues = values[0] && values[0].children ? values[0].children.filter(f => f.type == patternDiscriminator).map(d => d.value) : []
-                                /*
-                                 const patternType = values[0].children.map(d => ({
-                                     value: d.value, [measures[0]]: d[measures[0]]
-                                 })).sort(d => d.value)[0].value
-                                 */
-                                d.properties.meta[patternDiscriminator] = patternsValues
-                            }
-
-                        } else {
-                            d.properties._value = null
-                        }
-
-                    } else if (app == 'csv') {
-                        const values = data.data.filter(d => d[data.meta.fields[0]] == joinValue)
-                        if (values.length > 0) {
-                            d.properties.meta = values[0]
-                            d.properties._value = values[0][data.meta.fields[1]]
-
-                        } else {
-                            d.properties._value = null
-                        }
-
-
-                    } else {
-                        d.properties._value = null
-                    }
-                    return d
+        const features = json.features.map(d => {
+            const joinValue = d.properties[featureJoinAttribute]
+            if (app != 'csv' && data && data.children) {
+                const values = data.children.filter(d => {
+                    return d.value == joinValue
                 })
+                if (values.length > 0) {
+                    const measureValue = (values[0][measures[0]])
+                    d.properties.meta = values[0]
+                    d.properties._value = measureValue
+                    if (patternDiscriminator && patternDiscriminator != 'none') {
+                        const patternsValues = values[0] && values[0].children ? values[0].children.filter(f => f.type == patternDiscriminator).map(d => d.value) : []
+
+                        d.properties.meta[patternDiscriminator] = patternsValues
+                    }
+
+                } else {
+                    d.properties._value = null
+                }
+
+            } else if (app == 'csv') {
+                const values = data.data.filter(d => d[data.meta.fields[0]] == joinValue)
+                if (values.length > 0) {
+                    d.properties.meta = values[0]
+                    d.properties._value = values[0][data.meta.fields[1]]
+
+                } else {
+                    d.properties._value = null
+                }
+            } else {
+                d.properties._value = null
+            }
+            return d
+        })
+        const newJson = {...json, features}
+
+        return newJson
 
 
-                const newJson = {...json, features}
-
-
-                this.createDataLayer(newJson);
-
-
-            });
-        }
     }
 
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        const {projection} = this.props
-        this.create()
+        const {app, file, featureJoinAttribute, data, measures, patternDiscriminator, editing} = this.props
+
+        //TODO:Check if data has changed using JSON.stringify
+
+        if (editing || JSON.stringify(prevProps.data) !== JSON.stringify(data)) {
+            //eslint-disable-next-line
+            debugger
+            this.create()
+
+        }
+
+        if (prevProps.visible != this.props.visible) {
+            //eslint-disable-next-line
+            debugger
+            this.g.style("display", this.props.visible ? "" : "none")
+        }
+
+        if (prevProps.patternsVisible != this.props.patternsVisible) {
+            //eslint-disable-next-line
+            const svg = d3.select(this.gRef.current.parentNode.parentNode)
+
+            const legendDiv = svg.select(`.layer_${toGenericID(this.props.id)}`)
+
+            legendDiv.select(".patterns-checkbox").text(this.props.patternsVisible ? "☑ " : "☐ ")
+            legendDiv.selectAll('.patterns-labels').style("display", this.props.patternsVisible ? "" : "none")
+
+            legendDiv.selectAll('rect').style("display", this.props.patternsVisible ? "" : "none")
+
+            //eslint-disable-next-line
+
+
+            legendDiv.select("svg").attr("height", this.props.patternsVisible ? 30 + (((legendDiv.selectAll('rect').size() -1) * 23)) + "px" : "30px")
+
+            this.g.selectAll(".shape-pattern").style("display", this.props.patternsVisible ? "" : "none")
+
+        }
+
+        if (prevProps.colorLayerVisible != this.props.colorLayerVisible) {
+            //eslint-disable-next-line
+
+            this.g.selectAll(".borders").style("fill", d => {
+                //eslint-disable-next-line
+                debugger
+                return this.props.colorLayerVisible ? null : this.props.fillColor
+
+            })
+            this.g.selectAll(".centroids").style("display", this.props.colorLayerVisible ? "block" : "none")
+        }
+
+        if (prevProps.usePattern != this.props.usePattern) {
+            if (!this.props.usePattern) {
+                const svg = d3.select(this.gRef.current.parentNode.parentNode)
+
+                const legendDiv = svg.select(`.layer_${toGenericID(this.props.id)}`)
+                legendDiv.select("svg").remove()
+            }
+        }
+
+        if (this.g) {
+            this.resize()
+        }
+
     }
 
+
     componentDidMount() {
-        this.create()
-        this.props.zoom.current.fullView()
+
+        super.componentDidMount()
     }
 
     render() {
-
         const {
             id,
             file,
@@ -573,7 +942,8 @@ const DataWrapper = (props) => {
         patternDiscriminator,
         dvzProxyDatasetId,
         intl,
-        settings
+        settings,
+        waitForFilters
     } = props
 
 
@@ -582,8 +952,7 @@ const DataWrapper = (props) => {
 
     if (ff && ff.forEach) {
         ff.forEach(f => {
-            if (f.value != null && f.value.filter(v => v != null && v.toString().trim() != "").length > 0)
-                params[f.param] = f.value
+            if (f.value != null && f.value.filter(v => v != null && v.toString().trim() != "").length > 0) params[f.param] = f.value
         })
     }
 
@@ -591,7 +960,9 @@ const DataWrapper = (props) => {
         params.dvzProxyDatasetId = dvzProxyDatasetId;
     }
 
+
     return (<DataProvider
+        waitForFilters={waitForFilters}
         editing={editing}
         params={params}
         app={app}

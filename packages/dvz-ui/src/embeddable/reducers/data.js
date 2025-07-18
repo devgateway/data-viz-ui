@@ -1,5 +1,5 @@
 import * as api from './data-api'
-import { Map, fromJS } from 'immutable'
+import * as Immutable from 'immutable'
 import Papa from 'papaparse'
 
 const LOAD_DATA = 'LOAD_DATA'
@@ -18,15 +18,15 @@ const SET_INITIAL_FILTER = 'SET_INITIAL_FILTER'
 const SET_APPLY = 'SET_APPLY'
 
 const CLEAN_FILTER = 'CLEAN_FILTER'
-const initialState = Map({mode: 'info'})
+const initialState = Immutable.Map({mode: 'info'})
 
 const SET_MEASURES = 'SET_MEASURES'
 const CLEAN_MEASURES = 'CLEAN_MEASURES'
 
-export const cleanMeasures = ({app, group}: {app: string, group: string}) => (dispatch, getState) => {
+export const cleanMeasures = ({app, group}) => (dispatch, getState) => {
     dispatch({type: CLEAN_MEASURES, app, group})
 }
-export const setMeasures = ({app, group, mGroup}: {app: string, group: string, mGroup: any}) => (dispatch, getState) => {
+export const setMeasures = ({app, group, mGroup}) => (dispatch, getState) => {
 
     const measures = Object.keys(mGroup.measures).filter(k => mGroup.measures[k].selected)
 
@@ -39,35 +39,44 @@ export const setMeasures = ({app, group, mGroup}: {app: string, group: string, m
     newMgroup[app].format = mGroup.format
     dispatch({type: SET_MEASURES, app, group, measure: newMgroup})
 }
-export const setFilter = ({app, group, param, value, autoApply}: {app: string, group: string, param: string, value: any, autoApply: boolean}) => (dispatch, getState) => {
+export const setFilter = ({app, group, param, value, autoApply}) => (dispatch, getState) => {
     dispatch({type: SET_FILTER, app, group, param, value, autoApply})
 }
-export const cleanFilter = ({app, group}: {app: string, group: string}) => (dispatch, getState) => {
+export const cleanFilter = ({app, group}) => (dispatch, getState) => {
 
     dispatch({type: CLEAN_FILTER, app, group})
     //dispatch({type: CLEAN_MEASURES, app, group})
 }
 
 export const applyFilter = ({app, group}) => (dispatch, getState) => {
-     dispatch({type: SET_APPLY, app, group})
+    dispatch({type: SET_APPLY, app, group})
 }
 export const setInitialFilters = ({app, group, param, value}) => (dispatch, getState) => {
     dispatch({type: SET_INITIAL_FILTER, app, group, param, value})
 }
 
 export const getCategories = (props) => (dispatch, getState) => {
-    const {app, params} = props
-    dispatch({type: LOAD_CATEGORIES, params, app, dvzProxyDatasetId: params.dvzProxyDatasetId})
+    const {app, params, dvzProxyDatasetId, uniqueStorage} = props
+    dispatch({type: LOAD_CATEGORIES, params, app, uniqueStorage, dvzProxyDatasetId})
+
+
     api.getCategories({app, params})
-        .then((data: any) => {
+        .then(data => {
             data.appliedFilters = params
-            return dispatch({type: LOAD_CATEGORIES_DONE, app, data, dvzProxyDatasetId: params.dvzProxyDatasetId})
+            return dispatch({
+                type: LOAD_CATEGORIES_DONE,
+                app,
+                data,
+                uniqueStorage,
+                dvzProxyDatasetId
+            })
         })
         .catch(error => dispatch({
             type: LOAD_CATEGORIES_ERROR,
             app,
+            uniqueStorage,
             error,
-            dvzProxyDatasetId: params.dvzProxyDatasetId
+            dvzProxyDatasetId
         }))
 }
 
@@ -76,11 +85,13 @@ export const setData = ({app, group, csv, store, params}) => (dispatch, getState
     const filters = getState().get('data').getIn(['filters', app, group])
     if (filters) {
         params = {...params, ...filters.toJS()}
+    } else {
+        params = params || {}
     }
 
     const data = Papa.parse(csv, {header: true, dynamicTyping: true});
 
-    const filtered = data.data.filter((d: any) => {
+    const filtered = data.data.filter(d => {
         let filtered = false
         Object.keys(params).forEach(k => {
             const field = k
@@ -98,22 +109,40 @@ export const setData = ({app, group, csv, store, params}) => (dispatch, getState
     dispatch({type: LOAD_DATA_DONE, app, group, store, data: {count: d2.data.length, itemsSize: d2.data.length, ...d2}})
 }
 export const getData = ({app, group, source, store, params}) => (dispatch, getState) => {
-    const filters = getState().get('data').getIn(['filters', app, group])
 
+
+    let filters = getState().get('data').getIn(['filters', app, group])
+
+    if (params) {
+        const presetFilters = Object.keys(params);
+        presetFilters.forEach(k => {
+            if (filters && filters.has(k)) {
+                let a = params[k]
+                let b = filters.get(k)
+                //[A,B,C,E]
+                //[C,D]
+                //We should remove other options from preset filter and turn on off the matching ones
+                let newB = b.filter(c => a.indexOf(c) > -1);
+                filters = filters.set(k, newB)
+            }
+        })
+    }
     if (filters) {
         params = {...params, ...filters.toJS()}
     }
-    dispatch({type: LOAD_DATA,app,group, params, store})
+
+    dispatch({type: LOAD_DATA, app, group, params, store})
+
     api.getData({app, source, params})
         .then(data => {
             data.appliedFilters = params
-            return dispatch({type: LOAD_DATA_DONE,app,group, store, data})
+            return dispatch({type: LOAD_DATA_DONE, app, group, store, data, params})
         })
-        .catch(error => dispatch({type: LOAD_DATA_ERROR,app,group, store, error}))
+        .catch(error => dispatch({type: LOAD_DATA_ERROR, app, group, store, error}))
 
 }
 
-export const setPageModuleProps = ({ data }) => (dispatch, getState) => {
+export const setPageModuleProps = ({data}) => (dispatch, getState) => {
     dispatch({type: SET_PAGE_MODULE_PROPS, data})
 }
 
@@ -121,11 +150,13 @@ export default (state = initialState, action) => {
 
     switch (action.type) {
         case LOAD_DATA: {
-            const {store, app, group} = action
+            const {store, app, group, params} = action
             const time = Date.now()
+
             return state.deleteIn([...store, 'error'])
                 .setIn([...store, 'loading'], true)
                 .setIn([...store, 'time'], time)
+                .setIn([...store, 'presetFilter'], params)
 
         }
         case LOAD_DATA_ERROR: {
@@ -147,11 +178,14 @@ export default (state = initialState, action) => {
         case SET_PAGE_MODULE_PROPS: {
             const {data} = action
             return state
-                    .setIn(['pageModuleProps'], data)
+                .setIn(['pageModuleProps'], data)
         }
         case LOAD_CATEGORIES: {
-            const {data, app, dvzProxyDatasetId} = action
+            const {data, app, uniqueStorage, dvzProxyDatasetId} = action
             const path = ["categories", app]
+            if (uniqueStorage) {
+                path.push(uniqueStorage)
+            }
 
             if (dvzProxyDatasetId) {
                 path.push(dvzProxyDatasetId)
@@ -162,20 +196,25 @@ export default (state = initialState, action) => {
         }
 
         case LOAD_CATEGORIES_DONE: {
-            const {data, app, dvzProxyDatasetId} = action
+            const {data, app, uniqueStorage, dvzProxyDatasetId} = action
             const path = ["categories", app]
-
             if (dvzProxyDatasetId) {
                 path.push(dvzProxyDatasetId)
             }
+            if (uniqueStorage) {
+                path.push(uniqueStorage)
+            }
+
 
             return state.setIn([...path, "loading"], false)
-                .setIn([...path, "items"], fromJS(data))
+                .setIn([...path, "items"], Immutable.fromJS(data))
         }
         case LOAD_CATEGORIES_ERROR: {
-            const {data, app, dvzProxyDatasetId} = action
+            const {data, app, uniqueStorage, dvzProxyDatasetId} = action
             const path = ["categories", app]
-
+            if (uniqueStorage) {
+                path.push(uniqueStorage)
+            }
             if (dvzProxyDatasetId) {
                 path.push(dvzProxyDatasetId)
             }
@@ -191,16 +230,23 @@ export default (state = initialState, action) => {
         }
 
         case SET_FILTER: {
+            const now = Date.now();
             const {app, group, param, value, autoApply} = action
             return state.setIn(['filters-settings', app, group, "autoApply"], autoApply)
                 .setIn(['filters', app, group, param], value.length === 0 ? [Number.MIN_SAFE_INTEGER] : value)
-                .setIn(['filters-settings', app, group, "apply"],null)
+                .setIn(['filters-settings', app, group, "apply"], null)
+                .setIn(['filters-settings', app, group, 'lastUserFilterChange'], now);
         }
 
         case SET_INITIAL_FILTER: {
+            const now = Date.now();
             const {app, group, param, value} = action
+            //eslint-disable-next-line
+
+            console.log(param)
             return state.setIn(['filters', 'initial', app, group, param], value.length === 0 ? [Number.MIN_SAFE_INTEGER] : value)
                 .setIn(['filters', app, group, param], value.length === 0 ? [Number.MIN_SAFE_INTEGER] : value)
+                .setIn(['filters-settings', app, group, 'lastInitialFilterChange'], now);
         }
 
         case CLEAN_FILTER: {

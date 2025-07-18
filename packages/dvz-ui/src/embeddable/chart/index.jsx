@@ -1,9 +1,9 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Container } from "semantic-ui-react";
+import React, {useEffect, useRef, useState} from "react";
+import {Container} from "semantic-ui-react";
 import DataProvider from "../data/DataProvider";
 import DataConsumer from "../data/DataConsumer";
 import getDeviceType from "../../utils/deviceType";
-import { buildDivergingOptions, buildPieOptions } from "./prevalenceBuilder";
+import {buildDivergingOptions, buildPieOptions} from "./prevalenceBuilder";
 import HalfPie from "./Pie";
 import * as Immutable from 'immutable';
 
@@ -11,95 +11,95 @@ import Radar from "./Radar";
 import Bar from "./Bar";
 import Line from "./Line";
 
-import { PostContent } from "@devgateway/wp-react-lib";
+import {PostContent} from "@devgateway/wp-react-lib";
 import dataFrames from "./data/index";
 
 import CSVDataFrame from "./CSVDataFrame";
 import ColorProvider from "./colors/ColorProvider";
 import Messages from "./Messages";
-import { connect } from "react-redux";
-import { injectIntl } from "react-intl";
+import {connect} from "react-redux";
+import {injectIntl} from "react-intl";
 
 const PieChart = (props) => {
-  const { data, legends, colors, height } = props;
-  const options = buildPieOptions(data, true);
-  return (
-      <HalfPie
-          height={height}
-          legends={legends}
-          colors={colors}
-          options={options}
-          format={{ style: "percent" }}
-      ></HalfPie>
-  );
+    const {data, legends, colors, height} = props;
+    const options = buildPieOptions(data, true);
+    return (
+        <HalfPie
+            height={height}
+            legends={legends}
+            colors={colors}
+            options={options}
+            format={{style: "percent"}}
+        ></HalfPie>
+    );
 };
 
 const Diverging = (props) => {
-  const { data, legends, colors, height } = props;
-  const options = buildDivergingOptions(data, true);
-  return (
-      <Diverging
-          height={height}
-          legends={legends}
-          colors={colors}
-          options={options}
-          format={{ style: "percent", currency: "EUR" }}
-      ></Diverging>
-  );
+    const {data, legends, colors, height} = props;
+    const options = buildDivergingOptions(data, true);
+    return (
+        <Diverging
+            height={height}
+            legends={legends}
+            colors={colors}
+            options={options}
+            format={{style: "percent", currency: "EUR"}}
+        ></Diverging>
+    );
 };
 
 const Chart = (props) => {
-  let {
-    parent,
-    editing = false,
-    unique,
-    childContent,
-    categories,
-    injectedMeasures,
-    "data-app": app = "csv",
-    "data-dvz-proxy-dataset-id": dvzProxyDatasetId,
-    "data-group": group = "default",
-    "data-height": height = 500,
-    "data-type": type = "bar", //'data-source': source = 'gender/smoke',f
-    "data-dimension1": dimension1,
-    "data-dimension2": dimension2,
-    "data-dimension3": dimension3,
-    "data-color-by": colorBy = "index",
-    "data-scheme": scheme = "system",
-    "data-group-mode": groupMode = "grouped",
-    "data-left-legend": left = "Left Legend",
-    "data-legend-label": legendLabel = "",
-    "data-bottom-legend": bottom = "Bottom Legend",
-    "data-dualmode": dualMode,
-    "data-legend-position": legendPosition = "right",
-    "data-show-legends": showLegends = "true",
-    "data-data-source-label": dataSourceLabel = "Source",
-    "data-chart-data-source": dataSource = "Data Source",
-    "data-toggle-info-label": toggleInfoLabel = "Info Graphic",
-    "data-toggle-chart-label": toggleChartLabel = "Chart", //'data-number-format': format = '{"style":"percent", "minimumFractionDigits": 1, "maximumFractionDigits": 1}',
-    "data-tick-rotation": tickRotation = 0,
-    "data-tick-color": tickColor = "rgb(92,93,99)",
-    "data-measures": measures = "{}",
-    "data-format": format = "{}",
-    "data-csv": csv = "",
-    "data-margin-left": marginLeft = 50,
-    "data-margin-top": marginTop = 25,
-    "data-margin-right": marginRight = 25,
-    "data-margin-bottom": marginBottom = 25,
-    "data-start-angle": startAngle = 0,
-    "data-end-angle": endAngle = 360,
-    "data-view-mode": editMode = "info",
-    "data-filters": filters = "[]", //filters
-    "data-tooltip-html": tooltip = "",
-    "data-layout": layout = "vertical",
-    "data-reverse": reverse = "false",
-    "data-offset-y": offsetY = "-40",
-    "data-line-layer-enabled": lineLayerEnabled = "false",
+    let {
+        parent,
+        editing = false,
+        unique,
+        childContent,
+        categories,
+        injectedMeasures,
+        "data-app": app = "csv",
+        "data-dvz-proxy-dataset-id": dvzProxyDatasetId,
+        "data-group": group = "default",
+        "data-height": height = 500,
+        "data-type": type = "bar", //'data-source': source = 'gender/smoke',f
+        "data-dimension1": dimension1,
+        "data-dimension2": dimension2,
+        "data-dimension3": dimension3,
+        "data-color-by": colorBy = "index",
+        "data-scheme": scheme = "system",
+        "data-group-mode": groupMode = "grouped",
+        "data-left-legend": left = "Left Legend",
+        "data-legend-label": legendLabel = "",
+        "data-bottom-legend": bottom = "Bottom Legend",
+        "data-dualmode": dualMode,
+        "data-legend-position": legendPosition = "right",
+        "data-show-legends": showLegends = "true",
+        "data-data-source-label": dataSourceLabel = "Source",
+        "data-chart-data-source": dataSource = "Data Source",
+        "data-toggle-info-label": toggleInfoLabel = "Info Graphic",
+        "data-toggle-chart-label": toggleChartLabel = "Chart", //'data-number-format': format = '{"style":"percent", "minimumFractionDigits": 1, "maximumFractionDigits": 1}',
+        "data-tick-rotation": tickRotation = 0,
+        "data-tick-color": tickColor = "rgb(92,93,99)",
+        "data-measures": measures = "{}",
+        "data-format": format = "{}",
+        "data-csv": csv = "",
+        "data-margin-left": marginLeft = 50,
+        "data-margin-top": marginTop = 25,
+        "data-margin-right": marginRight = 25,
+        "data-margin-bottom": marginBottom = 25,
+        "data-start-angle": startAngle = 0,
+        "data-end-angle": endAngle = 360,
+        "data-view-mode": editMode = "info",
+        "data-filters": filters = "[]", //filters
+        "data-tooltip-html": tooltip = "",
+        "data-layout": layout = "vertical",
+        "data-reverse": reverse = "false",
+        "data-offset-y": offsetY = "-40",
+        "data-line-layer-enabled": lineLayerEnabled = "false",
 
-    //"data-csv-line-layer-data": csvLineLayerData = "",
-    //"data-csv-line-color": lineColor = "#000000",
-    //"data-csv-line-tooltip": lineTooltip = "",
-    //"data-csv-line-title": lineTitle = "",
+        //"data-csv-line-layer-data": csvLineLayerData = "",
+        //"data-csv-line-color": lineColor = "#000000",
+        //"data-csv-line-tooltip": lineTooltip = "",
+        //"data-csv-line-title": lineTitle = "",
 
     "data-overlays": overlays = "[]",
     "data-max-value": maxValue = "auto",
@@ -161,7 +161,8 @@ const Chart = (props) => {
     "data-reverse-legend": reverseLegend = "false",
     "data-sort": sort = "default",
     "data-sort-reverse": sortReverse = "false",
-    "data-sort2dimension": sort2Dimension = "_total",
+    "data-sort-second-dimension": sortSecondDimension = "default",
+    "data-sort-reverse-second-dimension": sortReverseSecondDimension = "false",
     "data-radar-curve": radarCurve = "linearClosed",
     "data-radar-fill-opacity": radarFillOpacity = 0.25,
     "data-radar-border-width": radarBorderWidth = 2,
@@ -175,9 +176,11 @@ const Chart = (props) => {
     "data-mobile-customization": mobileCustomization = "{}",
     "data-show-percentage": showPercentage = "false",
     "data-preview-mode": previewMode = "Desktop",
+    "data-wait-for-filters": waitForFilters = "false",
+    "data-line-curve": lineCurve = "linear",
     pageModuleProps
   } = props;
-  const originalEditValue = editing;
+   const originalEditValue = editing;
   const mobileConfigSettings = JSON.parse(
     decodeURIComponent(mobileCustomization)
   );
@@ -196,45 +199,45 @@ const Chart = (props) => {
   const isMobileEditMode =  (["Mobile"].includes(previewMode) && editing);
   const isDesktopEditMode = (["Desktop"].includes(previewMode) && editing);
 
-  const isNotDesktopPreview = isMobileConfigEnabled && previewMode !== "Desktop";
-  const isNotEditingAndIsMobileOrTablet = isMobileConfigEnabled && !editing;
+    const isNotDesktopPreview = isMobileConfigEnabled && previewMode !== "Desktop";
+    const isNotEditingAndIsMobileOrTablet = isMobileConfigEnabled && !editing;
 
-  const getTickRotation = () => {
-    const isTabletViewport = window.matchMedia("(min-width: 768px) and (max-width: 1250px)").matches;
-    const isMobileViewport = window.matchMedia("(max-width: 767px)").matches;
+    const getTickRotation = () => {
+        const isTabletViewport = window.matchMedia("(min-width: 768px) and (max-width: 1250px)").matches;
+        const isMobileViewport = window.matchMedia("(max-width: 767px)").matches;
 
-    switch (true) {
-      case isDesktopEditMode:
-        return tickRotation;
+        switch (true) {
+            case isDesktopEditMode:
+                return tickRotation;
 
-      case isTabletEditMode:
-        return isMobileConfigEnabled
-          ? mobileConfigSettings?.tabletXAxisTextRotation ?? tickRotation
-          : tickRotation;
+            case isTabletEditMode:
+                return isMobileConfigEnabled
+                    ? mobileConfigSettings?.tabletXAxisTextRotation ?? tickRotation
+                    : tickRotation;
 
-      case isMobileEditMode:
-        return isMobileConfigEnabled
-          ? mobileConfigSettings?.mobileXAxisTextRotation ?? tickRotation
-          : tickRotation;
+            case isMobileEditMode:
+                return isMobileConfigEnabled
+                    ? mobileConfigSettings?.mobileXAxisTextRotation ?? tickRotation
+                    : tickRotation;
 
-      case isTabletViewport:
-        return isMobileConfigEnabled
-          ? mobileConfigSettings?.tabletXAxisTextRotation ?? tickRotation
-          : tickRotation;
+            case isTabletViewport:
+                return isMobileConfigEnabled
+                    ? mobileConfigSettings?.tabletXAxisTextRotation ?? tickRotation
+                    : tickRotation;
 
-      case isMobileViewport:
-        return isMobileConfigEnabled
-          ? mobileConfigSettings?.mobileXAxisTextRotation ?? tickRotation
-          : tickRotation;
+            case isMobileViewport:
+                return isMobileConfigEnabled
+                    ? mobileConfigSettings?.mobileXAxisTextRotation ?? tickRotation
+                    : tickRotation;
 
-      default:
-        return tickRotation;
-    }
-  };
+            default:
+                return tickRotation;
+        }
+    };
 
-  const _tickRotation = getTickRotation();
+    const _tickRotation = getTickRotation();
 
-  const [deviceTickRotation, setTickRotation] = useState(_tickRotation);
+    const [deviceTickRotation, setTickRotation] = useState(_tickRotation);
 
   const locale = props.intl.locale;
   const ref = useRef(null);
@@ -257,12 +260,12 @@ const Chart = (props) => {
       console.error(`error parsing value:${value}`);
     }
 
-    return null;
-  };
+        return null;
+    };
 
-  const getManualColor = () => {
-    return parse(manualColors)[app];
-  };
+    const getManualColor = () => {
+        return parse(manualColors)[app];
+    };
 
   const getMeasuresObject = () => {
     return parse(measures);
@@ -306,8 +309,8 @@ const Chart = (props) => {
       }
     }
 
-    return format;
-  };
+        return format;
+    };
 
   const getSelectedMeasures = () => {
     if (measuresObject?.[app]) {
@@ -339,16 +342,16 @@ const Chart = (props) => {
     return [];
   };
 
-  let measuresObject = getMeasuresObject();
-  let selectedMeasures = getSelectedMeasures();
+    let measuresObject = getMeasuresObject();
+    let selectedMeasures = getSelectedMeasures();
 
-  let selectedFormat = getSelectedFormat();
-  const userMeasures = getUserMeasures();
-  let leftLegendForSelectedMeasure = left;
-  let rightLegendForSelectedMeasure = rightLegend;
+    let selectedFormat = getSelectedFormat();
+    const userMeasures = getUserMeasures();
+    let leftLegendForSelectedMeasure = left;
+    let rightLegendForSelectedMeasure = rightLegend;
 
-  /*Decoding tooltip string*/
-  let tooltipForSelectedMeasure = decode(tooltip);
+    /*Decoding tooltip string*/
+    let tooltipForSelectedMeasure = decode(tooltip);
 
   if (injectedMeasures?.[app]) {
     const selected = Object.keys(injectedMeasures[app].measures)
@@ -359,34 +362,34 @@ const Chart = (props) => {
     selectedMeasures = selected;
     selectedFormat = getSelectedFormat();
 
-    leftLegendForSelectedMeasure = injectedMeasures.leftTitle;
-    rightLegendForSelectedMeasure = injectedMeasures.rightTitle;
-    if (injectedMeasures.customTooltip) {
-      tooltipForSelectedMeasure = injectedMeasures.customTooltip;
+        leftLegendForSelectedMeasure = injectedMeasures.leftTitle;
+        rightLegendForSelectedMeasure = injectedMeasures.rightTitle;
+        if (injectedMeasures.customTooltip) {
+            tooltipForSelectedMeasure = injectedMeasures.customTooltip;
+        }
     }
-  }
 
-  const numberFormat = selectedFormat
-    ? {
-        style:
-            selectedFormat.style === "compacted"
-                ? "decimal"
-                : selectedFormat.style,
-        notation: selectedFormat.style === "compacted" ? "compact" : "standard",
-        currency: selectedFormat.currency,
-        minimumFractionDigits: parseInt(selectedFormat.minimumFractionDigits),
-        maximumFractionDigits: parseInt(selectedFormat.maximumFractionDigits),
-      }
-      : {
-        notation: "standard",
-        currency: "USD",
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      };
+    const numberFormat = selectedFormat
+        ? {
+            style:
+                selectedFormat.style === "compacted"
+                    ? "decimal"
+                    : selectedFormat.style,
+            notation: selectedFormat.style === "compacted" ? "compact" : "standard",
+            currency: selectedFormat.currency,
+            minimumFractionDigits: parseInt(selectedFormat.minimumFractionDigits),
+            maximumFractionDigits: parseInt(selectedFormat.maximumFractionDigits),
+        }
+        : {
+            notation: "standard",
+            currency: "USD",
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+        };
 
-  const customAxisFormat = getCustomAxisFormat();
+    const customAxisFormat = getCustomAxisFormat();
 
-  const groupTotalFormatObject = parse(groupTotalFormat);
+    const groupTotalFormatObject = parse(groupTotalFormat);
 
   const groupTotalFormatParsed = {
     style:
@@ -412,239 +415,240 @@ const Chart = (props) => {
   const child = null;
   const contentHeight = editing ? height - 80 : height;
 
-  const showXAxisTitle = () => (
-    (isNotDesktopPreview || isNotEditingAndIsMobileOrTablet) && !mobileConfigSettings?.showXAxisTitle
-      ? ""
-      : bottom
-  );
+    const showXAxisTitle = () => (
+        (isNotDesktopPreview || isNotEditingAndIsMobileOrTablet) && !mobileConfigSettings?.showXAxisTitle
+            ? ""
+            : bottom
+    );
 
-  const showYAxisTitle = () => {
-    if (isNotDesktopPreview || isNotEditingAndIsMobileOrTablet) {
-      if (mobileConfigSettings?.showYAxisTitle) {
+    const showYAxisTitle = () => {
+        if (isNotDesktopPreview || isNotEditingAndIsMobileOrTablet) {
+            if (mobileConfigSettings?.showYAxisTitle) {
+                return leftLegendForSelectedMeasure;
+            }
+            return "";
+        }
         return leftLegendForSelectedMeasure;
-      }
-      return "";
-    }
-    return leftLegendForSelectedMeasure;
-  };
+    };
 
-  const showRightAxisTitle = () => {
-    if (isNotDesktopPreview || isNotEditingAndIsMobileOrTablet) {
-      if (mobileConfigSettings?.showRightAxisTitle) {
+    const showRightAxisTitle = () => {
+        if (isNotDesktopPreview || isNotEditingAndIsMobileOrTablet) {
+            if (mobileConfigSettings?.showRightAxisTitle) {
+                return rightLegendForSelectedMeasure;
+            }
+            return "";
+        }
         return rightLegendForSelectedMeasure;
-      }
-      return "";
-    }
-    return rightLegendForSelectedMeasure;
-  };
-
-  const legends = {
-    left: showYAxisTitle(),
-    bottom: showXAxisTitle(),
-    right: showRightAxisTitle(),
-  };
-
-  const parseBoolean = (str) => {
-    if (str === "true" || str === true) {
-      return true;
-    }
-    if (str === "false" || str === false) {
-      return false;
-    }
-  };
-
-  const switchGridLines = () => {
-    if (parseBoolean(enableGridX) && !parseBoolean(enableGridY)) {
-      enableGridX = false;
-      enableGridY = true;
-    } else if (!parseBoolean(enableGridX) && parseBoolean(enableGridY)) {
-      enableGridX = true;
-      enableGridY = false;
-    }
-  };
-
-  const switchLayout = () => {
-    if (layout === "horizontal") {
-      switchGridLines();
-      return "vertical";
-    }
-    switchGridLines();
-    return "horizontal";
-  };
-
-  const mobileLayout = () => {
-    if (mobileConfigSettings?.chartLayoutOverride) {
-      return switchLayout();
-    }
-    return layout;
-  };
-
-  const getMarginValue = (mobileEnabled, mobileSetting, defaultValue) => {
-    return mobileEnabled
-      ? Number.parseInt(mobileSetting) ?? defaultValue
-      : defaultValue;
-  };
-
-  const getBarPadValueOuterOrInner = (
-    mobileEnabled,
-    mobileSetting,
-    defaultValue
-  ) => {
-    return mobileEnabled ? mobileSetting ?? defaultValue : defaultValue;
-  };
-
-  useEffect(() => {
-    const updateDeviceType = () => {
-      setIsMobileOrTablet(window.innerWidth <= 1250);
-      const rotation = getTickRotation();
-      setTickRotation(rotation);
     };
-    window.addEventListener("resize", updateDeviceType);
-    setTickRotation(getTickRotation());
-    return () => {
-      window.removeEventListener("resize", updateDeviceType);
+
+    const legends = {
+        left: showYAxisTitle(),
+        bottom: showXAxisTitle(),
+        right: showRightAxisTitle(),
     };
-  }, [
-    editing,
-    previewMode,
-    isMobileConfigEnabled,
-    tickRotation,
-    mobileConfigSettings?.tabletXAxisTextRotation,
-    mobileConfigSettings?.mobileXAxisTextRotation,
-  ]);
 
-  const determineLegendPosition = () => {
-    const isTabletOrMobile = ["tablet", "mobile", "midTablet"].includes(getDeviceType());
-    if (editing && previewMode === "Desktop") {
-      return legendPosition
-    }
-    return isTabletOrMobile ? "bottom" : legendPosition;
-  };
+    const parseBoolean = (str) => {
+        if (str === "true" || str === true) {
+            return true;
+        }
+        if (str === "false" || str === false) {
+            return false;
+        }
+    };
+
+    const switchGridLines = () => {
+        if (parseBoolean(enableGridX) && !parseBoolean(enableGridY)) {
+            enableGridX = false;
+            enableGridY = true;
+        } else if (!parseBoolean(enableGridX) && parseBoolean(enableGridY)) {
+            enableGridX = true;
+            enableGridY = false;
+        }
+    };
+
+    const switchLayout = () => {
+        if (layout === "horizontal") {
+            switchGridLines();
+            return "vertical";
+        }
+        switchGridLines();
+        return "horizontal";
+    };
+
+    const mobileLayout = () => {
+        if (mobileConfigSettings?.chartLayoutOverride) {
+            return switchLayout();
+        }
+        return layout;
+    };
+
+    const getMarginValue = (mobileEnabled, mobileSetting, defaultValue) => {
+        return mobileEnabled
+            ? Number.parseInt(mobileSetting) ?? defaultValue
+            : defaultValue;
+    };
+
+    const getBarPadValueOuterOrInner = (
+        mobileEnabled,
+        mobileSetting,
+        defaultValue
+    ) => {
+        return mobileEnabled ? mobileSetting ?? defaultValue : defaultValue;
+    };
+
+    useEffect(() => {
+        const updateDeviceType = () => {
+            setIsMobileOrTablet(window.innerWidth <= 1250);
+            const rotation = getTickRotation();
+            setTickRotation(rotation);
+        };
+        window.addEventListener("resize", updateDeviceType);
+        setTickRotation(getTickRotation());
+        return () => {
+            window.removeEventListener("resize", updateDeviceType);
+        };
+    }, [
+        editing,
+        previewMode,
+        isMobileConfigEnabled,
+        tickRotation,
+        mobileConfigSettings?.tabletXAxisTextRotation,
+        mobileConfigSettings?.mobileXAxisTextRotation,
+    ]);
+
+    const determineLegendPosition = () => {
+        const isTabletOrMobile = ["tablet", "mobile", "midTablet"].includes(getDeviceType());
+        if (editing && previewMode === "Desktop") {
+            return legendPosition
+        }
+        return isTabletOrMobile ? "bottom" : legendPosition;
+    };
 
 
-  const chartProps = {
-    app,
-    editing,
-    tickColor: decodeURIComponent(tickColor),
-    tickRotation: deviceTickRotation,
-    layout: (isNotDesktopPreview || isNotEditingAndIsMobileOrTablet) ? mobileLayout() : layout,
-    reverse: reverse == true || reverse == "true",
-    showLegends: showLegends == true || showLegends == "true",
-    legendLabel,
-    swap: swap == true || swap == "true",
-    showGrid: showGrid == true || showGrid == "true",
-    showPercentage: showPercentage == true || showPercentage == "true",
-    marginLeft: getMarginValue(
-      (isNotDesktopPreview || isNotEditingAndIsMobileOrTablet),
-      Number.parseInt(mobileConfigSettings?.marginLeft),
-      parseInt(marginLeft)
-    ),
-    marginTop: getMarginValue(
-      (isNotDesktopPreview || isNotEditingAndIsMobileOrTablet),
-      Number.parseInt(mobileConfigSettings?.marginTop),
-      parseInt(marginTop)
-    ),
-    marginRight: getMarginValue(
-      (isNotDesktopPreview || isNotEditingAndIsMobileOrTablet),
-      Number.parseInt(mobileConfigSettings?.marginRight),
-      Number.parseInt(marginRight)
-    ),
-    marginBottom: getMarginValue(
-      (isNotDesktopPreview || isNotEditingAndIsMobileOrTablet),
-      Number.parseInt(mobileConfigSettings?.marginBottom),
-      Number.parseInt(marginBottom)
-    ),
-    height: `${contentHeight}px`,
-    legendPosition: determineLegendPosition(),
-    legends,
-    tooltip:
-        tooltipEnableMarkdown == true || tooltipEnableMarkdown == "true"
-            ? tooltipForSelectedMeasure
-            : tooltipForSelectedMeasure
-                .replace(/\r\n/g, "<hr/>")
-                .replace(/[\r\n]/g, "<hr/>"),
-    colors: colors,
-    groupMode: groupMode,
-    format: numberFormat,
-    startAngle,
-    endAngle,
-    offsetY, // csvLineLayerData,
-    // lineColor: decodeURIComponent(lineColor),
-    // lineTooltip,
-    // lineTitle,
-    maxValue,
-    valueScale,
-    categories,
-    lineLayerEnabled: lineLayerEnabled == true || lineLayerEnabled == "true",
-    overlays: parse(overlays) || [],
-    barColor: decodeURIComponent(barColor),
-    overrideTickColor: overrideTickColor == true || overrideTickColor == "true",
-    fixedMinValue,
-    fixedMaxValue,
-    barPadding: getBarPadValueOuterOrInner(
-      (isNotDesktopPreview || isNotEditingAndIsMobileOrTablet),
-      mobileConfigSettings?.barPadding,
-      barPadding
-    ),
-    barLabelPosition,
-    lineLabelPosition,
-    barInnerPadding: getBarPadValueOuterOrInner(
-      (isNotDesktopPreview || isNotEditingAndIsMobileOrTablet),
-      mobileConfigSettings?.barInnerPadding,
-      barInnerPadding
-    ),
-    xLabelColor: decodeURIComponent(xLabelColor),
-    barLabelColor: decodeURIComponent(barLabelColor),
-    legendLabelColor: decodeURIComponent(legendLabelColor),
-    tooltipEnabled: tooltipEnabled == true || tooltipEnabled == "true",
-    legendLabelBack: legendLabelBack == true || legendLabelBack == "true",
-    legendCheckBack: legendCheckBack == true || legendCheckBack == "true",
-    highlightXAxisLine:
-        highlightXAxisLine == true || highlightXAxisLine == "true",
-    showTickLine: showTickLine == true || showTickLine == "true",
-    showRightAxis: showRightAxis == true || showRightAxis == "true",
-    offsetRight,
-    offsetBottom,
-    confidenceIntervals: parse(confidenceIntervals) || [],
-    showPoints: showPoints == true || showPoints == "true",
-    enableArea: enableArea == true || enableArea == "true",
-    areaShadingCriteria,
-    areaLowerBound,
-    areaUpperBound,
-    showGroupTotal: showGroupTotal == true || showGroupTotal == "true",
-    groupTotalMeasure,
-    groupTotalLabel,
-    groupTotalFormat: groupTotalFormatParsed,
-    groupTotalOffset,
-    groupTotalFixedPosition:
-        groupTotalFixedPosition == true || groupTotalFixedPosition == "true",
-    centerLabel,
-    showArcLabels: showArcLabels == true || showArcLabels == "true",
-    showArcLinkLabels: showArcLinkLabels == true || showArcLinkLabels == "true",
-    slicePadding,
-    centerLabelFontWeight,
-    centerLabelFontSize,
-    centerLabelXOffset,
-    centerLabelYOffset,
-    userMeasures,
-    tooltipEnableMarkdown:
-      tooltipEnableMarkdown == true || tooltipEnableMarkdown == "true",
-    yAxisTickValues: (isNotDesktopPreview || isNotEditingAndIsMobileOrTablet)
-      ? mobileConfigSettings.yAxisTickValues ?? yAxisTickValues
-      : yAxisTickValues,
-    xAxisTickValues:(isNotDesktopPreview || isNotEditingAndIsMobileOrTablet)
-      ? mobileConfigSettings.xAxisTickValues ?? xAxisTickValues
-      : xAxisTickValues,
-    enableGridY: enableGridY == true || enableGridY == "true",
-    enableGridX: enableGridX == true || enableGridX == "true",
-    offsetText,
-    selectedMeasures,
-    overallLabel,
-    minMaxClamp,
-    reverseLegend: reverseLegend == true || reverseLegend == "true",
-    customAxisFormat,
-    sort,
-    sortReverse: sortReverse == true || sortReverse == "true",
+    const chartProps = {
+        app,
+        editing,
+        tickColor: decodeURIComponent(tickColor),
+        tickRotation: deviceTickRotation,
+        layout: (isNotDesktopPreview || isNotEditingAndIsMobileOrTablet) ? mobileLayout() : layout,
+        reverse: reverse == true || reverse == "true",
+        showLegends: showLegends == true || showLegends == "true",
+        legendLabel,
+        swap: swap == true || swap == "true",
+        showGrid: showGrid == true || showGrid == "true",
+        showPercentage: showPercentage == true || showPercentage == "true",
+        marginLeft: getMarginValue(
+            (isNotDesktopPreview || isNotEditingAndIsMobileOrTablet),
+            Number.parseInt(mobileConfigSettings?.marginLeft),
+            parseInt(marginLeft)
+        ),
+        marginTop: getMarginValue(
+            (isNotDesktopPreview || isNotEditingAndIsMobileOrTablet),
+            Number.parseInt(mobileConfigSettings?.marginTop),
+            parseInt(marginTop)
+        ),
+        marginRight: getMarginValue(
+            (isNotDesktopPreview || isNotEditingAndIsMobileOrTablet),
+            Number.parseInt(mobileConfigSettings?.marginRight),
+            Number.parseInt(marginRight)
+        ),
+        marginBottom: getMarginValue(
+            (isNotDesktopPreview || isNotEditingAndIsMobileOrTablet),
+            Number.parseInt(mobileConfigSettings?.marginBottom),
+            Number.parseInt(marginBottom)
+        ),
+        height: `${contentHeight}px`,
+        legendPosition: determineLegendPosition(),
+        legends,
+        tooltip:
+            tooltipEnableMarkdown == true || tooltipEnableMarkdown == "true"
+                ? tooltipForSelectedMeasure
+                : tooltipForSelectedMeasure
+                    .replace(/\r\n/g, "<hr/>")
+                    .replace(/[\r\n]/g, "<hr/>"),
+        colors: colors,
+        groupMode: groupMode,
+        format: numberFormat,
+        startAngle,
+        endAngle,
+        offsetY, // csvLineLayerData,
+        // lineColor: decodeURIComponent(lineColor),
+        // lineTooltip,
+        // lineTitle,
+        maxValue,
+        valueScale,
+        categories,
+        lineLayerEnabled: lineLayerEnabled == true || lineLayerEnabled == "true",
+        overlays: parse(overlays) || [],
+        barColor: decodeURIComponent(barColor),
+        overrideTickColor: overrideTickColor == true || overrideTickColor == "true",
+        fixedMinValue,
+        fixedMaxValue,
+        barPadding: getBarPadValueOuterOrInner(
+            (isNotDesktopPreview || isNotEditingAndIsMobileOrTablet),
+            mobileConfigSettings?.barPadding,
+            barPadding
+        ),
+        barLabelPosition,
+        lineLabelPosition,
+        barInnerPadding: getBarPadValueOuterOrInner(
+            (isNotDesktopPreview || isNotEditingAndIsMobileOrTablet),
+            mobileConfigSettings?.barInnerPadding,
+            barInnerPadding
+        ),
+        xLabelColor: decodeURIComponent(xLabelColor),
+        barLabelColor: decodeURIComponent(barLabelColor),
+        legendLabelColor: decodeURIComponent(legendLabelColor),
+        tooltipEnabled: tooltipEnabled == true || tooltipEnabled == "true",
+        legendLabelBack: legendLabelBack == true || legendLabelBack == "true",
+        legendCheckBack: legendCheckBack == true || legendCheckBack == "true",
+        highlightXAxisLine:
+            highlightXAxisLine == true || highlightXAxisLine == "true",
+        showTickLine: showTickLine == true || showTickLine == "true",
+        showRightAxis: showRightAxis == true || showRightAxis == "true",
+        offsetRight,
+        offsetBottom,
+        confidenceIntervals: parse(confidenceIntervals) || [],
+        showPoints: showPoints == true || showPoints == "true",
+        enableArea: enableArea == true || enableArea == "true",
+        areaShadingCriteria,
+        areaLowerBound,
+        areaUpperBound,
+        showGroupTotal: showGroupTotal == true || showGroupTotal == "true",
+        groupTotalMeasure,
+        groupTotalLabel,
+        groupTotalFormat: groupTotalFormatParsed,
+        groupTotalOffset,
+        groupTotalFixedPosition:
+            groupTotalFixedPosition == true || groupTotalFixedPosition == "true",
+        centerLabel,
+        showArcLabels: showArcLabels == true || showArcLabels == "true",
+        showArcLinkLabels: showArcLinkLabels == true || showArcLinkLabels == "true",
+        slicePadding,
+        centerLabelFontWeight,
+        centerLabelFontSize,
+        centerLabelXOffset,
+        centerLabelYOffset,
+        userMeasures,
+        tooltipEnableMarkdown:
+            tooltipEnableMarkdown == true || tooltipEnableMarkdown == "true",
+        yAxisTickValues: (isNotDesktopPreview || isNotEditingAndIsMobileOrTablet)
+            ? mobileConfigSettings.yAxisTickValues ?? yAxisTickValues
+            : yAxisTickValues,
+        xAxisTickValues: (isNotDesktopPreview || isNotEditingAndIsMobileOrTablet)
+            ? mobileConfigSettings.xAxisTickValues ?? xAxisTickValues
+            : xAxisTickValues,
+        enableGridY: enableGridY == true || enableGridY == "true",
+        enableGridX: enableGridX == true || enableGridX == "true",
+        offsetText,
+        selectedMeasures,
+        overallLabel,
+        minMaxClamp,
+        reverseLegend: reverseLegend == true || reverseLegend == "true",
+        customAxisFormat,
+        sort,
+        sortReverse: sortReverse == true || sortReverse == "true",
+        sortReverseSecondDimension: sortReverseSecondDimension == true || sortReverseSecondDimension == "true",
     radarCurve,
     radarFillOpacity,
     radarBorderWidth,
@@ -656,289 +660,293 @@ const Chart = (props) => {
     radarEnableDotLabel:
         radarEnableDotLabel == true || radarEnableDotLabel == "true",
     radarDotLabelOffset,
-    sort2Dimension,
-    mobileCustomization,
-    dimension1,
-    previewMode
-  };
+    sortSecondDimension,
+        mobileCustomization,
+        dimension1,
+        previewMode,
+        lineCurve
+    };
 
-  const params = {};
-  const ff = parse(filters) || {};
+    const params = {};
+    const ff = parse(filters) || {};
 
-  if (ff && ff.forEach) {
-    ff.forEach((f) => {
-      if (
-          f.value != null &&
-          f.value.filter((v) => v != null && v.toString().trim() != "").length > 0
-      )
-        params[f.param] = f.value;
-    });
-  }
-
-  if (dvzProxyDatasetId) {
-    params.dvzProxyDatasetId = dvzProxyDatasetId;
-  }
-
-  let ChartDataFrame = null;
-  let Chart = null;
-
-  if (app === "csv") {
-    ChartDataFrame = CSVDataFrame;
-  } else {
-    switch (type) {
-      case "line":
-        ChartDataFrame = dataFrames.LineDataFrame;
-        break;
-      case "pie":
-        ChartDataFrame = dataFrames.PieDataFrame;
-        break;
-      case "radar":
-        //TODO RADAR
-        ChartDataFrame = dataFrames.BarDataFrame;
-        break;
-      default:
-        ChartDataFrame = dataFrames.BarDataFrame;
-        break;
+    if (ff && ff.forEach) {
+        ff.forEach((f) => {
+            if (
+                f.value != null &&
+                f.value.filter((v) => v != null && v.toString().trim() != "").length > 0
+            )
+                params[f.param] = f.value;
+        });
     }
-  }
-  let showNotEnoughParameters = false;
 
-  switch (type) {
-    case "bar":
-      Chart = Bar;
-      showNotEnoughParameters =
-          app != "csv" && dimension1 == "none" && selectedMeasures.length == 0;
-      break;
-    case "line":
-      Chart = Line;
-      showNotEnoughParameters =
-        app !== "csv" &&
-        (selectedMeasures.length === 0 || dimension1 === "none");
-      break;
-    case "pie":
-      showNotEnoughParameters = app != "csv" && selectedMeasures.length == 0;
-      Chart = HalfPie;
-      break;
-    case "radar":
-      showNotEnoughParameters = app != "csv" && selectedMeasures.length == 0;
-      Chart = Radar;
-      break;
-    default:
-      Chart = <div>No Chart</div>;
-      break;
-  }
+    if (dvzProxyDatasetId) {
+        params.dvzProxyDatasetId = dvzProxyDatasetId;
+    }
 
-  const dual = dualMode === "true";
-  const dimensions = [];
-  if (dimension1 != "none") {
-    dimensions.push(dimension1);
-  }
-  if (dimension2 != "none") {
-    dimensions.push(dimension2);
-  }
-  const [legendsContainerHeight, setLegendsContainerHeight] = useState(0);
-  const [orientation, setOrientation] = useState(getScreenOrientation());
+    let ChartDataFrame = null;
+    let Chart = null;
 
-  function getScreenOrientation() {
-    return (
-        window.screen.orientation?.type ||
-        (window.innerWidth > window.innerHeight
-            ? "landscape-primary"
-            : "portrait-primary")
-    );
-  }
+    if (app === "csv") {
+        ChartDataFrame = CSVDataFrame;
+    } else {
+        switch (type) {
+            case "line":
+                ChartDataFrame = dataFrames.LineDataFrame;
+                break;
+            case "pie":
+                ChartDataFrame = dataFrames.PieDataFrame;
+                break;
+            case "radar":
+                //TODO RADAR
+                ChartDataFrame = dataFrames.BarDataFrame;
+                break;
+            default:
+                ChartDataFrame = dataFrames.BarDataFrame;
+                break;
+        }
+    }
+    let showNotEnoughParameters = false;
 
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      if (isMobileOrTablet) {
-        // Function to handle margin adjustment for all charts
-        const adjustDataSourceMargin = () => {
-          const legendsContainer =
-              ref.current.querySelector(
-                  ".legends.container.has-standard-12-font-size.bottom"
-              ) || ref.current.querySelector(".legends.container.items-section");
+    switch (type) {
+        case "bar":
+            Chart = Bar;
+            showNotEnoughParameters =
+                app != "csv" && dimension1 == "none" && selectedMeasures.length == 0;
+            break;
+        case "line":
+            Chart = Line;
+            showNotEnoughParameters =
+                app !== "csv" &&
+                (selectedMeasures.length === 0 || dimension1 === "none");
+            break;
+        case "pie":
+            showNotEnoughParameters = app != "csv" && selectedMeasures.length == 0;
+            Chart = HalfPie;
+            break;
+        case "radar":
+            showNotEnoughParameters = app != "csv" && selectedMeasures.length == 0;
+            Chart = Radar;
+            break;
+        default:
+            Chart = <div>No Chart</div>;
+            break;
+    }
 
-          if (!legendsContainer) return;
+    const dual = dualMode === "true";
+    const dimensions = [];
+    if (dimension1 != "none") {
+        dimensions.push(dimension1);
+    }
+    if (dimension2 != "none") {
+        dimensions.push(dimension2);
+    }
+    const [legendsContainerHeight, setLegendsContainerHeight] = useState(0);
+    const [orientation, setOrientation] = useState(getScreenOrientation());
 
-          // Get computed style and dimensions of the legends container
-          const { clientHeight: height } = legendsContainer;
-          const styles = window.getComputedStyle(legendsContainer);
-          const marginTop = parseInt(styles.marginTop);
-          const marginBottom = parseInt(styles.marginBottom);
-          const paddingTop = parseInt(styles.paddingTop);
-          const paddingBottom = parseInt(styles.paddingBottom);
-          const totalHeight =
-              height + marginTop + marginBottom + paddingTop + paddingBottom;
+    function getScreenOrientation() {
+        return (
+            window.screen.orientation?.type ||
+            (window.innerWidth > window.innerHeight
+                ? "landscape-primary"
+                : "portrait-primary")
+        );
+    }
 
-          // Find the closest '.ui.fluid.container.content' ancestor from the legends container
-          const container = legendsContainer.closest(
-            ".ui.fluid.container.content"
-          );
+    useEffect(() => {
+        const timeoutId = setTimeout(() => {
+            if (isMobileOrTablet) {
+                // Function to handle margin adjustment for all charts
+                const adjustDataSourceMargin = () => {
+                    const legendsContainer =
+                        ref.current.querySelector(
+                            ".legends.container.has-standard-12-font-size.bottom"
+                        ) || ref.current.querySelector(".legends.container.items-section");
 
-          if (container) {
-            const dataSourceParagraph = container.querySelector(".data-source");
-            if (dataSourceParagraph) {
-              const dataSourceRect =
-                dataSourceParagraph.getBoundingClientRect();
-              const legendsRect = legendsContainer.getBoundingClientRect();
+                    if (!legendsContainer) return;
 
-              // Ensure elements are visible before adjusting margins
-              if (legendsRect.bottom !== 0 && dataSourceRect.top !== 0) {
-                if (legendsContainer.textContent.trim() === "") return;
+                    // Get computed style and dimensions of the legends container
+                    const {clientHeight: height} = legendsContainer;
+                    const styles = window.getComputedStyle(legendsContainer);
+                    const marginTop = parseInt(styles.marginTop);
+                    const marginBottom = parseInt(styles.marginBottom);
+                    const paddingTop = parseInt(styles.paddingTop);
+                    const paddingBottom = parseInt(styles.paddingBottom);
+                    const totalHeight =
+                        height + marginTop + marginBottom + paddingTop + paddingBottom;
 
-                const legendsMarginBottom = marginBottom; // Legend margin-bottom is already computed
-                const adjustedLegendsBottom =
-                  legendsRect.bottom + legendsMarginBottom;
-                const dataSourceStyles =
-                  window.getComputedStyle(dataSourceParagraph);
-                const dataSourceMarginTop =
-                  parseFloat(dataSourceStyles.marginTop) || 0;
-                const adjustedDataSourceTop =
-                  dataSourceRect.top - dataSourceMarginTop;
+                    // Find the closest '.ui.fluid.container.content' ancestor from the legends container
+                    const container = legendsContainer.closest(
+                        ".ui.fluid.container.content"
+                    );
 
-                if (adjustedLegendsBottom > adjustedDataSourceTop) {
-                  let overlap = adjustedLegendsBottom - adjustedDataSourceTop;
-                  if (overlap < 5) overlap += 1;
-                  dataSourceParagraph.style.marginTop = `${overlap + 1}px`; // Add padding
-                }
-              } else {
-                // Delay adjustment if elements are not fully visible yet
-                setTimeout(() => {
-                  if (dataSourceRect.top < legendsRect.bottom) {
-                    dataSourceParagraph.style.marginTop = `${
-                        legendsRect.bottom - dataSourceRect.top + 1
-                    }px`;
-                  }
-                }, 1000);
-              }
+                    if (container) {
+                        const dataSourceParagraph = container.querySelector(".data-source");
+                        if (dataSourceParagraph) {
+                            const dataSourceRect =
+                                dataSourceParagraph.getBoundingClientRect();
+                            const legendsRect = legendsContainer.getBoundingClientRect();
+
+                            // Ensure elements are visible before adjusting margins
+                            if (legendsRect.bottom !== 0 && dataSourceRect.top !== 0) {
+                                if (legendsContainer.textContent.trim() === "") return;
+
+                                const legendsMarginBottom = marginBottom; // Legend margin-bottom is already computed
+                                const adjustedLegendsBottom =
+                                    legendsRect.bottom + legendsMarginBottom;
+                                const dataSourceStyles =
+                                    window.getComputedStyle(dataSourceParagraph);
+                                const dataSourceMarginTop =
+                                    parseFloat(dataSourceStyles.marginTop) || 0;
+                                const adjustedDataSourceTop =
+                                    dataSourceRect.top - dataSourceMarginTop;
+
+                                if (adjustedLegendsBottom > adjustedDataSourceTop) {
+                                    let overlap = adjustedLegendsBottom - adjustedDataSourceTop;
+                                    if (overlap < 5) overlap += 1;
+                                    dataSourceParagraph.style.marginTop = `${overlap + 1}px`; // Add padding
+                                }
+                            } else {
+                                // Delay adjustment if elements are not fully visible yet
+                                setTimeout(() => {
+                                    if (dataSourceRect.top < legendsRect.bottom) {
+                                        dataSourceParagraph.style.marginTop = `${
+                                            legendsRect.bottom - dataSourceRect.top + 1
+                                        }px`;
+                                    }
+                                }, 1000);
+                            }
+                        }
+                    }
+
+                    // Check for overlap with the chart container above
+                    const chartContainer = legendsContainer.closest(".chart.container");
+                    if (chartContainer) {
+                        const chartContainerRect = chartContainer.getBoundingClientRect();
+                        const chartContainerStyles =
+                            window.getComputedStyle(chartContainer);
+                        const chartContainerMarginBottom =
+                            Number.parseFloat(chartContainerStyles.marginBottom) || 0;
+                        const adjustedChartContainerBottom =
+                            chartContainerRect.bottom + chartContainerMarginBottom;
+
+                        const legendsRect = legendsContainer.getBoundingClientRect();
+                        const legendsMarginTop = Number.parseFloat(styles.marginTop) || 0;
+                        const adjustedLegendsTop = legendsRect.top - legendsMarginTop;
+
+                        if (adjustedLegendsTop < adjustedChartContainerBottom) {
+                            const overlap = adjustedChartContainerBottom - adjustedLegendsTop;
+                            legendsContainer.style.marginTop = `${overlap + 1}px`; // Add padding
+                        }
+                    }
+
+                    setLegendsContainerHeight(totalHeight);
+                };
+
+                adjustDataSourceMargin();
             }
-          }
+        }, 100);
 
-          // Check for overlap with the chart container above
-          const chartContainer = legendsContainer.closest(".chart.container");
-          if (chartContainer) {
-            const chartContainerRect = chartContainer.getBoundingClientRect();
-            const chartContainerStyles =
-              window.getComputedStyle(chartContainer);
-            const chartContainerMarginBottom =
-              Number.parseFloat(chartContainerStyles.marginBottom) || 0;
-            const adjustedChartContainerBottom =
-                chartContainerRect.bottom + chartContainerMarginBottom;
+        // Cleanup observer and timeout
+        return () => {
+            clearTimeout(timeoutId);
+        };
+    }, [isMobileOrTablet, ref]);
 
-            const legendsRect = legendsContainer.getBoundingClientRect();
-            const legendsMarginTop = Number.parseFloat(styles.marginTop) || 0;
-            const adjustedLegendsTop = legendsRect.top - legendsMarginTop;
-
-            if (adjustedLegendsTop < adjustedChartContainerBottom) {
-              const overlap = adjustedChartContainerBottom - adjustedLegendsTop;
-              legendsContainer.style.marginTop = `${overlap + 1}px`; // Add padding
-            }
-          }
-
-          setLegendsContainerHeight(totalHeight);
+    useEffect(() => {
+        const handleResize = () => {
+            setTimeout(() => {
+                setOrientation(getScreenOrientation());
+            }, 100);
         };
 
-        adjustDataSourceMargin();
-      }
-    }, 100);
-
-    // Cleanup observer and timeout
-    return () => {
-      clearTimeout(timeoutId);
-    };
-  }, [isMobileOrTablet, ref]);
-
-  useEffect(() => {
-    const handleResize = () => {
-        setTimeout(() => {
-            setOrientation(getScreenOrientation());
-        }, 100);
-    };
-
-    if (window.screen.orientation) {
-        window.screen.orientation.addEventListener("change", handleResize);
-    } else {
-        window.addEventListener("resize", handleResize);
-    }
-    return () => {
         if (window.screen.orientation) {
-            window.screen.orientation.removeEventListener("change", handleResize);
+            window.screen.orientation.addEventListener("change", handleResize);
         } else {
-            window.removeEventListener("resize", handleResize);
+            window.addEventListener("resize", handleResize);
         }
-    };
-}, []);
+        return () => {
+            if (window.screen.orientation) {
+                window.screen.orientation.removeEventListener("change", handleResize);
+            } else {
+                window.removeEventListener("resize", handleResize);
+            }
+        };
+    }, []);
 
 
-  return (
-    <div ref={ref} key={orientation + Math.random()}>
-      <Container
-        className={"chart container"}
-        style={{
-          minHeight:
-            type === "pie" && window.innerWidth <= 480
-              ? `${parseInt(height) + parseInt(legendsContainerHeight) * 0.5}px`
-              : `${parseInt(height) + parseInt(legendsContainerHeight)}px`,
-        }}
-        fluid={true}
-      >
-        <DataProvider
-              editing={editing}
-              style={{ height: `${contentHeight}px` }}
-              params={params}
-              app={app}
-              group={group}
-              csv={csv}
-              store={[app, unique, ...dimensions]}
-              source={dimensions.join("/")}
-          >
+    return (
+        <div ref={ref} >
             <Container
-                style={{ height: `${contentHeight}px` }}
-                className={"body"}
+                className={"chart container"}
+                style={{
+                    minHeight:
+                        type === "pie" && window.innerWidth <= 480
+                            ? `${parseInt(height) + parseInt(legendsContainerHeight) * 0.5}px`
+                            : `${parseInt(height) + parseInt(legendsContainerHeight)}px`,
+                }}
+
                 fluid={true}
             >
-              {showNotEnoughParameters && <Messages editing={editing}></Messages>}
-              {!showNotEnoughParameters && (
-                  <DataConsumer>
-                    <Messages app={app} group={group} noDataMsg={noDataMsg}>
-                      {" "}
-                    </Messages>
-                    <ChartDataFrame
-                        locale={locale}
-                        colorBy={colorBy}
-                        hiddenBars={hiddenBars}
-                        swap={swap === "true" || swap === true}
-                        type={type}
-                        includeTotal={true}
-                        includeOverall={
-                            includeOverall === true || includeOverall === "true"
-                        }
-                        overallLabel={overallLabel}
-                        measures={selectedMeasures}
-                        dimensions={[...dimensions]}
-                        sort={sort}
-                        sortreverse={sortReverse === true || sortReverse === "true"}
-                        sort2Dimension={sort2Dimension}
-                        customLabels={getCustomLabels()}
+                <DataProvider
+                    editing={editing}
+                    style={{height: `${contentHeight}px`}}
+                    params={params}
+                    waitForFilters={waitForFilters === "true"}
+                    app={app}
+                    group={group}
+                    csv={csv}
+                    store={[app, unique, ...dimensions]}
+                    source={dimensions.join("/")}
+                >
+                    <Container
+                        style={{height: `${contentHeight}px`}}
+                        className={"body"}
+                        fluid={true}
                     >
-                      <ColorProvider
-                          type={type}
-                          app={app}
-                          locale={locale}
-                          overallLabel={overallLabel}
-                          customLabels={getCustomLabels()}
-                          manualColors={getManualColor()}
-                          colorBy={colorBy}
-                          scheme={scheme}
-                          barColor={chartProps.barColor}
-                      >
-                        <Chart {...chartProps}></Chart>
-                      </ColorProvider>
-                    </ChartDataFrame>
-                  </DataConsumer>
-              )}
-            </Container>
-          </DataProvider>
+                        {showNotEnoughParameters && <Messages editing={editing}></Messages>}
+                        {!showNotEnoughParameters && (
+                            <DataConsumer>
+                                <Messages app={app} group={group} noDataMsg={noDataMsg}>
+                                    {" "}
+                                </Messages>
+                                <ChartDataFrame
+                                    locale={locale}
+                                    colorBy={colorBy}
+                                    hiddenBars={hiddenBars}
+                                    swap={swap === "true" || swap === true}
+                                    type={type}
+                                    includeTotal={true}
+                                    includeOverall={
+                                        includeOverall === true || includeOverall === "true"
+                                    }
+                                    overallLabel={overallLabel}
+                                    measures={selectedMeasures}
+                                    dimensions={[...dimensions]}
+                                    sort={sort}
+                                    sortReverse={sortReverse === true || sortReverse === "true"}
+                                    sortSecondDimension={sortSecondDimension}
+                        sortReverseSecondDimension={sortReverseSecondDimension === true || sortReverseSecondDimension === "true"}
+                                    customLabels={getCustomLabels()}
+                                >
+                                    <ColorProvider
+                                        type={type}
+                                        app={app}
+                                        locale={locale}
+                                        overallLabel={overallLabel}
+                                        customLabels={getCustomLabels()}
+                                        manualColors={getManualColor()}
+                                        colorBy={colorBy}
+                                        scheme={scheme}
+                                        barColor={chartProps.barColor}
+                                    >
+                                        <Chart {...chartProps}></Chart>
+                                    </ColorProvider>
+                                </ChartDataFrame>
+                            </DataConsumer>
+                        )}
+                    </Container>
+                </DataProvider>
 
           <br />
           {dual && childContent && viewMode === "info" && (
@@ -974,4 +982,4 @@ const mapStateToProps = (state, ownProps) => {
   return _props;
 };
 const mapActionCreators = {};
-export default connect(mapStateToProps, mapActionCreators)(Chart);
+export default connect(mapStateToProps, mapActionCreators)(injectIntl(Chart));
