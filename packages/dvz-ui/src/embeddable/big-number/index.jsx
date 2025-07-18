@@ -27,8 +27,9 @@ const Chart = (props) => {
         'data-number-color': numberColor = '#000000',
         'data-label-color': labelColor = '#000000',
         'data-label': label = '',
-    } = props
-
+        "data-wait-for-filters": waitForFilters = "false",
+        "data-no-data-text": noDataText = "-",
+    } = props   
  
     const locale = intl.locale
     const ref = useRef(null);
@@ -81,7 +82,6 @@ const Chart = (props) => {
       }
 
     const dimensions = []   
-    
     return (<div ref={ref}>
         <Container className={"chart container big-number-container"} style={{"height": height + 'px'}} fluid={true}>
             <DataProvider
@@ -91,6 +91,7 @@ const Chart = (props) => {
                 group={group}
                 csv={csv}
                 editing={editing}
+                waitForFilters={waitForFilters === "true"}
                 store={[app, unique, ...dimensions]} source={dimensions.join("/")}>               
                     <DataConsumer>
                         <DataFrame
@@ -104,6 +105,7 @@ const Chart = (props) => {
                             numberColor={numberColor}
                             labelFontSize={labelFontSize}
                             labelColor={labelColor}
+                            noDataText={noDataText}
                           >
                        </DataFrame>
                     </DataConsumer>                
@@ -116,8 +118,7 @@ const Chart = (props) => {
 
 const DataFrame = (props) => {
     const { app, measure, data, format, label, numberColor, numberFontSize, 
-        labelColor, labelFontSize,
-        intl } = props
+        labelColor, labelFontSize, noDataText, intl } = props
 
     let measureField = measure
     let dataItem = data
@@ -127,10 +128,14 @@ const DataFrame = (props) => {
         dataItem = data.data[0]    
     } 
 
-
     let formattedNumber = ''
-    if (dataItem && dataItem[measureField]) {
-        formattedNumber = intl.formatNumber(format.style === 'percent' ? dataItem[measureField] / 100 : dataItem[measureField], { ...format })
+    if (dataItem) {
+        let number = dataItem[measureField] ? dataItem[measureField] : 0        
+       if (number) {           
+          formattedNumber = intl.formatNumber(format.style === 'percent' ? number / 100 : number, { ...format })
+        } else {
+           formattedNumber = noDataText
+        }
     }
     const numberStyle = {
         color: decodeURIComponent(numberColor),

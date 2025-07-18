@@ -502,7 +502,7 @@ const mapStateToProps = (state, _ownProps) => {
     "data",
     "pageModuleProps"
   ]);
-  const _props : Record<string, any> = {};
+  const _props = {};
   if(pageModuleProps) {
     _props.pageModuleProps = pageModuleProps;
   }
