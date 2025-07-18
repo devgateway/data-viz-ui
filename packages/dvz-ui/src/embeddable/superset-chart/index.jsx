@@ -1,14 +1,9 @@
 import React from 'react';
 import {connect} from "react-redux";
-import { SettingProvider } from '@devgateway/wp-react-lib';
-import {SettingsConsumer} from '@devgateway/wp-react-lib';
+
 
 const SupersetChartWrapper = (props) => {
-  return (<SettingProvider locale={props.intl.locale} changeUUID={props.unique}>
-            <SettingsConsumer>
-                <SupersetChart {...props} />
-            </SettingsConsumer>
-            </SettingProvider>);
+  return (<SupersetChart {...props} />);
 }
         
 const SupersetChart = (props) => {

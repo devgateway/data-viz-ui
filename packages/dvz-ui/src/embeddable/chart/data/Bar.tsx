@@ -1,5 +1,7 @@
 import React from "react";
-import { getTranslatedValue, measuresMap, typesMap, alphaSort,  numericSort,  dateSort } from "./Utils";
+import { getTranslatedValue, measuresMap, typesMap, alphaSort, dateSort, numericSort } from "./Utils";
+
+
 
 interface RowObject {
     type?: string;
@@ -67,7 +69,7 @@ const getOptionsNoDimension = (props) => {
     return options;
 };
 const includeOverallData = (props) => {
-    const { data, measures, dimensions, overallLabel } = props;
+    const {data, measures, dimensions, overallLabel} = props;
     if (dimensions.length == 1 && data.children) {
         const overallAdded =
             data.children.filter((c) => c.value == overallLabel).length > 0;
@@ -130,8 +132,8 @@ const BarOneDimension = (props) => {
         hiddenBars,
     } = props;
     const selectedDimensions = dimensions.filter((f) => f != "");
-    const selectedMeasures = data.metadata.measures
-        .filter((m) => measures.includes(m.value))
+
+    const selectedMeasures = data?.metadata?.measures.filter((m) => measures.includes(m.value))
         .sort((aMeasure, bMeasure) => {
             if (
                 aMeasure.position != null &&
@@ -183,7 +185,7 @@ const BarOneDimension = (props) => {
                     keys.add(value);
                 });
 
-                series.push({ ...row });
+                series.push({...row});
             });
         } else {
             if (data.children[0]) {
@@ -214,7 +216,7 @@ const BarOneDimension = (props) => {
                     keys.add(label);
                 });
 
-                series.push({ ...row, variables, parent_variables: variables });
+                series.push({...row, variables, parent_variables: variables});
             });
         }
         const allKeys = Array.from(keys);
@@ -226,13 +228,13 @@ const BarOneDimension = (props) => {
 
         if (props.sort == "alphabetically") {
             filtered = filtered.sort((a, b) =>
-                alphaSort(props.sortreverse, locale, a[indexBy], b[indexBy])
+                alphaSort(props.sortReverse, locale, a[indexBy], b[indexBy])
             );
         }
 
         if (props.sort == "date") {
             filtered = filtered.sort((a, b) =>
-                dateSort(props.sortreverse, a[indexBy], b[indexBy])
+                dateSort(props.sortReverse, a[indexBy], b[indexBy])
             );
         }
 
@@ -240,7 +242,7 @@ const BarOneDimension = (props) => {
             filtered = filtered.sort((a, b) => {
                 const va = Math.max(...allKeys.map((k: any) => a[k]));
                 const vb = Math.max(...allKeys.map((k: any) => b[k]));
-                return numericSort(props.sortreverse, va, vb);
+                return numericSort(props.sortReverse, va, vb);
             });
         }
         options = {
@@ -254,7 +256,7 @@ const BarOneDimension = (props) => {
     }
 
     return React.Children.map(props.children, (child) =>
-        React.cloneElement(child, { options })
+        React.cloneElement(child, {options})
     );
 };
 const Bar2Dimensions = (props) => {
@@ -276,7 +278,7 @@ const Bar2Dimensions = (props) => {
 
     if (selectedDimensions.length == 0 && data) {
         options = getOptionsNoDimension(props);
-    } else if (data && data.children && selectedDimensions.length > 0) {
+    } else if (data && data.children && data.children.length > 0 && selectedDimensions.length > 0) {
         const mMap = measuresMap(data);
         const tMap = typesMap(data);
         const field = measures[0];
@@ -291,7 +293,7 @@ const Bar2Dimensions = (props) => {
         let parentValue;
 
         data.children.forEach((d) => {
-            const row: Record<string, any> = { variables: {} };
+            const row: Record<string, any> = {variables: {}};
             parentValue =
                 getTranslatedValue(
                     tMap[d.type] && tMap[d.type].items
@@ -366,46 +368,35 @@ const Bar2Dimensions = (props) => {
 
         if (props.sort == "alphabetically") {
             filtered.sort((a, b) =>
-                alphaSort(props.sortreverse, locale, a[indexBy], b[indexBy])
+                alphaSort(props.sortReverse, locale, a[indexBy], b[indexBy])
             );
         } else if (props.sort == "date") {
             filtered.sort((a, b) =>
-                dateSort(props.sortreverse, a[indexBy], b[indexBy])
+                dateSort(props.sortReverse, a[indexBy], b[indexBy])
             );
         } else if (props.sort == "values") {
             // @ts-ignore
             filtered.sort((a, b) => {
-                if (props.sort2Dimension == "_total") {
+                if (props.sortSecondDimension == "_total") {
                     const va = Math.max(...allKeys.map((k: any) => a[k]));
                     const vb = Math.max(...allKeys.map((k: any) => b[k]));
-                    return numericSort(props.sortreverse, va, vb);
-                } else {
-                    //props.sort2Dimension is value of category
-                    ///Keys are labels we need to filter keys using the right label
-                    if (data?.metadata?.types?.length > 1) {
-                        const translatedSor2Dimension =
-                            data?.metadata?.types[1].items.filter((c) => {
-                                if (
-                                    props.sort2Dimension === c.value ||
-                                    (c.labels && c.labels[upperLocale] === props.sort2Dimension)
-                                ) {
-                                    return true;
-                                }
-                                return false;
-                            });
-                        if (translatedSor2Dimension.length > 0) {
-                            const sortVal = translatedSor2Dimension[0].labels[upperLocale]
-                                ? translatedSor2Dimension[0].labels[upperLocale]
-                                : translatedSor2Dimension[0].value;
-                            const va = Math.max(
-                                ...allKeys.filter((k) => k === sortVal).map((k: any) => a[k])
-                            );
-                            const vb = Math.max(
-                                ...allKeys.filter((k) => k === sortVal).map((k:any) => b[k])
-                            );
-                            return numericSort(props.sortreverse, va ? va : 0, vb ? vb : 0);
+                    return numericSort(props.sortReverse, va, vb);
+                } else {                    
+                    const sumA = Object.keys(a).reduce((acc, key) => {                        
+                       if (key !== indexBy && key !== "variables" && key !== "parent_variables" && !isNaN(a[key])) {                            
+                            return acc + (a[key] || 0);
                         }
-                    }
+                        return acc;
+                    }, 0);
+                    const sumB = Object.keys(b).reduce((acc, key) => {
+                        
+                        if (key !== indexBy && key !== "variables" && key !== "parent_variables" && !isNaN(b[key])) {                             
+                            return acc + (b[key] || 0);
+                        }
+                        return acc;
+                    }, 0);
+                   
+                    return numericSort(props.sortReverse, sumA, sumB);
                 }
             });
         }
@@ -414,15 +405,21 @@ const Bar2Dimensions = (props) => {
         //second level sort by position only
         if (data?.metadata?.types?.length > 1) {
             arrayKeys.sort((k1, k2) => {
-                const item1 = data.metadata.types[1].items.filter(
-                    (f) => f.value == k1 || (f.labels && f.labels[upperLocale] == k1)
-                );
-                const item2 = data.metadata.types[1].items.filter(
-                    (f) => f.value == k2 || (f.labels && f.labels[upperLocale] == k2)
-                );
-                const pos1 = item1[0]?.position;
-                const pos2 = item2[0]?.position;
-                return pos1 - pos2;
+                if (props.sortSecondDimension == "date") {
+                    return dateSort(props.sortReverseSecondDimension, k1, k2);
+                } else if (props.sortSecondDimension == "alphabetically") {
+                    return alphaSort(props.sortReverseSecondDimension, locale, k1, k2);
+                } else {
+                    const item1 = data.metadata.types[1].items.filter(
+                        (f) => f.value == k1 || (f.labels && f.labels[upperLocale] == k1)
+                    );
+                    const item2 = data.metadata.types[1].items.filter(
+                        (f) => f.value == k2 || (f.labels && f.labels[upperLocale] == k2)
+                    );
+                    const pos1 = item1[0]?.position;
+                    const pos2 = item2[0]?.position;
+                    return pos1 - pos2;
+                }
             });
         }
 
@@ -441,14 +438,14 @@ const Bar2Dimensions = (props) => {
     return (
         <>
             {React.Children.map(props.children, (child) =>
-                React.cloneElement(child, { options })
+                React.cloneElement(child, {options})
             )}
         </>
     );
 };
 
 const BarData = (props) => {
-    const { data, measures, dimensions } = props;
+    const {data, measures, dimensions} = props;
     const copyData = JSON.parse(JSON.stringify(data));
     if (dimensions.length === 1) {
         return <BarOneDimension {...props} data={copyData}></BarOneDimension>;

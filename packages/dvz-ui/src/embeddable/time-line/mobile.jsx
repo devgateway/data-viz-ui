@@ -1,10 +1,12 @@
 import { PostConsumer, PostProvider } from "@devgateway/wp-react-lib";
 import PostIntro from "../connected-templates/PostIntro";
-import React, { useEffect, useRef, useState } from "react";
+import "pure-react-carousel/dist/react-carousel.es.css";
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Container } from "semantic-ui-react";
 import * as d3 from "d3";
-import getDeviceType from "../../utils/deviceType";
 import { Modal } from "semantic-ui-react";
+import { useWindowDimensionsAndDevice } from "@/lib/hooks/window-dimensions";
+import { useScreenOrientation } from "@/lib/hooks/screen-orientation";
 
 const visibleStyle = {
   visibility: "visible",
@@ -20,7 +22,6 @@ const TimeLine = (props) => {
     posts,
     lineWidth,
     lineColor,
-    height,
     config,
     marginLeft,
     marginTop,
@@ -36,7 +37,6 @@ const TimeLine = (props) => {
     unique,
   } = props;
 
-  height = window.innerHeight;
   subtitleWidth = 250;
 
   const ref = useRef();
@@ -44,9 +44,13 @@ const TimeLine = (props) => {
   const [displayTooltip, setDisplayTooltip] = useState(false);
   const [parentWidth, setParentWidth] = useState(0);
   const [tooltipData, setTooltipData] = useState(null);
-
-  const getCircleId = (idx) => "circle" + unique + idx;
-  const getTitleId = (idx) => "title" + unique + idx;
+  const { orientation } = useScreenOrientation();
+  const {width, deviceType, height} = useWindowDimensionsAndDevice({
+    getDeviceType: true,
+    getHeight: true
+  });
+  const getCircleId = useCallback((idx) => `circle${unique}${idx}`, [unique]);
+  const getTitleId = useCallback((idx) => `title${unique}${idx}`, [unique]);
 
   const size = (idx) => config[idx]?.size || 10;
 
@@ -63,7 +67,7 @@ const TimeLine = (props) => {
     };
     return (
       <Modal
-        key={content.props.children.key + "modal"}
+        key={`${content.props.children.key}modal`}
         open={isOpen}
         onClose={() => setDisplayTooltip(false)}
         size="fullscreen"
@@ -76,7 +80,7 @@ const TimeLine = (props) => {
           ...style,
         }}
       >
-        <Modal.Header style={{ ...style, borderBottom: "none" }}></Modal.Header>
+        <Modal.Header style={{ ...style, borderBottom: "none" }} />
         <Modal.Content
           className="styled-list-content"
           style={{ ...style }}
@@ -85,7 +89,7 @@ const TimeLine = (props) => {
               content.props.children.props.post.content.rendered
             ),
           }}
-        ></Modal.Content>
+        />
       </Modal>
     );
   };
@@ -114,51 +118,26 @@ const TimeLine = (props) => {
     return "ontouchstart" in window || navigator.maxTouchPoints > 0;
   };
 
-  const onTouchStart = (event, d) => {
+  const onTouchStart = useCallback((event, d) => {
     event.preventDefault();
-    if (isTouchDevice()) {
-      const xOffset = 260;
-      const yOffset = 50;
-      let position = [0, 0];
-      if (event) {
-        const rect = event.target.getBoundingClientRect();
-        const parentDiv = event.target.closest(".time").getBoundingClientRect();
-        const x = rect.left - parentDiv.left;
-        const y = rect.top + parentDiv.top;
-        position = [x + xOffset, y + yOffset];
-        let tooltipWidth = 400;
-        if (rect.left + x + tooltipWidth + xOffset > window.innerWidth) {
-          position[0] = x - tooltipWidth * 0.6;
-        }
+    const xOffset = 260;
+    const yOffset = 50;
+    let position = [0, 0];
+    if (event) {
+      const rect = event.target.getBoundingClientRect();
+      const parentDiv = event.target.closest(".time").getBoundingClientRect();
+      const x = rect.left - parentDiv.left;
+      const y = rect.top + parentDiv.top;
+      position = [x + xOffset, y + yOffset];
+      const tooltipWidth = 400;
+      if (rect.left + x + tooltipWidth + xOffset > window.innerWidth) {
+        position[0] = x - tooltipWidth * 0.6;
       }
-      setDisplayTooltip(true);
-      setTooltipData({ data: d, id: d.id, position });
-      highlightCircle(d.id);
     }
-  };
-
-  const onMouseOver = (event, d) => {
-    event.preventDefault();
-    if (!isTouchDevice()) {
-      const xOffset = 260;
-      const yOffset = 50;
-      let position = [0, 0];
-      if (event) {
-        const rect = event.target.getBoundingClientRect();
-        const parentDiv = event.target.closest(".time").getBoundingClientRect();
-        const x = rect.left - parentDiv.left;
-        const y = rect.top + parentDiv.top;
-        position = [x + xOffset, y + yOffset];
-        const tooltipWidth = 400;
-        if (rect.left + x + tooltipWidth + xOffset > window.innerWidth) {
-          position[0] = x - tooltipWidth * 0.6;
-        }
-      }
-      setDisplayTooltip(true);
-      setTooltipData({ data: d, id: d.id, position });
-      highlightCircle(d.id);
-    }
-  };
+    setDisplayTooltip(true);
+    setTooltipData({ data: d, id: d.id, position });
+    highlightCircle(d.id);
+  }, []);
 
   const onMouseOut = (event, d, i) => {
     event.preventDefault();
@@ -170,23 +149,23 @@ const TimeLine = (props) => {
   };
 
   const unHighlightCircle = (i) => {
-    d3.selectAll("#" + getCircleId(i))
+    d3.selectAll(`#${getCircleId(i)}`)
       .style("stroke", "none")
       .style("fill", circleColor(i));
 
-    d3.selectAll("#label" + i).style("font-weight", "normal");
+    d3.selectAll(`#label${i}`).style("font-weight", "normal");
   };
 
   const highlightCircle = (i) => {
     unHighlightCircle(DEFAULT_HIGHLIGHTED_POST);
-    d3.selectAll("#" + getCircleId(i))
+    d3.selectAll(`#${getCircleId(i)}`)
       .style("stroke", circleColor(i))
       .style("fill", "#fff");
 
-    d3.selectAll("#label" + i).style("font-weight", "bold");
+    d3.selectAll(`#label${i}`).style("font-weight", "bold");
   };
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const margin = {
       top: marginTop,
       right: marginRight,
@@ -196,12 +175,10 @@ const TimeLine = (props) => {
 
     const svgWidth = ref.current.clientWidth;
     const parentWidth = parentRef.current.clientWidth;
-    if(parentWidth > 0) {
+    if (parentWidth > 0) {
       setParentWidth(parentWidth);
     }
     const svgHeight = height;
-
-    const deviceType = getDeviceType();
 
     const transformMap = {
       mobile: "75",
@@ -231,6 +208,7 @@ const TimeLine = (props) => {
       .range([margin.top, svgHeight - margin.bottom]);
 
     const svgElement = d3.select(ref.current);
+    svgElement.selectAll("*").remove();
     svgElement.attr("width", svgWidth).attr("height", svgHeight);
 
     // Define the vertical path line
@@ -245,9 +223,7 @@ const TimeLine = (props) => {
     if (isEthiopia) {
       translationVal = `translate(${transformMap[deviceType]},20)`;
     }
-    const g = svgElement
-      .append("g")
-      .attr("transform", translationVal);
+    const g = svgElement.append("g").attr("transform", translationVal);
     lineColor = "#E4E5EA";
     lineWidth = 6;
 
@@ -255,7 +231,8 @@ const TimeLine = (props) => {
     g.append("path")
       .attr("d", pathString)
       .attr("stroke-width", lineWidth)
-      .attr("stroke", lineColor);
+      .attr("stroke", lineColor)
+      .attr("class", "timeline-path");
 
     // Circles for each event
     g.selectAll(".circle")
@@ -264,111 +241,110 @@ const TimeLine = (props) => {
       .append("circle")
       .attr("id", (d, i) => getCircleId(i))
       .attr("cx", 0)
+      .attr("class", "timeline-circle")
       .attr("cy", (d, i) => yScale(i))
       .attr("r", (d, i) => size(i))
       .style("fill", (d, i) => config[i]?.circleColor || "#000")
       .style("cursor", enableCirclePopup ? "pointer" : "default")
-      .on(isTouchDevice() ? "touchstart" : "mouseover", (event, d) => {
+      .on("click", (event, d) => {
         event.preventDefault();
         if (enableCirclePopup) {
-          isTouchDevice() ? onTouchStart(event, d) : onMouseOver(event, d);
-        }
-      })
-      .on("mouseout", (event, d) => {
-        event.preventDefault();
-        unHighlightCircle(d.id);
-        if (closePopupOnMouseOut) {
+          onTouchStart(event, d);
         }
       });
 
     // titles (Post Title)
     g.selectAll(".title")
-    .data(posts)
-    .enter()
-    .append("foreignObject")
-    .attr("x", titleXAxis[deviceType]) // Move the label to the right of the timeline
-    .attr("y", (d, i) => yScale(i) - parseInt(subtitleHeight) / 2)
-    .attr("width", parseInt(subtitleWidthDeviceMap[deviceType]))
-    .attr("height", parseInt(subtitleHeight))
-    .append("xhtml:div")
-    .attr("id", (d, i) => getTitleId(i))
-    .style("font-size", parseInt(fontSize) + 1 + "px")
-    .style("color", (d, i) => titleColor(i))
-    .style("font-weight", "bold")
-    .style("line-height", "1.2rem")
-    .style("text-align", "left")
-    .style("cursor", enableTitlePopup ? "pointer" : "default")
-    .style("overflow", "hidden")
-    .style("display", "-webkit-box")
-    .style("-webkit-line-clamp", "2") // Limit to 2 lines
-    .style("-webkit-box-orient", "vertical") // Required for line-clamp
-    .style("text-overflow", "ellipsis") // Add ellipsis
-    .style("overflow-wrap", "break-word")
-    .html((d, i) => {
-      const readmore = readMoreLabel(i);
-      let title = d.title.rendered;
-      if (readmore) {
-        title += `<br><span style="font-size:${
-          parseInt(fontSize) - 3
-        }px;color:${titleColor(
-          i
-        )};text-decoration:underline;text-underline-offset:3px">${readmore}</span>`;
-      }
-      return title;
-    })
-    .each(function (d, i) {
-      const foreignObject = d3.select(this.parentNode); // Select the foreignObject
-
-      // Wait for the DOM to be updated before calculating the height
-      setTimeout(() => {
-        const bbox = this.getBoundingClientRect(); // Get the actual bounding box of the rendered content
-        const contentHeight = Math.min(bbox.height, parseInt(subtitleHeight) * 2); // Ensure height doesn't exceed two lines
-        foreignObject.attr("height", contentHeight); // Update the height based on actual content
-
-        // Update y position to vertically center the content
-        foreignObject.attr("y", yScale(i) - contentHeight / 2);
-      }, 0); // Timeout ensures the DOM is rendered first before measuring
-    })
-    .on(isTouchDevice() ? "touchstart" : "mouseover", (event, d, i) => {
-      event.preventDefault();
-      if (enableTitlePopup) {
-        isTouchDevice() ? onTouchStart(event, d) : onMouseOver(event, d);
-      }
-    })
-    .on("mouseout", (event, d, i) => {
-      event.preventDefault();
-      if (enableTitlePopup) {
-        onMouseOut(event, d, d.id);
-        if (closePopupOnMouseOut) {
-          // Additional logic if needed
-        }
-      }
-    });
-
-    g.selectAll(".year")
       .data(posts)
       .enter()
-      .append("text")
-      .attr("x", -40) // Position years to the left of the circles
-      .attr("y", (d, i) => yScale(i))
-      .attr("dy", "0.35em")
-      .style("text-anchor", "end")
-      .style("font-size", `${parseInt(fontSize) + 1}px`)
-      .style("font-weight", "400")
-      .style("fill", "#4C4D50")
-      .text((d) => {
-        return d["meta_fields"]["subtitle"];
+      .append("foreignObject")
+      .attr("x", titleXAxis[deviceType]) // Move the label to the right of the timeline
+      .attr("y", (d, i) => yScale(i) - Number.parseInt(subtitleHeight) / 2)
+      .attr("width", Number.parseInt(subtitleWidthDeviceMap[deviceType]))
+      .attr("height", Number.parseInt(subtitleHeight))
+      .attr("class", "timeline-title")
+      .append("xhtml:div")
+      .attr("id", (d, i) => getTitleId(i))
+      .style("font-size", `${Number.parseInt(fontSize) + 1}px`)
+      .style("color", (d, i) => titleColor(i))
+      .style("font-weight", "bold")
+      .style("line-height", "1.2rem")
+      .style("text-align", "left")
+      .style("cursor", enableTitlePopup ? "pointer" : "default")
+      .style("overflow", "hidden")
+      .style("display", "-webkit-box")
+      .style("-webkit-line-clamp", "2") // Limit to 2 lines
+      .style("-webkit-box-orient", "vertical") // Required for line-clamp
+      .style("text-overflow", "ellipsis") // Add ellipsis
+      .style("overflow-wrap", "break-word")
+      .html((d, i) => {
+        const readmore = readMoreLabel(i);
+        let title = d.title.rendered;
+        if (readmore) {
+          title += `<br><span style="font-size:${
+            Number.parseInt(fontSize) - 3
+          }px;color:${titleColor(
+            i
+          )};text-decoration:underline;text-underline-offset:3px">${readmore}</span>`;
+        }
+        return title;
+      })
+      .each(function (d, i) {
+        const foreignObject = d3.select(this.parentNode); // Select the foreignObject
+
+        // Wait for the DOM to be updated before calculating the height
+        setTimeout(() => {
+          const bbox = this.getBoundingClientRect(); // Get the actual bounding box of the rendered content
+          const contentHeight = Math.min(
+            bbox.height,
+            Number.parseInt(subtitleHeight) * 2
+          ); // Ensure height doesn't exceed two lines
+          foreignObject.attr("height", contentHeight); // Update the height based on actual content
+
+          // Update y position to vertically center the content
+          foreignObject.attr("y", yScale(i) - contentHeight / 2);
+        }, 0); // Timeout ensures the DOM is rendered first before measuring
+      })
+      .on("click", (event, d, i) => {
+        event.preventDefault();
+        if (enableTitlePopup) {
+          onTouchStart(event, d);
+        }
       });
 
-    if (enableDefaultPopup) {
-      d3.select("#" + getCircleId(DEFAULT_HIGHLIGHTED_POST)).dispatch(
-        "mouseover"
-      );
-    }
-  }, []);
+    const yearFontSize = +fontSize + 1;
+    const yearBoxW = 60;
+    const yearBoxH = yearFontSize * 0.9;
+
+    g.selectAll(".year-fo")
+      .data(posts)
+      .enter()
+      .append("foreignObject")
+      .attr("class", "year-fo")
+      .attr("x", -yearBoxW - 10)
+      .attr("y", (d, i) => yScale(i) - yearBoxH / 2)
+      .attr("width", yearBoxW)
+      .attr("height", yearBoxH)
+      .append("xhtml:div")
+      .style("display", "flex")
+      .style("align-items", "center")
+      .style("justify-content", "flex-end")
+      .style("width", `${yearBoxW}px`)
+      .style("height", `${yearBoxH}px`)
+      .style("font-size", `${yearFontSize}px`)
+      .style("line-height", "1em")
+      .style("font-weight", "400")
+      .style("color", "#4C4D50")
+      .html((d) => d.meta_fields.subtitle);
+  }, [deviceType, orientation]);
 
   return (
-    <div className={"time line"} style={{ position: "relative" }} ref={parentRef}>
+    <div
+      className={"time line"}
+      style={{ position: "relative" }}
+      ref={parentRef}
+      key={unique + deviceType + orientation}
+    >
       {posts
         .filter((post) => tooltipData && tooltipData.id === post.id)
         .map((post) => {
@@ -377,7 +353,7 @@ const TimeLine = (props) => {
           return (
             <TooltipModal
               isOpen={displayTooltip}
-              key={safePostSlug + "_modal"}
+              key={`${safePostSlug}_modal`}
               content={
                 <div
                   style={{
@@ -473,12 +449,12 @@ const PostCarousel = (props) => {
         type={type}
         taxonomy={taxonomy}
         categories={categories}
-        store={"carousel_" + parent + "_" + unique}
+        store={`carousel_${parent}_${unique}`}
         page={1}
         perPage={items}
       >
         <PostConsumer>
-          <TimeLine {...timeProps}></TimeLine>
+          <TimeLine {...timeProps} />
         </PostConsumer>
       </PostProvider>
     </Container>
