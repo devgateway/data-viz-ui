@@ -20,47 +20,57 @@ class BaseLayer extends Layer {
 
         if (this.gRef && this.gRef.current) {
             this.g = d3.select(this.gRef.current)
-
-            const svg = d3.select(this.gRef.current.parentElement);
-            
-            this.g.attr("class", "base-layer") //add unique name
-            this.g.selectAll("path").remove()
-            this.g.selectAll(".label").remove()
-            this.g.selectAll("path")
+            this.g.attr("class", "base-layer zoomable") //add unique name
+            this.g.selectAll(".borders").remove()
+            this.g.selectAll(".feature-label").remove()
+            this.g.selectAll(".borders")
                 .data(json.features)
                 .enter()
                 .append("path")
                 .attr("fill", fillColor)
                 .attr("stroke", borderColor)
                 .attr("id", "state-borders")
+                .attr("class","borders")
                 .attr("d", path)
+                .style("vector-effect", "non-scaling-stroke")
 
-            if (this.props.transform) {
-                this.g.attr("transform", this.props.transform)
-            }
         }
     }
 
+
     createLabels(json) {
         const {
-            path, labelFilter = [], labelSettings = {}, labelField, labelFontSize, labelColor, projection
+            path,
+            labelFilter = [],
+            labelSettings = {},
+            labelField,
+            labelFontSize,
+            labelColor,
+            projection,
+            initialPosition
         } = this.props
+
         if (this.gRef && this.gRef.current) {
             this.g = d3.select(this.gRef.current)
+            const scale = projection.scale();
+            const k = this.props.transform ? this.props.transform.k : initialPosition.k
 
-            const k = this.props.transform ? this.props.transform.k : 1
-
-            this.g.selectAll(".label")
+            this.g.selectAll(".feature-label")
                 .data(json.features.filter(f => {
                     return labelFilter.indexOf(f.properties[labelField]) == -1
                 }))
-                .enter().append("text")
-                .attr("class", "label")
+                .enter()
+                .append("text")
+                .attr("class", "feature-label")
                 .attr("font-size", d => {
-                    return Math.min((labelFontSize * 1 / k), labelFontSize / 2) + "px"
+                    return Math.max(0.5, labelFontSize / k) + "px"
                 })
+                .style("pointer-events", "none")
                 .text(function (d) {
                     return d.properties[labelField]
+                })
+                .attr("font-size", d => {
+                    return Math.max(0.5, labelFontSize / k) + "px"
                 })
                 .attr("color", labelColor)
                 .attr("fill", labelColor)
@@ -68,51 +78,51 @@ class BaseLayer extends Layer {
                     const rotation = labelSettings[d.properties[labelField] + "_rotation"] || 0
                     const offsetX = labelSettings[d.properties[labelField] + "_offsetX"] || 0
                     const offsetY = labelSettings[d.properties[labelField] + "_offsetY"] || 0
-                    const x = path.centroid(d)[0] + (offsetX / projection.scale())
-                    const y = path.centroid(d)[1] + (offsetY / projection.scale())
+                    const x = path.centroid(d)[0] + (offsetX / scale)
+                    const y = path.centroid(d)[1] + (offsetY / scale)
                     return "translate(" + [x, y] + "),rotate(" + (rotation ? rotation : 0) + ")"
                 })
-            if (this.props.transform) {
-                this.g.attr("transform", this.props.transform)
-            }
+                .attr("text-anchor", "middle")
+                .attr("dominant-baseline", "middle")
+
+
         }
     }
 
 
     createLayer(json) {
-        this.createPaths(json)
-        this.createLabels(json)
+        //eslint-disable-next-line
+
+        this.createPaths(json);
+        this.createLabels(json);
+
+
     }
 
 
+    componentDidMount() {
+        super.componentDidMount()
+    }
+
     componentDidUpdate(prevProps, prevState, snapshot) {
         const {
-            name,
-            file,
-            path,
-            transform,
-            labelFilter = [],
-            labelField,
-            labelFontSize,
-            labelColor,
-            fillColor,
-            borderColor,
-            projection,
-            update,
-
-
+            editing
         } = this.props
-        
-        if (file !== prevProps.file || path !== prevProps.path || projection !== prevProps.projection || transform !== prevProps.transform || labelFilter !== prevProps.labelFilter || labelField !== prevProps.labelField || labelFontSize !== prevProps.labelFontSize || labelColor !== prevProps.labelColor || fillColor !== prevProps.fillColor || borderColor !== prevProps.borderColor) {
+        //eslint-disable-next-line
+
+        if (editing) {
             this.create()
         }
+        if (prevProps.visible != this.props.visible) {
+            this.g.style("display", this.props.visible ? "block" : "none")
 
+        }
 
     }
 
     render() {
         const {name, height, width} = this.props
-        return <g className={"base"} ref={this.gRef}/>
+        return <g ref={this.gRef}/>
     }
 }
 

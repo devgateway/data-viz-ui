@@ -62,7 +62,8 @@ class ProjectedContainer extends React.Component {
                     editing,
                     height,
                     width,
-                    settings
+                    settings,
+                    projection: this.state.projection
                 })
 
             })}

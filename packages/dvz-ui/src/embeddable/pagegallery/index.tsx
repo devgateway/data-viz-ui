@@ -3,7 +3,7 @@ import { PageConsumer, PageProvider, PostIntro } from "@devgateway/wp-react-lib"
 import React from "react";
 import { injectIntl } from "react-intl";
 
-const VerticalDashboardGallery = ({ pages }) => {
+const VerticalDashboardGallery = ({ pages, width }) => {
     const childPages = pages ? pages.sort((a, b) => a.menu_order - b.menu_order) : []
     return (
         <Grid columns={3} stackable={true}>
@@ -18,7 +18,7 @@ const VerticalDashboardGallery = ({ pages }) => {
     )
 }
 
-export interface HorizontalDashboardGalleryProps {
+interface HorizontalDashboardGalleryProps {
     pages?: any[],
     columns: string
 }
@@ -32,11 +32,11 @@ const HorizontalDashboardGallery: React.FC<HorizontalDashboardGalleryProps> = ({
         <Grid columns={columns as SemanticWIDTHS}>
             {/* @ts-ignore */}
             {[...Array(parseInt(rows)).keys()]
-                .map((_, idx) => {
+                .map((r, idx) => {
 
 
                     return (<Grid.Row key={idx}>
-                        {[...Array(parseInt(columns)).keys()].map((_, __) => {
+                        {[...Array(parseInt(columns)).keys()].map((c, _) => {
                             index++
                             return (<Grid.Column key={_}>
                                 <PostIntro as={"div"} post={childPages[index]}></PostIntro>

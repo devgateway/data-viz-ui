@@ -1,95 +1,94 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { CategoriesContext } from './DataContext';
-import { getCategories, setData } from '../reducers/data';
-import { Container, Segment } from 'semantic-ui-react';
+import React from 'react'
+import {connect} from 'react-redux'
+import {injectIntl} from 'react-intl';
+import {CategoriesContext} from './DataContext'
+import {getCategories} from "../reducers/data";
+import {Container, Segment} from "semantic-ui-react";
 
-const CategoriesProvider = (props) => {
-  const {
-    app,
-    filters,
-    source,
-    store,
-    params = {},
-    csv,
-    group,
-    editing,
-    children,
-  } = props;
+class DataProvider extends React.Component {
 
-  const dispatch = useDispatch();
-  const [showLoading, setShowLoading] = useState(false);
-  const prevProps = useRef({ filters, params, app, source, csv });
-
-  // Build the path for useSelector
-  const path = ['data', 'categories', app];
-  if (params.dvzProxyDatasetId) {
-    path.push(params.dvzProxyDatasetId);
-  }
-
-  const data = useSelector((state) => state.getIn([...path, 'items']));
-  const error = useSelector((state) => state.getIn([...path, 'error']));
-  const loading = useSelector((state) => state.getIn([...path, 'loading']));
-
-  // componentDidMount
-  useEffect(() => {
-    if (!data && !loading) {
-      dispatch(getCategories(props));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // componentDidUpdate
-  useEffect(() => {
-    if (
-      filters !== prevProps.current.filters ||
-      JSON.stringify(params) !== JSON.stringify(prevProps.current.params) ||
-      app !== prevProps.current.app ||
-      prevProps.current.source !== source ||
-      csv !== prevProps.current.csv
-    ) {
-      if (app === 'csv') {
-        dispatch(setData({ app, csv, store, params, group }));
-      } else {
-        if (editing) {
-          params.v = (Math.random() + 1).toString(36).substring(7);
+    componentDidMount() {
+        const {categories} = this.props
+        if (!categories && !this.props.loading) {
+            this.props.onLoadData(this.props)
         }
-        setShowLoading(false);
-        dispatch(getCategories(props));
-        // Optionally, implement checkLoadingTime if needed
-      }
     }
-    prevProps.current = { filters, params, app, source, csv };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filters, params, app, source, csv, editing]);
 
-  if (loading) {
-    return <Container></Container>;
-  }
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        const {app, filters, source, store, params, csv, group, editing} = this.props
+        if (filters != prevProps.filters ||
+            JSON.stringify(params) != JSON.stringify(prevProps.params)
+            || app != prevProps.app
+            || prevProps.source != source
+            || csv != prevProps.csv) {
 
-  if (data) {
-    return (
-      <CategoriesContext.Provider value={data.toJS()}>
-        {children}
-      </CategoriesContext.Provider>
-    );
-  } else if (error) {
-    return (
-      <Segment color={'red'}>
-        <h1>500</h1>
-        <p>Wasn't able to load data</p>
-      </Segment>
-    );
-  } else {
-    return (
-      <Container>
-        <Segment color={'red'}>
-          <h1>404</h1>
-          <p>Can't find this page</p>
-        </Segment>
-      </Container>
-    );
-  }
+            if (app === "csv") {
+                this.props.onSetData({app, csv, store, params, group})
+            } else {
+                if (editing) {
+                    params.v = (Math.random() + 1).toString(36).substring(7)
+                }
+                this.setState({showLoading: false})
+                this.props.onLoadData(this.props)//this.props.onLoadData({app, source, store, params, group})
+                setTimeout(this.checkLoadingTime, 100);
+            }
+        }
+    }
+
+    render() {
+        const {data, loading, error} = this.props
+
+        if (loading) {
+            return (<Container>
+
+
+            </Container>)
+        }
+
+
+        if (data) {
+            return <CategoriesContext.Provider value={data.toJS()}>{this.props.children}</CategoriesContext.Provider>
+        } else if (error) {
+            return <Segment color={"red"}>
+                <h1>500</h1>
+                <p>Wasn't able to load data</p>
+            </Segment>
+        } else {
+            return <Container>
+                <Segment color={"red"}>
+                    <h1>404</h1>
+                    <p>Can't find this page</p>
+                </Segment>
+            </Container>
+        }
+
+        return null
+    }
+}
+
+const mapStateToProps = (state, ownProps) => {
+    const {app, params, dvzProxyDatasetId, uniqueStorage} = ownProps
+
+
+    const path = ['data', 'categories', app]
+    if (dvzProxyDatasetId) {
+        path.push(dvzProxyDatasetId)
+    }
+    if (uniqueStorage) {
+        path.push(uniqueStorage)
+    }
+
+
+
+    return {
+        data: state.getIn([...path, 'items']),
+        error: state.getIn([...path, 'error']),
+        loading: state.getIn([...path, 'loading']),
+    }
+}
+
+const mapActionCreators = {
+    onLoadData: getCategories
 };
 
-export default CategoriesProvider;
+export default connect(mapStateToProps, mapActionCreators)(injectIntl(DataProvider));

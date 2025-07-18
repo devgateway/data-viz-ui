@@ -1,12 +1,12 @@
 import React, { Fragment, useEffect, useState } from "react";
 import Tooltip from "./Tooltip";
 import { ResponsiveBar } from "@nivo/bar";
-import { useTheme } from '@nivo/theming';
 import { injectIntl } from "react-intl";
+import { useTheme } from "@nivo/core";
 import { line } from "d3-shape";
 import LineLayer from "./LineLayer";
 import Papa from "papaparse";
-import FlexWrapDetector from '../../layout/FlexWrapDetector';
+import FlexWrapDetector from '@/layout/FlexWrapDetector';
 import deviceType from '@/utils/deviceType';
 
 const POSITION_MIDDLE = "middle";
@@ -14,7 +14,6 @@ const POSITION_TOP = "top";
 const ZERO_LINE_COLOR = "#66676d";
 const GRID_LINE_COLOR = "#dddddd";
 const DEFAULT_COLOR = "none";
-const LABEL_SKIP_HEIGHT = 0;
 const COLOR_VARIABLE = "_Color";
 
 export interface BarChartProps {
@@ -1026,6 +1025,9 @@ const Chart = ({
     overLayMin = Math.min(...overlayData.data.map((d) => d[1]));
   }
 
+
+ 
+
   const getValuesFromData = () => {
     const values: number [] = [];
     if (confidenceIntervals) {
@@ -1036,11 +1038,13 @@ const Chart = ({
         if (c.high) {
           values.push(parseFloat(c.high));
         }
-      });
+      });    
 
       if (options.data) {
-        options.data.map((d) => {
-          options.keys.forEach((k) => {
+        const filteredData = applyFilter(options.data, false)
+        const filteredKeys = applyFilter(options.keys, true)
+        filteredData.forEach((d) => {
+          filteredKeys.forEach((k) => {
             if (d[k]) {
               values.push(d[k]);
             }
@@ -1056,17 +1060,21 @@ const Chart = ({
   const dataMin = Math.min(...values);
 
   const getMaxValueFromData = () => {
+    const filteredData = applyFilter(options.data, false)
+    const filteredKeys = applyFilter(options.keys, true)     
     if (
       (groupMode === "stacked" && maxValue !== "fixed") ||
       (maxValue === "fixed" && fixedMaxValue === null) ||
       // @ts-ignore
       fixedMaxValue === ""
     ) {
+      
+      let keys = filteredKeys.length > 0 ? filteredKeys : options.keys;
       return (
         Math.max(
           Math.max(
-            ...options.data
-              .map((d) => options.keys.map((x) => (d[x] ? d[x] : 0)))
+            ...filteredData
+              .map((d) => keys.map((x) => (d[x] ? d[x] : 0)))
               .map((l) =>
                 l.reduce((a, b) => {
                   return Math.max(a + b, a + 0);
@@ -1206,7 +1214,7 @@ const Chart = ({
     }
   }
 
-  return (
+return (
     <div style={{ height: height }}>
       {options?.data && options.data.length > 0 && (
         <>

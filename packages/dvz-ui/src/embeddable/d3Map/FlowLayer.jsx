@@ -31,7 +31,8 @@ class DataLayer extends BaseLayer {
             markSizeScale2, //arrow size
             measures,
             zoom,
-            offsetPixels = 10
+            offsetPixels = 10,
+            waitForFilters,
         } = this.props
 
         const measure = measures[0];
@@ -81,20 +82,19 @@ class DataLayer extends BaseLayer {
 
         const k = this.props.transform ? this.props.transform.k : 1
         const originPoints = []
+        //eslint-disable-next-line
+
         filteredData.forEach(d1 => {
 
             //collect starting points ro be rendered later and keep them on top of the svg layers
             originPoints.push(d1) //started points to be rendered later
 
-            d1.properties.destinations.forEach(child => {
+            d1.properties.destinations.sort((a,b)=>a[measure]-b[measure]).forEach(child => {
 
                 const value = child[measure] //value by target country
-                debugger; //eslint-disable-line
                 json.features.filter(feature => feature.properties[featureJoinAttribute] == child.value)
                     .forEach(d2 => {
-
                         d2.properties.meta=child
-
                         const originID = d1.properties[featureJoinAttribute]
                         const id = d1.properties[featureJoinAttribute] + "--" + d2.properties[featureJoinAttribute];
 
@@ -125,6 +125,7 @@ class DataLayer extends BaseLayer {
                         // Change these data to see ho the great circle reacts
                         //d1 is origin
                         //d2 is destination
+                        const theG=this.g.append("g")
 
                         this.g.select("defs")
                             .append("marker")
@@ -143,11 +144,10 @@ class DataLayer extends BaseLayer {
                                 return "fill: " + brStyles.getColor(value) + ";"
                             });
 
-                        const g = this.g;
 
-                        this.g.append("path")
-
+                        theG.append("path")
                             .attr("d", path(link))
+                            .attr("id", id)
                             .attr("class", "flow-line")
                             .style("fill", "none")
                             .style("cursor", "pointer")
@@ -157,26 +157,25 @@ class DataLayer extends BaseLayer {
                                 return brStyles.getColor(value)
                             })
                             .style("stroke-width", d => {
-
+""
                                 return brStyles.getSize(value)
                             })
                             .attr("marker-end", "url(#arrow" + id + ")")
 
                             .on("mouseenter", (event, d) => {
-                                g.selectAll("marker").transition().duration("200").style("opacity", 0)
-                                g.selectAll(".start-point").transition().duration("200").style("opacity", 0)
-                                g.selectAll(".flow-line").transition().duration("200")
+                                theG.selectAll("marker").transition().duration("200").style("opacity", 0)
+                                theG.selectAll(".start-point").transition().duration("200").style("opacity", 0)
+                                theG.selectAll(".flow-line").transition().duration("200")
                                     .style("opacity", 0)
 
                                 d3.select(event.target).transition().duration("200").style("opacity", 1)
 
-                                g.selectAll("#arrow" + id).transition().duration("200").style("opacity", 1)
+                                theG.selectAll("#arrow" + id).transition().duration("200").style("opacity", 1)
 
 
-                                g.selectAll(".start-point.circle_" + originID).transition().duration("200").style("opacity", 1)
+                                theG.selectAll(".start-point.circle_" + originID).transition().duration("200").style("opacity", 1)
 
                                 if (value) {
-                                    debugger; //eslint-disable-line
                                     const origin = {}
                                     const target = {}
                                     Object.keys(d1.properties).forEach(key => {
@@ -191,7 +190,6 @@ class DataLayer extends BaseLayer {
                                     Object.keys(d2.properties.meta).forEach(key => {
                                         target["target_" + key] = d2.properties.meta[key]
                                     })
-                                    debugger; //eslint-disable-line
 
                                     const variables = {
                                         ...origin,
@@ -209,10 +207,19 @@ class DataLayer extends BaseLayer {
                                 /*Hidden others paths*/
                                 this.hiddenToolTip()
                                 d3.selectAll(".flow-line").transition().duration("100").style("opacity", 1)
-                                g.selectAll(".start-point").transition().duration("100").style("opacity", 1)
-                                g.selectAll("marker").transition().duration("100").style("opacity", 1)
+                                theG.selectAll(".start-point").transition().duration("100").style("opacity", 1)
+                                theG.selectAll("marker").transition().duration("100").style("opacity", 1)
 
                             })
+
+                        theG.append("text")
+                            .append("textPath") //append a textPath to the text element
+                            .attr("xlink:href", id) //place the ID of the path here
+                            .style("text-anchor","middle") //place the text halfway on the arc
+                            .attr("startOffset", "50%")
+                            .attr("fill", "#fff")
+                            .text("Yay, my text is on a wavy path");
+
 
 
                     })
@@ -220,6 +227,7 @@ class DataLayer extends BaseLayer {
 
             })
         })
+
         originPoints.forEach(d1 => {
             this.g.append("circle")
                 .attr("fill", markFillColor)
@@ -346,7 +354,8 @@ const DataWrapper = (props) => {
         flowOrigin,
         editing,
         flowDestination,
-        dvzProxyDatasetId
+        dvzProxyDatasetId,
+        waitForFilters
     } = props
 
     const params = {dvzProxyDatasetId}
@@ -360,10 +369,10 @@ const DataWrapper = (props) => {
         })
     }
 
-
     return (<DataProvider
         editing={editing}
         params={params}
+        waitForFilters={waitForFilters}
         app={app}
         csv={decodeURIComponent(csv)}
         group={group}

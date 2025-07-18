@@ -8,7 +8,7 @@ import {
     sequentialColorInterpolators
 } from "@nivo/colors";
 import * as d3 from "d3";
-import {useTheme} from "@nivo/theming";
+import {useTheme} from "@nivo/core";
 
 const getTextWidth = (text, font) => {
     // re-use canvas object for better performance
