@@ -2,7 +2,7 @@ import React, { RefObject, useEffect, useState } from 'react'
 import { Container, Grid, Label } from 'semantic-ui-react'
 import { MediaConsumer, MediaProvider, PostConsumer, PostIcon, PostProvider, utils } from "@devgateway/wp-react-lib";
 import PostIntro from "../connected-templates/PostIntro";
-import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router';
 import PostContent from '../connected-templates/PostContent';
 
 interface ListOfPostProps {
@@ -117,7 +117,7 @@ const ListOfPost: React.FC<ListOfPostProps> = (props) => {
                                         </>
                                     )}
                                     {!showContentToggle && (
-                                        <a href={utils.replaceLink(p.link)} className="link">
+                                        <a href={utils.replaceLink(p.link, locale)} className="link">
                                             Read More
                                         </a>
                                     )}
