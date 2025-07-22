@@ -3,6 +3,7 @@ import type { Route } from "./+types/slug";
 import { getPages } from "@devgateway/wp-react-lib/api";
 import { getMetaSeo } from "~/utils/meta-seo";
 import Loading from "~/components/layout/Loading";
+import Header from "~/components/layout/Header";
 
 const SlugContainer = lazy(async () => {
   const module = await import('@devgateway/dvz-ui-react/layout');
@@ -46,8 +47,8 @@ export function meta({ data }: Route.MetaArgs): Route.MetaDescriptors {
   return getMetaSeo(post, yoastHead);
 }
 
-const SlugRoute = ({ loaderData }: Route.ComponentProps) => {
-  return <SlugContainer />;
+const SlugRoute = ({ loaderData, params }: Route.ComponentProps) => {
+  return <SlugContainer header={<Header {...loaderData} locale={params.lan} />} />;
 };
 
 export default SlugRoute;
