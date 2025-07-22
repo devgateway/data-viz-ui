@@ -36,11 +36,11 @@ interface LayoutProps {
 const Layout = () => {
     const pathParams = useParams();
     const defaultLocale = DEFAULT_LOCALE;
+    console.log("defaultLocale", defaultLocale);
     const locale = pathParams.lan;
 
     useEffect(() => {
-        if (process.env) {
-
+        if (process.env.NODE_ENV === "development") {
             console.log("----------.env-----------");
             console.log(process.env);
             console.log("----------.env-----------");
@@ -62,29 +62,25 @@ const Layout = () => {
         store.dispatch(updateIntl({ locale, formats: {}, messages: messages[locale as Locale ?? 'en'] }));
     }, [locale]);
 
-    const urlParams = new URLSearchParams(window && window.location.search);
-    const customize_changeset_uuid = urlParams.get('customize_changeset_uuid');
-
-
-    useEffect(() => {
-        // @ts-ignore
-        window.isCustomizedPreview = customize_changeset_uuid != null;
-    }, [customize_changeset_uuid]);
+    // const urlParams = new URLSearchParams(window && window.location.search);
+    // const customize_changeset_uuid = urlParams.get('customize_changeset_uuid');
+    //
+    //
+    // useEffect(() => {
+    //     // @ts-ignore
+    //     window.isCustomizedPreview = customize_changeset_uuid != null;
+    // }, [customize_changeset_uuid]);
 
 
     if (!locale) {
         return <Navigate to={defaultLocale}></Navigate>
     }
 
-    console.log("----------locale-----------");
-    console.log(locale);
-    console.log("----------locale-----------");
-
     return (
         <Provider store={store}>
             <IntlProvider key={locale} locale={locale} messages={messages[locale as Locale]}>
-                <AppContextProvider getComponent={getComponentByNameIgnoreCase} store={store} locale={"en"}>
-                    <SettingProvider locale={locale} changeUUID={customize_changeset_uuid}>
+                <AppContextProvider getComponent={getComponentByNameIgnoreCase} store={store} locale={locale}>
+                    <SettingProvider locale={locale} changeUUID={null}>
                         <SettingsConsumer>
                             <CustomizerWrapper>
                                 <InjectTitle />
