@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useParams, useSearchParams } from 'react-router';
-import { getComponentByNameIgnoreCase } from '@devgateway/dvz-ui-react/embeddable';
+import { getComponentByNameIgnoreCase } from '@devgateway/dvz-ui-react';
 import { Container, Segment } from 'semantic-ui-react';
 import { SettingsConsumer } from '@devgateway/wp-react-lib';
 

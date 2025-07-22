@@ -1,1 +1,2 @@
-export const DEFAULT_LOCALE = import.meta.env.VITE_REACT_APP_DEFAULT_LOCALE ?? "en";
+export const DEFAULT_LOCALE = import.meta.env.VITE_REACT_APP_DEFAULT_LOCALE ?? process.env.VITE_REACT_APP_DEFAULT_LOCALE ?? "en";
+export const WP_API_URL = import.meta.env.VITE_REACT_APP_WP_API ?? process.env.VITE_REACT_APP_WP_API ?? "/wp/wp-json";
