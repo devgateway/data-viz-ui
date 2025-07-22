@@ -15,17 +15,19 @@ interface SlugPostContainerProps {
 const SlugPostContainer = ({ header, footer }: SlugPostContainerProps) => {
     const { lan: locale, slug } = useParams();
     return (
-        <ResponsiveContainer header={header} footer={footer}>
-            <PostProvider
-                slug={slug}
-                store={slug}
-                locale={locale}
-            >
+        <PostProvider
+            slug={slug}
+            store={slug}
+            locale={locale}
+        >
+            <ResponsiveContainer header={header} footer={footer}>
+
                 <PostConsumer>
-                    <Post/>
+                    <Post />
                 </PostConsumer>
-            </PostProvider>
-        </ResponsiveContainer>
+
+            </ResponsiveContainer>
+        </PostProvider>
     )
 }
 
