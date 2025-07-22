@@ -7,6 +7,7 @@ import { getPages } from "@devgateway/wp-react-lib/api";
 import { getMetaSeo } from "../utils/meta-seo";
 import Loading from "~/components/layout/Loading";
 import { DEFAULT_LOCALE } from "~/utils/constants";
+import Header from "~/components/layout/Header";
 
 export function HydrateFallback() {
   return <Loading />
@@ -78,7 +79,7 @@ const Home = ({
       locale={locale}
       store={"home"}>
       <PageConsumer>
-        <ResponsiveContainer locale={locale}>
+        <ResponsiveContainer locale={locale} header={<Header {...loaderData} locale={params.lan} />}>
           <PageConsumer>
             <Page />
           </PageConsumer>
