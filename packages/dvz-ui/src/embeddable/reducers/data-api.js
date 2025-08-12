@@ -6,6 +6,7 @@ function deepClone(obj) {
 }
 
 const API_ROOT = process.env.VITE_REACT_APP_API_ROOT
+console.log("API_ROOT==>", API_ROOT);
 
 // In-flight request cache
 const inFlightRequests = {}

@@ -72,6 +72,7 @@ body {
   display: flex;
   align-items: center;
   font-weight: bold;
+  width: 100%!important;
 }
 
 @mixin break-item-base {
@@ -183,6 +184,7 @@ body {
       }
 
       .measure-label {
+        width: 100% !important;
         height: 22px;
 
       }

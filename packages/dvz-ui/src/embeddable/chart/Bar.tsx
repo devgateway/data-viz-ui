@@ -8,6 +8,7 @@ import LineLayer from "./LineLayer";
 import Papa from "papaparse";
 import FlexWrapDetector from '@/layout/FlexWrapDetector';
 import deviceType from '@/utils/deviceType';
+import { parse } from "path";
 
 const POSITION_MIDDLE = "middle";
 const POSITION_TOP = "top";
@@ -79,6 +80,8 @@ export interface BarChartProps {
   customAxisFormat: any;
   previewMode: string;
   editing: boolean;
+  showLegendsInColumns?: boolean;
+  numberOfLegendColumns?: number;
 }
 
 const Chart = ({
@@ -143,7 +146,9 @@ const Chart = ({
   enableGridY,
   enableGridX,
   customAxisFormat,
-  previewMode
+  previewMode,
+  showLegendsInColumns = false,
+  numberOfLegendColumns = 4
 }: BarChartProps) => {
   const isMobileOrTablet = ["mobile", "tablet", "midTablet"].includes(
     deviceType()
@@ -1214,12 +1219,14 @@ const Chart = ({
     }
   }
 
+let newHeight = parseInt(height + '') - newMarginBottom;
+
 return (
-    <div style={{ height: height }}>
+    <div style={{ height: newHeight + "px" }} className="bar-chart">
       {options?.data && options.data.length > 0 && (
         <>
           <ResponsiveBar
-            colorBy={colors.colorBy}
+           colorBy={colors.colorBy}
             animate={true}
             enableLabel={barLabelPosition == POSITION_MIDDLE}
             {...options}
@@ -1404,8 +1411,7 @@ return (
           />
           {(legendPosition === "top" || legendPosition === "bottom") && (
             <div
-              className={`legends container has-standard-12-font-size ${legendPosition}`}
-            >
+              className={`legends container has-standard-12-font-size ${legendPosition}`}   >
               <div className="legend-sections">
                 <div className="title-section">{legendTitle()}</div>
                 <FlexWrapDetector
@@ -1419,6 +1425,8 @@ return (
                     }
                   }}
                   className={`legends container has-standard-12-font-size items-section`}
+                  useColumns={showLegendsInColumns}
+                  numberOfLegendColumns={numberOfLegendColumns}
                 >
                   {legendItems()}
                 </FlexWrapDetector>
