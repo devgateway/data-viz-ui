@@ -1,10 +1,10 @@
-import React, {useRef, useState} from "react";
+import React, {useRef, useState,useEffect} from "react";
 import {Container} from "semantic-ui-react";
 import DataProvider from "../data/DataProvider";
 import DataConsumer from "../data/DataConsumer";
 import {PostContent} from "@devgateway/wp-react-lib";
 import {connect} from "react-redux";
-
+import { useSpring, animated } from '@react-spring/web';
 
 const Chart = (props) => {
     const {
@@ -117,43 +117,72 @@ const Chart = (props) => {
 }
 
 const DataFrame = (props) => {
-    const { app, measure, data, format, label, numberColor, numberFontSize, 
-        labelColor, labelFontSize, noDataText, intl } = props
+    const {
+        app, measure, data, format, label, numberColor, numberFontSize,
+        labelColor, labelFontSize, noDataText = '-', intl
+    } = props;
 
-    let measureField = measure
-    let dataItem = data
-    if (app == 'csv') {
-        const { data: json, meta: { fields } } = data
-        measureField = fields[0];   
-        dataItem = data.data[0]    
-    } 
+    let measureField = measure;
+    let dataItem = data;
 
-    let formattedNumber = ''
-    if (dataItem) {
-        let number = dataItem[measureField] ? dataItem[measureField] : 0        
-       if (number) {           
-          formattedNumber = intl.formatNumber(format.style === 'percent' ? number / 100 : number, { ...format })
-        } else {
-           formattedNumber = noDataText
-        }
+    if (app === 'csv' && data?.meta?.fields && data?.data?.length) {
+        measureField = data.meta.fields[0];
+        dataItem = data.data[0];
     }
+
+    const rawValue = dataItem?.[measureField] ?? null;
+    const value = rawValue ? (format?.style === 'percent' ? rawValue / 100 : rawValue) : null;
+
+    const [targetValue, setTargetValue] = useState(value);
+
+    useEffect(() => {
+        if (value !== null && value !== undefined) {
+            setTargetValue(value);
+        }
+    }, [value]);
+
+    const { number } = useSpring({
+        from: { number: 0 },
+        to: { number: targetValue ?? 0 },
+       // reset: true,
+        config: { mass: 1,
+            tension: 120,
+            friction: 30, },
+    });
+
     const numberStyle = {
         color: decodeURIComponent(numberColor),
         fontSize: numberFontSize + 'px',
         textAlign: 'center'
-    }
+    };
+
     const labelStyle = {
         color: decodeURIComponent(labelColor),
         fontSize: labelFontSize + 'px',
         textAlign: 'center'
-    }
-    return <div >
-        <div style = {numberStyle} className={"big-number"}>{formattedNumber}</div>
-        {label &&
-          <div style = {labelStyle} className={"big-number-label"}>{label}</div>
-        }        
-    </div>
-}
+    };
+
+    const formatNumber = (val) =>
+        intl.formatNumber(val, { ...format });
+
+
+    return (
+        <div>
+            <div style={numberStyle} className="big-number">
+                {value === null ? noDataText : (
+                    <animated.span>
+                        {number.to((n) => formatNumber(n))}
+                    </animated.span>
+                )}
+            </div>
+            {label && (
+                <div style={labelStyle} className="big-number-label">
+                    {label}
+                </div>
+            )}
+        </div>
+    );
+};
 
 
 const mapStateToProps = (state, ownProps) => {

@@ -4,6 +4,7 @@ import { Dropdown, Button, Icon, Pagination, Container } from 'semantic-ui-react
 import Post from './Post';
 import { getStartDateAndEndDateFromYear } from './utils';
 import { toBoolean, toNumber } from '@/utils/data';
+import DropDownFilter from './DropDownFilter';
 
 interface PostsWithFiltersProps {
   editing: boolean;
@@ -137,32 +138,33 @@ const Filters = (props: FiltersProps) => {
   }, []);
 
   const displayCategories = (categories && categoriesToBeShown) ? categories.filter((category: any) => categoriesToBeShown.includes(category.id)) : [];
+
   const displayCountryCategories = (categories && countryCategory) ? categories.filter((category: any) => category.parent === parseInt(countryCategory)) : [];
 
   return (
-    <div className="filters-section">
-      <div className="filter-controls">
+    <div>
+      <div>
         {showCountryFilter && (
-          <Dropdown
+          <DropDownFilter
             options={displayCountryCategories.map((category: any) => ({
               key: category.id,
               value: category.id,
               text: category.name
             }))}
             placeholder={countryPlaceholder}
-            value={selectedCountry as string}
+            value={selectedCountry as number}
             onChange={(e, { value }) => {
-              setSelectedCountry(value as string);
+              setSelectedCountry(value as number);
               setCurrentPage(1);
             }}
           />
         )}
 
         {showDateFilter && (
-          <Dropdown
+          <DropDownFilter
             options={yearOptions}
             placeholder="Select Year"
-            value={selectedYear || ''}
+            value={selectedYear as number}
             onChange={(e, { value }) => {
               setSelectedYear(value as number);
               setCurrentPage(1);
@@ -175,7 +177,7 @@ const Filters = (props: FiltersProps) => {
         )}
 
         {showCategoryFilter && (
-          <Dropdown
+          <DropDownFilter
             options={displayCategories ? displayCategories.map((category: any) => ({
               key: category.id,
               value: category.id,
@@ -191,7 +193,7 @@ const Filters = (props: FiltersProps) => {
             searchable={false}
             showAllNone={false}
             closeOnSelect={true}
-            className="category-filter"
+
           />
         )}
 
@@ -222,8 +224,9 @@ const PostsWithFilters = (props: PostsWithFiltersProps) => {
 
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
-  const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
+  const [selectedCountry, setSelectedCountry] = useState<number | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [resetKey, setResetKey] = useState(0);
 
   const heightValue = toNumber(height);
   const showPaginationValue = toBoolean(showPagination);
@@ -237,6 +240,8 @@ const PostsWithFilters = (props: PostsWithFiltersProps) => {
     setSelectedCategory(null);
     setSelectedYear(null);
     setSelectedCountry(null);
+    setCurrentPage(1);
+    setResetKey(prev => prev + 1); // Force PostProvider to refetch
   };
 
 
@@ -262,9 +267,10 @@ const PostsWithFilters = (props: PostsWithFiltersProps) => {
     selectedCategoryIds = [];
   }
 
+  console.log(heightValue, 'heightValue');
 
   return (
-    <Container fluid style={{ height: '100%', minHeight: heightValue + 'px' }}>
+    <Container fluid className='container' style={{ height: heightValue + 'px', minHeight: heightValue + 'px' }}>
       {showFiltersValue && (
         <CategoriesProvider>
           <CategoriesContext.Consumer>
@@ -294,9 +300,10 @@ const PostsWithFilters = (props: PostsWithFiltersProps) => {
 
 
       <PostProvider
+        key={resetKey} // Add key to force remount when filters are reset
         perPage={postsPerPageValue || 10}
         store="posts-with-filters"
-        categories={selectedCountry || selectedCategory || selectedCategoryIds.join(',')}
+        categories={selectedCountry?.toString() || selectedCategory?.toString() || selectedCategoryIds.join(',')}
         after={yearRange?.startDate || null}
         before={yearRange?.endDate || null}
         page={currentPage}

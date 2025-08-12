@@ -1,15 +1,15 @@
 import React from "react";
-import { getTranslatedValue, measuresMap, typesMap, alphaSort, dateSort, numericSort } from "./Utils";
-
+import {getTranslatedValue, measuresMap, typesMap, alphaSort, dateSort, numericSort} from "./Utils";
 
 
 interface RowObject {
     type?: string;
+
     [key: string]: any;
 }
 
 const getOptionsNoDimension = (props) => {
-    const { data, measures, swap, dimensions, locale, customLabels } = props;
+    const {data, measures, swap, dimensions, locale, customLabels} = props;
     let options = {};
     const selectedDimensions = dimensions.filter((f) => f != "");
     const measuresMetadata = new Set();
