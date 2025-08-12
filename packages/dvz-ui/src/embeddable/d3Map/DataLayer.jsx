@@ -55,7 +55,11 @@ class DataLayer extends BaseLayer {
         //eslint-disable-next-line
         const joined = this.joinData(json, this.props.app, this.props.featureJoinAttribute, this.props.data, this.props.measures, this.props.patternDiscriminator)
         this.createDataLayer(joined)
+        if (this.props.onReady) {
+            //eslint-disable-next-line
 
+            this.props.onReady();
+        }
     }
 
 
@@ -69,9 +73,14 @@ class DataLayer extends BaseLayer {
             data,
             breaks,
             gradientScheme,
-            gradientReverse
+            gradientReverse,labelFontSize
 
         } = this.props
+
+        const k = this.props.transform ? this.props.transform.k : 1
+
+        super.resize()
+
         const brStyles = new BreaksStyles({
             breaks: breaks,
             defaultFillColor: markFillColor,
@@ -86,16 +95,18 @@ class DataLayer extends BaseLayer {
             gradientScheme: gradientScheme,
             gradientReverse: gradientReverse
         })
-        const k = this.props.transform ? this.props.transform.k : 1
 
         this.g.selectAll(".centroids .point").attr('r', d => {
             return brStyles.getSize(d.properties._value) * 1 / k
         })
 
-        this.g.selectAll(".centroids .point-label")
+        this.g.selectAll(".point-label")
             .attr("font-size", d => {
                 return (markerLabelSize * (1 / k)) + "px"
             })
+
+
+
 
 
         const patternWidth = 10 * 1 / k
@@ -200,15 +211,16 @@ class DataLayer extends BaseLayer {
 
         if (this.gRef && this.gRef.current) {
             //eslint-disable-next-line
-            debugger;
 
-            this.g = d3.select(this.gRef.current.parentNode)
+
+            this.g = d3.select(this.gRef.current)
 
             this.g.attr("class", "base-layer") //add unique name
             const filteredData = json.features.filter(f => f.properties._value != null)
 
             //call create path on base layer
             this.createPaths(json)
+
 
             if (!useCentroidPoint) {
                 this.createColors(filteredData)
@@ -293,7 +305,7 @@ class DataLayer extends BaseLayer {
         if (this.g) {
 
             //eslint-disable-next-line
-            debugger;
+
             this.g.selectAll("path")
                 .attr("fill", d => {
                     if (!d || !d.properties || !d.properties._value) {
@@ -519,9 +531,12 @@ class DataLayer extends BaseLayer {
         })
 
         const k = this.props.transform ? this.props.transform.k : 1
+
         const patternWidth = 10 * 1 / k
         const patternHeight = 10 * 1 / k
+
         let patternsData = []
+
         if (app == "csv" && patternDiscriminator != 'none') {
             patternsData = [...new Set(data.data.map(d => d[patternDiscriminator]))].map(key => {
                 return {
@@ -664,7 +679,7 @@ class DataLayer extends BaseLayer {
                 .select("svg").remove()
 
             //eslint-disable-next-line
-            debugger;
+
 
             const legendsSVG = d3.select(this.gRef.current.parentNode.parentNode)
                 .select(`.layer_${toGenericID(id)}`).append("svg")
@@ -836,15 +851,12 @@ class DataLayer extends BaseLayer {
 
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        const {app, file, featureJoinAttribute, data, measures, patternDiscriminator, editing} = this.props
+        const {app, file, featureJoinAttribute, data, measures, patternDiscriminator, editing,usePattern} = this.props
 
         //TODO:Check if data has changed using JSON.stringify
 
         if (editing || JSON.stringify(prevProps.data) !== JSON.stringify(data)) {
-            //eslint-disable-next-line
-            debugger
             this.create()
-
         }
 
         if (prevProps.visible != this.props.visible) {
@@ -897,7 +909,9 @@ class DataLayer extends BaseLayer {
         if (this.g) {
             this.resize()
         }
-
+        if (usePattern) {
+           // this.createPatterns(json)
+        }
     }
 
 
