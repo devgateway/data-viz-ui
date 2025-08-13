@@ -87,7 +87,16 @@ const MapWrapper = (props) => {
 
         setLayers(newLayers)
     }
+    const [readyToZoom, setReadyToZoom] = useState(false);
+    const readyLayersCount = useRef(0);
+    const totalLayers = layers.length;
+    const handleLayerReady = () => {
+        readyLayersCount.current += 1;
+        if (readyLayersCount.current === layers.length) {
 
+            setReadyToZoom(true);
+        }
+    }
 
     return (
         <div ref={ref} className={"d3map-container"}>
@@ -99,15 +108,23 @@ const MapWrapper = (props) => {
 
                 <Map rotationEnabled={parse(rotationEnabled, editing)}>
                     {layers.map((layer, i) => {
+
+
                         if (layer.type === 'base') {
-                            return <BaseLayer transform={transform} intl={intl} zoom={zoomRef} unique={unique}
-                                              key={i} {...layer} />
+                            return <BaseLayer
+                                minLabelZoomVisible={layer.minLabelZoomVisible}
+                                onReady={handleLayerReady}
+                                transform={transform} intl={intl} zoom={zoomRef} unique={unique}
+                                key={i} {...layer} />
                         }
                         if (layer.type === 'data') {
                             return <DataLayer
+                                minLabelZoomVisible={layer.minLabelZoomVisible}
                                 editing={editing}
                                 onLayerCreated={e => {
+
                                 }}
+                                onReady={handleLayerReady}
                                 transform={transform}
                                 intl={intl}
                                 group={group} zoom={zoomRef}
@@ -121,19 +138,24 @@ const MapWrapper = (props) => {
 
                         }
                         if (layer.type === 'flow') {
-                            return <FlowLayer transform={transform} intl={intl} group={group} zoom={zoomRef}
-                                              unique={unique}
-                                              key={i} {...layer}
-                                              waitForFilters={waitForFilters == "true" || waitForFilters == true}
+                            return <FlowLayer
+
+                                onReady={handleLayerReady}
+                                transform={transform} intl={intl} group={group} zoom={zoomRef}
+                                unique={unique}
+                                key={i} {...layer}
+                                waitForFilters={waitForFilters == "true" || waitForFilters == true}
                             />
                         }
                         if (layer.type === 'dataPoints') {
-                            return <LatLongLayer onZoomToPoint={zoomToPoint} selectedItem={selectedItem}
-                                                 transform={transform} intl={intl}
-                                                 group={group} zoom={zoomRef}
-                                                 unique={unique}
-                                                 key={i} {...layer}
-                                                 waitForFilters={waitForFilters == "true" || waitForFilters == true}
+                            return <LatLongLayer
+                                onReady={handleLayerReady}
+                                onZoomToPoint={zoomToPoint} selectedItem={selectedItem}
+                                transform={transform} intl={intl}
+                                group={group} zoom={zoomRef}
+                                unique={unique}
+                                key={i} {...layer}
+                                waitForFilters={waitForFilters == "true" || waitForFilters == true}
                             />
                         }
 
@@ -142,16 +164,18 @@ const MapWrapper = (props) => {
 
                 </Map>
 
-                <Legends selectedItem={selectedItem} d2Click={e => setSelectedItem(e)} patternsData={null} layers={layers} group={group}
+                <Legends selectedItem={selectedItem} d2Click={e => setSelectedItem(e)} patternsData={null}
+                         layers={layers} group={group}
                          onItemClick={toggleLayerView} toggleColorLayer={toggleColorLayer}></Legends>
 
 
                 <ZoomControl
-                        selectedPoint={selectedPoint}
-                        rootationEmabled={parse(rotationEnabled, editing)}
-                             zoomEnabled={parse(zoomEnabled, editing)} onZoomed={setTransform} width={width}
-                             height={height} ref={zoomRef} group={group} identifier={identifier}
-                             editing={editing}/>
+                    readyToZoom={readyToZoom}
+                    selectedPoint={selectedPoint}
+                    rootationEmabled={parse(rotationEnabled, editing)}
+                    zoomEnabled={parse(zoomEnabled, editing)} onZoomed={setTransform} width={width}
+                    height={height} ref={zoomRef} group={group} identifier={identifier}
+                    editing={editing}/>
 
             </ProjectedContainer>
 
