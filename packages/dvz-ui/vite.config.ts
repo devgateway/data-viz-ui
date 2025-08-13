@@ -37,7 +37,6 @@ export default defineConfig({
                 // Button: resolve(__dirname, 'src/components/ui/Button/index.tsx'),
                 // Card: resolve(__dirname, 'src/components/ui/Card/index.tsx'),
 
-
             },
             name: '@devgateway/dvz-ui'
 

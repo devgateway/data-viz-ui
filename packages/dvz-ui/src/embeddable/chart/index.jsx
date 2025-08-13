@@ -178,6 +178,8 @@ const Chart = (props) => {
     "data-preview-mode": previewMode = "Desktop",
     "data-wait-for-filters": waitForFilters = "false",
     "data-line-curve": lineCurve = "linear",
+    "data-show-legends-in-columns": showLegendsInColumns = "false",
+    "data-number-of-legend-columns": numberOfLegendColumns = 4,
     pageModuleProps
   } = props;
    const originalEditValue = editing;
@@ -664,7 +666,9 @@ const Chart = (props) => {
         mobileCustomization,
         dimension1,
         previewMode,
-        lineCurve
+        lineCurve,
+        showLegendsInColumns: showLegendsInColumns == true || showLegendsInColumns == "true",
+        numberOfLegendColumns: parseInt(numberOfLegendColumns) || 4,
     };
 
     const params = {};
