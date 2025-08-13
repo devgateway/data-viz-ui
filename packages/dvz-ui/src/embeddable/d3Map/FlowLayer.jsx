@@ -71,7 +71,7 @@ class DataLayer extends BaseLayer {
 
         }
         this.g = d3.select(this.gRef.current)
-        this.g.attr("class", "base-layer") //add unique name
+        this.g.attr("class", "base-layer zoomable") //add unique name
         if (this.props.transform) {
             this.g.attr("transform", this.props.transform)
         }
@@ -80,7 +80,7 @@ class DataLayer extends BaseLayer {
         this.g.selectAll(".end-point").remove()
         this.g.select("defs").selectAll("*").remove()
 
-        const k = this.props.transform ? this.props.transform.k : 1
+        const kLevel = this.props.transform ? this.props.transform.k : 1
         const originPoints = []
         //eslint-disable-next-line
 
@@ -238,7 +238,7 @@ class DataLayer extends BaseLayer {
                 .attr("cx", path.centroid(d1)[0])
                 .attr("cy", path.centroid(d1)[1])
                 .attr('r', () => {
-                    return markSizeScale * 1 / k
+                    return markSizeScale * 1 / kLevel
                 })
                 .on("mouseenter", d => {
 
@@ -319,8 +319,16 @@ class DataLayer extends BaseLayer {
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        const {projection} = this.props
-        this.create()
+        const {projection,editing,data} = this.props
+        if (editing || JSON.stringify(prevProps.data) !== JSON.stringify(data)) {
+            this.create()
+        }
+
+        if (prevProps.visible != this.props.visible) {
+            //eslint-disable-next-line
+            debugger
+            this.g.style("display", this.props.visible ? "" : "none")
+        }
     }
 
     componentDidMount() {
