@@ -1,6 +1,8 @@
 import React from 'react';
 import * as d3 from 'd3' // d3 plugin
 import Layer from "./Layer";
+import BreaksStyles from "@/embeddable/d3Map/BreaksStyles.js";
+import GradientColors from "@/embeddable/d3Map/GradientColors.js";
 
 class BaseLayer extends Layer {
 
@@ -30,7 +32,7 @@ class BaseLayer extends Layer {
                 .attr("fill", fillColor)
                 .attr("stroke", borderColor)
                 .attr("id", "state-borders")
-                .attr("class","borders")
+                .attr("class", "borders")
                 .attr("d", path)
                 .style("vector-effect", "non-scaling-stroke")
 
@@ -47,7 +49,8 @@ class BaseLayer extends Layer {
             labelFontSize,
             labelColor,
             projection,
-            initialPosition
+            initialPosition,
+            minLabelZoomVisible
         } = this.props
 
         if (this.gRef && this.gRef.current) {
@@ -63,15 +66,13 @@ class BaseLayer extends Layer {
                 .append("text")
                 .attr("class", "feature-label")
                 .attr("font-size", d => {
-                    return Math.max(0.5, labelFontSize / k) + "px"
+                    return Math.max(.5, labelFontSize / k) + "px";
                 })
                 .style("pointer-events", "none")
                 .text(function (d) {
                     return d.properties[labelField]
                 })
-                .attr("font-size", d => {
-                    return Math.max(0.5, labelFontSize / k) + "px"
-                })
+
                 .attr("color", labelColor)
                 .attr("fill", labelColor)
                 .attr("transform", function (d) {
@@ -84,19 +85,53 @@ class BaseLayer extends Layer {
                 })
                 .attr("text-anchor", "middle")
                 .attr("dominant-baseline", "middle")
-
+            if (k < minLabelZoomVisible){
+                console.log("remove layers")
+                this.g.selectAll(".feature-label").transition().style("display","none")
+            }else{
+                this.g.selectAll(".feature-label").style("display","")
+            }
 
         }
     }
 
 
-    createLayer(json) {
+    resize() {
+        const {
+            labelFontSize,
+            minLabelZoomVisible=-1
+
+        } = this.props
         //eslint-disable-next-line
+        debugger
+        const k = this.props.transform ? this.props.transform.k : 1
+        console.log("minLabelZoomVisible",minLabelZoomVisible,k)
+
+
+        if (k < minLabelZoomVisible){
+            console.log("remove layers")
+            this.g.selectAll(".feature-label").transition().style("display","none")
+        }else{
+            this.g.selectAll(".feature-label").style("display","")
+        }
+        this.g.selectAll(".feature-label").attr("font-size", d => {
+            return Math.max(.5, labelFontSize / k) + "px";
+        })
+
+
+    }
+
+    createLayer(json) {
+
 
         this.createPaths(json);
         this.createLabels(json);
 
-
+        if (this.props.onReady) {
+            //eslint-disable-next-line
+            debugger;
+            this.props.onReady();
+        }
     }
 
 
@@ -116,6 +151,9 @@ class BaseLayer extends Layer {
         if (prevProps.visible != this.props.visible) {
             this.g.style("display", this.props.visible ? "block" : "none")
 
+        }
+        if(this.g){
+            this.resize()
         }
 
     }

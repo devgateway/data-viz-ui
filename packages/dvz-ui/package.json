@@ -8,6 +8,7 @@
     "dev": "concurrently \"tsc --watch\" \"vite build --watch\"",
     "build": "rm -rf dist && vite build"
   },
+  "type": "module",
   "files": [
     "dist",
     "README.md"
@@ -111,6 +112,7 @@
     "prop-types": "^15.8.1",
     "react-compiler-runtime": "^19.0.0-beta-a7bf2bd-20241110",
     "rollup-plugin-preserve-directives": "^0.4.0",
+    "sass-embedded": "^1.90.0",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.32.1",
     "unbuild": "^3.5.0",
