@@ -1,5 +1,11 @@
 # @devgateway/dvz-ui-react
 
+## 1.2.0
+
+### Minor Changes
+
+- [#37](https://github.com/devgateway/data-viz-ui/pull/37) [`7e29fba`](https://github.com/devgateway/data-viz-ui/commit/7e29fba906db77d15e449090e250f9ebea2c0d32) Thanks [@sdimunzio](https://github.com/sdimunzio)! - Updates from alive
+
 ## 1.1.1
 
 ### Patch Changes
