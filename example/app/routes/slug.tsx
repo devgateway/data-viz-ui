@@ -1,19 +1,8 @@
-import React, { lazy} from "react";
+import React from "react";
 import type { Route } from "./+types/slug";
 import { getPages } from "@devgateway/wp-react-lib/api";
 import { getMetaSeo } from "~/utils/meta-seo";
-import Loading from "~/components/layout/Loading";
-import Header from "~/components/layout/Header";
-
-const SlugContainer = lazy(async () => {
-  const module = await import('@devgateway/dvz-ui-react/layout');
-  return { default: module.SlugContainer };
-});
-
-
-export function HydrateFallback() {
-  return <Loading />
-}
+import { SlugContainer } from "@devgateway/dvz-ui-react/layout";
 
 
 export async function clientLoader({ request, params}: Route.ClientLoaderArgs) {
@@ -48,7 +37,7 @@ export function meta({ data }: Route.MetaArgs): Route.MetaDescriptors {
 }
 
 const SlugRoute = ({ loaderData, params }: Route.ComponentProps) => {
-  return <SlugContainer header={<Header {...loaderData} locale={params.lan} />} />;
+  return <SlugContainer />;
 };
 
 export default SlugRoute;
