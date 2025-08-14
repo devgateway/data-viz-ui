@@ -5,13 +5,7 @@ import ResponsiveContainer from "@devgateway/dvz-ui-react/layout";
 import { useParams } from "react-router";
 import { getPages } from "@devgateway/wp-react-lib/api";
 import { getMetaSeo } from "../utils/meta-seo";
-import Loading from "~/components/layout/Loading";
 import { DEFAULT_LOCALE } from "~/utils/constants";
-import Header from "~/components/layout/Header";
-
-export function HydrateFallback() {
-  return <Loading />
-}
 
 
 export async function clientLoader({ request, params}: Route.ClientLoaderArgs) {
@@ -79,7 +73,7 @@ const Home = ({
       locale={locale}
       store={"home"}>
       <PageConsumer>
-        <ResponsiveContainer locale={locale} header={<Header {...loaderData} locale={params.lan} />}>
+        <ResponsiveContainer locale={locale}>
           <PageConsumer>
             <Page />
           </PageConsumer>
