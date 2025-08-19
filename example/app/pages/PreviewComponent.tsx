@@ -11,19 +11,17 @@ const PreviewComponentParameterParser = () => {
 
     const [UIComponent] = useState(() => getComponentByNameIgnoreCase(urlParams.name ?? ''));
 
-
     let [params, setParams] = useSearchParams();
     const readMessage = (event: MessageEvent) => {
+        console.log("-------------------------------reading message ----------------------------------------")
         const data = event.data
         if (data.messageType && data.messageType == 'component-attributes') {
-
-            const newParams = new URLSearchParams(params);
+            const newPrams = {...params}
             Object.keys(data).forEach(k => {
-                const key = "data-" + k.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
-                const value = typeof data[k] === 'object' ? JSON.stringify(data[k]) : data[k];
-                newParams.set(key, value);
-            });
-            setParams(newParams);
+                // @ts-ignore
+                newPrams["data-" + k.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()] = typeof data[k] == 'object' ? JSON.stringify(data[k]) : data[k]
+            })
+            setParams(newPrams)
         }
     };
 
@@ -63,4 +61,4 @@ const PreviewComponent = () => {
     )
 }
 
-export default PreviewComponent
+export default PreviewComponent;
