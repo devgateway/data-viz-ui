@@ -13,8 +13,6 @@ const PreviewComponentParameterParser = () => {
 
     let [params, setParams] = useSearchParams();
 
-    //eslint-disable-next-line
-    debugger;
     const readMessage = (event: MessageEvent) => {
         console.log("-------------------------------reading message ----------------------------------------")
         const data = event.data
