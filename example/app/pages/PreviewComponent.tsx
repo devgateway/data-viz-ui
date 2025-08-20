@@ -12,6 +12,7 @@ const PreviewComponentParameterParser = () => {
     const [UIComponent] = useState(() => getComponentByNameIgnoreCase(urlParams.name ?? ''));
 
     let [params, setParams] = useSearchParams();
+
     const readMessage = (event: MessageEvent) => {
         console.log("-------------------------------reading message ----------------------------------------")
         const data = event.data
@@ -38,11 +39,15 @@ const PreviewComponentParameterParser = () => {
             window.removeEventListener('message', readMessage);
         };
     }, []);
+
+
+    const paramProps = React.useMemo(() => Object.fromEntries(params.entries()), [params]);
+
     return (
         <div>
             <Container fluid={true} className={"editing"}>
                 {/* @ts-ignore */}
-                {UIComponent ? <UIComponent  {...params} editing={true} /> :
+                {UIComponent ? <UIComponent  {...paramProps} editing={true} /> :
                     <Segment.Group color={"red"} textAlign={"center"}><h1>Wrong Component Name</h1></Segment.Group>}
             </Container>
 
