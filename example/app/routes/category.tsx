@@ -1,6 +1,8 @@
 import React, { lazy } from "react";
 import { Category } from "@devgateway/wp-react-lib";
-import ResponsiveContainer from "@devgateway/dvz-ui-react/layout";
+import Loading from "~/components/layout/Loading";
+
+const ResponsiveContainer = lazy(() => import("@devgateway/dvz-ui-react/layout"));
 
 
 const CategoryRoute = ({ params }: any) => {

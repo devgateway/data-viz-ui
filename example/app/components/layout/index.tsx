@@ -38,7 +38,8 @@ const Layout = () => {
     const defaultLocale = DEFAULT_LOCALE;
     console.log("defaultLocale", defaultLocale);
     const locale = pathParams.lan;
-
+    const pathname = window.location.pathname;
+    console.log("pathParams", pathParams);
     useEffect(() => {
         if (process.env.NODE_ENV === "development") {
             console.log("----------.env-----------");
@@ -73,7 +74,11 @@ const Layout = () => {
 
 
     if (!locale) {
-        return <Navigate to={defaultLocale}></Navigate>
+        return <Navigate to={defaultLocale} replace></Navigate>
+    }
+
+    if (!Object.keys(messages).includes(locale)) {
+        return <Navigate to={`/${defaultLocale}${pathname}`} replace></Navigate>
     }
 
     return (
