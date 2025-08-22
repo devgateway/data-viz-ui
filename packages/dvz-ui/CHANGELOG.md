@@ -1,5 +1,13 @@
 # @devgateway/dvz-ui-react
 
+## 1.2.1
+
+### Patch Changes
+
+- [#43](https://github.com/devgateway/data-viz-ui/pull/43) [`e4c2cb8`](https://github.com/devgateway/data-viz-ui/commit/e4c2cb88e7d402634225e3779d1f993a769d17db) Thanks [@timothygachengo](https://github.com/timothygachengo)! - - Update wp-react-lib
+  - Move pure-react-carousel to the css imports
+  - Fix content links when parsing the HTML
+
 ## 1.2.0
 
 ### Minor Changes
