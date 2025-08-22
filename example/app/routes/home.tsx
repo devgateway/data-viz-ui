@@ -7,7 +7,6 @@ import { getPages } from "@devgateway/wp-react-lib/api";
 import { getMetaSeo } from "../utils/meta-seo";
 import { DEFAULT_LOCALE } from "~/utils/constants";
 
-
 export async function clientLoader({ request, params}: Route.ClientLoaderArgs) {
   const posts = await getPages({
     slug: "home",
