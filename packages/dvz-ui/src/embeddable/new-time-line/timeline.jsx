@@ -1,4 +1,3 @@
-import 'pure-react-carousel/dist/react-carousel.es.css';
 import React, {useEffect, useRef, useState} from "react";
 import * as d3 from 'd3'
 

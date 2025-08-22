@@ -29,7 +29,6 @@ ENV VITE_REACT_APP_WP_API_URL=${VITE_REACT_APP_WP_API_URL:-"http://0.0.0.0/wp-js
 ARG VITE_REACT_APP_WP_API
 ARG VITE_REACT_APP_DEFAULT_LOCALE
 ARG VITE_REACT_APP_USE_HASH_LINKS
-ARG VITE_REACT_APP_WP_HOSTS
 ARG VITE_REACT_APP_API_ROOT
 ARG VITE_REACT_APP_WP_SEARCH_END_POINT
 
@@ -39,7 +38,6 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
 #    VITE_REACT_APP_WP_STYLES=${VITE_REACT_APP_WP_STYLES:-"http://0.0.0.0/wp/wp-json"} \
 #    VITE_REACT_APP_DEFAULT_LOCALE=${VITE_REACT_APP_DEFAULT_LOCALE:-"en"} \
 #    VITE_REACT_APP_USE_HASH_LINKS=${VITE_REACT_APP_USE_HASH_LINKS:-"false"} \
-#    VITE_REACT_APP_WP_HOSTS=${VITE_REACT_APP_WP_HOSTS:-"0.0.0.0"} \
 #    VITE_REACT_APP_API_ROOT=${VITE_REACT_APP_API_ROOT:-"http://0.0.0.0"} \
 #    VITE_REACT_APP_WP_SEARCH_END_POINT=${VITE_REACT_APP_WP_SEARCH_END_POINT:-"/dg/v1/search"} \
 #    VITE_REACT_APP_WP_STYLES="http://localhost/wp/wp-admin/load-styles.php?c=1&dir=ltr&load%5Bchunk_0%5D=dashicons,admin-bar,buttons,media-views,editor-buttons,wp-components,wp-block-editor,wp-nux,wp-editor,wp-block-library,wp-block-&load%5Bchunk_1%5D=library-theme,wp-edit-blocks,wp-edit-post,wp-format-library,wp-block-directory,common,forms,admin-menu,dashboard,list-tables,edi&load%5Bchunk_2%5D=t,revisions,media,themes,about,nav-menus,wp-pointer,widgets,site-icon,l10n,wp-auth-check&ver=5.5.6"\

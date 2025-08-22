@@ -1,10 +1,13 @@
-import React from "react";
+import React, { lazy } from "react";
 import type { Route } from "./+types/slugPost";
-import { SlugPostContainer } from '@devgateway/dvz-ui-react/layout'
+
+const SlugPostContainer = lazy(async () => {
+  const module = await import('@devgateway/dvz-ui-react/layout');
+  return { default: module.SlugPostContainer };
+});
 
 
-
-const SlugPostRoute = ({ loaderData }: Route.ComponentProps) => {
+const SlugPostRoute = ({ params }: Route.ComponentProps) => {
   return <SlugPostContainer />
 };
 
