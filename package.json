@@ -10,7 +10,8 @@
   "scripts": {
     "build": "pnpm --filter @devgateway/* build",
     "build:example": "pnpm --filter example run build",
-    "version": "changeset version"
+    "version": "changeset version",
+    "dev": "pnpm --filter @devgateway/* dev"
   },
   "keywords": [],
   "author": "",
