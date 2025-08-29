@@ -1,5 +1,11 @@
 # @devgateway/dvz-ui-react
 
+## 1.3.0
+
+### Minor Changes
+
+- [`fe6d3e5`](https://github.com/devgateway/data-viz-ui/commit/fe6d3e59e9c3fade15b98d590e37637873ab0af2) Thanks [@sdimunzio](https://github.com/sdimunzio)! - Removing static image from big number with trend component
+
 ## 1.2.1
 
 ### Patch Changes
