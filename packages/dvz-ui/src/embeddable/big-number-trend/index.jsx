@@ -210,7 +210,7 @@ const DataFrame = (props) => {
         <div className="number-and-icon">
             <span className="number" style={numberStyle}>{formattedNumber}</span>
             {percentChange &&
-                <div className={percentChange > 0 ? "icon trend up" : "icon trend down"}/>
+                <div className={percentChange > 0 ? "icon trend arrow up" : "icon trend arrow down"}/>
             }
         </div>
         {showPercentageChange && percentChange &&
