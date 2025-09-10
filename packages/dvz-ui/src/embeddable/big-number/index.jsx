@@ -83,6 +83,7 @@ const Chart = (props) => {
 
     const dimensions = []   
     return (<div ref={ref}>
+        <h1>TEST</h1>
          <Container className={"chart container big-number-container"} style={{"height": height + 'px'}} fluid={true}>
              <h1>TEST</h1>
              <DataProvider
