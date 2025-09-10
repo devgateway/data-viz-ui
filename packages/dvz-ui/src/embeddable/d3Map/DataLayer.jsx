@@ -149,6 +149,8 @@ class DataLayer extends BaseLayer {
 
     getTooltipVariables(d) {
         const {apiJoinAttribute} = this.props
+        //eslint-disable-next-line
+
         if (d.properties._value) {
             const variables = {
                 ...d.properties, meta: {
@@ -861,7 +863,7 @@ class DataLayer extends BaseLayer {
 
         if (prevProps.visible != this.props.visible) {
             //eslint-disable-next-line
-            debugger
+
             this.g.style("display", this.props.visible ? "" : "none")
         }
 
@@ -890,7 +892,7 @@ class DataLayer extends BaseLayer {
 
             this.g.selectAll(".borders").style("fill", d => {
                 //eslint-disable-next-line
-                debugger
+
                 return this.props.colorLayerVisible ? null : this.props.fillColor
 
             })
