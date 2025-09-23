@@ -11,6 +11,7 @@ const devConfig = defineConfig({
 
     plugins: [
         reactRouter(),
+        // @ts-ignore
         tsconfigPaths(),
         Environment({
             prefix: "VITE_",
@@ -30,27 +31,27 @@ const devConfig = defineConfig({
     resolve: {
         alias: {
             // Fix: remove leading slash inside resolve() so paths are relative to project
-            "@devgateway/dvz-ui-react/dist/esm/common.css": resolve(__dirname, "../data-viz-ui/packages/dvz-ui/src/scss/common.scss"),
-            "@devgateway/dvz-ui-react/dist/esm/styles.css": resolve(__dirname, "../data-viz-ui/packages/dvz-ui/src/scss/themes/default/index.scss"),
+            "@devgateway/dvz-ui-react/dist/esm/common.css": resolve(__dirname, "../packages/dvz-ui/src/scss/common.scss"),
+            "@devgateway/dvz-ui-react/dist/esm/styles.css": resolve(__dirname, "../packages/dvz-ui/src/scss/themes/default/index.scss"),
             // Add aliases for ?url variants used in links()
-            "@devgateway/dvz-ui-react/dist/esm/common.css?url": resolve(__dirname, "../data-viz-ui/packages/dvz-ui/src/scss/common.scss") + "?url",
-            "@devgateway/dvz-ui-react/dist/esm/styles.css?url": resolve(__dirname, "../data-viz-ui/packages/dvz-ui/src/scss/themes/default/index.scss") + "?url",
+            "@devgateway/dvz-ui-react/dist/esm/common.css?url": resolve(__dirname, "../packages/dvz-ui/src/scss/common.scss") + "?url",
+            "@devgateway/dvz-ui-react/dist/esm/styles.css?url": resolve(__dirname, "../packages/dvz-ui/src/scss/themes/default/index.scss") + "?url",
             // Direct source imports for instant hot reloading
-            "@devgateway/dvz-ui-react": resolve(__dirname, "../data-viz-ui/packages/dvz-ui/src"),
-            "@devgateway/wp-react-lib": resolve(__dirname, "../data-viz-ui/packages/react-lib/wp-react-lib/src"),
+            "@devgateway/dvz-ui-react": resolve(__dirname, "../packages/dvz-ui/src"),
+            "@devgateway/wp-react-lib": resolve(__dirname, "../packages/react-lib/wp-react-lib/src"),
             // Handle subpath imports
-            "@devgateway/wp-react-lib/api": resolve(__dirname, "../data-viz-ui/packages/react-lib/wp-react-lib/src/api"),
-            "@devgateway/wp-react-lib/hooks": resolve(__dirname, "../data-viz-ui/packages/react-lib/wp-react-lib/src/hooks"),
+            "@devgateway/wp-react-lib/api": resolve(__dirname, "../packages/react-lib/wp-react-lib/src/api"),
+            "@devgateway/wp-react-lib/hooks": resolve(__dirname, "../packages/react-lib/wp-react-lib/src/hooks"),
             // Handle internal aliases within dvz-ui package
-            "@/conf": resolve(__dirname, "../data-viz-ui/packages/dvz-ui/src/conf"),
-            "@/embeddable": resolve(__dirname, "../data-viz-ui/packages/dvz-ui/src/embeddable"),
-            "@/layout": resolve(__dirname, "../data-viz-ui/packages/dvz-ui/src/layout"),
-            "@/utils": resolve(__dirname, "../data-viz-ui/packages/dvz-ui/src/utils"),
-            "@/lib": resolve(__dirname, "../data-viz-ui/packages/dvz-ui/src/lib"),
-            "@/redux": resolve(__dirname, "../data-viz-ui/packages/dvz-ui/src/redux"),
-            "@/translations": resolve(__dirname, "../data-viz-ui/packages/dvz-ui/src/translations"),
+            "@/conf": resolve(__dirname, "../packages/dvz-ui/src/conf"),
+            "@/embeddable": resolve(__dirname, "../packages/dvz-ui/src/embeddable"),
+            "@/layout": resolve(__dirname, "../packages/dvz-ui/src/layout"),
+            "@/utils": resolve(__dirname, "../packages/dvz-ui/src/utils"),
+            "@/lib": resolve(__dirname, "../packages/dvz-ui/src/lib"),
+            "@/redux": resolve(__dirname, "../packages/dvz-ui/src/redux"),
+            "@/translations": resolve(__dirname, "../packages/dvz-ui/src/translations"),
             "@/tracker": resolve(__dirname, "../data-viz-ui/packages/dvz-ui/src/tracker"),
-            "@/api": resolve(__dirname, "../data-viz-ui/packages/dvz-ui/src/api"),
+            "@/api": resolve(__dirname, "../packages/dvz-ui/src/api"),
         },
         // Avoid duplicate React instances between app and linked packages
         dedupe: ["react", "react-dom"],
@@ -69,8 +70,8 @@ const devConfig = defineConfig({
         force: true,
         // Ensure CSS files are properly processed
         entries: [
-            resolve(__dirname, "../data-viz-ui/packages/dvz-ui/src/**/*.css"),
-            resolve(__dirname, "../data-viz-ui/packages/dvz-ui/src/**/*.scss"),
+            resolve(__dirname, "../packages/dvz-ui/src/**/*.css"),
+            resolve(__dirname, "../packages/dvz-ui/src/**/*.scss"),
         ]
     },
     ssr: {
@@ -112,6 +113,7 @@ const prodConfig = defineConfig({
     plugins: [
         // reactRouterDevTools(),
         reactRouter(),
+        // @ts-ignore
         tsconfigPaths(),
         // nodePolyfills({
         //   include: ["querystring"]

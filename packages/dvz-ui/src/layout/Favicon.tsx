@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import { WP_API_URL } from "~/utils/constants";
+import { Config } from "@/conf";
 
 function Favicon() {
     const [siteLogo, setSiteLogo] = useState(null);
 
     if (!siteLogo) {
-        const siteUrl = WP_API_URL;
+        const siteUrl = Config.REACT_APP_WP_API;
         fetch(siteUrl)
             .then(response => response.json())
             .then(data => {
