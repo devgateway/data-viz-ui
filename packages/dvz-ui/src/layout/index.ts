@@ -5,3 +5,8 @@ export * from './Customizer';
 
 export default ResponsiveContainer;
 export { ScrollToTop };
+
+export { default as RootLayout } from './Layout';
+export { default as PreviewComponent } from './PreviewComponent';
+export { default as Favicon } from './Favicon';
+export { default as Loading } from './Loading';

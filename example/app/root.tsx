@@ -8,19 +8,23 @@ import {
 } from "react-router";
 import './embeddable';
 import type { Route } from "./+types/root";
-import 'semantic-ui-css/semantic.min.css';
-import "@devgateway/dvz-ui-react/dist/esm/common.css";
-import "@devgateway/dvz-ui-react/dist/esm/styles.css";
 
-// Custom styles
-import "./scss/index.scss";
+import { Loading, Favicon } from '@devgateway/dvz-ui-react/layout';
+// Replace ESM CSS imports with URL imports so we can control order via links()
+import semanticCssHref from "semantic-ui-css/semantic.min.css?url";
+import dvzCommonCssHref from "@devgateway/dvz-ui-react/dist/esm/common.css?url";
+import dvzStylesCssHref from "@devgateway/dvz-ui-react/dist/esm/styles.css?url";
+import appCssHref from "./scss/index.scss?url";
 
-import Loading from "./components/layout/Loading";
-import Favicon from "./components/layout/Favicon";
 
 
 export const links: Route.LinksFunction = () => [
-  { rel: "preconnect", href: "https://fonts.googleapis.com" },
+    { rel: "stylesheet", href: semanticCssHref },
+    { rel: "stylesheet", href: dvzCommonCssHref },
+    { rel: "stylesheet", href: dvzStylesCssHref },
+    // Ensure your app styles load last to override library defaults
+    { rel: "stylesheet", href: appCssHref },
+    { rel: "preconnect", href: "https://fonts.googleapis.com" },
   {
     rel: "preconnect",
     href: "https://fonts.gstatic.com",
@@ -28,8 +32,15 @@ export const links: Route.LinksFunction = () => [
   },
   {
     rel: "stylesheet",
+    href: import.meta.env.VITE_REACT_APP_WP_STYLES ??
+    "/wp/wp-admin/load-styles.php?c=1&dir=ltr&load%5Bchunk_0%5D=dashicons,admin-bar,buttons,media-views,editor-buttons,wp-components,wp-block-editor,wp-nux,wp-editor,wp-block-library,wp-block-&load%5Bchunk_1%5D=library-theme,wp-edit-blocks,wp-edit-post,wp-format-library,wp-block-directory,common,forms,admin-menu,dashboard,list-tables,edi&load%5Bchunk_2%5D=t,revisions,media,themes,about,nav-menus,wp-pointer,widgets,site-icon,l10n,wp-auth-check&ver=5.5.6' id='wp-block-library-css"
+  },
+  {
+    rel: "stylesheet",
     href: "https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap",
   },
+  // Keep third‑party CSS in explicit order
+
 ];
 
 export function HydrateFallback() {
@@ -43,7 +54,6 @@ export function Layout({ children }: Readonly<{ children: React.ReactNode}>) {
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="stylesheet" media="all" href={import.meta.env.VITE_REACT_APP_WP_STYLES} />
         <Meta />
         <Links />
         <Favicon />
@@ -59,7 +69,7 @@ export function Layout({ children }: Readonly<{ children: React.ReactNode}>) {
 
 export default function App() {
   if (typeof window === 'undefined') {
-    return <Loading />
+   return <Loading />
   }
 
   return (

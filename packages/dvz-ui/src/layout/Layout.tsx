@@ -1,25 +1,23 @@
 import React, { useEffect } from 'react'
-import { Navigate, Outlet, useParams } from 'react-router';
+import { Navigate, Outlet, useLocation, useParams } from 'react-router';
 import {
-    store,
-    updateIntl,
-    englishTranslations,
-    frenchTranslations,
-    afrikaansTranslations,
     getComponentByNameIgnoreCase
-} from '@devgateway/dvz-ui-react';
+} from '@/embeddable';
 import { injectIntl, IntlProvider } from 'react-intl';
 import { AppContextProvider, SettingProvider, SettingsConsumer } from '@devgateway/wp-react-lib';
 import { Provider } from 'react-redux';
-import { CustomizerWrapper } from '@devgateway/dvz-ui-react/layout';
-import { DEFAULT_LOCALE } from '~/utils/constants';
+import { CustomizerWrapper } from '@/layout';
+import { Config } from '@/conf';
+import { englishTranslations, frenchTranslations, afrikaansTranslations } from '@/translations';
+import { updateIntl } from '@/lib';
+import { store } from '@/redux';
 
 type Locale = 'en' | 'fr' | 'am';
 
 const messages: Record<Locale, any> = {
-    'en': englishTranslations.default,
-    'fr': frenchTranslations.default,
-    'am': afrikaansTranslations.default
+    'en': englishTranslations,
+    'fr': frenchTranslations,
+    'am': afrikaansTranslations
 };
 
 const InjectTitle = injectIntl((props) => {
@@ -33,12 +31,13 @@ interface LayoutProps {
     children: React.DetailedReactHTMLElement<any, HTMLElement>;
 }
 
-const Layout = () => {
+const RootLayout = () => {
     const pathParams = useParams();
-    const defaultLocale = DEFAULT_LOCALE;
+    const location = useLocation();
+    const defaultLocale = Config.DEFAULT_LOCALE;
     console.log("defaultLocale", defaultLocale);
     const locale = pathParams.lan;
-    const pathname = window.location.pathname;
+    const pathname = location.pathname;
     console.log("pathParams", pathParams);
     useEffect(() => {
         if (process.env.NODE_ENV === "development") {
@@ -99,4 +98,4 @@ const Layout = () => {
     );
 }
 
-export default Layout;
+export default RootLayout;
