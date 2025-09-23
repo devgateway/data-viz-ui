@@ -3,8 +3,13 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "pnpm run typecheck && react-router build",
-    "dev": "react-router dev",
+    "copy-dev-files": "cp tsconfig.dev.json tsconfig.json ",
+    "copy-prod-files": "cp tsconfig.prod.json tsconfig.json ",
+    "copy-example-files": "cp tsconfig.example.json tsconfig.json ",
+    "build": "rm -rf build  &&  pnpm run copy-prod-files   && pnpm run typecheck && react-router build",
+    "dev": "NODE_ENV=development && pnpm run copy-dev-files &&  react-router dev",
+    "dev:example": "NODE_ENV=development && pnpm run copy-example-files &&  react-router dev --config vite.config.example.ts",
+    "build:example": "NODE_ENV=production && pnpm run copy-example-files &&  react-router build --config vite.config.example.ts",
     "start": "PORT=4173 react-router-serve ./build/server/index.js",
     "serve": "vite preview",
     "typecheck": "react-router typegen && tsc"
@@ -35,6 +40,7 @@
     "vite": "^6.3.5",
     "vite-plugin-commonjs": "^0.10.4",
     "vite-plugin-env-compatible": "^2.0.1",
+    "vite-plugin-lib-inject-css": "^2.2.2",
     "vite-plugin-node-polyfills": "^0.23.0",
     "vite-tsconfig-paths": "^5.1.4"
   },
