@@ -34,10 +34,7 @@ class ZoomControl extends React.Component {
         const selection = this.getSelection();
         this._fullView(false)
         if (zoomEnabled) {
-
-            if (!this.props.editing) {
-
-                selection.on("dblclick.zoom", null);
+                 selection.on("dblclick.zoom", null);
                 selection.on("dblclick", (event) => {
                     event.preventDefault();
 
@@ -52,9 +49,7 @@ class ZoomControl extends React.Component {
                     selection.transition().duration(250).call(this.zoom.scaleBy, direction);
                 });
                 selection.call(this.zoom);
-            } else {
 
-            }
         }
         this.fullView();
 
