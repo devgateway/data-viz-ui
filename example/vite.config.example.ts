@@ -50,7 +50,7 @@ const devConfig = defineConfig({
             "@/lib": resolve(__dirname, "../packages/dvz-ui/src/lib"),
             "@/redux": resolve(__dirname, "../packages/dvz-ui/src/redux"),
             "@/translations": resolve(__dirname, "../packages/dvz-ui/src/translations"),
-            "@/tracker": resolve(__dirname, "../data-viz-ui/packages/dvz-ui/src/tracker"),
+            "@/tracker": resolve(__dirname, "../packages/dvz-ui/src/tracker"),
             "@/api": resolve(__dirname, "../packages/dvz-ui/src/api"),
         },
         // Avoid duplicate React instances between app and linked packages
