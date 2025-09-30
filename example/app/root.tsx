@@ -17,7 +17,6 @@ import dvzStylesCssHref from "@devgateway/dvz-ui-react/dist/esm/styles.css?url";
 import appCssHref from "./scss/index.scss?url";
 
 
-
 export const links: Route.LinksFunction = () => [
     { rel: "stylesheet", href: semanticCssHref },
     { rel: "stylesheet", href: dvzCommonCssHref },
@@ -68,10 +67,6 @@ export function Layout({ children }: Readonly<{ children: React.ReactNode}>) {
 }
 
 export default function App() {
-  if (typeof window === 'undefined') {
-   return <Loading />
-  }
-
   return (
     <Outlet/>
   );

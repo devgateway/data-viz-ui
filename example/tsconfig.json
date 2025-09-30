@@ -4,8 +4,8 @@
       "**/.server/**/*",
       "**/.client/**/*",
       ".react-router/types/**/*",
-      "../packages/dvz-ui/src/**/*",
-      "../packages/react-lib/wp-react-lib/src/**/*"
+      "../data-viz-ui/packages/dvz-ui/src/**/*",
+      "../data-viz-ui/packages/react-lib/wp-react-lib/src/**/*"
     ],
     "compilerOptions": {
       "lib": ["DOM", "DOM.Iterable", "ES2022"],
@@ -18,22 +18,22 @@
       "baseUrl": ".",
       "paths": {
         "~/*": ["./app/*"],
-        "@devgateway/dvz-ui-react": ["../packages/dvz-ui/src"],
-        "@devgateway/dvz-ui-react/*": ["../packages/dvz-ui/src/*"],
-        "@devgateway/wp-react-lib": ["../packages/react-lib/wp-react-lib/src"],
-        "@devgateway/wp-react-lib/*": ["../packages/react-lib/wp-react-lib/src/*"],
-        "@devgateway/wp-react-lib/api": ["../packages/react-lib/wp-react-lib/src/api"],
-        "@devgateway/wp-react-lib/hooks": ["../packages/react-lib/wp-react-lib/src/hooks"],
+        "@devgateway/dvz-ui-react": ["../data-viz-ui/packages/dvz-ui/src"],
+        "@devgateway/dvz-ui-react/*": ["../data-viz-ui/packages/dvz-ui/src/*"],
+        "@devgateway/wp-react-lib": ["../data-viz-ui/packages/react-lib/wp-react-lib/src"],
+        "@devgateway/wp-react-lib/*": ["../data-viz-ui/packages/react-lib/wp-react-lib/src/*"],
+        "@devgateway/wp-react-lib/api": ["../data-viz-ui/packages/react-lib/wp-react-lib/src/api"],
+        "@devgateway/wp-react-lib/hooks": ["../data-viz-ui/packages/react-lib/wp-react-lib/src/hooks"],
         // Handle internal aliases within dvz-ui package
-        "@/conf": ["../packages/dvz-ui/src/conf"],
-        "@/embeddable": ["../packages/dvz-ui/src/embeddable"],
-        "@/layout": ["../packages/dvz-ui/src/layout"],
-        "@/utils": ["../packages/dvz-ui/src/utils"],
-        "@/lib": ["../packages/dvz-ui/src/lib"],
-        "@/redux": ["../packages/dvz-ui/src/redux"],
-        "@/translations": ["../packages/dvz-ui/src/translations"],
-        "@/tracker": ["../packages/dvz-ui/src/tracker"],
-        "@/api": ["../packages/dvz-ui/src/api"]
+        "@/conf": ["../data-viz-ui/packages/dvz-ui/src/conf"],
+        "@/embeddable": ["../data-viz-ui/packages/dvz-ui/src/embeddable"],
+        "@/layout": ["../data-viz-ui/packages/dvz-ui/src/layout"],
+        "@/utils": ["../data-viz-ui/packages/dvz-ui/src/utils"],
+        "@/lib": ["../data-viz-ui/packages/dvz-ui/src/lib"],
+        "@/redux": ["../data-viz-ui/packages/dvz-ui/src/redux"],
+        "@/translations": ["../data-viz-ui/packages/dvz-ui/src/translations"],
+        "@/tracker": ["../data-viz-ui/packages/dvz-ui/src/tracker"],
+        "@/api": ["../data-viz-ui/packages/dvz-ui/src/api"]
       },
       "esModuleInterop": true,
       "verbatimModuleSyntax": true,
