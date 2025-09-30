@@ -4,31 +4,38 @@ import ResponsiveContainer from '../ResponsiveContainer';
 import {
     PostProvider,
     PostConsumer,
-    Post
+    Post,
+    PostType
 } from "@devgateway/wp-react-lib"
 
 interface SlugPostContainerProps {
     header?: React.ReactNode;
     footer?: React.ReactNode;
+    posts?: PostType;
 }
 
-const SlugPostContainer = ({ header, footer }: SlugPostContainerProps) => {
+const SlugPostContainer = ({ header, footer, posts }: SlugPostContainerProps = {}) => {
     const { lan: locale, slug } = useParams();
-    return (
-        <PostProvider
-            slug={slug}
-            store={slug}
-            locale={locale}
-        >
-            <ResponsiveContainer header={header} footer={footer}>
 
-                <PostConsumer>
-                    <Post />
-                </PostConsumer>
+    if (posts) {
+        return (
+            <Post posts={posts} />
+        )
+    }
 
-            </ResponsiveContainer>
-        </PostProvider>
-    )
+    <PostProvider
+        slug={slug}
+        store={slug}
+        locale={locale}
+    >
+        <ResponsiveContainer header={header} footer={footer}>
+
+            <PostConsumer>
+                <Post />
+            </PostConsumer>
+
+        </ResponsiveContainer>
+    </PostProvider>
 }
 
 export default SlugPostContainer
