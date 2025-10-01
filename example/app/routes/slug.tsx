@@ -3,6 +3,7 @@ import type { Route } from "./+types/slug";
 import { getPages } from "@devgateway/wp-react-lib/api";
 import { getMetaSeo } from "~/utils/meta-seo";
 import { SlugContainer } from '@devgateway/dvz-ui-react/layout'
+import Header from "~/embeddable/Header";
 
 export async function loader({ request, params}: Route.LoaderArgs) {
   const posts = await getPages({
@@ -35,12 +36,12 @@ export function meta({ data }: Route.MetaArgs): Route.MetaDescriptors {
   return getMetaSeo(post, yoastHead);
 }
 
-const SlugRoute = ({ loaderData }: Route.ComponentProps) => {
+const SlugRoute = ({ loaderData, params }: Route.ComponentProps) => {
   if (!loaderData.post) {
     return <div>Page not found</div>;
   }
 
-  return <SlugContainer pages={loaderData.post} />;
+  return <SlugContainer pages={loaderData.post} header={<Header {...loaderData}  locale={params.lan}/>}  />;
 };
 
 export default SlugRoute;
