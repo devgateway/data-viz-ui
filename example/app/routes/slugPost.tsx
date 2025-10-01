@@ -1,5 +1,6 @@
 import React, { lazy } from "react";
 import type { Route } from "./+types/slugPost";
+import Header from "~/embeddable/Header";
 
 const SlugPostContainer = lazy(async () => {
   const module = await import('@devgateway/dvz-ui-react/layout');
@@ -8,7 +9,7 @@ const SlugPostContainer = lazy(async () => {
 
 
 const SlugPostRoute = ({ params }: Route.ComponentProps) => {
-  return <SlugPostContainer/>
+  return <SlugPostContainer header={<Header locale={params.lan} />} />
 };
 
 export default SlugPostRoute;
