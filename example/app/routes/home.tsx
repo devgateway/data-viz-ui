@@ -1,6 +1,6 @@
 import React from "react";
 import type { Route } from "./+types/home";
-import { PageConsumer, PageProvider, Page } from '@devgateway/wp-react-lib';
+import { Page } from '@devgateway/wp-react-lib';
 import ResponsiveContainer from "@devgateway/dvz-ui-react/layout";
 import { useParams } from "react-router";
 import { getPages } from "@devgateway/wp-react-lib/api";

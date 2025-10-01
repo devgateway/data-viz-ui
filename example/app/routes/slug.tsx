@@ -35,9 +35,12 @@ export function meta({ data }: Route.MetaArgs): Route.MetaDescriptors {
   return getMetaSeo(post, yoastHead);
 }
 
-const SlugRoute = ({ loaderData, params }: Route.ComponentProps) => {
-  // @ts-ignore
-  return <SlugContainer pages={[loaderData.post]} />;
+const SlugRoute = ({ loaderData }: Route.ComponentProps) => {
+  if (!loaderData.post) {
+    return <div>Page not found</div>;
+  }
+
+  return <SlugContainer pages={loaderData.post} />;
 };
 
 export default SlugRoute;
