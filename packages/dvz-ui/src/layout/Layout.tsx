@@ -86,9 +86,7 @@ const RootLayout = () => {
                 <AppContextProvider getComponent={getComponentByNameIgnoreCase} store={store} locale={locale}>
                     <SettingProvider locale={locale} changeUUID={null}>
                         <SettingsConsumer>
-                            <CustomizerWrapper>
-                                <InjectTitle />
-                            </CustomizerWrapper>
+                            <CustomizerWrapper/>
                             <Outlet />
                         </SettingsConsumer>
                     </SettingProvider>
