@@ -10,7 +10,7 @@ import {
 } from "react-router";
 import './embeddable';
 import type { Route } from "./+types/root";
-
+import React from "react";
 import { Loading, SSRFavicon } from '@devgateway/dvz-ui-react/layout';
 // Replace ESM CSS imports with URL imports so we can control order via links()
 import semanticCssHref from "semantic-ui-css/semantic.min.css?url";
@@ -62,9 +62,9 @@ export async function loader(): Promise<{ faviconUrl: string | null }> {
   }
 }
 
-export function HydrateFallback() {
-  return <Loading />
-}
+// export function HydrateFallback() {
+//   return <Loading />
+// }
 
 
 export function Layout({ children }: Readonly<{ children: React.ReactNode}>) {
@@ -83,7 +83,6 @@ export function Layout({ children }: Readonly<{ children: React.ReactNode}>) {
         <SSRFavicon siteLogo={data?.faviconUrl ?? ""} />
       </head>
       <body>
-        {isNavigating && <Loading />}
         {children}
         <ScrollRestoration />
         <Scripts />
