@@ -8,7 +8,7 @@ const SlugPostContainer = lazy(async () => {
 
 
 const SlugPostRoute = ({ params }: Route.ComponentProps) => {
-  return <SlugPostContainer />
+  return <SlugPostContainer/>
 };
 
 export default SlugPostRoute;

@@ -5,17 +5,18 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLoaderData,
+  useNavigation
 } from "react-router";
 import './embeddable';
 import type { Route } from "./+types/root";
 
-import { Loading, Favicon } from '@devgateway/dvz-ui-react/layout';
+import { Loading, SSRFavicon } from '@devgateway/dvz-ui-react/layout';
 // Replace ESM CSS imports with URL imports so we can control order via links()
 import semanticCssHref from "semantic-ui-css/semantic.min.css?url";
 import dvzCommonCssHref from "@devgateway/dvz-ui-react/dist/esm/common.css?url";
 import dvzStylesCssHref from "@devgateway/dvz-ui-react/dist/esm/styles.css?url";
 import appCssHref from "./scss/index.scss?url";
-
 
 
 export const links: Route.LinksFunction = () => [
@@ -43,12 +44,35 @@ export const links: Route.LinksFunction = () => [
 
 ];
 
+export async function loader(): Promise<{ faviconUrl: string | null }> {
+  const siteUrl = import.meta.env.VITE_REACT_APP_WP_API || "/wp/wp-json";
+
+  try {
+    const response = await fetch(siteUrl);
+    const data = await response.json();
+
+    return {
+      faviconUrl: data?.site_icon_url || null,
+    };
+  } catch (error) {
+    console.error('Failed to fetch favicon:', error);
+    return {
+      faviconUrl: null,
+    };
+  }
+}
+
 export function HydrateFallback() {
   return <Loading />
 }
 
 
 export function Layout({ children }: Readonly<{ children: React.ReactNode}>) {
+  const data = useLoaderData<typeof loader>();
+
+  const navigation = useNavigation();
+  const isNavigating = Boolean(navigation.location);
+
   return (
     <html lang="en">
       <head>
@@ -56,9 +80,10 @@ export function Layout({ children }: Readonly<{ children: React.ReactNode}>) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Meta />
         <Links />
-        <Favicon />
+        <SSRFavicon siteLogo={data?.faviconUrl ?? ""} />
       </head>
       <body>
+        {isNavigating && <Loading />}
         {children}
         <ScrollRestoration />
         <Scripts />
@@ -68,10 +93,6 @@ export function Layout({ children }: Readonly<{ children: React.ReactNode}>) {
 }
 
 export default function App() {
-  if (typeof window === 'undefined') {
-   return <Loading />
-  }
-
   return (
     <Outlet/>
   );

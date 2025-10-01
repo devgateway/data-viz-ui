@@ -38,7 +38,7 @@ const RootLayout = () => {
     console.log("defaultLocale", defaultLocale);
     const locale = pathParams.lan;
     const pathname = location.pathname;
-    console.log("pathParams", pathParams);
+    console.log("pathParams", JSON.stringify(pathParams.lan));
     useEffect(() => {
         if (process.env.NODE_ENV === "development") {
             console.log("----------.env-----------");
