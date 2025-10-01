@@ -86,7 +86,7 @@ const devConfig = defineConfig({
                 // This app's root (required, otherwise Vite may block /app/* files)
                 resolve(__dirname),
                 resolve(__dirname, "data-viz-wordpress"),
-
+                resolve(__dirname, "../"),
             ],
         },
         watch: {

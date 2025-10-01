@@ -1,18 +1,10 @@
-import React, { lazy} from "react";
+import React from "react";
 import type { Route } from "./+types/slug";
 import { getPages } from "@devgateway/wp-react-lib/api";
 import { getMetaSeo } from "~/utils/meta-seo";
 import { SlugContainer } from '@devgateway/dvz-ui-react/layout'
 
-
-
-
-// export function HydrateFallback() {
-//   return <Loading />
-// }
-
-
-export async function clientLoader({ request, params}: Route.ClientLoaderArgs) {
+export async function loader({ request, params}: Route.LoaderArgs) {
   const posts = await getPages({
     slug: params.slug ?? "home",
     locale: params.lan,
@@ -43,8 +35,12 @@ export function meta({ data }: Route.MetaArgs): Route.MetaDescriptors {
   return getMetaSeo(post, yoastHead);
 }
 
-const SlugRoute = ({ loaderData, params }: Route.ComponentProps) => {
-  return <SlugContainer />;
+const SlugRoute = ({ loaderData }: Route.ComponentProps) => {
+  if (!loaderData.post) {
+    return <div>Page not found</div>;
+  }
+
+  return <SlugContainer pages={loaderData.post} />;
 };
 
 export default SlugRoute;
