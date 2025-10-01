@@ -21,7 +21,7 @@ const SlugContainer = ({ header, footer, pages }: SlugContainerProps = {}) => {
     if (pages) {
         return (
             <ResponsiveContainer header={header} footer={footer}>
-                <Page pages={pages} />
+                <Page pages={typeof pages === 'object' ? [pages] : pages} />
             </ResponsiveContainer>
         )
     }
