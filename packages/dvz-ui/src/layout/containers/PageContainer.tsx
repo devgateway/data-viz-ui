@@ -17,7 +17,7 @@ const PageContainer = ({header, footer, page}: SlugContainerProps) => {
     const {lan: locale, slug} = useParams();
 
     //eslint-disable-next-line
-    debugger;
+
     return (
 
         <ResponsiveContainer header={header} footer={footer}>
