@@ -4,6 +4,8 @@ import embeddable from './reducers/embeddable'
 import { injectIntl } from "react-intl";
 import * as Immutable from 'immutable';
 
+import ParseUtils from "@/embeddable/utils/parseUtils";
+
 // components
 const PageGallery = lazy(() => import("./pagegallery"));
 const Download = lazy(() => import("./download"));
@@ -41,6 +43,7 @@ const SupersetDashboard = lazy(() => import("./superset-dashboard"));
 const BigNumber = lazy(() => import("./big-number"));
 const BigNumberTrend = lazy(() => import("./big-number-trend"));
 const PostsWithFilters = lazy(() => import("./posts-with-filters"));
+
 
 
 export const components = {
@@ -128,5 +131,6 @@ export const getComponentByNameIgnoreCase = (name: string) => {
 
     return null
 }
+
 
 export const reducers =  { data, embeddable, ...customizer.getReducers() };
