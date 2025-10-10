@@ -1,5 +1,33 @@
 # @devgateway/dvz-ui-react
 
+## 1.3.2
+
+### Patch Changes
+
+- [#58](https://github.com/devgateway/data-viz-ui/pull/58) [`b5c0a01`](https://github.com/devgateway/data-viz-ui/commit/b5c0a01bdc9ec18a1afd16c47fbb59a86d7689d1) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Upgrade dependencies to fix CVEs
+
+## 1.3.1
+
+### Patch Changes
+
+- [#49](https://github.com/devgateway/data-viz-ui/pull/49) [`528d75f`](https://github.com/devgateway/data-viz-ui/commit/528d75f46ac8735f4621f6128fb59d4381285532) Thanks [@timothygachengo](https://github.com/timothygachengo)! - #### Feature
+
+  - Move the following components into the core
+
+  1. Favicon
+  2. RootLayout component
+  3. Loading Component
+  4. Preview Component Parser
+
+  #### Chores
+
+  - update some dependenices
+
+  #### Internal Improvements
+
+  - Create testing and prod environment for data-viz-ui
+  - Add dockerfiles for each deployment
+
 ## 1.3.0
 
 ### Minor Changes

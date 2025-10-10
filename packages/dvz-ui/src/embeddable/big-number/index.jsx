@@ -29,8 +29,8 @@ const Chart = (props) => {
         'data-label': label = '',
         "data-wait-for-filters": waitForFilters = "false",
         "data-no-data-text": noDataText = "-",
-    } = props   
- 
+    } = props
+
     const locale = intl.locale
     const ref = useRef(null);
     const decode = (value) => {
@@ -81,7 +81,7 @@ const Chart = (props) => {
         params.dvzProxyDatasetId = dvzProxyDatasetId;
       }
 
-    const dimensions = []   
+    const dimensions = []
     return (<div ref={ref}>
 
          <Container className={"chart container big-number-container"} style={{"height": height + 'px'}} fluid={true}>
@@ -93,10 +93,10 @@ const Chart = (props) => {
                 csv={csv}
                 editing={editing}
                 waitForFilters={waitForFilters === "true"}
-                store={[app, unique, ...dimensions]} source={dimensions.join("/")}>               
+                store={[app, unique, ...dimensions]} source={dimensions.join("/")}>
                     <DataConsumer>
                         <DataFrame
-                          locale={locale}                          
+                          locale={locale}
                           intl={intl}
                           app={app}
                           format={numberFormat}
@@ -109,8 +109,8 @@ const Chart = (props) => {
                             noDataText={noDataText}
                           >
                        </DataFrame>
-                    </DataConsumer>                
-            </DataProvider>           
+                    </DataConsumer>
+            </DataProvider>
 
         </Container>
     </div>)
