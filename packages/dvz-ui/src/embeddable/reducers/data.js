@@ -18,6 +18,8 @@ const SET_INITIAL_FILTER = 'SET_INITIAL_FILTER'
 const SET_APPLY = 'SET_APPLY'
 
 const CLEAN_FILTER = 'CLEAN_FILTER'
+const UNSET_FILTER = 'UNSET_FILTER'
+
 const initialState = Immutable.Map({mode: 'info'})
 
 const SET_MEASURES = 'SET_MEASURES'
@@ -43,9 +45,16 @@ export const setFilter = ({app, group, param, value, autoApply}) => (dispatch, g
     dispatch({type: SET_FILTER, app, group, param, value, autoApply})
 }
 export const cleanFilter = ({app, group}) => (dispatch, getState) => {
-
+    debugger;
     dispatch({type: CLEAN_FILTER, app, group})
     //dispatch({type: CLEAN_MEASURES, app, group})
+}
+
+
+export const unsetFilter = ({app, group,param}) => (dispatch, getState) => {
+    debugger;
+    dispatch({type: UNSET_FILTER, app, group, param})
+
 }
 
 export const applyFilter = ({app, group}) => (dispatch, getState) => {
@@ -232,6 +241,7 @@ export default (state = initialState, action) => {
         case SET_FILTER: {
             const now = Date.now();
             const {app, group, param, value, autoApply} = action
+            debugger;
             return state.setIn(['filters-settings', app, group, "autoApply"], autoApply)
                 .setIn(['filters', app, group, param], value.length === 0 ? [Number.MIN_SAFE_INTEGER] : value)
                 .setIn(['filters-settings', app, group, "apply"], null)
@@ -241,13 +251,19 @@ export default (state = initialState, action) => {
         case SET_INITIAL_FILTER: {
             const now = Date.now();
             const {app, group, param, value} = action
-            //eslint-disable-next-line
 
-            console.log(param)
             return state.setIn(['filters', 'initial', app, group, param], value.length === 0 ? [Number.MIN_SAFE_INTEGER] : value)
                 .setIn(['filters', app, group, param], value.length === 0 ? [Number.MIN_SAFE_INTEGER] : value)
                 .setIn(['filters-settings', app, group, 'lastInitialFilterChange'], now);
         }
+
+        case UNSET_FILTER: {
+            const now = Date.now();
+            const {app, group, param} = action
+            return state.deleteIn(['filters', app, group, param])
+                .setIn(['filters-settings', app, group, 'lastUserFilterChange'], now);
+        }
+
 
         case CLEAN_FILTER: {
             const {app, group} = action
