@@ -1,5 +1,11 @@
 # @devgateway/dvz-ui-react
 
+## 1.3.2
+
+### Patch Changes
+
+- [#58](https://github.com/devgateway/data-viz-ui/pull/58) [`b5c0a01`](https://github.com/devgateway/data-viz-ui/commit/b5c0a01bdc9ec18a1afd16c47fbb59a86d7689d1) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Upgrade dependencies to fix CVEs
+
 ## 1.3.1
 
 ### Patch Changes
