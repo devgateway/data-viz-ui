@@ -1,8 +1,8 @@
 import React, { useState, useEffect,useMemo } from 'react';
 import { useLocation, useParams, useSearchParams } from 'react-router';
-import { getComponentByNameIgnoreCase } from '@devgateway/dvz-ui-react';
 import { Container, Segment } from 'semantic-ui-react';
 import { SettingsConsumer } from '@devgateway/wp-react-lib';
+import { getComponentByNameIgnoreCase } from '@/embeddable';
 
 
 const PreviewComponentParameterParser = () => {

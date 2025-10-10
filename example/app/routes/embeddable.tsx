@@ -1,7 +1,6 @@
 import React, { lazy } from 'react';
 import type { Route } from './+types/embeddable';
-
-const PreviewComponent = lazy(() => import("~/pages/PreviewComponent"));
+import { PreviewComponent } from '@devgateway/dvz-ui-react/layout';
 
 export function meta({ }: Route.MetaArgs) {
     return [
