@@ -10,21 +10,14 @@ const LOAD_CATEGORIES_DONE = 'LOAD_CATEGORIES_DONE'
 const LOAD_CATEGORIES_ERROR = 'LOAD_CATEGORIES_ERROR'
 const SET_PAGE_MODULE_PROPS = 'SET_PAGE_MODULE_PROPS'
 const LOAD_PAGE_MODULE_PROPS = 'LOAD_PAGE_MODULE_PROPS'
-
-
 const SET_FILTER = 'SET_FILTER'
 const SET_INITIAL_FILTER = 'SET_INITIAL_FILTER'
-
 const SET_APPLY = 'SET_APPLY'
-
 const CLEAN_FILTER = 'CLEAN_FILTER'
 const UNSET_FILTER = 'UNSET_FILTER'
-
 const initialState = Immutable.Map({mode: 'info'})
-
 const SET_MEASURES = 'SET_MEASURES'
 const CLEAN_MEASURES = 'CLEAN_MEASURES'
-
 export const cleanMeasures = ({app, group}) => (dispatch, getState) => {
     dispatch({type: CLEAN_MEASURES, app, group})
 }
@@ -49,21 +42,17 @@ export const cleanFilter = ({app, group}) => (dispatch, getState) => {
     dispatch({type: CLEAN_FILTER, app, group})
     //dispatch({type: CLEAN_MEASURES, app, group})
 }
-
-
 export const unsetFilter = ({app, group,param}) => (dispatch, getState) => {
     debugger;
     dispatch({type: UNSET_FILTER, app, group, param})
 
 }
-
 export const applyFilter = ({app, group}) => (dispatch, getState) => {
     dispatch({type: SET_APPLY, app, group})
 }
 export const setInitialFilters = ({app, group, param, value}) => (dispatch, getState) => {
     dispatch({type: SET_INITIAL_FILTER, app, group, param, value})
 }
-
 export const getCategories = (props) => (dispatch, getState) => {
     const {app, params, dvzProxyDatasetId, uniqueStorage} = props
     dispatch({type: LOAD_CATEGORIES, params, app, uniqueStorage, dvzProxyDatasetId})
@@ -88,7 +77,6 @@ export const getCategories = (props) => (dispatch, getState) => {
             dvzProxyDatasetId
         }))
 }
-
 export const setData = ({app, group, csv, store, params}) => (dispatch, getState) => {
 
     const filters = getState().get('data').getIn(['filters', app, group])
@@ -150,11 +138,9 @@ export const getData = ({app, group, source, store, params}) => (dispatch, getSt
         .catch(error => dispatch({type: LOAD_DATA_ERROR, app, group, store, error}))
 
 }
-
 export const setPageModuleProps = ({data}) => (dispatch, getState) => {
     dispatch({type: SET_PAGE_MODULE_PROPS, data})
 }
-
 export default (state = initialState, action) => {
 
     switch (action.type) {

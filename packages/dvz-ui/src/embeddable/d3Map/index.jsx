@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {connect} from "react-redux";
-import {decode, parse, compareJsonProps} from "../utils/parseUtils";
+import {decode, parse, compareJsonProps} from "../utils/index.js";
 import Map from "./Map"
 import BaseLayer from './BaseLayer'
 import DataLayer from './DataLayer'

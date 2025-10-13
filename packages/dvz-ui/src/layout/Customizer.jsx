@@ -49,3 +49,6 @@ export const CustomizerWrapper = (props) => {
         key: `customizer-child-${index}`
     })))
 };
+
+
+export default CustomizerWrapper;
