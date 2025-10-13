@@ -1,7 +1,7 @@
 import React from 'react';
 import DataProvider from "../data/DataProvider";
 import DataConsumer from "../data/DataConsumer";
-import {parse} from "../utils/parseUtils";
+import {parse} from "../utils/";
 import * as d3 from "d3";
 import {injectIntl} from "react-intl";
 import * as ReactDOM from "react-dom";

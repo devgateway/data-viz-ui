@@ -2,7 +2,7 @@ import React from 'react';
 import BaseLayer from "./BaseLayer.jsx";
 import DataProvider from "../data/DataProvider.jsx";
 import DataConsumer from "../data/DataConsumer.jsx";
-import {parse} from "../utils/parseUtils.js";
+import {parse} from "../utils/index.js";
 import * as d3 from "d3";
 import {injectIntl} from "react-intl";
 

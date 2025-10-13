@@ -4,8 +4,6 @@ import embeddable from './reducers/embeddable'
 import { injectIntl } from "react-intl";
 import * as Immutable from 'immutable';
 
-import ParseUtils from "@/embeddable/utils/parseUtils";
-
 // components
 const PageGallery = lazy(() => import("./pagegallery"));
 const Download = lazy(() => import("./download"));
