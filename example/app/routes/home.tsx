@@ -1,13 +1,14 @@
 import React from "react";
 import type { Route } from "./+types/home";
-import { PageConsumer, PageProvider, Page } from '@devgateway/wp-react-lib';
+import { Page } from '@devgateway/wp-react-lib';
 import ResponsiveContainer from "@devgateway/dvz-ui-react/layout";
 import { useParams } from "react-router";
 import { getPages } from "@devgateway/wp-react-lib/api";
 import { getMetaSeo } from "../utils/meta-seo";
 import { DEFAULT_LOCALE } from "~/utils/constants";
+import Header from "~/embeddable/Header";
 
-export async function clientLoader({ request, params}: Route.ClientLoaderArgs) {
+export async function loader({ request, params }: Route.LoaderArgs) {
   const posts = await getPages({
     slug: "home",
     locale: params.lan,
@@ -26,25 +27,6 @@ export async function clientLoader({ request, params}: Route.ClientLoaderArgs) {
 }
 
 
-
-
-// export async function loader({ request, params}: Route.LoaderArgs) {
-//   const posts = await getPages({
-//     slug: "home",
-//     locale: params.lan,
-//   });
-//
-//   const findPost = posts.data.find(post => post.slug === "home");
-//   if (!findPost) {
-//     return {
-//       post: null,
-//     }
-//   }
-//
-//   return {
-//     post: findPost,
-//   }
-// }
 
 export function meta({ data }: Route.MetaArgs): Route.MetaDescriptors {
   const post = data?.post;
@@ -67,18 +49,9 @@ const Home = ({
   const locale = params.lan ?? DEFAULT_LOCALE;
 
   return (
-    <PageProvider
-      slug={"home"}
-      locale={locale}
-      store={"home"}>
-      <PageConsumer>
-        <ResponsiveContainer locale={locale}>
-          <PageConsumer>
-            <Page />
-          </PageConsumer>
-        </ResponsiveContainer>
-      </PageConsumer>
-    </PageProvider>
+    <ResponsiveContainer locale={locale} header={<Header {...loaderData} locale={params.lan}/>}>
+      <Page pages={[loaderData.post]} />
+    </ResponsiveContainer>
   )
 };
 
