@@ -38,7 +38,7 @@ const RootLayout = () => {
     console.log("defaultLocale", defaultLocale);
     const locale = pathParams.lan;
     const pathname = location.pathname;
-    console.log("pathParams", pathParams);
+    console.log("pathParams", JSON.stringify(pathParams.lan));
     useEffect(() => {
         if (process.env.NODE_ENV === "development") {
             console.log("----------.env-----------");
@@ -86,9 +86,7 @@ const RootLayout = () => {
                 <AppContextProvider getComponent={getComponentByNameIgnoreCase} store={store} locale={locale}>
                     <SettingProvider locale={locale} changeUUID={null}>
                         <SettingsConsumer>
-                            <CustomizerWrapper>
-                                <InjectTitle />
-                            </CustomizerWrapper>
+                            <CustomizerWrapper/>
                             <Outlet />
                         </SettingsConsumer>
                     </SettingProvider>

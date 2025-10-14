@@ -9,7 +9,7 @@ export default {
   routeDiscovery: {
     mode: "initial",
   },
-  // prerender: ["/", "/en", "/en/home"],
+  prerender: ["/", "/en/home"],
   future: {
 
   }
