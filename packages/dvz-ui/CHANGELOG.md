@@ -1,5 +1,11 @@
 # @devgateway/dvz-ui-react
 
+## 1.3.3
+
+### Patch Changes
+
+- [#60](https://github.com/devgateway/data-viz-ui/pull/60) [`72220d1`](https://github.com/devgateway/data-viz-ui/commit/72220d1543a5d61dcababbbe0de41c5dad1a79ea) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Standardize react-router versions
+
 ## 1.3.2
 
 ### Patch Changes
@@ -11,20 +17,16 @@
 ### Patch Changes
 
 - [#49](https://github.com/devgateway/data-viz-ui/pull/49) [`528d75f`](https://github.com/devgateway/data-viz-ui/commit/528d75f46ac8735f4621f6128fb59d4381285532) Thanks [@timothygachengo](https://github.com/timothygachengo)! - #### Feature
-
   - Move the following components into the core
-
   1. Favicon
   2. RootLayout component
   3. Loading Component
   4. Preview Component Parser
 
   #### Chores
-
   - update some dependenices
 
   #### Internal Improvements
-
   - Create testing and prod environment for data-viz-ui
   - Add dockerfiles for each deployment
 
@@ -59,13 +61,10 @@
 ### Minor Changes
 
 - [#30](https://github.com/devgateway/data-viz-ui/pull/30) [`8bb29d6`](https://github.com/devgateway/data-viz-ui/commit/8bb29d6afb3a91a7a286c06314e5ad01bfff32f7) Thanks [@timothygachengo](https://github.com/timothygachengo)! - # Changelog
-
   - This release contains updated code from [`data-viz-front`](https://github.com/devgateway/data-viz-front).
 
   ## Added
-
   - **New Component**: `posts-with-filters` - A comprehensive posts display component with filtering capabilities
-
     - Supports category filtering, country filtering, date filtering
     - Includes pagination and posts per page options
     - Posts with country category appear first in display order
@@ -73,7 +72,6 @@
     - Added utility functions for date handling
 
   - **New Map Utilities**: Enhanced d3Map functionality
-
     - `GradientColors.js` - Sequential color palettes for map visualizations (blues, greens, greys, oranges, purples, etc.)
     - `Utils.jsx` - Additional utility functions for map operations
 
@@ -85,9 +83,7 @@
     - `decodeHtmlEntitiesToHtml()` - HTML entity decoding with DOMPurify sanitization
 
   ## Changed
-
   - **Chart Components**: Major refactoring and improvements
-
     - Updated `Bar.tsx`, `Bump.jsx`, `Diverging.jsx`, `Line.jsx` components
     - Enhanced `Tooltip.jsx` with improved functionality
     - Updated chart data handling in `Bar.tsx` and `Line.jsx`
@@ -95,7 +91,6 @@
     - Significant refactoring of main chart `index.jsx`
 
   - **Map Components**: Extensive d3Map improvements
-
     - Enhanced `BaseLayer.jsx` and `DataLayer.jsx` with better rendering
     - Improved `FlowLayer.jsx`, `LatLongLayer.jsx` functionality
     - Updated `Legends.jsx` with better legend handling
@@ -103,12 +98,10 @@
     - Updated main map `index.jsx` with better integration
 
   - **Data Management**: Improved data providers and handling
-
     - Enhanced `CategoriesProvider.jsx` with better category management
     - Improved `DataProvider.jsx` with enhanced data fetching and processing
 
   - **Filter System**: Comprehensive filter improvements
-
     - Major refactoring of main filter `index.tsx` (1381 line changes)
     - Enhanced filter reset and apply button functionality
     - Improved filter state management
@@ -124,7 +117,6 @@
 ### Patch Changes
 
 - [#29](https://github.com/devgateway/data-viz-ui/pull/29) [`ae3acd8`](https://github.com/devgateway/data-viz-ui/commit/ae3acd87ca119fc5c45e7e40f162ee0e97123f26) Thanks [@timothygachengo](https://github.com/timothygachengo)! - ## Fixes
-
   - Add missing stylesheet
   - Migrate `useKeyOnly, useValueAndKey, getUnhandledProps` from semantic-ui-react to the repo to prevent semantic-react from being bundled.
 
@@ -146,7 +138,6 @@
 ### Patch Changes
 
 - [#17](https://github.com/devgateway/data-viz-ui/pull/17) [`486c7da`](https://github.com/devgateway/data-viz-ui/commit/486c7daff5b4e8736f9f15ae5a44249fce1298a3) Thanks [@timothygachengo](https://github.com/timothygachengo)! - # Changes
-
   - Add `header` and `footer` props in the PreviewPageContainers, PreviewTypeContainers, SlugContainer and SlugPostContainer to be injected in the `ResponsiveContainer` component.
 
 ## 1.0.3
@@ -172,12 +163,10 @@
 ### Patch Changes
 
 - [#2](https://github.com/devgateway/data-viz-ui/pull/2) [`e11b6f1`](https://github.com/devgateway/data-viz-ui/commit/e11b6f11596b1311a47478ce354e7786da8e0b18) Thanks [@timothygachengo](https://github.com/timothygachengo)! - ### 🐛 Bug Fixes
-
   - _(TCDICORE-258)_ Fix page module component showing mobile styles
   - _(TCDING-708)_ Fix measures component in data charts
 
   ### ⚙️ Miscellaneous Tasks
-
   - _(TCDICORE-234)_ Merged tree of tcdi official main into main
   - _(TCDICORE-234)_ Modify nginx dockerfile to make build work
   - _(TCDICORE-234)_ Update nginx dockerfileg
