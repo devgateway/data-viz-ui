@@ -6,7 +6,6 @@ import * as d3 from "d3";
 import { Modal } from "semantic-ui-react";
 import { useWindowDimensionsAndDevice } from "@/lib/hooks/window-dimensions";
 import { useScreenOrientation } from "@/lib/hooks/screen-orientation";
-import { l } from "node_modules/react-router/dist/development/components-DzqPLVI1.d.mts";
 import { Loading } from "@/layout";
 
 const visibleStyle = {
