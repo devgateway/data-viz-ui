@@ -74,7 +74,7 @@
     "react-is": "^18.3.1",
     "react-markdown": "^10.1.0",
     "react-redux": "^9.2.0",
-    "react-router": "^7.6.0",
+    "react-router": "~7.7.1",
     "redux": "^5.0.1",
     "redux-thunk": "^3.1.0",
     "rehype-raw": "^7.0.0",
@@ -129,29 +129,29 @@
   },
   "exports": {
     ".": {
-      "types": "./dist/types/index.d.ts",
+      "types": "./dist/types/dvz-ui/src/index.d.ts",
       "require": "./dist/cjs/index.js",
       "import": "./dist/esm/index.js"
     },
     "./conf": {
-      "types": "./dist/conf/index.d.ts",
+      "types": "./dist/types/dvz-ui/src/conf/index.d.ts",
       "require": "./dist/conf/index.js",
       "default": "./dist/conf/index.js"
     },
     "./embeddable": {
-      "types": "./dist/types/embeddable/index.d.ts",
+      "types": "./dist/types/dvz-ui/src/embeddable/index.d.ts",
       "require": "./dist/cjs/embeddable/index.js",
       "import": "./dist/esm/embeddable/index.js"
     },
     "./dist/esm/styles.css": "./dist/esm/styles.css",
     "./dist/esm/common.css": "./dist/esm/common.css",
     "./tracker": {
-      "types": "./dist/types/tracker/index.d.ts",
+      "types": "./dist/types/dvz-ui/src/tracker/index.d.ts",
       "require": "./dist/cjs/tracker/index.js",
       "import": "./dist/esm/tracker/index.js"
     },
     "./layout": {
-      "types": "./dist/types/layout/index.d.ts",
+      "types": "./dist/types/dvz-ui/src/layout/index.d.ts",
       "require": "./dist/cjs/layout/index.js",
       "import": "./dist/esm/layout/index.js"
     }

@@ -417,7 +417,7 @@ const Wrapper: React.FC<VerticalFeaturedTabsProps> = (props) => {
   };
 
   useEffect(() => {
-    if (window.screen.orientation) {
+    if (window && window.screen.orientation) {
       window.screen.orientation.addEventListener(
         "change",
         handleOrientationChange
@@ -502,7 +502,7 @@ const mapStateToProps = (state, _ownProps) => {
     "data",
     "pageModuleProps"
   ]);
-  const _props = {};
+  const _props: any = {};
   if(pageModuleProps) {
     _props.pageModuleProps = pageModuleProps;
   }
