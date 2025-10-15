@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { utils, SearchConsumer, SearchProvider } from "@devgateway/wp-react-lib";
-import CustomSemanticSearch from "./CustomSemanticSearch";
+// import CustomSemanticSearch from "./CustomSemanticSearch";
 import { createPortal } from "react-dom";
 import { Icon } from "semantic-ui-react";
 import { IntlProvider, injectIntl } from "react-intl";
@@ -34,9 +34,9 @@ const ResultRenderer = injectIntl(({
     ? utils.replaceLink(parent_link, locale) + `#${slug}`
     : utils.replaceLink(link, locale);
   target = redirect_url ? redirect_url + `#${slug}` : target;
-  
 
- 
+
+
 
   const boldedTitle = boldSearchTerm(String(title), searchTerm);
   const boldedExtract = boldSearchTerm(extract, searchTerm);
