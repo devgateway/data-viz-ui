@@ -1,4 +1,3 @@
-import {Config} from '@/conf'
 import {get} from '../../api/commons'
 
 function deepClone(obj) {
