@@ -1,9 +1,9 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Navigate, Outlet, useLocation, useParams } from 'react-router';
 import {
     getComponentByNameIgnoreCase
 } from '@/embeddable';
-import { injectIntl, IntlProvider } from 'react-intl';
+import { IntlProvider } from 'react-intl';
 import { AppContextProvider, SettingProvider, SettingsConsumer } from '@devgateway/wp-react-lib';
 import { Provider } from 'react-redux';
 import { CustomizerWrapper } from '@/layout';
@@ -20,26 +20,19 @@ const messages: Record<Locale, any> = {
     'am': afrikaansTranslations
 };
 
-const InjectTitle = injectIntl((props) => {
-
-    // @ts-expect-error description
-    document.title = props.settings.description
-    return <></>
-});
-
-interface LayoutProps {
-    children: React.DetailedReactHTMLElement<any, HTMLElement>;
-}
 
 const RootLayout = () => {
     const pathParams = useParams();
     const location = useLocation();
     const defaultLocale = Config.DEFAULT_LOCALE;
+    const [isClient, setIsClient] = useState(false);
     console.log("defaultLocale", defaultLocale);
     const locale = pathParams.lan;
     const pathname = location.pathname;
     console.log("pathParams", JSON.stringify(pathParams.lan));
     useEffect(() => {
+        setIsClient(true);
+
         if (process.env.NODE_ENV === "development") {
             console.log("----------.env-----------");
             console.log(process.env);
@@ -47,14 +40,16 @@ const RootLayout = () => {
         }
 
 
-        window && window.setTimeout(() => {
-            if (window && window.location.hash) {
-                const element = document.getElementById(window.location.hash.substring(1));
-                if (element) {
-                    element.scrollIntoView({ behavior: "auto", block: "start" });
+        if (typeof window !== 'undefined') {
+            window.setTimeout(() => {
+                if (window.location.hash) {
+                    const element = document.getElementById(window.location.hash.substring(1));
+                    if (element) {
+                        element.scrollIntoView({ behavior: "auto", block: "start" });
+                    }
                 }
-            }
-        }, 2000);
+            }, 2000);
+        }
     }, []);
 
     useEffect(() => {
