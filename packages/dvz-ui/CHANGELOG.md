@@ -1,5 +1,13 @@
 # @devgateway/dvz-ui-react
 
+## 1.3.4
+
+### Patch Changes
+
+- [#63](https://github.com/devgateway/data-viz-ui/pull/63) [`740799f`](https://github.com/devgateway/data-viz-ui/commit/740799f87ddf3c944e700ac881185935a6f3c3d0) Thanks [@timothygachengo](https://github.com/timothygachengo)! - - Update wp-react-lib
+  - Standardize package verions
+  - Add missing exports in the `layout`
+
 ## 1.3.3
 
 ### Patch Changes
