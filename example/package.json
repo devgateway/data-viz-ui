@@ -6,7 +6,7 @@
     "copy-dev-files": "cp tsconfig.dev.json tsconfig.json ",
     "copy-prod-files": "rm -rf tsconfig.json && cp tsconfig.prod.json tsconfig.json",
     "copy-example-files": "cp tsconfig.example.json tsconfig.json ",
-    "build": "rm -rf build &&  && pnpm run copy-prod-files && pnpm run typecheck && react-router build",
+    "build": "rm -rf build && pnpm run copy-prod-files && pnpm run typecheck && react-router build",
     "dev": "NODE_ENV=development && pnpm run copy-dev-files &&  react-router dev",
     "dev:example": "NODE_ENV=development && pnpm run copy-example-files &&  react-router dev --config vite.config.example.ts",
     "build:example": "NODE_ENV=production && pnpm run copy-example-files &&  react-router build --config vite.config.example.ts",
