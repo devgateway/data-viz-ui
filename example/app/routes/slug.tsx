@@ -1,6 +1,6 @@
 import React from "react";
 import type { Route } from "./+types/slug";
-import { getPages } from "@devgateway/wp-react-lib/api";
+import { getPages } from "@devgateway/wp-react-lib";
 import { getMetaSeo } from "~/utils/meta-seo";
 import { SlugContainer } from '@devgateway/dvz-ui-react/layout'
 import Header from "~/embeddable/Header";

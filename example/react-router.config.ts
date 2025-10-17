@@ -1,5 +1,5 @@
 import type { Config } from "@react-router/dev/config";
-import { getPages } from "@devgateway/wp-react-lib/api";
+import { getPages } from "@devgateway/wp-react-lib";
 
 export default {
   // Config options...
