@@ -1,5 +1,11 @@
 # @devgateway/dvz-ui-react
 
+## 1.3.5
+
+### Patch Changes
+
+- [#66](https://github.com/devgateway/data-viz-ui/pull/66) [`868dce8`](https://github.com/devgateway/data-viz-ui/commit/868dce8405df2e587db294e721a01e8d1569a614) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Fix environment variables import
+
 ## 1.3.4
 
 ### Patch Changes
