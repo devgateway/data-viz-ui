@@ -3,7 +3,7 @@ import type { Route } from "./+types/home";
 import { Page } from '@devgateway/wp-react-lib';
 import ResponsiveContainer from "@devgateway/dvz-ui-react/layout";
 import { useParams } from "react-router";
-import { getPages } from "@devgateway/wp-react-lib/api";
+import { getPages } from "@devgateway/wp-react-lib";
 import { getMetaSeo } from "../utils/meta-seo";
 import { DEFAULT_LOCALE } from "~/utils/constants";
 import Header from "~/embeddable/Header";
