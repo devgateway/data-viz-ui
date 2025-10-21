@@ -38,12 +38,10 @@ export const setFilter = ({app, group, param, value, autoApply}) => (dispatch, g
     dispatch({type: SET_FILTER, app, group, param, value, autoApply})
 }
 export const cleanFilter = ({app, group}) => (dispatch, getState) => {
-    debugger;
     dispatch({type: CLEAN_FILTER, app, group})
     //dispatch({type: CLEAN_MEASURES, app, group})
 }
 export const unsetFilter = ({app, group,param}) => (dispatch, getState) => {
-    debugger;
     dispatch({type: UNSET_FILTER, app, group, param})
 
 }
@@ -227,7 +225,6 @@ export default (state = initialState, action) => {
         case SET_FILTER: {
             const now = Date.now();
             const {app, group, param, value, autoApply} = action
-            debugger;
             return state.setIn(['filters-settings', app, group, "autoApply"], autoApply)
                 .setIn(['filters', app, group, param], value.length === 0 ? [Number.MIN_SAFE_INTEGER] : value)
                 .setIn(['filters-settings', app, group, "apply"], null)
