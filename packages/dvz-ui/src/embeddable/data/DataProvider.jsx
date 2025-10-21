@@ -69,7 +69,6 @@ class DataProvider extends React.Component {
             lastUserFilterChange
         } = this.props
 
-    debugger;
         const initialChanged = lastInitialFilterChange !== prevProps.lastInitialFilterChange;
         const userChanged = lastUserFilterChange !== prevProps.lastUserFilterChange;
 
