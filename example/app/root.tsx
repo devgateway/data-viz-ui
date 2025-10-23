@@ -17,6 +17,7 @@ import semanticCssHref from "semantic-ui-css/semantic.min.css?url";
 import dvzCommonCssHref from "@devgateway/dvz-ui-react/dist/esm/common.css?url";
 import dvzStylesCssHref from "@devgateway/dvz-ui-react/dist/esm/styles.css?url";
 import appCssHref from "./scss/index.scss?url";
+import { getApiUrl } from "./utils/api-utils";
 
 
 export const links: Route.LinksFunction = () => [
@@ -44,9 +45,9 @@ export const links: Route.LinksFunction = () => [
 
 ];
 
-export async function loader(): Promise<{ faviconUrl: string | null }> {
-  const siteUrl = import.meta.env.VITE_REACT_APP_WP_API || "/wp/wp-json";
-
+export async function loader({ request }: Route.LoaderArgs): Promise<{ faviconUrl: string | null }> {
+  const siteUrl = getApiUrl(request);
+  console.log("siteUrl", siteUrl);
   try {
     const response = await fetch(siteUrl);
     const data = await response.json();
