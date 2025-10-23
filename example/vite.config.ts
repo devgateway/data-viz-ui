@@ -130,6 +130,9 @@ const prodConfig = defineConfig({
             "@nivo/*",
         ]
     },
+    ssr: {
+        noExternal: ["@devgateway/wp-react-lib"],
+    }
 });
 
 
