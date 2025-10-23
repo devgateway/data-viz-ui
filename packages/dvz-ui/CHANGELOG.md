@@ -1,5 +1,11 @@
 # @devgateway/dvz-ui-react
 
+## 1.4.0
+
+### Minor Changes
+
+- [#70](https://github.com/devgateway/data-viz-ui/pull/70) [`9c97e20`](https://github.com/devgateway/data-viz-ui/commit/9c97e20ad91467397217336a35068432ff79adc6) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Update wp-react-lib to be SSR friendly
+
 ## 1.3.5
 
 ### Patch Changes
