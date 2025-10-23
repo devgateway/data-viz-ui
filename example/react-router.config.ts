@@ -11,6 +11,6 @@ export default {
   },
   prerender: ["/", "/en/home"],
   future: {
-
+    unstable_middleware: true,
   }
 } satisfies Config;
