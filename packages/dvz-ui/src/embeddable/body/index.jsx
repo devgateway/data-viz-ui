@@ -18,6 +18,8 @@ import Ectopic from "./Ectopic";
 import { injectIntl, FormattedMessage } from "react-intl";
 import messages_en from "../../translations/en.json";
 import messages_fr from "../../translations/fr.json";
+import messages_am from "../../translations/am.json";
+
 
 import getDeviceType from "../../utils/deviceType";
 
@@ -38,6 +40,11 @@ class Body extends React.Component {
     this.updateSvgLabels = this.updateSvgLabels.bind(this);
     this.handleTextClick = this.handleTextClick.bind(this);
     this.handleOrientationChange = this.handleOrientationChange.bind(this);
+    this.messages = {
+      en: messages_en,
+      fr: messages_fr,
+      am: messages_am,
+    }
   }
 
   updateLayout() {
@@ -51,6 +58,11 @@ class Body extends React.Component {
         ? "landscape-primary"
         : "portrait-primary")
     );
+  }
+
+  isIphone() {
+    const userAgent = navigator.userAgent.toLowerCase();
+    return /iphone/i.test(userAgent);
   }
 
   handleOrientationChange() {
@@ -76,24 +88,31 @@ class Body extends React.Component {
       );
 
       const selectedElement = titleText || btn;
+      const selectedOption = selectedElement.getAttribute('data-option');
 
       // Add the 'on' class to the clicked title and title-rect
       selectedElement.classList.add("on");
 
+      // Find and add 'on' class to the corresponding rect if we clicked text, or text if we clicked rect
+      const parentG = selectedElement.closest("g");
+      const correspondingRect = parentG.querySelector(".title-rect");
+      const correspondingText = parentG.querySelector(".title");
+
+      if (correspondingRect) correspondingRect.classList.add("on");
+      if (correspondingText) correspondingText.classList.add("on");
+
       // Add the 'on' class to the corresponding title-line
-      const titleLine = selectedElement
-        .closest("g")
-        .querySelector(".title-line");
+      const titleLine = parentG.querySelector(".title-line");
       if (titleLine) {
         titleLine.classList.add("on");
       }
 
-      // Update the selected option state
-      this.setState({
-        selectedOption: titleText
-          ? titleText.innerHTML
-          : btn.nextSibling.innerHTML,
-      });
+      // Update the selected option state using data attribute
+      if (selectedOption) {
+        this.setState({
+          selectedOption: selectedOption,
+        });
+      }
     }
   }
 
@@ -194,39 +213,40 @@ class Body extends React.Component {
     const { selectedOption } = this.state;
     const svg = document.querySelector("svg");
 
-    // Find the text element and the corresponding line for the selected option
-    let selectedTitleText, selectedTitleLine;
+    if (!svg) return;
 
-    if (selectedOption === "Cancers") {
-      selectedTitleText = svg.querySelector(".title");
-      selectedTitleLine = svg.querySelector(".title-line");
-    } else if (selectedOption === "OtherConditions") {
-      // Assuming the second text and line refer to "Other conditions"
-      selectedTitleText = svg.querySelectorAll(".title")[1];
-      selectedTitleLine = svg.querySelectorAll(".title-line")[1];
+    // Remove 'on' class from all elements first
+    [...svg.querySelectorAll(".title, .title-rect, .title-line")].forEach(
+      (node) => node.classList.remove("on")
+    );
+
+    // Find elements with matching data-option attribute
+    const selectedTitleText = svg.querySelector(`[data-option="${selectedOption}"].title`);
+    const selectedTitleRect = svg.querySelector(`[data-option="${selectedOption}"].title-rect`);
+
+    // Find the parent group and get the title-line
+    let selectedTitleLine = null;
+    if (selectedTitleText || selectedTitleRect) {
+      const parentG = (selectedTitleText || selectedTitleRect).closest('g');
+      selectedTitleLine = parentG ? parentG.querySelector('.title-line') : null;
     }
 
     // Add the 'on' class if the elements exist
-    if (selectedTitleText && selectedTitleLine) {
-      selectedTitleText.classList.add("on");
-      selectedTitleLine.classList.add("on");
-    }
+    if (selectedTitleText) selectedTitleText.classList.add("on");
+    if (selectedTitleRect) selectedTitleRect.classList.add("on");
+    if (selectedTitleLine) selectedTitleLine.classList.add("on");
   }
 
   updateSvgLabels() {
     const root = d3.select(".body.parts");
-    let messages = {
-      en: messages_en,
-      fr: messages_fr,
-    };
     const intl = this.props.intl;
-    messages = messages[intl.locale];
+    const _messages = this.messages[intl.locale];
 
     const left = [
       {
         label: intl.formatMessage({
           id: "oropharyngeal.cancer",
-          defaultMessage: messages["oropharyngeal.cancer"],
+          defaultMessage: _messages["oropharyngeal.cancer"],
         }),
         selector: ".stomach",
         tx: 90,
@@ -235,7 +255,7 @@ class Body extends React.Component {
       {
         label: intl.formatMessage({
           id: "laryngeal.cancer",
-          defaultMessage: messages["laryngeal.cancer"],
+          defaultMessage: _messages["laryngeal.cancer"],
         }),
         selector: ".larynx",
         tx: 80,
@@ -244,7 +264,7 @@ class Body extends React.Component {
       {
         label: intl.formatMessage({
           id: "oesophageal.ancer",
-          defaultMessage: messages["oesophageal.cancer"],
+          defaultMessage: _messages["oesophageal.cancer"],
         }),
         selector: ".stomach",
         tx: 77,
@@ -254,7 +274,7 @@ class Body extends React.Component {
       {
         label: intl.formatMessage({
           id: "tracheal.bronchial.lung.cancer",
-          defaultMessage: messages["tracheal.bronchial.lung.cancer"],
+          defaultMessage: _messages["tracheal.bronchial.lung.cancer"],
         }),
         selector: ".larynx",
         tx: intl.locale === "en" ? 80 : 90,
@@ -264,7 +284,7 @@ class Body extends React.Component {
       {
         label: intl.formatMessage({
           id: "acute.myeloid.leukaemia",
-          defaultMessage: messages["acute.myeloid.leukaemia"],
+          defaultMessage: _messages["acute.myeloid.leukaemia"],
         }),
         selector: ".blood",
         tx: 90,
@@ -273,7 +293,7 @@ class Body extends React.Component {
       {
         label: intl.formatMessage({
           id: "stomach.cancer",
-          defaultMessage: messages["stomach.cancer"],
+          defaultMessage: _messages["stomach.cancer"],
         }),
         selector: ".stomach",
         tx: 80,
@@ -282,7 +302,7 @@ class Body extends React.Component {
       {
         label: intl.formatMessage({
           id: "liver.cancer",
-          defaultMessage: messages["liver.cancer"],
+          defaultMessage: _messages["liver.cancer"],
         }),
         selector: ".stomach",
         tx: 80,
@@ -291,7 +311,7 @@ class Body extends React.Component {
       {
         label: intl.formatMessage({
           id: "pancreatic.cancer",
-          defaultMessage: messages["pancreatic.cancer"],
+          defaultMessage: _messages["pancreatic.cancer"],
         }),
         selector: ".stomach",
         tx: 105,
@@ -300,7 +320,7 @@ class Body extends React.Component {
       {
         label: intl.formatMessage({
           id: "colorectal.cancer",
-          defaultMessage: messages["colorectal.cancer"],
+          defaultMessage: _messages["colorectal.cancer"],
         }),
         selector: ".stomach",
         tx: 85,
@@ -309,7 +329,7 @@ class Body extends React.Component {
       {
         label: intl.formatMessage({
           id: "kidney.cancer",
-          defaultMessage: messages["kidney.cancer"],
+          defaultMessage: _messages["kidney.cancer"],
         }),
         selector: ".stomach",
         tx: 65,
@@ -318,7 +338,7 @@ class Body extends React.Component {
       {
         label: intl.formatMessage({
           id: "bladder.cancer",
-          defaultMessage: messages["bladder.cancer"],
+          defaultMessage: _messages["bladder.cancer"],
         }),
         selector: ".erectile",
         tx: 85,
@@ -327,7 +347,7 @@ class Body extends React.Component {
       {
         label: intl.formatMessage({
           id: "cervical.cancer",
-          defaultMessage: messages["cervical.cancer"],
+          defaultMessage: _messages["cervical.cancer"],
         }),
         selector: ".Ectopic",
         tx: 85,
@@ -339,7 +359,7 @@ class Body extends React.Component {
       {
         label: intl.formatMessage({
           id: "stroke",
-          defaultMessage: messages["stroke"],
+          defaultMessage: _messages["stroke"],
         }),
         selector: ".brain",
         tx: 97,
@@ -348,7 +368,7 @@ class Body extends React.Component {
       {
         label: intl.formatMessage({
           id: "blindness.decreased.eyesight",
-          defaultMessage: messages["blindness.decreased.eyesight"],
+          defaultMessage: _messages["blindness.decreased.eyesight"],
         }),
         selector: ".eyes",
         tx: 97,
@@ -357,7 +377,7 @@ class Body extends React.Component {
       {
         label: intl.formatMessage({
           id: "periodontitis",
-          defaultMessage: messages["periodontitis"],
+          defaultMessage: _messages["periodontitis"],
         }),
         selector: ".stomach",
         tx: 90,
@@ -366,7 +386,7 @@ class Body extends React.Component {
       {
         label: intl.formatMessage({
           id: "aortic.aneurysm",
-          defaultMessage: messages["aortic.aneurysm"],
+          defaultMessage: _messages["aortic.aneurysm"],
         }),
         selector: ".blood",
         tx: 90,
@@ -375,7 +395,7 @@ class Body extends React.Component {
       {
         label: intl.formatMessage({
           id: "heart.disease",
-          defaultMessage: messages["heart.disease"],
+          defaultMessage: _messages["heart.disease"],
         }),
         selector: ".heart",
         tx: 90,
@@ -384,7 +404,7 @@ class Body extends React.Component {
       {
         label: intl.formatMessage({
           id: "pneumonia",
-          defaultMessage: messages["pneumonia"],
+          defaultMessage: _messages["pneumonia"],
         }),
         selector: ".lungs",
         tx: 85,
@@ -394,7 +414,7 @@ class Body extends React.Component {
         label: intl.formatMessage({
           id: "atherosclerotic.peripheral.vascular.disease",
           defaultMessage:
-            messages["atherosclerotic.peripheral.vascular.disease"],
+            _messages["atherosclerotic.peripheral.vascular.disease"],
         }),
         selector: ".blood",
         tx: 90,
@@ -403,7 +423,7 @@ class Body extends React.Component {
       {
         label: intl.formatMessage({
           id: "copd",
-          defaultMessage: messages["copd"],
+          defaultMessage: _messages["copd"],
         }),
         selector: ".lungs",
         tx: 85,
@@ -412,7 +432,7 @@ class Body extends React.Component {
       {
         label: intl.formatMessage({
           id: "tuberculosis",
-          defaultMessage: messages["tuberculosis"],
+          defaultMessage: _messages["tuberculosis"],
         }),
         selector: ".lungs",
         tx: 85,
@@ -421,7 +441,7 @@ class Body extends React.Component {
       {
         label: intl.formatMessage({
           id: "asthma",
-          defaultMessage: messages["asthma"],
+          defaultMessage: _messages["asthma"],
         }),
         selector: ".lungs",
         tx: 85,
@@ -430,7 +450,7 @@ class Body extends React.Component {
       {
         label: intl.formatMessage({
           id: "diabetes",
-          defaultMessage: messages["diabetes"],
+          defaultMessage: _messages["diabetes"],
         }),
         selector: ".stomach",
         tx: 105,
@@ -439,7 +459,7 @@ class Body extends React.Component {
       {
         label: intl.formatMessage({
           id: "hip.fractures",
-          defaultMessage: messages["hip.fractures"],
+          defaultMessage: _messages["hip.fractures"],
         }),
         selector: ".bounds",
         tx: 90,
@@ -448,7 +468,7 @@ class Body extends React.Component {
       {
         label: intl.formatMessage({
           id: "rheumatoid.arthritis",
-          defaultMessage: messages["rheumatoid.arthritis"],
+          defaultMessage: _messages["rheumatoid.arthritis"],
         }),
         selector: ".bounds",
         tx: 134,
@@ -457,7 +477,7 @@ class Body extends React.Component {
       {
         label: intl.formatMessage({
           id: "impaired.immune.function",
-          defaultMessage: messages["impaired.immune.function"],
+          defaultMessage: _messages["impaired.immune.function"],
         }),
         selector: null,
         tx: 85,
@@ -466,7 +486,7 @@ class Body extends React.Component {
       {
         label: intl.formatMessage({
           id: "erectile.dysfunction",
-          defaultMessage: messages["erectile.dysfunction"],
+          defaultMessage: _messages["erectile.dysfunction"],
         }),
         selector: ".erectile",
         tx: 107,
@@ -475,7 +495,7 @@ class Body extends React.Component {
       {
         label: intl.formatMessage({
           id: "reduced.fertility.men",
-          defaultMessage: messages["reduced.fertility.men"],
+          defaultMessage: _messages["reduced.fertility.men"],
         }),
         selector: ".erectile",
         tx: 95,
@@ -484,7 +504,7 @@ class Body extends React.Component {
       {
         label: intl.formatMessage({
           id: "ectopic.pregnancy",
-          defaultMessage: messages["ectopic.pregnancy"],
+          defaultMessage: _messages["ectopic.pregnancy"],
         }),
         selector: ".Ectopic",
         tx: 90,
@@ -493,7 +513,7 @@ class Body extends React.Component {
       {
         label: intl.formatMessage({
           id: "reduced.fertility.women",
-          defaultMessage: messages["reduced.fertility.women"],
+          defaultMessage: _messages["reduced.fertility.women"],
         }),
         selector: ".Ectopic",
         tx: 95,
@@ -511,6 +531,7 @@ class Body extends React.Component {
     let sy = 60;
 
     const calculateX = (d, i) => {
+      if(isMobile && this.props.intl.locale === "am") return 140;
       if (isMobile) return 160;
       return -250;
     };
@@ -534,7 +555,7 @@ class Body extends React.Component {
 
         root
           .select("svg")
-          .selectAll("text.rigth")
+          .selectAll("text.right")
           .data(right)
           .enter()
           .append("text")
@@ -556,7 +577,7 @@ class Body extends React.Component {
           .attr("y", (d, i) => sy + i * 25)
           .text((d) => d.label);
       }
-    } else {
+    } else if (intl.locale === "fr" || intl.locale === "am") {
       if (!isMobile) {
         root
           .select("svg")
@@ -633,26 +654,47 @@ class Body extends React.Component {
     }
   }
 
-  mobileOptions = {
-    Cancers: {
-      x: 180,
-      y: 25,
-    },
-    OtherConditions: {
-      x: 320,
-      y: 25,
-    },
-    viewBoxDims: "0 0 500 520",
-  };
-
   localeYDims = {
     en: "60",
     fr: "40",
+    am: "40",
   };
 
   localeXdims = {
     en: "-250",
     fr: "-280",
+    am: "-280",
+  };
+
+  titleDims = {
+    am: 160,
+    fr: 180,
+    en: 180,
+  }
+
+  titleLineWidths = {
+    Cancers: {
+      am: 125,  // Wider for Amharic text
+      fr: 58,
+      en: 58,
+    },
+    OtherConditions: {
+      am: 158, // Much wider for Amharic text
+      fr: 118,
+      en: 118,
+    },
+  }
+
+  mobileOptions = {
+    Cancers: {
+      x: this.titleDims[this.props.intl.locale],
+      y: 25,
+    },
+    OtherConditions: {
+      x: this.isIphone() && this.props.intl.locale === "am" ? 370 : 350,
+      y: 25,
+    },
+    viewBoxDims: "0 0 550 520",
   };
 
   render() {
@@ -684,6 +726,7 @@ class Body extends React.Component {
           <g onClick={this.handleTextClick}>
             <rect
               className="title-rect"
+              data-option="Cancers"
               x={
                 this.state.isMobile
                   ? this.mobileOptions["Cancers"]["x"] - 20
@@ -711,8 +754,13 @@ class Body extends React.Component {
                   : this.localeYDims[this.props.intl.locale]
               }
               className="title"
+              data-option="Cancers"
             >
-              <FormattedMessage id="ailments.title" defaultMessage="Cancers" />
+              <FormattedMessage
+                id="ailments.title"
+                defaultMessage="{cancers}"
+                values={{ cancers: this.messages[this.props.intl.locale]["ailments.title"] }}
+              />
             </text>
             {this.state.isMobile && (
               <rect
@@ -727,7 +775,7 @@ class Body extends React.Component {
                     ? this.mobileOptions["Cancers"]["y"] + 7
                     : ""
                 }
-                width="58"
+                width={this.titleLineWidths["Cancers"][this.props.intl.locale] || this.titleLineWidths["Cancers"]["en"]}
                 height="3"
                 fill="#E5EBED"
               />
@@ -736,6 +784,7 @@ class Body extends React.Component {
           <g onClick={this.handleTextClick}>
             <rect
               className="title-rect"
+              data-option="OtherConditions"
               x={
                 this.state.isMobile
                   ? this.mobileOptions["OtherConditions"]["x"] - 65
@@ -763,10 +812,12 @@ class Body extends React.Component {
                   : this.localeYDims[this.props.intl.locale]
               } // Ensure the default desktop y-position
               className="title"
+              data-option="OtherConditions"
             >
               <FormattedMessage
                 id="ailments.otherConditions"
-                defaultMessage="Other conditions"
+                defaultMessage="{otherConditions}"
+                values={{ otherConditions: this.messages[this.props.intl.locale]["ailments.otherConditions"] }}
               />
             </text>
             {this.state.isMobile && (
@@ -782,7 +833,7 @@ class Body extends React.Component {
                     ? this.mobileOptions["OtherConditions"]["y"] + 7
                     : "60"
                 } // Default desktop y-position
-                width="118"
+                width={this.titleLineWidths["OtherConditions"][this.props.intl.locale] || this.titleLineWidths["OtherConditions"]["en"]}
                 height="3"
                 fill="#E5EBED"
               />

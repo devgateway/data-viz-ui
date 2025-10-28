@@ -165,7 +165,6 @@ const DataFrame = (props) => {
     const formatNumber = (val) =>
         intl.formatNumber(val, { ...format });
 
-
     return (
         <div>
             <div style={numberStyle} className="big-number">

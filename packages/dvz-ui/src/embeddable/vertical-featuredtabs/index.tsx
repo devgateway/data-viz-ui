@@ -20,6 +20,7 @@ export interface VerticalFeaturedTabsProps {
     "data-colors": string;
     "data-cover-width"?: number;
     "data-read-more-label"?: string;
+    "data-click-to-expand-label"?: string;
     "data-preview-mode"?: string;
     editing: boolean;
     parent: string;
@@ -45,6 +46,7 @@ interface IntroWithFeaturedImageProps {
     coverWidth: number;
     index: number;
     editing: boolean;
+    clickToExpandLabel?: string;
 }
 
 interface FeaturedTabsProps {
@@ -260,7 +262,8 @@ const IntroWithFeaturedImage: React.FC<IntroWithFeaturedImageProps> = ({
     height,
     coverWidth,
     index,
-    editing
+    editing,
+    clickToExpandLabel
 }) => {
     const media = post._embedded ? post._embedded["wp:featuredmedia"] : null;
     const [isHovered, setIsHovered] = useState(false);
@@ -282,7 +285,9 @@ const IntroWithFeaturedImage: React.FC<IntroWithFeaturedImageProps> = ({
                     <PostIntro post={post} />
                 </div>
                 <div className="overlay-label-container">
-                    <div className={`overlay-label ${isHovered && !active ? 'visible' : ''}`}>CLICK TO EXPAND</div>
+                    <div className={`overlay-label ${isHovered && !active ? 'visible' : ''}`}>
+                        {clickToExpandLabel || 'CLICK TO EXPAND'}
+                    </div>
                     <div className="arrow-svg" />
                 </div>
             </div>
@@ -299,28 +304,43 @@ const IntroWithFeaturedImage: React.FC<IntroWithFeaturedImageProps> = ({
     );
 };
 
+interface FeaturedTabsProps {
+  editing: boolean;
+  posts: Array<any>;
+  height: number;
+  colors: { [key: string]: string };
+  coverWidth: number;
+  clickToExpandLabel?: string;
+}
+
 const FeaturedTabs: React.FC<FeaturedTabsProps> = ({
   editing,
   posts,
   height,
   colors,
   coverWidth,
+  clickToExpandLabel,
 }) => {
   const [active, setActive] = useState<string | null>(null);
   const targetRef = useRef<HTMLDivElement>(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // Only switch to a new slug; do nothing if slug === active
   const toggleAnimation = (slug: string) => {
-    setActive((prev) => (prev === slug ? null : slug));
+    if (active !== slug) {
+      setActive(slug);
+    }
   };
 
+  // If in editing mode and nothing is active yet, open the first post by default
   useEffect(() => {
-    if (posts.length > 0 && !active && editing) {
+    if (posts.length > 0 && active === null && editing) {
       setActive(posts[0].slug);
     }
   }, [posts, active, editing]);
 
+  // Measure dimensions and force overflow style on container
   useLayoutEffect(() => {
     if (targetRef.current?.parentElement) {
       setDimensions({
@@ -330,26 +350,33 @@ const FeaturedTabs: React.FC<FeaturedTabsProps> = ({
         height: targetRef.current.offsetHeight,
       });
     }
-    const container = containerRef.current;
-    if (!container) return;
-    container.style.overflow = editing ? 'visible' : 'hidden';
+
+    if (containerRef.current) {
+      containerRef.current.style.overflow = editing ? "visible" : "hidden";
+    }
   }, [editing]);
 
   return (
     <Container
       fluid={true}
-      className={"vertical featured tabs"}
+      className="vertical featured tabs"
       ref={containerRef}
     >
       {posts?.map((post, i) => {
-        const isActive = active ? post.slug === active : i === 0;
+        const isActive = active
+          ? post.slug === active
+          : i === 0; // fallback if active is still null
+
         return (
           <div
             key={post.slug}
             ref={targetRef}
             onClick={() => toggleAnimation(post.slug)}
             className={isActive ? "item expanded" : "item collapsed"}
-            style={{ minHeight: `${height}px`, minWidth: `${coverWidth}px` }}
+            style={{
+              minHeight: `${height}px`,
+              minWidth: `${coverWidth}px`,
+            }}
           >
             <a id={post.slug}></a>
             <IntroWithFeaturedImage
@@ -362,6 +389,7 @@ const FeaturedTabs: React.FC<FeaturedTabsProps> = ({
               active={isActive}
               post={post}
               index={i}
+              clickToExpandLabel={clickToExpandLabel}
             />
           </div>
         );
@@ -380,6 +408,7 @@ const Wrapper: React.FC<VerticalFeaturedTabsProps> = (props) => {
     "data-colors": colors,
     "data-cover-width": coverWidth = 50,
     "data-read-more-label": moreLabel = "READ More",
+    "data-click-to-expand-label": clickToExpandLabel = "CLICK TO EXPAND",
     "data-preview-mode": previewMode = 'Desktop',
     editing,
     parent,
@@ -396,12 +425,14 @@ const Wrapper: React.FC<VerticalFeaturedTabsProps> = (props) => {
   const dataCategories = categories ? categories : "[]";
 
   // Determine screen width and conditionally render components
-  const [isMobileOrTablet, setIsMobileOrTablet] = useState(window.innerWidth <= 1365);
+  const [isMobileOrTablet, setIsMobileOrTablet] = useState((window?.visualViewport?.width || window.innerWidth) <= 1365);
+
+  console.log('isMobileOrTablet:', isMobileOrTablet);
 
   const getScreenOrientation = (): string => {
     return (
       window.screen.orientation?.type ||
-      (window.innerWidth > window.innerHeight
+      ((window?.visualViewport?.width || window.innerWidth) > (window?.visualViewport?.height || window.innerHeight)
         ? "landscape-primary"
         : "portrait-primary")
     );
@@ -412,12 +443,12 @@ const Wrapper: React.FC<VerticalFeaturedTabsProps> = (props) => {
   const handleOrientationChange = () => {
     setTimeout(() => {
       setOrientation(getScreenOrientation());
-      setIsMobileOrTablet(window.innerWidth <= 1365);
+      setIsMobileOrTablet((window?.visualViewport?.width || window.innerWidth) <= 1365);
     }, 100);
   };
 
   useEffect(() => {
-    if (window && window.screen.orientation) {
+    if (window.screen.orientation) {
       window.screen.orientation.addEventListener(
         "change",
         handleOrientationChange
@@ -486,6 +517,7 @@ const Wrapper: React.FC<VerticalFeaturedTabsProps> = (props) => {
               editing={editing}
               coverWidth={coverWidth}
               moreLabel={moreLabel}
+              clickToExpandLabel={clickToExpandLabel}
               colors={parse(colors)}
               height={height}
               posts={items}
@@ -502,7 +534,7 @@ const mapStateToProps = (state, _ownProps) => {
     "data",
     "pageModuleProps"
   ]);
-  const _props: any = {};
+  const _props = {};
   if(pageModuleProps) {
     _props.pageModuleProps = pageModuleProps;
   }
