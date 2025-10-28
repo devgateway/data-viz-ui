@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Container, Icon } from "semantic-ui-react";
-import isEqual from 'lodash.isequal'
+import isEqual from 'lodash/isEqual'
 
 const PostsFiltersResetButton = (props) => {
     const {
