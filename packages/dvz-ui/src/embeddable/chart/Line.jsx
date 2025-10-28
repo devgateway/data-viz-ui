@@ -123,9 +123,6 @@ const Chart = ({
     color: colorGenerator.getColor(d.id, d),
   }));
 
-
-  console.log(lineCurve)
-
   const legendItems = () => {
     if (reverseLegend) {
       chartLegends.reverse();
@@ -289,7 +286,7 @@ const Chart = ({
                   ...theme.axis.ticks.text,
                   fill: xLabelColor === "null" ? "black" : xLabelColor,
                   fontSize: "12px",
-                  fontFamily: "Roboto",
+                  fontFamily: "sans-serif",
                 }}
               >
                 {line}
@@ -363,7 +360,7 @@ const Chart = ({
                 ...theme.axis.ticks.text,
                 fill: xLabelColor === "null" ? "black" : xLabelColor,
                 fontSize: "12px",
-                fontFamily: "Roboto",
+                fontFamily: "sans-serif",
               }}
             >
               {line}
@@ -562,14 +559,18 @@ const Chart = ({
       }
   }
 
+  const filtered = applyFilter(options.data);
+  const baseLayers = ["grid", "axes", "lines", "legends"]
+  const emptyLayers = ["grid", "axes", "legends"]
+
   if (options?.data && hasData > 0) {
     let filteredData = applyFilter(options.data)
     return (
       <div style={{ height: height }}>
         <ResponsiveLine
-        curve={lineCurve}
+          curve={lineCurve}
           key={new Date()}
-          data={filteredData}
+          data={filtered}
           margin={margins}
           xScale={{ type: "point" }}
           yScale={{
@@ -580,7 +581,7 @@ const Chart = ({
             reverse: false,
             clamp: minMaxClamp,
           }}
-          layers={layers}
+          layers={filtered.length === 0 ? emptyLayers : layers}
           axisTop={null}
           axisRight={
             showRightAxis

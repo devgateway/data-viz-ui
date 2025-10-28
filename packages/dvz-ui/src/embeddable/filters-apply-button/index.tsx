@@ -21,29 +21,29 @@ const FiltersResetComponent = (props) => {
     const [enabled, setEnabled] = useState(false)
     const [selectedFilters, setSelectedFilters] = useState(initialFilters)
 
-    
-    const filtersChanged = (filters, selectedFilters) => {    
+
+    const filtersChanged = (filters, selectedFilters) => {
         for (let k in selectedFilters) {
             if (filters[k].length !== selectedFilters[k].length) {
                 return true;
             }
-            for (let i = 0; i < filters[k].length; i++) {                
+            for (let i = 0; i < filters[k].length; i++) {
                 if (filters[k][i] !== selectedFilters[k][i]) {
                     return true;
                 }
             }
         }
 
-        return false;        
+        return false;
     }
 
-    useEffect(() => {   
-       const changed = filtersChanged(filters, selectedFilters); 
+    useEffect(() => {
+       const changed = filtersChanged(filters, selectedFilters);
        if (changed) {
-           setEnabled(changed);           
+           setEnabled(changed);
         }
         setSelectedFilters(filters)
-       
+
     }, [filters])
 
     useEffect(() => {

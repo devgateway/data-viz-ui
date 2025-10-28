@@ -1,4 +1,5 @@
 import React, {LegacyRef, useRef, useState} from 'react';
+import "jspdf/dist/polyfills.es.js";
 import {Button, Container} from "semantic-ui-react";
 
 interface DownloadableContentProps {

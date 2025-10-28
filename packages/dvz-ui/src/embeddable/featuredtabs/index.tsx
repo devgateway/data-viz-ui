@@ -18,7 +18,8 @@ interface FeaturedTabsProps {
     width: number,
     height: number,
     color: string,
-    moreLabel: string
+    moreLabel: string,
+    closeLabel?: string
 }
 
 export interface FeatureTabsProps {
@@ -30,6 +31,7 @@ export interface FeatureTabsProps {
     "data-items": any,
     "data-color": string,
     "data-read-more-label": string,
+    "data-close-label": string,
     "data-use-scrolls": string,
     "data-preview-mode": string,
     pageModuleProps: any,
@@ -86,7 +88,7 @@ const GetFigureFromPost: React.FC<GetFigureFromPostProps> = ({ post }) => {
 };
 
 // Desktop FeaturedTabs Component
-const FeaturedTabs: React.FC<FeaturedTabsProps> = ({ posts, width, height, color, moreLabel }) => {
+const FeaturedTabs: React.FC<FeaturedTabsProps> = ({ posts, width, height, color, moreLabel, closeLabel }) => {
     const [active, setActive] = useState<string | null>(null);
     const [visible, setVisible] = useState(false);
     const [scrollPos, setScrollPos] = useState<[number, number]>([0, 0]);
@@ -156,7 +158,7 @@ const FeaturedTabs: React.FC<FeaturedTabsProps> = ({ posts, width, height, color
                             </Segment>
                             <PostContent as={"div"} fluid={true} post={post} style={{ maxHeight: `calc(${height}px - 150px)` }}
                             />
-                            <Label className={"closeIconText"} style={{ backgroundColor: `${arrayColors[i]}` }} onClick={() => setActive(null)}><Icon name='times circle outline' size="large" /> Close </Label>
+                            <Label className={"closeIconText"} style={{ backgroundColor: `${arrayColors[i]}` }} onClick={() => setActive(null)}><Icon name='times circle outline' size="large" /> {closeLabel || 'Close'} </Label>
                         </Grid.Column>
                     </React.Fragment>
                 ))}
@@ -296,6 +298,7 @@ const Wrapper: React.FC<FeatureTabsProps> = (props) => {
         "data-color": color,
         "data-use-scrolls": useScrolls,
         "data-read-more-label": moreLabel = "READ More",
+        "data-close-label": closeLabel = "Close",
         "data-preview-mode": previewMode = "Desktop",
         editing,
         parent,
@@ -343,6 +346,7 @@ const Wrapper: React.FC<FeatureTabsProps> = (props) => {
                     ) : (
                         <FeaturedTabs
                             moreLabel={moreLabel}
+                            closeLabel={closeLabel}
                             color={color}
                             width={width}
                             height={height}
