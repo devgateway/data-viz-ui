@@ -3,7 +3,7 @@ import {
     Container
 } from "semantic-ui-react";
 import { toBoolean, toNumber } from '@/utils/data';
-import { getYearRange } from "@devgateway/wp-react-lib/api";
+import { getYearRange } from "@devgateway/wp-react-lib";
 import PostsFilterDropdown from "./PostsFilterDropdown";
 import type { PostFilterDropdownProps } from "./PostsFilterDropdown";
 import { Config } from "@/conf";
