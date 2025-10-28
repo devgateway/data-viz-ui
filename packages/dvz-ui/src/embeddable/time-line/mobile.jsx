@@ -1,12 +1,12 @@
 import { PostConsumer, PostProvider } from "@devgateway/wp-react-lib";
 import PostIntro from "../connected-templates/PostIntro";
+import "pure-react-carousel/dist/react-carousel.es.css";
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Container } from "semantic-ui-react";
 import * as d3 from "d3";
 import { Modal } from "semantic-ui-react";
 import { useWindowDimensionsAndDevice } from "@/lib/hooks/window-dimensions";
 import { useScreenOrientation } from "@/lib/hooks/screen-orientation";
-import { Loading } from "@/layout";
 
 const visibleStyle = {
   visibility: "visible",
@@ -336,7 +336,7 @@ const TimeLine = (props) => {
       .style("font-weight", "400")
       .style("color", "#4C4D50")
       .html((d) => d.meta_fields.subtitle);
-  }, [deviceType, orientation]);
+  }, [deviceType, orientation, height]);
 
   return (
     <div
@@ -376,12 +376,12 @@ const TimeLine = (props) => {
             />
           );
         })}
-      <svg height={height} width={parentWidth} ref={ref} />
+      <svg height={height} width={parentWidth} ref={ref} style={{ overflow: 'visible'}} />
     </div>
   );
 };
 
-const PostCarouselComponent = (props) => {
+const PostCarousel = (props) => {
   const {
     "data-type": type,
     "data-taxonomy": taxonomy,
@@ -440,8 +440,8 @@ const PostCarouselComponent = (props) => {
 
   return (
     <Container
-      style={{ height: `${height}px` }}
-      className={`viz time line ${editing ? "editing" : ""}`}
+      style={{ height: 'auto' }}
+      className={`viz time line ${editing ? "editing" : ""} mobile`}
       fluid={true}
     >
       <PostProvider
@@ -460,20 +460,5 @@ const PostCarouselComponent = (props) => {
     </Container>
   );
 };
-
-
-const PostCarousel = (props) => {
-  const [showChild, setShowChild] = useState(false);
-  useEffect(() => {
-    setShowChild(true)
-  }, []);
-
-  if (!showChild){
-    return <Loading/>
-  }
-
-  return <PostCarouselComponent {...props} />;
-};
-
 
 export default PostCarousel;

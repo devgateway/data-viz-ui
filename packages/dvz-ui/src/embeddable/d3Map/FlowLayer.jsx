@@ -325,8 +325,6 @@ class DataLayer extends BaseLayer {
         }
 
         if (prevProps.visible != this.props.visible) {
-            //eslint-disable-next-line
-            debugger
             this.g.style("display", this.props.visible ? "" : "none")
         }
     }

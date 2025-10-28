@@ -16,6 +16,7 @@ import CategoriesProvider from "../data/CategoriesProvider";
 import {connect} from "react-redux";
 import {setFilter, setInitialFilters} from "../reducers/data";
 import {injectIntl} from "react-intl";
+import {SettingProvider, SettingsConsumer} from "@devgateway/wp-react-lib";
 
 const FILTER_TYPE_MULTI_SELECT = "multi-select";
 const FILTER_TYPE_SINGLE_SELECT = "single-select";
@@ -88,9 +89,8 @@ interface FilterDropDownProps {
 
 const FilterDropDown = (props: FilterDropDownProps) => {
     const {isRange, options, alphabeticalSort, ascOrder} = props;
-    let sortedOptions: any[] = [];
     if (booleanParameter(alphabeticalSort)) {
-        sortedOptions = options.sort(function (a, b) {
+        options.sort(function (a, b) {
             const aText = a.text ? a.text.toLowerCase() : "";
             const bText = b.text ? b.text.toLowerCase() : "";
             if (booleanParameter(ascOrder)) {
@@ -100,14 +100,14 @@ const FilterDropDown = (props: FilterDropDownProps) => {
             }
         });
     } else {
-        sortedOptions = options.sort(function (a, b) {
+       options.sort(function (a, b) {
             return booleanParameter(ascOrder)
                 ? a.position - b.position
                 : b.position - a.position;
         });
     }
 
-    const filterProps = {...props, options: sortedOptions};
+    const filterProps = {...props, options};
 
     if (isRange) {
         return <RangeFilterDropDown {...filterProps} />;
@@ -242,7 +242,7 @@ const ListFilterDropDown = connect(
     };
 
     const freeTextSelect = (searchText) => {
-        setSearchText(searchText);      
+        setSearchText(searchText);
     };
 
     useEffect(() => {
@@ -316,7 +316,7 @@ const ListFilterDropDown = connect(
             text={getSelected()}
             scrolling={false}
             button
-            icon={"angle down"}
+            icon={"angle down ignore"}
             multiple={true}
             search
             floating={false}
@@ -477,7 +477,7 @@ const RangeFilterDropDown = connect(
                 multiple={true}
                 search
                 floating={false}
-                icon="angle down"
+                icon="angle down ignore"
                 className={`${current && current.length > 0 ? "applied " : ""} range`}
             >
                 <Dropdown.Menu>
@@ -611,8 +611,11 @@ const CSVFilter = (props) => {
 
 const FilterWrapper = (props) => {
     return (
-        <Filter {...props}></Filter>
-
+        <SettingProvider locale={props.intl.locale} changeUUID={props.unique}>
+            <SettingsConsumer>
+                <Filter {...props}></Filter>
+            </SettingsConsumer>
+        </SettingProvider>
     );
 };
 
@@ -688,6 +691,7 @@ const Filter = ({
                 startLabel={startLabel}
                 endLabel={endLabel}
                 param={param}
+                ascOrder={ascOrder}
                 useSingleColumn={useSingleColumn === "true"}
                 enableTextSearch={enableTextSearch === "true"}
                 filterType={defaultFilterType}

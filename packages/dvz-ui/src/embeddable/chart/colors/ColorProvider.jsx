@@ -27,10 +27,10 @@ class ColorProvider extends React.Component {
       locale,
       overallLabel,
       customLabels,
-      options: { data, keys, indexBy, dimensionsMetadata, measuresMetadata },
+      options
     } = this.props;
     let colorManager;
-
+    const { data, keys, indexBy, dimensionsMetadata, measuresMetadata } = this.props.options;
     if (data) {
       if (scheme === "system") {
         colorManager = new SystemColors(
@@ -43,7 +43,8 @@ class ColorProvider extends React.Component {
           indexBy,
           dimensionsMetadata,
           measuresMetadata,
-          locale
+          locale,
+          options
         );
       } else if (scheme === "plain_color") {
         colorManager = new PlainColor(barColor);
@@ -61,7 +62,8 @@ class ColorProvider extends React.Component {
           manualColors,
           locale,
           overallLabel,
-          customLabels
+          customLabels,
+          options
         );
       } else {
         if (isSequentialColorScheme(scheme)) {

@@ -1,5 +1,6 @@
 import {PostConsumer, PostProvider} from "@devgateway/wp-react-lib";
 import PostIntro from "../connected-templates/PostIntro";
+import 'pure-react-carousel/dist/react-carousel.es.css';
 import React, {useState} from "react";
 import {Container} from "semantic-ui-react";
 import {CarouselProvider, Slide, Slider} from "pure-react-carousel";
@@ -7,7 +8,7 @@ import TimeLine from "./timeline";
 
 
 const Carousel = (props) => {
-
+    
     let i = 0
     const {posts, height, interval, autoSwitch,currentSlide} = props
     return (<CarouselProvider currentSlide={currentSlide}
@@ -48,7 +49,7 @@ const Component = (props) => {
     const [currentSlide,setCurrentSlide]=useState([0])
 
     const decode = (value) => {
-
+        
         if (editing) {
             return value
         }

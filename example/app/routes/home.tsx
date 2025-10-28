@@ -51,7 +51,7 @@ const Home = ({
   const locale = params.lan ?? DEFAULT_LOCALE;
 
   return (
-    <ResponsiveContainer locale={locale} header={<Header {...loaderData} locale={params.lan}/>}>
+    <ResponsiveContainer locale={locale}>
       <Page pages={[loaderData.post]} />
     </ResponsiveContainer>
   )

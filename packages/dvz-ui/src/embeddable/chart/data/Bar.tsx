@@ -190,8 +190,8 @@ const BarOneDimension = (props) => {
         } else {
             if (data.children[0]) {
                 indexBy = data.children[0].type;
-            }         
-            
+            }
+
             data.children.forEach((d) => {
                 const variables = {};
                 const row = {};
@@ -377,29 +377,31 @@ const Bar2Dimensions = (props) => {
         } else if (props.sort == "values") {
             // @ts-ignore
             filtered.sort((a, b) => {
-                if (props.sortSecondDimension == "_total") {
-                    const va = Math.max(...allKeys.map((k: any) => a[k]));
-                    const vb = Math.max(...allKeys.map((k: any) => b[k]));
-                    return numericSort(props.sortReverse, va, vb);
-                } else {                    
-                    const sumA = Object.keys(a).reduce((acc, key) => {                        
-                       if (key !== indexBy && key !== "variables" && key !== "parent_variables" && !isNaN(a[key])) {                            
-                            return acc + (a[key] || 0);
-                        }
-                        return acc;
-                    }, 0);
-                    const sumB = Object.keys(b).reduce((acc, key) => {
-                        
-                        if (key !== indexBy && key !== "variables" && key !== "parent_variables" && !isNaN(b[key])) {                             
-                            return acc + (b[key] || 0);
-                        }
-                        return acc;
-                    }, 0);
-                   
-                    return numericSort(props.sortReverse, sumA, sumB);
-                }
+
+                const va = allKeys.map((k: any) => a[k]).filter(a=>a).reduce((a,b)=>a+b)
+                const vb =allKeys.map((k: any) => b[k]).filter(a=>a).reduce((a,b)=>a+b)
+                console.log(allKeys.map((k: any) => a[k]))
+                if (va === undefined || va === null) return 1;
+                if (vb === undefined || vb === null) return -1;
+
+                return numericSort(props.sortReverse, va,vb);
             });
+        } else {
+            //The use selected a category (slice) to sort the bars
+            filtered.sort((a, b) => {
+                const va= a[props.sort];
+                const vb= b[props.sort];
+
+                if (va === undefined || va === null) return 1;
+                if (vb === undefined || vb === null) return -1;
+
+                return numericSort(props.sortReverse, va, vb);
+            });
+
+
         }
+
+
         const arrayKeys = [...keys];
 
         //second level sort by position only

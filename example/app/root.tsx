@@ -21,12 +21,11 @@ import { getApiUrl } from "./utils/api-utils";
 
 
 export const links: Route.LinksFunction = () => [
-    { rel: "stylesheet", href: semanticCssHref },
-    { rel: "stylesheet", href: dvzCommonCssHref },
-    { rel: "stylesheet", href: dvzStylesCssHref },
-    // Ensure your app styles load last to override library defaults
-    { rel: "stylesheet", href: appCssHref },
-    { rel: "preconnect", href: "https://fonts.googleapis.com" },
+  { rel: "stylesheet", href: semanticCssHref },
+  { rel: "stylesheet", href: dvzCommonCssHref },
+  { rel: "stylesheet", href: dvzStylesCssHref },
+  // Ensure your app styles load last to override library defaults
+  { rel: "preconnect", href: "https://fonts.googleapis.com" },
   {
     rel: "preconnect",
     href: "https://fonts.gstatic.com",
@@ -42,6 +41,7 @@ export const links: Route.LinksFunction = () => [
     href: "https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap",
   },
   // Keep third‑party CSS in explicit order
+  { rel: "stylesheet", href: appCssHref },
 
 ];
 
@@ -68,7 +68,7 @@ export async function loader({ request }: Route.LoaderArgs): Promise<{ faviconUr
 // }
 
 
-export function Layout({ children }: Readonly<{ children: React.ReactNode}>) {
+export function Layout({ children }: Readonly<{ children: React.ReactNode }>) {
   const data = useLoaderData<typeof loader>();
 
   const navigation = useNavigation();
@@ -84,7 +84,9 @@ export function Layout({ children }: Readonly<{ children: React.ReactNode}>) {
         <SSRFavicon siteLogo={data?.faviconUrl ?? ""} />
       </head>
       <body>
-        {children}
+        <div id="root">
+          {children}
+        </div>
         <ScrollRestoration />
         <Scripts />
       </body>
@@ -94,7 +96,7 @@ export function Layout({ children }: Readonly<{ children: React.ReactNode}>) {
 
 export default function App() {
   return (
-    <Outlet/>
+    <Outlet />
   );
 }
 
