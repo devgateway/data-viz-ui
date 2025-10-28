@@ -24,10 +24,10 @@ const Chart = (props) => {
         'data-format': format = '{}',
         'data-group': group,
         'data-filters': filters = '[]',
-        'data-text-color': textColor = '#000000',        
+        'data-text-color': textColor = '#000000',
         'data-big-number-font-size': bigNumberFontSize = 20,
         'data-label-font-size': labelFontSize = 20,
-        'data-percent-font-size': percentFontSize = 20,        
+        'data-percent-font-size': percentFontSize = 20,
         'data-label': label = '',
         'data-dimension1': dimension1,
         'data-show-percentage-change': showPercentageChange = 'false',
@@ -36,7 +36,7 @@ const Chart = (props) => {
 
     } = props
 
- 
+
     const locale = intl.locale
     const ref = useRef(null);
     const decode = (value) => {
@@ -87,11 +87,11 @@ const Chart = (props) => {
         params.dvzProxyDatasetId = dvzProxyDatasetId;
       }
 
-    const dimensions = []   
+    const dimensions = []
     if (dimension1 != "none") {
         dimensions.push(dimension1)
-    }   
-         
+    }
+
     return (<div ref={ref}>
         <Container className={"chart container big-number-trend-container"} style={{"height": height + 'px'}} fluid={true}>
             <DataProvider
@@ -102,13 +102,13 @@ const Chart = (props) => {
                 csv={csv}
                 editing={editing}
                 waitForFilters={waitForFilters === "true"}
-                store={[app, unique, ...dimensions]} source={dimensions.join("/")}>               
+                store={[app, unique, ...dimensions]} source={dimensions.join("/")}>
                     <DataConsumer>
                         <DataFrame
                           editing={editing}
-                          locale={locale}                          
+                          locale={locale}
                           intl={intl}
-                          app={app}                          
+                          app={app}
                           format={numberFormat}
                           dimension1={dimension1}
                           measure={parse(measures)[0] || null}
@@ -117,12 +117,12 @@ const Chart = (props) => {
                             textColor={textColor}
                             labelFontSize={labelFontSize}
                             percentFontSize={percentFontSize}
-                            showPercentageChange={showPercentageChange == 'true' || showPercentageChange == true} 
+                            showPercentageChange={showPercentageChange == 'true' || showPercentageChange == true}
                             noDataText={noDataText}
                             >
                        </DataFrame>
-                    </DataConsumer>                
-            </DataProvider>           
+                    </DataConsumer>
+            </DataProvider>
 
         </Container>
     </div>)
@@ -130,37 +130,37 @@ const Chart = (props) => {
 }
 
 const DataFrame = (props) => {
-    const { editing, app, measure, dimension1, data, format, label, textColor, bigNumberFontSize, 
+    const { editing, app, measure, dimension1, data, format, label, textColor, bigNumberFontSize,
         percentFontSize, labelFontSize, showPercentageChange, intl, noDataText} = props
     let dataItems = [];
     let dimensionField
     let measureField
 
-    if (app =="csv") {        
+    if (app =="csv") {
         const { data: json, meta: { fields } } = data
         dimensionField = fields[0];
-        measureField = fields[1];        
+        measureField = fields[1];
         dataItems = data.data.map(d => {
             return {
                 value: d[dimensionField],
                 [measureField]: d[measureField],
-                [dimensionField]: d[dimensionField]               
+                [dimensionField]: d[dimensionField]
             }
         })
-    } else {      
+    } else {
         dataItems = !data.children  || data.children.length == 0 ? [] : data.children
         measureField = measure;
         dimensionField = dimension1;
-       
+
         dataItems = dataItems.map(d => {
             return {
                 value: d.value,
                 [measureField]: d[measureField],
-                [dimensionField]:d.value                
+                [dimensionField]:d.value
             }
         })
    }
-    
+
     let currentValue = null
     let previousValue = null
     let percentChange;
@@ -184,12 +184,12 @@ const DataFrame = (props) => {
         if (previousValue) {
             percentChange = ((currentValue - previousValue) / previousValue)
             percentChangeFormatted = intl.formatNumber(percentChange, { style: 'percent', minimumFractionDigits: 2, maximumFractionDigits: 2 })
-        } 
-    } 
+        }
+    }
 
     if (currentValue == null) {
        formattedNumber = noDataText;
-    }   
+    }
 
     const numberStyle = {
         color: decodeURIComponent(textColor),
@@ -201,16 +201,16 @@ const DataFrame = (props) => {
     }
     const labelStyle = {
         color: decodeURIComponent(textColor),
-        fontSize: labelFontSize + 'px'        
+        fontSize: labelFontSize + 'px'
     }
 
-    return <div className="trend">       
-           <div className="label" style={labelStyle}>{template(label, dataItems[dataItems.length - 1])}</div>      
+    return <div className="trend">
+           <div className="label" style={labelStyle}>{template(label, dataItems[dataItems.length - 1])}</div>
 
         <div className="number-and-icon">
             <span className="number" style={numberStyle}>{formattedNumber}</span>
             {percentChange &&
-                <div className={percentChange > 0 ? "icon trend up" : "icon trend down"}/>
+                <img src={percentChange > 0 ? "/trend-up.svg" : "/trend-down.svg"} alt="Arrow" className="icon" />
             }
         </div>
         {showPercentageChange && percentChange &&
