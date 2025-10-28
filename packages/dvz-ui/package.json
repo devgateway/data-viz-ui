@@ -35,7 +35,6 @@
   "bugs": "https://github.com/devgateway/data-viz-ui/issues",
   "dependencies": {
     "@artsy/fresnel": "^8.1.0",
-    "@devgateway/wp-react-lib": "workspace:*",
     "@nivo/bar": "^0.96.0",
     "@nivo/bump": "^0.96.0",
     "@nivo/colors": "^0.96.0",
@@ -86,6 +85,7 @@
     "uuid": "^11.1.0"
   },
   "devDependencies": {
+    "@devgateway/wp-react-lib": "workspace:*",
     "@eslint/js": "^9.37.0",
     "@stylistic/eslint-plugin-js": "^4.2.0",
     "@types/d3": "^7.4.3",
