@@ -1,7 +1,7 @@
 import {reactRouter} from "@react-router/dev/vite";
 import {defineConfig} from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
-import Environment from 'vite-plugin-env-compatible';
+import EnvironmentPlugin from 'vite-plugin-environment'
 import commonjs from 'vite-plugin-commonjs';
 import {libInjectCss} from 'vite-plugin-lib-inject-css';
 import {resolve} from 'path';
@@ -12,7 +12,7 @@ const devConfig = defineConfig({
     plugins: [
         reactRouter(),
         tsconfigPaths(),
-        Environment({
+        EnvironmentPlugin({
             prefix: "VITE_",
         }),
         commonjs(),
