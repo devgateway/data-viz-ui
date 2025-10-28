@@ -1,8 +1,21 @@
+const updateItemLabels = (items) => {
+  const updatedItems = items?.map((item) => {
+    const groupName = item.group.label;
+    if (item.label.includes(groupName)) return item;
+    return {
+      ...item,
+      label: `${groupName} - ${item.label}`,
+    };
+  });
+  return updatedItems;
+};
+
 export const measuresMap = (data) => {
   const { metadata } = data ? data : {};
   const metadataMap = {};
+  const updatedMeasures = updateItemLabels(metadata?.measures || []);
   if (metadata) {
-    metadata.measures.forEach((f) => {
+    updatedMeasures.forEach((f) => {
       metadataMap[f.value] = f;
     });
   }
@@ -29,7 +42,6 @@ export const measureLabel = (map, field) => {
 };
 
 export const getTranslatedValue = (obj, locale) => {
-
   if (obj) {
     if (obj.labels && obj.labels[locale.toUpperCase()]) {
       return obj.labels[locale.toUpperCase()];
@@ -66,7 +78,7 @@ const parseMonthYear = (str) => {
     console.error(`Invalid month/year format: ${str}`);
   }
 
-  return new Date(year, month, 1); 
+  return new Date(year, month, 1);
 }
 
 export const dateSort = (reverse, a, b) => {
@@ -74,7 +86,7 @@ export const dateSort = (reverse, a, b) => {
   let bDate = Date.parse(b);
 
   if (isNaN(aDate)) {
-    aDate = parseMonthYear(a);    
+    aDate = parseMonthYear(a);
   }
   if (isNaN(bDate)) {
     bDate = parseMonthYear(b);
@@ -85,7 +97,14 @@ export const dateSort = (reverse, a, b) => {
   }
 
   return 0;
-}
+};
 
-
-export default { measuresMap, typesMap, measureLabel, getTranslatedValue, alphaSort, numericSort, dateSort };
+export default {
+  measuresMap,
+  typesMap,
+  measureLabel,
+  getTranslatedValue,
+  alphaSort,
+  numericSort,
+  dateSort,
+};

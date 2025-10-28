@@ -181,12 +181,12 @@ const LineOneDimension = (props) => {
           serie.data = serieData;
         }
       });
-      series.push(serie)
+      series.push(serie);
     });
 
     const allKeys = Array.from(keys);
     let filtered =
-      hiddenBars && series
+      hiddenBars?.length > 0 && series?.length > 0
         ? series.filter((s) => hiddenBars.indexOf(s[indexBy]) == -1)
         : series;
 
@@ -233,15 +233,15 @@ const Line2Dimensions = (props) => {
     const measuresMetadata = new Set()
     const keys = []
     const series = [];
-    const indexBy = data.children[0].type;
+    const indexBy = data.children[0]?.type;
 
     const firstDimensionItems = data?.metadata?.types?.find(d => d.dimension == selectedDimensions[0])?.items || [];
-     
+
     const secondDimensionItems = data?.metadata?.types?.find(d => d.dimension == selectedDimensions[1])?.items || [];
     if (props.sortSecondDimension == "alphabetically") {
       secondDimensionItems.sort((a, b) =>
           alphaSort(props.sortReverseSecondDimension, locale, a.value, b.value)
-      );    
+      );
     } else if (props.sortSecondDimension == "date") {
       secondDimensionItems.sort((a, b) =>
           dateSort(props.sortReverseSecondDimension, a.value, b.value)
@@ -257,10 +257,10 @@ const Line2Dimensions = (props) => {
       const serieData = [];
       firstDimensionItems.forEach(fdi => {
         const itemData = data.children.find(c => c.value === fdi.value)
-        dimensionsMetadata.add(tMap[itemData.type]);
-        const childItemData = itemData.children.find(c => c.value === sdi.value)
+        dimensionsMetadata.add(tMap[itemData?.type]);
+        const childItemData = itemData?.children.find(c => c.value === sdi.value)
         if (childItemData) {
-          dimensionsMetadata.add(tMap[childItemData.type]);
+          dimensionsMetadata.add(tMap[childItemData?.type]);
           const variables = {};
           Object.keys(childItemData).forEach((k) => {
             variables[k] = childItemData[k];
@@ -268,11 +268,11 @@ const Line2Dimensions = (props) => {
           variables["value"] = childItemData[measures[0]];
           variables[itemData.type] = itemData.value.toString();
           variables[childItemData.type] = childItemData.value.toString();
-          serieData.push({x: itemData.value, y: childItemData[measures[0]], variables});  
-          
+          serieData.push({x: itemData.value, y: childItemData[measures[0]], variables});
+
           if (keys.indexOf(itemData.value) == -1) {
             keys.push(itemData.value);
-          }       
+          }
         }
       })
       serie.data = serieData;

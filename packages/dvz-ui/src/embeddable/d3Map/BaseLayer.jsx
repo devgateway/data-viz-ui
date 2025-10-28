@@ -102,8 +102,6 @@ class BaseLayer extends Layer {
             minLabelZoomVisible=-1
 
         } = this.props
-        //eslint-disable-next-line
-        debugger
         const k = this.props.transform ? this.props.transform.k : 1
         console.log("minLabelZoomVisible",minLabelZoomVisible,k)
 
@@ -128,8 +126,6 @@ class BaseLayer extends Layer {
         this.createLabels(json);
 
         if (this.props.onReady) {
-            //eslint-disable-next-line
-            debugger;
             this.props.onReady();
         }
     }
@@ -166,4 +162,3 @@ class BaseLayer extends Layer {
 
 
 export default BaseLayer
-

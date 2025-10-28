@@ -662,7 +662,7 @@ const Chart = ({
                   ...theme.axis.ticks.text,
                   fill: xLabelColor === "null" ? "black" : xLabelColor,
                   fontSize: "12px",
-                  fontFamily: "Roboto",
+                  fontFamily: "sans-serif",
                 }}
               >
                 {line}
@@ -696,7 +696,7 @@ const Chart = ({
                   ...theme.axis.ticks.text,
                   fill: xLabelColor === "null" ? "black" : xLabelColor,
                   fontSize: "12px",
-                  fontFamily: "Roboto",
+                  fontFamily: "sans-serif",
                 }}
               >
                 {line}
@@ -729,7 +729,7 @@ const Chart = ({
                   ...theme.axis.ticks.text,
                   fill: xLabelColor === "null" ? "black" : xLabelColor,
                   fontSize: "12px",
-                  fontFamily: "Roboto",
+                  fontFamily: "sans-serif",
                 }}
               >
                 {line}
@@ -813,7 +813,7 @@ const Chart = ({
             style={{
               fill: xLabelColor === "null" ? "black" : xLabelColor,
               fontSize: "12px",
-              fontFamily: "Roboto",
+              fontFamily: "sans-serif",
             }}
           >
             {line}
@@ -1012,9 +1012,9 @@ const Chart = ({
   };
 
   const margins = {
-    top: newMarginTop,
+    top: marginTop,
     right: marginRight,
-    bottom: newMarginBottom,
+    bottom: marginBottom,
     left: marginLeft,
   };
 
@@ -1035,6 +1035,8 @@ const Chart = ({
 
   const getValuesFromData = () => {
     const values: number [] = [];
+
+    // Include confidence intervals
     if (confidenceIntervals) {
       confidenceIntervals.forEach((c) => {
         if (c.low) {
@@ -1044,75 +1046,96 @@ const Chart = ({
           values.push(parseFloat(c.high));
         }
       });
-
-      if (options.data) {
-        const filteredData = applyFilter(options.data, false)
-        const filteredKeys = applyFilter(options.keys, true)
-        filteredData.forEach((d) => {
-          filteredKeys.forEach((k) => {
-            if (d[k]) {
-              values.push(d[k]);
-            }
-          });
-        });
-      }
     }
+
+    // Include filtered bar data
+    if (options.data) {
+      const filteredData = applyFilter(options.data, false)
+      const filteredKeys = applyFilter(options.keys, true)
+      filteredData.forEach((d) => {
+        filteredKeys.forEach((k) => {
+          if (d[k]) {
+            values.push(d[k]);
+          }
+        });
+      });
+    }
+
+    // Include ALL active line overlay data
+    if (lineLayerEnabled && overlays) {
+      overlays.forEach((o, idx) => {
+        if (showLine[idx] !== false) { // Include if line is visible
+          if (o.app === "csv" && o.csvLineLayerData) {
+            const overlayData = Papa.parse(o.csvLineLayerData, {
+              header: false,
+              dynamicTyping: true,
+            });
+            if (overlayData.data) {
+              overlayData.data
+                .filter((d: any) => d[1] !== null && typeof d[1] === 'number')
+                .forEach((d: any) => values.push(d[1]));
+            }
+          } else if (o.measure[0] && options.data) {
+            options.data.forEach((d) => {
+              const value = d.variables?.[o.measure[0]];
+              if (value !== null && typeof value === 'number') {
+                values.push(value);
+              }
+            });
+          }
+        }
+      });
+    }
+
     return values;
   };
 
-  const values = getValuesFromData();
-  const dataMax = Math.max(...values);
-  const dataMin = Math.min(...values);
-
   const getMaxValueFromData = () => {
-    const filteredData = applyFilter(options.data, false)
-    const filteredKeys = applyFilter(options.keys, true)
-    if (
-      (groupMode === "stacked" && maxValue !== "fixed") ||
-      (maxValue === "fixed" && fixedMaxValue === null) ||
-      // @ts-ignore
-      fixedMaxValue === ""
-    ) {
+    const values = getValuesFromData();
+    const dataMax = values.length > 0 ? Math.max(...values) : 0;
 
-      let keys = filteredKeys.length > 0 ? filteredKeys : options.keys;
-      return (
-        Math.max(
-          Math.max(
-            ...filteredData
-              .map((d) => keys.map((x) => (d[x] ? d[x] : 0)))
-              .map((l) =>
-                l.reduce((a, b) => {
-                  return Math.max(a + b, a + 0);
-                })
-              )
-          ),
-          overLayMax
-        ) * 1.1
-      );
+    // If fixed max value is set, use it
+    if (maxValue === "fixed" && fixedMaxValue !== null && fixedMaxValue !== "") {
+      return Number(fixedMaxValue);
     }
 
-    return maxValue === "fixed" &&
-      fixedMaxValue !== null &&
-      // @ts-ignore
-      fixedMaxValue !== ""
-      ? fixedMaxValue
-      : Math.max(overLayMax, dataMax) * 1.05;
+
+    // For stacked mode, calculate stacked totals and compare with overlay data
+    if (groupMode === "stacked" && maxValue !== "fixed") {
+      const filteredData = applyFilter(options.data, false);
+      const filteredKeys = applyFilter(options.keys, true);
+      let keys = filteredKeys.length > 0 ? filteredKeys : options.keys;
+
+      const stackedMax = Math.max(
+        ...filteredData
+          .map((d) => keys.map((x) => (d[x] ? d[x] : 0)))
+          .map((l) =>
+            l.length > 0 ? l.reduce((a, b) => a + b, 0) : 0
+          )
+      );
+
+      return Math.max(stackedMax, dataMax) * 1.1;
+    }
+
+    // For non-stacked mode, use the maximum from all data sources
+    return dataMax * 1.05;
   };
 
   const getMinValueFromData = () => {
-    const minVal = Math.min(overLayMin, dataMin);
-    return maxValue === "fixed" &&
-      fixedMinValue !== null &&
-      // @ts-ignore
-      fixedMinValue !== ""
-      ? fixedMinValue
-      : minVal > 0
-        ? minVal * 0.9
-        : minVal * 1.1;
+    const values = getValuesFromData();
+    const dataMin = values.length > 0 ? Math.min(...values) : 0;
+
+    if (maxValue === "fixed" && fixedMinValue !== null && String(fixedMinValue) !== "") {
+      return Number(fixedMinValue);
+    }
+
+    return dataMin > 0 ? dataMin * 0.9 : dataMin * 1.1;
   };
 
-  const maxValueFromData = getMaxValueFromData();
-  const minValueFromData = getMinValueFromData();
+  const maxValueFromData = Number(getMaxValueFromData());
+  const minValueFromData = Number(getMinValueFromData());
+  const domainMin = Math.min(0, minValueFromData);
+  const domainMax = Math.max(0, maxValueFromData);
 
   const layers: any [] = ["grid", "axes", "bars"];
   if (showGroupTotal) {
@@ -1230,17 +1253,14 @@ return (
             animate={true}
             enableLabel={barLabelPosition == POSITION_MIDDLE}
             {...options}
-            maxValue={maxValueFromData as number}
-            minValue={minValueFromData}
+            maxValue={domainMax}
+            minValue={domainMin}
             keys={applyFilter(options.keys, true)}
             data={applyFilter(options.data, false)}
             groupMode={groupMode ? groupMode : "grouped"}
             margin={margins}
             innerPadding={barInnerPadding}
-            valueScale={{
-              type: valueScale,
-              clamp: maxValue === "fixed" && minMaxClamp,
-            }}
+            valueScale={{ type: valueScale, clamp: true }}
             colors={(d) => {
               if (d && d.data[COLOR_VARIABLE]) {
                 return d.data[COLOR_VARIABLE];

@@ -157,7 +157,7 @@ const DataPointsLayerLegend = (props) => {
         d2Click,
         selectedItem
     } = props
-    
+
     const numberFormat = {
         style: (format.style === 'compacted') ? 'decimal' : format.style,
         notation: (format.style === 'compacted') ? 'compact' : "standard",
@@ -175,19 +175,19 @@ const DataPointsLayerLegend = (props) => {
     const dimensionValues = items.map(i => i.value)
 
     const fieldLabel = pointStyleBy === "dimension" || showDim2OnLegends ? dimension2 : measureLabel
-   
+
     return <div className={"legend"}>
         <div>
             <div className={"legend-item"}>
                 <div className={"legend-color legend-check"} onClick={e => onItemClick(id)}
-                     style={pointStyleBy === "measure" || showDim2OnLegends ? {} : { 
+                     style={pointStyleBy === "measure" || showDim2OnLegends ? {} : {
                          backgroundColor: markFillColor,
                          borderColor: markBorderColor
                      }}>{visible != false && <>&#10003;</>}
                 </div>
                 <div className={"legend-label"}>{name} </div>
             </div>
-            
+
             {(pointStyleBy === "measure" && visible != false) && <div className={"legend-breaks"}>
                 {breaks.map((b, i) => {
                     return (<div className={"break"}>
@@ -210,7 +210,7 @@ const DataPointsLayerLegend = (props) => {
                 </div>
               </div>
             }
-           
+
             {(visible != false && showDim2OnLegends != false) && <div className={"legend-breaks"}>
                 {dimensionValues.map((d) => {
                     return (<div className={"break"}>
@@ -236,7 +236,7 @@ const DataPointsLayerLegend = (props) => {
             </div>
             }
 
-         
+
         </div>
     </div>
 }
@@ -352,7 +352,7 @@ const DataLayerLegend = (props) => {
                          style={{
                         backgroundColor: markFillColor,
                         border: `1px solid ${markBorderColor}`,
-                    }}>                       
+                    }}>
                     </div>
                     {measureLabel}
                 </div>
@@ -361,16 +361,16 @@ const DataLayerLegend = (props) => {
 
             {(useBreaks && visible != false) &&
                 <div>
-                     
+
                         <div className="legend-breaks">
                             <div
-                                className="legend-section-title"                               
+                                className="legend-section-title"
                                 onClick={e => toggleColorLayer(id)}>
                                 <div className={`legend-section-title-checkbox ${colorLayerVisible ? "checked" : ""}`}></div>
                                 <span className="measure-label">{measureLabel}</span>
                             </div>
                         </div>
-                    
+
                     {colorLayerVisible &&
                     <Breaks isPoint={useCentroidPoint} numberFormat={numberFormat}
                             breaks={breaks} visible={visible} intl={intl}></Breaks>

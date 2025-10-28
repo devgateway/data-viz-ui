@@ -43,7 +43,7 @@ const SlugRoute = ({ loaderData, params }: Route.ComponentProps) => {
     return <div>Page not found</div>;
   }
 
-  return <SlugContainer pages={loaderData.post} header={<Header {...loaderData}  locale={params.lan}/>}  />;
+  return <SlugContainer pages={loaderData.post} />;
 };
 
 export default SlugRoute;

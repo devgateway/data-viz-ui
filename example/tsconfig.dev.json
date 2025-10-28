@@ -22,7 +22,6 @@
         "@devgateway/dvz-ui-react/*": ["../data-viz-ui/packages/dvz-ui/src/*"],
         "@devgateway/wp-react-lib": ["../data-viz-ui/packages/react-lib/wp-react-lib/src"],
         "@devgateway/wp-react-lib/*": ["../data-viz-ui/packages/react-lib/wp-react-lib/src/*"],
-        "@devgateway/wp-react-lib/api": ["../data-viz-ui/packages/react-lib/wp-react-lib/src/api"],
         "@devgateway/wp-react-lib/hooks": ["../data-viz-ui/packages/react-lib/wp-react-lib/src/hooks"],
         // Handle internal aliases within dvz-ui package
         "@/conf": ["../data-viz-ui/packages/dvz-ui/src/conf"],

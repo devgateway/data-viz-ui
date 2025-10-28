@@ -13,11 +13,7 @@ const Root = (props) => {
     }
 
     C2 = React.lazy(() => import('../' + name + '/'))
-    // if (external[name]) {
-    //     C2 = external[name]
-    // } else {
 
-    // }
     return (<div style={{width: '100%', height: height + "px"}} className={"parallax-container"}>
 
         {/* <React.Suspense> */}
