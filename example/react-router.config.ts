@@ -9,8 +9,10 @@ export default {
   routeDiscovery: {
     mode: "initial",
   },
-  prerender: ["/", "/en/home"],
+  prerender: [
+    // add routes that can be prerendered here. The pages should be static.
+  ],
   future: {
-    unstable_middleware: true,
+
   }
 } satisfies Config;
