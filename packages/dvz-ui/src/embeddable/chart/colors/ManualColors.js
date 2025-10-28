@@ -14,9 +14,9 @@ class CustomColors extends Colors {
     manualColors = {},
     locale,
     overallLabel,
-    customLabels
+    customLabels,
+    options
   ) {
-    //colorBy, scheme, data, keys, indexBy
     super(colorBy, scheme, data, keys, indexBy);
 
     this._manualColor = {};
@@ -25,7 +25,6 @@ class CustomColors extends Colors {
       ? manualColors["Overall"]
       : null;
 
-    //1 dimension by id == by measure
     if (app != "csv") {
       const mapByDimension = (whichDimension) => {
         items = [...dimensionsMetadata][whichDimension] ? [...dimensionsMetadata][whichDimension].items : [];
@@ -47,8 +46,32 @@ class CustomColors extends Colors {
         }
       };
 
+      const updateItemLabels = (items) => {
+        const updatedItems = items?.map((item) => {
+          const groupName = item.group.label;
+          if (item.label.includes(groupName)) return item;
+          return {
+            ...item,
+            label: `${groupName} - ${item.label}`,
+          };
+        });
+        return updatedItems;
+      };
+
+      const ifNoMeasuresUseOptionMeasures = () => {
+        if (measuresMetadata && measuresMetadata.size > 0) {
+          return measuresMetadata;
+        } else if (options?.metadata?.measures.length > 0) {
+          options.metadata.measures = updateItemLabels(
+            options.metadata.measures
+          );
+          return options.metadata.measures;
+        }
+        return [];
+      };
+
       const mapByMeasure = () => {
-        items = measuresMetadata;
+        items = ifNoMeasuresUseOptionMeasures();
         Object.keys(manualColors).forEach((k) => {
           const vals = [...items].filter((i) => i.value === k);
           if (vals.length > 0 && vals[0].labels) {
@@ -71,8 +94,7 @@ class CustomColors extends Colors {
       };
 
       let items = [];
-      const whichDimension = colorBy === "index" ? 0 : 1;
-
+      const whichDimension = type === 'line' ? 1: colorBy === "index" ? 0 : 1;
       if (!dimensionsMetadata) {
         mapByMeasure();
       } else if (dimensionsMetadata.size == 1 && whichDimension == 1) {

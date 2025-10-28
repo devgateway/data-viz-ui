@@ -2,7 +2,6 @@ import React, { lazy } from 'react'
 import data from './reducers/data'
 import embeddable from './reducers/embeddable'
 import { injectIntl } from "react-intl";
-import * as Immutable from 'immutable';
 
 // components
 const PageGallery = lazy(() => import("./pagegallery"));
@@ -17,7 +16,7 @@ const PageModules = lazy(() => import("./pagemodules"));
 const FeaturedTabs = lazy(() => import("./featuredtabs"));
 const VerticalFeaturedTabs = lazy(() => import("./vertical-featuredtabs"));
 const InlineList = lazy(() => import("./inlinelist"));
-const AgreeAndDownload = lazy(() => import("./agree-and-download/"));
+const AgreeAndDownload = lazy(() => import("./agree-and-download"));
 const DownloadPdf = lazy(() => import("./downloadPDF"));
 const Map = lazy(() => import("./map"));
 const DataFiltersReset = lazy(() => import("./filter-reset-button"));
@@ -40,7 +39,10 @@ const SupersetChart = lazy(() => import("./superset-chart"));
 const SupersetDashboard = lazy(() => import("./superset-dashboard"));
 const BigNumber = lazy(() => import("./big-number"));
 const BigNumberTrend = lazy(() => import("./big-number-trend"));
-const PostsWithFilters = lazy(() => import("./posts-with-filters"));
+const PostsFilter = lazy(() => import("./posts-filter"));
+const FilteredPosts = lazy(() => import("./filtered-posts"));
+const PostsFiltersResetButton = lazy(() => import("./posts-filters-reset-button"));
+const PostsPagination = lazy(() => import("./posts-pagination"));
 
 
 export const components = {
@@ -79,7 +81,10 @@ export const components = {
     agreeAndDownload: AgreeAndDownload,
 	bigNumber: BigNumber,
     bigNumberTrend: BigNumberTrend,
-    postsWithFilters: PostsWithFilters,
+    postsFilter: PostsFilter,
+    filteredPosts: FilteredPosts,
+    postsFiltersReset: PostsFiltersResetButton,
+    postsPagination: PostsPagination,
     redirect: () => null
 }
 

@@ -48,6 +48,7 @@ const Diverging = (props) => {
     );
 };
 
+
 const Chart = (props) => {
     let {
         parent,
@@ -877,7 +878,6 @@ const Chart = (props) => {
             }
         };
     }, []);
-
 
     return (
         <div ref={ref} >
