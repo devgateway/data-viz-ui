@@ -105,9 +105,6 @@ importers:
       '@artsy/fresnel':
         specifier: ^8.1.0
         version: 8.1.0(react@18.3.1)
-      '@devgateway/wp-react-lib':
-        specifier: workspace:*
-        version: link:../react-lib/wp-react-lib
       '@nivo/bar':
         specifier: ^0.96.0
         version: 0.96.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -253,6 +250,9 @@ importers:
         specifier: ^11.1.0
         version: 11.1.0
     devDependencies:
+      '@devgateway/wp-react-lib':
+        specifier: workspace:*
+        version: link:../react-lib/wp-react-lib
       '@eslint/js':
         specifier: ^9.37.0
         version: 9.37.0
