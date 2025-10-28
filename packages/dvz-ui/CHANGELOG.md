@@ -1,5 +1,15 @@
 # @devgateway/dvz-ui-react
 
+## 1.5.1
+
+### Patch Changes
+
+- [#75](https://github.com/devgateway/data-viz-ui/pull/75) [`88bafca`](https://github.com/devgateway/data-viz-ui/commit/88bafcaa2d8901d474039aea72508ae0f6c7aee4) Thanks [@timothygachengo](https://github.com/timothygachengo)! - - Add `process.env` in the config file for SSR context
+  - Move `pure-react-carousel` css into the common CSS to fix carousel rendering issues
+  - Update some packages
+  - Fix import leaks in the dist
+  - Expose `layout` and `conf` packages.
+
 ## 1.5.0
 
 ### Minor Changes
