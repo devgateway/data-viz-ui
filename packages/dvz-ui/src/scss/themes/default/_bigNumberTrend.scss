@@ -1,37 +1,68 @@
-.chart.big-number-trend-container {  
-  /*trend */
-.trend {
-  text-align: left; 
-  font-size: 16px;
-  margin: 10px;
+.alternative.big.number.container.editing {
+  margin: 2px!important;
+
 }
 
-.label {
-  font-size: 14px;
-  color: #666; 
+.alternative.big.number.container {
+  border: 1px solid #EEE;
+  border-radius: 10px;
+  width: 100%;
+  .icon.main {
+
+  }
+  .icon.up {
+    margin-right: 18px;
+
+    vertical-align: middle;
+  }
+
+  .icon.down {
+    float: left;
+    margin: 10px;
+
+  }
+
+  .percentage{
+    float:right;
+  }
+
 }
 
-.number-and-icon {
-  display: flex; 
-  align-items: center; 
-  justify-content: flex-start;
-  margin: 4px 0; 
-}
 
-.number {
-  margin-right: 8px; 
-  font-size: 24px; 
-}
+.chart.big-number-trend-container {
+  padding: 2em!important;
+  .trend {
+    text-align: left;
+    font-size: 16px;
+    margin: 10px;
+  }
 
-.icon {
-  width: 24px;
-  height: 24px; 
-}
+  .label {
+    font-size: 14px;
+    color: #666;
+  }
 
-.percentage {
-  color: green; 
-  font-size: 18px; 
-}
+  .number-and-icon {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    margin: 4px 0;
+  }
+
+  .number {
+    margin-right: 8px;
+    font-size: 24px;
+  }
+
+  .icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  .percentage {
+    color: green;
+    font-size: 18px;
+  }
 
 }
 
