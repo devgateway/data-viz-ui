@@ -1,5 +1,18 @@
 # @devgateway/dvz-ui-react
 
+## 1.5.0
+
+### Minor Changes
+
+- [#73](https://github.com/devgateway/data-viz-ui/pull/73) [`32da4c6`](https://github.com/devgateway/data-viz-ui/commit/32da4c6d61811b266a672cddfdcd213ec2404ba1) Thanks [@timothygachengo](https://github.com/timothygachengo)! - - _(TCDICORE-350)_ Sync embeddables from data-viz-front to data-viz-ui
+  - _(TCDICORE-350)_ Sync scss from data-viz-front to daata-viz-ui
+  - _(TCDICORE-350)_ Fix header rendering, fix search control and update example to have a div with id root
+  - _(TCDICORE-350)_ Update example
+  - _(TCDICORE-350)_ Update router config, clean up TypeScript paths, and fix imports to fix build errors
+
+  ## New Change
+  - _(TCDICORE-350)_ Upgrade react router version to 7.9.4. (Upgrade your project to react-router ~v7.9.4)
+
 ## 1.4.0
 
 ### Minor Changes
