@@ -4,6 +4,7 @@ import React, {useEffect, useState} from "react";
 import {injectIntl} from "react-intl";
 import {MediaConsumer, MediaProvider} from "@devgateway/wp-react-lib";
 import PostContent from "../connected-templates/PostContent";
+import { useAppConfig } from "@/utils/ConfigProvider";
 
 const VerticalDashboardGallery = ({pages, width}) => {
     const childPages = pages ? pages.sort((a, b) => a.menu_order - b.menu_order) : []
@@ -42,7 +43,7 @@ const ChildNavigator = ({pages, title, selected, onPageSelected}: ChildNavigator
     const childPages = pages ? pages.sort((a, b) => a.menu_order - b.menu_order) : []
 
     const [selectedGroup, setSelectedGroup] = useState({id: -1})
-
+    const { apiBaseUrl } = useAppConfig();
 
     useEffect(() => {
         setSelectedGroup(childPages[0])
@@ -54,7 +55,7 @@ const ChildNavigator = ({pages, title, selected, onPageSelected}: ChildNavigator
             page: p,
             id: p.id,
             label: p.meta_fields.label ? p.meta_fields.label : p.title.rendered,
-            iconComponent: <MediaProvider id={p.meta_fields && p.meta_fields.icon ? p.meta_fields.icon[0] : null}>
+            iconComponent: <MediaProvider id={p.meta_fields && p.meta_fields.icon ? p.meta_fields.icon[0] : null} apiBaseUrl={apiBaseUrl}>
                 <MediaConsumer>
                     <MediaImage/>
                 </MediaConsumer>
@@ -104,7 +105,7 @@ const ChildNavigator = ({pages, title, selected, onPageSelected}: ChildNavigator
                     <div className="green-rectangle"></div>
 
                     <Menu.Menu className={`${s.id == selectedGroup.id ? 'expanded' : 'collapsed'}`}>
-                        <PageProvider locale={"en"}
+                        <PageProvider locale={"en"} apiBaseUrl={apiBaseUrl}
                                       parent={s.id}
                                       store={"child_menu" + s.id}
                                       perPage={100}>
@@ -140,7 +141,7 @@ const Root = (props) => {
         intl: {locale}
     } = props
 
-
+    const { apiBaseUrl } = useAppConfig();
     const [page, setPage] = useState(null)
     const styles = editing ? {padding: '4px', margin: '0px'} : {}
     return (<Container style={styles} fluid className={`viz child page navigator`}>
@@ -149,7 +150,8 @@ const Root = (props) => {
                               parent={parent}
                               noCache={true}
                               store={"child_menu" + props.parent + '_' + props.unique}
-                              perPage={100}>
+                              perPage={100}
+                              apiBaseUrl={apiBaseUrl}>
                     <Grid>
                         <Grid.Row>
                             <Grid.Column className={"navigator"} width={2}>

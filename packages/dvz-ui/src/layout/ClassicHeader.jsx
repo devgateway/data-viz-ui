@@ -5,6 +5,7 @@ import { injectIntl } from "react-intl";
 import { useParams, Link, NavLink } from "react-router";
 import SearchControl from "./SearchControl";
 import LangSwitcher from "./LangSwitcher";
+import { useAppConfig } from "@/utils/ConfigProvider";
 
 const getPath = (menu, params) => {
     const path = [];
@@ -159,6 +160,7 @@ const Header = ({ intl,  settings }) => {
 
     const [selected, setSelected] = useState()
     const { slug } = useParams();
+    const { apiBaseUrl } = useAppConfig();
 
 
     const Logo = ({ media }) => {
@@ -168,7 +170,8 @@ const Header = ({ intl,  settings }) => {
     return <React.Fragment>
 
 
-        <MenuProvider slug={"main"} locale={intl.locale}>
+
+        <MenuProvider slug={"main"} locale={intl.locale} apiBaseUrl={apiBaseUrl}>
             <Container fluid={true} className="header classic">
                 <Container fluid={true} className={"background"}>
 

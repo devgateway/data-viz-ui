@@ -5,6 +5,7 @@ import * as d3 from "d3";
 import { Modal } from "semantic-ui-react";
 import { useWindowDimensionsAndDevice } from "@/lib/hooks/window-dimensions";
 import { useScreenOrientation } from "@/lib/hooks/screen-orientation";
+import { useAppConfig } from "@/utils/ConfigProvider";
 
 const visibleStyle = {
   visibility: "visible",
@@ -436,6 +437,7 @@ const PostCarousel = (props) => {
       closePopupOnMouseOut == true || closePopupOnMouseOut == "true",
   };
 
+  const { apiBaseUrl } = useAppConfig();
   return (
     <Container
       style={{ height: 'auto' }}
@@ -450,6 +452,7 @@ const PostCarousel = (props) => {
         store={`carousel_${parent}_${unique}`}
         page={1}
         perPage={items}
+        apiBaseUrl={apiBaseUrl}
       >
         <PostConsumer>
           <TimeLine {...timeProps} />

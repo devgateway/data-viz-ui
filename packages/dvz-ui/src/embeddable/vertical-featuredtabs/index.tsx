@@ -10,7 +10,7 @@ import {
 } from "@devgateway/wp-react-lib";
 import { connect } from 'react-redux';
 import PostIntro from "../connected-templates/PostIntro";
-
+import { useAppConfig } from "@/utils/ConfigProvider";
 export interface VerticalFeaturedTabsProps {
     "data-height": number;
     "data-type": string;
@@ -325,7 +325,7 @@ const FeaturedTabs: React.FC<FeaturedTabsProps> = ({
   const targetRef = useRef<HTMLDivElement>(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
-
+  const { apiBaseUrl } = useAppConfig();
   // Only switch to a new slug; do nothing if slug === active
   const toggleAnimation = (slug: string) => {
     if (active !== slug) {
@@ -488,6 +488,7 @@ const Wrapper: React.FC<VerticalFeaturedTabsProps> = (props) => {
   const isNotDesktopPreview = previewMode !== 'Desktop' && editing;
   const isMobileRenderMode = isMobileOrTablet && !editing;
 
+  const { apiBaseUrl } = useAppConfig();
   return (
     <Container
       style={{ maxWidth: "100%" }}
@@ -503,6 +504,7 @@ const Wrapper: React.FC<VerticalFeaturedTabsProps> = (props) => {
         store={`vertical_tabs${parent}_${unique}`}
         page={1}
         perPage={items}
+        apiBaseUrl={apiBaseUrl}
       >
         <PostConsumer>
           {(isMobileRenderMode || isNotDesktopPreview) ? (
@@ -534,9 +536,9 @@ const mapStateToProps = (state, _ownProps) => {
     "data",
     "pageModuleProps"
   ]);
-  const _props = {};
+  const _props: { pageModuleProps?: Record<string, unknown> } = {};
   if(pageModuleProps) {
-    _props.pageModuleProps = pageModuleProps;
+    _props.pageModuleProps = pageModuleProps as Record<string, unknown>;
   }
   return _props;
 };

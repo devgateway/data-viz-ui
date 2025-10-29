@@ -4,7 +4,7 @@ import { PostConsumer, PostProvider} from "@devgateway/wp-react-lib";
 import {Parallax, ParallaxLayer} from '@react-spring/parallax'
 import PostContent from "../connected-templates/PostContent";
 import {parse} from "../utils/parseUtils";
-
+import { useAppConfig } from "@/utils/ConfigProvider";
 interface ListOfPostProps {
     posts?: any[],
     locale?: string,
@@ -12,7 +12,7 @@ interface ListOfPostProps {
 }
 
 const ListOfPost = ({posts, locale, configuration}: ListOfPostProps) => {
-
+    const { apiBaseUrl } = useAppConfig();
 
     const toProps = (conf) => {
         if (conf.sticky) {
@@ -53,7 +53,7 @@ const ListOfPost = ({posts, locale, configuration}: ListOfPostProps) => {
 
 const Root = (props) => {
 
-    
+
     const [random, setRandomStore] = useState(Math.random() * (99999 - 1) + 1);
     const {
         "data-width": width,
@@ -70,11 +70,11 @@ const Root = (props) => {
         component,
         unique
     } = props
-
+    const { apiBaseUrl } = useAppConfig();
 
     const configuration = parse(config)
 
-    
+
     const parallax = useRef(null)
 
     return (<div style={{width: '100%', height: height + "px"}} className={"parallax-container"}>
@@ -85,7 +85,8 @@ const Root = (props) => {
                           categories={categories}
                           store={"parallax" + parent + "_" + unique}
                           page={1}
-                          perPage={50}>
+                          perPage={50}
+                          apiBaseUrl={apiBaseUrl}>
                 <PostConsumer>
                     <ListOfPost configuration={configuration}/>
                 </PostConsumer>

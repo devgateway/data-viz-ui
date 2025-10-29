@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { PostProvider, PostConsumer, Post } from "@devgateway/wp-react-lib";
 import { MediaConsumer, MediaProvider } from "@devgateway/wp-react-lib";
 import { Button, Modal } from "semantic-ui-react";
+import { useAppConfig } from "@/utils/ConfigProvider";
 
 const Component = (props) => {
   const {
@@ -16,6 +17,7 @@ const Component = (props) => {
     "data-cancel": cancelText = "Cancel",
     intl: { locale },
   } = props;
+  const { apiBaseUrl } = useAppConfig();
 
   const RenderPostTitle = (props) => {
     return (
@@ -35,7 +37,7 @@ const Component = (props) => {
     return (
       <>
         {slug && (
-          <PostProvider locale={locale} type={type} slug={slug}>
+          <PostProvider locale={locale} type={type} slug={slug} apiBaseUrl={apiBaseUrl}>
             <Modal
               onClose={() => setOpen(false)}
               onOpen={() => setOpen(true)}
@@ -114,7 +116,7 @@ const Component = (props) => {
   };
   return (
     <span className="">
-      <MediaProvider id={mediaId}>
+      <MediaProvider id={mediaId} apiBaseUrl={apiBaseUrl}>
         <MediaConsumer>
           <TheDownload></TheDownload>
         </MediaConsumer>

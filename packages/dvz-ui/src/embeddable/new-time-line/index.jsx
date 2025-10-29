@@ -4,7 +4,7 @@ import React, {useState} from "react";
 import {Container} from "semantic-ui-react";
 import {CarouselProvider, Slide, Slider} from "pure-react-carousel";
 import TimeLine from "./timeline";
-
+import { useAppConfig } from "@/utils/ConfigProvider";
 
 const Carousel = (props) => {
 
@@ -46,7 +46,7 @@ const Component = (props) => {
     } = props
 
     const [currentSlide,setCurrentSlide]=useState([0])
-
+    const { apiBaseUrl } = useAppConfig();
     const decode = (value) => {
 
         if (editing) {
@@ -83,7 +83,8 @@ const Component = (props) => {
 
             <PostProvider type={type} taxonomy={taxonomy} categories={parse(categories)}
                           store={"carousel_" + parent + "_" + unique} page={1}
-                          perPage={items}>
+                          perPage={items}
+                          apiBaseUrl={apiBaseUrl}>
                 <Container className={"carousel-section"}>
                     <PostConsumer>
                         <Carousel currentSlide={currentSlide}  height={height - 250} interval={5} autoSwitch={false}></Carousel>

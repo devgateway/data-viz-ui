@@ -2,6 +2,7 @@ import { Container, Grid, Segment, SemanticWIDTHS } from "semantic-ui-react";
 import { PageConsumer, PageProvider, PostIntro } from "@devgateway/wp-react-lib";
 import React from "react";
 import { injectIntl } from "react-intl";
+import { useAppConfig } from '@/utils/ConfigProvider';
 
 const VerticalDashboardGallery = ({ pages, width }) => {
     const childPages = pages ? pages.sort((a, b) => a.menu_order - b.menu_order) : []
@@ -72,11 +73,13 @@ const Root = (props: PageGalleryProps) => {
         intl: { locale }
     } = props
 
+    const { apiBaseUrl } = useAppConfig();
+
     const options = { style, columns }
     return (<Container fluid className={`viz dashboard gallery ${style}`}>
         {parent &&
             <PageProvider locale={locale} parent={parent} store={"gallery_" + props.parent + '_' + props.unique}
-                perPage={100}>
+                perPage={100} apiBaseUrl={apiBaseUrl}>
                 <PageConsumer>
 
                     <HorizontalDashboardGallery {...options} />

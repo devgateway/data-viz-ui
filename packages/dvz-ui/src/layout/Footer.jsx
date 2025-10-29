@@ -3,26 +3,22 @@ import {Container} from "semantic-ui-react";
 
 import {Page, PageConsumer, PageProvider} from "@devgateway/wp-react-lib";
 import {injectIntl} from "react-intl";
+import { useAppConfig } from "@/utils/ConfigProvider";
 
 
-class Footer extends Component {
-    componentDidMount() {
+const Footer = ({ children, fixed, location, intl: { locale } }) => {
+    const { apiBaseUrl } = useAppConfig();
 
-    }
-
-    render() {
-        const {children, fixed, location,intl: {locale}} = this.props
-        return (<Container fluid className={"viz footer"}>
-
-            <PageProvider locale={locale}  slug={"footer"} store={"footer"}>
+    return (
+        <Container fluid className={"viz footer"}>
+            <PageProvider locale={locale} slug={"footer"} store={"footer"} apiBaseUrl={apiBaseUrl}>
                 <PageConsumer>
                     <Page></Page>
                 </PageConsumer>
             </PageProvider>
-
-        </Container>)
-    }
-}
+        </Container>
+    );
+};
 
 
 export default injectIntl(Footer)

@@ -6,7 +6,8 @@ import { MediaConsumer, MediaProvider, PageConsumer, PageProvider, PostContent }
 import { injectIntl } from "react-intl";
 import { connect } from "react-redux";
 import { setPageModuleProps} from '../reducers/data';
-import FloatingNavigator from './FloatingNavigator'
+import FloatingNavigator from './FloatingNavigator';
+import { useAppConfig } from "@/utils/ConfigProvider";
 
 const decodeHtmlEntity = function (str: string) {
   if (str) {
@@ -53,10 +54,11 @@ interface ModuleProps {
     onVisibilityUpdate: any
 }
 const Module: React.FC<ModuleProps> = ({ page, locale }) => {
+    const { apiBaseUrl } = useAppConfig();
     return (
         <Container fluid={true} className={`section ${page.slug}`} id={page.id}>
             <div id={`${page.slug}`} />
-            <MediaProvider id={page.meta_fields?.icon ? page.meta_fields.icon[0] : null}>
+            <MediaProvider id={page.meta_fields?.icon ? page.meta_fields.icon[0] : null} apiBaseUrl={apiBaseUrl}>
                 <MediaConsumer>
                     <SectionHeader title={decodeHtmlEntity(page.title.rendered)} subtitle={decodeHtmlEntity(page.meta_fields.subtitle)} />
                 </MediaConsumer>
@@ -76,7 +78,7 @@ interface PageIteratorProps {
 
 const PageIterator: React.FC<PageIteratorProps> = ({ pages, locale, editing, navTitle, toTopLabel }) => {
     const [modules, setModules] = useState<any>([]);
-
+    const { apiBaseUrl } = useAppConfig();
     const onVisibilityUpdate = useCallback((id, {
         direction = 'down',
         onScreen,
@@ -99,7 +101,7 @@ const PageIterator: React.FC<PageIteratorProps> = ({ pages, locale, editing, nav
         id: p.id,
         label: p.meta_fields.label ? p.meta_fields.label : p.title.rendered,
         iconComponent: (
-            <MediaProvider id={p.meta_fields?.icon ? p.meta_fields.icon[0] : null}>
+            <MediaProvider id={p.meta_fields?.icon ? p.meta_fields.icon[0] : null} apiBaseUrl={apiBaseUrl}>
                 <MediaConsumer>
                     <MediaImage />
                 </MediaConsumer>
@@ -159,7 +161,7 @@ const Root = (props) => {
     onLoadPageModule
   } = props;
 
-
+  const { apiBaseUrl } = useAppConfig();
 
   useEffect(() => {
     onLoadPageModule({ data: props})
@@ -174,6 +176,7 @@ const Root = (props) => {
           parent={props.parent}
           store={`modules_${parent}_${unique}`}
           perPage={100}
+          apiBaseUrl={apiBaseUrl}
         >
           <PageConsumer>
             <PageIterator

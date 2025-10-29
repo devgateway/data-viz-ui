@@ -11,6 +11,7 @@ import { Config } from '@/conf';
 import { englishTranslations, frenchTranslations, afrikaansTranslations } from '@/translations';
 import { updateIntl } from '@/lib';
 import { store } from '@/redux';
+import { ConfigProvider } from '@/utils/ConfigProvider';
 
 type Locale = 'en' | 'fr' | 'am';
 
@@ -20,11 +21,17 @@ const messages: Record<Locale, any> = {
     'am': afrikaansTranslations
 };
 
+interface RootLayoutProps {
+    config?: {
+        apiBaseUrl?: string;
+    }
+}
 
-const RootLayout = () => {
+const RootLayout = (props: RootLayoutProps = {}) => {
     const pathParams = useParams();
     const location = useLocation();
     const defaultLocale = Config.DEFAULT_LOCALE;
+    const apiBaseUrl = props?.config?.apiBaseUrl ?? Config.REACT_APP_WP_API;
     const [isClient, setIsClient] = useState(false);
     console.log("defaultLocale", defaultLocale);
     const locale = pathParams.lan;
@@ -76,18 +83,20 @@ const RootLayout = () => {
     }
 
     return (
-        <Provider store={store}>
-            <IntlProvider key={locale} locale={locale} messages={messages[locale as Locale]}>
-                <AppContextProvider getComponent={getComponentByNameIgnoreCase} store={store} locale={locale}>
-                    <SettingProvider locale={locale} changeUUID={null}>
-                        <SettingsConsumer>
-                            <CustomizerWrapper/>
-                            <Outlet />
-                        </SettingsConsumer>
-                    </SettingProvider>
-                </AppContextProvider>
-            </IntlProvider>
-        </Provider>
+        <ConfigProvider config={{ apiBaseUrl, locale }}>
+            <Provider store={store}>
+                <IntlProvider key={locale} locale={locale} messages={messages[locale as Locale]}>
+                    <AppContextProvider getComponent={getComponentByNameIgnoreCase} store={store} locale={locale}>
+                        <SettingProvider locale={locale} changeUUID={null} apiBaseUrl={apiBaseUrl}>
+                            <SettingsConsumer>
+                                <CustomizerWrapper />
+                                <Outlet />
+                            </SettingsConsumer>
+                        </SettingProvider>
+                    </AppContextProvider>
+                </IntlProvider>
+            </Provider>
+        </ConfigProvider>
     );
 }
 

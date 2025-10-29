@@ -12,7 +12,7 @@ import {
 import PostIntro from "../connected-templates/PostIntro";
 import { useWindowDimensionsAndDevice } from '@/lib/hooks/window-dimensions';
 import { connect } from 'react-redux';
-
+import { useAppConfig } from "@/utils/ConfigProvider";
 interface FeaturedTabsProps {
     posts?: any[],
     width: number,
@@ -93,7 +93,7 @@ const FeaturedTabs: React.FC<FeaturedTabsProps> = ({ posts, width, height, color
     const [visible, setVisible] = useState(false);
     const [scrollPos, setScrollPos] = useState<[number, number]>([0, 0]);
     const arrayColors = color.split(',');
-
+    const { apiBaseUrl } = useAppConfig();
     const toggleAnimation = (k: string) => {
         if (!visible) {
             setActive(k);
@@ -147,7 +147,7 @@ const FeaturedTabs: React.FC<FeaturedTabsProps> = ({ posts, width, height, color
                         >
                             <Segment style={{ "backgroundColor": arrayColors[i] }}>
                                 {post.meta_fields?.icon &&
-                                    <MediaProvider id={post.meta_fields ? post.meta_fields.icon[0] : null}>
+                                    <MediaProvider id={post.meta_fields ? post.meta_fields.icon[0] : null} apiBaseUrl={apiBaseUrl}>
                                         <MediaConsumer>
                                             <PostIcon />
                                         </MediaConsumer>
@@ -172,7 +172,7 @@ const AccordionContent: React.FC<AccordionContentProps> = ({ posts, activeItem, 
     const [activeIndex, setActiveIndex] = useState(posts.findIndex(p => p.slug === activeItem));
     const [scrollTarget, setScrollTarget] = useState<HTMLElement | null>(null);
     const arrayColors = color.split(',');
-
+    const { apiBaseUrl } = useAppConfig();
     const getScreenOrientation = (): string => {
         return (
             window.screen.orientation?.type ||
@@ -264,7 +264,7 @@ const AccordionContent: React.FC<AccordionContentProps> = ({ posts, activeItem, 
 
                                 <div style={{ display: 'flex', alignItems: 'center' }}>
                                     {iconUrl && (
-                                        <MediaProvider id={iconUrl}>
+                                        <MediaProvider id={iconUrl} apiBaseUrl={apiBaseUrl}>
                                             <MediaConsumer>
                                                 <PostIcon className="icon" />
                                             </MediaConsumer>
@@ -320,7 +320,7 @@ const Wrapper: React.FC<FeatureTabsProps> = (props) => {
     const isMobile = deviceWidth <= 1250;
     const isNotDesktopPreview = previewMode !== 'Desktop' && editing;
     const isMobileRenderMode = isMobile && !editing;
-
+    const { apiBaseUrl } = useAppConfig();
     return (
         <Container
             className={`viz featured tabs ${editing ? 'editing' : ''} ${scrollable ? 'scrollable' : ''}`}
@@ -334,6 +334,7 @@ const Wrapper: React.FC<FeatureTabsProps> = (props) => {
                 store={`tabbedposts_${parent}_${unique}`}
                 page={1}
                 perPage={items}
+                apiBaseUrl={apiBaseUrl}
             >
                 <PostConsumer>
                     {(isNotDesktopPreview || isMobileRenderMode) ? (

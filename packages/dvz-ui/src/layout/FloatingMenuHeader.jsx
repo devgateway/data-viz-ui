@@ -5,6 +5,7 @@ import {injectIntl} from "react-intl";
 import SearchControl from "./SearchControl.jsx";
 import LangSwitcher from "./LangSwitcher.jsx";
 import { useParams } from "react-router";
+import { useAppConfig } from "@/utils/ConfigProvider";
 
 const getPath = (menu, locationParams) => {
     const path = [];
@@ -75,12 +76,14 @@ const HeaderFloatingMenu = ({
             <img className="brand logo" size="large" src='/logo_full.png'/>
     }
 
-    return (<MenuProvider slug={"main"} locale={locale}>
+    const { apiBaseUrl } = useAppConfig();
+
+    return (<MenuProvider slug={"main"} locale={locale} apiBaseUrl={apiBaseUrl}>
         <Menu className={"header floating branding"} text>
             <Menu.Item className={"logo"}>
                 <a href={`/${locale}`}>
 
-                    {settings.site_logo != 0 && <MediaProvider id={settings.site_logo}>
+                    {settings.site_logo != 0 && <MediaProvider id={settings.site_logo} apiBaseUrl={apiBaseUrl}>
                         <MediaConsumer>
                             <Logo></Logo>
                         </MediaConsumer>

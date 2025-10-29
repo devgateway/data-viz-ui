@@ -3,10 +3,12 @@ import { PostConsumer, PostIntro, PostProvider } from "@devgateway/wp-react-lib"
 import React from "react";
 import { Container } from "semantic-ui-react";
 import { CarouselProvider, DotGroup, Slide, Slider } from "pure-react-carousel";
+import { useAppConfig } from "@/utils/ConfigProvider";
 
 const Carousel = (props) => {
     let i = 0
     const { posts, height, interval, autoSwitch } = props
+    const { apiBaseUrl } = useAppConfig();
     return (
         // @ts-ignore
         <CarouselProvider
@@ -16,7 +18,7 @@ const Carousel = (props) => {
             naturalSlideHeight={height}>
             <Slider style={{ height: `${height}px` }} trayTag="ul">
                 {posts.map(p => <Slide index={i++} tag="li">
-                    <PostIntro post={p} fluid />
+                    <PostIntro post={p} fluid apiBaseUrl={apiBaseUrl} />
                 </Slide>)}
             </Slider>
             <DotGroup />
@@ -83,11 +85,13 @@ const PostCarousel = (props: PostCarouselProps) => {
         "data-interval": interval = 10000,
         editing, parent, unique
     } = props
+    const { apiBaseUrl } = useAppConfig();
     return <Container style={{ height: `${height}px` }} className={`viz post carousel ${editing ? 'editing' : ''}`} fluid={true}>
 
         <PostProvider type={type} taxonomy={taxonomy} categories={categories}
             store={"carousel_" + parent + "_" + unique} page={1}
-            perPage={items}>
+            perPage={items}
+            apiBaseUrl={apiBaseUrl}>
             <PostConsumer>
                 <Carousel height={height} interval={interval} autoSwitch={autoSwitch == "true"}></Carousel>
             </PostConsumer>

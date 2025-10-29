@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Container } from "semantic-ui-react";
 import * as d3 from "d3";
 import getDeviceType from "../../utils/deviceType";
+import { useAppConfig } from "@/utils/ConfigProvider";
 
 const visibleStyle = {
   visibility: "visible",
@@ -469,6 +470,8 @@ const PostCarousel = (props) => {
     closePopupOnMouseOut:
       closePopupOnMouseOut == true || closePopupOnMouseOut == "true",
   };
+
+  const { apiBaseUrl } = useAppConfig();
   return (
     <Container
       style={{ height: `${height}px` }}
@@ -483,6 +486,7 @@ const PostCarousel = (props) => {
         store={"carousel_" + parent + "_" + unique}
         page={1}
         perPage={items}
+        apiBaseUrl={apiBaseUrl}
       >
         <PostConsumer>
           <TimeLine {...timeProps}></TimeLine>

@@ -7,6 +7,7 @@ import {
     Post,
     PostType
 } from "@devgateway/wp-react-lib"
+import { useAppConfig } from '@/utils/ConfigProvider';
 
 interface SlugPostContainerProps {
     header?: React.ReactNode;
@@ -16,7 +17,7 @@ interface SlugPostContainerProps {
 
 const SlugPostContainer = ({ header, footer, posts }: SlugPostContainerProps = {}) => {
     const { lan: locale, slug } = useParams();
-
+    const { apiBaseUrl } = useAppConfig();
     if (posts) {
         return (
             <Post posts={posts} />
@@ -27,6 +28,7 @@ const SlugPostContainer = ({ header, footer, posts }: SlugPostContainerProps = {
         slug={slug}
         store={slug}
         locale={locale}
+        apiBaseUrl={apiBaseUrl}
     >
         <ResponsiveContainer header={header} footer={footer}>
 

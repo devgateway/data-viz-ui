@@ -4,6 +4,7 @@ import { MediaConsumer, MediaProvider, PostConsumer, PostIcon, PostProvider, uti
 import PostIntro from "../connected-templates/PostIntro";
 import { useParams } from 'react-router';
 import PostContent from '../connected-templates/PostContent';
+import { useAppConfig } from "@/utils/ConfigProvider";
 
 interface ListOfPostProps {
     posts: any[],
@@ -19,7 +20,7 @@ const ListOfPost: React.FC<ListOfPostProps> = (props) => {
     const { posts, showIcons, showContentToggle, contentToggleHPosition, locale, readMoreLabel, readLessLabel } = props
     const [toggleState, setToggleState] = useState({});
     const postTopRef: RefObject<HTMLDivElement> = React.createRef();
-
+    const { apiBaseUrl } = useAppConfig();
     const getTranslatedLabel = (label?: string, fallback: string = 'Read More') => {
         return label && label.trim() !== '' ? label : fallback;
     };
@@ -91,6 +92,7 @@ const ListOfPost: React.FC<ListOfPostProps> = (props) => {
                                             ? p.meta_fields.icon[0]
                                             : null
                                     }
+                                    apiBaseUrl={apiBaseUrl}
                                 >
                                     <MediaConsumer>
                                         <PostIcon as={Label}></PostIcon>
@@ -179,7 +181,7 @@ const Root: React.FC<InlineListProps> = (props) => {
         component, unique
 
     } = props
-
+    const { apiBaseUrl } = useAppConfig();
 
 
     return (
@@ -192,6 +194,7 @@ const Root: React.FC<InlineListProps> = (props) => {
                 store={"inline_list_" + parent + "_" + unique}
                 page={1}
                 perPage={items}
+                apiBaseUrl={apiBaseUrl}
             >
                 <PostConsumer>
                     {/* @ts-expect-error Posts are retrieved from Wordpress */}

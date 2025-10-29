@@ -5,8 +5,9 @@ import { injectIntl } from "react-intl";
 import { connect } from "react-redux";
 import PostIntro from "../connected-templates/PostIntro";
 import { useWindowDimensionsAndDevice } from '@/lib/hooks/window-dimensions';
-
+import { useAppConfig } from "@/utils/ConfigProvider";
 const ItemMenu = ({ posts, activeItem, setActive, showLabels }) => {
+  const { apiBaseUrl } = useAppConfig();
   return posts
     ? posts.map((post) => (
         <Menu.Item
@@ -34,6 +35,7 @@ const GriNavigator = ({
   showLabels,
 }) => {
   const count = posts.length;
+  const { apiBaseUrl } = useAppConfig();
   return posts
     ? posts.map((post) => {
         const iconUrl =
@@ -59,6 +61,7 @@ const GriNavigator = ({
                       ? post.meta_fields.icon[0]
                       : null
                   }
+                  apiBaseUrl={apiBaseUrl}
                 >
                   <MediaConsumer>
                     <PostIcon className={"icon"} />
@@ -283,6 +286,7 @@ const AccordionContent = ({ posts, activeItem, setActive }) => {
     }
   };
 
+  const { apiBaseUrl } = useAppConfig();
   return (
     <Accordion fluid styled>
       {posts.map((post, index) => {
@@ -308,7 +312,7 @@ const AccordionContent = ({ posts, activeItem, setActive }) => {
               >
                 <div style={{ display: "flex", alignItems: "center" }}>
                   {iconUrl && (
-                    <MediaProvider id={iconUrl}>
+                    <MediaProvider id={iconUrl} apiBaseUrl={apiBaseUrl}>
                       <MediaConsumer>
                         <PostIcon className="icon" />
                       </MediaConsumer>
@@ -419,6 +423,7 @@ const Wrapper = (props) => {
     const isNotDesktopPreview = previewMode !== 'Desktop' && editing;
     const isMobileRenderMode = isMobile && !editing;
 
+    const { apiBaseUrl } = useAppConfig();
     return (
         <Container className={`viz tabbed posts ${editing ? 'editing' : ''} ${scrollable ? 'scrollable' : ''}`} fluid={true}>
             <PostProvider
@@ -427,7 +432,8 @@ const Wrapper = (props) => {
                 taxonomy={taxonomy}
                 categories={categories}
                 store={`tabbedposts_${parent}_${unique}`} page={1}
-                perPage={items}>
+                perPage={items}
+                apiBaseUrl={apiBaseUrl}>
                 <PostConsumer>
                     <PostConsumer>
                         {(isMobileRenderMode || isNotDesktopPreview) ? (

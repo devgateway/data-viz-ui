@@ -11,7 +11,7 @@ import { injectIntl } from "react-intl";
 import { useParams } from "react-router";
 import SearchComponent from "./SearchControl";
 import LangSwitcher from "./LangSwitcher";
-
+import { useAppConfig } from "@/utils/ConfigProvider";
 
 
 const getPath = (menu, params) => {
@@ -268,7 +268,7 @@ const MenuItems = injectIntl(
     }
 );
 
-const Header = ({ intl, settings }) => {
+const Header = ({ intl, settings = {} }) => {
     const [selected, setSelected] = useState();
     const [isMenuVisible, setMenuVisible] = useState(false);
     const [isSmallScreen, setIsSmallScreen] = useState(false);
@@ -276,7 +276,7 @@ const Header = ({ intl, settings }) => {
     const [hasInteracted, setHasInteracted] = useState(false);
 
     const { slug } = useParams();
-
+    const { apiBaseUrl } = useAppConfig();
     const menuRef = useRef(null); // Reference for the menu container
     const hamburgerRef = useRef(null); // Reference for the hamburger icon
 
@@ -379,20 +379,18 @@ const Header = ({ intl, settings }) => {
         settings.landing_page_url !== "";
     const SITE_URL_WITH_LOCALE = hasLandingPageSettings ? settings.landing_page_url : `/${intl.locale}`;
 
-    console.log("isMenuVisible", isMenuVisible);
-
 
 
     return (
         <React.Fragment>
-            <MenuProvider slug={"main"} locale={intl.locale}>
+            <MenuProvider slug={"main"} locale={intl.locale} apiBaseUrl={apiBaseUrl}>
                 <Container key="header-container" fluid={true} className="header">
                     <Container fluid={true} className={"background"} ref={menuRef}>
                         <Menu className={"branding"} text>
                             <Menu.Item>
                                 <a href={`${SITE_URL_WITH_LOCALE}`} target={hasLandingPageSettings ? "_blank" : "_self"} rel="noopener noreferrer" id="site_url">
                                     {settings.site_logo !== 0 && !isMediumScreen && (
-                                        <MediaProvider id={settings.site_logo}>
+                                        <MediaProvider id={settings.site_logo} apiBaseUrl={apiBaseUrl}>
                                             <MediaConsumer>
                                                 <Logo key={"logo"} />
                                             </MediaConsumer>

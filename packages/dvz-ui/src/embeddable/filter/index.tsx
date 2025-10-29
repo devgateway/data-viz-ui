@@ -17,6 +17,8 @@ import {connect} from "react-redux";
 import {setFilter, setInitialFilters} from "../reducers/data";
 import {injectIntl} from "react-intl";
 import {SettingProvider, SettingsConsumer} from "@devgateway/wp-react-lib";
+import { Config } from "@/conf";
+import { useAppConfig } from "@/utils/ConfigProvider";
 
 const FILTER_TYPE_MULTI_SELECT = "multi-select";
 const FILTER_TYPE_SINGLE_SELECT = "single-select";
@@ -610,8 +612,9 @@ const CSVFilter = (props) => {
 };
 
 const FilterWrapper = (props) => {
+    const { apiBaseUrl } = useAppConfig();
     return (
-        <SettingProvider locale={props.intl.locale} changeUUID={props.unique}>
+        <SettingProvider locale={props.intl.locale} changeUUID={props.unique} apiBaseUrl={apiBaseUrl}>
             <SettingsConsumer>
                 <Filter {...props}></Filter>
             </SettingsConsumer>
