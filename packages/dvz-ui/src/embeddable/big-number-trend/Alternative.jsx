@@ -255,7 +255,7 @@ const DataFrame = (props) => {
                 <img className={`icon up ${percentChange < 0 ? 'visible' : 'hidden'}`} s src={props.iconDown}></img>
 
                 {showPercentageChange && percentChange &&
-                    <div className="percentage" style={percentStyle}> {percentChange > 0 ? '+' : '-'}
+                    <div className="percentage" style={percentStyle}> {percentChange > 0 ? '+' : ''}
                         {percentChange == 0 ? '=' : ''}{percentChangeFormatted}</div>}
             </Grid.Column>
 
