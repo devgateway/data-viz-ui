@@ -27,7 +27,7 @@ const Chart = (props) => {
         'data-text-color': textColor = '#5a5d68',
         'data-number-color': numberColor = '#5a5d68',
         'data-percent-color': percentColor = '#5a5d68',
-        'data-back-ground-color': backgroundColor = '#5a5d68',
+        'data-back-ground-color': backgroundColor = 'none',
 
 
         'data-big-number-font-size': bigNumberFontSize = 20,
