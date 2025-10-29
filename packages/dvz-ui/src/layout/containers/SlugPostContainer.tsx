@@ -13,9 +13,12 @@ interface SlugPostContainerProps {
 }
 
 const SlugPostContainer = ({ header, footer }: SlugPostContainerProps) => {
-    const { lan: locale, slug } = useParams();
+    const { lan: locale, slug, parent } = useParams();
+
+    debugger;
     return (
         <PostProvider
+            type={parent}
             slug={slug}
             store={slug}
             locale={locale}
