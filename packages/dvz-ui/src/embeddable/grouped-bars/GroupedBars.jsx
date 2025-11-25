@@ -1,22 +1,264 @@
-import React, {useRef, useState} from "react";
-import {Container, Grid} from "semantic-ui-react";
+import React, { useRef, useState } from "react";
+import { Container } from "semantic-ui-react";
 import DataProvider from "../data/DataProvider.jsx";
 import DataConsumer from "../data/DataConsumer.jsx";
-import {PostContent} from "@devgateway/wp-react-lib";
-import {connect} from "react-redux";
-import {alphaSort} from "../utils/common.js";
-import template from 'string-template';
+import { connect } from "react-redux";
+import { alphaSort } from "../utils/common.js";
 
+const DEFAULT_NO_DATA_MESSAGE = "No data matches your selection";
+const DEFAULT_NO_DATA_TEXT = "-";
+const DEFAULT_TEXT_COLOR = "#5a5d68";
+const DEFAULT_BACKGROUND_COLOR = "none";
+const DEFAULT_FONT_SIZE = 14;
+const DEFAULT_BAR_COLOR = "#3182ce";
+const DEFAULT_BAR_BACKGROUND_COLOR = "none";
+
+const decodeValue = (value, editing) => {
+    return editing ? value : decodeURIComponent(value);
+};
+
+const parseJSON = (value, editing) => {
+    try {
+        return JSON.parse(decodeValue(value, editing));
+    } catch (error) {
+        console.error("Error parsing value:", value, error);
+        return null;
+    }
+};
+
+const createNumberFormat = (formatObject) => {
+    if (!formatObject) {
+        return {
+            notation: "standard",
+            currency: "USD",
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+            prefix: '',
+            suffix: ''
+        };
+    }
+
+    return {
+        style: formatObject.style === 'compacted' ? 'decimal' : formatObject.style,
+        notation: formatObject.style === 'compacted' ? 'compact' : 'standard',
+        currency: formatObject.currency,
+        minimumFractionDigits: parseInt(formatObject.minimumFractionDigits),
+        maximumFractionDigits: parseInt(formatObject.maximumFractionDigits),
+        prefix: formatObject.prefix || '',
+        suffix: formatObject.suffix || ''
+    };
+};
+
+const buildParams = (filters, dvzProxyDatasetId) => {
+    const params = {};
+    const parsedFilters = filters || [];
+
+    if (parsedFilters.forEach) {
+        parsedFilters.forEach(filter => {
+            if (filter.value?.filter(v => v != null && v.toString().trim() !== "").length > 0) {
+                params[filter.param] = filter.value;
+            }
+        });
+    }
+
+    if (dvzProxyDatasetId) {
+        params.dvzProxyDatasetId = dvzProxyDatasetId;
+    }
+
+    return params;
+};
+
+const getDimensions = (dimension1) => {
+    const dimensions = [];
+    if (dimension1 && dimension1 !== "none") {
+        dimensions.push(dimension1);
+    }
+    return dimensions;
+};
+
+const BarItem = ({ 
+    dimensionValue, 
+    measureValue, 
+    barWidth, 
+    barColor, 
+    barBackgroundColor,
+    textColor, 
+    fontSize, 
+    format, 
+    intl 
+}) => {
+    return (
+        <div className="grouped-bar-item" style={{ marginBottom: "10px" }}>
+            <div style={{ 
+                display: "flex", 
+                justifyContent: "space-between", 
+                alignItems: "center", 
+                marginBottom: "4px" 
+            }}>
+                <div 
+                    className="grouped-bar-label" 
+                    style={{ fontSize: fontSize + 'px', color: textColor }}
+                >
+                    {dimensionValue}
+                </div>
+                <div 
+                    className="grouped-bar-measure" 
+                    style={{ fontSize: fontSize + 'px', color: textColor }}
+                >
+                    {format.prefix}
+                    {new Intl.NumberFormat(intl.locale, format).format(measureValue)}
+                    {format.suffix}
+                </div>
+            </div>
+            <div 
+                className="grouped-bar-bar-container" 
+                style={{ 
+                    backgroundColor: barBackgroundColor, 
+                    height: "32px", 
+                    borderRadius: "8px", 
+                    overflow: "hidden", 
+                    position: "relative" 
+                }}
+            >
+                <div 
+                    className="grouped-bar-bar" 
+                    style={{ 
+                        width: barWidth + '%', 
+                        backgroundColor: barColor, 
+                        height: "100%", 
+                        display: "flex", 
+                        alignItems: "center", 
+                        paddingLeft: "8px" 
+                    }}
+                >
+                    <span style={{ 
+                        color: "#ffffff", 
+                        fontSize: "14px", 
+                        fontWeight: "500" 
+                    }}>
+                        {barWidth.toFixed(1)}%
+                    </span>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+
+const NoDataDisplay = ({ textColor, message = "No data to display" }) => {
+    return (
+        <div className="grouped-bars-data-frame">
+            <div className="no-data-text" style={{ color: textColor }}>
+                {message}
+            </div>
+        </div>
+    );
+};
+
+
+const DataFrame = (props) => {
+    const { 
+        app, 
+        measure,
+        dimension1,
+        data,
+        format,
+        textColor,
+        fontSize,
+        intl,
+        manualColors,
+        defaultBarColor,
+        barBackgroundColor
+    } = props;
+
+    
+    const processData = () => {
+        if (!data) return { dataItems: [], measureField: null, dimensionField: null };
+
+        if (app === "csv") {
+            const { data: json, meta: { fields } } = data;
+            const dimensionField = fields[0];
+            const measureField = fields[1];
+            
+            const dataItems = data.data.map(d => ({
+                value: d[dimensionField],
+                [measureField]: d[measureField],
+                [dimensionField]: d[dimensionField]
+            }));
+
+            return { dataItems, measureField, dimensionField };
+        } else {
+            const children = data.children || [];
+            const measureField = measure;
+            const dimensionField = dimension1;
+
+            const dataItems = children.map(d => ({
+                value: d.value,
+                [measureField]: d[measureField],
+                [dimensionField]: d.value
+            }));
+
+            return { dataItems, measureField, dimensionField };
+        }
+    };
+
+    const { dataItems: rawDataItems, measureField, dimensionField } = processData();
+
+    const dataItems = rawDataItems.length > 0 
+        ? rawDataItems.sort((a, b) => alphaSort(false, intl.locale, a.value, b.value))
+        : [];
+
+    // Calculate total for percentage
+    const barTotal = dataItems.reduce((acc, item) => acc + (item[measureField] || 0), 0);
+
+    // Handle no data case
+    if (dataItems.length === 0 || !measureField || !dimensionField) {
+        return <NoDataDisplay textColor={textColor} />;
+    }
+
+    // Get bar color
+    const getBarColor = (dimensionValue) => {
+        if (dimensionValue && manualColors?.[app]?.[dimensionValue]) {
+            return manualColors[app][dimensionValue];
+        }
+        return defaultBarColor;
+    };
+
+    return (
+        <div className="grouped-bars-data-frame">
+            {dataItems.map((item, index) => {
+                const measureValue = item[measureField];
+                const dimensionValue = item[dimensionField];
+                const barWidth = measureValue && barTotal ? (measureValue / barTotal) * 100 : 0;
+                const barColor = getBarColor(dimensionValue);
+
+                return (
+                    <BarItem
+                        key={`${dimensionValue}-${index}`}
+                        dimensionValue={dimensionValue}
+                        measureValue={measureValue}
+                        barWidth={barWidth}
+                        barColor={barColor}
+                        barBackgroundColor={barBackgroundColor}
+                        textColor={textColor}
+                        fontSize={fontSize}
+                        format={format}
+                        intl={intl}
+                    />
+                );
+            })}
+        </div>
+    );
+};
 
 const Chart = (props) => {
     const {
         editing = false,
         unique,
         intl,
-        childContent,
         "data-csv": csv = "",
         "data-dvz-proxy-dataset-id": dvzProxyDatasetId,
-        "data-no-data-message": noDataMsg = "No data matches your selection",
+        "data-no-data-message": noDataMsg = DEFAULT_NO_DATA_MESSAGE,
         "data-view-mode": editMode = 'info',
         'data-height': height,
         'data-app': app,
@@ -24,211 +266,81 @@ const Chart = (props) => {
         'data-format': format = '{}',
         'data-group': group,
         'data-filters': filters = '[]',
-        'data-text-color': textColor = '#5a5d68',
-        'data-back-ground-color': backgroundColor = 'none',
-        'data-font-size': fontSize = 14,
-        'data-dimension1': dimension1,        
+        'data-text-color': textColor = DEFAULT_TEXT_COLOR,
+        'data-back-ground-color': backgroundColor = DEFAULT_BACKGROUND_COLOR,
+        'data-font-size': fontSize = DEFAULT_FONT_SIZE,
+        'data-dimension1': dimension1,
         "data-wait-for-filters": waitForFilters = "false",
-        "data-no-data-text": noDataText = "-" ,
+        "data-no-data-text": noDataText = DEFAULT_NO_DATA_TEXT,
         "data-manual-colors": manualColors = "{}",
-        "data-default-bar-color": defaultBarColor = "#3182ce",
-        "data-bar-background-color": barBackgroundColor = "none"
+        "data-default-bar-color": defaultBarColor = DEFAULT_BAR_COLOR,
+        "data-bar-background-color": barBackgroundColor = DEFAULT_BAR_BACKGROUND_COLOR
+    } = props;
 
-    } = props
-
-
-    const locale = intl.locale
     const ref = useRef(null);
-    const decode = (value) => {
-        if (editing) {
-            return value
-        }
-        return decodeURIComponent(value)
-    }
+    const [mode, setMode] = useState(editMode);
+    
+    const viewMode = editing ? editMode : mode;
+    const contentHeight = editing ? height - 80 : height - 40;
+   
+    const formatObject = parseJSON(format, editing);
+    const numberFormat = createNumberFormat(formatObject);
+    const parsedFilters = parseJSON(filters, editing);
+    const parsedMeasures = parseJSON(measures, editing);
+    const parsedManualColors = parseJSON(manualColors, editing);
 
-    const parse = (value) => {
-        try {
-            return JSON.parse(decode(value))
-        } catch (error) {
-            console.error("error parsing value:" + value)
-        }
-        return null
-    }
+    const params = buildParams(parsedFilters, dvzProxyDatasetId);
+    const dimensions = getDimensions(dimension1);
 
-    const formatObject = parse(format)
-    const numberFormat = formatObject ? {
-        style: (formatObject.style === 'compacted') ? 'decimal' : formatObject.style,
-        notation: (formatObject.style === 'compacted') ? 'compact' : "standard",
-        currency: formatObject.currency,
-        minimumFractionDigits: parseInt(formatObject.minimumFractionDigits),
-        maximumFractionDigits: parseInt(formatObject.maximumFractionDigits),
-        prefix: formatObject.prefix ? formatObject.prefix : '',
-        suffix: formatObject.suffix ? formatObject.suffix : ''
-    } : {
-        notation: "standard",
-        currency: "USD",
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-    }
-
-    const [mode, setMode] = useState(editMode)
-    const viewMode = editing ? editMode : mode
-    const contentHeight = (editing ? height - 80 : height - 40)
-
-    const params = {}
-    const ff = parse(filters) || {}
-
-    if (ff && ff.forEach) {
-        ff.forEach(f => {
-            if (f.value != null && f.value.filter(v => v != null && v.toString().trim() != "").length > 0)
-                params[f.param] = f.value
-        })
-    }
-
-    if (dvzProxyDatasetId) {
-        params.dvzProxyDatasetId = dvzProxyDatasetId;
-      }
-
-    const dimensions = []
-    if (dimension1 != "none") {
-        dimensions.push(dimension1)
-    }
-
-    return (<div ref={ref}>
-        <Container className={`chart container grouped-bars-container ${editing ? 'editing' : ''}`} style={{"height": height + 'px', backgroundColor:backgroundColor}} fluid={true}>
-            <DataProvider
-                style={{"height": `${contentHeight}px`}}
-                params={params}
-                app={app}
-                group={group}
-                csv={csv}
-                editing={editing}
-                waitForFilters={waitForFilters === "true"}
-                store={[app, unique, ...dimensions]} source={dimensions.join("/")}>
+    return (
+        <div ref={ref}>
+            <Container 
+                className={`chart container grouped-bars-container ${editing ? 'editing' : ''}`}
+                style={{ height: height + 'px', backgroundColor }}
+                fluid
+            >
+                <DataProvider
+                    style={{ height: `${contentHeight}px` }}
+                    params={params}
+                    app={app}
+                    group={group}
+                    csv={csv}
+                    editing={editing}
+                    waitForFilters={waitForFilters === "true"}
+                    store={[app, unique, ...dimensions]}
+                    source={dimensions.join("/")}
+                >
                     <DataConsumer>
                         <DataFrame
-                        editing={editing}
-                        locale={locale}
-                        intl={intl}
-                        app={app}
-                        format={numberFormat}
-                        dimension1={dimension1}
-                        manualColors={parse(manualColors)}
-                        measure={parse(measures)[0] || null}
-                        fontSize={fontSize}
-                        textColor={textColor}
-                        backGroundColor={backgroundColor}
-                        noDataText={noDataText}
-                        defaultBarColor={defaultBarColor}
-                        barBackgroundColor={barBackgroundColor}
-                        >
-                       </DataFrame>
+                            editing={editing}
+                            locale={intl.locale}
+                            intl={intl}
+                            app={app}
+                            format={numberFormat}
+                            dimension1={dimension1}
+                            manualColors={parsedManualColors}
+                            measure={parsedMeasures?.[0] || null}
+                            fontSize={fontSize}
+                            textColor={textColor}
+                            backGroundColor={backgroundColor}
+                            noDataText={noDataText}
+                            defaultBarColor={defaultBarColor}
+                            barBackgroundColor={barBackgroundColor}
+                        />
                     </DataConsumer>
-            </DataProvider>
-
-        </Container>
-    </div>)
-
-}
-
-const DataFrame = (props) => {
-    const { editing,
-        app, measure,
-        dimension1,
-        data,
-        format,
-        textColor,
-        fontSize,             
-        intl,
-        noDataText,
-        manualColors,
-        defaultBarColor,
-        barBackgroundColor
-    } = props
-
-    let dataItems = [];
-    let dimensionField
-    let measureField
-
-    if (app =="csv") {
-        const { data: json, meta: { fields } } = data
-        dimensionField = fields[0];
-        measureField = fields[1];
-        dataItems = data.data.map(d => {
-            return {
-                value: d[dimensionField],
-                [measureField]: d[measureField],
-                [dimensionField]: d[dimensionField]
-            }
-        })
-    } else {
-        
-        dataItems = !data.children  || data.children.length == 0 ? [] : data.children
-        measureField = measure;
-        dimensionField = dimension1;
-
-        dataItems = dataItems.map(d => {
-            return {
-                value: d.value,
-                [measureField]: d[measureField],
-                [dimensionField]:d.value
-            }
-        })        
-   }
-
-
-    if (dataItems.length > 0) {
-        dataItems = dataItems.sort((a, b) => {
-            return alphaSort(false, intl.locale, a.value, b.value)
-        })
-
-        
-    }
-
-    const barTotal = dataItems.reduce((acc, item) => acc + item[measureField], 0)  ;
-    if (dataItems.length == 0  || !measureField  || !dimensionField) {
-        return (<div className="grouped-bars-data-frame">
-            <div className="no-data-text" style={{"color":textColor}}>No data to display</div>
-        </div>)
-    }
-
-    return (<div className="grouped-bars-data-frame">
-        {dataItems.length > 0 && dataItems.map((item, index) => {
-            const measureValue = item[measureField]
-            const dimensionValue = item[dimensionField]
-            const barWidth = measureValue && barTotal ? (measureValue / barTotal) * 100 : 0
-            let barColor = defaultBarColor
-            if (dimensionValue && manualColors && manualColors[app] && manualColors[app][dimensionValue]) {
-                barColor = manualColors[app][dimensionValue]
-            }
-            
-            return (<div key={index} className="grouped-bar-item" style={{"marginBottom":"10px"}}>
-                <div style={{"display":"flex", "justifyContent":"space-between", "alignItems":"center", "marginBottom":"4px"}}>
-                    <div className="grouped-bar-label" style={{"fontSize":fontSize + 'px', "color":textColor}}>{dimensionValue}</div>
-                    <div className="grouped-bar-measure" style={{"fontSize":fontSize + 'px', "color":textColor}}>{
-                    format.prefix + new Intl.NumberFormat(intl.locale, format).format(measureValue) + format.suffix}</div>
-                </div>
-                <div className="grouped-bar-bar-container" style={{"backgroundColor": barBackgroundColor, "height":"32px", "borderRadius":"8px", "overflow":"hidden", "position":"relative"}}>
-                    <div className="grouped-bar-bar" style={{"width":barWidth + '%', "backgroundColor": barColor, "height":"100%", "display":"flex", "alignItems":"center", "paddingLeft":"8px"}}>
-                        <span style={{"color":"#ffffff", "fontSize":"14px", "fontWeight":"500"}}>{barWidth.toFixed(1)}%</span>
-                    </div>
-                </div>
-            </div>)
-        })}
-    </div>)
-}
-
+                </DataProvider>
+            </Container>
+        </div>
+    );
+};
 
 const mapStateToProps = (state, ownProps) => {
-    const {"data-app": app, "data-group": group,} = ownProps
-    const injectedMeasures = state.getIn(['data', 'measures', app, group])
-    if (injectedMeasures) {
-        return {
-            "injectedMeasures": injectedMeasures,
-        }
-    } else {
-        return {}
-    }
-}
+    const { "data-app": app, "data-group": group } = ownProps;
+    const injectedMeasures = state.getIn(['data', 'measures', app, group]);
+    
+    return injectedMeasures ? { injectedMeasures } : {};
+};
+
 const mapActionCreators = {};
-export default connect(mapStateToProps, mapActionCreators)(Chart)
+
+export default connect(mapStateToProps, mapActionCreators)(Chart);
