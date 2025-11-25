@@ -61,7 +61,9 @@ const Chart = (props) => {
         notation: (formatObject.style === 'compacted') ? 'compact' : "standard",
         currency: formatObject.currency,
         minimumFractionDigits: parseInt(formatObject.minimumFractionDigits),
-        maximumFractionDigits: parseInt(formatObject.maximumFractionDigits)
+        maximumFractionDigits: parseInt(formatObject.maximumFractionDigits),
+        prefix: formatObject.prefix ? formatObject.prefix : '',
+        suffix: formatObject.suffix ? formatObject.suffix : ''
     } : {
         notation: "standard",
         currency: "USD",
@@ -203,7 +205,8 @@ const DataFrame = (props) => {
             return (<div key={index} className="grouped-bar-item" style={{"marginBottom":"10px"}}>
                 <div style={{"display":"flex", "justifyContent":"space-between", "alignItems":"center", "marginBottom":"4px"}}>
                     <div className="grouped-bar-label" style={{"fontSize":fontSize + 'px', "color":textColor}}>{dimensionValue}</div>
-                    <div className="grouped-bar-measure" style={{"fontSize":fontSize + 'px', "color":textColor}}>{new Intl.NumberFormat(intl.locale, format).format(measureValue)}</div>
+                    <div className="grouped-bar-measure" style={{"fontSize":fontSize + 'px', "color":textColor}}>{
+                    format.prefix + new Intl.NumberFormat(intl.locale, format).format(measureValue) + format.suffix}</div>
                 </div>
                 <div className="grouped-bar-bar-container" style={{"backgroundColor": barBackgroundColor, "height":"32px", "borderRadius":"8px", "overflow":"hidden", "position":"relative"}}>
                     <div className="grouped-bar-bar" style={{"width":barWidth + '%', "backgroundColor": barColor, "height":"100%", "display":"flex", "alignItems":"center", "paddingLeft":"8px"}}>
