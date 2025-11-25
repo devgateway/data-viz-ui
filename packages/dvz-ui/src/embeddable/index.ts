@@ -39,6 +39,7 @@ const Body = lazy(() => import("./body"));
 const SupersetChart = lazy(() => import("./superset-chart"));
 const SupersetDashboard = lazy(() => import("./superset-dashboard"));
 const BigNumber = lazy(() => import("./big-number"));
+const GroupedBars = lazy(() => import("./grouped-bars"));
 const BigNumberTrend = lazy(() => import("./big-number-trend"));
 const PostsWithFilters = lazy(() => import("./posts-with-filters"));
 
@@ -79,6 +80,7 @@ export const components = {
     supersetDashboard: SupersetDashboard,
     agreeAndDownload: AgreeAndDownload,
 	bigNumber: BigNumber,
+    groupedBars: GroupedBars,
     bigNumberTrend: BigNumberTrend,
     postsWithFilters: PostsWithFilters,
     redirect: () => null
