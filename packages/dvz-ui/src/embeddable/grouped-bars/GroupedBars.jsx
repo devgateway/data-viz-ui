@@ -93,17 +93,30 @@ const BarItem = ({
                 display: "flex", 
                 justifyContent: "space-between", 
                 alignItems: "center", 
-                marginBottom: "4px" 
+                marginBottom: "4px",
+                gap: "8px"
             }}>
                 <div 
                     className="grouped-bar-label" 
-                    style={{ fontSize: fontSize + 'px', color: textColor }}
+                    style={{ 
+                        fontSize: fontSize + 'px', 
+                        color: textColor,
+                        whiteSpace: "nowrap",
+                        overflow: "visible",
+                        flex: "0 0 auto"
+                    }}
                 >
                     {dimensionValue}
                 </div>
                 <div 
                     className="grouped-bar-measure" 
-                    style={{ fontSize: fontSize + 'px', color: textColor }}
+                    style={{ 
+                        fontSize: fontSize + 'px', 
+                        color: textColor,
+                        whiteSpace: "nowrap",
+                        overflow: "visible",
+                        flex: "0 0 auto"
+                    }}
                 >
                     {format.prefix}
                     {new Intl.NumberFormat(intl.locale, format).format(measureValue)}
@@ -134,7 +147,8 @@ const BarItem = ({
                     <span style={{ 
                         color: "#ffffff", 
                         fontSize: "14px", 
-                        fontWeight: "500" 
+                        fontWeight: "500",
+                        whiteSpace: "nowrap"
                     }}>
                         {barWidth.toFixed(1)}%
                     </span>
