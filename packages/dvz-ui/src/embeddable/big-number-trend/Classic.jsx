@@ -175,14 +175,18 @@ const DataFrame = (props) => {
         dataItems = !data.children  || data.children.length == 0 ? [] : data.children
         measureField = measure;
         dimensionField = dimension1;
-
-        dataItems = dataItems.map(d => {
-            return {
-                value: d.value,
-                [measureField]: d[measureField],
-                [dimensionField]:d.value
-            }
-        })
+        if (dimensionField == null || dimensionField == "none") {
+            let obj = {};
+            obj[measureField] = data[measureField];
+            dataItems = [obj];
+        } else {
+            dataItems = !data.children || data.children.length == 0 ? [] : data.children
+            dataItems = dataItems.map(d => {
+                return {
+                    value: d.value, [measureField]: d[measureField], [dimensionField]: d.value
+                }
+            })            
+        }        
    }
 
     let currentValue = null
