@@ -85,8 +85,72 @@ const BarItem = ({
     textColor, 
     fontSize, 
     format, 
+    labelPosition,
+    valuePosition,
     intl 
-}) => {
+}) => {    
+    if (labelPosition === 'left') {
+        return (
+            <div className="grouped-bar-item" style={{ marginBottom: "10px" }}>
+                <div style={{ 
+                    display: "flex", 
+                    alignItems: "center", 
+                    gap: "12px"
+                }}>
+                    <div 
+                        className="grouped-bar-label" 
+                        style={{ 
+                            fontSize: fontSize + 'px', 
+                            color: textColor,
+                            whiteSpace: "nowrap",
+                            overflow: "visible",
+                            flex: "0 0 auto",
+                            minWidth: "120px"
+                        }}
+                    >
+                        {dimensionValue}
+                    </div>
+                    <div 
+                        className="grouped-bar-bar-container" 
+                        style={{ 
+                            backgroundColor: barBackgroundColor, 
+                            height: "32px", 
+                            borderRadius: "8px", 
+                            overflow: "hidden", 
+                            position: "relative",
+                            flex: "1"
+                        }}
+                    >
+                        <div 
+                            className="grouped-bar-bar" 
+                            style={{ 
+                                width: barWidth + '%', 
+                                backgroundColor: barColor, 
+                                height: "100%", 
+                                display: "flex", 
+                                alignItems: "center", 
+                                paddingLeft: "8px",
+                                paddingRight: "8px"
+                            }}
+                        >
+                            <span style={{ 
+                                color: "#ffffff", 
+                                fontSize: "14px", 
+                                fontWeight: "500",
+                                whiteSpace: "nowrap"
+                            }}>
+                                {valuePosition === 'bar' 
+                                    ? `${format.prefix}${new Intl.NumberFormat(intl.locale, format).format(measureValue)}${format.suffix}`
+                                    : `${barWidth.toFixed(1)}%`
+                                }
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="grouped-bar-item" style={{ marginBottom: "10px" }}>
             <div style={{ 
@@ -108,20 +172,22 @@ const BarItem = ({
                 >
                     {dimensionValue}
                 </div>
-                <div 
-                    className="grouped-bar-measure" 
-                    style={{ 
-                        fontSize: fontSize + 'px', 
-                        color: textColor,
-                        whiteSpace: "nowrap",
-                        overflow: "visible",
-                        flex: "0 0 auto"
-                    }}
-                >
-                    {format.prefix}
-                    {new Intl.NumberFormat(intl.locale, format).format(measureValue)}
-                    {format.suffix}
-                </div>
+                {valuePosition === 'top' && (
+                    <div 
+                        className="grouped-bar-measure" 
+                        style={{ 
+                            fontSize: fontSize + 'px', 
+                            color: textColor,
+                            whiteSpace: "nowrap",
+                            overflow: "visible",
+                            flex: "0 0 auto"
+                        }}
+                    >
+                        {format.prefix}
+                        {new Intl.NumberFormat(intl.locale, format).format(measureValue)}
+                        {format.suffix}
+                    </div>
+                )}
             </div>
             <div 
                 className="grouped-bar-bar-container" 
@@ -141,7 +207,8 @@ const BarItem = ({
                         height: "100%", 
                         display: "flex", 
                         alignItems: "center", 
-                        paddingLeft: "8px" 
+                        paddingLeft: "8px",
+                        paddingRight: "8px"
                     }}
                 >
                     <span style={{ 
@@ -150,7 +217,10 @@ const BarItem = ({
                         fontWeight: "500",
                         whiteSpace: "nowrap"
                     }}>
-                        {barWidth.toFixed(1)}%
+                        {valuePosition === 'bar' 
+                            ? `${format.prefix}${new Intl.NumberFormat(intl.locale, format).format(measureValue)}${format.suffix}`
+                            : `${barWidth.toFixed(1)}%`
+                        }
                     </span>
                 </div>
             </div>
@@ -182,7 +252,9 @@ const DataFrame = (props) => {
         intl,
         manualColors,
         defaultBarColor,
-        barBackgroundColor
+        barBackgroundColor,
+        labelPosition,
+        valuePosition
     } = props;
 
     
@@ -258,6 +330,8 @@ const DataFrame = (props) => {
                         fontSize={fontSize}
                         format={format}
                         intl={intl}
+                        labelPosition={labelPosition}
+                        valuePosition={valuePosition}
                     />
                 );
             })}
@@ -288,8 +362,12 @@ const Chart = (props) => {
         "data-no-data-text": noDataText = DEFAULT_NO_DATA_TEXT,
         "data-manual-colors": manualColors = "{}",
         "data-default-bar-color": defaultBarColor = DEFAULT_BAR_COLOR,
-        "data-bar-background-color": barBackgroundColor = DEFAULT_BAR_BACKGROUND_COLOR
+        "data-bar-background-color": barBackgroundColor = DEFAULT_BAR_BACKGROUND_COLOR,
+        "data-label-position": labelPosition,
+        "data-value-position": valuePosition
     } = props;
+
+    
 
     const ref = useRef(null);
     const [mode, setMode] = useState(editMode);
@@ -340,6 +418,8 @@ const Chart = (props) => {
                             noDataText={noDataText}
                             defaultBarColor={defaultBarColor}
                             barBackgroundColor={barBackgroundColor}
+                            labelPosition={labelPosition}
+                            valuePosition={valuePosition}
                         />
                     </DataConsumer>
                 </DataProvider>
