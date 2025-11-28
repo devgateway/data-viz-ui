@@ -87,27 +87,33 @@ const BarItem = ({
     format, 
     labelPosition,
     valuePosition,
+    labelWidth,
     intl 
 }) => {    
+    
+    const labelStyle = {
+        fontSize: fontSize + 'px',
+        color: textColor,
+        width: `${labelWidth}%`,              
+        flex: `0 0 ${labelWidth}%`,            
+        whiteSpace: 'normal',         
+        wordBreak: 'break-word',
+        overflow: 'hidden',
+        lineHeight: '1.2',
+        display: 'flex',              
+        alignItems: 'center',    
+        height: '32px'           
+    };
+
     if (labelPosition === 'left') {
         return (
             <div className="grouped-bar-item" style={{ marginBottom: "10px" }}>
                 <div style={{ 
                     display: "flex", 
-                    alignItems: "center", 
+                    alignItems: "flex-start",    // allow taller label without shrinking bar
                     gap: "12px"
                 }}>
-                    <div 
-                        className="grouped-bar-label" 
-                        style={{ 
-                            fontSize: fontSize + 'px', 
-                            color: textColor,
-                            whiteSpace: "nowrap",
-                            overflow: "visible",
-                            flex: "0 0 auto",
-                            minWidth: "120px"
-                        }}
-                    >
+                    <div className="grouped-bar-label" style={labelStyle}>
                         {dimensionValue}
                     </div>
                     <div 
@@ -118,7 +124,8 @@ const BarItem = ({
                             borderRadius: "8px", 
                             overflow: "hidden", 
                             position: "relative",
-                            flex: "1"
+                            flex: "1",
+                            minWidth: 0            // allow flex container to shrink properly
                         }}
                     >
                         <div 
@@ -155,21 +162,11 @@ const BarItem = ({
         <div className="grouped-bar-item" style={{ marginBottom: "10px" }}>
             <div style={{ 
                 display: "flex", 
-                justifyContent: "space-between", 
-                alignItems: "center", 
-                marginBottom: "4px",
-                gap: "8px"
+                alignItems: "flex-start",
+                gap: "12px",
+                marginBottom: "6px"
             }}>
-                <div 
-                    className="grouped-bar-label" 
-                    style={{ 
-                        fontSize: fontSize + 'px', 
-                        color: textColor,
-                        whiteSpace: "nowrap",
-                        overflow: "visible",
-                        flex: "0 0 auto"
-                    }}
-                >
+                <div className="grouped-bar-label" style={labelStyle}>
                     {dimensionValue}
                 </div>
                 {valuePosition === 'top' && (
@@ -179,8 +176,8 @@ const BarItem = ({
                             fontSize: fontSize + 'px', 
                             color: textColor,
                             whiteSpace: "nowrap",
-                            overflow: "visible",
-                            flex: "0 0 auto"
+                            flex: "1",
+                            textAlign: "right"
                         }}
                     >
                         {format.prefix}
@@ -254,7 +251,8 @@ const DataFrame = (props) => {
         defaultBarColor,
         barBackgroundColor,
         labelPosition,
-        valuePosition
+        valuePosition,
+        labelWidth
     } = props;
 
     
@@ -332,6 +330,7 @@ const DataFrame = (props) => {
                         intl={intl}
                         labelPosition={labelPosition}
                         valuePosition={valuePosition}
+                        labelWidth={labelWidth}
                     />
                 );
             })}
@@ -364,7 +363,8 @@ const Chart = (props) => {
         "data-default-bar-color": defaultBarColor = DEFAULT_BAR_COLOR,
         "data-bar-background-color": barBackgroundColor = DEFAULT_BAR_BACKGROUND_COLOR,
         "data-label-position": labelPosition,
-        "data-value-position": valuePosition
+        "data-value-position": valuePosition,
+        "data-label-width": labelWidth,
     } = props;
 
     
@@ -420,7 +420,7 @@ const Chart = (props) => {
                             barBackgroundColor={barBackgroundColor}
                             labelPosition={labelPosition}
                             valuePosition={valuePosition}
-                        />
+                            labelWidth={labelWidth}/>
                     </DataConsumer>
                 </DataProvider>
             </Container>
