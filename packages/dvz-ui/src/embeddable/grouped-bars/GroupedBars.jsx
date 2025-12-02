@@ -4,6 +4,7 @@ import DataProvider from "../data/DataProvider.jsx";
 import DataConsumer from "../data/DataConsumer.jsx";
 import { connect } from "react-redux";
 import { alphaSort } from "../utils/common.js";
+import { formatContent } from "../common/ChartTooltip.jsx";
 
 const DEFAULT_NO_DATA_MESSAGE = "No data matches your selection";
 const DEFAULT_NO_DATA_TEXT = "-";
@@ -88,6 +89,9 @@ const BarItem = ({
     labelPosition,
     valuePosition,
     labelWidth,
+    labelHeight,
+    labelFormat,
+    vars,
     intl 
 }) => {    
     
@@ -102,10 +106,12 @@ const BarItem = ({
         lineHeight: '1.2',
         display: 'flex',              
         alignItems: 'center',    
-        height: '32px'           
-    };
+        height: labelHeight + 'px'           
+    }; 
 
-    if (labelPosition === 'left') {
+    let lformat = decodeURIComponent(labelFormat);
+    let labelString = formatContent(lformat, vars ? vars : {value: dimensionValue}, intl);
+    if (labelPosition === 'left') {      
         return (
             <div className="grouped-bar-item" style={{ marginBottom: "10px" }}>
                 <div style={{ 
@@ -113,8 +119,7 @@ const BarItem = ({
                     alignItems: "flex-start",    // allow taller label without shrinking bar
                     gap: "12px"
                 }}>
-                    <div className="grouped-bar-label" style={labelStyle}>
-                        {dimensionValue}
+                    <div className="grouped-bar-label" style={labelStyle} dangerouslySetInnerHTML={{__html: labelString}}>
                     </div>
                     <div 
                         className="grouped-bar-bar-container" 
@@ -166,8 +171,7 @@ const BarItem = ({
                 gap: "12px",
                 marginBottom: "6px"
             }}>
-                <div className="grouped-bar-label" style={labelStyle}>
-                    {dimensionValue}
+                <div className="grouped-bar-label" style={labelStyle} dangerouslySetInnerHTML={{__html: labelString}}>
                 </div>
                 {valuePosition === 'top' && (
                     <div 
@@ -252,7 +256,9 @@ const DataFrame = (props) => {
         barBackgroundColor,
         labelPosition,
         valuePosition,
-        labelWidth
+        labelWidth,
+        labelHeight,
+        labelFormat
     } = props;
 
     
@@ -279,7 +285,8 @@ const DataFrame = (props) => {
             const dataItems = children.map(d => ({
                 value: d.value,
                 [measureField]: d[measureField],
-                [dimensionField]: d.value
+                [dimensionField]: d.value,
+                vars: {...d}
             }));
 
             return { dataItems, measureField, dimensionField };
@@ -331,6 +338,9 @@ const DataFrame = (props) => {
                         labelPosition={labelPosition}
                         valuePosition={valuePosition}
                         labelWidth={labelWidth}
+                        labelHeight={labelHeight}
+                        labelFormat={labelFormat}
+                        vars={item.vars}
                     />
                 );
             })}
@@ -365,10 +375,11 @@ const Chart = (props) => {
         "data-label-position": labelPosition,
         "data-value-position": valuePosition,
         "data-label-width": labelWidth,
+        "data-label-height": labelHeight,
+        "data-label-format": labelFormat
     } = props;
 
     
-
     const ref = useRef(null);
     const [mode, setMode] = useState(editMode);
     
@@ -420,7 +431,10 @@ const Chart = (props) => {
                             barBackgroundColor={barBackgroundColor}
                             labelPosition={labelPosition}
                             valuePosition={valuePosition}
-                            labelWidth={labelWidth}/>
+                            labelWidth={labelWidth}
+                            labelHeight={labelHeight}
+                            labelFormat={labelFormat}
+                            />
                     </DataConsumer>
                 </DataProvider>
             </Container>
