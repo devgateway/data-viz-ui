@@ -89,6 +89,7 @@ const BarItem = ({
     labelPosition,
     valuePosition,
     labelWidth,
+    labelHeight,
     labelFormat,
     vars,
     intl 
@@ -105,7 +106,7 @@ const BarItem = ({
         lineHeight: '1.2',
         display: 'flex',              
         alignItems: 'center',    
-        height: '32px'           
+        height: labelHeight + 'px'           
     }; 
 
     let lformat = decodeURIComponent(labelFormat);
@@ -256,6 +257,7 @@ const DataFrame = (props) => {
         labelPosition,
         valuePosition,
         labelWidth,
+        labelHeight,
         labelFormat
     } = props;
 
@@ -336,6 +338,7 @@ const DataFrame = (props) => {
                         labelPosition={labelPosition}
                         valuePosition={valuePosition}
                         labelWidth={labelWidth}
+                        labelHeight={labelHeight}
                         labelFormat={labelFormat}
                         vars={item.vars}
                     />
@@ -372,6 +375,7 @@ const Chart = (props) => {
         "data-label-position": labelPosition,
         "data-value-position": valuePosition,
         "data-label-width": labelWidth,
+        "data-label-height": labelHeight,
         "data-label-format": labelFormat
     } = props;
 
@@ -428,6 +432,7 @@ const Chart = (props) => {
                             labelPosition={labelPosition}
                             valuePosition={valuePosition}
                             labelWidth={labelWidth}
+                            labelHeight={labelHeight}
                             labelFormat={labelFormat}
                             />
                     </DataConsumer>
