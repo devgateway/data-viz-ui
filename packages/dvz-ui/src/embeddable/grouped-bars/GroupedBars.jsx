@@ -424,11 +424,11 @@ const Chart = (props) => {
                             manualColors={parsedManualColors}
                             measure={parsedMeasures?.[0] || null}
                             fontSize={fontSize}
-                            textColor={textColor}
-                            backGroundColor={backgroundColor}
+                            textColor={decodeValue(textColor)}
+                            backGroundColor={decodeValue(backgroundColor)}
                             noDataText={noDataText}
-                            defaultBarColor={defaultBarColor}
-                            barBackgroundColor={barBackgroundColor}
+                            defaultBarColor={decodeValue(defaultBarColor)}
+                            barBackgroundColor={decodeValue(barBackgroundColor)}
                             labelPosition={labelPosition}
                             valuePosition={valuePosition}
                             labelWidth={labelWidth}
