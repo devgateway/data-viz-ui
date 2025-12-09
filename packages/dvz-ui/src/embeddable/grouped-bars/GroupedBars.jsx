@@ -258,7 +258,9 @@ const DataFrame = (props) => {
         valuePosition,
         labelWidth,
         labelHeight,
-        labelFormat
+        labelFormat,
+        sorting,
+        sortDirection
     } = props;
 
     
@@ -295,9 +297,20 @@ const DataFrame = (props) => {
 
     const { dataItems: rawDataItems, measureField, dimensionField } = processData();
 
-    const dataItems = rawDataItems.length > 0 
-        ? rawDataItems.sort((a, b) => alphaSort(false, intl.locale, a.value, b.value))
-        : [];
+    let dataItems = rawDataItems.slice();
+    if (sorting === 'measure') {
+        dataItems = rawDataItems.sort((a, b) => {
+            const aValue = a[measureField] || 0;
+            const bValue = b[measureField] || 0;
+            return sortDirection === 'asc' ? aValue - bValue : bValue - aValue;
+        });
+    } else if (sorting === 'dimension') {
+        dataItems = rawDataItems.sort((a, b) => {
+            return sortDirection === 'asc'
+                ? alphaSort(false, intl.locale, a.value, b.value)
+                : alphaSort(true, intl.locale, a.value, b.value);
+        });
+    }
 
     // Calculate total for percentage
     const barTotal = dataItems.reduce((acc, item) => acc + (item[measureField] || 0), 0);
@@ -376,7 +389,9 @@ const Chart = (props) => {
         "data-value-position": valuePosition,
         "data-label-width": labelWidth,
         "data-label-height": labelHeight,
-        "data-label-format": labelFormat
+        "data-label-format": labelFormat,
+        "data-sorting": sorting,
+        "data-sort-direction": sortDirection
     } = props;
 
     
@@ -434,6 +449,8 @@ const Chart = (props) => {
                             labelWidth={labelWidth}
                             labelHeight={labelHeight}
                             labelFormat={labelFormat}
+                            sorting={sorting}
+                            sortDirection={sortDirection}
                             />
                     </DataConsumer>
                 </DataProvider>
