@@ -297,7 +297,7 @@ const DataFrame = (props) => {
 
     const { dataItems: rawDataItems, measureField, dimensionField } = processData();
 
-    let dataItems = rawDataItems.slice();
+    let dataItems;
     if (sorting === 'measure') {
         dataItems = rawDataItems.sort((a, b) => {
             const aValue = a[measureField] || 0;
@@ -310,7 +310,9 @@ const DataFrame = (props) => {
                 ? alphaSort(false, intl.locale, a.value, b.value)
                 : alphaSort(true, intl.locale, a.value, b.value);
         });
-    }
+    } else {
+        dataItems = rawDataItems;
+    }    
 
     // Calculate total for percentage
     const barTotal = dataItems.reduce((acc, item) => acc + (item[measureField] || 0), 0);
