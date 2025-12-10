@@ -317,7 +317,9 @@ const DataFrame = (props) => {
 
     if (topN && !isNaN(parseInt(topN))) {
         const n = parseInt(topN);
-        dataItems = dataItems.slice(0, n);
+        if (n > 0) {
+            dataItems = dataItems.slice(0, n);
+        }
     }
 
     // Calculate total for percentage
