@@ -260,7 +260,8 @@ const DataFrame = (props) => {
         labelHeight,
         labelFormat,
         sorting,
-        sortDirection
+        sortDirection,
+        topN
     } = props;
 
     
@@ -312,10 +313,17 @@ const DataFrame = (props) => {
         });
     } else {
         dataItems = rawDataItems;
-    }    
+    }      
+
+    if (topN && !isNaN(parseInt(topN))) {
+        const n = parseInt(topN);
+        if (n > 0) {
+            dataItems = dataItems.slice(0, n);
+        }
+    }
 
     // Calculate total for percentage
-    const barTotal = dataItems.reduce((acc, item) => acc + (item[measureField] || 0), 0);
+    const barTotal = dataItems.reduce((acc, item) => acc + (item[measureField] || 0), 0);   
 
     // Handle no data case
     if (dataItems.length === 0 || !measureField || !dimensionField) {
@@ -393,7 +401,8 @@ const Chart = (props) => {
         "data-label-height": labelHeight,
         "data-label-format": labelFormat,
         "data-sorting": sorting,
-        "data-sort-direction": sortDirection
+        "data-sort-direction": sortDirection,
+        "data-top-n": topN
     } = props;
 
     
@@ -453,6 +462,7 @@ const Chart = (props) => {
                             labelFormat={labelFormat}
                             sorting={sorting}
                             sortDirection={sortDirection}
+                            topN={topN}
                             />
                     </DataConsumer>
                 </DataProvider>
