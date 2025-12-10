@@ -258,7 +258,10 @@ const DataFrame = (props) => {
         valuePosition,
         labelWidth,
         labelHeight,
-        labelFormat
+        labelFormat,
+        sorting,
+        sortDirection,
+        topN
     } = props;
 
     
@@ -295,12 +298,32 @@ const DataFrame = (props) => {
 
     const { dataItems: rawDataItems, measureField, dimensionField } = processData();
 
-    const dataItems = rawDataItems.length > 0 
-        ? rawDataItems.sort((a, b) => alphaSort(false, intl.locale, a.value, b.value))
-        : [];
+    let dataItems;
+    if (sorting === 'measure') {
+        dataItems = rawDataItems.sort((a, b) => {
+            const aValue = a[measureField] || 0;
+            const bValue = b[measureField] || 0;
+            return sortDirection === 'asc' ? aValue - bValue : bValue - aValue;
+        });
+    } else if (sorting === 'dimension') {
+        dataItems = rawDataItems.sort((a, b) => {
+            return sortDirection === 'asc'
+                ? alphaSort(false, intl.locale, a.value, b.value)
+                : alphaSort(true, intl.locale, a.value, b.value);
+        });
+    } else {
+        dataItems = rawDataItems;
+    }      
+
+    if (topN && !isNaN(parseInt(topN))) {
+        const n = parseInt(topN);
+        if (n > 0) {
+            dataItems = dataItems.slice(0, n);
+        }
+    }
 
     // Calculate total for percentage
-    const barTotal = dataItems.reduce((acc, item) => acc + (item[measureField] || 0), 0);
+    const barTotal = dataItems.reduce((acc, item) => acc + (item[measureField] || 0), 0);   
 
     // Handle no data case
     if (dataItems.length === 0 || !measureField || !dimensionField) {
@@ -376,7 +399,10 @@ const Chart = (props) => {
         "data-value-position": valuePosition,
         "data-label-width": labelWidth,
         "data-label-height": labelHeight,
-        "data-label-format": labelFormat
+        "data-label-format": labelFormat,
+        "data-sorting": sorting,
+        "data-sort-direction": sortDirection,
+        "data-top-n": topN
     } = props;
 
     
@@ -434,6 +460,9 @@ const Chart = (props) => {
                             labelWidth={labelWidth}
                             labelHeight={labelHeight}
                             labelFormat={labelFormat}
+                            sorting={sorting}
+                            sortDirection={sortDirection}
+                            topN={topN}
                             />
                     </DataConsumer>
                 </DataProvider>
