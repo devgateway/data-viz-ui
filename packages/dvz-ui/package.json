@@ -35,7 +35,7 @@
   "bugs": "https://github.com/devgateway/data-viz-ui/issues",
   "publishConfig": {
     "access": "public",
-    "provenance": true
+    "provenance": false
   },
   "dependencies": {
     "@artsy/fresnel": "^8.1.0",
