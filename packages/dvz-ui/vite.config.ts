@@ -6,7 +6,7 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 import * as packageJson from './package.json';
 import preserveDirectives from "rollup-plugin-preserve-directives";
 import autoprefixer from 'autoprefixer';
-
+import { purgeCSSPlugin } from '@fullhuman/postcss-purgecss';
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -100,6 +100,12 @@ export default defineConfig({
         postcss: {
             plugins: [
                 autoprefixer(),
+                purgeCSSPlugin({
+                    content: ['./src/**/*.{html,js,jsx,ts,tsx}'],
+                    safelist: {
+                        deep: [/ui/],
+                    },
+                })
             ]
         },
         preprocessorOptions: {

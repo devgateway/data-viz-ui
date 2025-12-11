@@ -26,10 +26,8 @@ const RootLayout = () => {
     const location = useLocation();
     const defaultLocale = Config.DEFAULT_LOCALE;
     const [isClient, setIsClient] = useState(false);
-    console.log("defaultLocale", defaultLocale);
     const locale = pathParams.lan;
     const pathname = location.pathname;
-    console.log("pathParams", JSON.stringify(pathParams.lan));
     useEffect(() => {
         setIsClient(true);
 
