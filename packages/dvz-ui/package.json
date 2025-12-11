@@ -88,6 +88,7 @@
   "devDependencies": {
     "@devgateway/wp-react-lib": "workspace:*",
     "@eslint/js": "^9.37.0",
+    "@fullhuman/postcss-purgecss": "^7.0.2",
     "@stylistic/eslint-plugin-js": "^4.2.0",
     "@types/d3": "^7.4.3",
     "@types/d3-shape": "^3.1.7",
