@@ -1,5 +1,11 @@
 # @devgateway/dvz-ui-react
 
+## 1.5.3
+
+### Patch Changes
+
+- [#92](https://github.com/devgateway/data-viz-ui/pull/92) [`5c2155e`](https://github.com/devgateway/data-viz-ui/commit/5c2155efc01e1aee29248e227e3804902236e0d5) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Use window location for API
+
 ## 1.5.2
 
 ### Patch Changes
