@@ -36,6 +36,10 @@ jobs:
       with:
         node-version: 22.x
         cache: pnpm
+        registry-url: 'https://registry.npmjs.org'
+
+    - name: Upgrade npm for OIDC support
+      run: npm install -g npm@latest
 
     - name: Install Dependencies
       run: pnpm install --frozen-lockfile
@@ -53,4 +57,5 @@ jobs:
         title: "chore(release): update version"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        NPM_CONFIG_PROVENANCE: true
 
