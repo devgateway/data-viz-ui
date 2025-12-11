@@ -1,5 +1,12 @@
 # @devgateway/dvz-ui-react
 
+## 1.5.2
+
+### Patch Changes
+
+- [#86](https://github.com/devgateway/data-viz-ui/pull/86) [`cda0d1b`](https://github.com/devgateway/data-viz-ui/commit/cda0d1bc4f3786b34f01ae22807e2151643e995c) Thanks [@timothygachengo](https://github.com/timothygachengo)! - - Fix `data-api` endpoint to use host URL if `VITE_REACT_APP_API_ROOT` env variable is not set.
+  - Add purgeCSS plugin to remove unused CSS which helps in reducing the bundle size of CSS.
+
 ## 1.5.1
 
 ### Patch Changes
