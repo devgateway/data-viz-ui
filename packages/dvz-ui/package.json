@@ -33,6 +33,10 @@
   },
   "homepage": "https://github.com/devgateway/data-viz-ui/tree/main/packages/dvz-ui",
   "bugs": "https://github.com/devgateway/data-viz-ui/issues",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "dependencies": {
     "@artsy/fresnel": "^8.1.0",
     "@nivo/bar": "^0.96.0",
