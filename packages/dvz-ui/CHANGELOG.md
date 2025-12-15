@@ -1,5 +1,11 @@
 # @devgateway/dvz-ui-react
 
+## 1.5.4
+
+### Patch Changes
+
+- [#94](https://github.com/devgateway/data-viz-ui/pull/94) [`f00592c`](https://github.com/devgateway/data-viz-ui/commit/f00592c000eca492afbd41fb324558c09865deee) Thanks [@timothygachengo](https://github.com/timothygachengo)! - FIx data API for charts
+
 ## 1.5.3
 
 ### Patch Changes
