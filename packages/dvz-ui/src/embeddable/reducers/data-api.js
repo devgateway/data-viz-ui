@@ -6,7 +6,8 @@ function deepClone(obj) {
 }
 
 const API_ROOT = process.env.VITE_REACT_APP_API_ROOT || Config.REACT_APP_API_ROOT || null;
-const fallbackUrl = typeof window !== 'undefined' ? window.location.origin : null;
+const fallbackUrl = typeof window !== 'undefined' ? window.location.origin : '';
+
 
 // In-flight request cache
 const inFlightRequests = {};
@@ -53,11 +54,13 @@ function requestWithDeduplication(url, withHeaders = false) {
 
 export const getCategories = ({ app, params }) => {
     const finalUrl = `${API_ROOT ? API_ROOT : fallbackUrl}/api/${app}/categories${params ? '?' + queryParams(params) : ''}`;
+    console.log("finalUrl", finalUrl);
     return requestWithDeduplication(finalUrl);
 };
 
 export const getData = ({ source, app, params }) => {
     const finalUrl = `${API_ROOT ? API_ROOT : fallbackUrl}/api/${app}/stats/${source}${params ? '?' + queryParams(params) : ''}`;
+    console.log("finalUrl", finalUrl);
     return requestWithDeduplication(finalUrl);
 };
 
