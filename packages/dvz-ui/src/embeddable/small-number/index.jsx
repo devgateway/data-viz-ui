@@ -126,7 +126,6 @@ const DataFrame = (props) => {
 
     const rawValue = dataItem?.[measureField] ?? null;
     const value = rawValue ? (format?.style === 'percent' ? rawValue / 100 : rawValue) : null;
-
     const [targetValue, setTargetValue] = useState(value);
 
     useEffect(() => {
@@ -186,11 +185,20 @@ const DataFrame = (props) => {
             measure: measureField || '',
         };
         let out = decodeURIComponent(textTemplate) || '';
-        // simple handlebars-style replacement for {{token}}
+        // first replace built-in tokens
         out = out.replace(/\{\{\s*(value|rawValue|measure)\s*\}\}/g, (_, key) => {
             const v = tokens[key];
             return v === null || v === undefined ? '' : String(v);
         });
+        // then replace any other {{field}} tokens from the current data item
+        if (dataItem && typeof dataItem === 'object') {
+            out = out.replace(/\{\{\s*([a-zA-Z0-9_]+)\s*\}\}/g, (m, key) => {
+                if (key in tokens) return m; // already handled
+                const v = dataItem[key];
+                if (v === null || v === undefined) return '';
+                return typeof v === 'number' ? formatNumber(v) : String(v);
+            });
+        }
         const finalHtml = (out && out.trim().length) ? out : (formattedValue ?? noDataText);
         return sanitizeHtml(finalHtml);
     };
