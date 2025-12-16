@@ -63,7 +63,8 @@ const Chart = (props) => {
 
     const [mode, setMode] = useState(editMode)
     const viewMode = editing ? editMode : mode
-    const contentHeight = (editing ? height - 80 : height - 40)
+    // Let height auto-adjust to content; provide a minimal line height
+    const minLineHeightPx = Math.max(24, (numberFontSize || 14) * 1.2)
 
     const params = {}
     const ff = parse(filters) || {}
@@ -80,9 +81,9 @@ const Chart = (props) => {
       }
 
     const dimensions = []
-    return (<span div ref={ref} >
+    return (<span ref={ref} >
              <DataProvider
-                style={{"height": `${contentHeight}px`}}
+                style={{ minHeight: `${minLineHeightPx}px` }}
                 params={params}
                 app={app}
                 group={group}
@@ -167,12 +168,37 @@ const DataFrame = (props) => {
         });
         return out.trim().length ? out : (formattedValue ?? noDataText);
     };
+    const sanitizeHtml = (html) => {
+        if (!html) return '';
+        let out = String(html);
+        // remove script tags
+        out = out.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+        // remove inline event handlers like onclick="..."
+        out = out.replace(/\son\w+=(?:"[^"]*"|'[^']*')/gi, '');
+        return out;
+    };
+
+    const renderTemplateHtml = () => {
+        const formattedValue = value !== null ? formatNumber(value) : null;
+        const tokens = {
+            value: formattedValue ?? noDataText,
+            rawValue: value ?? null,
+            measure: measureField || '',
+        };
+        let out = decodeURIComponent(textTemplate) || '';
+        // simple handlebars-style replacement for {{token}}
+        out = out.replace(/\{\{\s*(value|rawValue|measure)\s*\}\}/g, (_, key) => {
+            const v = tokens[key];
+            return v === null || v === undefined ? '' : String(v);
+        });
+        const finalHtml = (out && out.trim().length) ? out : (formattedValue ?? noDataText);
+        return sanitizeHtml(finalHtml);
+    };
 
 
     return (
-        <>
-            {renderTemplate()}
-        </>);
+        <span style={numberStyle} dangerouslySetInnerHTML={{ __html: renderTemplateHtml() }} />
+    );
 };
 
 
