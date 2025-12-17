@@ -182,11 +182,14 @@ const DataFrame = (props) => {
 
     const renderTemplateHtml = () => {
         // Prepare variables object for string-template and formatting macros
+        // Spread row fields first, then set reserved keys last to avoid being overridden by a row field named "value"
+        const rowVars = (dataItem && typeof dataItem === 'object') ? dataItem : {};
         const variables = {
+            ...rowVars,
             measure: measureField || '',
-            value: value,           // numeric value suitable for macros like #(value,2)
             rawValue: rawValue,     // original numeric from dataset
-            ...((dataItem && typeof dataItem === 'object') ? dataItem : {})
+            value: value,           // numeric value for selected measure
+            formattedValue: (value !== null && value !== undefined) ? formatNumber(value) : noDataText
         };
 
         const formattedValue = value !== null ? formatNumber(value) : null;
