@@ -5,6 +5,7 @@ import DataConsumer from "../data/DataConsumer";
 import {PostContent} from "@devgateway/wp-react-lib";
 import {connect} from "react-redux";
 import { useSpring, animated } from '@react-spring/web';
+import { formatContent } from "../chart/Tooltip.jsx";
 
 const Chart = (props) => {
     const {
@@ -146,7 +147,9 @@ const DataFrame = (props) => {
     const numberStyle = {
         color: decodeURIComponent(numberColor),
         fontSize: numberFontSize + 'px',
-        textAlign: 'center'
+        textAlign: 'center',
+        whiteSpace: 'normal',
+        wordBreak: 'break-word'
     };
 
     const formatNumber = (val) =>
@@ -178,28 +181,60 @@ const DataFrame = (props) => {
     };
 
     const renderTemplateHtml = () => {
-        const formattedValue = value !== null ? formatNumber(value) : null;
-        const tokens = {
-            value: formattedValue ?? noDataText,
-            rawValue: value ?? null,
+        // Prepare variables object for string-template and formatting macros
+        const variables = {
             measure: measureField || '',
+            value: value,           // numeric value suitable for macros like #(value,2)
+            rawValue: rawValue,     // original numeric from dataset
+            ...((dataItem && typeof dataItem === 'object') ? dataItem : {})
         };
-        let out = decodeURIComponent(textTemplate) || '';
-        // first replace built-in tokens
-        out = out.replace(/\{\{\s*(value|rawValue|measure)\s*\}\}/g, (_, key) => {
-            const v = tokens[key];
-            return v === null || v === undefined ? '' : String(v);
+
+        const formattedValue = value !== null ? formatNumber(value) : null;
+
+        // Start with original template (URI-decoded)
+        let templateStr = decodeURIComponent(textTemplate) || '';
+
+        // Normalize macro arguments by removing extra spaces inside parentheses
+        // so patterns like %({prevalence}, 2) are handled consistently
+        templateStr = templateStr.replace(/(\%|\#C|\#)\(\s*([^)]*?)\s*\)/g, (m, sig, inner) => {
+            const compactInner = inner.replace(/\s+/g, '');
+            return `${sig}(${compactInner})`;
         });
-        // then replace any other {{field}} tokens from the current data item
-        if (dataItem && typeof dataItem === 'object') {
-            out = out.replace(/\{\{\s*([a-zA-Z0-9_]+)\s*\}\}/g, (m, key) => {
-                if (key in tokens) return m; // already handled
-                const v = dataItem[key];
-                if (v === null || v === undefined) return '';
-                return typeof v === 'number' ? formatNumber(v) : String(v);
-            });
-        }
-        const finalHtml = (out && out.trim().length) ? out : (formattedValue ?? noDataText);
+
+        // Robust pre-processing: directly handle macros whose argument is a {field}
+        // This ensures patterns like #({vaccinated_prophylaxis},2) or %({rate},2) are formatted
+        const fmtNum = (n, digits, style) => intl.formatNumber(n, { maximumFractionDigits: digits ?? 2, ...style });
+        const getVar = (k) => {
+            const v = variables[k];
+            return typeof v === 'string' ? Number(v) : v;
+        };
+        // #C({field},d) compact
+        templateStr = templateStr.replace(/#C\(\{([a-zA-Z0-9_]+)\}(?:,([0-9]+))?\)/g, (m, key, d) => {
+            const n = getVar(key);
+            if (n == null || isNaN(n)) return '';
+            return fmtNum(n, d ? parseInt(d) : 2, { notation: 'compact' });
+        });
+        // #({field},d) decimal
+        templateStr = templateStr.replace(/#\(\{([a-zA-Z0-9_]+)\}(?:,([0-9]+))?\)/g, (m, key, d) => {
+            const n = getVar(key);
+            if (n == null || isNaN(n)) return '';
+            return fmtNum(n, d ? parseInt(d) : 2, { style: 'decimal' });
+        });
+        // %({field},d) percent (expects value in whole percent)
+        templateStr = templateStr.replace(/%\(\{([a-zA-Z0-9_]+)\}(?:,([0-9]+))?\)/g, (m, key, d) => {
+            const n = getVar(key);
+            if (n == null || isNaN(n)) return '';
+            const val = n / 100;
+            return fmtNum(val, d ? parseInt(d) : 2, { style: 'percent' });
+        });
+
+        // Apply Tooltip-like formatting and {var} interpolation (secondary pass)
+        const withFormatting = formatContent(templateStr, variables, intl, false);
+
+        // Fallback to formattedValue/noDataText if template is effectively empty
+        const finalHtml = (withFormatting && withFormatting.trim().length)
+            ? withFormatting
+            : (formattedValue ?? noDataText);
         return sanitizeHtml(finalHtml);
     };
 
