@@ -32,6 +32,14 @@ const Chart = (props) => {
   
     const locale = intl.locale
     const ref = useRef(null);
+    // Read auto-height settings from query params for iframe previews
+    let autoHeight = false;
+    let frameId = '';
+    try {
+        const sp = new URLSearchParams(window.location.search);
+        autoHeight = sp.get('autoHeight') === '1' || sp.get('autoHeight') === 'true';
+        frameId = sp.get('frameId') || '';
+    } catch (e) {}
     const decode = (value) => {
         if (editing) {
             return value
@@ -82,6 +90,8 @@ const Chart = (props) => {
       }
 
     const dimensions = []
+    // Enable auto-resize if embedded with autoHeight flag
+    useAutoHeight(ref, autoHeight, frameId);
     return (<span ref={ref} >
              <DataProvider
                 style={{ minHeight: `${minLineHeightPx}px` }}
@@ -245,6 +255,29 @@ const DataFrame = (props) => {
     return (
         <span style={numberStyle} dangerouslySetInnerHTML={{ __html: renderTemplateHtml() }} />
     );
+};
+
+// Post height to parent for auto-resizing if requested
+const useAutoHeight = (ref, enabled, id) => {
+    useEffect(() => {
+        if (!enabled) return;
+        const target = ref.current || document.body;
+        const post = () => {
+            try {
+                const h = (ref.current ? ref.current.scrollHeight : document.body.scrollHeight) || 0;
+                if (window.parent && h) {
+                    window.parent.postMessage({ type: 'dvz-embed-height', id, height: h }, '*');
+                }
+            } catch (e) {}
+        };
+        const observer = new MutationObserver(() => {
+            requestAnimationFrame(post);
+        });
+        observer.observe(target, { childList: true, subtree: true, characterData: true });
+        // initial post
+        setTimeout(post, 0);
+        return () => observer.disconnect();
+    }, [ref, enabled, id]);
 };
 
 
