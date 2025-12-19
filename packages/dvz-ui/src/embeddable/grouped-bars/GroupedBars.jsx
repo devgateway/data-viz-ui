@@ -261,7 +261,8 @@ const DataFrame = (props) => {
         labelFormat,
         sorting,
         sortDirection,
-        topN
+        topN,
+        barSizeCriteria
     } = props;
 
     
@@ -324,6 +325,8 @@ const DataFrame = (props) => {
 
     // Calculate total for percentage
     const barTotal = dataItems.reduce((acc, item) => acc + (item[measureField] || 0), 0);   
+     const maxMeasure = Math.max(...dataItems.map(i => i[measureField] || 0));
+    
 
     // Handle no data case
     if (dataItems.length === 0 || !measureField || !dimensionField) {
@@ -343,7 +346,16 @@ const DataFrame = (props) => {
             {dataItems.map((item, index) => {
                 const measureValue = item[measureField];
                 const dimensionValue = item[dimensionField];
-                const barWidth = measureValue && barTotal ? (measureValue / barTotal) * 100 : 0;
+                let barWidth = 0;
+                if (barSizeCriteria == 'percentage' && barTotal > 0) {
+                   barWidth = measureValue && barTotal ? (measureValue / barTotal) * 100 : 0;
+                } else if (barSizeCriteria == 'relative_max') {                   
+                    if (maxMeasure === 0) {
+                        barWidth = 0;
+                    } else {
+                       barWidth = measureValue && maxMeasure ? (measureValue / maxMeasure) * 100 : 0;
+                   }
+                }
                 const barColor = getBarColor(dimensionValue);
 
                 return (
@@ -364,6 +376,7 @@ const DataFrame = (props) => {
                         labelHeight={labelHeight}
                         labelFormat={labelFormat}
                         vars={item.vars}
+                        
                     />
                 );
             })}
@@ -402,7 +415,8 @@ const Chart = (props) => {
         "data-label-format": labelFormat,
         "data-sorting": sorting,
         "data-sort-direction": sortDirection,
-        "data-top-n": topN
+        "data-top-n": topN,
+        "data-bar-size-criteria": barSizeCriteria,
     } = props;
 
     
@@ -463,6 +477,7 @@ const Chart = (props) => {
                             sorting={sorting}
                             sortDirection={sortDirection}
                             topN={topN}
+                            barSizeCriteria={barSizeCriteria}
                             />
                     </DataConsumer>
                 </DataProvider>
