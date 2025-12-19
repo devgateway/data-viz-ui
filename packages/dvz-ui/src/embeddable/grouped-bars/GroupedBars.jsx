@@ -325,6 +325,7 @@ const DataFrame = (props) => {
 
     // Calculate total for percentage
     const barTotal = dataItems.reduce((acc, item) => acc + (item[measureField] || 0), 0);   
+     const maxMeasure = Math.max(...dataItems.map(i => i[measureField] || 0));
     
 
     // Handle no data case
@@ -346,10 +347,9 @@ const DataFrame = (props) => {
                 const measureValue = item[measureField];
                 const dimensionValue = item[dimensionField];
                 let barWidth = 0;
-                if (barSizeCriteria== 'percentage' && barTotal > 0) {
+                if (barSizeCriteria == 'percentage' && barTotal > 0) {
                    barWidth = measureValue && barTotal ? (measureValue / barTotal) * 100 : 0;
-                } else if (barSizeCriteria == 'relative_max') {
-                    const maxMeasure = Math.max(...dataItems.map(i => i[measureField] || 0));
+                } else if (barSizeCriteria == 'relative_max') {                   
                     if (maxMeasure === 0) {
                         barWidth = 0;
                     } else {
