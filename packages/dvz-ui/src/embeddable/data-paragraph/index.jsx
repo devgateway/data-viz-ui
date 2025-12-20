@@ -1,7 +1,7 @@
 import React, {useRef, useState,useEffect} from "react";
 import {Container} from "semantic-ui-react";
-import DataProvider from "../data/DataProvider";
-import DataConsumer from "../data/DataConsumer";
+import DataProvider from "../data/DataProvider.jsx";
+import DataConsumer from "../data/DataConsumer.jsx";
 import {PostContent} from "@devgateway/wp-react-lib";
 import {connect} from "react-redux";
 import { useSpring, animated } from '@react-spring/web';

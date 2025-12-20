@@ -42,7 +42,7 @@ const BigNumber = lazy(() => import("./big-number"));
 const GroupedBars = lazy(() => import("./grouped-bars"));
 const BigNumberTrend = lazy(() => import("./big-number-trend"));
 const PostsWithFilters = lazy(() => import("./posts-with-filters"));
-const SmallNumber = lazy(() => import("./small-number"));
+const DataParagraph = lazy(() => import("./data-paragraph"));
 
 
 export const components = {
@@ -83,7 +83,7 @@ export const components = {
     groupedBars: GroupedBars,
     bigNumberTrend: BigNumberTrend,
     postsWithFilters: PostsWithFilters,
-    smallNumber: SmallNumber,
+    dataParagraph: DataParagraph,
     redirect: () => null
 }
 
