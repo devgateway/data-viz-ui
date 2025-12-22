@@ -1,10 +1,7 @@
 import React, {useRef, useState,useEffect} from "react";
-import {Container} from "semantic-ui-react";
 import DataProvider from "../data/DataProvider.jsx";
 import DataConsumer from "../data/DataConsumer.jsx";
-import {PostContent} from "@devgateway/wp-react-lib";
 import {connect} from "react-redux";
-import { useSpring, animated } from '@react-spring/web';
 import { formatContent } from "../chart/Tooltip.jsx";
 
 const Chart = (props) => {
@@ -32,7 +29,6 @@ const Chart = (props) => {
   
     const locale = intl.locale
     const ref = useRef(null);
-    // Read auto-height settings from query params for iframe previews
     let autoHeight = false;
     let frameId = '';
     try {
@@ -145,15 +141,6 @@ const DataFrame = (props) => {
         }
     }, [value]);
 
-    const { number } = useSpring({
-        from: { number: 0 },
-        to: { number: targetValue ?? 0 },
-       // reset: true,
-        config: { mass: 1,
-            tension: 120,
-            friction: 30, },
-    });
-
     const numberStyle = {
         color: decodeURIComponent(numberColor),
         fontSize: numberFontSize + 'px',
@@ -165,74 +152,52 @@ const DataFrame = (props) => {
     const formatNumber = (val) =>
         intl.formatNumber(val, { ...format });
 
-    const renderTemplate = () => {        
-        const formattedValue = value !== null ? formatNumber(value) : null;
-        const tokens = {
-            value: formattedValue ?? noDataText,
-            rawValue: value ?? null,
-            measure: measureField || '',
-        };
-        let out = decodeURIComponent(textTemplate)
-        // simple handlebars-style replacement for {{token}}
-        out = out.replace(/\{\{\s*(value|rawValue|measure)\s*\}\}/g, (_, key) => {
-            const v = tokens[key];
-            return v === null || v === undefined ? '' : String(v);
-        });
-        return out.trim().length ? out : (formattedValue ?? noDataText);
-    };
-    const sanitizeHtml = (html) => {
+   const sanitizeHtml = (html) => {
         if (!html) return '';
         let out = String(html);
-        // remove script tags
         out = out.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
-        // remove inline event handlers like onclick="..."
         out = out.replace(/\son\w+=(?:"[^"]*"|'[^']*')/gi, '');
         return out;
     };
 
-    const renderTemplateHtml = () => {
-        // Prepare variables object for string-template and formatting macros
-        // Spread row fields first, then set reserved keys last to avoid being overridden by a row field named "value"
+    const renderTemplateHtml = () => {       
         const rowVars = (dataItem && typeof dataItem === 'object') ? dataItem : {};
         const variables = {
             ...rowVars,
             measure: measureField || '',
-            rawValue: rawValue,     // original numeric from dataset
-            value: value,           // numeric value for selected measure
+            rawValue: rawValue,     
+            value: value,           
             formattedValue: (value !== null && value !== undefined) ? formatNumber(value) : noDataText
         };
 
         const formattedValue = value !== null ? formatNumber(value) : null;
 
-        // Start with original template (URI-decoded)
-        let templateStr = decodeURIComponent(textTemplate) || '';
-
-        // Normalize macro arguments by removing extra spaces inside parentheses
-        // so patterns like %({prevalence}, 2) are handled consistently
+       
+        let templateStr = decodeURIComponent(textTemplate) || '';        
         templateStr = templateStr.replace(/(\%|\#C|\#)\(\s*([^)]*?)\s*\)/g, (m, sig, inner) => {
             const compactInner = inner.replace(/\s+/g, '');
             return `${sig}(${compactInner})`;
         });
 
-        // Robust pre-processing: directly handle macros whose argument is a {field}
-        // This ensures patterns like #({vaccinated_prophylaxis},2) or %({rate},2) are formatted
         const fmtNum = (n, digits, style) => intl.formatNumber(n, { maximumFractionDigits: digits ?? 2, ...style });
         const getVar = (k) => {
             const v = variables[k];
             return typeof v === 'string' ? Number(v) : v;
         };
-        // #C({field},d) compact
+        
         templateStr = templateStr.replace(/#C\(\{([a-zA-Z0-9_]+)\}(?:,([0-9]+))?\)/g, (m, key, d) => {
             const n = getVar(key);
             if (n == null || isNaN(n)) return '';
             return fmtNum(n, d ? parseInt(d) : 2, { notation: 'compact' });
         });
+
         // #({field},d) decimal
         templateStr = templateStr.replace(/#\(\{([a-zA-Z0-9_]+)\}(?:,([0-9]+))?\)/g, (m, key, d) => {
             const n = getVar(key);
             if (n == null || isNaN(n)) return '';
             return fmtNum(n, d ? parseInt(d) : 2, { style: 'decimal' });
         });
+
         // %({field},d) percent (expects value in whole percent)
         templateStr = templateStr.replace(/%\(\{([a-zA-Z0-9_]+)\}(?:,([0-9]+))?\)/g, (m, key, d) => {
             const n = getVar(key);
@@ -241,11 +206,9 @@ const DataFrame = (props) => {
             return fmtNum(val, d ? parseInt(d) : 2, { style: 'percent' });
         });
 
-        // Apply Tooltip-like formatting and {var} interpolation (secondary pass)
         const withFormatting = formatContent(templateStr, variables, intl, false);
 
-        // Fallback to formattedValue/noDataText if template is effectively empty
-        const finalHtml = (withFormatting && withFormatting.trim().length)
+       const finalHtml = (withFormatting && withFormatting.trim().length)
             ? withFormatting
             : (formattedValue ?? noDataText);
         return sanitizeHtml(finalHtml);
@@ -257,7 +220,7 @@ const DataFrame = (props) => {
     );
 };
 
-// Post height to parent for auto-resizing if requested
+
 const useAutoHeight = (ref, enabled, id) => {
     useEffect(() => {
         if (!enabled) return;
