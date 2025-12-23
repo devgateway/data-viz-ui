@@ -51,7 +51,7 @@ const createNumberFormat = (formatObject) => {
 };
 
 // Extract a list of selected measures and their specific formats
-const extractSelectedMeasures = (parsedMeasures, fallbackFormat, app) => {
+const extractSelectedMeasures = (parsedMeasures, fallbackFormat, app) => {    
     const selected = [];
     if (!parsedMeasures) return selected;
 
