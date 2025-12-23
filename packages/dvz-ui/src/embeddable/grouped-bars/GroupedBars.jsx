@@ -593,6 +593,7 @@ const Chart = (props) => {
 
     const params = buildParams(parsedFilters, dvzProxyDatasetId);
     const dimensions = getDimensions(dimension1);
+    const effectiveBarSizeCriteria = selectedMeasures.length > 1 ? 'relative_max' : barSizeCriteria;
 
     return (
         <div ref={ref}>
@@ -636,7 +637,7 @@ const Chart = (props) => {
                             sorting={sorting}
                             sortDirection={sortDirection}
                             topN={topN}
-                            barSizeCriteria={barSizeCriteria}
+                            barSizeCriteria={effectiveBarSizeCriteria}
                             selectedMeasures={selectedMeasures}
                             />
                     </DataConsumer>
