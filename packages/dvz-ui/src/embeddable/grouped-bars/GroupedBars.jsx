@@ -304,6 +304,25 @@ const BarGroup = ({
     const lformat = decodeURIComponent(labelFormat || '');
     const labelString = formatContent(lformat, vars ? vars : { value: dimensionValue }, intl);
 
+    const isSingleMeasure = Array.isArray(measureEntries) && measureEntries.length === 1;
+    const topValueNode = (valuePosition === 'top' && isSingleMeasure)
+        ? (
+            <div
+                className="grouped-bar-measure"
+                style={{
+                    fontSize: fontSize + 'px',
+                    color: textColor,
+                    whiteSpace: 'nowrap',
+                    flex: '1',
+                    textAlign: 'right'
+                }}
+            >
+                {format.prefix}
+                {new Intl.NumberFormat(intl.locale, format).format(measureEntries[0].value)}
+                {format.suffix}
+            </div>
+        ) : null;
+
     const barsStack = (
         <div style={{ flex: '1', display: 'flex', flexDirection: 'column', gap: '6px', minWidth: 0 }}>
             {measureEntries.map((entry, idx) => (
@@ -359,6 +378,7 @@ const BarGroup = ({
         <div className="grouped-bar-item" style={{ marginBottom: '12px' }}>
             <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', marginBottom: '6px' }}>
                 <div className="grouped-bar-label" style={labelStyle} dangerouslySetInnerHTML={{ __html: labelString }} />
+                {topValueNode}
             </div>
             {barsStack}
         </div>
