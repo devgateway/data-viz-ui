@@ -275,6 +275,7 @@ const NoDataDisplay = ({ textColor, message = "No data to display" }) => {
 const BarGroup = ({
     dimensionValue,
     measureEntries,
+    mainEntry,
     barBackgroundColor,
     textColor,
     fontSize,
@@ -304,7 +305,7 @@ const BarGroup = ({
     const lformat = decodeURIComponent(labelFormat || '');
     const labelString = formatContent(lformat, vars ? vars : { value: dimensionValue }, intl);
 
-    const isSingleMeasure = Array.isArray(measureEntries) && measureEntries.length === 1;
+    const isSingleMeasure = Array.isArray(measureEntries) && measureEntries.length === 1 && !mainEntry;
     const topValueNode = (valuePosition === 'top' && isSingleMeasure)
         ? (
             <div
@@ -353,7 +354,7 @@ const BarGroup = ({
                     >
                         <span style={{ color: '#ffffff', fontSize: '13px', fontWeight: '500', whiteSpace: 'nowrap' }}>
                             {(entry.label || entry.name)}: {valuePosition === 'bar'
-                                ? `${format.prefix}${new Intl.NumberFormat(intl.locale, format).format(entry.value)}${format.suffix}`
+                                ? `${entry.format?.prefix || ''}${new Intl.NumberFormat(intl.locale, entry.format || format).format(entry.value)}${entry.format?.suffix || ''}`
                                 : `${(entry.width || 0).toFixed(1)}%`}
                         </span>
                     </div>
@@ -362,11 +363,40 @@ const BarGroup = ({
         </div>
     );
 
+    const mainColumn = mainEntry ? (
+        <div
+            className="grouped-bar-main"
+            style={{
+                flex: '0 0 140px',
+                backgroundColor: barBackgroundColor,
+                borderRadius: '8px',
+                padding: '10px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                minWidth: 0
+            }}
+        >
+            <span style={{
+                color: textColor,
+                fontSize: '24px',
+                fontWeight: 600,
+                lineHeight: 1,
+                whiteSpace: 'nowrap'
+            }}>
+                {mainEntry.format?.prefix || ''}
+                {new Intl.NumberFormat(intl.locale, mainEntry.format || format).format(mainEntry.value)}
+                {mainEntry.format?.suffix || ''}
+            </span>
+        </div>
+    ) : null;
+
     if (labelPosition === 'left') {
         return (
             <div className="grouped-bar-item" style={{ marginBottom: '12px' }}>
                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
                     <div className="grouped-bar-label" style={labelStyle} dangerouslySetInnerHTML={{ __html: labelString }} />
+                    {mainColumn}
                     {barsStack}
                 </div>
             </div>
@@ -380,7 +410,10 @@ const BarGroup = ({
                 <div className="grouped-bar-label" style={labelStyle} dangerouslySetInnerHTML={{ __html: labelString }} />
                 {topValueNode}
             </div>
-            {barsStack}
+            <div style={{ display: 'flex', alignItems: 'stretch', gap: '12px' }}>
+                {mainColumn}
+                {barsStack}
+            </div>
         </div>
     );
 };
@@ -408,7 +441,8 @@ const DataFrame = (props) => {
         sortDirection,
         topN,
         barSizeCriteria,
-        selectedMeasures
+        selectedMeasures,
+        mainMeasureName
     } = props;
 
     
@@ -521,7 +555,8 @@ const DataFrame = (props) => {
             {dataItems.map((item, index) => {
                 const dimensionValue = item[dimensionField];
 
-                const measureEntries = selected.map(sm => {
+                // Build entries for all selected measures
+                const allEntries = selected.map(sm => {
                     const mVal = (item.vars && item.vars[sm.name]) ?? item[sm.name] ?? 0;
                     let width = 0;
                     if (barSizeCriteria === 'percentage') {
@@ -530,18 +565,25 @@ const DataFrame = (props) => {
                     } else if (barSizeCriteria === 'relative_max') {
                         width = globalMax > 0 ? (mVal / globalMax) * 100 : 0;
                     } else {
-                        // Default to relative_max
                         width = globalMax > 0 ? (mVal / globalMax) * 100 : 0;
                     }
                     const color = getBarColor(sm.name, dimensionValue);
                     return { name: sm.name, label: sm.label || sm.name, value: mVal, width, color, format: sm.format || format };
                 });
 
+                const mainEntry = mainMeasureName
+                    ? allEntries.find(e => e.name === mainMeasureName)
+                    : null;
+                const measureEntries = mainEntry
+                    ? allEntries.filter(e => e.name !== mainMeasureName)
+                    : allEntries;
+
                 return (
                     <BarGroup
                         key={`${dimensionValue}-${index}`}
                         dimensionValue={dimensionValue}
                         measureEntries={measureEntries}
+                        mainEntry={mainEntry}
                         barBackgroundColor={barBackgroundColor}
                         textColor={textColor}
                         fontSize={fontSize}
@@ -593,6 +635,7 @@ const Chart = (props) => {
         "data-sort-direction": sortDirection,
         "data-top-n": topN,
         "data-bar-size-criteria": barSizeCriteria,
+        "data-main-measure": mainMeasureProp,
     } = props;
 
     
@@ -611,6 +654,13 @@ const Chart = (props) => {
     // Compute selected measures (names + formats) and pass to DataFrame
     const selectedMeasures = extractSelectedMeasures(parsedMeasures, numberFormat, app);
 
+    // Determine effective main measure from WordPress block prop
+    const selectedNames = selectedMeasures.map(sm => sm.name);
+    const decodedMainProp = typeof mainMeasureProp === 'string' ? decodeValue(mainMeasureProp) : null;
+    const effectiveMainMeasure = selectedMeasures.length > 1
+        ? (decodedMainProp && selectedNames.includes(decodedMainProp) ? decodedMainProp : selectedNames[0])
+        : null;
+
     const params = buildParams(parsedFilters, dvzProxyDatasetId);
     const dimensions = getDimensions(dimension1);
     const effectiveBarSizeCriteria = selectedMeasures.length > 1 ? 'relative_max' : barSizeCriteria;
@@ -622,6 +672,7 @@ const Chart = (props) => {
                 style={{ height: height + 'px', backgroundColor }}
                 fluid
             >
+                {/* Main measure configured via WordPress block; no local dropdown */}
                 <DataProvider
                     style={{ height: `${contentHeight}px` }}
                     params={params}
@@ -659,6 +710,7 @@ const Chart = (props) => {
                             topN={topN}
                             barSizeCriteria={effectiveBarSizeCriteria}
                             selectedMeasures={selectedMeasures}
+                            mainMeasureName={effectiveMainMeasure}
                             />
                     </DataConsumer>
                 </DataProvider>
