@@ -51,11 +51,11 @@ const createNumberFormat = (formatObject) => {
 };
 
 // Extract a list of selected measures and their specific formats
-const extractSelectedMeasures = (parsedMeasures, fallbackFormat) => {
+const extractSelectedMeasures = (parsedMeasures, fallbackFormat, app) => {
     const selected = [];
     if (!parsedMeasures) return selected;
 
-    const proxy = parsedMeasures['superset-proxy'];
+    const proxy = parsedMeasures[app];
     if (proxy && typeof proxy === 'object') {
         Object.entries(proxy).forEach(([name, cfg]) => {
             if (cfg && cfg.selected) {
@@ -284,7 +284,8 @@ const BarGroup = ({
     labelFormat,
     vars,
     intl,
-    valuePosition
+    valuePosition,
+    format
 }) => {
     const labelStyle = {
         fontSize: fontSize + 'px',
@@ -333,7 +334,7 @@ const BarGroup = ({
                     >
                         <span style={{ color: '#ffffff', fontSize: '13px', fontWeight: '500', whiteSpace: 'nowrap' }}>
                             {(entry.label || entry.name)}: {valuePosition === 'bar'
-                                ? `${entry.format.prefix}${new Intl.NumberFormat(intl.locale, entry.format).format(entry.value)}${entry.format.suffix}`
+                                ? `${format.prefix}${new Intl.NumberFormat(intl.locale, format).format(entry.value)}${format.suffix}`
                                 : `${(entry.width || 0).toFixed(1)}%`}
                         </span>
                     </div>
@@ -452,7 +453,8 @@ const DataFrame = (props) => {
         dataItems = rawDataItems;
     }
 
-    if (topN && !isNaN(parseInt(topN))) {
+    // Apply Top N only for single-measure scenarios
+    if (selected.length <= 1 && topN && !isNaN(parseInt(topN))) {
         const n = parseInt(topN);
         if (n > 0) {
             dataItems = dataItems.slice(0, n);
@@ -525,6 +527,7 @@ const DataFrame = (props) => {
                         fontSize={fontSize}
                         labelPosition={labelPosition}
                         valuePosition={valuePosition}
+                        format={format}
                         labelWidth={labelWidth}
                         labelHeight={labelHeight}
                         labelFormat={labelFormat}
@@ -586,7 +589,7 @@ const Chart = (props) => {
     const parsedManualColors = parseJSON(manualColors, editing);
 
     // Compute selected measures (names + formats) and pass to DataFrame
-    const selectedMeasures = extractSelectedMeasures(parsedMeasures, numberFormat);
+    const selectedMeasures = extractSelectedMeasures(parsedMeasures, numberFormat, app);
 
     const params = buildParams(parsedFilters, dvzProxyDatasetId);
     const dimensions = getDimensions(dimension1);
@@ -626,7 +629,7 @@ const Chart = (props) => {
                             defaultBarColor={decodeValue(defaultBarColor)}
                             barBackgroundColor={decodeValue(barBackgroundColor)}
                             labelPosition={labelPosition}
-                            valuePosition={valuePosition}
+                            valuePosition={selectedMeasures.length > 1 ? 'bar' : valuePosition}
                             labelWidth={labelWidth}
                             labelHeight={labelHeight}
                             labelFormat={labelFormat}
