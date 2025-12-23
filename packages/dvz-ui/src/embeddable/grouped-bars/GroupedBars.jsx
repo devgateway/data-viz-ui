@@ -50,6 +50,37 @@ const createNumberFormat = (formatObject) => {
     };
 };
 
+// Extract a list of selected measures and their specific formats
+const extractSelectedMeasures = (parsedMeasures, fallbackFormat) => {
+    const selected = [];
+    if (!parsedMeasures) return selected;
+
+    const proxy = parsedMeasures['superset-proxy'];
+    if (proxy && typeof proxy === 'object') {
+        Object.entries(proxy).forEach(([name, cfg]) => {
+            if (cfg && cfg.selected) {
+                const fmt = createNumberFormat(cfg.format || fallbackFormat);
+
+                const label = (cfg && typeof cfg.customLabel === 'string' && cfg.customLabel.trim().length > 0)
+                    ? cfg.customLabel.trim()
+                    : name;
+                selected.push({ name, format: fmt, label });
+            }
+        });
+    }
+
+    // Fallback to the primary measure if none explicitly selected
+    if (selected.length === 0) {
+        const primary = Array.isArray(parsedMeasures)
+            ? parsedMeasures[0]
+            : parsedMeasures['0'];
+        if (primary) {
+            selected.push({ name: primary, format: fallbackFormat, label: primary });
+        }
+    }
+    return selected;
+};
+
 const buildParams = (filters, dvzProxyDatasetId) => {
     const params = {};
     const parsedFilters = filters || [];
@@ -240,11 +271,104 @@ const NoDataDisplay = ({ textColor, message = "No data to display" }) => {
     );
 };
 
+// Render one dimension label with multiple bars (one per selected measure)
+const BarGroup = ({
+    dimensionValue,
+    measureEntries,
+    barBackgroundColor,
+    textColor,
+    fontSize,
+    labelPosition,
+    labelWidth,
+    labelHeight,
+    labelFormat,
+    vars,
+    intl,
+    valuePosition
+}) => {
+    const labelStyle = {
+        fontSize: fontSize + 'px',
+        color: textColor,
+        width: `${labelWidth}%`,
+        flex: `0 0 ${labelWidth}%`,
+        whiteSpace: 'normal',
+        wordBreak: 'break-word',
+        overflow: 'hidden',
+        lineHeight: '1.2',
+        display: 'flex',
+        alignItems: 'center',
+        height: labelHeight + 'px'
+    };
+
+    const lformat = decodeURIComponent(labelFormat || '');
+    const labelString = formatContent(lformat, vars ? vars : { value: dimensionValue }, intl);
+
+    const barsStack = (
+        <div style={{ flex: '1', display: 'flex', flexDirection: 'column', gap: '6px', minWidth: 0 }}>
+            {measureEntries.map((entry, idx) => (
+                <div
+                    key={`${dimensionValue}-${entry.name}-${idx}`}
+                    className="grouped-bar-bar-container"
+                    style={{
+                        backgroundColor: barBackgroundColor,
+                        height: '28px',
+                        borderRadius: '8px',
+                        overflow: 'hidden',
+                        position: 'relative',
+                        display: 'flex',
+                        alignItems: 'center'
+                    }}
+                >
+                    <div
+                        className="grouped-bar-bar"
+                        style={{
+                            width: entry.width + '%',
+                            backgroundColor: entry.color,
+                            height: '100%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            paddingLeft: '8px',
+                            paddingRight: '8px'
+                        }}
+                    >
+                        <span style={{ color: '#ffffff', fontSize: '13px', fontWeight: '500', whiteSpace: 'nowrap' }}>
+                            {(entry.label || entry.name)}: {valuePosition === 'bar'
+                                ? `${entry.format.prefix}${new Intl.NumberFormat(intl.locale, entry.format).format(entry.value)}${entry.format.suffix}`
+                                : `${(entry.width || 0).toFixed(1)}%`}
+                        </span>
+                    </div>
+                </div>
+            ))}
+        </div>
+    );
+
+    if (labelPosition === 'left') {
+        return (
+            <div className="grouped-bar-item" style={{ marginBottom: '12px' }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+                    <div className="grouped-bar-label" style={labelStyle} dangerouslySetInnerHTML={{ __html: labelString }} />
+                    {barsStack}
+                </div>
+            </div>
+        );
+    }
+
+    // Default/top label rendering: label above the stack
+    return (
+        <div className="grouped-bar-item" style={{ marginBottom: '12px' }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', marginBottom: '6px' }}>
+                <div className="grouped-bar-label" style={labelStyle} dangerouslySetInnerHTML={{ __html: labelString }} />
+            </div>
+            {barsStack}
+        </div>
+    );
+};
+
 
 const DataFrame = (props) => {
     const { 
         app, 
-        measure,
+        measure,        
         dimension1,
         data,
         format,
@@ -262,7 +386,8 @@ const DataFrame = (props) => {
         sorting,
         sortDirection,
         topN,
-        barSizeCriteria
+        barSizeCriteria,
+        selectedMeasures
     } = props;
 
     
@@ -299,11 +424,22 @@ const DataFrame = (props) => {
 
     const { dataItems: rawDataItems, measureField, dimensionField } = processData();
 
+    // Prepare selected measures list (multi-measure support)
+    const selected = (selectedMeasures && selectedMeasures.length > 0)
+        ? selectedMeasures
+        : (measure ? [{ name: measure, format: format }] : []);
+
+    // Apply sorting (support multi-measure by using first selected measure when needed)
     let dataItems;
     if (sorting === 'measure') {
+        const sortMeasure = measureField || (selected[0] ? selected[0].name : null);
         dataItems = rawDataItems.sort((a, b) => {
-            const aValue = a[measureField] || 0;
-            const bValue = b[measureField] || 0;
+            const aValue = sortMeasure
+                ? (measureField ? (a[measureField] || 0) : (((a.vars && a.vars[sortMeasure]) ?? a[sortMeasure] ?? 0)))
+                : 0;
+            const bValue = sortMeasure
+                ? (measureField ? (b[measureField] || 0) : (((b.vars && b.vars[sortMeasure]) ?? b[sortMeasure] ?? 0)))
+                : 0;
             return sortDirection === 'asc' ? aValue - bValue : bValue - aValue;
         });
     } else if (sorting === 'dimension') {
@@ -314,7 +450,7 @@ const DataFrame = (props) => {
         });
     } else {
         dataItems = rawDataItems;
-    }      
+    }
 
     if (topN && !isNaN(parseInt(topN))) {
         const n = parseInt(topN);
@@ -323,18 +459,35 @@ const DataFrame = (props) => {
         }
     }
 
-    // Calculate total for percentage
-    const barTotal = dataItems.reduce((acc, item) => acc + (item[measureField] || 0), 0);   
-     const maxMeasure = Math.max(...dataItems.map(i => i[measureField] || 0));
+    // Calculate totals and maxima for multi-measure scaling
+    const barTotal = dataItems.reduce((acc, item) => acc + (item[measureField] || 0), 0);
+    const maxMeasure = Math.max(...dataItems.map(i => i[measureField] || 0));
+    const measureTotals = {};
+    selected.forEach(sm => {
+        measureTotals[sm.name] = dataItems.reduce((acc, item) => {
+            const v = (item.vars && item.vars[sm.name]) ?? item[sm.name] ?? 0;
+            return acc + (v || 0);
+        }, 0);
+    });
+    const globalMax = Math.max(
+        0,
+        ...selected.flatMap(sm => dataItems.map(item => ((item.vars && item.vars[sm.name]) ?? item[sm.name] ?? 0)))
+    );
     
 
     // Handle no data case
-    if (dataItems.length === 0 || !measureField || !dimensionField) {
+    if (dataItems.length === 0 || !dimensionField || (selected.length === 0 && !measureField)) {
         return <NoDataDisplay textColor={textColor} />;
     }
 
-    // Get bar color
-    const getBarColor = (dimensionValue) => {
+    // Get bar color: prefer measure-based, then dimension-based, then default
+    const getBarColor = (measureName, dimensionValue) => {
+        if (manualColors?.[app]?.measures?.[measureName]) {
+            return manualColors[app].measures[measureName];
+        }
+        if (manualColors?.[app]?.[measureName]) {
+            return manualColors[app][measureName];
+        }
         if (dimensionValue && manualColors?.[app]?.[dimensionValue]) {
             return manualColors[app][dimensionValue];
         }
@@ -344,39 +497,39 @@ const DataFrame = (props) => {
     return (
         <div className="grouped-bars-data-frame">
             {dataItems.map((item, index) => {
-                const measureValue = item[measureField];
                 const dimensionValue = item[dimensionField];
-                let barWidth = 0;
-                if (barSizeCriteria == 'percentage' && barTotal > 0) {
-                   barWidth = measureValue && barTotal ? (measureValue / barTotal) * 100 : 0;
-                } else if (barSizeCriteria == 'relative_max') {                   
-                    if (maxMeasure === 0) {
-                        barWidth = 0;
+
+                const measureEntries = selected.map(sm => {
+                    const mVal = (item.vars && item.vars[sm.name]) ?? item[sm.name] ?? 0;
+                    let width = 0;
+                    if (barSizeCriteria === 'percentage') {
+                        const total = measureTotals[sm.name] || 0;
+                        width = total > 0 ? (mVal / total) * 100 : 0;
+                    } else if (barSizeCriteria === 'relative_max') {
+                        width = globalMax > 0 ? (mVal / globalMax) * 100 : 0;
                     } else {
-                       barWidth = measureValue && maxMeasure ? (measureValue / maxMeasure) * 100 : 0;
-                   }
-                }
-                const barColor = getBarColor(dimensionValue);
+                        // Default to relative_max
+                        width = globalMax > 0 ? (mVal / globalMax) * 100 : 0;
+                    }
+                    const color = getBarColor(sm.name, dimensionValue);
+                    return { name: sm.name, label: sm.label || sm.name, value: mVal, width, color, format: sm.format || format };
+                });
 
                 return (
-                    <BarItem
+                    <BarGroup
                         key={`${dimensionValue}-${index}`}
                         dimensionValue={dimensionValue}
-                        measureValue={measureValue}
-                        barWidth={barWidth}
-                        barColor={barColor}
+                        measureEntries={measureEntries}
                         barBackgroundColor={barBackgroundColor}
                         textColor={textColor}
                         fontSize={fontSize}
-                        format={format}
-                        intl={intl}
                         labelPosition={labelPosition}
                         valuePosition={valuePosition}
                         labelWidth={labelWidth}
                         labelHeight={labelHeight}
                         labelFormat={labelFormat}
                         vars={item.vars}
-                        
+                        intl={intl}
                     />
                 );
             })}
@@ -429,8 +582,11 @@ const Chart = (props) => {
     const formatObject = parseJSON(format, editing);
     const numberFormat = createNumberFormat(formatObject);
     const parsedFilters = parseJSON(filters, editing);
-    const parsedMeasures = parseJSON(measures, editing);
+    const parsedMeasures = parseJSON(measures, editing);    
     const parsedManualColors = parseJSON(manualColors, editing);
+
+    // Compute selected measures (names + formats) and pass to DataFrame
+    const selectedMeasures = extractSelectedMeasures(parsedMeasures, numberFormat);
 
     const params = buildParams(parsedFilters, dvzProxyDatasetId);
     const dimensions = getDimensions(dimension1);
@@ -462,7 +618,7 @@ const Chart = (props) => {
                             format={numberFormat}
                             dimension1={dimension1}
                             manualColors={parsedManualColors}
-                            measure={parsedMeasures?.[0] || null}
+                            measure={selectedMeasures.length === 1 ? selectedMeasures[0]?.name : null}                           
                             fontSize={fontSize}
                             textColor={decodeValue(textColor)}
                             backGroundColor={decodeValue(backgroundColor)}
@@ -478,6 +634,7 @@ const Chart = (props) => {
                             sortDirection={sortDirection}
                             topN={topN}
                             barSizeCriteria={barSizeCriteria}
+                            selectedMeasures={selectedMeasures}
                             />
                     </DataConsumer>
                 </DataProvider>
