@@ -377,6 +377,8 @@ const Bar2Dimensions = (props) => {
         } else if (props.sort == "values") {
             // @ts-ignore
             filtered.sort((a, b) => {
+                //eslint-disable-next-line no-debugger
+                debugger;
 
                 const va = allKeys.map((k: any) => a[k]).filter(a=>a).reduce((a,b)=>a+b)
                 const vb =allKeys.map((k: any) => b[k]).filter(a=>a).reduce((a,b)=>a+b)
@@ -391,6 +393,8 @@ const Bar2Dimensions = (props) => {
             filtered.sort((a, b) => {
                 const va= a[props.sort];
                 const vb= b[props.sort];
+                //eslint-disable-next-line no-debugger
+                debugger;
 
                 if (va === undefined || va === null) return 1;
                 if (vb === undefined || vb === null) return -1;

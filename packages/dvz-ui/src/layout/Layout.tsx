@@ -8,16 +8,17 @@ import { AppContextProvider, SettingProvider, SettingsConsumer } from '@devgatew
 import { Provider } from 'react-redux';
 import { CustomizerWrapper } from '@/layout';
 import { Config } from '@/conf';
-import { englishTranslations, frenchTranslations, afrikaansTranslations } from '@/translations';
+import { englishTranslations, frenchTranslations, afrikaansTranslations, amharicTranslations } from '@/translations';
 import { updateIntl } from '@/lib';
 import { store } from '@/redux';
 
-type Locale = 'en' | 'fr' | 'am';
+type Locale = 'en' | 'fr' | 'am' | 'af';
 
 const messages: Record<Locale, any> = {
     'en': englishTranslations,
     'fr': frenchTranslations,
-    'am': afrikaansTranslations
+    'am': amharicTranslations,
+    'af': afrikaansTranslations
 };
 
 
