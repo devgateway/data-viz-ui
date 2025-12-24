@@ -372,6 +372,7 @@ const BarGroup = ({
                 borderRadius: '8px',
                 padding: '10px',
                 display: 'flex',
+                flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
                 minWidth: 0
@@ -387,6 +388,17 @@ const BarGroup = ({
                 {mainEntry.format?.prefix || ''}
                 {new Intl.NumberFormat(intl.locale, mainEntry.format || format).format(mainEntry.value)}
                 {mainEntry.format?.suffix || ''}
+            </span>
+            <span style={{
+                color: textColor,
+                fontSize: fontSize + 'px',
+                fontWeight: 500,
+                lineHeight: 1.2,
+                marginTop: 6,
+                textAlign: 'center',
+                whiteSpace: 'nowrap'
+            }}>
+                {mainEntry.label || mainEntry.name}
             </span>
         </div>
     ) : null;
