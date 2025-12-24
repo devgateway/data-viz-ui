@@ -15,8 +15,8 @@
     "typecheck": "react-router typegen && tsc"
   },
   "dependencies": {
-    "@devgateway/dvz-ui-react": "~1.6.0",
-    "@devgateway/wp-react-lib": "~0.5.1",
+    "@devgateway/dvz-ui-react": "workspace:*",
+    "@devgateway/wp-react-lib": "workspace:*",
     "@nivo/colors": "^0.96.0",
     "@react-router/node": "~7.9.4",
     "@react-router/serve": "~7.9.4",
