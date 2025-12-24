@@ -85,7 +85,9 @@ class CustomColors extends Colors {
                 mapByDimension(whichDimension)
             }
         } else {
-            this._manualColor = manualColors
+            // For CSV, colors are nested by colorBy mode: manualColors['index'] or manualColors['id']
+            // Get the colors for the current colorBy mode, or empty object if not set
+            this._manualColor = (manualColors && manualColors[colorBy]) ? manualColors[colorBy] : {};
         }
     }
 

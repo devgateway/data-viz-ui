@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { injectIntl } from "react-intl";
 import { ResponsiveRadar } from "@nivo/radar";
 import Legends from "./Legends.jsx";
-import deviceType from "@/utils/deviceType";
+import deviceType from "@/utils/deviceType.js";
 import _ from "lodash";
 
 const DEFAULT_COLOR = "none";

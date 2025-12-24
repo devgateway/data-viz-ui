@@ -126,6 +126,8 @@ class BaseLayer extends Layer {
         this.createLabels(json);
 
         if (this.props.onReady) {
+            //eslint-disable-next-line
+            debugger;
             this.props.onReady();
         }
     }

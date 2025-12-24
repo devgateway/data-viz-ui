@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Container, Icon } from "semantic-ui-react";
-import isEqual from 'lodash.isequal';
+import isEqual from 'lodash.isequal'
 
 const PostsFiltersResetButton = (props) => {
     const {
@@ -28,13 +28,19 @@ const PostsFiltersResetButton = (props) => {
     return (
         <Container
             fluid={true}
+            style={{
+                pointerEvents: enabled ? 'auto' : 'none',
+                cursor: enabled ? 'pointer' : 'not-allowed',
+                opacity: enabled ? 1 : 0.5
+            }}
             className={`data-filters-reset ignore ${enabled ? '' : "disabled"}`}
             onClick={() => {
                 dispatch({
                     type: "SET_INITIAL_POSTS_FILTER",
                     group,
                     ...initialFilters,
-                    reset: true
+                    reset: true,
+                    page: 1
                 })
             }}>
             <span>{resetLabel}</span>
