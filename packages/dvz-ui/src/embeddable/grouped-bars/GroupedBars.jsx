@@ -288,7 +288,8 @@ const BarGroup = ({
     vars,
     intl,
     valuePosition,
-    format
+    format,
+    showMeasureLabels = false
 }) => {
     const labelStyle = {
         fontSize: fontSize + 'px',
@@ -355,8 +356,12 @@ const BarGroup = ({
                         }}
                     >
                         <span style={{ color: '#ffffff', fontSize: '13px', fontWeight: '500', whiteSpace: 'nowrap' }}>
-                            {(entry.label || entry.name)}
-                            {((entry.label && entry.label !== entry.name) ? ' ' : ': ')}
+                            {showMeasureLabels ? (
+                                <>
+                                    {(entry.label || entry.name)}
+                                    {((entry.label && entry.label !== entry.name) ? ' ' : ': ')}
+                                </>
+                            ) : null}
                             {valuePosition === 'bar'
                                 ? `${entry.format?.prefix || ''}${new Intl.NumberFormat(intl.locale, entry.format || format).format(entry.value)}${entry.format?.suffix || ''}`
                                 : `${(entry.width || 0).toFixed(1)}%`}
@@ -458,7 +463,8 @@ const DataFrame = (props) => {
         topN,
         barSizeCriteria,
         selectedMeasures,
-        mainMeasureName
+        mainMeasureName,
+        showMeasureLabels = false
     } = props;
 
     
@@ -628,6 +634,7 @@ const DataFrame = (props) => {
                         labelFormat={labelFormat}
                         vars={item.vars}
                         intl={intl}
+                        showMeasureLabels={showMeasureLabels}
                     />
                 );
             })}
@@ -669,6 +676,7 @@ const Chart = (props) => {
         "data-top-n": topN,
         "data-bar-size-criteria": barSizeCriteria,
         "data-main-measure": mainMeasureProp,
+        "data-show-measure-labels": showMeasureLabelsProp,
     } = props;
 
     
@@ -698,6 +706,9 @@ const Chart = (props) => {
     const params = buildParams(parsedFilters, dvzProxyDatasetId);
     const dimensions = getDimensions(dimension1);
     const effectiveBarSizeCriteria = selectedMeasures.length > 1 ? 'relative_max' : barSizeCriteria;
+
+    // interpret showMeasureLabels flag
+    const showMeasureLabels = showMeasureLabelsProp === "true";
 
     return (
         <div ref={ref}>
@@ -745,6 +756,7 @@ const Chart = (props) => {
                             barSizeCriteria={effectiveBarSizeCriteria}
                             selectedMeasures={selectedMeasures}
                             mainMeasureName={effectiveMainMeasure}
+                            showMeasureLabels={showMeasureLabels}
                             />
                     </DataConsumer>
                 </DataProvider>
