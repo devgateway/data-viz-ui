@@ -108,7 +108,9 @@ class CustomColors extends Colors {
         mapByDimension(whichDimension);
       }
     } else {
-      this._manualColor = manualColors;
+      // For CSV, colors are nested by colorBy mode: manualColors['index'] or manualColors['id']
+      // Get the colors for the current colorBy mode, or empty object if not set
+      this._manualColor = (manualColors && manualColors[colorBy]) ? manualColors[colorBy] : {};
     }
   }
 
@@ -116,18 +118,18 @@ class CustomColors extends Colors {
     if (this.colorBy === "index") {
       const color =
         this._manualColor[id] || this._manualColor[datum[this.indexBy]];
-      return color ? color : "#5555";
+      return color ? color : "#555555";
     }
     if (this.colorBy === "id") {
-      return this._manualColor[id] ? this._manualColor[id] : "#5555";
+      return this._manualColor[id] ? this._manualColor[id] : "#555555";
     }
-    return "#5555";
+    return "#555555";
   }
 
   getColorByIndex(value) {}
 
   getColorByKey(value) {
-    return this._manualColor[value] ? this._manualColor[value] : "#5555";
+    return this._manualColor[value] ? this._manualColor[value] : "#555555";
   }
 }
 

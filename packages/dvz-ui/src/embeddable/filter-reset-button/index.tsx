@@ -45,8 +45,8 @@ const FiltersResetComponent = (props) => {
 
 
     return (
-        <Container fluid={true} className={`data-filters-reset ignore ${enabled ? '' : "disabled"}`} 
-        onClick={e => { 
+        <Container fluid={true} className={`data-filters-reset ignore ${enabled ? '' : "disabled"}`}
+        onClick={e => {
         onClean({ app, group })
         onApply({ app, group })
         }}>

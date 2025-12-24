@@ -1,5 +1,6 @@
 import { PostConsumer, PostIntro, PostProvider } from "@devgateway/wp-react-lib";
 
+// import 'pure-react-carousel/dist/react-carousel.es.css';
 import React from "react";
 import { Container } from "semantic-ui-react";
 import { CarouselProvider, DotGroup, Slide, Slider } from "pure-react-carousel";

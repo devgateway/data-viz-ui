@@ -19,12 +19,19 @@ import dvzStylesCssHref from "@devgateway/dvz-ui-react/dist/esm/styles.css?url";
 import appCssHref from "./scss/index.scss?url";
 import { getApiUrl } from "./utils/api-utils";
 
-
 export const links: Route.LinksFunction = () => [
+
+  {
+    rel: "stylesheet",
+    href: import.meta.env.VITE_REACT_APP_WP_STYLES ??
+      "/wp/wp-admin/load-styles.php?c=1&dir=ltr&load%5Bchunk_0%5D=dashicons,admin-bar,buttons,media-views,editor-buttons,wp-components,wp-block-editor,wp-nux,wp-editor,wp-block-library,wp-block-&load%5Bchunk_1%5D=library-theme,wp-edit-blocks,wp-edit-post,wp-format-library,wp-block-directory,common,forms,admin-menu,dashboard,list-tables,edi&load%5Bchunk_2%5D=t,revisions,media,themes,about,nav-menus,wp-pointer,widgets,site-icon,l10n,wp-auth-check&ver=5.5.6id='wp-block-library-css"
+  },
   { rel: "stylesheet", href: semanticCssHref },
   { rel: "stylesheet", href: dvzCommonCssHref },
-  { rel: "stylesheet", href: dvzStylesCssHref },
+  // { rel: "stylesheet", href: dvzStylesCssHref },
+
   // Ensure your app styles load last to override library defaults
+
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
   {
     rel: "preconnect",
@@ -33,21 +40,19 @@ export const links: Route.LinksFunction = () => [
   },
   {
     rel: "stylesheet",
-    href: import.meta.env.VITE_REACT_APP_WP_STYLES ??
-    "/wp/wp-admin/load-styles.php?c=1&dir=ltr&load%5Bchunk_0%5D=dashicons,admin-bar,buttons,media-views,editor-buttons,wp-components,wp-block-editor,wp-nux,wp-editor,wp-block-library,wp-block-&load%5Bchunk_1%5D=library-theme,wp-edit-blocks,wp-edit-post,wp-format-library,wp-block-directory,common,forms,admin-menu,dashboard,list-tables,edi&load%5Bchunk_2%5D=t,revisions,media,themes,about,nav-menus,wp-pointer,widgets,site-icon,l10n,wp-auth-check&ver=5.5.6' id='wp-block-library-css"
+    href: "https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap",
   },
   {
     rel: "stylesheet",
-    href: "https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap",
+    href: "https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&family=Roboto:wdth,wght@75..100,100..900&display=swap",
   },
-  // Keep third‑party CSS in explicit order
   { rel: "stylesheet", href: appCssHref },
+  // Keep third‑party CSS in explicit order
 
 ];
 
 export async function loader({ request }: Route.LoaderArgs): Promise<{ faviconUrl: string | null }> {
   const siteUrl = getApiUrl(request);
-  console.log("siteUrl", siteUrl);
   try {
     const response = await fetch(siteUrl);
     const data = await response.json();

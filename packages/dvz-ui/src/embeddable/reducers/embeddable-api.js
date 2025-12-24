@@ -1,6 +1,6 @@
-import { Config } from '@/conf';
 import {post} from '../../api/commons'
-const API_ROOT = process.env.VITE_REACT_APP_API_ROOT || Config.REACT_APP_API_ROOT || '';
+import { Config } from '@/conf';
+const API_ROOT = process.env.VITE_REACT_APP_API_ROOT || Config.REACT_APP_API_ROOT || null;
 
 export const sendShowCase = (params) => {
     const data = new FormData();
