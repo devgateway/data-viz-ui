@@ -359,6 +359,7 @@ const Chart = ({
           {(legendPosition === "top" || legendPosition === "bottom") && (
             <div
               className={`legends container has-standard-12-font-size ${legendPosition}`}
+              style={legendPosition === "top" ? { marginTop: `${newMarginTop}px` } : legendPosition === "bottom" ? { marginBottom: `${newMarginBottom}px` } : {}}
             >
               <div className="legend-sections">
                 <div className="title-section">{legendTitle()}</div>

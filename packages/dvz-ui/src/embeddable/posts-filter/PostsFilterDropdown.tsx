@@ -1,4 +1,4 @@
-import React, { LegacyRef, useEffect, useRef, useState } from "react";
+import React, { LegacyRef, useEffect, useRef, useState, useMemo } from "react";
 import {
     Checkbox,
     Container,
@@ -14,6 +14,14 @@ import {
 
 const FILTER_TYPE_MULTI_SELECT = "multi-select";
 const FILTER_TYPE_SINGLE_SELECT = "single-select";
+const NONE_SELECTION_VALUE = Number.MIN_SAFE_INTEGER;
+
+const toValueKey = (value: any): string | null => {
+    if (value === null || value === undefined) {
+        return null;
+    }
+    return String(value);
+};
 
 export interface PostFilterDropdownProps extends DropdownProps {
     allLabel?: string;
@@ -30,7 +38,8 @@ export interface PostFilterDropdownProps extends DropdownProps {
     ascOrder?: boolean;
     placeholder?: string;
     taxonomy?: string
-    type?: string
+    type?: string;
+    noneFunction?: (e: any) => void;
 }
 
 const PostsFilterDropdown = (props: PostFilterDropdownProps) => {
@@ -54,28 +63,39 @@ const PostsFilterDropdown = (props: PostFilterDropdownProps) => {
         // taxonomy,
         // type,
         value,
-        closeOnSelect = true
+        closeOnSelect = true,
+        noneFunction
     } = props;
 
     const isMultiSelect = filterType === FILTER_TYPE_MULTI_SELECT;
 
-    const selectedValues = Array.isArray(value) ? value : (current || []);
+    const rawSelectedValues = Array.isArray(value) ? value : (current || []) || [];
+    const isExplicitNoneSelection = Array.isArray(rawSelectedValues)
+        ? rawSelectedValues.some((optionValue) => optionValue === NONE_SELECTION_VALUE)
+        : false;
+    const selectedValues = isExplicitNoneSelection
+        ? rawSelectedValues.filter((optionValue) => optionValue !== NONE_SELECTION_VALUE)
+        : rawSelectedValues;
     const [searchText, setSearchText] = useState("");
     // const [searchFilter, setSearchFilter] = useState("");
-    const changeFilter = (e: any, value: any) => {
+    const changeFilter = (e: any, candidateValue: any) => {
         if (filterType === FILTER_TYPE_MULTI_SELECT) {
-            let nextValues = Array.isArray(selectedValues) ? [...selectedValues] : [];
-            if (nextValues.indexOf(value) > -1) {
-                nextValues = nextValues.filter((i) => i !== value);
-            } else {
-                nextValues = [...nextValues, value];
+            const candidateKey = toValueKey(candidateValue);
+            const baseValues = Array.isArray(selectedValues) ? [...selectedValues] : [];
+            const hasValue = baseValues.some((optionValue) => toValueKey(optionValue) === candidateKey);
+            let nextValues = hasValue
+                ? baseValues.filter((optionValue) => toValueKey(optionValue) !== candidateKey)
+                : [...baseValues, candidateValue];
+
+            if (!allNoneSameBehaviour && nextValues.length === 0) {
+                nextValues = [NONE_SELECTION_VALUE];
             }
 
             return onChange && onChange(e, nextValues);
         }
 
         if (filterType === FILTER_TYPE_SINGLE_SELECT) {
-            return onChange && onChange(e, value);
+            return onChange && onChange(e, candidateValue);
         }
 
 
@@ -106,29 +126,33 @@ const PostsFilterDropdown = (props: PostFilterDropdownProps) => {
             refContainer.current.close();
         }
     };
-    const none = () => {
-        let nextValues: any[] = [];
-        if (allNoneSameBehaviour) {
-            nextValues = (options || [])
-                .filter((o) => {
-                    if (
-                        enableTextSearch &&
-                        searchText &&
-                        searchText.trim().length > 0 &&
-                        o.text
-                    ) {
-                        return o.text?.toString().toLowerCase().includes(searchText.toLowerCase());
-                    }
-                    return true;
-                })
-                .map((v) => v.value);
+    const none = (e: any) => {
+        if (noneFunction) {
+            noneFunction(e);
+            return;
+        } else {
+            if (!options) return [];
+            const matchingItems = options.filter((o) => {
+                if (
+                    enableTextSearch &&
+                    searchText &&
+                    searchText.trim().length > 0 &&
+                    o.text
+                ) {
+                    return o.text?.toString().toLowerCase().includes(searchText?.toString().toLowerCase());
+                }
+                return true;
+            });
+
+            if (isMultiSelect && onChange) {
+                const finalValues = allNoneSameBehaviour ? matchingItems.map((v) => v.value) : [NONE_SELECTION_VALUE];
+                onChange({} as any, finalValues);
+            }
+            if (!isMultiSelect && closeOnSelect && refContainer.current) {
+                refContainer.current.close();
+            }
         }
-        if (isMultiSelect && onChange) {
-            onChange({} as any, nextValues);
-        }
-        if (!isMultiSelect && closeOnSelect && refContainer.current) {
-            refContainer.current.close();
-        }
+
     };
 
     const freeTextSelect = (searchText) => {
@@ -150,6 +174,7 @@ const PostsFilterDropdown = (props: PostFilterDropdownProps) => {
             } else {
                 didAutoInitRef.current = true;
             }
+
         }
     }, [isMultiSelect, options])
 
@@ -159,17 +184,17 @@ const PostsFilterDropdown = (props: PostFilterDropdownProps) => {
             const allValues = options.map((o) => o.value);
             onChange({} as any, allValues);
         }
-    }, [])
+    }, [isMultiSelect])
 
 
 
-    const getSelected = () => {
+    const getSelected = useMemo(() => {
         if (filterType == FILTER_TYPE_SINGLE_SELECT) {
             const selectedItem =
                 value
                     ? options?.filter((v) => v.value == value)[0]
                     : null;
-            return selectedItem ? selectedItem.text : "";
+            return selectedItem ? `${placeholder ? placeholder + " " : ""}${selectedItem.text}` : "";
         } else {
             const selectedCount = selectedValues
                 ? selectedValues.filter((v) => {
@@ -194,11 +219,11 @@ const PostsFilterDropdown = (props: PostFilterDropdownProps) => {
 
             return `${placeholder} (${selectedCount}/${totalCount})`;
         }
-    };
+    }, [options, selectedValues, filterType]);
     const refContainer = useRef<DropdownProps>(null);
 
 
-    const selectedText = getSelected();
+    const selectedText = getSelected;
     const selectedString = typeof selectedText === 'string' ? selectedText : '';
     const displayText = (selectedString && selectedString.length > 0) ? selectedString : (placeholder || "");
 
@@ -331,7 +356,7 @@ const PostsFilterDropdown = (props: PostFilterDropdownProps) => {
 
                                 {filterType === FILTER_TYPE_SINGLE_SELECT && (
                                     <Radio
-                                        checked={value === optionValue}
+                                        checked={value == optionValue}
                                         onChange={(e) => {
                                             changeFilter(e, optionValue)
                                         }}
@@ -342,12 +367,9 @@ const PostsFilterDropdown = (props: PostFilterDropdownProps) => {
                                     <Checkbox
                                         checked={
                                             selectedValues &&
-                                                selectedValues.indexOf(optionValue) > -1 &&
-                                                !(
-                                                    options.length == selectedValues.length && allNoneSameBehaviour
-                                                )
-                                                ? true
-                                                : false
+                                            selectedValues.some(
+                                                (selectedValue) => toValueKey(selectedValue) === toValueKey(optionValue)
+                                            )
                                         }
                                         onChange={() => changeFilter(null, optionValue)}
                                         label={text}
@@ -362,3 +384,4 @@ const PostsFilterDropdown = (props: PostFilterDropdownProps) => {
 };
 
 export default PostsFilterDropdown;
+
