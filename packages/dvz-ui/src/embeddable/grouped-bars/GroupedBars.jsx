@@ -51,7 +51,7 @@ const createNumberFormat = (formatObject) => {
 };
 
 // Extract a list of selected measures and their specific formats
-const extractSelectedMeasures = (parsedMeasures, fallbackFormat, app) => {    
+const extractSelectedMeasures = (parsedMeasures, fallbackFormat, app, useCustomMeasureFormats = true) => {
     const selected = [];
     if (!parsedMeasures) return selected;
 
@@ -59,7 +59,9 @@ const extractSelectedMeasures = (parsedMeasures, fallbackFormat, app) => {
     if (proxy && typeof proxy === 'object') {
         Object.entries(proxy).forEach(([name, cfg]) => {
             if (cfg && cfg.selected) {
-                const fmt = createNumberFormat(cfg.format || fallbackFormat);
+                const fmt = useCustomMeasureFormats
+                    ? createNumberFormat(cfg.format || fallbackFormat)
+                    : fallbackFormat;
 
                 const label = (cfg && typeof cfg.customLabel === 'string' && cfg.customLabel.trim().length > 0)
                     ? cfg.customLabel.trim()
@@ -683,7 +685,7 @@ const Chart = (props) => {
     const parsedManualColors = parseJSON(manualColors, editing);
 
     // Compute selected measures (names + formats) and pass to DataFrame
-    const selectedMeasures = extractSelectedMeasures(parsedMeasures, numberFormat, app);
+    const selectedMeasures = extractSelectedMeasures(parsedMeasures, numberFormat, app, (props["data-enable-custom-measure-formats"] === "true"));
 
     // Determine effective main measure from WordPress block prop
     const selectedNames = selectedMeasures.map(sm => sm.name);
