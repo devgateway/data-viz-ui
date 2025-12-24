@@ -668,9 +668,10 @@ const Chart = (props) => {
 
     // Determine effective main measure from WordPress block prop
     const selectedNames = selectedMeasures.map(sm => sm.name);
-    const decodedMainProp = typeof mainMeasureProp === 'string' ? decodeValue(mainMeasureProp) : null;
+    const decodedMainProp = (typeof mainMeasureProp === 'string' && mainMeasureProp.length > 0) ? decodeValue(mainMeasureProp) : null;
+    const normalizedMain = decodedMainProp && decodedMainProp.toLowerCase() === 'none' ? null : (decodedMainProp || null);
     const effectiveMainMeasure = selectedMeasures.length > 1
-        ? (decodedMainProp && selectedNames.includes(decodedMainProp) ? decodedMainProp : selectedNames[0])
+        ? (normalizedMain === null ? null : (selectedNames.includes(normalizedMain) ? normalizedMain : selectedNames[0]))
         : null;
 
     const params = buildParams(parsedFilters, dvzProxyDatasetId);
