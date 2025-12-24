@@ -353,7 +353,9 @@ const BarGroup = ({
                         }}
                     >
                         <span style={{ color: '#ffffff', fontSize: '13px', fontWeight: '500', whiteSpace: 'nowrap' }}>
-                            {(entry.label || entry.name)}: {valuePosition === 'bar'
+                            {(entry.label || entry.name)}
+                            {((entry.label && entry.label !== entry.name) ? ' ' : ': ')}
+                            {valuePosition === 'bar'
                                 ? `${entry.format?.prefix || ''}${new Intl.NumberFormat(intl.locale, entry.format || format).format(entry.value)}${entry.format?.suffix || ''}`
                                 : `${(entry.width || 0).toFixed(1)}%`}
                         </span>
@@ -519,11 +521,28 @@ const DataFrame = (props) => {
         dataItems = rawDataItems;
     }
 
-    // Apply Top N only for single-measure scenarios
-    if (selected.length <= 1 && topN && !isNaN(parseInt(topN))) {
+    // Apply Top N selection rules
+    // - Single measure: keep first N after current sorting (existing behavior)
+    // - Multiple measures with a main measure: select top N by main measure values, then keep current sorting among those
+    // - Multiple measures without a main measure: ignore Top N
+    if (topN && !isNaN(parseInt(topN))) {
         const n = parseInt(topN);
         if (n > 0) {
-            dataItems = dataItems.slice(0, n);
+            if (selected.length <= 1) {
+                dataItems = dataItems.slice(0, n);
+            } else if (mainMeasureName) {
+                // Determine top N items based on main measure values (descending)
+                const ranked = [...rawDataItems].sort((a, b) => {
+                    const aVal = ((a.vars && a.vars[mainMeasureName]) ?? a[mainMeasureName] ?? 0) || 0;
+                    const bVal = ((b.vars && b.vars[mainMeasureName]) ?? b[mainMeasureName] ?? 0) || 0;
+                    return bVal - aVal;
+                });
+                const allowed = new Set(
+                    ranked.slice(0, n).map(item => item[dimensionField])
+                );
+                dataItems = dataItems.filter(item => allowed.has(item[dimensionField]));
+            }
+            // else: no main measure -> ignore Top N
         }
     }
 
