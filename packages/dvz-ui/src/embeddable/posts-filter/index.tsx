@@ -1,103 +1,12 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
     Container
 } from "semantic-ui-react";
 import { toBoolean, toNumber } from '@/utils/data';
-import { getYearRange } from "@devgateway/wp-react-lib";
-import PostsFilterDropdown from "./PostsFilterDropdown";
-import type { PostFilterDropdownProps } from "./PostsFilterDropdown";
-import { Config } from "@/conf";
 import { useAppDispatch } from "@/redux/hooks";
 import { useSelector } from "react-redux";
-
-
-interface CategoricalFilterProps extends PostFilterDropdownProps {
-    taxonomies?: any[] | null
-    type?: string;
-    categories?: any[] | null;
-}
-
-const CategoricalFilter = (props: CategoricalFilterProps) => {
-    const {
-        taxonomy,
-        group,
-        placeholder,
-        allLabel,
-        noneLabel,
-        useSingleColumn,
-        enableTextSearch,
-        filterType,
-        showNoDataOption,
-        closeOnSelect,
-        allNoneSameBehaviour,
-        autoApply,
-        alphabeticalSort,
-        ascOrder,
-        type,
-        categories,
-        onChange,
-    } = props;
-
-    const [taxonomyOptions, setTaxonomyOptions] = useState([]);
-
-    // const dispatch = useAppDispatch();
-
-
-    const getPostTypeBySlug = async () => {
-        if (!taxonomy || taxonomy === "none") {
-            setTaxonomyOptions([]);
-            return;
-        };
-
-        const response: any = await fetch(Config.REACT_APP_WP_API + "/wp/v2/" + taxonomy);
-        const data = await response.json();
-
-        if (data) {
-            const taxonomyOptions = data.map((taxonomy: any) => ({
-                key: taxonomy.id,
-                value: taxonomy.id,
-                text: taxonomy.name
-            }));
-            if (categories) {
-                const filteredTaxonomyOptions = taxonomyOptions.filter((option: any) => categories.indexOf(option.value.toString()) > -1);
-                setTaxonomyOptions(filteredTaxonomyOptions);
-            } else {
-                setTaxonomyOptions(taxonomyOptions);
-            }
-        }
-
-    }
-
-    useEffect(() => {
-        getPostTypeBySlug();
-        // cleanup
-        return () => {
-            setTaxonomyOptions([]);
-        }
-    }, [type]);
-
-    return (
-        <PostsFilterDropdown
-            {...props}
-            group={group}
-            placeholder={placeholder}
-            allLabel={allLabel}
-            noneLabel={noneLabel}
-            useSingleColumn={useSingleColumn}
-            enableTextSearch={enableTextSearch}
-            filterType={filterType}
-            showNoDataOption={showNoDataOption}
-            closeOnSelect={closeOnSelect}
-            allNoneSameBehaviour={allNoneSameBehaviour}
-            autoApply={autoApply}
-            alphabeticalSort={alphabeticalSort}
-            ascOrder={ascOrder}
-            options={taxonomyOptions}
-            onChange={onChange}
-
-        />
-    )
-}
+import CategoricalFilter from "./CategoricalFilter";
+import YearFilter from "./YearFilter";
 
 
 interface PostsFilterProps {
@@ -121,6 +30,8 @@ interface PostsFilterProps {
     "data-selected-year"?: number | string;
     "data-type"?: string;
     "data-sort-first-by"?: string;
+    "data-default-values"?: string;
+    editing?: boolean;
 }
 const PostsFilter = (props: PostsFilterProps) => {
     const {
@@ -138,11 +49,13 @@ const PostsFilter = (props: PostsFilterProps) => {
         "data-all-none-same-behaviour": allNoneSameBehaviour,
         "data-auto-apply": autoApply,
         "data-taxonomy": taxonomy,
-        "data-categories": categories,
+        "data-categories": categories = "[]",
         "data-is-country-filter": isCountryFilter,
         "data-is-year-filter": isYearFilter,
         "data-type": type,
-        "data-sort-first-by": sortFirstBy
+        "data-sort-first-by": sortFirstBy,
+        "data-default-values": defaultValues = "[]",
+        editing = false
     } = props;
 
     const dispatch = useAppDispatch();
@@ -151,6 +64,33 @@ const PostsFilter = (props: PostsFilterProps) => {
     const isMultiSelectFilter = filterType === "multi-select";
     const resetKey = useRef(0);
 
+    const decode = (value: string) => {
+        if (editing) {
+            return value;
+        }
+        return decodeURIComponent(value)
+    }
+
+    const parse = (value: string) => {
+        try {
+            return JSON.parse(decode(value))
+        } catch (error) {
+            // If JSON parsing fails, return the decoded value as-is
+            // This handles cases where the value is a plain comma-separated string like "300,302"
+            console.warn("JSON parsing failed for value:", value, "- treating as plain string. Error:", error)
+            return decode(value);
+        }
+    }
+    let defaultValuesArray = parse(defaultValues);
+    if (!defaultValuesArray) {
+        defaultValuesArray = [];
+    }
+    if (typeof defaultValuesArray === 'string') {
+        defaultValuesArray = defaultValuesArray.split(',').map(Number);
+    }
+    if (typeof defaultValuesArray === 'number') {
+        defaultValuesArray = [defaultValuesArray];
+    }
     const alphabeticalSortValue = toBoolean(alphabeticalSort);
     const ascOrderValue = toBoolean(ascOrder);
     const showNoDataOptionValue = toBoolean(showNoDataOption);
@@ -163,42 +103,91 @@ const PostsFilter = (props: PostsFilterProps) => {
     const enableTextSearchValue = toBoolean(enableTextSearch);
     const sortFirstByValue = (sortFirstBy !== 'none') ? toNumber(sortFirstBy) : null;
 
+    const [yearOptions, setYearOptions] = useState<any>([]);
+    const [yearFilterLoading, setYearFilterLoading] = useState<boolean>(false);
 
-    const [yearOptions, setYearOptions] = useState([]);
-    const [selectedYear, setSelectedYear] = useState<any>(
-        isMultiSelectFilter
-            ? (Array.isArray(postsFilters.yearFilter) ? postsFilters.yearFilter : (postsFilters.yearFilter != null ? [postsFilters.yearFilter] : []))
-            : (postsFilters.yearFilter || undefined)
+    // Helper function to normalize filter values
+    const normalizeFilterValue = (value: any, isMulti: boolean): any => {
+        if (isMulti) {
+            return Array.isArray(value) ? value : (value !== null && value !== undefined ? [value] : []);
+        }
+        return value || undefined;
+    };
+
+    // Helper function to compare filter values
+    const areFilterValuesEqual = (a: any, b: any): boolean => {
+        if (Array.isArray(a) && Array.isArray(b)) {
+            if (a.length !== b.length) return false;
+            return a.every((val, idx) => val === b[idx]);
+        }
+        return a === b;
+    };
+
+    // Memoize normalized filter values to prevent unnecessary re-renders
+    const normalizedCountryFilter = useMemo(
+        () => normalizeFilterValue(postsFilters.countryFilter, isMultiSelectFilter),
+        [postsFilters.countryFilter, isMultiSelectFilter]
     );
-    const [selectedCountry, setSelectedCountry] = useState<any>(
-        isMultiSelectFilter
-            ? (Array.isArray(postsFilters.countryFilter) ? postsFilters.countryFilter : (postsFilters.countryFilter != null ? [postsFilters.countryFilter] : []))
-            : (postsFilters.countryFilter || undefined)
+    const normalizedCategoryFilter = useMemo(
+        () => normalizeFilterValue(postsFilters.categoryFilter, isMultiSelectFilter),
+        [postsFilters.categoryFilter, isMultiSelectFilter]
     );
-    const [selectedCategory, setSelectedCategory] = useState<any>(
-        isMultiSelectFilter
-            ? (Array.isArray(postsFilters.categoryFilter) ? postsFilters.categoryFilter : (postsFilters.categoryFilter != null ? [postsFilters.categoryFilter] : []))
-            : (postsFilters.categoryFilter || undefined)
+    const normalizedYearFilter = useMemo(
+        () => isYearFilterValue ? normalizeFilterValue(postsFilters.yearFilter, isMultiSelectFilter) : undefined,
+        [postsFilters.yearFilter, isMultiSelectFilter, isYearFilterValue]
     );
+
+    const [selectedYear, setSelectedYear] = useState<any>(normalizedYearFilter);
+    const [selectedCountry, setSelectedCountry] = useState<any>(normalizedCountryFilter);
+    const [selectedCategory, setSelectedCategory] = useState<any>(normalizedCategoryFilter);
+
+    // Use refs to track previous values to avoid unnecessary updates
+    const prevFiltersRef = useRef({
+        countryFilter: normalizedCountryFilter,
+        categoryFilter: normalizedCategoryFilter,
+        yearFilter: normalizedYearFilter,
+        isMultiSelectFilter
+    });
 
     useEffect(() => {
-        setSelectedYear(postsFilters.yearFilter || undefined);
-        if (isMultiSelectFilter) {
-            setSelectedCountry(Array.isArray(postsFilters.countryFilter) ? postsFilters.countryFilter : (postsFilters.countryFilter != null ? [postsFilters.countryFilter] : []));
-            setSelectedCategory(Array.isArray(postsFilters.categoryFilter) ? postsFilters.categoryFilter : (postsFilters.categoryFilter != null ? [postsFilters.categoryFilter] : []));
-        } else {
-            setSelectedCountry(postsFilters.countryFilter || undefined);
-            setSelectedCategory(postsFilters.categoryFilter || undefined);
+        const prev = prevFiltersRef.current;
+
+        // Check if any filter values actually changed
+        const countryChanged = !areFilterValuesEqual(prev.countryFilter, normalizedCountryFilter);
+        const categoryChanged = !areFilterValuesEqual(prev.categoryFilter, normalizedCategoryFilter);
+        const yearChanged = isYearFilterValue && !areFilterValuesEqual(prev.yearFilter, normalizedYearFilter);
+        const multiSelectChanged = prev.isMultiSelectFilter !== isMultiSelectFilter;
+
+        if (countryChanged || categoryChanged || yearChanged || multiSelectChanged) {
+            if (countryChanged) {
+                setSelectedCountry(normalizedCountryFilter);
+            }
+            if (categoryChanged) {
+                setSelectedCategory(normalizedCategoryFilter);
+            }
+            if (yearChanged) {
+                setSelectedYear(normalizedYearFilter);
+            }
+
+            // Update ref with current values
+            prevFiltersRef.current = {
+                countryFilter: normalizedCountryFilter,
+                categoryFilter: normalizedCategoryFilter,
+                yearFilter: normalizedYearFilter,
+                isMultiSelectFilter
+            };
         }
-    }, [postsFilters, isMultiSelectFilter]);
+    }, [normalizedCountryFilter, normalizedCategoryFilter, normalizedYearFilter, isMultiSelectFilter, isYearFilterValue]);
 
 
-    const handleYearChange = (value: string) => {
+    const handleYearChange = (value: any) => {
+        setSelectedYear(value);
         dispatch({
             type: "SET_POSTS_FILTER",
             group,
+            ...postsFilters,
             isYearFilter: isYearFilterValue,
-            yearFilter: value,
+            yearFilter: isYearFilterValue ? value : null,
             isCountryFilter: isCountryFilterValue,
             categoryFilter: postsFilters.categoryFilter,
             countryFilter: postsFilters.countryFilter,
@@ -219,11 +208,12 @@ const PostsFilter = (props: PostsFilterProps) => {
         dispatch({
             type: "SET_POSTS_FILTER",
             group,
+            ...postsFilters,
             // Preserve both filters so they can work together
             categoryFilter: isCountryFilterValue ? postsFilters.categoryFilter : value,
             countryFilter: isCountryFilterValue ? value : postsFilters.countryFilter,
-            yearFilter: postsFilters.yearFilter,
             isYearFilter: isYearFilterValue,
+            yearFilter: postsFilters.yearFilter,
             isCountryFilter: isCountryFilterValue,
             sortFirstBy: isCountryFilterValue ? sortFirstByValue : postsFilters.sortFirstBy,
             countryCategory: isCountryFilterValue ? taxonomy : postsFilters.countryCategory,
@@ -235,12 +225,24 @@ const PostsFilter = (props: PostsFilterProps) => {
 
 
     useEffect(() => {
+        const hasDefaultValues = defaultValuesArray.length > 0;
+        const defaultValue = isMultiSelectFilter ? defaultValuesArray : defaultValuesArray[0];
+
         const categoryFilter = !isCountryFilterValue
-            ? (isMultiSelectFilter ? categories ? categories.split(',').map(Number) : [] : postsFilters.categoryFilter)
+            ? (hasDefaultValues
+                ? defaultValue
+                : (isMultiSelectFilter ? categories ? categories.split(',').map(Number) : [] : postsFilters.categoryFilter))
             : postsFilters.categoryFilter;
+
         const countryFilter = isCountryFilterValue
-            ? (isMultiSelectFilter ? categories ? categories.split(',').map(Number) : [] : postsFilters.countryFilter)
+            ? (hasDefaultValues
+                ? defaultValue
+                : (isMultiSelectFilter ? categories ? categories.split(',').map(Number) : [] : postsFilters.countryFilter))
             : postsFilters.countryFilter;
+
+        const yearFilter = isYearFilterValue ?
+            (isMultiSelectFilter ? yearOptions.length > 0 ? yearOptions.map((year: any) => year.value) : [] : postsFilters.yearFilter)
+            : postsFilters.yearFilter;
 
         dispatch({
             type: "SET_INITIAL_POSTS_FILTER",
@@ -250,35 +252,42 @@ const PostsFilter = (props: PostsFilterProps) => {
             isYearFilter: isYearFilterValue,
             isCountryFilter: isCountryFilterValue,
             sortFirstBy: sortFirstByValue,
+            yearFilter: isYearFilterValue ? yearFilter : null,
             categoryCategory: !isCountryFilterValue ? postsFilters.categoryCategory : null,
             categoryTaxonomy: !isCountryFilterValue ? taxonomy : null,
             countryCategory: isCountryFilterValue ? postsFilters.countryCategory : null,
-            countryTaxonomy: isCountryFilterValue ? taxonomy : null
-        })
-    }, [group]);
+            countryTaxonomy: isCountryFilterValue ? taxonomy : null,
+            page: 1
+        });
+
+    }, []);
 
     useEffect(() => {
-        if (isYearFilterValue) {
-            fetchYears();
+        if (isYearFilterValue && !yearFilterLoading) {
+
+
+            const yearFilter = isYearFilterValue ?
+                (isMultiSelectFilter ? yearOptions.length > 0 ? yearOptions.map((year: any) => year.value) : [] : postsFilters.yearFilter)
+                : postsFilters.yearFilter;
+
+            dispatch({
+                type: "SET_INITIAL_POSTS_FILTER",
+                group,
+                ...postsFilters,
+                isYearFilter: isYearFilterValue,
+                yearFilter: isYearFilterValue ? yearFilter : null,
+            });
         }
 
-    }, [isYearFilterValue]);
+    }, [yearFilterLoading]);
 
-    const fetchYears = async () => {
-        const response: any = await getYearRange();
-        const data = response.data;
-        const yearOptions = data.map((year: any) => ({
-            key: year,
-            value: year,
-            text: `Year ${year}`
-        }));
-        setYearOptions(yearOptions || []);
-    }
 
     return (
-        <Container fluid className="filter">
+        <Container fluid className="filter post-filter">
             {isYearFilterValue && (
-                <PostsFilterDropdown group={group}
+                <YearFilter
+                    // key={`year-filter-${group}`}
+                    group={group}
                     placeholder={placeholder}
                     allLabel={allLabel}
                     noneLabel={noneLabel}
@@ -292,9 +301,11 @@ const PostsFilter = (props: PostsFilterProps) => {
                     alphabeticalSort={alphabeticalSortValue}
                     ascOrder={ascOrderValue}
                     options={yearOptions}
-                    taxonomy={taxonomy}
-                    type={type}
                     value={selectedYear}
+                    yearOptions={yearOptions}
+                    setYearOptions={setYearOptions}
+                    yearFilterLoading={yearFilterLoading}
+                    setYearFilterLoading={setYearFilterLoading}
                     onChange={(_e, value) => {
                         handleYearChange(value as any);
                     }}

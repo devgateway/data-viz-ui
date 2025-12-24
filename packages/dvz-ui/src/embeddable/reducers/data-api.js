@@ -62,7 +62,7 @@ export const getData = ({ source, app, params }) => {
     return requestWithDeduplication(finalUrl);
 };
 
-export const getCustomPosts = ({ postType, taxonomy, category, taxonomyFilters, before, perPage, page, locale, after }) => {
+export const getCustomPosts = ({ postType, taxonomy, category, taxonomyFilters, before, perPage, page, locale, after, ordering, orderingDirection }) => {
     const url = `${Config.REACT_APP_WP_API}/wp/v2/${postType}`;
     const queryParams = new URLSearchParams();
 
@@ -98,8 +98,12 @@ export const getCustomPosts = ({ postType, taxonomy, category, taxonomyFilters, 
     // Serialize taxonomy params: join duplicate taxonomy values with commas
     taxonomyToValues.forEach((values, tax) => {
         const uniqueOrdered = Array.from(new Set(values));
+        if (uniqueOrdered.length === 0) {
+            return;
+        }
         queryParams.set(tax, uniqueOrdered.join(','));
     });
+
 
     if (before) queryParams.append("before", before.toISOString());
     if (perPage) queryParams.append("per_page", perPage.toString());
@@ -107,8 +111,17 @@ export const getCustomPosts = ({ postType, taxonomy, category, taxonomyFilters, 
     if (locale) queryParams.append("locale", locale);
     if (after) queryParams.append("after", after.toISOString());
 
-    // Preserve commas for taxonomy value lists for readability and parity with WP examples
+    // append ordering
+    if (ordering) queryParams.append("orderby", ordering);
+    if (orderingDirection) queryParams.append("order", orderingDirection);
+
+    // Preserve commas for taxonomy value lists for readability and parity with WordPress APIs
     const queryString = queryParams.toString().replace(/%2C/g, ',');
-    return get(`${url}?${queryString}`, {}, true);
+    return get(`${url}?${queryString}`, {
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+    }, true);
 
 };

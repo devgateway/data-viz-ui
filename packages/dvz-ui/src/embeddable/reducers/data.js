@@ -305,7 +305,7 @@ export default (state = initialState, action) => {
                 countryCategory,
                 countryFilter,
                 countryTaxonomy,
-                page: undefined,
+                page: 1,
                 itemsPerPage: undefined,
                 sortFirstBy: sortFirstByValue,
                 postTaxonomy: null,
@@ -362,7 +362,8 @@ export default (state = initialState, action) => {
                 )
             ) && (
                 (Array.isArray(categoryFilter) && categoryFilter.length > 0) ||
-                (Array.isArray(countryFilter) && countryFilter.length > 0)
+                (Array.isArray(countryFilter) && countryFilter.length > 0) ||
+                (Array.isArray(yearFilter) && yearFilter.length > 0)
             );
 
             if (shouldCaptureInitial) {
@@ -396,3 +397,13 @@ export default (state = initialState, action) => {
             return state;
     }
 };
+
+export const clearPostsFilter = ({ group, dispatch, initialFilters }) => {
+    dispatch({
+        type: SET_INITIAL_POSTS_FILTER,
+        group,
+        ...initialFilters,
+        reset: true,
+        page: 1
+    });
+}
