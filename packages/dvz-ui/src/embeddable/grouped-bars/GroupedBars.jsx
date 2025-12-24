@@ -509,13 +509,14 @@ const DataFrame = (props) => {
     // Apply sorting (support multi-measure by using first selected measure when needed)
     let dataItems;
     if (sorting === 'measure') {
-        const sortMeasure = measureField || (selected[0] ? selected[0].name : null);
+        // Prefer main measure for sorting when in multi-measure mode
+        const sortMeasure = mainMeasureName || measureField || (selected[0] ? selected[0].name : null);
         dataItems = rawDataItems.sort((a, b) => {
             const aValue = sortMeasure
-                ? (measureField ? (a[measureField] || 0) : (((a.vars && a.vars[sortMeasure]) ?? a[sortMeasure] ?? 0)))
+                ? (((a.vars && a.vars[sortMeasure]) ?? a[sortMeasure] ?? 0))
                 : 0;
             const bValue = sortMeasure
-                ? (measureField ? (b[measureField] || 0) : (((b.vars && b.vars[sortMeasure]) ?? b[sortMeasure] ?? 0)))
+                ? (((b.vars && b.vars[sortMeasure]) ?? b[sortMeasure] ?? 0))
                 : 0;
             return sortDirection === 'asc' ? aValue - bValue : bValue - aValue;
         });
@@ -613,9 +614,16 @@ const DataFrame = (props) => {
                 const mainEntry = mainMeasureName
                     ? allEntries.find(e => e.name === mainMeasureName)
                     : null;
-                const measureEntries = mainEntry
+                let measureEntries = mainEntry
                     ? allEntries.filter(e => e.name !== mainMeasureName)
                     : allEntries;
+
+                // When sorting by measure, also sort bars within each group by their values
+                if (sorting === 'measure') {
+                    measureEntries = [...measureEntries].sort((a, b) =>
+                        sortDirection === 'asc' ? (a.value - b.value) : (b.value - a.value)
+                    );
+                }
 
                 return (
                     <BarGroup
