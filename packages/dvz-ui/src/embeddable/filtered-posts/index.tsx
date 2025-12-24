@@ -13,10 +13,15 @@ import { toBoolean, toNumber } from '@/utils/data';
 interface PostGridContentProps {
     posts: PostType[];
     numberOfColumns: number;
-    sortFirstBy: number | null;
+    sortFirstBy: number | string | null;
     countryCategory: string;
     postWidth: number;
     postHeight: number;
+}
+
+interface NormalizedFilterValues {
+    values: number[];
+    isExplicitNone: boolean;
 }
 
 const PostGridContent = (props: PostGridContentProps) => {
@@ -24,36 +29,38 @@ const PostGridContent = (props: PostGridContentProps) => {
 
     const allPosts: any[] = [];
 
-    if (countryCategory && sortFirstBy) {
+    if (countryCategory && sortFirstBy && sortFirstBy !== 'none') {
         const countryPosts = posts.filter((post: any) => post[countryCategory].includes(Number(sortFirstBy)));
         const restPosts = posts.filter((post: any) => !post[countryCategory].includes(Number(sortFirstBy)));
-        allPosts.push(...countryPosts, ...restPosts);
+        allPosts.push(...countryPosts);
+        allPosts.push(...restPosts);
+
     }
     else {
         allPosts.push(...posts);
     }
 
     return (
-        <Grid columns={numberOfColumns as unknown as SemanticWIDTHS}>
+        <Grid className={"filtered-posts"} columns={numberOfColumns as unknown as SemanticWIDTHS}>
             <GridRow>
                 {
                     allPosts.map((post) => (
                         <Grid.Column key={post.id}>
-                                <div style={{ width: postWidth, height: postHeight, overflow: 'hidden' }}>
-                                    <PostIntro
-                                        style={{
-                                            width: '100%',
-                                            height: '100%',
-                                            overflow: 'hidden',
-                                            margin: 0,
-                                            padding: 0,
-                                        }}
-                                        key={post.id}
-                                        as={Container}
-                                        fluid
-                                        post={post}
-                                    />
-                                </div>
+                            <div className={"filtered-posts-column"} style={{ width: postWidth, height: postHeight, overflow: 'hidden' }}>
+                                <PostIntro
+                                    style={{
+                                        width: '100%',
+                                        height: '100%',
+                                        overflow: 'hidden',
+                                        margin: 0,
+                                        padding: 0,
+                                    }}
+                                    key={post.id}
+                                    as={Container}
+                                    fluid
+                                    post={post}
+                                />
+                            </div>
 
                         </Grid.Column>
 
@@ -77,10 +84,13 @@ interface FilteredPostsProps extends WrappedComponentProps {
     "data-post-height": number | string;
     "data-number-of-items-per-page": number | string;
     "data-enable-sorting": string | boolean;
-    "data-sort-first-by": string;
+    "data-sort-first-by": number | string;
     "data-sorting-type": string;
     "data-sorting-taxonomy": string;
+    editing?: boolean;
 }
+
+
 
 const FilteredPosts = (props: FilteredPostsProps) => {
     const {
@@ -88,7 +98,7 @@ const FilteredPosts = (props: FilteredPostsProps) => {
         "data-number-of-columns": numberOfColumns,
         "data-type": type,
         "data-taxonomy": taxonomy,
-        "data-categories": _categories,
+        "data-categories": categories,
         "data-height": _height,
         "data-post-width": postWidth,
         "data-post-height": postHeight,
@@ -96,16 +106,16 @@ const FilteredPosts = (props: FilteredPostsProps) => {
         "data-enable-sorting": enableSorting,
         "data-sort-first-by": sortFirstBy,
         "data-sorting-taxonomy": sortingTaxonomy,
+        editing,
     } = props;
 
     const dispatch = useDispatch();
     const { locale } = useParams();
 
     const [loading, setLoading] = useState(false);
-    const reduxState: any = useSelector((state: any) => state);
+    const postsReducer: any = useSelector((state: any) => state).getIn(["data", "posts", group]);
     const [posts, setPosts] = useState<any>([]);
     const enableSortingValue = toBoolean(enableSorting);
-    const postsReducer: any = reduxState.getIn(["data", "posts", group]);
 
     const sortFirstByValue = (enableSortingValue && sortFirstBy !== "none") ? toNumber(sortFirstBy) : null;
 
@@ -121,11 +131,59 @@ const FilteredPosts = (props: FilteredPostsProps) => {
         countryTaxonomy: null,
         categoryCategory: null,
         categoryTaxonomy: null,
+        type: type,
         taxonomy: (taxonomy && taxonomy !== "none") ? taxonomy : undefined,
     };
 
+
+    const normalizeFilterValues = (rawValue: any): NormalizedFilterValues => {
+        if (rawValue == null) {
+            return { values: [], isExplicitNone: false };
+        }
+        const values = Array.isArray(rawValue) ? rawValue : [rawValue];
+        const isExplicitNone = values.some(
+            (value) => Number(value) === Number.MIN_SAFE_INTEGER
+        );
+        const normalizedValues = values
+            .map((value) => Number(value))
+            .filter((value) => Number.isFinite(value) && value !== Number.MIN_SAFE_INTEGER);
+
+        return {
+            values: normalizedValues,
+            isExplicitNone
+        };
+    };
+
+    const buildYearRange = (years: number[]) => {
+        if (!years || years.length === 0) {
+            return null;
+        }
+
+        const uniqueSortedYears = Array.from(new Set(years)).sort((a, b) => a - b);
+        if (uniqueSortedYears.length === 0) {
+            return null;
+        }
+
+        const startYear = uniqueSortedYears[0];
+        const endYear = uniqueSortedYears[uniqueSortedYears.length - 1];
+        const startRange = getStartDateAndEndDateFromYear(startYear);
+        const endRange = getStartDateAndEndDateFromYear(endYear);
+
+        if (!startRange?.startDate || !endRange?.endDate) {
+            return null;
+        }
+
+        return {
+            startDate: startRange.startDate,
+            endDate: endRange.endDate
+        };
+    };
+
     const generateFilters = () => {
-        const yearFilters = postsFilters.yearFilter ? getStartDateAndEndDateFromYear(Number(postsFilters.yearFilter)) : null;
+        const normalizedYearFilter = normalizeFilterValues(postsFilters.yearFilter);
+        const yearFilters = (!normalizedYearFilter.isExplicitNone)
+            ? buildYearRange(normalizedYearFilter.values)
+            : null;
         const countryFilter = postsFilters.countryFilter ?? null;
         const categoryFilter = postsFilters.categoryFilter ?? null;
 
@@ -143,49 +201,101 @@ const FilteredPosts = (props: FilteredPostsProps) => {
         }
     };
 
+    const decode = (value: string) => {
+        if (editing) {
+            return value;
+        }
+        return decodeURIComponent(value)
+    }
+
+    const parse = (value: string) => {
+        try {
+            return JSON.parse(decode(value))
+        } catch (error) {
+            // If JSON parsing fails, return the decoded value as-is
+            // This handles cases where the value is a plain comma-separated string like "300,302"
+            console.warn("JSON parsing failed for value:", value, "- treating as plain string. Error:", error)
+            return decode(value);
+        }
+    }
+
+    const extractCategories = () => {
+        const categoriesArray = parse(categories);
+        if (!categoriesArray) return [];
+        if (typeof categoriesArray === 'string') {
+            return categoriesArray.split(',').map(Number);
+        }
+
+        if (typeof categoriesArray === 'number') {
+            return [categoriesArray];
+        }
+
+        return categoriesArray
+    }
+
+    const getEffectiveCategoryValues = (configIds: number[], selectedIds: number[], isExplicitNone: boolean): number[] | null => {
+        if (isExplicitNone) return null;
+        if (configIds.length === 0) return selectedIds.length > 0 ? selectedIds : null;
+        if (selectedIds.length === 0) return configIds;
+
+        const configSet = new Set(configIds);
+        const overlap = selectedIds.filter(id => configSet.has(id));
+        return overlap.length > 0 ? overlap : null;
+    };
+
     const getPosts = async () => {
+        setLoading(true);
         const filters = generateFilters();
 
-        // Guard: require a post type to query
-        if (!type) {
-            console.warn("FilteredPosts: missing post type. Configure 'type' in block settings.");
+        const configCategoryIds = normalizeFilterValues(extractCategories()).values;
+        const selectedCategory = normalizeFilterValues(filters.categoryFilter);
+        const effectiveCategoryValues = getEffectiveCategoryValues(
+            configCategoryIds,
+            selectedCategory.values,
+            selectedCategory.isExplicitNone
+        );
+        const selectedCountry = normalizeFilterValues(filters.countryFilter);
+
+        // Only skip fetching if user explicitly selected "none" for categories
+        // If no categories are configured and none are selected, we should fetch all posts
+        if (selectedCategory.isExplicitNone) {
             setPosts([]);
             setLoading(false);
             return;
         }
 
-        setLoading(true);
+        if (selectedCountry.isExplicitNone) {
+            setPosts([]);
+            setLoading(false);
+            return;
+        }
 
         const taxonomyFilters = new Map<string, any>();
 
-        // Category taxonomy and values
-        if (filters.categoryTaxonomy && filters.categoryFilter != null) {
-            taxonomyFilters.set(
-                filters.categoryTaxonomy,
-                Array.isArray(filters.categoryFilter) ? filters.categoryFilter : [filters.categoryFilter]
-            );
+        if (filters.categoryTaxonomy && effectiveCategoryValues && effectiveCategoryValues.length > 0) {
+            taxonomyFilters.set(filters.categoryTaxonomy, effectiveCategoryValues);
         }
 
-        // Country taxonomy and values
-        if (filters.countryTaxonomy && filters.countryFilter != null) {
-            taxonomyFilters.set(
-                filters.countryTaxonomy,
-                Array.isArray(filters.countryFilter) ? filters.countryFilter : [filters.countryFilter]
-            );
+        if (filters.countryTaxonomy && selectedCountry.values.length > 0) {
+            taxonomyFilters.set(filters.countryTaxonomy, selectedCountry.values);
         }
 
-        await getCustomPosts({
+        const categoryValues = effectiveCategoryValues ? effectiveCategoryValues.join(',') : undefined;
+        const args = {
             after: filters.after,
             before: filters.before,
             perPage: Number(numberOfItemsPerPage || 10),
             page: postsFilters.page || 1,
             locale: locale || "en",
             postType: type,
-            // explicit undefineds for legacy params to satisfy types
-            taxonomy: undefined,
-            category: undefined,
+            taxonomy: filters.categoryTaxonomy || undefined,
+            category: categoryValues || undefined,
             taxonomyFilters,
-        }).then((response: any) => {
+            ordering: "date",
+            orderingDirection: "desc",
+        };
+
+        await getCustomPosts(args).then((response: any) => {
             if (response) {
                 const { data, meta } = response;
 
@@ -208,8 +318,10 @@ const FilteredPosts = (props: FilteredPostsProps) => {
     }
 
     useEffect(() => {
-        getPosts();
-    }, [postsReducer, type, taxonomy, numberOfItemsPerPage]);
+        (async () => {
+            await getPosts();
+        })();
+    }, [postsReducer, type, taxonomy, numberOfItemsPerPage, categories, sortFirstByValue, sortingTaxonomy]);
 
 
     return (
@@ -226,7 +338,7 @@ const FilteredPosts = (props: FilteredPostsProps) => {
                         sortFirstBy={sortFirstByValue}
                         countryCategory={sortingTaxonomy} />
                 ) : (
-                    <NoData noDataMsg="No posts found" />
+                    <NoData noDataMsg="No posts found" group={group} />
                 )
             }
         </Container>

@@ -4,13 +4,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Container, Dropdown, Icon } from 'semantic-ui-react';
 import { injectIntl, WrappedComponentProps} from 'react-intl';
 
-const options = [
-    { key: 1, text: 'Choice 1', value: 1 },
-    { key: 2, text: 'Choice 2', value: 2 },
-    { key: 3, text: 'Choice 3', value: 3 },
-
-]
-
 interface PostsPaginationProps extends WrappedComponentProps {
     "data-group": string;
     "data-number-of-items-per-page": number;
@@ -22,9 +15,10 @@ const PostsPagination = (props: PostsPaginationProps) => {
     } = props;
     const dispatch = useDispatch();
     const postsState: any = useSelector((state: Immutable.Map<string, any>) => state.getIn(['data', "postsPagination", group]));
+    const postsFilters: any = useSelector((state: Immutable.Map<string, any>) => state.getIn(['data', 'posts', group]));
 
     const totalPages: number = postsState && postsState?.totalPages ? postsState.totalPages : 1;
-    const [currentPage, setCurrentPage] = useState(1);
+    const [currentPage, setCurrentPage] = useState(postsFilters?.page ?? 1);
     const [options, setOptions] = useState<any[]>([]);
 
     const generateOptions = () => {
@@ -43,7 +37,7 @@ const PostsPagination = (props: PostsPaginationProps) => {
         dispatch({
             type: "SET_POSTS_FILTER",
             group,
-            ...postsState,
+            ...postsFilters,
             page: page
         });
     }
@@ -51,6 +45,13 @@ const PostsPagination = (props: PostsPaginationProps) => {
     useEffect(() => {
         generateOptions();
     }, [postsState?.totalPages]);
+
+    useEffect(() => {
+        const pageFromState = postsFilters?.page ?? 1;
+        if (pageFromState !== currentPage) {
+            setCurrentPage(pageFromState);
+        }
+    }, [postsFilters?.page]);
 
 
     return (

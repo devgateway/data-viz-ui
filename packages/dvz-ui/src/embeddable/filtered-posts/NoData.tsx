@@ -1,13 +1,23 @@
+import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import React from 'react'
 import { Button, Header, Segment } from 'semantic-ui-react';
+import { clearPostsFilter } from '../reducers/data';
 
 interface NoDataProps {
     noDataMsg?: string;
     editing?: boolean;
+    group: string;
 }
 
 const NoData = (props: NoDataProps) => {
-    const { noDataMsg, editing } = props;
+    const { noDataMsg, editing, group } = props;
+    const dispatch = useAppDispatch();
+    const initialFilters = useAppSelector((state: any) => state.getIn(["data", "posts", "initialFilters", group]));
+
+    const cleanFilters = (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.preventDefault();
+        clearPostsFilter({ group, dispatch, initialFilters });
+    }
 
     return (<Segment placeholder className = "chartNoDataMessage">
         <Header icon>
@@ -32,7 +42,7 @@ const NoData = (props: NoDataProps) => {
             {editing&&<div className = "WPnoDataMsg">{'Not enough parameters to render the chart'}</div>}
             <div className = "WPnoDataMsg">{noDataMsg}</div>
         </Header>
-        {/* <Button onClick={e => onClean({app, group})}>Clear Filter</Button> */}
+        <Button size='medium' onClick={e => cleanFilters(e)}>Clear Filter</Button>
     </Segment>)
 }
 

@@ -34,3 +34,29 @@ export const decodeHtmlEntitiesToHtml = (html: string) => {
     const sanitized = DOMPurify.sanitize(doc.documentElement.innerHTML);
     return sanitized;
 }
+
+export const toTitleCase = (str: string) => {
+    return str
+    .replace(/[-,._!?;:'"()[\]{}]/g, ' ')  // Replace punctuation with spaces
+    .replace(/\s+/g, ' ')                 // Replace multiple spaces with single space
+    .trim()                               // Remove leading/trailing spaces
+    .split(' ')
+    .map(word => {
+        // If the whole word is already all capitals, keep it as is
+        if (word === word.toUpperCase() && word.length > 1) {
+            return word;
+        }
+        // Otherwise, convert to title case
+        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+    })
+    .join(' ');
+}
+
+export function stringToArray(str: string) {
+    return str.replace(/^\[|\]$/g, '').split(',').map(item => {
+      const trimmed = item.trim();
+      // Try to convert to number if it's numeric
+      const num = Number(trimmed);
+      return isNaN(num) ? trimmed : num;
+    });
+  }

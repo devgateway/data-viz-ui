@@ -16,7 +16,7 @@ const PageModules = lazy(() => import("./pagemodules"));
 const FeaturedTabs = lazy(() => import("./featuredtabs"));
 const VerticalFeaturedTabs = lazy(() => import("./vertical-featuredtabs"));
 const InlineList = lazy(() => import("./inlinelist"));
-const AgreeAndDownload = lazy(() => import("./agree-and-download"));
+const AgreeAndDownload = lazy(() => import("./agree-and-download/"));
 const DownloadPdf = lazy(() => import("./downloadPDF"));
 const Map = lazy(() => import("./map"));
 const DataFiltersReset = lazy(() => import("./filter-reset-button"));
@@ -87,6 +87,7 @@ export const components = {
     postsPagination: PostsPagination,
     redirect: () => null
 }
+
 
 export const customizer = {
     components: {},
