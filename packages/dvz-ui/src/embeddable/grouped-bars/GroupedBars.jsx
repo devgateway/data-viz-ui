@@ -377,7 +377,7 @@ const BarGroup = ({
             className="grouped-bar-main"
             style={{
                 flex: '0 0 140px',
-                backgroundColor: barBackgroundColor,
+                backgroundColor: (mainEntry.color || barBackgroundColor),
                 borderRadius: '8px',
                 padding: '10px',
                 display: 'flex',
