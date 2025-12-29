@@ -297,20 +297,35 @@ const FilteredPosts = (props: FilteredPostsProps) => {
 
         await getCustomPosts(args).then((response: any) => {
             if (response) {
-                const { data, meta } = response;
+                let postsData: any[] | null = null;
+                let metaData: any = null;
 
-                setPosts(data);
-                const totalPages = meta && meta['x-wp-totalpages'] ? meta['x-wp-totalpages'] : 1;
-                const totalItems = meta && meta['x-wp-total'] ? meta['x-wp-total'] : 0;
-
-                if (totalPages && totalItems) {
-                    dispatch({
-                        type: 'SET_POSTS_PAGINATION',
-                        group,
-                        totalPages: Number(totalPages),
-                        totalItems: Number(totalItems),
-                    })
+                if (response && typeof response === 'object' && 'data' in response) {
+                    postsData = response.data;
+                    metaData = response.meta;
+                } else if (Array.isArray(response)) {
+                    postsData = response;
+                } else {
+                    postsData = response;
                 }
+
+                setPosts(Array.isArray(postsData) ? postsData : []);
+
+                if (metaData) {
+                    const totalPages = metaData['x-wp-totalpages'] ? metaData['x-wp-totalpages'] : 1;
+                    const totalItems = metaData['x-wp-total'] ? metaData['x-wp-total'] : 0;
+
+                    if (totalPages && totalItems) {
+                        dispatch({
+                            type: 'SET_POSTS_PAGINATION',
+                            group,
+                            totalPages: Number(totalPages),
+                            totalItems: Number(totalItems),
+                        })
+                    }
+                }
+            } else {
+                setPosts([]);
             }
         }).finally(() => {
             setLoading(false);
