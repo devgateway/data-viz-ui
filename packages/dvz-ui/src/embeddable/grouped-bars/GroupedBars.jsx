@@ -117,6 +117,7 @@ const BarItem = ({
     barColor, 
     barBackgroundColor,
     textColor, 
+    measureTextColor,
     fontSize, 
     format, 
     labelPosition,
@@ -179,7 +180,7 @@ const BarItem = ({
                             }}
                         >
                             <span style={{ 
-                                color: "#ffffff", 
+                                color: (measureTextColor || "#ffffff"), 
                                 fontSize: "14px", 
                                 fontWeight: "500",
                                 whiteSpace: "nowrap"
@@ -246,7 +247,7 @@ const BarItem = ({
                     }}
                 >
                     <span style={{ 
-                        color: "#ffffff", 
+                        color: (measureTextColor || "#ffffff"), 
                         fontSize: "14px", 
                         fontWeight: "500",
                         whiteSpace: "nowrap"
@@ -280,6 +281,7 @@ const BarGroup = ({
     mainEntry,
     barBackgroundColor,
     textColor,
+    measureTextColor,
     fontSize,
     labelPosition,
     labelWidth,
@@ -353,9 +355,9 @@ const BarGroup = ({
                             alignItems: 'center',
                             paddingLeft: '8px',
                             paddingRight: '8px'
-                        }}
-                    >
-                        <span style={{ color: '#ffffff', fontSize: '13px', fontWeight: '500', whiteSpace: 'nowrap' }}>
+                        }}>
+                            
+                        <span style={{ color: (measureTextColor || '#ffffff'), fontSize: '13px', fontWeight: '500', whiteSpace: 'nowrap' }}>
                             {showMeasureLabels ? (
                                 <>
                                     {(entry.label || entry.name)}
@@ -388,7 +390,7 @@ const BarGroup = ({
             }}
         >
             <span style={{
-                color: textColor,
+                color: (measureTextColor || textColor),
                 fontSize: '24px',
                 fontWeight: 600,
                 lineHeight: 1,
@@ -399,7 +401,7 @@ const BarGroup = ({
                 {mainEntry.format?.suffix || ''}
             </span>
             <span style={{
-                color: textColor,
+                color: (measureTextColor || textColor),
                 fontSize: fontSize + 'px',
                 fontWeight: 500,
                 lineHeight: 1.2,
@@ -448,6 +450,7 @@ const DataFrame = (props) => {
         data,
         format,
         textColor,
+        measureTextColor,
         fontSize,
         intl,
         manualColors,
@@ -689,6 +692,7 @@ const DataFrame = (props) => {
                         mainEntry={mainEntry}
                         barBackgroundColor={barBackgroundColor}
                         textColor={textColor}
+                        measureTextColor={measureTextColor}
                         fontSize={fontSize}
                         labelPosition={labelPosition}
                         valuePosition={valuePosition}
@@ -722,6 +726,7 @@ const Chart = (props) => {
         'data-group': group,
         'data-filters': filters = '[]',
         'data-text-color': textColor = DEFAULT_TEXT_COLOR,
+        'data-measure-text-color': measureTextColorProp = '#ffffff',
         'data-back-ground-color': backgroundColor = DEFAULT_BACKGROUND_COLOR,
         'data-font-size': fontSize = DEFAULT_FONT_SIZE,
         'data-dimension1': dimension1,
@@ -812,6 +817,7 @@ const Chart = (props) => {
                             measure={selectedMeasures.length === 1 ? selectedMeasures[0]?.name : null}                           
                             fontSize={fontSize}
                             textColor={decodeValue(textColor)}
+                            measureTextColor={decodeValue(measureTextColorProp)}
                             backGroundColor={decodeValue(backgroundColor)}
                             noDataText={noDataText}
                             defaultBarColor={decodeValue(defaultBarColor)}
