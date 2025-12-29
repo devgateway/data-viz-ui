@@ -603,14 +603,25 @@ const DataFrame = (props) => {
 
     // Get bar color: prefer measure-based, then dimension-based, then default
     const getBarColor = (measureName, dimensionValue) => {
-        if (manualColors?.[app]?.measures?.[measureName]) {
-            return manualColors[app].measures[measureName];
+        const mode = props.manualColorsMode || 'dimension';
+        const appColors = manualColors?.[app] || {};
+        if (mode === 'measure') {
+            if (appColors.measures && appColors.measures[measureName]) {
+                return appColors.measures[measureName];
+            }
+            // Optional fallback to dimension color if measure not set
+            if (dimensionValue && appColors[dimensionValue]) {
+                return appColors[dimensionValue];
+            }
+            return defaultBarColor;
         }
-        if (manualColors?.[app]?.[measureName]) {
-            return manualColors[app][measureName];
+        // mode === 'dimension'
+        if (dimensionValue && appColors[dimensionValue]) {
+            return appColors[dimensionValue];
         }
-        if (dimensionValue && manualColors?.[app]?.[dimensionValue]) {
-            return manualColors[app][dimensionValue];
+        // Optional fallback to measure color if dimension not set
+        if (appColors.measures && appColors.measures[measureName]) {
+            return appColors.measures[measureName];
         }
         return defaultBarColor;
     };
@@ -731,6 +742,8 @@ const Chart = (props) => {
         "data-main-measure": mainMeasureProp,
         "data-show-measure-labels": showMeasureLabelsProp,
         "data-bar-size-use-group": barSizeUseGroupProp,
+        "data-enable-manual-colors": enableManualColorsProp,
+        "data-manual-colors-mode": manualColorsModeProp,
     } = props;
 
     
@@ -744,7 +757,7 @@ const Chart = (props) => {
     const numberFormat = createNumberFormat(formatObject);
     const parsedFilters = parseJSON(filters, editing);
     const parsedMeasures = parseJSON(measures, editing);    
-    const parsedManualColors = parseJSON(manualColors, editing);
+    const parsedManualColorsRaw = parseJSON(manualColors, editing);
 
     // Compute selected measures (names + formats) and pass to DataFrame
     const selectedMeasures = extractSelectedMeasures(parsedMeasures, numberFormat, app, (props["data-enable-custom-measure-formats"] === "true"));
@@ -761,6 +774,8 @@ const Chart = (props) => {
     const dimensions = getDimensions(dimension1);
     const effectiveBarSizeCriteria = barSizeCriteria;
     const barSizeUseGroup = barSizeUseGroupProp === "true";
+    const enableManualColors = enableManualColorsProp === "true";
+    const manualColorsMode = manualColorsModeProp || 'dimension';
 
     // interpret showMeasureLabels flag
     const showMeasureLabels = showMeasureLabelsProp === "true";
@@ -792,7 +807,8 @@ const Chart = (props) => {
                             app={app}
                             format={numberFormat}
                             dimension1={dimension1}
-                            manualColors={parsedManualColors}
+                            manualColors={enableManualColors ? parsedManualColorsRaw : {}}
+                            manualColorsMode={manualColorsMode}
                             measure={selectedMeasures.length === 1 ? selectedMeasures[0]?.name : null}                           
                             fontSize={fontSize}
                             textColor={decodeValue(textColor)}
