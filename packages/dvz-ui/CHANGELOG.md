@@ -1,5 +1,11 @@
 # @devgateway/dvz-ui-react
 
+## 1.6.1
+
+### Patch Changes
+
+- [#104](https://github.com/devgateway/data-viz-ui/pull/104) [`bc71679`](https://github.com/devgateway/data-viz-ui/commit/bc7167988dd580c9ae3ec84048c0ebe00c117575) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Fix filtered posts
+
 ## 1.6.0
 
 ### Minor Changes
