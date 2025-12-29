@@ -464,6 +464,7 @@ const DataFrame = (props) => {
         barSizeCriteria,
         selectedMeasures,
         mainMeasureName,
+        barSizeUseGroup = false,
         showMeasureLabels = false
     } = props;
 
@@ -504,7 +505,7 @@ const DataFrame = (props) => {
     // Prepare selected measures list (multi-measure support)
     const selected = (selectedMeasures && selectedMeasures.length > 0)
         ? selectedMeasures
-        : (measure ? [{ name: measure, format: format }] : []);
+        : (measureField ? [{ name: measureField, format: format }] : (measure ? [{ name: measure, format: format }] : []));
 
     // Apply sorting (support multi-measure by using first selected measure when needed)
     let dataItems;
@@ -569,6 +570,30 @@ const DataFrame = (props) => {
         0,
         ...selected.flatMap(sm => dataItems.map(item => ((item.vars && item.vars[sm.name]) ?? item[sm.name] ?? 0)))
     );
+
+    const globalTotal = Object.values(measureTotals).reduce((acc, val) => acc + val, 0);
+
+    //group totals - total of all measures, grouped by dimension
+    const groupTotals = {};
+    dataItems.forEach(item => {
+        const dimValue = item[dimensionField];
+        groupTotals[dimValue] = 0;
+        selected.forEach(sm => {
+            const v = (item.vars && item.vars[sm.name]) ?? item[sm.name] ?? 0;
+            groupTotals[dimValue] += (v || 0);
+        });
+    });
+
+    // group max across selected measures within the row
+    const groupMaxByDim = {};
+    dataItems.forEach(item => {
+        const dimValue = item[dimensionField];
+        const values = selected.map(sm => {
+            const v = (item.vars && item.vars[sm.name]) ?? item[sm.name] ?? 0;
+            return v || 0;
+        });
+        groupMaxByDim[dimValue] = values.length > 0 ? Math.max(...values) : 0;
+    });
     
 
     // Handle no data case
@@ -597,16 +622,36 @@ const DataFrame = (props) => {
 
                 // Build entries for all selected measures
                 const allEntries = selected.map(sm => {
-                    const mVal = (item.vars && item.vars[sm.name]) ?? item[sm.name] ?? 0;
+                    const rawVal = (item.vars && item.vars[sm.name]) ?? item[sm.name] ?? 0;
+                    const mVal = typeof rawVal === 'number' ? rawVal : (parseFloat(rawVal) || 0);
                     let width = 0;
                     if (barSizeCriteria === 'percentage') {
-                        const total = measureTotals[sm.name] || 0;
-                        width = total > 0 ? (mVal / total) * 100 : 0;
+                        if (selected.length > 1) {
+                            if (barSizeUseGroup) {
+                                const groupTotal = groupTotals[dimensionValue] || 0;
+                                width = groupTotal > 0 ? (mVal / groupTotal) * 100 : 0;
+                            } else {
+                                // Global percentage across all selected measures and rows
+                                const total = globalTotal || 0;
+                                width = total > 0 ? (mVal / total) * 100 : 0;
+                            }
+                        } else {
+                            // Single-measure percentage: use the measure's global total
+                            const total = measureTotals[sm.name] || 0;
+                            width = total > 0 ? (mVal / total) * 100 : 0;
+                        }
                     } else if (barSizeCriteria === 'relative_max') {
-                        width = globalMax > 0 ? (mVal / globalMax) * 100 : 0;
+                        if (selected.length > 1 && barSizeUseGroup) {
+                            const groupMax = groupMaxByDim[dimensionValue] || 0;
+                            width = groupMax > 0 ? (mVal / groupMax) * 100 : 0;
+                        } else {
+                            width = globalMax > 0 ? (mVal / globalMax) * 100 : 0;
+                        }
                     } else {
+                        // default fall-back
                         width = globalMax > 0 ? (mVal / globalMax) * 100 : 0;
                     }
+                    width = Math.max(0, Math.min(100, width));
                     const color = getBarColor(sm.name, dimensionValue);
                     return { name: sm.name, label: sm.label || sm.name, value: mVal, width, color, format: sm.format || format };
                 });
@@ -685,6 +730,7 @@ const Chart = (props) => {
         "data-bar-size-criteria": barSizeCriteria,
         "data-main-measure": mainMeasureProp,
         "data-show-measure-labels": showMeasureLabelsProp,
+        "data-bar-size-use-group": barSizeUseGroupProp,
     } = props;
 
     
@@ -713,7 +759,8 @@ const Chart = (props) => {
 
     const params = buildParams(parsedFilters, dvzProxyDatasetId);
     const dimensions = getDimensions(dimension1);
-    const effectiveBarSizeCriteria = selectedMeasures.length > 1 ? 'relative_max' : barSizeCriteria;
+    const effectiveBarSizeCriteria = barSizeCriteria;
+    const barSizeUseGroup = barSizeUseGroupProp === "true";
 
     // interpret showMeasureLabels flag
     const showMeasureLabels = showMeasureLabelsProp === "true";
@@ -762,6 +809,7 @@ const Chart = (props) => {
                             sortDirection={sortDirection}
                             topN={topN}
                             barSizeCriteria={effectiveBarSizeCriteria}
+                            barSizeUseGroup={barSizeUseGroup}
                             selectedMeasures={selectedMeasures}
                             mainMeasureName={effectiveMainMeasure}
                             showMeasureLabels={showMeasureLabels}
