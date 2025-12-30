@@ -13,6 +13,7 @@ const DEFAULT_BACKGROUND_COLOR = "none";
 const DEFAULT_FONT_SIZE = 14;
 const DEFAULT_BAR_COLOR = "#3182ce";
 const DEFAULT_BAR_BACKGROUND_COLOR = "none";
+const DEFAULT_MAIN_VALUE_FONT_SIZE = 24;
 
 const decodeValue = (value, editing) => {
     return editing ? value : decodeURIComponent(value);
@@ -283,6 +284,7 @@ const BarGroup = ({
     textColor,
     measureTextColor,
     fontSize,
+    mainValueFontSize,
     labelPosition,
     labelWidth,
     labelHeight,
@@ -316,7 +318,7 @@ const BarGroup = ({
             <div
                 className="grouped-bar-measure"
                 style={{
-                    fontSize: fontSize + 'px',
+                    fontSize: (mainValueFontSize || DEFAULT_MAIN_VALUE_FONT_SIZE) + 'px',
                     color: textColor,
                     whiteSpace: 'nowrap',
                     flex: '1',
@@ -357,7 +359,7 @@ const BarGroup = ({
                             paddingRight: '8px'
                         }}>
                             
-                        <span style={{ color: (measureTextColor || '#ffffff'), fontSize: '13px', fontWeight: '500', whiteSpace: 'nowrap' }}>
+                        <span style={{ color: (measureTextColor || '#ffffff'), fontSize: (isSingleMeasure ? (mainValueFontSize || DEFAULT_MAIN_VALUE_FONT_SIZE) : 13) + 'px', fontWeight: '500', whiteSpace: 'nowrap' }}>
                             {showMeasureLabels ? (
                                 <>
                                     {(entry.label || entry.name)}
@@ -391,7 +393,7 @@ const BarGroup = ({
         >
             <span style={{
                 color: (measureTextColor || textColor),
-                fontSize: '24px',
+                fontSize: (mainValueFontSize || DEFAULT_MAIN_VALUE_FONT_SIZE) + 'px',
                 fontWeight: 600,
                 lineHeight: 1,
                 whiteSpace: 'nowrap'
@@ -452,6 +454,7 @@ const DataFrame = (props) => {
         textColor,
         measureTextColor,
         fontSize,
+        mainValueFontSize,
         intl,
         manualColors,
         defaultBarColor,
@@ -694,6 +697,7 @@ const DataFrame = (props) => {
                         textColor={textColor}
                         measureTextColor={measureTextColor}
                         fontSize={fontSize}
+                        mainValueFontSize={mainValueFontSize}
                         labelPosition={labelPosition}
                         valuePosition={valuePosition}
                         format={format}
@@ -749,6 +753,7 @@ const Chart = (props) => {
         "data-bar-size-use-group": barSizeUseGroupProp,
         "data-enable-manual-colors": enableManualColorsProp,
         "data-manual-colors-mode": manualColorsModeProp,
+        "data-main-value-font-size": mainValueFontSizeProp,
     } = props;
 
     
@@ -781,6 +786,7 @@ const Chart = (props) => {
     const barSizeUseGroup = barSizeUseGroupProp === "true";
     const enableManualColors = enableManualColorsProp === "true";
     const manualColorsMode = manualColorsModeProp || 'dimension';
+    const mainValueFontSize = parseInt(mainValueFontSizeProp || DEFAULT_MAIN_VALUE_FONT_SIZE, 10);
 
     // interpret showMeasureLabels flag
     const showMeasureLabels = showMeasureLabelsProp === "true";
@@ -834,6 +840,7 @@ const Chart = (props) => {
                             barSizeUseGroup={barSizeUseGroup}
                             selectedMeasures={selectedMeasures}
                             mainMeasureName={effectiveMainMeasure}
+                            mainValueFontSize={mainValueFontSize}
                             showMeasureLabels={showMeasureLabels}
                             />
                     </DataConsumer>
