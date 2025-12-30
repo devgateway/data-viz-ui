@@ -359,7 +359,7 @@ const BarGroup = ({
                             paddingRight: '8px'
                         }}>
                             
-                        <span style={{ color: (measureTextColor || '#ffffff'), fontSize: (isSingleMeasure ? (mainValueFontSize || DEFAULT_MAIN_VALUE_FONT_SIZE) : 13) + 'px', fontWeight: '500', whiteSpace: 'nowrap' }}>
+                        <span style={{ color: (measureTextColor || '#ffffff'), fontSize: fontSize + 'px', fontWeight: '500', whiteSpace: 'nowrap' }}>
                             {showMeasureLabels ? (
                                 <>
                                     {(entry.label || entry.name)}
