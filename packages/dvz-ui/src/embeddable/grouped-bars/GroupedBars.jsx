@@ -56,9 +56,9 @@ const extractSelectedMeasures = (parsedMeasures, fallbackFormat, app, useCustomM
     const selected = [];
     if (!parsedMeasures) return selected;
 
-    const proxy = parsedMeasures[app];
-    if (proxy && typeof proxy === 'object') {
-        Object.entries(proxy).forEach(([name, cfg]) => {
+    const formats = parsedMeasures[app];
+    if (formats && typeof formats === 'object') {
+        Object.entries(formats).forEach(([name, cfg]) => {
             if (cfg && cfg.selected) {
                 const fmt = useCustomMeasureFormats
                     ? createNumberFormat(cfg.format || fallbackFormat)
@@ -151,7 +151,7 @@ const BarItem = ({
             <div className="grouped-bar-item" style={{ marginBottom: "10px" }}>
                 <div style={{ 
                     display: "flex", 
-                    alignItems: "flex-start",    // allow taller label without shrinking bar
+                    alignItems: "flex-start",   
                     gap: "12px"
                 }}>
                     <div className="grouped-bar-label" style={labelStyle} dangerouslySetInnerHTML={{__html: labelString}}>
@@ -165,7 +165,7 @@ const BarItem = ({
                             overflow: "hidden", 
                             position: "relative",
                             flex: "1",
-                            minWidth: 0            // allow flex container to shrink properly
+                            minWidth: 0            
                         }}
                     >
                         <div 
@@ -538,9 +538,6 @@ const DataFrame = (props) => {
     }
 
     // Apply Top N selection rules
-    // - Single measure: keep first N after current sorting (existing behavior)
-    // - Multiple measures with a main measure: select top N by main measure values, then keep current sorting among those
-    // - Multiple measures without a main measure: ignore Top N
     if (topN && !isNaN(parseInt(topN))) {
         const n = parseInt(topN);
         if (n > 0) {
@@ -557,14 +554,10 @@ const DataFrame = (props) => {
                     ranked.slice(0, n).map(item => item[dimensionField])
                 );
                 dataItems = dataItems.filter(item => allowed.has(item[dimensionField]));
-            }
-            // else: no main measure -> ignore Top N
+            }           
         }
     }
 
-    // Calculate totals and maxima for multi-measure scaling
-    const barTotal = dataItems.reduce((acc, item) => acc + (item[measureField] || 0), 0);
-    const maxMeasure = Math.max(...dataItems.map(i => i[measureField] || 0));
     const measureTotals = {};
     selected.forEach(sm => {
         measureTotals[sm.name] = dataItems.reduce((acc, item) => {
@@ -615,17 +608,17 @@ const DataFrame = (props) => {
             if (appColors.measures && appColors.measures[measureName]) {
                 return appColors.measures[measureName];
             }
-            // Optional fallback to dimension color if measure not set
+           
             if (dimensionValue && appColors[dimensionValue]) {
                 return appColors[dimensionValue];
             }
             return defaultBarColor;
         }
-        // mode === 'dimension'
+       
         if (dimensionValue && appColors[dimensionValue]) {
             return appColors[dimensionValue];
         }
-        // Optional fallback to measure color if dimension not set
+        
         if (appColors.measures && appColors.measures[measureName]) {
             return appColors.measures[measureName];
         }
@@ -635,9 +628,7 @@ const DataFrame = (props) => {
     return (
         <div className="grouped-bars-data-frame">
             {dataItems.map((item, index) => {
-                const dimensionValue = item[dimensionField];
-
-                // Build entries for all selected measures
+                const dimensionValue = item[dimensionField];               
                 const allEntries = selected.map(sm => {
                     const rawVal = (item.vars && item.vars[sm.name]) ?? item[sm.name] ?? 0;
                     const mVal = typeof rawVal === 'number' ? rawVal : (parseFloat(rawVal) || 0);
@@ -647,13 +638,11 @@ const DataFrame = (props) => {
                             if (barSizeUseGroup) {
                                 const groupTotal = groupTotals[dimensionValue] || 0;
                                 width = groupTotal > 0 ? (mVal / groupTotal) * 100 : 0;
-                            } else {
-                                // Global percentage across all selected measures and rows
+                            } else {                                
                                 const total = globalTotal || 0;
                                 width = total > 0 ? (mVal / total) * 100 : 0;
                             }
-                        } else {
-                            // Single-measure percentage: use the measure's global total
+                        } else {                            
                             const total = measureTotals[sm.name] || 0;
                             width = total > 0 ? (mVal / total) * 100 : 0;
                         }
@@ -664,8 +653,7 @@ const DataFrame = (props) => {
                         } else {
                             width = globalMax > 0 ? (mVal / globalMax) * 100 : 0;
                         }
-                    } else {
-                        // default fall-back
+                    } else {                      
                         width = globalMax > 0 ? (mVal / globalMax) * 100 : 0;
                     }
                     width = Math.max(0, Math.min(100, width));
@@ -767,12 +755,9 @@ const Chart = (props) => {
     const numberFormat = createNumberFormat(formatObject);
     const parsedFilters = parseJSON(filters, editing);
     const parsedMeasures = parseJSON(measures, editing);    
-    const parsedManualColorsRaw = parseJSON(manualColors, editing);
-
-    // Compute selected measures (names + formats) and pass to DataFrame
+    const parsedManualColorsRaw = parseJSON(manualColors, editing);    
     const selectedMeasures = extractSelectedMeasures(parsedMeasures, numberFormat, app, (props["data-enable-custom-measure-formats"] === "true"));
 
-    // Determine effective main measure from WordPress block prop
     const selectedNames = selectedMeasures.map(sm => sm.name);
     const decodedMainProp = (typeof mainMeasureProp === 'string' && mainMeasureProp.length > 0) ? decodeValue(mainMeasureProp) : null;
     const normalizedMain = decodedMainProp && decodedMainProp.toLowerCase() === 'none' ? null : (decodedMainProp || null);
@@ -787,8 +772,6 @@ const Chart = (props) => {
     const enableManualColors = enableManualColorsProp === "true";
     const manualColorsMode = manualColorsModeProp || 'dimension';
     const mainValueFontSize = parseInt(mainValueFontSizeProp || DEFAULT_MAIN_VALUE_FONT_SIZE, 10);
-
-    // interpret showMeasureLabels flag
     const showMeasureLabels = showMeasureLabelsProp === "true";
 
     return (
@@ -796,9 +779,8 @@ const Chart = (props) => {
             <Container 
                 className={`chart container grouped-bars-container ${editing ? 'editing' : ''}`}
                 style={{ height: height + 'px', backgroundColor }}
-                fluid
-            >
-                {/* Main measure configured via WordPress block; no local dropdown */}
+                fluid>
+                
                 <DataProvider
                     style={{ height: `${contentHeight}px` }}
                     params={params}
