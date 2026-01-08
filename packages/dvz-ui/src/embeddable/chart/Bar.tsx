@@ -488,7 +488,7 @@ const Chart = ({
   };
 
   const createHighLowLine = (data) => {
-    const { yScale, bars } = data;
+    const { yScale, xScale, bars } = data;
 
     return (
       <Fragment>
@@ -511,36 +511,71 @@ const Chart = ({
               confidenceInterval.low &&
               confidenceInterval.high
             ) {
-              const low = yScale(parseFloat(confidenceInterval.low));
-              const high = yScale(parseFloat(confidenceInterval.high));
-              return (
-                <g>
-                  <line
-                    y1={low}
-                    y2={high}
-                    x1={bar.x + bar.width / 2}
-                    x2={bar.x + bar.width / 2}
-                    strokeWidth={1}
-                    stroke={ZERO_LINE_COLOR}
-                  />
-                  <line
-                    y1={low}
-                    y2={low}
-                    x1={bar.x + bar.width / 2 - 3}
-                    x2={bar.x + bar.width / 2 + 3}
-                    strokeWidth={1}
-                    stroke={ZERO_LINE_COLOR}
-                  />
-                  <line
-                    y1={high}
-                    y2={high}
-                    x1={bar.x + bar.width / 2 - 3}
-                    x2={bar.x + bar.width / 2 + 3}
-                    strokeWidth={1}
-                    stroke={ZERO_LINE_COLOR}
-                  />
-                </g>
-              );
+              if (layout === "horizontal") {
+                // For horizontal layout, use xScale for the confidence interval values
+                const low = xScale(parseFloat(confidenceInterval.low));
+                const high = xScale(parseFloat(confidenceInterval.high));
+                return (
+                  <g>
+                    <line
+                      x1={low}
+                      x2={high}
+                      y1={bar.y + bar.height / 2}
+                      y2={bar.y + bar.height / 2}
+                      strokeWidth={1}
+                      stroke={ZERO_LINE_COLOR}
+                    />
+                    <line
+                      x1={low}
+                      x2={low}
+                      y1={bar.y + bar.height / 2 - 3}
+                      y2={bar.y + bar.height / 2 + 3}
+                      strokeWidth={1}
+                      stroke={ZERO_LINE_COLOR}
+                    />
+                    <line
+                      x1={high}
+                      x2={high}
+                      y1={bar.y + bar.height / 2 - 3}
+                      y2={bar.y + bar.height / 2 + 3}
+                      strokeWidth={1}
+                      stroke={ZERO_LINE_COLOR}
+                    />
+                  </g>
+                );
+              } else {
+                // For vertical layout, use yScale
+                const low = yScale(parseFloat(confidenceInterval.low));
+                const high = yScale(parseFloat(confidenceInterval.high));
+                return (
+                  <g>
+                    <line
+                      y1={low}
+                      y2={high}
+                      x1={bar.x + bar.width / 2}
+                      x2={bar.x + bar.width / 2}
+                      strokeWidth={1}
+                      stroke={ZERO_LINE_COLOR}
+                    />
+                    <line
+                      y1={low}
+                      y2={low}
+                      x1={bar.x + bar.width / 2 - 3}
+                      x2={bar.x + bar.width / 2 + 3}
+                      strokeWidth={1}
+                      stroke={ZERO_LINE_COLOR}
+                    />
+                    <line
+                      y1={high}
+                      y2={high}
+                      x1={bar.x + bar.width / 2 - 3}
+                      x2={bar.x + bar.width / 2 + 3}
+                      strokeWidth={1}
+                      stroke={ZERO_LINE_COLOR}
+                    />
+                  </g>
+                );
+              }
             }
           })}
       </Fragment>
