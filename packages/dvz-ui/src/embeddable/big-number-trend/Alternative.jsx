@@ -45,7 +45,7 @@ const Chart = (props) => {
         "data-icon-down": iconDown = "",
         'data-show-tooltip': showTooltip = 'false',
         'data-tooltip-text': rawTooltipText = '',
-        'data-tooltip-style': tooltipStyle = 'dark'
+        'data-tooltip-style': tooltipStyle = 'light'
 
     } = props
 
