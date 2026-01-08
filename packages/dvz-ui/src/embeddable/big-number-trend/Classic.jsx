@@ -40,7 +40,9 @@ const Chart = (props) => {
         "data-no-data-text": noDataText = "-",
         "data-icon-image": iconImage = "",
         "data-icon-up": iconUp = "",
-        "data-icon-down": iconDown = ""
+        "data-icon-down": iconDown = "",
+        'data-show-tooltip': showTooltip = 'false',
+        'data-tooltip-text': rawTooltipText = ''
 
     } = props
 
@@ -132,7 +134,10 @@ const Chart = (props) => {
                         labelFontSize={labelFontSize}
                         percentFontSize={percentFontSize}
                         showPercentageChange={showPercentageChange == 'true' || showPercentageChange == true}
-                        noDataText={noDataText}>
+                        noDataText={noDataText}
+                        showTooltip={showTooltip == 'true' || showTooltip === true}
+                        tooltipText={rawTooltipText}
+                       >
                        </DataFrame>
                     </DataConsumer>
             </DataProvider>
@@ -230,8 +235,25 @@ const DataFrame = (props) => {
     }
 
 
+    const lastItem = dataItems.length > 0 ? dataItems[dataItems.length - 1] : {}
+    const currentYear = dataItems.length > 0 ? lastItem[dimensionField] : null
+    const previousYear = dataItems.length > 1 ? dataItems[dataItems.length - 2][dimensionField] : null
+    const currentValueFormatted = currentValue != null ? intl.formatNumber(format.style === 'percent' ? currentValue / 100 : currentValue, { ...format }) : null
+    const previousValueFormatted = previousValue != null ? intl.formatNumber(format.style === 'percent' ? previousValue / 100 : previousValue, { ...format }) : null
+
+    const templateContext = {
+        ...lastItem,
+        current_year: currentYear,
+        previous_year: previousYear,
+        current_value: currentValueFormatted,
+        previous_value: previousValueFormatted,
+        percent_change: percentChangeFormatted
+    }
+
+    const tooltip = (props.showTooltip && props.tooltipText) ? template(props.tooltipText, templateContext) : undefined
+
     return <div className="trend">
-           <div className="label" style={labelStyle}>{template(label, dataItems[dataItems.length - 1])}</div>
+           <div className="label" style={labelStyle}>{template(label, templateContext)}</div>
 
         <div className="number-and-icon">
             <span className="number" style={numberStyle}>{formattedNumber}</span>
@@ -245,7 +267,7 @@ const DataFrame = (props) => {
 
         </div>
         {showPercentageChange && percentChange &&
-            <div className="percentage" style={percentStyle}>{percentChangeFormatted}</div>
+            <div className="percentage" style={percentStyle} title={tooltip}>{percentChangeFormatted}</div>
         }
     </div>
 }

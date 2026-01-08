@@ -42,7 +42,9 @@ const Chart = (props) => {
 
         "data-icon-image": iconImage = "",
         "data-icon-up": iconUp = "",
-        "data-icon-down": iconDown = ""
+        "data-icon-down": iconDown = "",
+        'data-show-tooltip': showTooltip = 'false',
+        'data-tooltip-text': rawTooltipText = ''
 
     } = props
 
@@ -133,6 +135,8 @@ const Chart = (props) => {
                         percentFontSize={percentFontSize}
                         showPercentageChange={showPercentageChange == 'true' || showPercentageChange == true}
                         noDataText={noDataText}
+                        showTooltip={showTooltip == 'true' || showTooltip === true}
+                        tooltipText={decode(rawTooltipText)}
                     >
                     </DataFrame>
                 </DataConsumer>
@@ -248,6 +252,23 @@ const DataFrame = (props) => {
         color: decodeURIComponent(textColor), fontSize: labelFontSize + 'px'
     }
 
+    const lastItem = dataItems.length > 0 ? dataItems[dataItems.length - 1] : {}
+    const currentYear = dataItems.length > 0 ? lastItem[dimensionField] : null
+    const previousYear = dataItems.length > 1 ? dataItems[dataItems.length - 2][dimensionField] : null
+    const currentValueFormatted = currentValue != null ? intl.formatNumber(format.style === 'percent' ? currentValue / 100 : currentValue, { ...format }) : null
+    const previousValueFormatted = previousValue != null ? intl.formatNumber(format.style === 'percent' ? previousValue / 100 : previousValue, { ...format }) : null
+
+    const templateContext = {
+        ...lastItem,
+        current_year: currentYear,
+        previous_year: previousYear,
+        current_value: currentValueFormatted,
+        previous_value: previousValueFormatted,
+        percent_change: percentChangeFormatted
+    }
+
+    const tooltip = (props.showTooltip && props.tooltipText) ? template(props.tooltipText, templateContext) : undefined
+
     return <Grid padded={true}>
         <Grid.Row>
             <Grid.Column width={4}>
@@ -260,7 +281,7 @@ const DataFrame = (props) => {
                 <img className={`icon up ${percentChange < 0 ? 'visible' : 'hidden'}`} s src={props.iconDown}></img>
 
                 {showPercentageChange && percentChange &&
-                    <div className="percentage" style={percentStyle}> {percentChange > 0 ? '+' : ''}
+                    <div className="percentage" style={percentStyle} title={tooltip}> {percentChange > 0 ? '+' : ''}
                         {percentChange == 0 ? '=' : ''}{percentChangeFormatted}</div>}
             </Grid.Column>
 
@@ -273,7 +294,7 @@ const DataFrame = (props) => {
         </Grid.Row>
         <Grid.Row>
             <Grid.Column>
-                <div className="label" style={labelStyle}>{template(label, dataItems[dataItems.length - 1])}</div>
+                <div className="label" style={labelStyle}>{template(label, templateContext)}</div>
             </Grid.Column>
         </Grid.Row>
 
