@@ -1,5 +1,5 @@
 import React, {useRef, useState} from "react";
-import {Container, Grid} from "semantic-ui-react";
+import {Container, Grid, Popup} from "semantic-ui-react";
 import DataProvider from "../data/DataProvider.jsx";
 import DataConsumer from "../data/DataConsumer.jsx";
 import {PostContent} from "@devgateway/wp-react-lib";
@@ -42,7 +42,8 @@ const Chart = (props) => {
         "data-icon-up": iconUp = "",
         "data-icon-down": iconDown = "",
         'data-show-tooltip': showTooltip = 'false',
-        'data-tooltip-text': rawTooltipText = ''
+        'data-tooltip-text': rawTooltipText = '',
+        'data-tooltip-style': tooltipStyle = 'dark'
 
     } = props
 
@@ -137,6 +138,7 @@ const Chart = (props) => {
                         noDataText={noDataText}
                         showTooltip={showTooltip == 'true' || showTooltip === true}
                         tooltipText={rawTooltipText}
+                        tooltipStyle={tooltipStyle}
                        >
                        </DataFrame>
                     </DataConsumer>
@@ -266,9 +268,19 @@ const DataFrame = (props) => {
 
 
         </div>
-        {showPercentageChange && percentChange &&
-            <div className="percentage" style={percentStyle} title={tooltip}>{percentChangeFormatted}</div>
-        }
+        {showPercentageChange && percentChange && (
+            props.showTooltip && tooltip ? (
+                <Popup
+                    content={tooltip}
+                    position="top center"
+                    inverted={props.tooltipStyle === 'dark'}
+                    size="small"
+                    trigger={<div className="percentage" style={percentStyle}>{percentChangeFormatted}</div>}
+                />
+            ) : (
+                <div className="percentage" style={percentStyle}>{percentChangeFormatted}</div>
+            )
+        )}
     </div>
 }
 
