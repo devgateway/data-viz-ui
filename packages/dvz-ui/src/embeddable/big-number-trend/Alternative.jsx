@@ -1,5 +1,5 @@
 import React, {useRef, useState} from "react";
-import {Container, Grid, GridColumn} from "semantic-ui-react";
+import {Container, Grid, GridColumn, Popup} from "semantic-ui-react";
 import DataProvider from "../data/DataProvider.jsx";
 import DataConsumer from "../data/DataConsumer.jsx";
 import {PostContent} from "@devgateway/wp-react-lib";
@@ -44,7 +44,8 @@ const Chart = (props) => {
         "data-icon-up": iconUp = "",
         "data-icon-down": iconDown = "",
         'data-show-tooltip': showTooltip = 'false',
-        'data-tooltip-text': rawTooltipText = ''
+        'data-tooltip-text': rawTooltipText = '',
+        'data-tooltip-style': tooltipStyle = 'dark'
 
     } = props
 
@@ -137,6 +138,7 @@ const Chart = (props) => {
                         noDataText={noDataText}
                         showTooltip={showTooltip == 'true' || showTooltip === true}
                         tooltipText={decode(rawTooltipText)}
+                        tooltipStyle={tooltipStyle}
                     >
                     </DataFrame>
                 </DataConsumer>
@@ -280,9 +282,19 @@ const DataFrame = (props) => {
                 <img className={`icon up ${percentChange > 0 ? 'visible' : 'hidden'}`} src={props.iconUp}></img>
                 <img className={`icon up ${percentChange < 0 ? 'visible' : 'hidden'}`} s src={props.iconDown}></img>
 
-                {showPercentageChange && percentChange &&
-                    <div className="percentage" style={percentStyle} title={tooltip}> {percentChange > 0 ? '+' : ''}
-                        {percentChange == 0 ? '=' : ''}{percentChangeFormatted}</div>}
+                {showPercentageChange && percentChange && (
+                    props.showTooltip && tooltip ? (
+                        <Popup
+                            content={tooltip}
+                            position="top center"
+                            inverted={props.tooltipStyle === 'dark'}
+                            size="small"
+                            trigger={<div className="percentage" style={percentStyle}> {percentChange > 0 ? '+' : ''}{percentChange == 0 ? '=' : ''}{percentChangeFormatted}</div>}
+                        />
+                    ) : (
+                        <div className="percentage" style={percentStyle}> {percentChange > 0 ? '+' : ''}{percentChange == 0 ? '=' : ''}{percentChangeFormatted}</div>
+                    )
+                )}
             </Grid.Column>
 
         </Grid.Row>
