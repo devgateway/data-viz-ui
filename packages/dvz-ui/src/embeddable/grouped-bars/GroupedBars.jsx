@@ -111,6 +111,52 @@ const getDimensions = (dimension1) => {
     return dimensions;
 };
 
+// Reusable content for rendering zero-width bars with a thin line and optional text
+const ZeroBarContent = ({
+    lineColor,
+    textColor = '#ffffff',
+    fontSizePx = '14px',
+    showLabel = false,
+    label = '',
+    showValue = false,
+    valueString = ''
+}) => {
+    return (
+        <div style={{ display: 'flex', alignItems: 'center', height: '100%' }}>
+            <div
+                className="grouped-bar-zero-line"
+                style={{
+                    width: '2px',
+                    backgroundColor: lineColor,
+                    height: '100%'
+                }}
+            />
+            {showLabel && (
+                <span style={{
+                    color: textColor,
+                    fontSize: fontSizePx,
+                    fontWeight: '500',
+                    whiteSpace: 'nowrap',
+                    marginLeft: '8px'
+                }}>
+                    {label}
+                </span>
+            )}
+            {showValue && (
+                <span style={{
+                    color: textColor,
+                    fontSize: fontSizePx,
+                    fontWeight: '500',
+                    whiteSpace: 'nowrap',
+                    marginLeft: showLabel ? '6px' : '8px'
+                }}>
+                    {valueString}
+                </span>
+            )}
+        </div>
+    );
+};
+
 const BarItem = ({ 
     dimensionValue, 
     measureValue, 
@@ -194,27 +240,14 @@ const BarItem = ({
                                 </span>
                             </div>
                         ) : (
-                            <div style={{ display: 'flex', alignItems: 'center', height: '100%' }}>
-                                <div
-                                    className="grouped-bar-zero-line"
-                                    style={{
-                                        width: '2px',
-                                        backgroundColor: barColor,
-                                        height: '100%'
-                                    }}
-                                />
-                                {valuePosition === 'bar' && (
-                                    <span style={{ 
-                                        color: (measureTextColor || '#ffffff'), 
-                                        fontSize: '14px', 
-                                        fontWeight: '500', 
-                                        whiteSpace: 'nowrap', 
-                                        marginLeft: '8px' 
-                                    }}>
-                                        {format.prefix}{new Intl.NumberFormat(intl.locale, format).format(measureValue)}{format.suffix}
-                                    </span>
-                                )}
-                            </div>
+                            <ZeroBarContent
+                                lineColor={barColor}
+                                textColor={measureTextColor || '#ffffff'}
+                                fontSizePx={'14px'}
+                                showLabel={false}
+                                showValue={valuePosition === 'bar'}
+                                valueString={`${format.prefix}${new Intl.NumberFormat(intl.locale, format).format(measureValue)}${format.suffix}`}
+                            />
                         )}
                     </div>
                 </div>
@@ -285,27 +318,14 @@ const BarItem = ({
                         </span>
                     </div>
                 ) : (
-                    <div style={{ display: 'flex', alignItems: 'center', height: '100%' }}>
-                        <div
-                            className="grouped-bar-zero-line"
-                            style={{
-                                width: '2px',
-                                backgroundColor: barColor,
-                                height: '100%'
-                            }}
-                        />
-                        {valuePosition === 'bar' && (
-                            <span style={{ 
-                                color: (measureTextColor || '#ffffff'), 
-                                fontSize: '14px', 
-                                fontWeight: '500', 
-                                whiteSpace: 'nowrap', 
-                                marginLeft: '8px' 
-                            }}>
-                                {format.prefix}{new Intl.NumberFormat(intl.locale, format).format(measureValue)}{format.suffix}
-                            </span>
-                        )}
-                    </div>
+                    <ZeroBarContent
+                        lineColor={barColor}
+                        textColor={measureTextColor || '#ffffff'}
+                        fontSizePx={'14px'}
+                        showLabel={false}
+                        showValue={valuePosition === 'bar'}
+                        valueString={`${format.prefix}${new Intl.NumberFormat(intl.locale, format).format(measureValue)}${format.suffix}`}
+                    />
                 )}
             </div>
         </div>
@@ -421,24 +441,15 @@ const BarGroup = ({
                             </span>
                         </div>
                     ) : (
-                        <div style={{ display: 'flex', alignItems: 'center', height: '100%' }}>
-                            <div
-                                className="grouped-bar-zero-line"
-                                style={{
-                                    width: '2px',
-                                    backgroundColor: entry.color,
-                                    height: '100%'
-                                }}
-                            />
-                            {showMeasureLabels && (
-                                <span style={{ color: (measureTextColor || '#ffffff'), fontSize: fontSize + 'px', fontWeight: '500', whiteSpace: 'nowrap', marginLeft: '8px' }}>
-                                    {(entry.label || entry.name)}
-                                </span>
-                            )}
-                            <span style={{ color: (measureTextColor || '#ffffff'), fontSize: fontSize + 'px', fontWeight: '500', whiteSpace: 'nowrap', marginLeft: showMeasureLabels ? '6px' : '8px' }}>
-                                {entry.format?.prefix || ''}{new Intl.NumberFormat(intl.locale, entry.format || format).format(entry.value)}{entry.format?.suffix || ''}
-                            </span>
-                        </div>
+                        <ZeroBarContent
+                            lineColor={entry.color}
+                            textColor={measureTextColor || '#ffffff'}
+                            fontSizePx={fontSize + 'px'}
+                            showLabel={!!showMeasureLabels}
+                            label={(entry.label || entry.name)}
+                            showValue={true}
+                            valueString={`${entry.format?.prefix || ''}${new Intl.NumberFormat(intl.locale, entry.format || format).format(entry.value)}${entry.format?.suffix || ''}`}
+                        />
                     )}
                 </div>
             ))}
