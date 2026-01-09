@@ -410,7 +410,7 @@ const Header = ({ intl, settings }) => {
                                         <img
                                             className="brand logo small"
                                             size="small"
-                                            src="/TCDI-Icon-small_02.png"
+                                            src="/wp-media/TCDI-Icon-small_02.png"
                                         />
                                     )}
                                 </a>
