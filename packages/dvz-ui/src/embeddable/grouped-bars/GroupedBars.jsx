@@ -706,15 +706,33 @@ const DataFrame = (props) => {
         return defaultBarColor;
     };
 
-    // Compute dynamic height based on number of visualized rows and entries
-    const rowCount = dataItems.length;
-    const entriesPerRow = selected.length;
+    // Compute dynamic height based on ACTUAL entries rendered per row
     const barHeight = 28; // px per bar row
-    const labelBlockHeight = 6 + (labelPosition === 'left' ? 0 : 6); // rough padding
-    const perRowHeight = (labelPosition === 'left')
-        ? Math.max(barHeight, labelHeight ? parseInt(labelHeight, 10) || 0 : barHeight) + 12
-        : (barHeight * Math.max(1, entriesPerRow)) + 12 + labelBlockHeight;
-    const computedHeight = (rowCount * perRowHeight) + 40; // bottom padding
+    const gapBetweenBars = 6; // matches barsStack gap
+    const labelBlockHeight = 6 + (labelPosition === 'left' ? 0 : 6); // rough padding for top label
+    const parsedLabelHeight = labelHeight ? (parseInt(labelHeight, 10) || 0) : 0;
+
+    const countDisplayedEntriesForRow = (item) => {
+        if (props.showZeroNullMeasures) return selected.length;
+        let count = 0;
+        selected.forEach(sm => {
+            const rawVal = (item.vars && item.vars[sm.name]) ?? item[sm.name] ?? null;
+            const mVal = typeof rawVal === 'number' ? rawVal : (rawVal != null ? parseFloat(rawVal) : null);
+            if (mVal != null && mVal !== 0) count++;
+        });
+        return count;
+    };
+
+    let totalRowsHeight = 0;
+    dataItems.forEach(item => {
+        const perRowBars = Math.max(1, countDisplayedEntriesForRow(item));
+        const barsStackHeight = (barHeight * perRowBars) + (gapBetweenBars * Math.max(0, perRowBars - 1));
+        const perRowHeight = (labelPosition === 'left')
+            ? Math.max(barsStackHeight, parsedLabelHeight) + 12
+            : barsStackHeight + 12 + labelBlockHeight;
+        totalRowsHeight += perRowHeight;
+    });
+    const computedHeight = totalRowsHeight + 40; // bottom padding
     if (typeof onHeightChange === 'function') {
         onHeightChange(computedHeight);
     }
