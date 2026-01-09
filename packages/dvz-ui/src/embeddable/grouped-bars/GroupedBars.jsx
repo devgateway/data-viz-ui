@@ -44,8 +44,8 @@ const createNumberFormat = (formatObject) => {
         style: formatObject.style === 'compacted' ? 'decimal' : formatObject.style,
         notation: formatObject.style === 'compacted' ? 'compact' : 'standard',
         currency: formatObject.currency,
-        minimumFractionDigits: parseInt(formatObject.minimumFractionDigits),
-        maximumFractionDigits: parseInt(formatObject.maximumFractionDigits),
+        minimumFractionDigits: parseInt(formatObject.minimumFractionDigits, 10),
+        maximumFractionDigits: parseInt(formatObject.maximumFractionDigits, 10),
         prefix: formatObject.prefix || '',
         suffix: formatObject.suffix || ''
     };
@@ -111,6 +111,52 @@ const getDimensions = (dimension1) => {
     return dimensions;
 };
 
+// Reusable content for rendering zero-width bars with a thin line and optional text
+const ZeroBarContent = ({
+    lineColor,
+    textColor = '#ffffff',
+    fontSizePx = '14px',
+    showLabel = false,
+    label = '',
+    showValue = false,
+    valueString = ''
+}) => {
+    return (
+        <div style={{ display: 'flex', alignItems: 'center', height: '100%' }}>
+            <div
+                className="grouped-bar-zero-line"
+                style={{
+                    width: '2px',
+                    backgroundColor: lineColor,
+                    height: '100%'
+                }}
+            />
+            {showLabel && (
+                <span style={{
+                    color: textColor,
+                    fontSize: fontSizePx,
+                    fontWeight: '500',
+                    whiteSpace: 'nowrap',
+                    marginLeft: '8px'
+                }}>
+                    {label}
+                </span>
+            )}
+            {showValue && (
+                <span style={{
+                    color: textColor,
+                    fontSize: fontSizePx,
+                    fontWeight: '500',
+                    whiteSpace: 'nowrap',
+                    marginLeft: showLabel ? '6px' : '8px'
+                }}>
+                    {valueString}
+                </span>
+            )}
+        </div>
+    );
+};
+
 const BarItem = ({ 
     dimensionValue, 
     measureValue, 
@@ -168,30 +214,41 @@ const BarItem = ({
                             minWidth: 0            
                         }}
                     >
-                        <div 
-                            className="grouped-bar-bar" 
-                            style={{ 
-                                width: barWidth + '%', 
-                                backgroundColor: barColor, 
-                                height: "100%", 
-                                display: "flex", 
-                                alignItems: "center", 
-                                paddingLeft: "8px",
-                                paddingRight: "8px"
-                            }}
-                        >
-                            <span style={{ 
-                                color: (measureTextColor || "#ffffff"), 
-                                fontSize: "14px", 
-                                fontWeight: "500",
-                                whiteSpace: "nowrap"
-                            }}>
-                                {valuePosition === 'bar' 
-                                    ? `${format.prefix}${new Intl.NumberFormat(intl.locale, format).format(measureValue)}${format.suffix}`
-                                    : `${barWidth.toFixed(1)}%`
-                                }
-                            </span>
-                        </div>
+                        {barWidth > 0 ? (
+                            <div 
+                                className="grouped-bar-bar" 
+                                style={{ 
+                                    width: barWidth + '%', 
+                                    backgroundColor: barColor, 
+                                    height: "100%", 
+                                    display: "flex", 
+                                    alignItems: "center", 
+                                    paddingLeft: "8px",
+                                    paddingRight: "8px"
+                                }}
+                            >
+                                <span style={{ 
+                                    color: (measureTextColor || "#ffffff"), 
+                                    fontSize: "14px", 
+                                    fontWeight: "500",
+                                    whiteSpace: "nowrap"
+                                }}>
+                                    {valuePosition === 'bar' 
+                                        ? `${format.prefix}${new Intl.NumberFormat(intl.locale, format).format(measureValue)}${format.suffix}`
+                                        : `${barWidth.toFixed(1)}%`
+                                    }
+                                </span>
+                            </div>
+                        ) : (
+                            <ZeroBarContent
+                                lineColor={barColor}
+                                textColor={measureTextColor || '#ffffff'}
+                                fontSizePx={'14px'}
+                                showLabel={false}
+                                showValue={valuePosition === 'bar'}
+                                valueString={`${format.prefix}${new Intl.NumberFormat(intl.locale, format).format(measureValue)}${format.suffix}`}
+                            />
+                        )}
                     </div>
                 </div>
             </div>
@@ -235,30 +292,41 @@ const BarItem = ({
                     position: "relative" 
                 }}
             >
-                <div 
-                    className="grouped-bar-bar" 
-                    style={{ 
-                        width: barWidth + '%', 
-                        backgroundColor: barColor, 
-                        height: "100%", 
-                        display: "flex", 
-                        alignItems: "center", 
-                        paddingLeft: "8px",
-                        paddingRight: "8px"
-                    }}
-                >
-                    <span style={{ 
-                        color: (measureTextColor || "#ffffff"), 
-                        fontSize: "14px", 
-                        fontWeight: "500",
-                        whiteSpace: "nowrap"
-                    }}>
-                        {valuePosition === 'bar' 
-                            ? `${format.prefix}${new Intl.NumberFormat(intl.locale, format).format(measureValue)}${format.suffix}`
-                            : `${barWidth.toFixed(1)}%`
-                        }
-                    </span>
-                </div>
+                {barWidth > 0 ? (
+                    <div 
+                        className="grouped-bar-bar" 
+                        style={{ 
+                            width: barWidth + '%', 
+                            backgroundColor: barColor, 
+                            height: "100%", 
+                            display: "flex", 
+                            alignItems: "center", 
+                            paddingLeft: "8px",
+                            paddingRight: "8px"
+                        }}
+                    >
+                        <span style={{ 
+                            color: (measureTextColor || "#ffffff"), 
+                            fontSize: "14px", 
+                            fontWeight: "500",
+                            whiteSpace: "nowrap"
+                        }}>
+                            {valuePosition === 'bar' 
+                                ? `${format.prefix}${new Intl.NumberFormat(intl.locale, format).format(measureValue)}${format.suffix}`
+                                : `${barWidth.toFixed(1)}%`
+                            }
+                        </span>
+                    </div>
+                ) : (
+                    <ZeroBarContent
+                        lineColor={barColor}
+                        textColor={measureTextColor || '#ffffff'}
+                        fontSizePx={'14px'}
+                        showLabel={false}
+                        showValue={valuePosition === 'bar'}
+                        valueString={`${format.prefix}${new Intl.NumberFormat(intl.locale, format).format(measureValue)}${format.suffix}`}
+                    />
+                )}
             </div>
         </div>
     );
@@ -347,30 +415,42 @@ const BarGroup = ({
                         alignItems: 'center'
                     }}
                 >
-                    <div
-                        className="grouped-bar-bar"
-                        style={{
-                            width: entry.width + '%',
-                            backgroundColor: entry.color,
-                            height: '100%',
-                            display: 'flex',
-                            alignItems: 'center',
-                            paddingLeft: '8px',
-                            paddingRight: '8px'
-                        }}>
-                            
-                        <span style={{ color: (measureTextColor || '#ffffff'), fontSize: fontSize + 'px', fontWeight: '500', whiteSpace: 'nowrap' }}>
-                            {showMeasureLabels ? (
-                                <>
-                                    {(entry.label || entry.name)}
-                                    {((entry.label && entry.label !== entry.name) ? ' ' : ': ')}
-                                </>
-                            ) : null}
-                            {valuePosition === 'bar'
-                                ? `${entry.format?.prefix || ''}${new Intl.NumberFormat(intl.locale, entry.format || format).format(entry.value)}${entry.format?.suffix || ''}`
-                                : `${(entry.width || 0).toFixed(1)}%`}
-                        </span>
-                    </div>
+                    {entry.width > 0 ? (
+                        <div
+                            className="grouped-bar-bar"
+                            style={{
+                                width: entry.width + '%',
+                                backgroundColor: entry.color,
+                                height: '100%',
+                                display: 'flex',
+                                alignItems: 'center',
+                                paddingLeft: '8px',
+                                paddingRight: '8px'
+                            }}>
+                                
+                            <span style={{ color: (measureTextColor || '#ffffff'), fontSize: fontSize + 'px', fontWeight: '500', whiteSpace: 'nowrap' }}>
+                                {showMeasureLabels ? (
+                                    <>
+                                        {(entry.label || entry.name)}
+                                        {((entry.label && entry.label !== entry.name) ? ' ' : ': ')}
+                                    </>
+                                ) : null}
+                                {valuePosition === 'bar'
+                                    ? `${entry.format?.prefix || ''}${new Intl.NumberFormat(intl.locale, entry.format || format).format(entry.value)}${entry.format?.suffix || ''}`
+                                    : `${(entry.width || 0).toFixed(1)}%`}
+                            </span>
+                        </div>
+                    ) : (
+                        <ZeroBarContent
+                            lineColor={entry.color}
+                            textColor={measureTextColor || '#ffffff'}
+                            fontSizePx={fontSize + 'px'}
+                            showLabel={!!showMeasureLabels}
+                            label={(entry.label || entry.name)}
+                            showValue={true}
+                            valueString={`${entry.format?.prefix || ''}${new Intl.NumberFormat(intl.locale, entry.format || format).format(entry.value)}${entry.format?.suffix || ''}`}
+                        />
+                    )}
                 </div>
             ))}
         </div>
@@ -471,9 +551,13 @@ const DataFrame = (props) => {
         selectedMeasures,
         mainMeasureName,
         barSizeUseGroup = false,
-        showMeasureLabels = false
+        showMeasureLabels = false,
+        onHeightChange
     } = props;
 
+    // Debounced height update guard to avoid render loops
+    const heightUpdateRef = useRef({ last: null, timer: null });
+    
     
     const processData = () => {
         if (!data) return { dataItems: [], measureField: null, dimensionField: null };
@@ -625,45 +709,102 @@ const DataFrame = (props) => {
         return defaultBarColor;
     };
 
+    // Compute dynamic height based on ACTUAL entries rendered per row
+    const barHeight = 28; // px per bar row
+    const gapBetweenBars = 6; // matches barsStack gap
+    const labelBlockHeight = 6 + (labelPosition === 'left' ? 0 : 6); // rough padding for top label
+    const parsedLabelHeight = labelHeight ? (parseInt(labelHeight, 10) || 0) : 0;
+
+    const countDisplayedEntriesForRow = (item) => {
+        if (props.showZeroNullMeasures) return selected.length;
+        let count = 0;
+        selected.forEach(sm => {
+            const rawVal = (item.vars && item.vars[sm.name]) ?? item[sm.name] ?? null;
+            const mVal = typeof rawVal === 'number' ? rawVal : (rawVal != null ? parseFloat(rawVal) : null);
+            if (mVal != null && mVal !== 0) count++;
+        });
+        return count;
+    };
+
+    let totalRowsHeight = 0;
+    dataItems.forEach(item => {
+        const perRowBars = Math.max(1, countDisplayedEntriesForRow(item));
+        const barsStackHeight = (barHeight * perRowBars) + (gapBetweenBars * Math.max(0, perRowBars - 1));
+        const perRowHeight = (labelPosition === 'left')
+            ? Math.max(barsStackHeight, parsedLabelHeight) + 12
+            : barsStackHeight + 12 + labelBlockHeight;
+        totalRowsHeight += perRowHeight;
+    });
+    const computedHeight = totalRowsHeight + 40; // bottom padding
+    if (typeof onHeightChange === 'function') {
+        const next = Math.ceil(computedHeight);
+        if (heightUpdateRef.current.timer) {
+            clearTimeout(heightUpdateRef.current.timer);
+            heightUpdateRef.current.timer = null;
+        }
+        if (heightUpdateRef.current.last !== next) {
+            heightUpdateRef.current.timer = setTimeout(() => {
+                if (heightUpdateRef.current.last !== next) {
+                    heightUpdateRef.current.last = next;
+                    onHeightChange(next);
+                }
+            }, 100);
+        }
+    }
+
     return (
         <div className="grouped-bars-data-frame">
             {dataItems.map((item, index) => {
                 const dimensionValue = item[dimensionField];               
-                const allEntries = selected.map(sm => {
-                    const rawVal = (item.vars && item.vars[sm.name]) ?? item[sm.name] ?? 0;
-                    const mVal = typeof rawVal === 'number' ? rawVal : (parseFloat(rawVal) || 0);
+                const allEntriesRaw = selected.map(sm => {
+                    const rawVal = (item.vars && item.vars[sm.name]) ?? item[sm.name] ?? null;
+                    const mVal = typeof rawVal === 'number' ? rawVal : (rawVal != null ? parseFloat(rawVal) : null);
                     let width = 0;
                     if (barSizeCriteria === 'percentage') {
                         if (selected.length > 1) {
                             if (barSizeUseGroup) {
                                 const groupTotal = groupTotals[dimensionValue] || 0;
-                                width = groupTotal > 0 ? (mVal / groupTotal) * 100 : 0;
+                                width = (groupTotal > 0 && mVal != null) ? (mVal / groupTotal) * 100 : 0;
                             } else {                                
                                 const total = globalTotal || 0;
-                                width = total > 0 ? (mVal / total) * 100 : 0;
+                                width = (total > 0 && mVal != null) ? (mVal / total) * 100 : 0;
                             }
                         } else {                            
                             const total = measureTotals[sm.name] || 0;
-                            width = total > 0 ? (mVal / total) * 100 : 0;
+                            width = (total > 0 && mVal != null) ? (mVal / total) * 100 : 0;
                         }
                     } else if (barSizeCriteria === 'relative_max') {
                         if (selected.length > 1 && barSizeUseGroup) {
                             const groupMax = groupMaxByDim[dimensionValue] || 0;
-                            width = groupMax > 0 ? (mVal / groupMax) * 100 : 0;
+                            width = (groupMax > 0 && mVal != null) ? (mVal / groupMax) * 100 : 0;
                         } else {
-                            width = globalMax > 0 ? (mVal / globalMax) * 100 : 0;
+                            width = (globalMax > 0 && mVal != null) ? (mVal / globalMax) * 100 : 0;
                         }
                     } else {                      
-                        width = globalMax > 0 ? (mVal / globalMax) * 100 : 0;
+                        width = (globalMax > 0 && mVal != null) ? (mVal / globalMax) * 100 : 0;
+                    }
+
+                    // Force absolutely zero width for zero/null values to show the zero line
+                    if (mVal == null || mVal === 0) {
+                        width = 0;
                     }
                     width = Math.max(0, Math.min(100, width));
                     const color = getBarColor(sm.name, dimensionValue);
                     return { name: sm.name, label: sm.label || sm.name, value: mVal, width, color, format: sm.format || format };
                 });
 
-                const mainEntry = mainMeasureName
-                    ? allEntries.find(e => e.name === mainMeasureName)
-                    : null;
+                // Optionally exclude measures with null or zero values from visualization
+                const allEntries = props.showZeroNullMeasures ? allEntriesRaw : allEntriesRaw.filter(e => e.value != null && e.value !== 0);
+
+                let mainEntry = null;
+                if (mainMeasureName) {
+                    const candidate = allEntries.find(e => e.name === mainMeasureName);
+                    if (props.showZeroNullMeasures) {
+                        mainEntry = candidate || null;
+                    } else {
+                        mainEntry = candidate && candidate.value != null && candidate.value !== 0 ? candidate : null;
+                    }
+                }
                 let measureEntries = mainEntry
                     ? allEntries.filter(e => e.name !== mainMeasureName)
                     : allEntries;
@@ -736,20 +877,24 @@ const Chart = (props) => {
         "data-sort-direction": sortDirection,
         "data-top-n": topN,
         "data-bar-size-criteria": barSizeCriteria,
-        "data-main-measure": mainMeasureProp,
-        "data-show-measure-labels": showMeasureLabelsProp,
-        "data-bar-size-use-group": barSizeUseGroupProp,
-        "data-enable-manual-colors": enableManualColorsProp,
-        "data-manual-colors-mode": manualColorsModeProp,
-        "data-main-value-font-size": mainValueFontSizeProp,
+        "data-main-measure": mainMeasure,
+        "data-show-measure-labels": showMeasureLabels,
+        "data-bar-size-use-group": barSizeUseGroup,
+        "data-enable-manual-colors": enableManualColors,
+        "data-manual-colors-mode": manualColorsMode,
+        "data-main-value-font-size": mainValueFontSize,
+        "data-show-zero-null-measures": showZeroNullMeasures,
     } = props;
 
     
     const ref = useRef(null);
     const [mode, setMode] = useState(editMode);
+    const [autoHeight, setAutoHeight] = useState(null);
     
     const viewMode = editing ? editMode : mode;
-    const contentHeight = editing ? height - 80 : height - 40;
+    const baseHeight = parseInt(height || 0, 10) || 0;
+    const containerHeight = Math.max(baseHeight, autoHeight || 0);
+    const contentHeight = (editing ? (containerHeight - 80) : (containerHeight - 40));
    
     const formatObject = parseJSON(format, editing);
     const numberFormat = createNumberFormat(formatObject);
@@ -759,8 +904,8 @@ const Chart = (props) => {
     const selectedMeasures = extractSelectedMeasures(parsedMeasures, numberFormat, app, (props["data-enable-custom-measure-formats"] === "true"));
 
     const selectedNames = selectedMeasures.map(sm => sm.name);
-    const decodedMainProp = (typeof mainMeasureProp === 'string' && mainMeasureProp.length > 0) ? decodeValue(mainMeasureProp) : null;
-    const normalizedMain = decodedMainProp && decodedMainProp.toLowerCase() === 'none' ? null : (decodedMainProp || null);
+    const decodedMain = (typeof mainMeasure === 'string' && mainMeasure.length > 0) ? decodeValue(mainMeasure) : null;
+    const normalizedMain = decodedMain && decodedMain.toLowerCase() === 'none' ? null : (decodedMain || null);
     const effectiveMainMeasure = selectedMeasures.length > 1
         ? (normalizedMain === null ? null : (selectedNames.includes(normalizedMain) ? normalizedMain : selectedNames[0]))
         : null;
@@ -768,17 +913,18 @@ const Chart = (props) => {
     const params = buildParams(parsedFilters, dvzProxyDatasetId);
     const dimensions = getDimensions(dimension1);
     const effectiveBarSizeCriteria = barSizeCriteria;
-    const barSizeUseGroup = barSizeUseGroupProp === "true";
-    const enableManualColors = enableManualColorsProp === "true";
-    const manualColorsMode = manualColorsModeProp || 'dimension';
-    const mainValueFontSize = parseInt(mainValueFontSizeProp || DEFAULT_MAIN_VALUE_FONT_SIZE, 10);
-    const showMeasureLabels = showMeasureLabelsProp === "true";
+    const barSizeUseGroupBool = barSizeUseGroup === "true";
+    const enableManualColorsBool = enableManualColors === "true";
+    const manualColorsModeStr = manualColorsMode || 'dimension';
+    const mainValueFontSizeNum = parseInt(mainValueFontSize || DEFAULT_MAIN_VALUE_FONT_SIZE, 10);
+    const showMeasureLabelsBool = showMeasureLabels === "true";
+    const showZeroNullMeasuresBool = showZeroNullMeasures === "true";
 
     return (
         <div ref={ref}>
             <Container 
                 className={`chart container grouped-bars-container ${editing ? 'editing' : ''}`}
-                style={{ height: height + 'px', backgroundColor }}
+                style={{ height: (containerHeight || baseHeight) + 'px', backgroundColor }}
                 fluid>
                 
                 <DataProvider
@@ -800,8 +946,8 @@ const Chart = (props) => {
                             app={app}
                             format={numberFormat}
                             dimension1={dimension1}
-                            manualColors={enableManualColors ? parsedManualColorsRaw : {}}
-                            manualColorsMode={manualColorsMode}
+                            manualColors={enableManualColorsBool ? parsedManualColorsRaw : {}}
+                            manualColorsMode={manualColorsModeStr}
                             measure={selectedMeasures.length === 1 ? selectedMeasures[0]?.name : null}                           
                             fontSize={fontSize}
                             textColor={decodeValue(textColor)}
@@ -819,11 +965,18 @@ const Chart = (props) => {
                             sortDirection={sortDirection}
                             topN={topN}
                             barSizeCriteria={effectiveBarSizeCriteria}
-                            barSizeUseGroup={barSizeUseGroup}
+                            barSizeUseGroup={barSizeUseGroupBool}
                             selectedMeasures={selectedMeasures}
                             mainMeasureName={effectiveMainMeasure}
-                            mainValueFontSize={mainValueFontSize}
-                            showMeasureLabels={showMeasureLabels}
+                            mainValueFontSize={mainValueFontSizeNum}
+                            showMeasureLabels={showMeasureLabelsBool}
+                            showZeroNullMeasures={showZeroNullMeasuresBool}
+                            onHeightChange={(h) => {
+                                if (typeof h === 'number' && h > 0) {
+                                    const clamped = Math.ceil(h);
+                                    if (clamped !== autoHeight) setAutoHeight(clamped);
+                                }
+                            }}
                             />
                     </DataConsumer>
                 </DataProvider>
