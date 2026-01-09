@@ -672,14 +672,15 @@ const Chart = ({
         {(legendPosition === "top" || legendPosition === "bottom") && (
           <div
               className={`legends container has-standard-12-font-size ${legendPosition}`}
-              style={legendPosition === "top" ? { marginTop: `${newMarginTop}px` } : legendPosition === "bottom" ? { marginBottom: `${newMarginBottom}px` } : {}}
+              style={legendPosition === "top" ? { marginTop: isMobileOrTablet && `${newMarginTop}px` } : legendPosition === "bottom" ? { marginBottom: `${newMarginBottom}px` } : {}}
             >
             <div className="legend-sections">
               <div className="title-section">{legendTitle()}</div>
               <FlexWrapDetector
                 onWrapChange={(count) => {
                   if (legendPosition === "top") {
-                    setNewMarginTop(marginTop + (count / 2) * 40);
+                    const newMarginTop = marginTop + (count / 2) * 40;
+                    setNewMarginTop(newMarginTop);
                     setWrapCount(count);
                   } else {
                     setNewMarginBottom(marginBottom + (count / 2) * 25);
