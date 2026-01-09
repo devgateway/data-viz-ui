@@ -555,6 +555,9 @@ const DataFrame = (props) => {
         onHeightChange
     } = props;
 
+    // Debounced height update guard to avoid render loops
+    const heightUpdateRef = useRef({ last: null, timer: null });
+    
     
     const processData = () => {
         if (!data) return { dataItems: [], measureField: null, dimensionField: null };
@@ -734,7 +737,19 @@ const DataFrame = (props) => {
     });
     const computedHeight = totalRowsHeight + 40; // bottom padding
     if (typeof onHeightChange === 'function') {
-        onHeightChange(computedHeight);
+        const next = Math.ceil(computedHeight);
+        if (heightUpdateRef.current.timer) {
+            clearTimeout(heightUpdateRef.current.timer);
+            heightUpdateRef.current.timer = null;
+        }
+        if (heightUpdateRef.current.last !== next) {
+            heightUpdateRef.current.timer = setTimeout(() => {
+                if (heightUpdateRef.current.last !== next) {
+                    heightUpdateRef.current.last = next;
+                    onHeightChange(next);
+                }
+            }, 100);
+        }
     }
 
     return (
