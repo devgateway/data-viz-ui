@@ -148,7 +148,7 @@ const DownloadComponent = (props) => {
                 {buttonLabel} {fileType === 'PNG' ? 'PNG' : 'JPG'}
               </Button>
               <Dropdown className={"download"} data-tooltip={decodeURIComponent(tooltip)}
-                trigger={(isCheckJPG && isCheckPNG) ?
+                trigger={(isCheckJPG || isCheckPNG) ?
                   <Icon name={"download"} className='download-icon'></Icon> : null}>
                 <Dropdown.Menu>
                   {title}
