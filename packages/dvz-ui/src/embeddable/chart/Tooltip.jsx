@@ -39,8 +39,8 @@ export const formatContent = (
     variables._value = variables[`_${variables.field}`];
   }
   //if there is a category prop in the variables and field is not defined, set field to category
-  if(!variables.field && variables.category){
-    variables.field = variables.category
+  if (!variables.field && variables.category) {
+    variables.field = variables.category;
   }
   let str = tooltipEnableMarkdown
     ? template(tooltip, variables)
@@ -64,7 +64,7 @@ const Tooltip = ({ tooltip, d, intl, tooltipEnableMarkdown }) => {
     (d.datum ? d.datum.value : null) ||
     (d.point ? d.point.data.y : null);
   if (data) {
-    
+
     let vars;
     if (data.variables) {
       vars = typeof data.variables[d.id] === 'object'
@@ -79,7 +79,7 @@ const Tooltip = ({ tooltip, d, intl, tooltipEnableMarkdown }) => {
       ...vars,
       value: current,
     };
-    
+
     if (data.measureFieldName) {
       params.populationValue =
         data.variables[data.measureFieldName + "Population"];
@@ -87,12 +87,14 @@ const Tooltip = ({ tooltip, d, intl, tooltipEnableMarkdown }) => {
     const str = formatContent(tooltip, params, intl, tooltipEnableMarkdown);
     if (tooltipEnableMarkdown) {
       return (
-        <ReactMarkdown
-          children={str}
-          remarkPlugins={[remarkGfm]}
-          rehypePlugins={[rehypeRaw]}
-          className={"chart tooltip"}
-        ></ReactMarkdown>
+        <div className={"chart tooltip"}>
+          <ReactMarkdown
+            children={str}
+            remarkPlugins={[remarkGfm]}
+            rehypePlugins={[rehypeRaw]}
+          ></ReactMarkdown>
+        </div>
+
       );
     } else {
       return (
