@@ -1528,8 +1528,9 @@ const Chart = ({
                   <div className="title-section">{legendTitle()}</div>
                   <FlexWrapDetector
                     onWrapChange={(count) => {
-                      if (legendPosition === "top") {
-                        setNewMarginTop(marginTop + (count / 2) * 40);
+                      if (legendPosition === "top" && isMobileOrTablet) {
+                        const newMarginTop = marginTop + (count / 2) * 40;
+                        setNewMarginTop(newMarginTop);
                         setWrapCount(count);
                       } else {
                         setNewMarginBottom(marginBottom + (count / 2) * 25);
