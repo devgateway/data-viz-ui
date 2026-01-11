@@ -267,13 +267,16 @@ export default (state = initialState, action) => {
 
         case SET_INITIAL_FILTER: {
             const now = Date.now();
-            const { app, group, param, value } = action;
+            const { app, group, param, value, autoApply} = action;
             //eslint-disable-next-line
 
             console.log(param);
-            return state.setIn(['filters', 'initial', app, group, param], value.length === 0 ? [Number.MIN_SAFE_INTEGER] : value)
+            return state
+                .setIn(['filters-settings', app, group, "autoApply"], autoApply)
+                .setIn(['filters', 'initial', app, group, param], value.length === 0 ? [Number.MIN_SAFE_INTEGER] : value)
                 .setIn(['filters', app, group, param], value.length === 0 ? [Number.MIN_SAFE_INTEGER] : value)
-                .setIn(['filters-settings', app, group, 'lastInitialFilterChange'], now);
+                .setIn(['filters-settings', app, group, 'lastInitialFilterChange'], now)
+                .setIn(['filters-settings', app, group, 'lastUserFilterChange'], now);
         }
 
         case CLEAN_FILTER: {
