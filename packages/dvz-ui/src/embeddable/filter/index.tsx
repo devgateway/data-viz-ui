@@ -185,7 +185,6 @@ const ListFilterDropDown = connect(
         } else {
             newValue = [value];
         }
-
         onChange({app, group, param, value: newValue, autoApply});
 
         if (closeOnSelect && refContainer.current) {
@@ -267,7 +266,7 @@ const ListFilterDropDown = connect(
                     }
                     onInit({app, group, param, value: filterValues});
                 } else {
-                    onInit({app, group, param, value: [filterItems[0]]});
+                    onInit({app, group, param, value: [filterItems[0]], autoApply});
                 }
             }
         }
