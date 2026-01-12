@@ -252,10 +252,16 @@ const Chart = ({
 
   const radarMarginVals = deviceTypeMarginValueMap();
 
+  // Reduce bottom margin when legends are at the bottom to avoid excess whitespace
+  const effectiveBottomMargin =
+    legendPosition === "bottom"
+      ? Math.min(Number(radarMarginVals.marginBottom || 0), 10)
+      : radarMarginVals.marginBottom;
+
   const margins = {
     top: radarMarginVals.marginTop,
     right: radarMarginVals.marginRight,
-    bottom: radarMarginVals.marginBottom,
+    bottom: effectiveBottomMargin,
     left: radarMarginVals.marginLeft,
   };
 
@@ -267,8 +273,9 @@ const Chart = ({
   }));
 
   return (
-    <div style={{ height }} className="radar">
-      <ResponsiveRadar
+    <div style={{ height, display: "flex", flexDirection: "column" }} className="radar">
+      <div style={{ flex: "1 1 auto", minHeight: 0 }} className="chart-area">
+        <ResponsiveRadar
         data={options.data}
         keys={applyFilter(options.keys)}
         indexBy={options.indexBy}
@@ -318,8 +325,17 @@ const Chart = ({
           "mesh",
           "annotations",
         ]}
-      />
-      <Legends
+        />
+      </div>
+      <div
+        className="legend-wrapper"
+        style={
+          legendPosition === "bottom"
+            ? { flex: "0 1 40%", overflowY: "auto", minHeight: 0 }
+            : undefined
+        }
+      >
+        <Legends
         filter={filter}
         showLegends={showLegends}
         chartLegends={chartLegends}
@@ -330,7 +346,8 @@ const Chart = ({
         legendLabelColor={legendLabelColor}
         onToggle={toggle}
         reverseLegend={reverseLegend}
-      />
+        />
+      </div>
     </div>
   );
 };
