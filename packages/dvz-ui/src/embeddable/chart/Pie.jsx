@@ -122,10 +122,12 @@ const Chart = ({
     return null;
   }
 
+  const baseBottom = newMarginBottom;
+  const enforcedBottom = showLegends && legendPosition === "bottom" ? Math.max(baseBottom, 150) : baseBottom;
   const margins = {
     top: newMarginTop,
     right: marginRight,
-    bottom: newMarginBottom,
+    bottom: enforcedBottom,
     left: marginLeft,
   };
 
@@ -381,8 +383,8 @@ const Chart = ({
                       // Dynamically reduce chart bottom margin as legends wrap
                       // Every two wraps reduce ~25px, keep at least 10px
                       const reduction = Math.ceil(count / 2) * 25;
-                      const adjustedBottom = Math.max(marginBottom - reduction, 10);
-                      setNewMarginBottom(adjustedBottom);
+                        const adjustedBottom = Math.max(marginBottom - reduction, 100);
+                        setNewMarginBottom(adjustedBottom);
                       setWrapCount(count);
                     }
                   }}

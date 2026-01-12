@@ -1022,10 +1022,14 @@ const Chart = ({
     );
   };
 
+  // Ensure sufficient bottom space when legend is rendered at the bottom
+  const baseBottom = stackedMobile ? marginBottom : newMarginBottom;
+  const effectiveBottomMargin = showLegends && legendPosition === "bottom" ? Math.max(baseBottom, 150) : baseBottom;
+
   const margins = {
     top: stackedMobile ? marginTop : newMarginTop,
     right: marginRight,
-    bottom: stackedMobile ? marginBottom : newMarginBottom,
+    bottom: effectiveBottomMargin,
     left: marginLeft,
   };
 

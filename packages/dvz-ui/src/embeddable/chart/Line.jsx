@@ -576,17 +576,20 @@ const Chart = ({
     );
   };
 
+  const baseBottom = stackedMobile ? marginBottom : newMarginBottom;
+  const effectiveBottomMargin = showLegends && legendPosition === "bottom" ? Math.max(baseBottom, 150) : baseBottom;
+
   const margins = stackedMobile
     ? {
         top: marginTop,
         right: marginRight,
-        bottom: marginBottom,
+        bottom: effectiveBottomMargin,
         left: marginLeft,
       }
     : {
         top: newMarginTop,
         right: marginRight,
-        bottom: newMarginBottom,
+        bottom: effectiveBottomMargin,
         left: marginLeft,
       };
 
