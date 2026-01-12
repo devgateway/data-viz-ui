@@ -6,9 +6,16 @@ on:
     branches:
       - main
 
-permissions: { }
+permissions:
+  contents: read
+  id-token: write
+  pull-requests: write
+  actions: write
+  checks: write
 
-concurrency: ${{ github.workflow }}-${{ github.ref }}
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   test:
