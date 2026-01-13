@@ -1259,7 +1259,7 @@ useEffect(() => {
 let newHeight = stackedMobile ? parseInt(height + '') : parseInt(height + '');
 
 return (
-  <div style={{ height: stackedMobile ? 'auto' : newHeight + "px", display: stackedMobile ? 'flex' : undefined, flexDirection: stackedMobile ? 'column' : undefined }} className="bar-chart">
+  <div style={{ height: stackedMobile && !editing ? 'auto' : newHeight + "px", display: stackedMobile ? 'flex' : undefined, flexDirection: stackedMobile ? 'column' : undefined }} className="bar-chart">
       {options?.data && options.data.length > 0 && (
         <>
           {stackedMobile && legendPosition === 'top' && (

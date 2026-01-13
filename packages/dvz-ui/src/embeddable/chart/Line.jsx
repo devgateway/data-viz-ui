@@ -612,7 +612,7 @@ const Chart = ({
   if (options?.data && hasData > 0) {
     let filteredData = applyFilter(options.data)
     return (
-      <div style={{ height: stackedMobile ? "auto" : containerHeight, position: "relative", display: stackedMobile ? "flex" : undefined, flexDirection: stackedMobile ? "column" : undefined }}>
+      <div style={{ height: stackedMobile && !editing ? "auto" : containerHeight, position: "relative", display: stackedMobile ? "flex" : undefined, flexDirection: stackedMobile ? "column" : undefined }}>
         {stackedMobile && legendPosition === "top" && (
           <div
             className={`legends container has-standard-12-font-size ${legendPosition}`}
