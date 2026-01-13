@@ -122,10 +122,12 @@ const Chart = ({
     return null;
   }
 
+  const baseBottom = newMarginBottom;
+  const enforcedBottom = showLegends && legendPosition === "bottom" ? Math.max(baseBottom, 150) : baseBottom;
   const margins = {
     top: newMarginTop,
     right: marginRight,
-    bottom: newMarginBottom,
+    bottom: enforcedBottom,
     left: marginLeft,
   };
 
@@ -286,10 +288,14 @@ const Chart = ({
   }
 
   return (
-    <div style={{ height: height }} className={"pie-chart"}>
+    <div
+      style={{ height: height, display: "flex", flexDirection: "column" }}
+      className={"pie-chart"}
+    >
       {optionsVal && optionsVal.data && optionsVal.data.length > 0 && (
         <>
-          <ResponsivePie
+          <div style={{ flex: "1 1 60%", minHeight: 0 }} className={"chart-area"}>
+            <ResponsivePie
             key={optionsVal.id}
             data={applyFilter(getData(optionsVal.data, showPercentage))}
             margin={margins}
@@ -355,10 +361,16 @@ const Chart = ({
               }
               return null;
             }}
-          />
+            />
+          </div>
           {(legendPosition === "top" || legendPosition === "bottom") && (
             <div
               className={`legends container has-standard-12-font-size ${legendPosition}`}
+              style={
+                legendPosition === "bottom"
+                  ? { flex: "0 1 40%", overflowY: "auto", minHeight: 0 }
+                  : undefined
+              }
             >
               <div className="legend-sections">
                 <div className="title-section">{legendTitle()}</div>
@@ -368,7 +380,11 @@ const Chart = ({
                       setNewMarginTop(marginTop + (count / 2) * 40);
                       setWrapCount(count);
                     } else {
-                      setNewMarginBottom(marginBottom + (count / 2) * 25);
+                      // Dynamically reduce chart bottom margin as legends wrap
+                      // Every two wraps reduce ~25px, keep at least 10px
+                      const reduction = Math.ceil(count / 2) * 25;
+                        const adjustedBottom = Math.max(marginBottom - reduction, 100);
+                        setNewMarginBottom(adjustedBottom);
                       setWrapCount(count);
                     }
                   }}

@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from "react";
+import React, { Fragment, useEffect, useRef, useState } from "react";
 import Tooltip from "./Tooltip";
 import { ResponsiveBar } from "@nivo/bar";
 import { injectIntl } from "react-intl";
@@ -182,6 +182,17 @@ const Chart = ({
   const [newMarginTop, setNewMarginTop] = useState(marginTop);
   const [wrapCount, setWrapCount] = useState(0);
   const [newMarginBottom, setNewMarginBottom] = useState(marginBottom);
+  const legendTopRef = useRef<HTMLDivElement | null>(null);
+  const legendBottomRef = useRef<HTMLDivElement | null>(null);
+  const stackedMobile = isNotDesktopPreview || isMobileOrTablet;
+
+  // Keep internal margins in sync with external props
+  useEffect(() => {
+    setNewMarginBottom(marginBottom);
+  }, [marginBottom]);
+  useEffect(() => {
+    setNewMarginTop(marginTop);
+  }, [marginTop]);
 
   const generateChartLegends = (
     options,
@@ -1011,10 +1022,14 @@ const Chart = ({
     );
   };
 
+  // Ensure sufficient bottom space when legend is rendered at the bottom
+  const baseBottom = stackedMobile ? marginBottom : newMarginBottom;
+  const effectiveBottomMargin = showLegends && legendPosition === "bottom" ? Math.max(baseBottom, 150) : baseBottom;
+
   const margins = {
-    top: newMarginTop,
+    top: stackedMobile ? marginTop : newMarginTop,
     right: marginRight,
-    bottom: newMarginBottom,
+    bottom: effectiveBottomMargin,
     left: marginLeft,
   };
 
@@ -1219,12 +1234,51 @@ const Chart = ({
     }
   }
 
-let newHeight = parseInt(height + '') - newMarginBottom;
+// Measure legend heights precisely (desktop) to avoid overlap without extra whitespace
+useEffect(() => {
+  if (legendPosition !== 'top' || stackedMobile) return;
+  const el = legendTopRef.current;
+  if (!el) return;
+  const ro = new ResizeObserver((entries) => {
+    const rect = entries[0]?.contentRect;
+    if (rect) {
+      const required = Math.ceil(rect.height) + 8; // small padding
+      setNewMarginTop(Math.max(marginTop, required));
+    }
+  });
+  ro.observe(el);
+  return () => ro.disconnect();
+}, [legendPosition, marginTop, stackedMobile]);
+
+// Do not dynamically adjust bottom margin when legend is at the bottom and static
+// This avoids whitespace and resize feedback loops
+useEffect(() => {
+  return;
+}, [legendPosition, marginBottom, stackedMobile]);
+
+let newHeight = stackedMobile ? parseInt(height + '') : parseInt(height + '');
 
 return (
-    <div style={{ height: newHeight + "px" }} className="bar-chart">
+  <div style={{ height: stackedMobile ? 'auto' : newHeight + "px", display: stackedMobile ? 'flex' : undefined, flexDirection: stackedMobile ? 'column' : undefined }} className="bar-chart">
       {options?.data && options.data.length > 0 && (
         <>
+          {stackedMobile && legendPosition === 'top' && (
+            <div className={`legends container has-standard-12-font-size ${legendPosition}`}>
+              <div className="legend-sections">
+                <div className="title-section">{legendTitle()}</div>
+                <FlexWrapDetector
+                  onWrapChange={(count) => {
+                    setWrapCount(count);
+                  }}
+                  className={`legends container has-standard-12-font-size items-section`}
+                  useColumns={showLegendsInColumns}
+                  numberOfLegendColumns={numberOfLegendColumns}
+                >
+                  {legendItems()}
+                </FlexWrapDetector>
+              </div>
+            </div>
+          )}
           <ResponsiveBar
            colorBy={colors.colorBy}
             animate={true}
@@ -1409,20 +1463,38 @@ return (
               },
             }}
           />
-          {(legendPosition === "top" || legendPosition === "bottom") && (
+          {!stackedMobile && (legendPosition === "top" || legendPosition === "bottom") && (
             <div
-              className={`legends container has-standard-12-font-size ${legendPosition}`}   >
+              ref={legendPosition === 'top' ? legendTopRef : legendBottomRef}
+              className={`legends container has-standard-12-font-size ${legendPosition}`}
+              style={
+                legendPosition === 'bottom'
+                  ? { position: 'absolute', left: margins.left, right: margins.right, bottom: 0 }
+                  : { position: 'absolute', left: margins.left, right: margins.right, top: 0 }
+              }
+            >
               <div className="legend-sections">
                 <div className="title-section">{legendTitle()}</div>
                 <FlexWrapDetector
                   onWrapChange={(count) => {
-                    if (legendPosition === "top") {
-                      setNewMarginTop(marginTop + (count / 2) * 40);
-                      setWrapCount(count);
-                    } else {
-                      setNewMarginBottom(marginBottom + (count / 2) * 25);
-                      setWrapCount(count);
-                    }
+                    setWrapCount(count);
+                  }}
+                  className={`legends container has-standard-12-font-size items-section`}
+                  useColumns={showLegendsInColumns}
+                  numberOfLegendColumns={numberOfLegendColumns}
+                >
+                  {legendItems()}
+                </FlexWrapDetector>
+              </div>
+            </div>
+          )}
+          {stackedMobile && legendPosition === 'bottom' && (
+            <div className={`legends container has-standard-12-font-size ${legendPosition}`}>
+              <div className="legend-sections">
+                <div className="title-section">{legendTitle()}</div>
+                <FlexWrapDetector
+                  onWrapChange={(count) => {
+                    setWrapCount(count);
                   }}
                   className={`legends container has-standard-12-font-size items-section`}
                   useColumns={showLegendsInColumns}
