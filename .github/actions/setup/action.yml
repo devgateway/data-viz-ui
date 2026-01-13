@@ -1,0 +1,29 @@
+name: Setup
+description: Setup Node.js and install dependencies
+
+runs:
+  using: composite
+  steps:
+    - name: Install PNPM
+      uses: pnpm/action-setup@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v6
+      with:
+        node-version: 22.x
+        cache: pnpm
+        cache-dependency-path: pnpm-lock.yaml
+        registry-url: https://registry.npmjs.org
+
+    - name: Install pnpm
+      uses: pnpm/action-setup@1e1c8eafbd745f64b1ef30a7d7ed7965034c486c
+      with:
+        cache: true
+
+    - name: Upgrade npm for OIDC support
+      run: npm install -g npm@latest
+      shell: bash
+
+    - name: Install dependencies
+      run: pnpm install --frozen-lockfile
+      shell: bash
