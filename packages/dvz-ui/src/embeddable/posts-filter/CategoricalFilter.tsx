@@ -27,6 +27,7 @@ const CategoricalFilter = (props: CategoricalFilterProps) => {
         type,
         categories,
         onChange,
+        ...restProps
     } = props;
 
     const [taxonomyOptions, setTaxonomyOptions] = useState([]);
@@ -72,7 +73,7 @@ const CategoricalFilter = (props: CategoricalFilterProps) => {
 
     return (
         <PostsFilterDropdown
-            {...props}
+            {...restProps}
             group={group}
             placeholder={placeholder}
             allLabel={allLabel}
