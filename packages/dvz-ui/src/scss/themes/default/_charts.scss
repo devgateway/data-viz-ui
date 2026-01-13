@@ -417,29 +417,15 @@
       width: 100% !important;
     }
     .legends.container.top {
-      position: static !important;
-      top: auto !important;
-      left: auto !important;
-      right: auto !important;
-      bottom: auto !important;
       .legend-sections {
         flex-direction: column;
-        transform: none !important;
+        transform: translateY(-20px);
         .legend.item {
           .legend-title {
             padding-left: 0 !important;
           }
         }
       }
-    }
-    .legends.container.bottom,
-    .legends.container.left,
-    .legends.container.right {
-      position: static !important;
-      top: auto !important;
-      left: auto !important;
-      right: auto !important;
-      bottom: auto !important;
     }
     .pie-chart {
       height: 360px !important;
@@ -470,7 +456,7 @@
     .legends.container.top {
       .legend-sections {
         flex-direction: column;
-        transform: none;
+        transform: translateY(-20px);
         .legend.item {
           .legend-title {
             padding-left: 0 !important;
@@ -480,22 +466,4 @@
     }
   }
 
-}
-
-/* Stack legends and chart vertically on tablets too */
-@media (max-width: 1024px) {
-  .chart.container {
-    .legends.container.top,
-    .legends.container.bottom,
-    .legends.container.left,
-    .legends.container.right {
-      position: static !important;
-      top: auto !important;
-      left: auto !important;
-      right: auto !important;
-      bottom: auto !important;
-      transform: none !important;
-      margin: 8px 0 !important;
-    }
-  }
 }
