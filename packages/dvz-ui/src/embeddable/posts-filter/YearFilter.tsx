@@ -27,8 +27,11 @@ const YearFilter = (props: YearFilterProps) => {
         alphabeticalSort,
         ascOrder,
         onChange,
+        yearOptions,
         setYearOptions,
-        setYearFilterLoading
+        yearFilterLoading,
+        setYearFilterLoading,
+        ...restProps
     } = props;
 
     const fetchYears = async () => {
@@ -54,7 +57,7 @@ const YearFilter = (props: YearFilterProps) => {
 
     return (
         <PostsFilterDropdown
-            {...props}
+            {...restProps}
             group={group}
             placeholder={placeholder}
             allLabel={allLabel}

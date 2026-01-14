@@ -336,7 +336,7 @@ const FilteredPosts = (props: FilteredPostsProps) => {
         (async () => {
             await getPosts();
         })();
-    }, [postsReducer, type, taxonomy, numberOfItemsPerPage, categories, sortFirstByValue, sortingTaxonomy]);
+    }, [postsReducer, type, taxonomy, numberOfItemsPerPage, categories, sortingTaxonomy]);
 
 
     return (
