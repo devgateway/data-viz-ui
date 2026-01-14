@@ -1,5 +1,12 @@
 # @devgateway/dvz-ui-react
 
+## 1.6.4
+
+### Patch Changes
+
+- [#117](https://github.com/devgateway/data-viz-ui/pull/117) [`dceb62a`](https://github.com/devgateway/data-viz-ui/commit/dceb62a3d7eabdd2937b0b8e7c7b4df4ef45f006) Thanks [@timothygachengo](https://github.com/timothygachengo)! - - Refactor posts filter components to streamline props passing
+  - Fix React Markdown to render CSS in production
+
 ## 1.6.1
 
 ### Patch Changes
