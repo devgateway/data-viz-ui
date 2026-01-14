@@ -2,6 +2,7 @@ import { Config } from '@/conf';
 import { createSlice } from '@reduxjs/toolkit';
 import { fetchBaseQuery, createApi } from '@reduxjs/toolkit/query/react';
 import * as Immutable from 'immutable';
+import { getCustomPosts } from './data-api';
 
 interface PostsState {
     posts?: any;
@@ -27,11 +28,14 @@ interface GetCustomPostsQueryArgs {
     postType?: string;
     taxonomy?: string;
     category?: string;
-    before?: Date;
+    before?: Date | null;
     perPage?: number;
     page?: number;
     locale?: string;
-    after?: Date;
+    after?: Date | null;
+    ordering?: string;
+    orderingDirection?: string;
+    taxonomyFilters?: Map<string, string[]>;
 }
 
 export const postsApi = createApi({
@@ -40,31 +44,22 @@ export const postsApi = createApi({
     refetchOnMountOrArgChange: true,
     endpoints: (builder) => ({
         getCustomPosts: builder.query({
-            query: (args: GetCustomPostsQueryArgs) => {
-                const { postType, taxonomy, category, before, perPage, page, locale, after } = args;
-                const url = `${postType}`;
-                const queryParams = new URLSearchParams();
-                if (taxonomy && category) queryParams.append(taxonomy, category);
-                if (before) queryParams.append("before", before.toISOString());
-                if (perPage) queryParams.append("per_page", perPage.toString());
-                if (page) queryParams.append("page", page.toString());
-                if (locale) queryParams.append("locale", locale);
-                if (after) queryParams.append("after", after.toISOString());
-                console.log("queryParams", queryParams.toString());
-                console.log("url", url);
-                return {
-                    url: `${url}?${queryParams.toString()}`,
-                    method: "GET",
-
+            queryFn: async (args: GetCustomPostsQueryArgs) => {
+                try {
+                    const { postType, taxonomy, category, taxonomyFilters, before, perPage, page, locale, after, ordering, orderingDirection } = args;
+                const response = await getCustomPosts({ postType, taxonomy, category, taxonomyFilters, before, perPage, page, locale, after, ordering, orderingDirection });
+                return { data: response };
+                } catch (error) {
+                    // @ts-ignore
+                    return { error: error.message };
                 }
-            },
 
-            transformResponse: (response: any) => Immutable.fromJS(response)
+            },
         }),
     }),
 });
 
-export const { useGetCustomPostsQuery } = postsApi;
+export const { useGetCustomPostsQuery, useLazyGetCustomPostsQuery } = postsApi;
 
 const postSlice = createSlice({
     name: "postsReducer",

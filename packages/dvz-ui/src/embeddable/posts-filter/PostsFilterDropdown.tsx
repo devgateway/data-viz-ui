@@ -64,7 +64,10 @@ const PostsFilterDropdown = (props: PostFilterDropdownProps) => {
         // type,
         value,
         closeOnSelect = true,
-        noneFunction
+        noneFunction,
+        alphabeticalSort,
+        ascOrder,
+        ...restProps
     } = props;
 
     const isMultiSelect = filterType === FILTER_TYPE_MULTI_SELECT;
@@ -241,7 +244,7 @@ const PostsFilterDropdown = (props: PostFilterDropdownProps) => {
     return (
         // @ts-ignore
         <Dropdown
-            {...props}
+            {...restProps}
             ref={refContainer as unknown as LegacyRef<HTMLDivElement>}
             fluid
             text={displayText}
