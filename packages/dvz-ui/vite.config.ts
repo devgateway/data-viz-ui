@@ -63,6 +63,7 @@ export default defineConfig({
                 "common.css": resolve(__dirname, 'src/scss/common.scss'),
                 "tracker/index": resolve(__dirname, 'src/tracker/index.ts'),
                 "layout/index": resolve(__dirname, 'src/layout/index.ts'),
+                "utils/index": resolve(__dirname, 'src/utils/index.ts'),
             },
             plugins: [preserveDirectives()],
             output: [
