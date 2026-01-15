@@ -1,21 +1,28 @@
 import React from 'react'
-import {connect} from 'react-redux'
-import {injectIntl} from 'react-intl';
-import {CategoriesContext} from './DataContext'
-import {getCategories} from "../reducers/data";
-import {Container, Segment} from "semantic-ui-react";
+import { connect } from 'react-redux'
+import { injectIntl } from 'react-intl';
+import { CategoriesContext } from './DataContext'
+import { getCategories, loadFilterItems } from "../reducers/data";
+import { Container, Segment } from "semantic-ui-react";
+
 
 class DataProvider extends React.Component {
 
     componentDidMount() {
-        const {categories} = this.props
+        const { categories } = this.props
         if (!categories && !this.props.loading) {
             this.props.onLoadData(this.props)
         }
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        const {app, filters, source, store, params, csv, group, editing} = this.props
+        const { app, parentSelectedItems, filters, source, store, params, csv, group, editing } = this.props
+
+        if (prevProps.parentSelectedItems && parentSelectedItems.length != prevProps.parentSelectedItems.length) {
+            this.props.onReLoadItems(this.props)
+        }
+
+
         if (filters != prevProps.filters ||
             JSON.stringify(params) != JSON.stringify(prevProps.params)
             || app != prevProps.app
@@ -23,12 +30,12 @@ class DataProvider extends React.Component {
             || csv != prevProps.csv) {
 
             if (app === "csv") {
-                this.props.onSetData({app, csv, store, params, group})
+                this.props.onSetData({ app, csv, store, params, group })
             } else {
                 if (editing) {
                     params.v = (Math.random() + 1).toString(36).substring(7)
                 }
-                this.setState({showLoading: false})
+                this.setState({ showLoading: false })
                 this.props.onLoadData(this.props)//this.props.onLoadData({app, source, store, params, group})
                 setTimeout(this.checkLoadingTime, 100);
             }
@@ -36,7 +43,7 @@ class DataProvider extends React.Component {
     }
 
     render() {
-        const {data, loading, error} = this.props
+        const { data, loading, error } = this.props
 
         if (loading) {
             return (<Container>
@@ -67,8 +74,8 @@ class DataProvider extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
-    const {app, params, dvzProxyDatasetId, uniqueStorage} = ownProps
 
+    const { app, group, type, parentType, param, parentParam, params, dvzProxyDatasetId, uniqueStorage } = ownProps
 
     const path = ['data', 'categories', app]
     if (dvzProxyDatasetId) {
@@ -78,9 +85,26 @@ const mapStateToProps = (state, ownProps) => {
         path.push(uniqueStorage)
     }
 
+    const itemsJS = state.getIn([...path, 'items'])
+    const items = itemsJS ? itemsJS.toJS() : []
+    const selectedItems = state.getIn(['data', 'filters', app, group, param])
 
+    const tmpFilterItems = items.filter(f => f.type == type)
+    const filterItems = tmpFilterItems && tmpFilterItems.length > 0 ? tmpFilterItems[0].items : []
+    const thisFilterSelection = []
 
+    let parentItems = []
+    let parentSelectedItems = []
+    if (parentType) {
+
+        parentItems = items.filter(f => f.type == parentType)
+        parentSelectedItems = state.getIn(['data', 'filters', app, group, parentParam])
+    }
     return {
+        parentSelectedItems,
+        selectedItems,
+        items,
+        parentItems,
         data: state.getIn([...path, 'items']),
         error: state.getIn([...path, 'error']),
         loading: state.getIn([...path, 'loading']),
@@ -88,7 +112,8 @@ const mapStateToProps = (state, ownProps) => {
 }
 
 const mapActionCreators = {
-    onLoadData: getCategories
+    onLoadData: getCategories,
+    onReLoadItems: loadFilterItems
 };
 
 export default connect(mapStateToProps, mapActionCreators)(injectIntl(DataProvider));
