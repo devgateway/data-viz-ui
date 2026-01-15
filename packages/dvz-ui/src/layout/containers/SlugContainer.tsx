@@ -7,7 +7,6 @@ import {
 import React from 'react'
 import { useParams } from 'react-router';
 import ResponsiveContainer from '../ResponsiveContainer';
-import { post } from '../../../../react-lib/wp-react-lib/src/api/index';
 
 interface SlugContainerProps {
     header?: React.ReactNode;

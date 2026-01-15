@@ -15,27 +15,36 @@ interface SlugPostContainerProps {
 }
 
 const SlugPostContainer = ({ header, footer, posts }: SlugPostContainerProps = {}) => {
-    const { lan: locale, slug } = useParams();
+    const { lan: locale, slug, parent, year, month, day } = useParams();
 
     if (posts) {
+        const renderedPosts = typeof posts === 'object' ? [posts] : posts;
         return (
-            <Post posts={posts} />
+            <ResponsiveContainer header={header} footer={footer}>
+                <Post posts={renderedPosts} />
+            </ResponsiveContainer>
         )
     }
 
-    <PostProvider
-        slug={slug}
-        store={slug}
-        locale={locale}
-    >
-        <ResponsiveContainer header={header} footer={footer}>
+    console.log('SlugPostContainer falling back to PostProvider');
 
-            <PostConsumer>
-                <Post />
-            </PostConsumer>
-
-        </ResponsiveContainer>
-    </PostProvider>
+    return (
+        <PostProvider
+            slug={slug}
+            store={slug}
+            locale={locale}
+            type={parent}
+            year={year}
+            month={month}
+            day={day}
+        >
+            <ResponsiveContainer header={header} footer={footer}>
+                <PostConsumer>
+                    <Post />
+                </PostConsumer>
+            </ResponsiveContainer>
+        </PostProvider>
+    )
 }
 
 export default SlugPostContainer
