@@ -1,5 +1,11 @@
 # @devgateway/dvz-ui-react
 
+## 1.6.5
+
+### Patch Changes
+
+- [#120](https://github.com/devgateway/data-viz-ui/pull/120) [`f1fe884`](https://github.com/devgateway/data-viz-ui/commit/f1fe884321c340cdb8393c4d768885a082c7aa60) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Fix posts handling in the SlugPostContainer
+
 ## 1.6.4
 
 ### Patch Changes
