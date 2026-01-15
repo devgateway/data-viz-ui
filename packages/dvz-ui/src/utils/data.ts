@@ -1,4 +1,3 @@
-import DOMPurify from 'dompurify';
 import {decode as decodeHtmlEntities} from 'html-entities';
 
 // Utility functions to safely convert props to proper types
