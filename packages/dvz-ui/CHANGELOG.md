@@ -1,5 +1,11 @@
 # @devgateway/dvz-ui-react
 
+## 1.6.6
+
+### Patch Changes
+
+- [#122](https://github.com/devgateway/data-viz-ui/pull/122) [`6729a96`](https://github.com/devgateway/data-viz-ui/commit/6729a965370cdabe34b09eb0921b3bfc5d8e6a8d) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Fix type import paths
+
 ## 1.6.5
 
 ### Patch Changes
