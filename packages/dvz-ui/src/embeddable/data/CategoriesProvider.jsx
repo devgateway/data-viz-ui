@@ -18,7 +18,7 @@ class DataProvider extends React.Component {
     componentDidUpdate(prevProps, prevState, snapshot) {
         const { app, parentSelectedItems, filters, source, store, params, csv, group, editing } = this.props
 
-        if (prevProps.parentSelectedItems && parentSelectedItems.length != prevProps.parentSelectedItems.length) {
+        if (prevProps.parentSelectedItems && parentSelectedItems && parentSelectedItems.length != prevProps.parentSelectedItems.length) {
             this.props.onReLoadItems(this.props)
         }
 
