@@ -1,4 +1,4 @@
-import DOMPurify from 'dompurify';
+import {decode as decodeHtmlEntities} from 'html-entities';
 
 // Utility functions to safely convert props to proper types
 export const toBoolean = (value: any): boolean => {
@@ -25,31 +25,14 @@ export const uriStringToArray = (value: string | string[]): any[] => {
 }
 
 export const decodeHtmlEntitiesToText = (html: string) => {
-    const doc = new DOMParser().parseFromString(html, 'text/html');
-    return doc.documentElement.textContent;
+    if (!html) return '';
+    return decodeHtmlEntities(html);
 }
 
 export const decodeHtmlEntitiesToHtml = (html: string) => {
-    const doc = new DOMParser().parseFromString(html, 'text/html');
-    const sanitized = DOMPurify.sanitize(doc.documentElement.innerHTML);
+    if (!html) return '';
+    const sanitized = decodeHtmlEntities(html);
     return sanitized;
-}
-
-export const toTitleCase = (str: string) => {
-    return str
-    .replace(/[-,._!?;:'"()[\]{}]/g, ' ')  // Replace punctuation with spaces
-    .replace(/\s+/g, ' ')                 // Replace multiple spaces with single space
-    .trim()                               // Remove leading/trailing spaces
-    .split(' ')
-    .map(word => {
-        // If the whole word is already all capitals, keep it as is
-        if (word === word.toUpperCase() && word.length > 1) {
-            return word;
-        }
-        // Otherwise, convert to title case
-        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
-    })
-    .join(' ');
 }
 
 export function stringToArray(str: string) {
