@@ -1,5 +1,12 @@
 # @devgateway/dvz-ui-react
 
+## 1.6.7
+
+### Patch Changes
+
+- [#126](https://github.com/devgateway/data-viz-ui/pull/126) [`8b12127`](https://github.com/devgateway/data-viz-ui/commit/8b121277aac810263227dfd12156465e95dc4a9a) Thanks [@timothygachengo](https://github.com/timothygachengo)! - - Expose utils to be imported from data-viz
+  - Fix download button
+
 ## 1.6.6
 
 ### Patch Changes
