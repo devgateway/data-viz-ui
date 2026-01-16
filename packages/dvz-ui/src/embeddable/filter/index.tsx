@@ -258,12 +258,22 @@ const FilterSelectorBox = connect(
     useEffect(() => {
         if (!current) {
             const filterItems = options.map((o) => o.value);
-            if (filterType == FILTER_TYPE_MULTI_SELECT || filterType == "") {
-                //if multiple select select all  elements
-                onInit({ app, group, param, value: filterItems });
+            if (filterType == FILTER_TYPE_MULTI_SELECT || filterType == "") {                
+                const defaultsArr = defaultValues
+                    ? defaultValues
+                        .split(",")
+                        .map((v) => v.trim())
+                        .filter((v) => v.length > 0)
+                    : [];
+                const selected =
+                    defaultsArr.length > 0
+                        ? options
+                            .filter((o) => defaultsArr.indexOf(String(o.value)) > -1)
+                            .map((o) => o.value)
+                        : filterItems;
+                onInit({app, group, param, value: selected});
             } else {
-                if (app == "csv") {
-                    //if single select select base on default value criteria
+                if (app == "csv") {                    
                     let filterValues: any[] = [];
                     if (defaultValueCriteria === DEFAULT_VALUE_INPUT) {
                         filterValues = defaultValues ? defaultValues.split(",") : [];
@@ -276,8 +286,23 @@ const FilterSelectorBox = connect(
                                 : [];
                     }
                     onInit({ app, group, param, value: filterValues });
-                } else {
-                    onInit({ app, group, param, value: [filterItems[0]] });
+                } else {                  
+                    const defaultsArr = defaultValues
+                        ? defaultValues
+                            .split(",")
+                            .map((v) => v.trim())
+                            .filter((v) => v.length > 0)
+                        : [];
+                    const selectedSingle =
+                        defaultsArr.length > 0
+                            ? options
+                                .filter((o) => defaultsArr.indexOf(String(o.value)) > -1)
+                                .map((o) => o.value)
+                                .slice(0, 1)
+                            : filterItems.length > 0
+                                ? [filterItems[0]]
+                                : [];
+                    onInit({app, group, param, value: selectedSingle});
                 }
             }
         }
