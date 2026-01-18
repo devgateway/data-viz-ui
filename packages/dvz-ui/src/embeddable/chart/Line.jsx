@@ -579,18 +579,23 @@ const Chart = ({
 
     let computedXTicks;
     if (lineXAxisTickMode === 'count') {
-      const count = Math.max(1, parseInt(lineXAxisTickCount));
-      if (xDomain.length > 0 && count > 0) {
-        const step = Math.max(1, Math.ceil(xDomain.length / count));
-        const idxs = [];
-        for (let i = 0; i < xDomain.length; i += step){
-           idxs.push(i);
+      const total = Math.max(1, parseInt(lineXAxisTickCount));
+      if (xDomain.length > 0 && total > 0) {
+        if (xDomain.length <= total) {
+          computedXTicks = xDomain.slice();
+        } else {
+          const step = (xDomain.length - 1) / (total - 1);
+          const idxs = new Array(total);
+          for (let i = 0; i < total; i++) {
+            idxs[i] = Math.floor(i * step);
+          }
+
+          // Ensure last index points to the last domain value
+          idxs[total - 1] = xDomain.length - 1;
+          
+          // Map to values
+          computedXTicks = idxs.map(i => xDomain[i]);
         }
-        if (idxs[idxs.length - 1] !== xDomain.length - 1) {
-            idxs.push(xDomain.length - 1);
-        }
-           
-        computedXTicks = idxs.map(i => xDomain[i]);
       }
     } else if (lineXAxisTickMode === 'every') {
       const every = Math.max(1, parseInt(lineXAxisTickEvery));
