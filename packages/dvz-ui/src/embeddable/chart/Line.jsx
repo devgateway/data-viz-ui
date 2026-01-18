@@ -104,7 +104,10 @@ const Chart = ({
   customAxisFormat,
   mobileCustomization,
   lineCurve,
-  customLabels
+  customLabels,
+  lineXAxisTickMode,
+  lineXAxisTickCount,
+  lineXAxisTickEvery
 }) => {
   const mobileConfigSettings = JSON.parse(decodeURIComponent(mobileCustomization));
   const isMobileConfigEnabled = isMobileOrTablet && (mobileConfigSettings?.showCustomization ?? false);
@@ -563,7 +566,50 @@ const Chart = ({
   }
 
   if (options?.data && hasData > 0) {
-    let filteredData = applyFilter(options.data)
+    let filteredData = applyFilter(options.data)    
+    const xDomain = [];
+    filteredData.forEach(series => {
+      if (series && Array.isArray(series.data)) {
+        series.data.forEach(p => {
+          const xv = p && p.x;
+          if (xv !== undefined && xDomain.indexOf(xv) === -1) xDomain.push(xv);
+        });
+      }
+    });
+
+    let computedXTicks;
+    if (lineXAxisTickMode === 'count') {
+      const count = Math.max(1, parseInt(lineXAxisTickCount));
+      if (xDomain.length > 0 && count > 0) {
+        const step = Math.max(1, Math.ceil(xDomain.length / count));
+        const idxs = [];
+        for (let i = 0; i < xDomain.length; i += step){
+           idxs.push(i);
+        }
+        if (idxs[idxs.length - 1] !== xDomain.length - 1) {
+            idxs.push(xDomain.length - 1);
+        }
+           
+        computedXTicks = idxs.map(i => xDomain[i]);
+      }
+    } else if (lineXAxisTickMode === 'every') {
+      const every = Math.max(1, parseInt(lineXAxisTickEvery));
+      if (xDomain.length > 0) {
+        const vals = [];
+        for (let i = 0; i < xDomain.length; i++){ 
+          if (i % every === 0) {
+            vals.push(xDomain[i]);
+          }
+        }
+
+        if (vals[vals.length - 1] !== xDomain[xDomain.length - 1]) {
+          vals.push(xDomain[xDomain.length - 1]);
+        }
+
+        computedXTicks = vals;
+      }
+    } 
+    
     return (
       <div style={{ height: height }}>
         <ResponsiveLine
@@ -622,6 +668,7 @@ const Chart = ({
           }}
           axisBottom={
             (isNotDesktopPreview || isNotEditingAndIsMobileCustomizationEnabled) && mobileConfigSettings?.xAxisDisabled === true ? null :{
+            ...(computedXTicks ? { tickValues: computedXTicks } : {}),
             renderTick: CustomTick,
             legend: legends.bottom,
             legendPosition: "middle",

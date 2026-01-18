@@ -180,6 +180,9 @@ const Chart = (props) => {
     "data-line-curve": lineCurve = "linear",
     "data-show-legends-in-columns": showLegendsInColumns = "false",
     "data-number-of-legend-columns": numberOfLegendColumns = 4,
+        "data-line-x-axis-tick-mode": lineXAxisTickMode = "none",
+        "data-line-x-axis-tick-count": lineXAxisTickCount = 10,
+        "data-line-x-axis-tick-every": lineXAxisTickEvery = 1,
     pageModuleProps
   } = props;
    const originalEditValue = editing;
@@ -640,6 +643,9 @@ const Chart = (props) => {
         xAxisTickValues: (isNotDesktopPreview || isNotEditingAndIsMobileOrTablet)
             ? mobileConfigSettings.xAxisTickValues ?? xAxisTickValues
             : xAxisTickValues,
+        lineXAxisTickMode,
+        lineXAxisTickCount: parseInt(lineXAxisTickCount) || 10,
+        lineXAxisTickEvery: parseInt(lineXAxisTickEvery) || 1,
         enableGridY: enableGridY == true || enableGridY == "true",
         enableGridX: enableGridX == true || enableGridX == "true",
         offsetText,
