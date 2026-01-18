@@ -142,6 +142,8 @@ export interface FilterPros {
     endLabel: string;
     uniqueStorage?: string;
     dvzProxyDatasetId?: string;
+    defaultTopNEnabled?: boolean;
+    defaultTopNCount?: number;
 }
 
 const FilterSelectorBox = connect(
@@ -174,6 +176,8 @@ const FilterSelectorBox = connect(
         params,
         uniqueStorage,
         dvzProxyDatasetId,
+        defaultTopNEnabled,
+        defaultTopNCount,
     } = props;
 
     const [searchFilter, setSearchFilter] = useState("");
@@ -258,20 +262,26 @@ const FilterSelectorBox = connect(
     useEffect(() => {
         if (!current) {
             const filterItems = options.map((o) => o.value);
-            if (filterType == FILTER_TYPE_MULTI_SELECT || filterType == "") {                
-                const defaultsArr = defaultValues
-                    ? defaultValues
-                        .split(",")
-                        .map((v) => v.trim())
-                        .filter((v) => v.length > 0)
-                    : [];
-                const selected =
-                    defaultsArr.length > 0
-                        ? options
-                            .filter((o) => defaultsArr.indexOf(String(o.value)) > -1)
-                            .map((o) => o.value)
-                        : filterItems;
-                onInit({app, group, param, value: selected});
+            if (filterType == FILTER_TYPE_MULTI_SELECT || filterType == "") {
+                if (defaultTopNEnabled) {
+                    const n = defaultTopNCount && defaultTopNCount > 0 ? defaultTopNCount : 0;
+                    const selectedTopN = options.slice(0, n).map((o) => o.value);
+                    onInit({ app, group, param, value: selectedTopN });
+                } else {
+                    const defaultsArr = defaultValues
+                        ? defaultValues
+                            .split(",")
+                            .map((v) => v.trim())
+                            .filter((v) => v.length > 0)
+                        : [];
+                    const selected =
+                        defaultsArr.length > 0
+                            ? options
+                                .filter((o) => defaultsArr.indexOf(String(o.value)) > -1)
+                                .map((o) => o.value)
+                            : filterItems;
+                    onInit({ app, group, param, value: selected });
+                }
             } else {
                 if (app == "csv") {                    
                     let filterValues: any[] = [];
@@ -287,22 +297,27 @@ const FilterSelectorBox = connect(
                     }
                     onInit({ app, group, param, value: filterValues });
                 } else {                  
-                    const defaultsArr = defaultValues
-                        ? defaultValues
-                            .split(",")
-                            .map((v) => v.trim())
-                            .filter((v) => v.length > 0)
-                        : [];
-                    const selectedSingle =
-                        defaultsArr.length > 0
-                            ? options
-                                .filter((o) => defaultsArr.indexOf(String(o.value)) > -1)
-                                .map((o) => o.value)
-                                .slice(0, 1)
-                            : filterItems.length > 0
-                                ? [filterItems[0]]
-                                : [];
-                    onInit({app, group, param, value: selectedSingle});
+                    if (defaultTopNEnabled) {
+                        const selectedTop1 = options.slice(0, 1).map((o) => o.value);
+                        onInit({ app, group, param, value: selectedTop1 });
+                    } else {
+                        const defaultsArr = defaultValues
+                            ? defaultValues
+                                .split(",")
+                                .map((v) => v.trim())
+                                .filter((v) => v.length > 0)
+                            : [];
+                        const selectedSingle =
+                            defaultsArr.length > 0
+                                ? options
+                                    .filter((o) => defaultsArr.indexOf(String(o.value)) > -1)
+                                    .map((o) => o.value)
+                                    .slice(0, 1)
+                                : filterItems.length > 0
+                                    ? [filterItems[0]]
+                                    : [];
+                        onInit({ app, group, param, value: selectedSingle });
+                    }
                 }
             }
         }
@@ -674,6 +689,8 @@ const Filter = ({
     "data-alphabetical-sort": alphabeticalSort = "true",
     "data-asc-order": ascOrder = "true",
     "data-auto-apply": autoApply = "true",
+    "data-default-top-n-enabled": defaultTopNEnabled = "false",
+    "data-default-top-n-count": defaultTopNCount = "0",
     settings,
     intl,
 }) => {
@@ -788,6 +805,8 @@ const Filter = ({
                                         filterType={defaultFilterType}
                                         defaultValues={defaultValues}
                                         defaultValueCriteria={defaultValueCriteria}
+                                        defaultTopNEnabled={booleanParameter(defaultTopNEnabled)}
+                                        defaultTopNCount={defaultTopNCount ? parseInt(defaultTopNCount) : 0}
                                         hiddenFilters={hiddenFiltersArr || []}
                                         allNoneSameBehaviour={allNoneSameBehaviour == "true"}
                                         autoApply={booleanParameter(autoApply)}
