@@ -73,7 +73,11 @@ const DownloadComponent = (props) => {
     return true;
   }
 
-  const options = { filter, bgcolor: "#FFF" };
+  // Use a tiny transparent PNG as a safe fallback for images that fail to load
+  const transparentPngDataUrl =
+    'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8Xw8AAoMBgQb9Z3kAAAAASUVORK5CYII=';
+
+  const options = { filter, bgcolor: "#FFF", imagePlaceholder: transparentPngDataUrl, cacheBust: true };
 
   const save = (type) => {
     domtoimage.cloneNode(componentRef.current).then(function (node) {
@@ -103,15 +107,29 @@ const DownloadComponent = (props) => {
 
       if (type === "PNG") {
         domtoimage.toPng(node, options)
+          .then(function (dataUrl) {
+            if (!dataUrl) throw new Error('PNG render returned empty result');
+            return fetch(dataUrl).then(r => r.blob());
+          })
           .then(function (blob) {
             saveAs(blob, pngLabel);
+          })
+          .catch(function (err) {
+            console.error('PNG download failed:', err);
           });
       }
 
       if (type === "JPG") {
         domtoimage.toJpeg(node, options)
+          .then(function (dataUrl) {
+            if (!dataUrl) throw new Error('JPEG render returned empty result');
+            return fetch(dataUrl).then(r => r.blob());
+          })
           .then(function (blob) {
             saveAs(blob, jpgLabel);
+          })
+          .catch(function (err) {
+            console.error('JPG download failed:', err);
           });
       }
     });
