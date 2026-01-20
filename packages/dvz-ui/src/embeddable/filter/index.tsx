@@ -592,7 +592,7 @@ const CategoryFilter = (props) => {
 
 
     return (
-        <Container fluid={true} className={`filter`}>
+        <Container fluid={true} className={`filter filter-component`}>
             <FilterDropDown
                 {...props}
                 options={options}
@@ -622,7 +622,7 @@ const BooleanFilter = connect(
         },
     ];
     return (
-        <Container fluid={true} className={`filter`}>
+        <Container fluid={true} className={`filter filter-component`}>
             <FilterDropDown options={options} {...props} />
         </Container>
     );
@@ -642,7 +642,7 @@ const CSVFilter = (props) => {
     });
 
     return (
-        <Container fluid={true} className={`filter`}>
+        <Container fluid={true} className={`filter filter-component`}>
             <FilterDropDown options={options} {...props}>
                 {" "}
             </FilterDropDown>
