@@ -28,6 +28,7 @@ const DownloadComponent = (props) => {
     "data-section-title": sectionTitle = "",
     "data-download-tooltip": tooltip = "",
     "data-include-source-url": includeSourceURL = "false",
+    "data-include-filters": includeFilters = "false",
     "data-source-urlmargin-left": sourceURLMarginLeft = 70,
     "data-source-urlmargin-top": sourceURLMarginTop = 10,
     "data-source-urlfont-size": sourceURLFontSize = 18,
@@ -67,7 +68,22 @@ const DownloadComponent = (props) => {
     }
 
     if (node.classList) {
-      return !node.classList.contains("ignore");
+      // Exclude explicit "ignore" UI
+      if (node.classList.contains("ignore")) return false;
+      // By default, exclude filter UI from exports unless allowed
+      const includeFiltersBool = includeFilters === true || includeFilters === 'true';
+      if (!includeFiltersBool) {
+        const excludeClasses = [
+          'filter',
+          'data-filters-reset',
+          'data-filters-apply',
+          'filter-search'
+        ];
+        for (const cls of excludeClasses) {
+          if (node.classList.contains(cls)) return false;
+        }
+      }
+      return true;
     }
 
     return true;
