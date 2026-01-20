@@ -379,7 +379,9 @@ function newUtil() {
             'jpeg': JPEG,
             'gif': 'image/gif',
             'tiff': 'image/tiff',
-            'svg': 'image/svg+xml'
+            'svg': 'image/svg+xml',       
+            'webp': 'image/webp',
+            'avif': 'image/avif'
         };
     }
 
@@ -722,12 +724,29 @@ function newImages() {
                     return util.dataAsUrl(data, util.mimeType(element.src));
                 })
                 .then(function (dataUrl) {
-                    return new Promise(function (resolve, reject) {
-                        element.onload = resolve;
-                        element.onerror = reject;
-                        element.src = dataUrl;
-                        element.srcset = "";
-                    });
+                        return new Promise(function (resolve) {
+                            // Load success
+                            element.onload = function () { resolve(); };
+                            // On error, fall back to placeholder if available and continue
+                            element.onerror = function () {
+                                const placeholder = domtoimage.impl.options.imagePlaceholder;
+                                if (placeholder) {
+                                    try {
+                                        element.onload = null;
+                                        element.onerror = null;
+                                        element.src = placeholder;
+                                        element.srcset = "";
+                                    } catch (e) {
+                                        console.error('Image placeholder assignment failed:', e);
+                                    }
+                                } else {
+                                    console.warn('Image inline failed, continuing without placeholder:', element.src);
+                                }
+                                resolve();
+                            };
+                            element.src = dataUrl;
+                            element.srcset = "";
+                        });
                 });
         }
     }
