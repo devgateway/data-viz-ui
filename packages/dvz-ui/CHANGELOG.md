@@ -1,5 +1,11 @@
 # @devgateway/dvz-ui-react
 
+## 1.6.9
+
+### Patch Changes
+
+- [#133](https://github.com/devgateway/data-viz-ui/pull/133) [`164bb32`](https://github.com/devgateway/data-viz-ui/commit/164bb32df62d430abfc525636490a2b4576cb24f) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Fix featured tabs featured media loading
+
 ## 1.6.7
 
 ### Patch Changes
