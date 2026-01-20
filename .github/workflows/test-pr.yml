@@ -36,4 +36,4 @@ jobs:
         run: pnpm build
 
       - name: Publish packages
-        run: pnpm dlx pkg-pr-new publish './packages/*' --packageManager=pnpm --commentWithSha --comment=create
+        run: pnpm dlx pkg-pr-new publish './packages/dvz-ui' './packages/react-lib/wp-react-lib' --packageManager=pnpm --commentWithSha --comment=create
