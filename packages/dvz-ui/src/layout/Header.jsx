@@ -97,15 +97,15 @@ const MenuItems = injectIntl(
         const params = useParams();
         useEffect(
             (e) => {
-                if (!selected) {
-                    const pathSelected = getPath(menu, params);
-                    const items = pathSelected.filter((i) => i.menu_item_parent == 0);
-                    if (items) {
-                        onSetSelected(items[0]);
-                    }
+                const pathSelected = getPath(menu, params);
+                const items = pathSelected.filter((i) => i.menu_item_parent == 0);
+                if (items && items.length > 0) {
+                    onSetSelected(items[0]);
+                } else {
+                    onSetSelected(null);
                 }
             },
-            [menu, onSetSelected, selected]
+            [menu, onSetSelected, params.slug]
         );
 
         /*Original menu mixed with customization changes*/
@@ -227,7 +227,10 @@ const MenuItems = injectIntl(
                                             </a>
                                         )
                                     ) : item.child_items ? (
-                                        <span onMouseOver={(e) => onSetSelected(item)}>
+                                        <span
+                                            onMouseOver={(e) => onSetSelected(item)}
+                                            onClick={() => onSetSelected(selected === item ? null : item)}
+                                        >
                                             {item.title}
                                         </span>
                                     ) : (
@@ -378,9 +381,6 @@ const Header = ({ intl, settings }) => {
         settings.landing_page_url !== undefined &&
         settings.landing_page_url !== "";
     const SITE_URL_WITH_LOCALE = hasLandingPageSettings ? settings.landing_page_url : `/${intl.locale}`;
-
-    console.log("isMenuVisible", isMenuVisible);
-
 
 
     return (
