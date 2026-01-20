@@ -74,7 +74,7 @@ const DownloadComponent = (props) => {
       const includeFiltersBool = includeFilters === true || includeFilters === 'true';
       if (!includeFiltersBool) {
         const excludeClasses = [
-          'filter',
+          'filter-component',
           'data-filters-reset',
           'data-filters-apply',
           'filter-search'
