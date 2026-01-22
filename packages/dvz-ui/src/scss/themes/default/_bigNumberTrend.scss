@@ -59,7 +59,12 @@
     height: 24px;
   }
 
-  .percentage {
+  
+  .icon.trend.arrow {   
+    z-index: 1;
+  }
+  
+ .percentage {
     color: green;
     font-size: 18px;
   }
