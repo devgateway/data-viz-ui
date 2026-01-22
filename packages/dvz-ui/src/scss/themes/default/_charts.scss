@@ -308,6 +308,9 @@
         padding: 0px 5px;
         line-height: 20px;
         height: 20px;
+        white-space: nowrap; 
+        word-break: normal; 
+        overflow-wrap: normal; 
 
       }
     }
