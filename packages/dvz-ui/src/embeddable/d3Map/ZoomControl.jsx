@@ -230,7 +230,7 @@ class ZoomControl extends React.Component {
     render() {
         const {editing, zoomEnabled = true} = this.props;
 
-        return (<div ref={this.zoomRef} className={`zoom ${zoomEnabled ? '' : 'disabled'}`}>
+        return (<div ref={this.zoomRef} className={`zoom ignore ${zoomEnabled ? '' : 'disabled'}`}>
             {(editing || zoomEnabled) && (<div>
                 <div className="button plus" onClick={this.zoomIn}>
                     <Icon name='plus' size='small'/>
