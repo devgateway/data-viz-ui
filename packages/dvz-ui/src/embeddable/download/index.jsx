@@ -117,9 +117,10 @@ const DownloadComponent = (props) => {
         node.appendChild(urlNode);
       }
 
-      options.height = componentRef.current.scrollHeight + 90;
-      options.width = componentRef.current.scrollWidth + 30;
-      node.style.padding = "20px";
+      const PADDING = 50;
+      options.height = componentRef.current.scrollHeight + (PADDING);
+      options.width = componentRef.current.scrollWidth + (PADDING * 2);
+      node.style.padding = `${PADDING}px`;
 
       if (type === "PNG") {
         domtoimage.toPng(node, options)
