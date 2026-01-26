@@ -172,6 +172,9 @@ body {
         font-weight: bold;
         line-height: 14px;
         font-size: 11px;
+        white-space: nowrap; 
+        word-break: normal; 
+        overflow-wrap: normal; 
       }
     }
 
