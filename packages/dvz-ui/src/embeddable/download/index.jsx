@@ -118,7 +118,7 @@ const DownloadComponent = (props) => {
       }
 
       const PADDING = 50;
-      options.height = componentRef.current.scrollHeight + (PADDING);
+      options.height = componentRef.current.scrollHeight + PADDING;
       options.width = componentRef.current.scrollWidth + (PADDING * 2);
       node.style.padding = `${PADDING}px`;
 
