@@ -469,6 +469,7 @@ const Header = ({ intl, settings }) => {
                             <Menu.Item fitted>
                                 <SearchComponent
                                     onSetSelected={setSelected}
+                                    selected={selected}
                                     settings={settings}
                                 />
                             </Menu.Item>
