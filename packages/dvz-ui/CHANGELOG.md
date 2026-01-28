@@ -1,5 +1,11 @@
 # @devgateway/dvz-ui-react
 
+## 1.6.10
+
+### Patch Changes
+
+- [#140](https://github.com/devgateway/data-viz-ui/pull/140) [`df67e3f`](https://github.com/devgateway/data-viz-ui/commit/df67e3f07fe35a9d2ee9b837beebe451e3aa6271) Thanks [@timothygachengo](https://github.com/timothygachengo)! - fix floating header to prevent it from covering the child items
+
 ## 1.6.9
 
 ### Patch Changes
