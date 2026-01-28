@@ -140,6 +140,7 @@ const FloatingSearchController = ({
   locale,
   intl,
   searchTerm, // Added search from SearchConsumer
+  selected, // Added selected prop to track menu selection
 }) => {
   const [showSearchInput, setShowSearchInput] = useState(false);
   const containerRef = useRef(null);
@@ -166,6 +167,13 @@ const FloatingSearchController = ({
       containerRef.current.style.display = showSearchInput ? "block" : "none";
     }
   }, [showSearchInput]);
+
+  // Hide floating search when menu item with child items is selected
+  useEffect(() => {
+    if (selected && selected.child_items) {
+      setShowSearchInput(false);
+    }
+  }, [selected]);
 
   const show = () => {
     onSetSelected(null);
