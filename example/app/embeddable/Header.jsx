@@ -466,6 +466,7 @@ const Header = ({locale, settings = {}, SearchComponent = null, LangSwitcher = n
                                         <Menu.Item fitted>
                                             <SearchComponent
                                                 onSetSelected={setSelected}
+                                                selected={selected}
                                                 settings={settings}
                                             />
                                         </Menu.Item>
