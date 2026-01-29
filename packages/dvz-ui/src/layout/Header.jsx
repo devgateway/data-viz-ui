@@ -467,11 +467,13 @@ const Header = ({ intl, settings }) => {
                                 </MenuConsumer>
                             </Menu.Item>
                             <Menu.Item fitted>
-                                <SearchComponent
-                                    onSetSelected={setSelected}
-                                    selected={selected}
-                                    settings={settings}
-                                />
+                                <MenuConsumer>
+                                    <SearchComponent
+                                        onSetSelected={setSelected}
+                                        // selected={selected}
+                                        settings={settings}
+                                    />
+                                </MenuConsumer>
                             </Menu.Item>
                             <div
                                 ref={hamburgerRef}
