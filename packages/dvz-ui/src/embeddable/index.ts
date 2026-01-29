@@ -43,6 +43,7 @@ const GroupedBars = lazy(() => import("./grouped-bars"));
 const BigNumberTrend = lazy(() => import("./big-number-trend"));
 const PostsWithFilters = lazy(() => import("./posts-with-filters"));
 const DataParagraph = lazy(() => import("./data-paragraph"));
+const BigFilter = lazy(() => import("./big-filter"));
 
 
 export const components = {
@@ -76,14 +77,15 @@ export const components = {
     sankeyChart: SankeyChart,
     dataLabel: DataLabel,
     body: Body,
-	supersetChart: SupersetChart,
+    supersetChart: SupersetChart,
     supersetDashboard: SupersetDashboard,
     agreeAndDownload: AgreeAndDownload,
-	bigNumber: BigNumber,
+    bigNumber: BigNumber,
     groupedBars: GroupedBars,
     bigNumberTrend: BigNumberTrend,
     postsWithFilters: PostsWithFilters,
     dataParagraph: DataParagraph,
+    bigFilter: BigFilter,
     redirect: () => null
 }
 
@@ -97,7 +99,7 @@ export const customizer = {
             customizer.components[key] = value
         }
     },
-    getComponentByNameIgnoreCase : (name: string) => {
+    getComponentByNameIgnoreCase: (name: string) => {
         const k = Object.keys(customizer.components).find(value => value.toLowerCase() === name.toLowerCase())
         if (k) {
             const Component = customizer.components[k]
@@ -134,4 +136,4 @@ export const getComponentByNameIgnoreCase = (name: string) => {
 }
 
 
-export const reducers =  { data, embeddable, ...customizer.getReducers() };
+export const reducers = { data, embeddable, ...customizer.getReducers() };
