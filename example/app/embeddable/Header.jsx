@@ -464,11 +464,13 @@ const Header = ({locale, settings = {}, SearchComponent = null, LangSwitcher = n
                                     )}
                                     {SearchComponent && (
                                         <Menu.Item fitted>
-                                            <SearchComponent
-                                                onSetSelected={setSelected}
-                                                selected={selected}
-                                                settings={settings}
-                                            />
+                                            <MenuConsumer>
+                                                <SearchComponent
+                                                    onSetSelected={setSelected}
+                                                    selected={selected}
+                                                    settings={settings}
+                                                />
+                                            </MenuConsumer>
                                         </Menu.Item>
                                     )}
                                 </Menu>

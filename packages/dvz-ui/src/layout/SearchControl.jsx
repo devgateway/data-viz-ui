@@ -145,6 +145,31 @@ const FloatingSearchController = ({
   const [showSearchInput, setShowSearchInput] = useState(false);
   const containerRef = useRef(null);
 
+  const hide = () => {
+    setShowSearchInput(false);
+  };
+
+  const addListenerToHeaderElements = () => {
+    const itemWithChildren = document.getElementsByClassName("has-child-items");
+    for (let i = 0; i < itemWithChildren.length; i++) {
+      const itemElement = itemWithChildren[i];
+      const spans = itemElement.getElementsByTagName("span");
+      if (spans.length > 0) {
+        spans[0].addEventListener("mouseover", hide);
+      }
+    }
+  };
+  const removeListenerToHeaderElements = () => {
+    const itemWithChildren = document.getElementsByClassName("has-child-items");
+    for (let i = 0; i < itemWithChildren.length; i++) {
+      const itemElement = itemWithChildren[i];
+      const spans = itemElement.getElementsByTagName("span");
+      if (spans.length > 0) {
+        spans[0].removeEventListener("mouseover", hide);
+      }
+    }
+  }
+
   useEffect(() => {
     const newContainer = document.createElement("div");
     newContainer.setAttribute("id", "float-input-container");
@@ -166,22 +191,17 @@ const FloatingSearchController = ({
     if (containerRef.current) {
       containerRef.current.style.display = showSearchInput ? "block" : "none";
     }
+    
+    // Add or remove listeners based on search input visibility
+    if (showSearchInput) {
+      addListenerToHeaderElements();
+    } else {
+      removeListenerToHeaderElements();
+    }
   }, [showSearchInput]);
 
-  // Hide floating search when menu item with child items is selected
-  useEffect(() => {
-    if (selected && selected.child_items) {
-      setShowSearchInput(false);
-    }
-  }, [selected]);
-
   const show = () => {
-    onSetSelected(null);
     setShowSearchInput(true);
-  };
-
-  const hide = () => {
-    setShowSearchInput(false);
   };
 
   return (
@@ -298,13 +318,14 @@ const SearchComponent = injectIntl((props) => {
 });
 
 // Inner component that uses the SearchContext
-const SearchComponentInner = ({ onSetSelected, setQuery, query, isSmallScreen, intl, ...props }) => {
+const SearchComponentInner = ({ onSetSelected, selected, setQuery, query, isSmallScreen, intl, ...props }) => {
   const searchContext = useContext(SearchContext);
 
   const component =
     props.settings.react_search_type === "floating" || isSmallScreen ? (
       <FloatingSearchController
         onSetSelected={onSetSelected}
+        selected={selected}
         onSearch={setQuery}
         perPage={5}
         intl={intl}
