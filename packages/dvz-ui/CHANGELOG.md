@@ -1,5 +1,11 @@
 # @devgateway/dvz-ui-react
 
+## 1.6.11
+
+### Patch Changes
+
+- [#142](https://github.com/devgateway/data-viz-ui/pull/142) [`bceaa08`](https://github.com/devgateway/data-viz-ui/commit/bceaa0859a7f6cad2edbc5049ebf3f0a95bf24fb) Thanks [@timothygachengo](https://github.com/timothygachengo)! - fix floating search to stop hiding child themes after it is closed
+
 ## 1.6.10
 
 ### Patch Changes
