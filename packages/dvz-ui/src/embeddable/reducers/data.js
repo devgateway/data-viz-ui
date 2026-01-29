@@ -46,7 +46,7 @@ export const loadFilterItems = ({ app, type, group, param, autoApply, params, pa
     api.getCategory({ app, params: newPrams, type })
         .then(
             data => {
-                debugger;
+
                 dispatch({
                     type: RELOAD_CHILD_FILTER_ITEMS,
                     filterType: type,
@@ -63,8 +63,10 @@ export const loadFilterItems = ({ app, type, group, param, autoApply, params, pa
 }
 
 
-export const setFilter = ({ app, group, param, value, autoApply, params, childFilter, childFilterParam, uniqueStorage, dvzProxyDatasetId }) => (dispatch, getState) => {
-    dispatch({ type: SET_FILTER, app, group, param, value, autoApply })
+export const setFilter = (props) => (dispatch, getState) => {
+    const { app, group, param, value, autoApply, parent } = props
+    console.log("set filters")
+    dispatch({ type: SET_FILTER, app, group, param, value, autoApply, parent })
 }
 
 
@@ -72,8 +74,9 @@ export const cleanFilter = ({ app, group }) => (dispatch, getState) => {
     dispatch({ type: CLEAN_FILTER, app, group })
     //dispatch({type: CLEAN_MEASURES, app, group})
 }
-export const unsetFilter = ({ app, group, param }) => (dispatch, getState) => {
-    dispatch({ type: UNSET_FILTER, app, group, param })
+export const unsetFilter = ({ app, group, param, parent }) => (dispatch, getState) => {
+
+    dispatch({ type: UNSET_FILTER, app, group, param, parent })
 
 }
 export const applyFilter = ({ app, group }) => (dispatch, getState) => {
@@ -138,31 +141,32 @@ export const setData = ({ app, group, csv, store, params }) => (dispatch, getSta
     const d2 = { ...data, data: filtered, appliedFilters: params }
     dispatch({ type: LOAD_DATA_DONE, app, group, store, data: { count: d2.data.length, itemsSize: d2.data.length, ...d2 } })
 }
-export const getData = ({ app, group, source, store, params }) => (dispatch, getState) => {
+export const getData = (props) => (dispatch, getState) => {
+    const { app, group, source, store, params, parent } = props
 
 
     let filters = getState().get('data').getIn(['filters', app, group])
 
-    if (params) {
-        const presetFilters = Object.keys(params);
-        presetFilters.forEach(k => {
-            if (filters && filters.has(k)) {
-                let a = params[k]
-                let b = filters.get(k)
-                //[A,B,C,E]
-                //[C,D]
-                //We should remove other options from preset filter and turn on off the matching ones
-                let newB = b.filter(c => a.indexOf(c) > -1);
-                filters = filters.set(k, newB)
-            }
-        })
-    }
+    if (parent)
+        if (params) {
+            const presetFilters = Object.keys(params);
+            presetFilters.forEach(k => {
+                if (filters && filters.has(k)) {
+                    let a = params[k]
+                    let b = filters.get(k)
+                    //[A,B,C,E]
+                    //[C,D]
+                    //We should remove other options from preset filter and turn on off the matching ones
+                    let newB = b.filter(c => a.indexOf(c) > -1);
+                    filters = filters.set(k, newB)
+                }
+            })
+        }
     if (filters) {
         params = { ...params, ...filters.toJS() }
     }
 
     dispatch({ type: LOAD_DATA, app, group, params, store })
-
     api.getData({ app, source, params })
         .then(data => {
             data.appliedFilters = params
@@ -176,7 +180,7 @@ export const setPageModuleProps = ({ data }) => (dispatch, getState) => {
 }
 export default (state = initialState, action) => {
 
-    console.log(action.type)
+
     switch (action.type) {
         case LOAD_DATA: {
             const { store, app, group, params } = action
@@ -264,11 +268,16 @@ export default (state = initialState, action) => {
 
         case SET_FILTER: {
             const now = Date.now();
-            const { app, group, param, value, autoApply } = action
+            const { app, group, param, value, autoApply, parent } = action
+
             return state.setIn(['filters-settings', app, group, "autoApply"], autoApply)
                 .setIn(['filters', app, group, param], value.length === 0 ? [Number.MIN_SAFE_INTEGER] : value)
                 .setIn(['filters-settings', app, group, "apply"], null)
-                .setIn(['filters-settings', app, group, 'lastUserFilterChange'], now);
+                .setIn(['filters-settings', app, group, 'lastUserFilterChange'], now)
+                .setIn(['filters-settings', app, group, "parent"], parent ? parent : null);
+
+
+
         }
 
 
@@ -284,7 +293,7 @@ export default (state = initialState, action) => {
 
 
         case RELOAD_CHILD_FILTER_ITEMS: {
-            debugger;
+
             const { data, app, group, param, uniqueStorage, dvzProxyDatasetId, filterType, parentType, autoApply } = action
             const now = Date.now();
 
@@ -353,9 +362,10 @@ export default (state = initialState, action) => {
 
         case UNSET_FILTER: {
             const now = Date.now();
-            const { app, group, param } = action
+            const { app, group, param, parent } = action
             return state.deleteIn(['filters', app, group, param])
-                .setIn(['filters-settings', app, group, 'lastUserFilterChange'], now);
+                .setIn(['filters-settings', app, group, 'lastUserFilterChange'], now)
+                .setIn(['filters-settings', app, group, "parent"], parent ? parent : null);;
         }
 
 
