@@ -142,6 +142,7 @@ export const setData = ({ app, group, csv, store, params }) => (dispatch, getSta
     dispatch({ type: LOAD_DATA_DONE, app, group, store, data: { count: d2.data.length, itemsSize: d2.data.length, ...d2 } })
 }
 export const getData = (props) => (dispatch, getState) => {
+    debugger
     const { app, group, source, store, params, parent } = props
 
 
@@ -162,15 +163,16 @@ export const getData = (props) => (dispatch, getState) => {
                 }
             })
         }
+    let newParams = { ...params }
     if (filters) {
-        params = { ...params, ...filters.toJS() }
+        newParams = { ...newParams, ...filters.toJS() }
     }
 
-    dispatch({ type: LOAD_DATA, app, group, params, store })
-    api.getData({ app, source, params })
+    dispatch({ type: LOAD_DATA, app, group, params: newParams, store })
+    api.getData({ app, source, params: newParams })
         .then(data => {
-            data.appliedFilters = params
-            return dispatch({ type: LOAD_DATA_DONE, app, group, store, data, params })
+            data.appliedFilters = newParams
+            return dispatch({ type: LOAD_DATA_DONE, app, group, store, data, params: newParams })
         })
         .catch(error => dispatch({ type: LOAD_DATA_ERROR, app, group, store, error }))
 
