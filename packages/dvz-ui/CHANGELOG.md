@@ -1,5 +1,11 @@
 # @devgateway/dvz-ui-react
 
+## 1.6.12
+
+### Patch Changes
+
+- [#144](https://github.com/devgateway/data-viz-ui/pull/144) [`cb11b1c`](https://github.com/devgateway/data-viz-ui/commit/cb11b1c4f4a7de33c32d60b766057837e9419848) Thanks [@timothygachengo](https://github.com/timothygachengo)! - remove height from slider in postcarousel
+
 ## 1.6.11
 
 ### Patch Changes
