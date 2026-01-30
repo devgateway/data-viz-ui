@@ -15,7 +15,7 @@ const Carousel = (props) => {
             isPlaying={autoSwitch}
             totalSlides={posts.length}
             naturalSlideHeight={height}>
-            <Slider style={{ height: `${height}px` }} trayTag="ul">
+            <Slider trayTag="ul">
                 {posts.map(p => <Slide index={i++} tag="li">
                     <PostIntro post={p} fluid />
                 </Slide>)}
