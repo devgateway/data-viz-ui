@@ -62,12 +62,7 @@ const BigFilter = (props) => {
     const readGroup = parent ? parent : blockName + Math.random(0, 1) //were to read my linked filters
     const selfGroup = blockName //where to store my  state
 
-
-
-
     return (<div ref={ref}>
-
-
         <Container fluid={true} style={{ padding: '0px', margin: '0px', height: `${height}px` }}>
             {(!app || app === 'csv') && <p><h2>Big Filter:</h2><h4>Please select an API! </h4></p>}
             {(app !== 'csv' && dimension == 'none') && <p><h2>Big Filter:</h2><h4>Please select dimension! </h4></p>}
