@@ -103,14 +103,25 @@ const BigNumberGroup = (props) => {
         return l && l.length > 0 ? l[0].items.filter(i => i.code == type)[0]?.value : null;
     }
 
+
+    const selected = appliedFilters && appliedFilters[dimension] ? appliedFilters[dimension].length : 0
+
+    const total = data.children ? data.children.length : 0
+
     if (dimension == null) {
-        return <div>Top Level</div>
+        return <h2>Select a dimensiosn to start configuring the component</h2>
     } else {
         return <Container fluid={true} style={{ padding: '0px', margin: '0px', height: `${height}px` }}>
 
 
 
             <Grid fluid={true} celled={true} stackable columns={nColumns} style={{ border: '1px solid #EEE' }}>
+                <Grid.Row>
+                    <Grid.Column width={16} textAlign='right'>
+
+                        Selected    {selected}/{total}
+                    </Grid.Column>
+                </Grid.Row>
                 {data.children && data.children.filter(d => {
                     if (showZeroValues === "true") {
                         return d[selectedKey] !== null && d[selectedKey] !== undefined;
@@ -135,18 +146,14 @@ const BigNumberGroup = (props) => {
                         onSetFilter={onSetFilter}
                         onUnSetFilter={onUnSetFilter}
                         intl={intl}
-
                         numberFontSize={numberFontSize}
                         labelFontSize={labelFontSize}
-
                         backgroundColor={backgroundColor}
                         numberColor={numberColor}
                         labelColor={labelColor}
-
                         unselectedBackgroundColor={unselectedBackgroundColor}
                         unselectedNumberColor={unselectedNumberColor}
                         unselectedLabelColor={unselectedLabelColor}
-
                         formatObject={formatObject}
                         decode={decode}
                         getLabel={getLabel}
