@@ -16,17 +16,13 @@ export const BigNumberItem = (props) => {
         onUnSetFilter,
         intl,
         numberFontSize,
-
         labelFontSize,
-
         backgroundColor,
         numberColor,
         labelColor,
-
         unselectedBackgroundColor,
         unselectedNumberColor,
         unselectedLabelColor,
-
         formatObject,
         decode,
         getLabel, // Received from parent
@@ -87,14 +83,15 @@ export const BigNumberItem = (props) => {
         return {
             border: '1px solid #EEE',
             backgroundColor: selected ? decode(backgroundColor) : decode(unselectedBackgroundColor),
+
         }
     };
 
     const formatNumber = (val) => intl.formatNumber(val, { ...formatObject });
 
-    return <Grid.Column className={` big filter item ${isSelected ? "selected" : "unselected"}`} key={idx} onClick={click} style={cellStyle(isSelected)} >
-        <p style={numberStyle(isSelected)} className="big-number">{formatNumber(value)}
-        </p>
+    return (<Grid.Column className={` big filter item ${isSelected ? "selected" : "unselected"}`} key={idx} onClick={click} style={cellStyle(isSelected)} >
+        <p style={numberStyle(isSelected)} className="big-number">{formatNumber(value)}</p>
         <p style={labelStyle(isSelected)} className="big-number-label">{getLabel ? getLabel(child.value) : (child.label || child.value)}</p>
     </Grid.Column >
+    )
 }
