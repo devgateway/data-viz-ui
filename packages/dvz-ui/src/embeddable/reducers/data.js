@@ -142,7 +142,7 @@ export const setData = ({ app, group, csv, store, params }) => (dispatch, getSta
     dispatch({ type: LOAD_DATA_DONE, app, group, store, data: { count: d2.data.length, itemsSize: d2.data.length, ...d2 } })
 }
 export const getData = (props) => (dispatch, getState) => {
-    debugger
+
     const { app, group, source, store, params, parent } = props
 
 

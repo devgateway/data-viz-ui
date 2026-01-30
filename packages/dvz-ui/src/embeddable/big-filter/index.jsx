@@ -27,8 +27,15 @@ const BigFilter = (props) => {
         'data-filters': filters = '[]',
         'data-number-font-size': numberFontSize = 20,
         'data-label-font-size': labelFontSize = 20,
+
+        'data-unselected-number-color': unselectedNumberColor = '#000000',
+        'data-unselected-label-color': unselectedLabelColor = '#000000',
+        'data-unselected-background-color': unselectedBackgroundColor = '#fdfdfdff',
+
         'data-number-color': numberColor = '#000000',
         'data-label-color': labelColor = '#000000',
+        'data-background-color': backgroundColor = '#ffffffff',
+
         'data-label': label = '',
         "data-wait-for-filters": waitForFilters = "false",
         "data-n-columns": nColumns = 4,
@@ -100,9 +107,16 @@ const BigFilter = (props) => {
                             measures={parse(measures)}
                             label={label}
                             numberFontSize={numberFontSize}
-                            numberColor={numberColor}
                             labelFontSize={labelFontSize}
+
+                            numberColor={numberColor}
                             labelColor={labelColor}
+                            backgroundColor={backgroundColor}
+
+                            unselectedNumberColor={unselectedNumberColor}
+                            unselectedLabelColor={unselectedLabelColor}
+                            unselectedBackgroundColor={unselectedBackgroundColor}
+
 
                             dimension={dimension}>
                         </BigNumberGroup>

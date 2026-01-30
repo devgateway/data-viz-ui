@@ -16,9 +16,17 @@ export const BigNumberItem = (props) => {
         onUnSetFilter,
         intl,
         numberFontSize,
-        numberColor,
+
         labelFontSize,
+
+        backgroundColor,
+        numberColor,
         labelColor,
+
+        unselectedBackgroundColor,
+        unselectedNumberColor,
+        unselectedLabelColor,
+
         formatObject,
         decode,
         getLabel, // Received from parent
@@ -53,7 +61,7 @@ export const BigNumberItem = (props) => {
     const numberStyle = (selected) => {
         return {
             cursor: 'pointer',
-            color: selected ? decode(numberColor) : "#CCC",
+            color: selected ? decode(numberColor) : decode(unselectedNumberColor),
             fontSize: numberFontSize + 'px',
             textAlign: 'center',
             paddingTop: '3%',
@@ -67,7 +75,7 @@ export const BigNumberItem = (props) => {
     const labelStyle = (selected) => {
         return {
             cursor: 'pointer',
-            color: selected ? decode(labelColor) : "#CCC",
+            color: selected ? decode(labelColor) : decode(unselectedLabelColor),
             fontSize: labelFontSize + 'px',
             textAlign: 'center',
             padding: '0px',
@@ -75,17 +83,18 @@ export const BigNumberItem = (props) => {
         }
     };
     const cellStyle = (selected) => {
+        debugger;
         return {
             border: '1px solid #EEE',
-            backgroundColor: selected ? '#EEE' : '#FFF',
+            backgroundColor: selected ? decode(backgroundColor) : decode(unselectedBackgroundColor),
         }
     };
 
     const formatNumber = (val) => intl.formatNumber(val, { ...formatObject });
 
-    return <Grid.Column key={idx} onClick={click} style={cellStyle(isSelected)}>
+    return <Grid.Column className={` big filter item ${isSelected ? "selected" : "unselected"}`} key={idx} onClick={click} style={cellStyle(isSelected)} >
         <p style={numberStyle(isSelected)} className="big-number">{formatNumber(value)}
         </p>
         <p style={labelStyle(isSelected)} className="big-number-label">{getLabel ? getLabel(child.value) : (child.label || child.value)}</p>
-    </Grid.Column>
+    </Grid.Column >
 }

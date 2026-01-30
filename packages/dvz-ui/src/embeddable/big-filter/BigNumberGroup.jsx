@@ -15,9 +15,13 @@ const BigNumberGroup = (props) => {
         measures,
         dimension,
         data,
-        numberColor,
         numberFontSize,
+        backgroundColor,
+        numberColor,
         labelColor,
+        unselectedBackgroundColor,
+        unselectedNumberColor,
+        unselectedLabelColor,
         labelFontSize,
         intl,
         onUnSetFilter,
@@ -115,6 +119,7 @@ const BigNumberGroup = (props) => {
                     }
                 }).sort(sortFunc).map((child, idx) => {
 
+                    debugger
                     return <BigNumberItem
                         key={idx}
                         idx={idx}
@@ -130,10 +135,18 @@ const BigNumberGroup = (props) => {
                         onSetFilter={onSetFilter}
                         onUnSetFilter={onUnSetFilter}
                         intl={intl}
+
                         numberFontSize={numberFontSize}
-                        numberColor={numberColor}
                         labelFontSize={labelFontSize}
+
+                        backgroundColor={backgroundColor}
+                        numberColor={numberColor}
                         labelColor={labelColor}
+
+                        unselectedBackgroundColor={unselectedBackgroundColor}
+                        unselectedNumberColor={unselectedNumberColor}
+                        unselectedLabelColor={unselectedLabelColor}
+
                         formatObject={formatObject}
                         decode={decode}
                         getLabel={getLabel}
