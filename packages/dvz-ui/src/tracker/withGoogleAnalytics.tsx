@@ -10,7 +10,8 @@ export interface WithGoogleAnalyticsProps {
     options?: any;
 }
 
-const initializationRef = useRef<Set<string>>(new Set());
+// Module-level tracking for GA initialization (not using useRef to avoid SSR issues)
+const initializedGACodes = new Set<string>();
 
 export const withTracker = <T extends WithGoogleAnalyticsProps>(WrappedComponent: React.ComponentType<T>, options = {}) => {
     const HOC = (props: T) => {
@@ -22,9 +23,9 @@ export const withTracker = <T extends WithGoogleAnalyticsProps>(WrappedComponent
         // Initialize GA only once per unique GA code
         useEffect(() => {
             if (gaCode && gaCode !== '#REACT_APP_GA_CODE#' && !hasInitialized.current) {
-                if (!initializationRef.current.has(gaCode)) {
+                if (!initializedGACodes.has(gaCode)) {
                     ReactGA.initialize(gaCode);
-                    initializationRef.current.add(gaCode);
+                    initializedGACodes.add(gaCode);
                     console.log('GA initialized with code:', gaCode);
                 }
                 hasInitialized.current = true;
