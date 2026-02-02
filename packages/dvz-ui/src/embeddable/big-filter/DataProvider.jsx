@@ -4,12 +4,23 @@ import { injectIntl } from 'react-intl';
 import { Container, Dimmer, Loader, Segment } from "semantic-ui-react";
 import DataContext from '../data/DataContext';
 import { getData, setData } from '../reducers/data'
+import debounce from 'lodash/debounce'
 
 
 class BigFilterDataProvider extends React.Component {
 
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
+        this.debouncedLoadData = this.debouncedLoadData.bind(this)
+        this.debounces = []
+
+    }
+
+    debouncedLoadData(time, args) {
+        const db = debounce((args) => {
+            this.props.onLoadData(args)
+        }, time)
+        this.debounces.push(db(args))
     }
 
     componentDidMount() {
@@ -23,8 +34,17 @@ class BigFilterDataProvider extends React.Component {
         if (filters != prevProps.filters || JSON.stringify(params) != JSON.stringify(prevProps.params) || app != prevProps.app || JSON.stringify(prevProps.source) != JSON.stringify(source) || csv != prevProps.csv) {
             this.setState({ showLoading: true });
 
-            this.props.onLoadData({ app, source, store, params, group })
+            this.debouncedLoadData(300, { app, source, store, params, group })
         }
+    }
+
+
+
+    componentWillUnmount() {
+        debugger;
+        this.debounces.forEach(d => {
+            d.canel()
+        })
     }
 
     render() {
@@ -64,7 +84,6 @@ const mapStateToProps = (state, ownProps) => {
             }
         })
 
-        console.log(blockName + " parameters", newParams)
 
     }
 

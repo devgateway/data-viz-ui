@@ -79,7 +79,7 @@ export const BigNumberItem = (props) => {
         }
     };
     const cellStyle = (selected) => {
-        debugger;
+
         return {
             border: '1px solid #EEE',
             backgroundColor: selected ? decode(backgroundColor) : decode(unselectedBackgroundColor),
@@ -87,7 +87,23 @@ export const BigNumberItem = (props) => {
         }
     };
 
-    const formatNumber = (val) => intl.formatNumber(val, { ...formatObject });
+
+
+    const formatNumber = (val) => {
+
+        const numberFormat = {
+            style: (formatObject.style === 'compacted') ? 'decimal' : formatObject.style,
+            notation: (formatObject.style === 'compacted') ? 'compact' : "standard",
+            currency: formatObject.currency,
+            minimumFractionDigits: parseInt(formatObject.minimumFractionDigits),
+            maximumFractionDigits: parseInt(formatObject.maximumFractionDigits)
+        }
+
+        return intl.formatNumber(val, { ...numberFormat })
+    };
+
+
+
 
     return (<Grid.Column className={` big filter item ${isSelected ? "selected" : "unselected"}`} key={idx} onClick={click} style={cellStyle(isSelected)} >
         <p style={numberStyle(isSelected)} className="big-number">{formatNumber(value)}</p>

@@ -2,9 +2,9 @@ import React from 'react';
 import BaseLayer from "./BaseLayer.jsx";
 import DataProvider from "../data/DataProvider.jsx";
 import DataConsumer from "../data/DataConsumer.jsx";
-import {parse} from "../utils/index.js";
+import { parse } from "../utils/index.js";
 import * as d3 from "d3";
-import {injectIntl} from "react-intl";
+import { injectIntl } from "react-intl";
 
 import BreaksStyles from "./BreaksStyles.js";
 import GradientColors from "@/embeddable/d3Map/GradientColors.js";
@@ -40,7 +40,7 @@ class DataLayer extends BaseLayer {
     constructor() {
         super();
 
-        this.state = {geoJson: null, json: null}
+        this.state = { geoJson: null, json: null }
         this.getTooltipVariables = this.getTooltipVariables.bind(this)
         this.resize = this.resize.bind(this)
         this.createLayer = this.createLayer.bind(this)
@@ -73,7 +73,7 @@ class DataLayer extends BaseLayer {
             data,
             breaks,
             gradientScheme,
-            gradientReverse,labelFontSize
+            gradientReverse, labelFontSize
 
         } = this.props
 
@@ -148,7 +148,7 @@ class DataLayer extends BaseLayer {
 
 
     getTooltipVariables(d) {
-        const {apiJoinAttribute} = this.props
+        const { apiJoinAttribute } = this.props
         //eslint-disable-next-line
 
         if (d.properties._value) {
@@ -318,10 +318,10 @@ class DataLayer extends BaseLayer {
                 .attr("stroke", borderColor)
                 .attr("id", "state-borders")
                 .attr("d", path).on("mouseenter", (d, p) => {
-                if (p.properties._value) {
-                    this.showToolTip(tooltip, this.getTooltipVariables(p), useGradients ? gradientColors.getColor(p.properties._value) : brStyles.getColor(p.properties._value), p)
-                }
-            })
+                    if (p.properties._value) {
+                        this.showToolTip(tooltip, this.getTooltipVariables(p), useGradients ? gradientColors.getColor(p.properties._value) : brStyles.getColor(p.properties._value), p)
+                    }
+                })
                 .on("mouseleave", (d) => {
                     this.hiddenToolTip(d)
                 })
@@ -437,17 +437,17 @@ class DataLayer extends BaseLayer {
                 .attr('r', d => {
                     return brStyles.getSize(d.properties._value) * 1 / k
                 }).on("mouseenter", (d, p) => {
-                if (p.properties._value) {
+                    if (p.properties._value) {
 
-                    const variables = {
-                        ...p.properties, meta: {
-                            [apiJoinAttribute]: p.properties.meta ? p.properties.meta.value : '', ...p.properties.meta,
-                            value: p.properties._value
+                        const variables = {
+                            ...p.properties, meta: {
+                                [apiJoinAttribute]: p.properties.meta ? p.properties.meta.value : '', ...p.properties.meta,
+                                value: p.properties._value
+                            }
                         }
+                        this.showToolTip(tooltip, variables, useGradients ? gradientColors.getColor(p.properties._value) : brStyles.getColor(p.properties._value))
                     }
-                    this.showToolTip(tooltip, variables, useGradients ? gradientColors.getColor(p.properties._value) : brStyles.getColor(p.properties._value))
-                }
-            })
+                })
                 .on("mouseleave", (d) => {
                     this.hiddenToolTip()
                 })
@@ -469,7 +469,7 @@ class DataLayer extends BaseLayer {
 
                 }).on("mouseover", (d) => {
 
-            });
+                });
 
             if (!colorLayerVisible) {
                 this.g.selectAll(".centroids").style("display", "none")
@@ -624,7 +624,7 @@ class DataLayer extends BaseLayer {
         patternsData = patternsData.filter(p => {
             return p.type != undefined
         }).sort((a, b) => {
-            return new Intl.Collator(intl.locale, {caseFirst: 'upper', numeric: true, sensitivity: 'variant'})
+            return new Intl.Collator(intl.locale, { caseFirst: 'upper', numeric: true, sensitivity: 'variant' })
                 .compare(a.key, b.key);
         })
 
@@ -661,10 +661,10 @@ class DataLayer extends BaseLayer {
                                     .on("mouseenter", () => {
                                         this.showToolTip(tooltip, this.getTooltipVariables(d), useGradients ? gradientColors.getColor(d.properties._value) : brStyles.getColor(d.properties._value))
                                     }).on("mousemove", (d) => {
-                                    this.moveToolTip()
-                                }).on("mouseleave", (d) => {
-                                    this.hiddenToolTip()
-                                })
+                                        this.moveToolTip()
+                                    }).on("mouseleave", (d) => {
+                                        this.hiddenToolTip()
+                                    })
 
                             })
                         }
@@ -844,7 +844,7 @@ class DataLayer extends BaseLayer {
             }
             return d
         })
-        const newJson = {...json, features}
+        const newJson = { ...json, features }
 
         return newJson
 
@@ -853,7 +853,7 @@ class DataLayer extends BaseLayer {
 
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        const {app, file, featureJoinAttribute, data, measures, patternDiscriminator, editing,usePattern} = this.props
+        const { app, file, featureJoinAttribute, data, measures, patternDiscriminator, editing, usePattern } = this.props
 
         //TODO:Check if data has changed using JSON.stringify
 
@@ -881,7 +881,7 @@ class DataLayer extends BaseLayer {
             //eslint-disable-next-line
 
 
-            legendDiv.select("svg").attr("height", this.props.patternsVisible ? 30 + (((legendDiv.selectAll('rect').size() -1) * 23)) + "px" : "30px")
+            legendDiv.select("svg").attr("height", this.props.patternsVisible ? 30 + (((legendDiv.selectAll('rect').size() - 1) * 23)) + "px" : "30px")
 
             this.g.selectAll(".shape-pattern").style("display", this.props.patternsVisible ? "" : "none")
 
@@ -912,7 +912,7 @@ class DataLayer extends BaseLayer {
             this.resize()
         }
         if (usePattern) {
-           // this.createPatterns(json)
+            // this.createPatterns(json)
         }
     }
 
@@ -940,7 +940,7 @@ class DataLayer extends BaseLayer {
             editing
         } = this.props
 
-        return <g id={"data-" + id} className={"data " + id} ref={this.gRef}/>
+        return <g id={"data-" + id} className={"data " + id} ref={this.gRef} />
     }
 
 }
