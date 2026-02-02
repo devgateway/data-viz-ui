@@ -1,9 +1,10 @@
 import React from 'react'
-import {connect} from 'react-redux'
-import {injectIntl} from 'react-intl';
-import {DataContext} from './DataContext'
-import {getData, setData} from "../reducers/data";
-import {Container, Dimmer, Loader, Segment} from "semantic-ui-react";
+import { connect } from 'react-redux'
+import { injectIntl } from 'react-intl';
+import { DataContext } from './DataContext'
+import { getData, setData } from "../reducers/data";
+import { Container, Dimmer, Loader, Segment } from "semantic-ui-react";
+import debounce from 'lodash/debounce'
 
 class DataProvider extends React.Component {
 
@@ -13,22 +14,40 @@ class DataProvider extends React.Component {
             showLoading: false
         }
         this.checkLoadingTime = this.checkLoadingTime.bind(this)
+        this.debounces = []
+
     }
 
+
+    debouncedLoadData(time, args) {
+        const db = debounce((args) => {
+
+            console.log("debouncedLoadData" + time)
+            this.setState({ showLoading: false })
+            this.props.onLoadData(args)
+            this.dataLoaded = true
+            this.checkLoadingTime = this.checkLoadingTime.bind(this)
+            setTimeout(this.checkLoadingTime, 0)
+        }, time)
+
+        this.debounces.push(db(args))
+    }
+
+
     componentDidMount() {
-        const {app, source, store, params, csv, group, editing, waitForFilters = false} = this.props
+        const { app, source, store, params, csv, group, editing, waitForFilters = false } = this.props
 
         if (app === "csv") {
-            this.props.onSetData({app, csv, store, params, group})
+            this.props.onSetData({ app, csv, store, params, group })
         } else {
             if (editing) {
                 // params.v = (Math.random() + 1).toString(36).substring(7)
             }
 
-            this.setState({showLoading: false})
+            this.setState({ showLoading: false })
             if (!waitForFilters || editing) {
                 console.log('loading -----')
-                this.props.onLoadData({app, source, store, params, group})
+                this.props.onLoadData({ app, source, store, params, group })
                 setTimeout(this.checkLoadingTime, 100);
             } else {
                 console.log("waiting for filters to be set before loading data", app, source, store, params, group)
@@ -38,8 +57,8 @@ class DataProvider extends React.Component {
             this.fallbackTimeout = setTimeout(() => {
                 if (!this.dataLoaded) {
                     console.warn("Fallback loading triggered");
-                    this.setState({showLoading: false});
-                    this.props.onLoadData({app, source, store, params, group});
+                    this.setState({ showLoading: false });
+                    this.props.onLoadData({ app, source, store, params, group });
                     setTimeout(this.checkLoadingTime, 100);
                 }
             }, 1000); // You can adjust this delay
@@ -51,6 +70,7 @@ class DataProvider extends React.Component {
     componentWillUnmount() {
         clearTimeout(this.fallbackTimeout);
         clearTimeout(this.debounceTimeout);
+        this.debounces.forEach(d => d.cancel())
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
@@ -93,12 +113,12 @@ class DataProvider extends React.Component {
 
 
                 if (app === "csv") {
-                    this.props.onSetData({app, csv, store, params, group})
+                    this.props.onSetData({ app, csv, store, params, group })
                 } else {
 
-                    this.setState({showLoading: true});
+                    this.setState({ showLoading: true });
                     if (editing) {
-                        this.props.onLoadData({app, source, store, params, group})
+                        this.props.onLoadData({ app, source, store, params, group })
                     }
 
                     if (initialChanged && this.props.waitForFilters) { //if this timestamp is different, it means that the initial filters still on initial setup
@@ -111,17 +131,18 @@ class DataProvider extends React.Component {
 
                         this.debounceTimeout = setTimeout(() => {
                             this.dataLoaded = true;
-                            this.setState({showLoading: false});
+                            this.setState({ showLoading: false });
                             console.log("Loading data " + app + " " + source)
-                            this.props.onLoadData({app, source, store, params, group})
+                            this.props.onLoadData({ app, source, store, params, group })
                             setTimeout(this.checkLoadingTime, 100);
                         }, 100);
 
                     } else if (userChanged) {
                         console.log("filters has been updated", filters, prevProps.filters, params, prevProps.params, app, source, store, group)
-                        this.setState({showLoading: false})
+                        this.setState({ showLoading: false })
                         console.log("filters has been updated", filters)
-                        this.props.onLoadData({app, source, store, params, group})
+
+                        this.debouncedLoadData(400, { app, source, store, params, group })
                         setTimeout(this.checkLoadingTime, 100);
                     } else {
                         console.log("no changes detected ............")
@@ -134,8 +155,8 @@ class DataProvider extends React.Component {
 
         } else if (doApply) {
             console.log('reloading -----')
-            this.props.onLoadData({app, source, store, params, group})
-            this.setState({showLoading: false})
+            this.props.onLoadData({ app, source, store, params, group })
+            this.setState({ showLoading: false })
             setTimeout(this.checkLoadingTime, 100);
         }
 
@@ -144,11 +165,11 @@ class DataProvider extends React.Component {
 
 
     checkLoadingTime() {
-        const {data, loading, time, error} = this.props
+        const { data, loading, time, error } = this.props
         const loadingTime = Date.now() - time
 
         if (loading && time && loadingTime > 1000) {
-            this.setState({showLoading: true})
+            this.setState({ showLoading: true })
         } else if (loading) {
             setTimeout(this.checkLoadingTime, 100);
         }
@@ -156,7 +177,7 @@ class DataProvider extends React.Component {
 
 
     render() {
-        const {data, style, loading, time, error, editing, isSvg} = this.props
+        const { data, style, loading, time, error, editing, isSvg } = this.props
 
 
         if ((loading && this.state.showLoading && !editing)) {
@@ -170,8 +191,8 @@ class DataProvider extends React.Component {
 
 
             const spinner = <Segment basic={true} padded={true} style={segmentStyle}>
-                <Dimmer active inverted style={{background: "transparent"}}>
-                    <Loader size='medium' style={{background: "transparent"}}></Loader>
+                <Dimmer active inverted style={{ background: "transparent" }}>
+                    <Loader size='medium' style={{ background: "transparent" }}></Loader>
                 </Dimmer>
             </Segment>
 
@@ -207,7 +228,7 @@ class DataProvider extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
-    const {store, group, app} = ownProps
+    const { store, group, app } = ownProps
 
 
     return {

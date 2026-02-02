@@ -130,7 +130,6 @@ const BigNumberGroup = (props) => {
                     }
                 }).sort(sortFunc).map((child, idx) => {
 
-                    debugger
                     return <BigNumberItem
                         key={idx}
                         idx={idx}
