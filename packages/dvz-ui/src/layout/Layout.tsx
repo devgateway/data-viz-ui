@@ -91,4 +91,4 @@ const RootLayout = () => {
     );
 }
 
-export default withTracker(RootLayout);
+export default withTracker(RootLayout) as any;
