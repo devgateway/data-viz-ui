@@ -5,63 +5,161 @@ import { Config } from '../conf';
 import { SettingsContext } from '@devgateway/wp-react-lib';
 import { isInternalTrafficEnabled } from './internalTrafficUtils';
 
-export interface WithGoogleAnalyticsProps {
-    WrappedComponent: React.ComponentType<any>;
-    options?: any;
-}
-
-// Module-level tracking for GA initialization
+// Module-level tracking for GA initialization - ensures GA is only initialized once globally
 const initializedGACodes = new Set<string>();
+let gaInitialized = false;
 
-export const withTracker = <T extends WithGoogleAnalyticsProps>(WrappedComponent: React.ComponentType<T>, options = {}) => {
-    const HOC = (props: T) => {
-        const settings = React.useContext(SettingsContext) ?? {};
-        const gaCode = settings?.data?.google_analytics_code ?? Config.GA_CODE;
-        const location = useLocation();
-        const hasInitialized = useRef(false);
-        const lastSentPage = useRef<string | null>(null);
+export const withTracker = <P extends Record<string, any>>(
+  WrappedComponent: React.ComponentType<P>
+) => {
+  const HOC = (props: P) => {
+    const settings = React.useContext(SettingsContext) ?? {};
+    const gaCode = settings?.data?.google_analytics_code ?? Config.GA_CODE;
+    const location = useLocation();
+    const lastSentPage = useRef<string | null>(null);
+    const scrollTracked = useRef<boolean>(false);
+    const eventListenersAdded = useRef<boolean>(false);
 
-        // Initialize GA only once per unique GA code (client-side only)
-        useEffect(() => {
-            if (typeof window === 'undefined') return;
-            if (!gaCode || gaCode === '#REACT_APP_GA_CODE#') return;
-            if (hasInitialized.current) return;
+    // Initialize GA only once globally (client-side only)
+    if (typeof window !== 'undefined' && !gaInitialized && gaCode && gaCode !== '#REACT_APP_GA_CODE#') {
+      if (!initializedGACodes.has(gaCode)) {
+        try {
+          ReactGA.initialize(gaCode);
+          initializedGACodes.add(gaCode);
+          console.log('GA initialized with code:', gaCode);
+        } catch (error) {
+          console.error('Failed to initialize GA:', error);
+        }
+      }
+      gaInitialized = true;
+    }
 
-            if (!initializedGACodes.has(gaCode)) {
-                ReactGA.initialize(gaCode);
-                initializedGACodes.add(gaCode);
-                console.log('GA initialized with code:', gaCode);
-            }
-            hasInitialized.current = true;
-        }, [gaCode]);
+    // Send pageview only when pathname changes
+    useEffect(() => {
+      if (typeof window === 'undefined') return;
+      if (!gaCode || gaCode === '#REACT_APP_GA_CODE#') return;
+      if (!gaInitialized) return;
 
-        // Send pageview with traffic_type on route change (client-side only)
-        // Only send if we've actually navigated to a different page
-        useEffect(() => {
-            if (typeof window === 'undefined') return;
-            if (!gaCode || gaCode === '#REACT_APP_GA_CODE#') return;
-            if (!hasInitialized.current) return;
+      const page = location.pathname;
 
-            const page = location.pathname;
+      // Only send if this is a different page than last time
+      if (lastSentPage.current === page) {
+        return;
+      }
 
-            // Only send if this is a different page than last time
-            if (lastSentPage.current === page) return;
+      lastSentPage.current = page;
+      scrollTracked.current = false; // Reset scroll tracking for new page
 
-            lastSentPage.current = page;
+      try {
+        const trafficType = isInternalTrafficEnabled() ? 'internal' : 'external';
 
-            const trafficType = isInternalTrafficEnabled() ? 'internal' : 'external';
+        ReactGA.event('page_view', {
+          page_path: page,
+          traffic_type: trafficType
+        });
 
-            ReactGA.send({
-                hitType: "pageview",
-                page,
-                traffic_type: trafficType
+        console.log('GA pageview sent:', { page, traffic_type: trafficType });
+      } catch (error) {
+        console.error('Failed to send pageview:', error);
+      }
+    }, [location.pathname, gaCode]);
+
+    // Track user interactions (scroll, click, etc.)
+    useEffect(() => {
+      if (typeof window === 'undefined') return;
+      if (!gaCode || gaCode === '#REACT_APP_GA_CODE#') return;
+      if (!gaInitialized) return;
+      if (eventListenersAdded.current) return;
+
+      const trafficType = isInternalTrafficEnabled() ? 'internal' : 'external';
+
+      // Track scroll events
+      const handleScroll = () => {
+        if (scrollTracked.current) return;
+
+        // Calculate scroll depth
+        const scrollPercentage = Math.round(
+          (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100
+        );
+
+        // Only track meaningful scroll (more than 10%)
+        if (scrollPercentage > 10) {
+          try {
+            ReactGA.event('scroll', {
+              engagement_type: 'scroll',
+              scroll_depth: scrollPercentage,
+              traffic_type: trafficType,
             });
+            console.log('GA scroll event sent:', { scrollPercentage, traffic_type: trafficType });
+            scrollTracked.current = true;
+          } catch (error) {
+            console.error('Failed to send scroll event:', error);
+          }
+        }
+      };
 
-            console.log('GA pageview sent:', { page, traffic_type: trafficType });
-        }, [location.pathname, gaCode]);
+      // Track click events
+      const handleClick = (event: MouseEvent) => {
+        const target = event.target as HTMLElement;
 
-        return <WrappedComponent {...props} />;
-    };
+        // Get element text or id or class for identification
+        const elementText = target.textContent?.substring(0, 50) || '';
+        const elementId = target.id || '';
+        const elementClass = target.className || '';
 
-    return HOC;
+        // Only track if element has meaningful content
+        if (!elementText && !elementId && !elementClass) return;
+
+        try {
+          ReactGA.event('element_click', {
+            element_id: elementId,
+            element_class: elementClass,
+            element_text: elementText.substring(0, 50),
+            traffic_type: trafficType,
+          });
+        } catch (error) {
+          // Silently fail for click tracking to avoid spam
+        }
+      };
+
+      // Track time on page
+      const startTime = Date.now();
+      const handleUnload = () => {
+        const timeOnPage = Math.round((Date.now() - startTime) / 1000);
+
+        if (timeOnPage > 3) { // Only track if spent more than 3 seconds
+          try {
+            ReactGA.event('time_on_page', {
+              page_path: location.pathname,
+              duration_seconds: timeOnPage,
+              traffic_type: trafficType,
+            });
+            console.log('GA time_on_page event sent:', { timeOnPage, path: location.pathname });
+          } catch (error) {
+            console.error('Failed to send time_on_page event:', error);
+          }
+        }
+      };
+
+      // Add event listeners
+      window.addEventListener('scroll', handleScroll, { passive: true });
+      document.addEventListener('click', handleClick);
+      window.addEventListener('beforeunload', handleUnload);
+
+      eventListenersAdded.current = true;
+
+      // Cleanup
+      return () => {
+        window.removeEventListener('scroll', handleScroll);
+        document.removeEventListener('click', handleClick);
+        window.removeEventListener('beforeunload', handleUnload);
+      };
+    }, [location.pathname, gaCode]);
+
+    return <WrappedComponent {...props} />;
+  };
+
+  HOC.displayName = `withTracker(${WrappedComponent.displayName || WrappedComponent.name || 'Component'})`;
+
+  return HOC;
 };
