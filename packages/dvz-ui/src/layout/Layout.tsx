@@ -11,6 +11,7 @@ import { Config } from '@/conf';
 import { englishTranslations, frenchTranslations, afrikaansTranslations, amharicTranslations } from '@/translations';
 import { updateIntl } from '@/lib';
 import { store } from '@/redux';
+import { withTracker } from '@/tracker';
 
 type Locale = 'en' | 'fr' | 'am' | 'af';
 
@@ -90,4 +91,4 @@ const RootLayout = () => {
     );
 }
 
-export default RootLayout;
+export default withTracker(RootLayout);
