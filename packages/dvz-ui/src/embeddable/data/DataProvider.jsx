@@ -22,7 +22,10 @@ class DataProvider extends React.Component {
     debouncedLoadData(time, args) {
         const db = debounce((args) => {
 
-            console.log("debouncedLoadData" + time)
+            console.log(`🔄 [DataProvider] Debounced load triggered (${time}ms delay)`, {
+                args,
+                timestamp: new Date().toISOString()
+            })
             this.setState({ showLoading: false })
             this.props.onLoadData(args)
             this.dataLoaded = true
@@ -46,17 +49,42 @@ class DataProvider extends React.Component {
 
             this.setState({ showLoading: false })
             if (!waitForFilters || editing) {
-                console.log('loading -----')
+                console.log('📥 [DataProvider] Initial data load triggered', {
+                    app,
+                    source,
+                    store,
+                    params,
+                    group,
+                    waitForFilters,
+                    editing,
+                    timestamp: new Date().toISOString()
+                })
                 this.props.onLoadData({ app, source, store, params, group })
                 setTimeout(this.checkLoadingTime, 100);
             } else {
-                console.log("waiting for filters to be set before loading data", app, source, store, params, group)
+                console.log('⏳ [DataProvider] Waiting for filters before loading data', {
+                    app,
+                    source,
+                    store,
+                    params,
+                    group,
+                    waitForFilters,
+                    timestamp: new Date().toISOString()
+                })
             }
         }
         if (!editing && waitForFilters) {
             this.fallbackTimeout = setTimeout(() => {
                 if (!this.dataLoaded) {
-                    console.warn("Fallback loading triggered");
+                    console.warn('⚠️ [DataProvider] Fallback loading triggered - filters took too long', {
+                        app,
+                        source,
+                        store,
+                        params,
+                        group,
+                        dataLoaded: this.dataLoaded,
+                        timestamp: new Date().toISOString()
+                    });
                     this.setState({ showLoading: false });
                     this.props.onLoadData({ app, source, store, params, group });
                     setTimeout(this.checkLoadingTime, 100);
@@ -124,7 +152,7 @@ class DataProvider extends React.Component {
                     if (initialChanged && this.props.waitForFilters) { //if this timestamp is different, it means that the initial filters still on initial setup
 
 
-                        console.log("initial filters has been updated", filters, params);
+                        // console.log("initial filters updated", filters, params);
                         clearTimeout(this.debounceTimeout);
                         clearTimeout(this.fallbackTimeout); // Cancel fallback because actual trigger happened
 
@@ -132,20 +160,44 @@ class DataProvider extends React.Component {
                         this.debounceTimeout = setTimeout(() => {
                             this.dataLoaded = true;
                             this.setState({ showLoading: false });
-                            console.log("Loading data " + app + " " + source)
+                            console.log('🔄 [DataProvider] Loading data after initial filter setup', {
+                                app,
+                                source,
+                                store,
+                                params,
+                                group,
+                                filters,
+                                debounceDelay: '100ms',
+                                timestamp: new Date().toISOString()
+                            })
                             this.props.onLoadData({ app, source, store, params, group })
                             setTimeout(this.checkLoadingTime, 100);
                         }, 100);
 
                     } else if (userChanged) {
-                        console.log("filters has been updated", filters, prevProps.filters, params, prevProps.params, app, source, store, group)
+                        console.log('🔧 [DataProvider] User filter change detected', {
+                            currentFilters: filters,
+                            previousFilters: prevProps.filters,
+                            currentParams: params,
+                            previousParams: prevProps.params,
+                            app,
+                            source,
+                            store,
+                            group,
+                            debounceDelay: '400ms',
+                            timestamp: new Date().toISOString()
+                        })
                         this.setState({ showLoading: false })
-                        console.log("filters has been updated", filters)
 
                         this.debouncedLoadData(400, { app, source, store, params, group })
                         setTimeout(this.checkLoadingTime, 100);
                     } else {
-                        console.log("no changes detected ............")
+                        console.log('ℹ️ [DataProvider] Component updated but no filter changes detected', {
+                            initialChanged,
+                            userChanged,
+                            waitForFilters: this.props.waitForFilters,
+                            timestamp: new Date().toISOString()
+                        })
                     }
 
 
@@ -154,7 +206,16 @@ class DataProvider extends React.Component {
             }
 
         } else if (doApply) {
-            console.log('reloading -----')
+            console.log('🔄 [DataProvider] Manual reload triggered (apply button)', {
+                app,
+                source,
+                store,
+                params,
+                group,
+                apply,
+                previousApply: prevProps.apply,
+                timestamp: new Date().toISOString()
+            })
             this.props.onLoadData({ app, source, store, params, group })
             this.setState({ showLoading: false })
             setTimeout(this.checkLoadingTime, 100);
