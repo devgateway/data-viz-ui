@@ -9,9 +9,9 @@ import { isInternalTrafficEnabled } from './internalTrafficUtils';
 const initializedGACodes = new Set<string>();
 let gaInitialized = false;
 
-export const withTracker = <P extends Record<string, any>>(
+export const withTracker = <P extends Record<string, any> = {}>(
   WrappedComponent: React.ComponentType<P>
-) => {
+): React.ComponentType<P> => {
   const HOC = (props: P) => {
     const settings = React.useContext(SettingsContext) ?? {};
     const gaCode = settings?.data?.google_analytics_code ?? Config.GA_CODE;
@@ -161,5 +161,5 @@ export const withTracker = <P extends Record<string, any>>(
 
   HOC.displayName = `withTracker(${WrappedComponent.displayName || WrappedComponent.name || 'Component'})`;
 
-  return HOC;
+  return HOC as React.ComponentType<P>;
 };
