@@ -4,9 +4,10 @@ import { setInternalTrafficCookie, validateToken } from './internalTrafficUtils'
 
 interface InternalTrafficToggleProps {
   token: string;
+  redirectTo?: string;
 }
 
-const InternalTrafficToggle: React.FC<InternalTrafficToggleProps> = ({ token }) => {
+const InternalTrafficToggle: React.FC<InternalTrafficToggleProps> = ({ token, redirectTo = '/' }) => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [status, setStatus] = useState<'validating' | 'success' | 'error'>('validating');
@@ -45,16 +46,16 @@ const InternalTrafficToggle: React.FC<InternalTrafficToggleProps> = ({ token }) 
 
       console.log(`Internal traffic ${enableInternal ? 'enabled' : 'disabled'} successfully`);
 
-      // Redirect to home after 3 seconds
+      // Redirect after 3 seconds
       setTimeout(() => {
-        navigate('/');
+        navigate(redirectTo);
       }, 3000);
     } catch (error) {
       setStatus('error');
       setMessage(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
       console.error('Error setting internal traffic cookie:', error);
     }
-  }, [searchParams, token, navigate]);
+  }, [searchParams, token, navigate, redirectTo]);
 
   const baseStyles: React.CSSProperties = {
     display: 'flex',
