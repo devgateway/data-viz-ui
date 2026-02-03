@@ -7,6 +7,8 @@ import {
   PostContent,
   MediaConsumer,
   MediaProvider,
+  Media,
+  MediaContext
 } from "@devgateway/wp-react-lib";
 import { connect } from "react-redux";
 import PostIntro from "../connected-templates/PostIntro";
@@ -47,6 +49,7 @@ interface IntroWithFeaturedImageProps {
   index: number;
   editing: boolean;
   clickToExpandLabel?: string;
+  mediaData: Media | null;
 }
 
 interface FeaturedTabsProps {
@@ -347,8 +350,12 @@ const IntroWithFeaturedImage: React.FC<IntroWithFeaturedImageProps> = ({
   index,
   editing,
   clickToExpandLabel,
+  mediaData
 }) => {
+  //backward compatible
   const media = post._embedded ? post._embedded["wp:featuredmedia"] : null;
+  const mediaUrl = mediaData ? mediaData.source_url : (media && media.length > 0 ? media[0].source_url : null);
+  const bgImage = mediaUrl ?? media;
   const [isHovered, setIsHovered] = useState(false);
   const editingMargin = editing ? count - index : 1;
 
@@ -359,7 +366,7 @@ const IntroWithFeaturedImage: React.FC<IntroWithFeaturedImageProps> = ({
         style={{
           width: `${coverWidth}px`,
           backgroundColor: backgroundColor,
-          backgroundImage: `url(${media ? media[0].source_url : ""})`,
+          backgroundImage: `url(${bgImage ? bgImage : ""})`,
         }}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
@@ -469,18 +476,27 @@ const FeaturedTabs: React.FC<FeaturedTabsProps> = ({
             }}
           >
             <a id={post.slug}></a>
-            <IntroWithFeaturedImage
-              editing={editing}
-              coverWidth={coverWidth}
-              height={height}
-              backgroundColor={colors[`color_${i}`]}
-              count={posts.length}
-              dimensions={dimensions}
-              active={isActive}
-              post={post}
-              index={i}
-              clickToExpandLabel={clickToExpandLabel}
-            />
+            <MediaProvider id={post.featured_media}>
+              <MediaContext.Consumer>
+                {({ media }) => (
+                  <IntroWithFeaturedImage
+                    mediaData={media}
+                    editing={editing}
+                    coverWidth={coverWidth}
+                    height={height}
+                    backgroundColor={colors[`color_${i}`]}
+                    count={posts.length}
+                    dimensions={dimensions}
+                    active={isActive}
+                    post={post}
+                    index={i}
+                    clickToExpandLabel={clickToExpandLabel}
+                  />
+                )}
+              </MediaContext.Consumer>
+
+            </MediaProvider>
+
           </div>
         );
       })}
@@ -523,7 +539,7 @@ const Wrapper: React.FC<VerticalFeaturedTabsProps> = (props) => {
     return (
       window.screen.orientation?.type ||
       ((window?.visualViewport?.width || window.innerWidth) >
-      (window?.visualViewport?.height || window.innerHeight)
+        (window?.visualViewport?.height || window.innerHeight)
         ? "landscape-primary"
         : "portrait-primary")
     );
@@ -603,7 +619,7 @@ const Wrapper: React.FC<VerticalFeaturedTabsProps> = (props) => {
               posts={items}
               activeItem={items?.[0]?.slug}
               colors={parse(colors)}
-              setActive={() => {}}
+              setActive={() => { }}
             />
           ) : (
             <FeaturedTabs
