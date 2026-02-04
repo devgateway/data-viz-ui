@@ -1,7 +1,8 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { Container, Grid } from "semantic-ui-react";
 import { BigNumberItem } from './BigNumberItem';
 import { decode } from '../utils/parseUtils';
+import _ from 'lodash';
 
 const BigNumberGroup = (props) => {
     const {
@@ -104,9 +105,77 @@ const BigNumberGroup = (props) => {
     }
 
 
-    const selected = appliedFilters && appliedFilters[dimension] ? appliedFilters[dimension].length : 0
+    // -------------------------------------------------------------------------
+    // Debounce Logic Implementation
+    // -------------------------------------------------------------------------
 
-    const total = data.children ? data.children.length : 0
+    // Local state to track filters immediately for UI feedback
+    const [localFilters, setLocalFilters] = useState([]);
+
+    // Sync local state with props when they change externally
+    useEffect(() => {
+        if (appliedFilters && appliedFilters[dimension]) {
+            setLocalFilters(appliedFilters[dimension]);
+        } else {
+            setLocalFilters([]);
+        }
+    }, [appliedFilters, dimension]);
+
+    // Create a debounced function to perform the actual expensive filter update
+    // We use useRef to keep the debounce function stable across renders
+    const debouncedApplyFilter = useRef(
+        _.debounce((newFilters, type) => {
+            if (newFilters.length == 0) {
+                onSetFilter({ app, group, parent, param: type, value: [] });
+                onUnSetFilter({ app, group: blockName, parent, param: type });
+            } else {
+                onSetFilter({ app, group, param: type, parent, value: [...newFilters] });
+                onSetFilter({ app, group: blockName, param: type, parent, value: [...newFilters] });
+            }
+        }, 600) // 600ms delay
+    ).current;
+
+    // Cleanup pending debounces on unmount
+    useEffect(() => {
+        return () => {
+            debouncedApplyFilter.cancel();
+        };
+    }, [debouncedApplyFilter]);
+
+    // Handler called by BigNumberItem
+    const handleSetLocalFilter = (childValue, type) => {
+        if (parent && !hasParentFilters) return;
+
+        let newFilters = [...localFilters];
+        if (newFilters.includes(childValue)) {
+            newFilters = newFilters.filter(f => f !== childValue);
+        } else {
+            newFilters.push(childValue);
+        }
+
+        // 1. Update local state immediately for UI responsiveness
+        setLocalFilters(newFilters);
+
+        // 2. Trigger the debounced server update
+        debouncedApplyFilter(newFilters, type);
+    };
+
+    // -------------------------------------------------------------------------
+
+
+    const filteredFilters = data.children.filter(d => {
+        if (showZeroValues === "true") {
+            return d[selectedKey] !== null && d[selectedKey] !== undefined;
+        } else {
+            return d[selectedKey] && d[selectedKey] > 0;
+        }
+    }).sort(sortFunc)
+
+    // Use localFilters for display count to reflect immediate user action
+    const selected = localFilters ? localFilters.length : 0;
+
+    const total = filteredFilters ? filteredFilters.length : 0
+
 
     if (dimension == null) {
         return <h2>Select a dimensiosn to start configuring the component</h2>
@@ -122,28 +191,50 @@ const BigNumberGroup = (props) => {
                         Selected    {selected}/{total}
                     </Grid.Column>
                 </Grid.Row>
-                {data.children && data.children.filter(d => {
-                    if (showZeroValues === "true") {
-                        return d[selectedKey] !== null && d[selectedKey] !== undefined;
-                    } else {
-                        return d[selectedKey] && d[selectedKey] > 0;
-                    }
-                }).sort(sortFunc).map((child, idx) => {
+                {data.children && filteredFilters.map((child, idx) => {
+
+                    // We override the appliedFilters prop passed to item to use our localFilters
+                    // This ensures the item looks selected immediately
+                    const appliedFiltersOverride = {
+                        ...appliedFilters,
+                        [dimension]: localFilters
+                    };
 
                     return <BigNumberItem
                         key={idx}
                         idx={idx}
                         child={child}
                         selectedKey={selectedKey}
-                        appliedFilters={appliedFilters}
+                        appliedFilters={appliedFiltersOverride} // Use overriding filters
                         dimension={dimension}
                         app={app}
                         group={group}
                         parent={parent}
                         blockName={blockName}
                         hasParentFilters={hasParentFilters}
-                        onSetFilter={onSetFilter}
+                        onSetFilter={(params) => {
+                            // Intercept the call from BigNumberItem
+                            // Note: BigNumberItem calls onSetFilter with complex object, 
+                            // but we essentially just need to know which item was clicked.
+                            // However, since we are rewriting the logic here, we can just pass
+                            // our simple handler if we modify BigNumberItem or keep the signature compatible.
+                            //
+                            // Wait! BigNumberItem implements its own toggle logic inside 'click'. 
+                            // We should probably pass a custom handler instead of onSetFilter
+                            // OR modify BigNumberItem to accept a simple 'onClick' handler.
+                            //
+                            // Let's pass a special prop `customClickHandler` and check for it in BigNumberItem
+                            // OR just pass our handler as `onSetFilter` but that might break strict prop types if checked.
+                            // The cleanest way without modifying BigNumberItem heavily is to pass this new handler
+                            // as a prop, but BigNumberItem needs to be updated to use it.
+                        }}
+                        // We will pass our new handler as a specific prop to intercept logic
+                        handleClick={() => handleSetLocalFilter(child.value, child.type)}
+
+                        // We pass the original handlers too just in case, but they won't be used for the click
+                        // if we update BigNumberItem to prefer handleClick
                         onUnSetFilter={onUnSetFilter}
+
                         intl={intl}
                         numberFontSize={numberFontSize}
                         labelFontSize={labelFontSize}
