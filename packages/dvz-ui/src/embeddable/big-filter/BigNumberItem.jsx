@@ -34,6 +34,10 @@ export const BigNumberItem = (props) => {
     const value = child[selectedKey]
 
     const click = () => {
+        if (props.handleClick) {
+            props.handleClick();
+            return;
+        }
 
         if (parent) {
             if (!hasParentFilters) return;

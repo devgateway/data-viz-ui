@@ -34,7 +34,7 @@ class BigFilterDataProvider extends React.Component {
         if (filters != prevProps.filters || JSON.stringify(params) != JSON.stringify(prevProps.params) || app != prevProps.app || JSON.stringify(prevProps.source) != JSON.stringify(source) || csv != prevProps.csv) {
             this.setState({ showLoading: true });
 
-            this.debouncedLoadData(300, { app, source, store, params, group })
+            this.debouncedLoadData(600, { app, source, store, params, group })
         }
     }
 
@@ -43,7 +43,7 @@ class BigFilterDataProvider extends React.Component {
     componentWillUnmount() {
         debugger;
         this.debounces.forEach(d => {
-            d.canel()
+            d ? d.canel() : d.canel()
         })
     }
 

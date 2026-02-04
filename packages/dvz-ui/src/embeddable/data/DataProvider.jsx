@@ -100,7 +100,7 @@ class DataProvider extends React.Component {
     componentWillUnmount() {
         clearTimeout(this.fallbackTimeout);
         clearTimeout(this.debounceTimeout);
-        this.debounces.forEach(d => d.cancel())
+        this.debounces.forEach(d => d ? d.cancel() : null)
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
