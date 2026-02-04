@@ -1,6 +1,6 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {connect} from "react-redux";
-import {decode, parse, compareJsonProps} from "../utils/index.js";
+import React, { useEffect, useRef, useState } from 'react';
+import { connect } from "react-redux";
+import { decode, parse, compareJsonProps } from "../utils/index.js";
 import Map from "./Map"
 import BaseLayer from './BaseLayer'
 import DataLayer from './DataLayer'
@@ -28,6 +28,8 @@ const MapWrapper = (props) => {
         "data-wait-for-filters": waitForFilters = "false",
         intl
     } = props
+
+
 
     const [paramMapPosition, setParamMapPosition] = useState(parse(dataMapPosition, editing), [])
 
@@ -101,10 +103,10 @@ const MapWrapper = (props) => {
     return (
         <div ref={ref} className={"d3map-container"}>
             <ProjectedContainer backgroundColor={decode(bgColorParam)}
-                                height={height}
-                                width={width}
-                                projectionName={projectionName}
-                                editing={editing} initialPosition={paramMapPosition}>
+                height={height}
+                width={width}
+                projectionName={projectionName}
+                editing={editing} initialPosition={paramMapPosition}>
 
                 <Map rotationEnabled={parse(rotationEnabled, editing)}>
                     {layers.map((layer, i) => {
@@ -164,9 +166,10 @@ const MapWrapper = (props) => {
 
                 </Map>
 
-                <Legends selectedItem={selectedItem} d2Click={e => setSelectedItem(e)} patternsData={null}
-                         layers={layers} group={group}
-                         onItemClick={toggleLayerView} toggleColorLayer={toggleColorLayer}></Legends>
+                <Legends selectedItem={selectedItem}
+                    d2Click={e => setSelectedItem(e)} patternsData={null}
+                    layers={layers} group={group}
+                    onItemClick={toggleLayerView} toggleColorLayer={toggleColorLayer}></Legends>
 
 
                 <ZoomControl
@@ -175,7 +178,7 @@ const MapWrapper = (props) => {
                     rootationEmabled={parse(rotationEnabled, editing)}
                     zoomEnabled={parse(zoomEnabled, editing)} onZoomed={setTransform} width={width}
                     height={height} ref={zoomRef} group={group} identifier={identifier}
-                    editing={editing}/>
+                    editing={editing} />
 
             </ProjectedContainer>
 

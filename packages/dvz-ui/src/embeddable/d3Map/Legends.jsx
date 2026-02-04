@@ -1,10 +1,11 @@
-import React, { useRef} from 'react';
-import {symbol} from "prop-types";
+import React, { useRef, useState } from 'react';
+import { symbol } from "prop-types";
 import Papa from "papaparse";
-import {injectIntl} from "react-intl";
+import { injectIntl } from "react-intl";
 import DataProvider from "../data/DataProvider.jsx";
 import DataConsumer from "../data/DataConsumer.jsx";
 import GradientColors from "@/embeddable/d3Map/GradientColors.js";
+import { Icon } from 'semantic-ui-react';
 
 /*
   id: Date.now(),
@@ -60,25 +61,25 @@ import GradientColors from "@/embeddable/d3Map/GradientColors.js";
 * */
 
 
-const Breaks = ({breaks, isPoint, numberFormat, intl}) => {
+const Breaks = ({ breaks, isPoint, numberFormat, intl }) => {
     return (breaks.length > 0) && <div className={"legend-breaks"}>
         {breaks.map((b, i) => {
             if (b.type !== 'graterThan') {
                 return (<div className={"break"}>
                     <div className={`break-item ${isPoint ? 'point' : ''}`}
-                         style={{
-                             backgroundColor: b.color,
-                             border: `1px solid ${b.borderColor}`,
-                         }}></div>
+                        style={{
+                            backgroundColor: b.color,
+                            border: `1px solid ${b.borderColor}`,
+                        }}></div>
                     <div className={"break-label"}> &lt; {intl.formatNumber(b.end, numberFormat)}</div>
                 </div>)
             } else {
                 return (<div className={"break"}>
                     <div className={`break-item ${isPoint ? 'point' : ''}`}
-                         style={{
-                             backgroundColor: b.color,
-                             border: `1px solid ${b.borderColor}`,
-                         }}></div>
+                        style={{
+                            backgroundColor: b.color,
+                            border: `1px solid ${b.borderColor}`,
+                        }}></div>
                     <div className={"break-label"}> &gt; {intl.formatNumber(b.end, numberFormat)}</div>
 
                 </div>)
@@ -120,10 +121,10 @@ const FlowLayerLegend = (props) => {
         <div>
             <div className={"legend-item"}>
                 <div className={"legend-color legend-check"} onClick={e => onItemClick(id)}
-                     style={{
-                         backgroundColor: markFillColor,
-                         borderColor: markBorderColor
-                     }}>{visible != false && <>&#10003;</>}
+                    style={{
+                        backgroundColor: markFillColor,
+                        borderColor: markBorderColor
+                    }}>{visible != false && <>&#10003;</>}
                 </div>
                 <div className={"legend-label"}>{name} ({measureLabel})</div>
             </div>
@@ -157,7 +158,7 @@ const DataPointsLayerLegend = (props) => {
         d2Click,
         selectedItem
     } = props
-    
+
     const numberFormat = {
         style: (format.style === 'compacted') ? 'decimal' : format.style,
         notation: (format.style === 'compacted') ? 'compact' : "standard",
@@ -175,26 +176,27 @@ const DataPointsLayerLegend = (props) => {
     const dimensionValues = items.map(i => i.value)
 
     const fieldLabel = pointStyleBy === "dimension" || showDim2OnLegends ? dimension2 : measureLabel
-   
+
     return <div className={"legend"}>
         <div>
+
             <div className={"legend-item"}>
                 <div className={"legend-color legend-check"} onClick={e => onItemClick(id)}
-                     style={pointStyleBy === "measure" || showDim2OnLegends ? {} : { 
-                         backgroundColor: markFillColor,
-                         borderColor: markBorderColor
-                     }}>{visible != false && <>&#10003;</>}
+                    style={pointStyleBy === "measure" || showDim2OnLegends ? {} : {
+                        backgroundColor: markFillColor,
+                        borderColor: markBorderColor
+                    }}>{visible != false && <>&#10003;</>}
                 </div>
                 <div className={"legend-label"}>{name} </div>
             </div>
-            
+
             {(pointStyleBy === "measure" && visible != false) && <div className={"legend-breaks"}>
                 {breaks.map((b, i) => {
                     return (<div className={"break"}>
                         <div className={"break-item"} style={{
                             backgroundColor: b.color,
                             border: `1px solid ${b.borderColor}`,
-                             borderRadius: type == 'dataPoints' ? "50%" : "0",
+                            borderRadius: type == 'dataPoints' ? "50%" : "0",
                         }}></div>
                         <div className={"break-label"}> &lt; {intl.formatNumber(b.end, numberFormat)}</div>
                     </div>)
@@ -203,14 +205,14 @@ const DataPointsLayerLegend = (props) => {
             }
 
             {visible != false && showDim2OnLegends != false &&
-              <div className={"legend"}>
-                <div className={"legend-item"} >
-                    <div className={"legend-label"}>{dim2LegendLabel || fieldLabel}</div>
+                <div className={"legend"}>
+                    <div className={"legend-item"} >
+                        <div className={"legend-label"}>{dim2LegendLabel || fieldLabel}</div>
 
+                    </div>
                 </div>
-              </div>
             }
-           
+
             {(visible != false && showDim2OnLegends != false) && <div className={"legend-breaks"}>
                 {dimensionValues.map((d) => {
                     return (<div className={"break"}>
@@ -228,25 +230,25 @@ const DataPointsLayerLegend = (props) => {
                                 }}
                             ></div>
                         )}
-                        <div className={"break-label"}   onClick={e=>d2Click(d)}>
-                            {selectedItem==d?<b>{d}</b>:d}
-                            </div>
+                        <div className={"break-label"} onClick={e => d2Click(d)}>
+                            {selectedItem == d ? <b>{d}</b> : d}
+                        </div>
                     </div>)
                 })}
             </div>
             }
 
-         
+
         </div>
     </div>
 }
 
 const BaseLayerLegend = (props) => {
-    const {fillColor, borderColor, name, visible, id, onItemClick} = props
+    const { fillColor, borderColor, name, visible, id, onItemClick } = props
     return <div className={"legend"}>
         <div className={"legend-item"}>
             <div className={"legend-color legend-check"} onClick={e => onItemClick(id)}
-                 style={{backgroundColor: fillColor, borderColor: borderColor}}>{visible != false && <>&#10003;</>}
+                style={{ backgroundColor: fillColor, borderColor: borderColor }}>{visible != false && <>&#10003;</>}
             </div>
             <div className={"legend-label"}>{name}</div>
         </div>
@@ -304,18 +306,18 @@ const DataLayerLegend = (props) => {
         maximumFractionDigits: parseInt(format.maximumFractionDigits)
     }
 
-    const gradientColors = new GradientColors({
+    const getGradientColors = (data) => (new GradientColors({
         data: data.children,
         measure: measures[0],
         defaultFillColor: markFillColor,
         gradientScheme: gradientScheme,
         gradientReverse: gradientReverse
-    })
+    }))
 
     if (app != "csv" && customMeasuresLabels) {
         measureLabel = customMeasuresLabels[measures[0]]
     } else {
-        const parsed = Papa.parse(csv, {header: true, dynamicTyping: true});
+        const parsed = Papa.parse(csv, { header: true, dynamicTyping: true });
         measureLabel = parsed.meta.fields.length > 0 ? parsed.meta.fields[1] : ''
     }
 
@@ -327,19 +329,21 @@ const DataLayerLegend = (props) => {
     }
 
     if (divRef.current) {
-    const patternLegend = divRef.current.querySelector(
-        `.legend.layer_${toId(id)} svg`
-    );
-    if (patternLegend) {
-        patternLegend.style.display = visible === false ? "none" : "block";
+        const patternLegend = divRef.current.querySelector(
+            `.legend.layer_${toId(id)} svg`
+        );
+        if (patternLegend) {
+            patternLegend.style.display = visible === false ? "none" : "block";
+        }
     }
- }
+
+
 
     return <div className={`legend layer_${toId(id)}`} id={toId(`${group} ${name} ${id}`)}>
         <div>
             <div className={"legend-item"}>
                 <div className={"legend-color legend-check"} onClick={e => onItemClick(id)}
-                     style={{backgroundColor: fillColor, borderColor: borderColor}}>{visible != false && <>&#10003;</>}
+                    style={{ backgroundColor: fillColor, borderColor: borderColor }}>{visible != false && <>&#10003;</>}
                 </div>
                 <div className={"legend-label"}>{name}</div>
 
@@ -348,11 +352,11 @@ const DataLayerLegend = (props) => {
             {((useCentroidPoint && !useBreaks && visible != false)) && <div className={"legend-breaks"}>
                 <div className={"break"}>
                     <div className={`break-item point ${colorLayerVisible ? "checked" : ""}`}
-                         onClick={e => toggleColorLayer(id)}
-                         style={{
-                        backgroundColor: markFillColor,
-                        border: `1px solid ${markBorderColor}`,
-                    }}>                       
+                        onClick={e => toggleColorLayer(id)}
+                        style={{
+                            backgroundColor: markFillColor,
+                            border: `1px solid ${markBorderColor}`,
+                        }}>
                     </div>
                     {measureLabel}
                 </div>
@@ -361,78 +365,120 @@ const DataLayerLegend = (props) => {
 
             {(useBreaks && visible != false) &&
                 <div>
-                     
-                        <div className="legend-breaks">
-                            <div
-                                className="legend-section-title"                               
-                                onClick={e => toggleColorLayer(id)}>
-                                <div className={`legend-section-title-checkbox ${colorLayerVisible ? "checked" : ""}`}></div>
-                                <span className="measure-label">{measureLabel}</span>
-                            </div>
+
+                    <div className="legend-breaks">
+                        <div
+                            className="legend-section-title"
+                            onClick={e => toggleColorLayer(id)}>
+                            <div className={`legend-section-title-checkbox ${colorLayerVisible ? "checked" : ""}`}></div>
+                            <span className="measure-label">{measureLabel}</span>
                         </div>
-                    
+                    </div>
+
                     {colorLayerVisible &&
-                    <Breaks isPoint={useCentroidPoint} numberFormat={numberFormat}
+                        <Breaks isPoint={useCentroidPoint} numberFormat={numberFormat}
                             breaks={breaks} visible={visible} intl={intl}></Breaks>
                     }
                 </div>
 
             }
 
-            {(useGradients && visible != false) &&
-                <div>
-                    <div className={"gradient-label"} style={{float: "right"}}>
-                        {intl.formatNumber(Math.max(...(data.children.map(d => d[measures[0]]))), numberFormat)}</div>
-                    <div className={"gradient-label"} style={{float: "left"}}>
-                        {intl.formatNumber(Math.min(...data.children.map(d => d[measures[0]])), numberFormat)}</div>
-                    <div
-                        style={{
-                            background: `linear-gradient(to right, ${gradientColors.getStartColor()}, ${gradientColors.getEndColor()})`,
-                            width: '200px',
-                            height: '10px',
-                        }}
+            {(useGradients && data && data.children && visible != false) &&
+                <div className='gradient-container'>
+
+                    <div className={"gradient-label"} style={{ float: "right" }}>{intl.formatNumber(Math.max(...(data.children.map(d => d[measures[0]]))), numberFormat)}</div>
+                    <div className={"gradient-label"} style={{ float: "left" }}>{intl.formatNumber(Math.min(...data.children.map(d => d[measures[0]])), numberFormat)}</div>
+
+                    <div className="gradient-bar" style={{
+                        background: `linear-gradient(to right, ${getGradientColors(data).getStartColor()}, ${getGradientColors(data).getEndColor()})`,
+                        width: '120px',
+                        height: '10px',
+                    }}
                     ></div>
                 </div>
 
             }
         </div>
     </div>
+
 }
 
 const Legends = (props) => {
     const divRef = useRef(null);
-    const {layers = [], onItemClick, patternsData, group, intl, toggleColorLayer} = props;
-    return <div className={"legends"} ref={divRef}>
-        {layers&&layers.map(l => {
-            return <DataProvider
-                editing={l.editing}
-                params={l.params}
-                app={l.app}
-                csv={decodeURIComponent(l.csv)}
-                group={group}
-                ignoreErrors={true}
-                isSvg={true}
-                store={[l.app, l.unique, l.id]}
-                source={l.apiJoinAttribute + (l.patternDiscriminator != 'none' ? "/" + l.patternDiscriminator : '')}>
-                <div>
-                    {l.type == "base" && <DataConsumer>
-                                            <BaseLayerLegend {...l} group={group} onItemClick={onItemClick}/>
-                                        </DataConsumer>}
-                    {l.type == "data" &&
-                                    <DataConsumer>
-                                        <DataLayerLegend group={group} patternsData={patternsData ? patternsData[l.id] : null}
-                                                     divRef={divRef} {...l} intl={props.intl} onItemClick={onItemClick} toggleColorLayer={toggleColorLayer} />
-                                    </DataConsumer>}
-                    {l.type == "dataPoints" && <DataConsumer>
-                                                   <DataPointsLayerLegend selectedItem={props.selectedItem} d2Click={props.d2Click} intl={props.intl} group={group} {...l} onItemClick={onItemClick}/>
-                                                </DataConsumer>}
-                    {l.type == "flow" && <DataConsumer>
-                                            <FlowLayerLegend group={group} {...l} onItemClick={onItemClick} intl={props.intl}/>
-                                        </DataConsumer>}
-                </div>
-            </DataProvider>
-        })}
-    </div>
+
+    const [collapsed, setCollapsed] = useState(false)
+
+    const ChevronDown = ({ size = 16, color = "currentColor" }) => (
+        <Icon name="chevron down"></Icon>
+    );
+
+    const ChevronRight = ({ size = 16, color = "currentColor" }) => (
+        <Icon name="chevron right"></Icon>
+    );
+
+    const { layers = [], onItemClick, patternsData, group, intl, toggleColorLayer } = props;
+
+
+    return (<div className={`legends ${collapsed ? 'collapsed' : ''}`} ref={divRef}>
+
+        <div className='legend-collapsible-control' onClick={() => setCollapsed(!collapsed)}>
+            {collapsed ? <div> <ChevronRight size={14} />   Show Legends</div> : <div><ChevronDown size={14} />   Hidden Legends</div>}
+        </div>
+
+        <div className="legends-content">
+            {
+                layers && layers.map(l => {
+
+
+                    const params = {}
+                    const ff = l.filters || {}
+
+                    if (ff && ff.forEach) {
+                        ff.forEach(f => {
+                            if (f.value != null && f.value.filter(v => v != null && v.toString().trim() != "").length > 0) params[f.param] = f.value
+                        })
+                    }
+
+                    if (l.dvzProxyDatasetId) {
+                        params.dvzProxyDatasetId = l.dvzProxyDatasetId;
+                    }
+
+                    return (<div key={l.id}>
+
+                        {l.type == "base" && <BaseLayerLegend {...l} group={group} onItemClick={onItemClick} />}
+
+                        {l.type == "data" && l.apiJoinAttribute != 'none' &&
+                            <DataProvider
+                                waitForFilters={true}
+                                editing={l.editing}
+                                params={params}
+                                app={l.app}
+                                verbose={false}
+                                csv={decodeURIComponent(l.csv)}
+                                group={group}
+                                ignoreErrors={true}
+                                isSvg={true}
+                                store={[l.app, l.unique, l.id]}
+                                source={l.apiJoinAttribute + (l.patternDiscriminator != 'none' ? "/" + l.patternDiscriminator : '')}>
+                                <DataConsumer>
+                                    <DataLayerLegend group={group} patternsData={patternsData ? patternsData[l.id] : null} divRef={divRef} {...l} intl={props.intl} onItemClick={onItemClick} toggleColorLayer={toggleColorLayer} />
+                                </DataConsumer>
+                            </DataProvider>
+                        }
+
+                        {l.type == "dataPoints" && <DataPointsLayerLegend selectedItem={props.selectedItem} d2Click={props.d2Click} intl={props.intl} group={group} {...l} onItemClick={onItemClick} />}
+
+                        {l.type == "flow" && <FlowLayerLegend group={group} {...l} onItemClick={onItemClick} intl={props.intl} />}
+
+                    </div>)
+
+                })
+            }
+        </div>
+
+
+
+    </div>)
 }
 
 export default injectIntl(Legends)

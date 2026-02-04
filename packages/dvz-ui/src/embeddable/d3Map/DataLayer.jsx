@@ -88,13 +88,8 @@ class DataLayer extends BaseLayer {
             defaultSize: markSizeScale
         })
 
-        const gradientColors = new GradientColors({
-            data: data.children,
-            measure: measures[0],
-            defaultFillColor: markFillColor,
-            gradientScheme: gradientScheme,
-            gradientReverse: gradientReverse
-        })
+
+
 
         this.g.selectAll(".centroids .point").attr('r', d => {
             return brStyles.getSize(d.properties._value) * 1 / k
@@ -297,6 +292,7 @@ class DataLayer extends BaseLayer {
             defaultBorderColor: markBorderColor,
             defaultSize: markSizeScale
         })
+
         const gradientColors = new GradientColors({
             data: data.children,
             measure: measures[0],
@@ -395,7 +391,7 @@ class DataLayer extends BaseLayer {
             defaultSize: markSizeScale
         })
 
-        const gradientColors = new GradientColors({
+        const getGradientColors = (data) => new GradientColors({
             data: data.children,
             measure: measures[0],
             defaultFillColor: markFillColor,
@@ -427,7 +423,7 @@ class DataLayer extends BaseLayer {
 
 
             pointsGroup.append("circle")
-                .attr("fill", d => useGradients ? gradientColors.getColor(d.properties._value) : brStyles.getColor(d.properties._value, true))
+                .attr("fill", d => useGradients ? getGradientColors(data).getColor(d.properties._value) : brStyles.getColor(d.properties._value, true))
                 .attr("stroke", markBorderColor)
                 .attr("class", "point")
                 .attr("stroke-width", 2)
@@ -445,7 +441,8 @@ class DataLayer extends BaseLayer {
                                 value: p.properties._value
                             }
                         }
-                        this.showToolTip(tooltip, variables, useGradients ? gradientColors.getColor(p.properties._value) : brStyles.getColor(p.properties._value))
+                        debugger;
+                        this.showToolTip(tooltip, variables, useGradients ? getGradientColors(data).getColor(p.properties._value) : brStyles.getColor(p.properties._value))
                     }
                 })
                 .on("mouseleave", (d) => {
@@ -536,6 +533,15 @@ class DataLayer extends BaseLayer {
 
         const patternWidth = 10 * 1 / k
         const patternHeight = 10 * 1 / k
+
+        const getGradientColors = (data) => new GradientColors({
+            data: data.children,
+            measure: measures[0],
+            defaultFillColor: markFillColor,
+            gradientScheme: gradientScheme,
+            gradientReverse: gradientReverse
+        })
+
 
         let patternsData = []
 
@@ -659,7 +665,7 @@ class DataLayer extends BaseLayer {
                                         return "none;fill:url(#" + toId(p) + ");"
                                     })
                                     .on("mouseenter", () => {
-                                        this.showToolTip(tooltip, this.getTooltipVariables(d), useGradients ? gradientColors.getColor(d.properties._value) : brStyles.getColor(d.properties._value))
+                                        this.showToolTip(tooltip, this.getTooltipVariables(d), useGradients ? getGradientColors(data).getColor(d.properties._value) : brStyles.getColor(d.properties._value))
                                     }).on("mousemove", (d) => {
                                         this.moveToolTip()
                                     }).on("mouseleave", (d) => {
@@ -688,10 +694,13 @@ class DataLayer extends BaseLayer {
 
 
             legendsSVG.attr("height", 30 + ((patternsData.length * 23)) + "px")
-            const g = legendsSVG.append("svg").append("g")
 
 
-            const defs = g.append("defs")
+
+            const lgenedsG = legendsSVG.append("svg").append("g")
+
+
+            const defs = lgenedsG.append("defs")
 
             defs.selectAll("pattern").remove()
 
@@ -753,7 +762,7 @@ class DataLayer extends BaseLayer {
 
             let patternCheckbox = patternsVisible ? "☑ " : "☐ ";
 
-            g.append("text")
+            lgenedsG.append("text")
                 .attr("class", "patterns-checkbox")
                 .attr("x", 10)
                 .attr("y", 20)
@@ -767,7 +776,7 @@ class DataLayer extends BaseLayer {
                     }
                 })
 
-            g.append("text")
+            lgenedsG.append("text")
                 .attr("class", "patterns-title")
                 .attr("x", 25)
                 .attr("y", 7)
@@ -780,7 +789,7 @@ class DataLayer extends BaseLayer {
 
 
             if (patternsVisible) {
-                g.selectAll(".legend-squares")
+                lgenedsG.selectAll(".legend-squares")
                     .data(patternsData)
                     .enter()
                     .append("rect")
@@ -794,7 +803,7 @@ class DataLayer extends BaseLayer {
                     })
 
 
-                g.selectAll(".patterns-labels")
+                lgenedsG.selectAll(".patterns-labels")
                     .data(patternsData)
                     .enter()
                     .append("text")
@@ -978,7 +987,7 @@ const DataWrapper = (props) => {
 
 
     return (<DataProvider
-        waitForFilters={waitForFilters}
+        waitForFilters={true}
         editing={editing}
         params={params}
         app={app}
