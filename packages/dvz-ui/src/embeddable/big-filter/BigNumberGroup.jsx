@@ -111,13 +111,38 @@ const BigNumberGroup = (props) => {
 
     // Local state to track filters immediately for UI feedback
     const [localFilters, setLocalFilters] = useState([]);
+    const pendingFilters = useRef(null); // Track the last local update we sent
 
     // Sync local state with props when they change externally
     useEffect(() => {
-        if (appliedFilters && appliedFilters[dimension]) {
-            setLocalFilters(appliedFilters[dimension]);
+        const incoming = appliedFilters && appliedFilters[dimension] ? appliedFilters[dimension] : [];
+
+        // Conflict Resolution Strategy:
+        // If we have a pending local update, we want to ignore "stale" props that might
+        // arrive before our update has been processed by the server.
+        // We only sync if:
+        // 1. We have NO pending update (pure external change)
+        // 2. OR the incoming props MATCH our pending update (server caught up!)
+
+        if (pendingFilters.current) {
+            // Check if incoming props match what we expect
+            // We sort both to ensure array order doesn't matter
+            const incomingSorted = [...incoming].sort();
+            const pendingSorted = [...pendingFilters.current].sort();
+
+            if (_.isEqual(incomingSorted, pendingSorted)) {
+                // Server caught up! We can clear pending and sync.
+                pendingFilters.current = null;
+                setLocalFilters(incoming);
+            } else {
+                // Props don't match our pending state yet.
+                // It's likely an old prop value or an intermediate state.
+                // We IGNORE it to preserve our optimistic local state (stopping the blink).
+                // Risk: If an external update happens simultaneously, we might miss it until we stop interacting.
+            }
         } else {
-            setLocalFilters([]);
+            // No pending local changes, always sync (e.g. initial load or external reset)
+            setLocalFilters(incoming);
         }
     }, [appliedFilters, dimension]);
 
@@ -132,7 +157,7 @@ const BigNumberGroup = (props) => {
                 onSetFilter({ app, group, param: type, parent, value: [...newFilters] });
                 onSetFilter({ app, group: blockName, param: type, parent, value: [...newFilters] });
             }
-        }, 600) // 600ms delay
+        }, 400) // 400ms delay
     ).current;
 
     // Cleanup pending debounces on unmount
@@ -155,6 +180,7 @@ const BigNumberGroup = (props) => {
 
         // 1. Update local state immediately for UI responsiveness
         setLocalFilters(newFilters);
+        pendingFilters.current = newFilters; // Mark this state as pending
 
         // 2. Trigger the debounced server update
         debouncedApplyFilter(newFilters, type);
