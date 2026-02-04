@@ -40,6 +40,8 @@ class DataProvider extends React.Component {
     componentDidMount() {
         const { app, source, store, params, csv, group, editing, waitForFilters = false } = this.props
 
+        debugger;
+
         if (app === "csv") {
             this.props.onSetData({ app, csv, store, params, group })
         } else {
@@ -226,7 +228,7 @@ class DataProvider extends React.Component {
 
 
     checkLoadingTime() {
-        const { data, loading, time, error } = this.props
+        const { data, loading, time, error, verbose = true } = this.props
         const loadingTime = Date.now() - time
 
         if (loading && time && loadingTime > 1000) {
@@ -238,7 +240,7 @@ class DataProvider extends React.Component {
 
 
     render() {
-        const { data, style, loading, time, error, editing, isSvg } = this.props
+        const { data, style, loading, time, error, editing, isSvg, verbose = true } = this.props
 
 
         if ((loading && this.state.showLoading && !editing)) {
