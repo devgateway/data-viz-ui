@@ -334,13 +334,7 @@ export default (state = initialState, action) => {
                 return newItemsValues.indexOf(f) > -1
             })
 
-            //if we have new items (meaning more parent filters selected, new items should be selected by default)
-            const addedItems = newItemsValues.filter(f => {
-                //new items added to the list only 
-                return prevItemsJs.indexOf(f) == -1
-            })
-
-            const consolidatedFilters = Array.from(new Set([...onlySelectedPresentOnItems, ...addedItems]))
+            const consolidatedFilters = Array.from(new Set([...onlySelectedPresentOnItems]))
 
             return state.setIn([...path, "items"], newItems)
                 .setIn(["filters", app, group, param], Array.from(consolidatedFilters))
