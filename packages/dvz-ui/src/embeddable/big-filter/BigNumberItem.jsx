@@ -29,33 +29,17 @@ export const BigNumberItem = (props) => {
         idx
     } = props;
 
-    const itemsOnFilters = appliedFilters && appliedFilters[dimension] ? appliedFilters[dimension] : []
-    const isSelected = appliedFilters && appliedFilters[dimension] ? appliedFilters[dimension].indexOf(child.value) > -1 : false;
+
+    const isSelected = appliedFilters.indexOf(child.value) > -1;
     const value = child[selectedKey]
 
     const click = () => {
+
         if (props.handleClick) {
             props.handleClick();
-            return;
         }
 
-        if (parent) {
-            if (!hasParentFilters) return;
-        }
-        const newFilters = [...itemsOnFilters]
-        if (isSelected) {
-            newFilters.splice(newFilters.indexOf(child.value), 1)
-        } else {
-            newFilters.push(child.value)
-        }
-        if (newFilters.length == 0) {
 
-            onSetFilter({ app, group, parent, param: child.type, value: [] })
-            onUnSetFilter({ app, group: blockName, parent, param: child.type })
-        } else {
-            onSetFilter({ app, group, param: child.type, parent, value: [...newFilters] })
-            onSetFilter({ app, group: blockName, param: child.type, parent, value: [...newFilters] })
-        }
     }
 
     const numberStyle = (selected) => {

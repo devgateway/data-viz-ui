@@ -9,7 +9,7 @@ const BigNumberGroup = (props) => {
         group,
         app,
         parent,
-        hasParentFilters,
+
         nColumns,
         height,
         blockName,
@@ -27,19 +27,24 @@ const BigNumberGroup = (props) => {
         intl,
         onUnSetFilter,
         onSetFilter,
-        appliedFilters,
+        appliedFilters, ///self applied filters
+        hasParentFilters, //util flag
+        effectiveFilter, //all filter toghether
+        parentAppliedFilters, //parent applied filter
         sort,
         order,
         showZeroValues
     } = props;
 
     const selectedKey = measures[app] ? Object.keys(measures[app]).find(key => measures[app][key].selected) : null
-
-
-    const readGroup = parent ? parent : blockName + Math.random(0, 1) //were to read my linked filters
+    const readGroup = parent ? parent : blockName + Math.random(0, 1) //were to read my linked filters, if parent we need to use parent filters parameters to load the data
     const selfGroup = blockName //where to store my  state
 
 
+    const [localFilters, setLocalFilters] = useState([]);
+
+    console.log("localFilters", blockName, localFilters)
+    console.log("effectiveFilter", effectiveFilter)
     const formatObject = measures[app] && measures[app].format ? measures[app].format : {
         style: "percent",
         minimumFractionDigits: 1,
@@ -64,99 +69,19 @@ const BigNumberGroup = (props) => {
         }
     }
 
-    useEffect(() => {
-
-        onSetFilter({ app, group, param: dimension, value: [Number.MIN_SAFE_INTEGER] }) //this is for global group the one connected to charts
-        onUnSetFilter({ app, group: blockName, parent, param: dimension }) //this one is internal state to filter other linked big filters
-
-    }, []);
-
-    useEffect(() => {
-        if (parent && parent != "" && hasParentFilters === false && appliedFilters) {
-            const hasAnyFilters = Object.values(appliedFilters).some(filterArray => filterArray && filterArray.length > 0);
-            if (hasAnyFilters) {
-                onSetFilter({ app, group, param: dimension, value: [Number.MIN_SAFE_INTEGER] })
-                onUnSetFilter({ app, group: blockName, parent, param: dimension })
-                setLocalFilters([])
-                pendingFilters.current = null
-            }
-        }
-    }, [hasParentFilters]);
-
-    useEffect(() => {
-
-        const items = data.children.map(d => d.value)
-        const hasMissing = appliedFilters && appliedFilters[dimension] ? appliedFilters[dimension].some(val => !items.includes(val)) : false;
-        if (hasMissing) {
-            const cleanedFilters = appliedFilters[dimension].filter(val => items.includes(val));
-            if (cleanedFilters.length == 0) {
-                onUnSetFilter({ app, group, param: dimension }) //write on global filters  group(charts)
-                onUnSetFilter({ app, group: selfGroup, param: dimension }) //keep isolated self selected filter
-                setLocalFilters([])
-                pendingFilters.current = null
-            } else {
-                onSetFilter({ app, group, param: dimension, value: cleanedFilters })//write on global filters  group(charts)
-                onSetFilter({ app, group: selfGroup, parent, param: dimension, value: cleanedFilters }) //keep update self selected filter
-                setLocalFilters(cleanedFilters)
-                pendingFilters.current = null
-            }
-        }
-    }, [hasParentFilters, appliedFilters, data]);
-
     const getLabel = (type) => {
         if (!data || !data.metadata || !data.metadata.types) return null;
-
         const l = data.metadata.types.filter(d => d.dimension == dimension)
         return l && l.length > 0 ? l[0].items.filter(i => i.code == type)[0]?.value : null;
     }
 
 
-    // -------------------------------------------------------------------------
-    // Debounce Logic Implementation
-    // -------------------------------------------------------------------------
 
-    // Local state to track filters immediately for UI feedback
-    const [localFilters, setLocalFilters] = useState([]);
-    const pendingFilters = useRef(null); // Track the last local update we sent
 
-    // Sync local state with props when they change externally
-    useEffect(() => {
-        const incoming = appliedFilters && appliedFilters[dimension] ? appliedFilters[dimension] : [];
-
-        // Conflict Resolution Strategy:
-        // If we have a pending local update, we want to ignore "stale" props that might
-        // arrive before our update has been processed by the server.
-        // We only sync if:
-        // 1. We have NO pending update (pure external change)
-        // 2. OR the incoming props MATCH our pending update (server caught up!)
-
-        if (pendingFilters.current) {
-            // Check if incoming props match what we expect
-            // We sort both to ensure array order doesn't matter
-            const incomingSorted = [...incoming].sort();
-            const pendingSorted = [...pendingFilters.current].sort();
-
-            if (_.isEqual(incomingSorted, pendingSorted)) {
-                // Server caught up! We can clear pending and sync.
-                pendingFilters.current = null;
-                setLocalFilters(incoming);
-            } else {
-                // Props don't match our pending state yet.
-                // It's likely an old prop value or an intermediate state.
-                // We IGNORE it to preserve our optimistic local state (stopping the blink).
-                // Risk: If an external update happens simultaneously, we might miss it until we stop interacting.
-            }
-        } else {
-            // No pending local changes, always sync (e.g. initial load or external reset)
-            setLocalFilters(incoming);
-        }
-    }, [appliedFilters, dimension]);
-
-    // Create a debounced function to perform the actual expensive filter update
-    // We use useRef to keep the debounce function stable across renders
     const debouncedApplyFilter = useRef(
         _.debounce((newFilters, type) => {
             if (newFilters.length == 0) {
+
                 onSetFilter({ app, group, parent, param: type, value: [] });
                 onUnSetFilter({ app, group: blockName, parent, param: type });
             } else {
@@ -166,17 +91,16 @@ const BigNumberGroup = (props) => {
         }, 300) // 400ms delay
     ).current;
 
-    // Cleanup pending debounces on unmount
-    useEffect(() => {
-        return () => {
-            debouncedApplyFilter.cancel();
-        };
-    }, [debouncedApplyFilter]);
+
+
+    const handleUnsetFilter = () => {
+
+    }
+
 
     // Handler called by BigNumberItem
     const handleSetLocalFilter = (childValue, type) => {
-        if (parent && !hasParentFilters) return;
-
+        if (hasParentFilters && (!parentAppliedFilters || parentAppliedFilters.length === 0)) return;
         let newFilters = [...localFilters];
         if (newFilters.includes(childValue)) {
             newFilters = newFilters.filter(f => f !== childValue);
@@ -186,14 +110,11 @@ const BigNumberGroup = (props) => {
 
         // 1. Update local state immediately for UI responsiveness
         setLocalFilters(newFilters);
-        pendingFilters.current = newFilters; // Mark this state as pending
-
         // 2. Trigger the debounced server update
         debouncedApplyFilter(newFilters, type);
     };
 
     // -------------------------------------------------------------------------
-
 
     const filteredFilters = data.children.filter(d => {
         if (showZeroValues === "true") {
@@ -203,41 +124,77 @@ const BigNumberGroup = (props) => {
         }
     }).sort(sortFunc)
 
+
+    useEffect(() => {
+        onSetFilter({ app, group, param: dimension, value: [Number.MIN_SAFE_INTEGER] }) //this is for global group the one connected to charts
+        onUnSetFilter({ app, group: blockName, parent, param: dimension }) //this one is internal state to filter other linked big filters
+
+    }, []);
+
+
+
+
+    const items = data.children.map(d => d.value)
+    const filteredValues = filteredFilters.map(d => d.value)
+
+
+
+
+    useEffect(() => {
+        //this is consilation script here we need to compare selected vs new items remove the non existing ones from applied filters if no longer available
+
+        const missing = appliedFilters ? appliedFilters.filter(val => !filteredValues.includes(val)) : []//
+        if (blockName == "ds")
+            debugger;
+
+        if (hasParentFilters && (parentAppliedFilters.length == 0)) {//remove all selected items
+
+            onSetFilter({ app, group, param: dimension, value: [Number.MIN_SAFE_INTEGER] })
+            onUnSetFilter({ app, group: selfGroup, param: dimension }) //keep isolated self selected filter
+
+            setLocalFilters([]);
+        } else if (missing.length > 0) {
+            const cleanedFilters = appliedFilters.filter(val => filteredValues.indexOf(val) > -1)
+            if (cleanedFilters.length == 0) {
+                setLocalFilters([]);
+                onUnSetFilter({ app, group, param: dimension }) //write on global filters  group(charts)
+                onUnSetFilter({ app, group: selfGroup, param: dimension }) //keep isolated self selected filter
+
+            } else {
+                setLocalFilters(cleanedFilters);
+                onSetFilter({ app, group, param: dimension, value: cleanedFilters })//write on global filters  group(charts)
+                onSetFilter({ app, group: selfGroup, parent, param: dimension, value: cleanedFilters }) //keep update self selected filter
+
+            }
+        }
+    }, [data]);
+
     // Use localFilters for display count to reflect immediate user action
     const selected = localFilters ? localFilters.length : 0;
-
     const total = filteredFilters ? filteredFilters.length : 0
+
+
 
 
     if (dimension == null) {
         return <h2>Select a dimensiosn to start configuring the component</h2>
     } else {
         return <Container fluid={true} style={{ padding: '0px', margin: '0px', height: `${height}px` }}>
-
-
-
             <Grid fluid={true} celled={true} stackable columns={nColumns} style={{ border: '1px solid #EEE' }}>
                 <Grid.Row>
-                    <Grid.Column width={16} textAlign='right'>
-
-                        Selected    {selected}/{total}
-                    </Grid.Column>
+                    <Grid.Column width={16} textAlign='right'>Selected    {selected}/{total}</Grid.Column>
                 </Grid.Row>
                 {data.children && filteredFilters.map((child, idx) => {
-
                     // We override the appliedFilters prop passed to item to use our localFilters
                     // This ensures the item looks selected immediately
-                    const appliedFiltersOverride = {
-                        ...appliedFilters,
-                        [dimension]: localFilters
-                    };
+
 
                     return <BigNumberItem
                         key={idx}
                         idx={idx}
                         child={child}
-                        selectedKey={selectedKey}
-                        appliedFilters={appliedFiltersOverride} // Use overriding filters
+                        selectedKey={selectedKey} //which measure will be shown
+                        appliedFilters={localFilters} // Use overriding filters
                         dimension={dimension}
                         app={app}
                         group={group}

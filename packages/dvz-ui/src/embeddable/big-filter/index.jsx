@@ -45,6 +45,7 @@ const BigFilter = (props) => {
         hasParentFilters,
         effectiveFilter,
         appliedFilters,
+        parentAppliedFilters,
         onSetFilter,
         onUnSetFilter
     } = props
@@ -90,12 +91,13 @@ const BigFilter = (props) => {
 
                     <DataConsumer noDataMessage={<h1>No data</h1>}>
                         <BigNumberGroup
+
                             nColumns={nColumns}
                             parent={parent}
                             sort={sort}
                             order={order}
                             showZeroValues={showZeroValues}
-                            hasParentFilters={hasParentFilters}
+
                             onSetFilter={onSetFilter}
                             onUnSetFilter={onUnSetFilter}
                             appliedFilters={appliedFilters}
@@ -116,7 +118,9 @@ const BigFilter = (props) => {
                             unselectedNumberColor={unselectedNumberColor}
                             unselectedLabelColor={unselectedLabelColor}
                             unselectedBackgroundColor={unselectedBackgroundColor}
-
+                            hasParentFilters={hasParentFilters} //util flag
+                            effectiveFilter={effectiveFilter} //all filter toghether
+                            parentAppliedFilters={parentAppliedFilters} //parent applied filter
 
                             dimension={dimension}>
                         </BigNumberGroup>
@@ -129,24 +133,31 @@ const BigFilter = (props) => {
 }
 
 const mapStateToProps = (state, ownProps) => {
-    const { "data-app": app, "data-group": group, "data-block-name": blockName, "data-parent": parent } = ownProps
+    const { "data-app": app, "data-group": group, "data-block-name": blockName, "data-parent": parent, "data-dimension1": dimension } = ownProps
 
 
     const writeGroup = group //where to write final filters
+
     const readGroup = parent ? parent : blockName + Math.random(0, 1) //were to read my linked filters
     const selfGroup = blockName //where to store my  state
 
-    const currentFilter = state.getIn(['data', 'filters', app, selfGroup])
+    const currentFilter = state.getIn(['data', 'filters', app, selfGroup]) //in
 
-    const hasParentFilters = (parent && parent != "") && state.getIn(['data', 'filters', app, readGroup])
-        && state.getIn(['data', 'filters', app, readGroup]).size > 0 ? true : false
+    const hasParentFilters = parent != "" && parent != null
 
     const effectiveFilter = state.getIn(['data', 'filters', app, writeGroup]) ? state.getIn(['data', 'filters', app, writeGroup]).toJS() : {}
 
+    let parentFilters = hasParentFilters ? state.getIn(['data', 'filters', app, readGroup]) : null
+    let parentAppliedFilters = parentFilters ? Object.values(state.getIn(['data', 'filters', app, parent]).toJS())[0] : []
+
+    let appliedFilters = currentFilter ? currentFilter.toJS()[dimension] : []
+    //console.log("applied filter", blockName, appliedFilters)
+    console.log(effectiveFilter)
     return {
-        hasParentFilters,
-        effectiveFilter,
-        appliedFilters: currentFilter ? currentFilter.toJS() : null
+        hasParentFilters, //util flag
+        effectiveFilter, //all filter toghether
+        parentAppliedFilters: parentAppliedFilters ? parentAppliedFilters : [], //parent applied filter
+        appliedFilters: appliedFilters ? appliedFilters : [] //self applied filters
     }
 
 }
