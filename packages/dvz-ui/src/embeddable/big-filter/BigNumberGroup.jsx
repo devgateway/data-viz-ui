@@ -77,6 +77,8 @@ const BigNumberGroup = (props) => {
             if (hasAnyFilters) {
                 onSetFilter({ app, group, param: dimension, value: [Number.MIN_SAFE_INTEGER] })
                 onUnSetFilter({ app, group: blockName, parent, param: dimension })
+                setLocalFilters([])
+                pendingFilters.current = null
             }
         }
     }, [hasParentFilters]);
@@ -90,9 +92,13 @@ const BigNumberGroup = (props) => {
             if (cleanedFilters.length == 0) {
                 onUnSetFilter({ app, group, param: dimension }) //write on global filters  group(charts)
                 onUnSetFilter({ app, group: selfGroup, param: dimension }) //keep isolated self selected filter
+                setLocalFilters([])
+                pendingFilters.current = null
             } else {
                 onSetFilter({ app, group, param: dimension, value: cleanedFilters })//write on global filters  group(charts)
                 onSetFilter({ app, group: selfGroup, parent, param: dimension, value: cleanedFilters }) //keep update self selected filter
+                setLocalFilters(cleanedFilters)
+                pendingFilters.current = null
             }
         }
     }, [hasParentFilters, appliedFilters, data]);
@@ -157,7 +163,7 @@ const BigNumberGroup = (props) => {
                 onSetFilter({ app, group, param: type, parent, value: [...newFilters] });
                 onSetFilter({ app, group: blockName, param: type, parent, value: [...newFilters] });
             }
-        }, 400) // 400ms delay
+        }, 300) // 400ms delay
     ).current;
 
     // Cleanup pending debounces on unmount
