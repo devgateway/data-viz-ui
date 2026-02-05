@@ -38,7 +38,7 @@ export const setMeasures = ({ app, group, mGroup }) => (dispatch, getState) => {
 
 
 export const loadFilterItems = ({ app, type, group, param, autoApply, params, parentParam, parentType, parentSelectedItems, uniqueStorage, dvzProxyDatasetId }) => (dispatch, getState) => {
-
+    debugger;
     const newPrams = { ...params }
     newPrams[parentParam] = parentSelectedItems
 
@@ -296,6 +296,7 @@ export default (state = initialState, action) => {
 
         case RELOAD_CHILD_FILTER_ITEMS: {
 
+            debugger;
             const { data, app, group, param, uniqueStorage, dvzProxyDatasetId, filterType, parentType, autoApply } = action
             const now = Date.now();
 
@@ -326,7 +327,7 @@ export default (state = initialState, action) => {
 
             //previous child applied filter
             const appliedFilters = state.getIn(["filters", app, group, param])
-            //on new items, set selected those items that war selected previously 
+            //on new items, set selected those items that were selected previously 
             const newItemsValues = data[0].items.map(i => i.value)
 
             //if filter were removed we should unselect them 
@@ -335,6 +336,9 @@ export default (state = initialState, action) => {
             })
 
             const consolidatedFilters = Array.from(new Set([...onlySelectedPresentOnItems]))
+
+
+            debugger;
 
             return state.setIn([...path, "items"], newItems)
                 .setIn(["filters", app, group, param], Array.from(consolidatedFilters))
