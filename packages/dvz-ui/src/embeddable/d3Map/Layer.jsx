@@ -1,5 +1,5 @@
 import React from 'react';
-import {createRoot} from 'react-dom/client';
+import { createRoot } from 'react-dom/client';
 import * as d3 from 'd3' // d3 plugin
 import Tooltip from "./Tooltip";
 import * as utils from './Utils'
@@ -15,7 +15,7 @@ class BaseLayer extends React.Component {
         this.showToolTip = this.showToolTip.bind(this)
         this.moveToolTip = this.moveToolTip.bind(this)
         this.gRef = React.createRef();
-        this.state = {json: null}
+        this.state = { json: null }
 
     }
 
@@ -29,7 +29,7 @@ class BaseLayer extends React.Component {
     }
 
     applyInitialTransform() {
-        const {editing, initialPosition, width, height} = this.props
+        const { editing, initialPosition, width, height } = this.props
         d3.select(this.gRef.current).attr("transform", `translate(${initialPosition.x},${initialPosition.y}) scale(${initialPosition.k})`);
 
     }
@@ -61,7 +61,7 @@ class BaseLayer extends React.Component {
                 .style("top", (window.event.pageY - 50) + "px")
             const root = createRoot(tip._groups[0][0]);
             root.render(<Tooltip intl={this.props.intl} tooltip={content} data={data}
-                                 tooltipEnableMarkdown={false}/>)
+                tooltipEnableMarkdown={false} />)
         }
     }
 
@@ -79,16 +79,18 @@ class BaseLayer extends React.Component {
 
 
     componentDidMount() {
+        console.log("MAP MOUNTED.....")
         //eslint-disable-next-line
         if (this.props.zoom && this.gRef.current) {
             this.applyInitialTransform()
         }
+        debugger;
         this.create()
     }
 
     render() {
-        const {name, height, width} = this.props
-        return <g className={"layer"} ref={this.gRef}/>
+        const { name, height, width } = this.props
+        return <g className={"layer"} ref={this.gRef} />
     }
 }
 

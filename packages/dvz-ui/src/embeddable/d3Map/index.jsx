@@ -102,11 +102,13 @@ const MapWrapper = (props) => {
 
     return (
         <div ref={ref} className={"d3map-container"}>
-            <ProjectedContainer backgroundColor={decode(bgColorParam)}
+            <ProjectedContainer
+                backgroundColor={decode(bgColorParam)}
                 height={height}
                 width={width}
                 projectionName={projectionName}
-                editing={editing} initialPosition={paramMapPosition}>
+                editing={editing}
+                initialPosition={paramMapPosition}>
 
                 <Map rotationEnabled={parse(rotationEnabled, editing)}>
                     {layers.map((layer, i) => {

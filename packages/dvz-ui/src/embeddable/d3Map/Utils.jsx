@@ -1,11 +1,11 @@
 import * as d3 from "d3";
-import {get} from "@/api/commons.js";
+import { get } from "@/api/commons.js";
 
 
 const requestQueue = {}
 
 const cache = {};
-const ttl = 3 * 60 * 1000 ; // 3 minutes
+const ttl = 3 * 60 * 1000; // 3 minutes
 const deepClone = (obj) => JSON.parse(JSON.stringify(obj));
 
 const requestWithDeduplication = (url) => {
@@ -22,7 +22,7 @@ const requestWithDeduplication = (url) => {
 
     const req = d3.json(url)
         .then(data => {
-            cache[key] = {data, timestamp: Date.now()};
+            cache[key] = { data, timestamp: Date.now() };
             return data;
         })
         .finally(() => {
@@ -37,15 +37,5 @@ const requestWithDeduplication = (url) => {
 
 
 export const loadJSON = (url) => {
-    return new Promise((resolve, reject) => {
-        d3.json(url).then(function (us, error) {
-            if (error) {
-                console.log("Error loading JSON: " + error)
-            }
-            resolve(us)
-        }).catch(function (error) {
-            console.error("Error loading JSON:", error);
-            reject(error);
-        })
-    })
+    return requestWithDeduplication(url)
 }
