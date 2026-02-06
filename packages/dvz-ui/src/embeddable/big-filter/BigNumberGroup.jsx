@@ -88,7 +88,7 @@ const BigNumberGroup = (props) => {
                 onSetFilter({ app, group, param: type, parent, value: [...newFilters] });
                 onSetFilter({ app, group: blockName, param: type, parent, value: [...newFilters] });
             }
-        }, 300) // 400ms delay
+        }, 400) // 400ms delay
     ).current;
 
 

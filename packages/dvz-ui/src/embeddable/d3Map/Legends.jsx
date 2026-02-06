@@ -3,7 +3,7 @@ import { symbol } from "prop-types";
 import Papa from "papaparse";
 import { injectIntl } from "react-intl";
 import DataProvider from "../data/DataProvider.jsx";
-import DataConsumer from "../data/DataConsumer.jsx";
+import DataConsumer from "../data/D3MapDataConsumer.jsx";
 import GradientColors from "@/embeddable/d3Map/GradientColors.js";
 import { Icon } from 'semantic-ui-react';
 
@@ -383,7 +383,7 @@ const DataLayerLegend = (props) => {
 
             }
 
-            {(useGradients && data && data.children.length > 0 && visible != false) &&
+            {(useGradients && data && data.children && data.children.length > 0 && visible != false) &&
                 <div className='gradient-container'>
 
                     <div className={"gradient-label"} style={{ float: "right" }}>{intl.formatNumber(Math.max(...(data.children.map(d => d[measures[0]]))), numberFormat)}</div>
