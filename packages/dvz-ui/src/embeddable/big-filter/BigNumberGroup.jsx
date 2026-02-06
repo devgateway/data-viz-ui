@@ -92,16 +92,11 @@ const BigNumberGroup = (props) => {
     ).current;
 
 
-
-    const handleUnsetFilter = () => {
-
-    }
-
-
     // Handler called by BigNumberItem
     const handleSetLocalFilter = (childValue, type) => {
         if (hasParentFilters && (!parentAppliedFilters || parentAppliedFilters.length === 0)) return;
         let newFilters = [...localFilters];
+
         if (newFilters.includes(childValue)) {
             newFilters = newFilters.filter(f => f !== childValue);
         } else {
@@ -112,6 +107,7 @@ const BigNumberGroup = (props) => {
         setLocalFilters(newFilters);
         // 2. Trigger the debounced server update
         debouncedApplyFilter(newFilters, type);
+
     };
 
     // -------------------------------------------------------------------------
@@ -132,13 +128,8 @@ const BigNumberGroup = (props) => {
     }, []);
 
 
-
-
     const items = data.children.map(d => d.value)
     const filteredValues = filteredFilters.map(d => d.value)
-
-
-
 
     useEffect(() => {
         //this is consilation script here we need to compare selected vs new items remove the non existing ones from applied filters if no longer available
@@ -148,24 +139,33 @@ const BigNumberGroup = (props) => {
             debugger;
 
         if (hasParentFilters && (parentAppliedFilters.length == 0)) {//remove all selected items
+            console.log(blockName, "RESETING FILTER; PARENT IS EMPTY")
 
             onSetFilter({ app, group, param: dimension, value: [Number.MIN_SAFE_INTEGER] })
             onUnSetFilter({ app, group: selfGroup, param: dimension }) //keep isolated self selected filter
-
             setLocalFilters([]);
+
         } else if (missing.length > 0) {
+
+            if (blockName == "ds") {
+                debugger
+            }
             const cleanedFilters = appliedFilters.filter(val => filteredValues.indexOf(val) > -1)
+
             if (cleanedFilters.length == 0) {
                 setLocalFilters([]);
-                onUnSetFilter({ app, group, param: dimension }) //write on global filters  group(charts)
+                onSetFilter({ app, group, param: dimension, value: [Number.MIN_SAFE_INTEGER] })
                 onUnSetFilter({ app, group: selfGroup, param: dimension }) //keep isolated self selected filter
 
             } else {
-                setLocalFilters(cleanedFilters);
+
                 onSetFilter({ app, group, param: dimension, value: cleanedFilters })//write on global filters  group(charts)
                 onSetFilter({ app, group: selfGroup, parent, param: dimension, value: cleanedFilters }) //keep update self selected filter
 
             }
+
+        } else {
+            setLocalFilters(appliedFilters);
         }
     }, [data]);
 
@@ -187,8 +187,6 @@ const BigNumberGroup = (props) => {
                 {data.children && filteredFilters.map((child, idx) => {
                     // We override the appliedFilters prop passed to item to use our localFilters
                     // This ensures the item looks selected immediately
-
-
                     return <BigNumberItem
                         key={idx}
                         idx={idx}
