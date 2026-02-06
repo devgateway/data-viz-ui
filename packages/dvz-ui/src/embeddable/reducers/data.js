@@ -285,6 +285,8 @@ export default (state = initialState, action) => {
 
         case SET_FILTERS: {
 
+            debugger;
+
             const now = Date.now();
             const { app, group, filters, autoApply } = action
             return state.setIn(['filters-settings', app, group, "autoApply"], autoApply)
@@ -335,7 +337,14 @@ export default (state = initialState, action) => {
                 return newItemsValues.indexOf(f) > -1
             })
 
-            const consolidatedFilters = Array.from(new Set([...onlySelectedPresentOnItems]))
+
+            //if we have new items (meaning more parent filters selected, new items should be selected by default)
+            const addedItems = newItemsValues.filter(f => {
+                //new items added to the list only 
+                return prevItemsJs.indexOf(f) == -1
+            })
+
+            const consolidatedFilters = Array.from(new Set([...onlySelectedPresentOnItems, ...addedItems]))
 
 
             debugger;
