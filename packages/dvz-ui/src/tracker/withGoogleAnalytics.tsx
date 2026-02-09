@@ -19,9 +19,18 @@ export const withTracker = <P extends Record<string, any> = {}>(
     const lastSentPage = useRef<string | null>(null);
     const scrollTracked = useRef<boolean>(false);
     const eventListenersAdded = useRef<boolean>(false);
+    const isInternal = useRef<boolean>(false);
 
-    // Initialize GA only once globally (client-side only)
-    if (typeof window !== 'undefined' && !gaInitialized && gaCode && gaCode !== '#REACT_APP_GA_CODE#') {
+    // Check internal traffic status once on mount
+    if (typeof window !== 'undefined' && !isInternal.current) {
+      isInternal.current = isInternalTrafficEnabled();
+      if (isInternal.current) {
+        console.log('[GA] Internal traffic detected — GA will NOT be initialized and no events will be sent.');
+      }
+    }
+
+    // Initialize GA only once globally (client-side only, external traffic only)
+    if (typeof window !== 'undefined' && !isInternal.current && !gaInitialized && gaCode && gaCode !== '#REACT_APP_GA_CODE#') {
       if (!initializedGACodes.has(gaCode)) {
         try {
           ReactGA.initialize(gaCode);
@@ -37,6 +46,7 @@ export const withTracker = <P extends Record<string, any> = {}>(
     // Send pageview only when pathname changes
     useEffect(() => {
       if (typeof window === 'undefined') return;
+      if (isInternal.current) return;
       if (!gaCode || gaCode === '#REACT_APP_GA_CODE#') return;
       if (!gaInitialized) return;
 
@@ -51,14 +61,11 @@ export const withTracker = <P extends Record<string, any> = {}>(
       scrollTracked.current = false; // Reset scroll tracking for new page
 
       try {
-        const trafficType = isInternalTrafficEnabled() ? 'internal' : 'external';
-
         ReactGA.event('page_view', {
           page_path: page,
-          traffic_type: trafficType
         });
 
-        console.log('GA pageview sent:', { page, traffic_type: trafficType });
+        console.log('GA pageview sent:', { page });
       } catch (error) {
         console.error('Failed to send pageview:', error);
       }
@@ -67,11 +74,10 @@ export const withTracker = <P extends Record<string, any> = {}>(
     // Track user interactions (scroll, click, etc.)
     useEffect(() => {
       if (typeof window === 'undefined') return;
+      if (isInternal.current) return;
       if (!gaCode || gaCode === '#REACT_APP_GA_CODE#') return;
       if (!gaInitialized) return;
       if (eventListenersAdded.current) return;
-
-      const trafficType = isInternalTrafficEnabled() ? 'internal' : 'external';
 
       // Track scroll events
       const handleScroll = () => {
@@ -88,9 +94,8 @@ export const withTracker = <P extends Record<string, any> = {}>(
             ReactGA.event('scroll', {
               engagement_type: 'scroll',
               scroll_depth: scrollPercentage,
-              traffic_type: trafficType,
             });
-            console.log('GA scroll event sent:', { scrollPercentage, traffic_type: trafficType });
+            console.log('GA scroll event sent:', { scrollPercentage });
             scrollTracked.current = true;
           } catch (error) {
             console.error('Failed to send scroll event:', error);
@@ -115,7 +120,6 @@ export const withTracker = <P extends Record<string, any> = {}>(
             element_id: elementId,
             element_class: elementClass,
             element_text: elementText.substring(0, 50),
-            traffic_type: trafficType,
           });
         } catch (error) {
           // Silently fail for click tracking to avoid spam
@@ -132,7 +136,6 @@ export const withTracker = <P extends Record<string, any> = {}>(
             ReactGA.event('time_on_page', {
               page_path: location.pathname,
               duration_seconds: timeOnPage,
-              traffic_type: trafficType,
             });
             console.log('GA time_on_page event sent:', { timeOnPage, path: location.pathname });
           } catch (error) {
