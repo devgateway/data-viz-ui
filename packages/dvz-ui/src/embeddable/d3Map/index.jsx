@@ -169,6 +169,7 @@ const MapWrapper = (props) => {
                 </Map>
 
                 <Legends selectedItem={selectedItem}
+                    unique={unique}
                     d2Click={e => setSelectedItem(e)} patternsData={null}
                     layers={layers} group={group}
                     onItemClick={toggleLayerView} toggleColorLayer={toggleColorLayer}></Legends>

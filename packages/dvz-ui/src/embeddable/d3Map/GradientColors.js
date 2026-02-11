@@ -121,7 +121,7 @@ class GradientColors {
     }
 
     createGradient(gradientScheme, data, gradientReverse) {
-        debugger;
+
         const gradientLimits = sequentialColors.find(sc => sc.value == gradientScheme) || {
             "startColor": "#ffffff",
             "endColor": "#000000"
@@ -167,7 +167,7 @@ class GradientColors {
     }
 
     getColor(value) {
-        debugger;
+
         if (this.valueColors.length > 0) {
             const colorValue = this.valueColors.find(vc => vc.value == value)
             return colorValue?.color || this.defaultFillColor;
@@ -176,6 +176,7 @@ class GradientColors {
     }
 
     getStartColor() {
+
         return this.startColor;
     }
 

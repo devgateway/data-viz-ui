@@ -1,6 +1,6 @@
 import React from 'react';
 import BaseLayer from "./BaseLayer.jsx";
-import DataProvider from "../data/DataProvider.jsx";
+import DataProvider from "../data/D3MapDataProvider.jsx";
 import DataConsumer from "../data/D3MapDataConsumer.jsx";
 import { parse } from "../utils/index.js";
 import * as d3 from "d3";
@@ -205,7 +205,7 @@ class DataLayer extends BaseLayer {
 
         } = this.props
 
-        console.log("useGradients", useGradients)
+
         if (this.gRef && this.gRef.current) {
             //eslint-disable-next-line
 
@@ -294,7 +294,7 @@ class DataLayer extends BaseLayer {
         })
 
         const gradientColors = new GradientColors({
-            data: data.children,
+            data: data ? data.children : [],
             measure: measures[0],
             defaultFillColor: markFillColor,
             gradientScheme: gradientScheme,
@@ -995,6 +995,7 @@ const DataWrapper = (props) => {
         ignoreErrors={true}
         isSvg={true}
         store={[app, unique, id]}
+        mySelf="Data layer"
         source={apiJoinAttribute + (patternDiscriminator != 'none' ? "/" + patternDiscriminator : '')}>
         <DataConsumer>
             <DataLayer {...props}></DataLayer>

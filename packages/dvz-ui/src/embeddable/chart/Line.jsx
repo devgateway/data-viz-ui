@@ -127,7 +127,7 @@ const Chart = ({
   }));
 
 
-  console.log(lineCurve)
+
 
   const legendItems = () => {
     if (reverseLegend) {
@@ -555,18 +555,18 @@ const Chart = ({
     options.data && options.data?.filter((d) => d?.data?.length > 0)?.length;
 
   const hiddenLabels = [];
-  if(isNotDesktopPreview || isNotEditingAndIsMobileCustomizationEnabled) {
-      ticks = Number.parseInt(mobileConfigSettings.yAxisTickValues);
-      const labels = new Map(Object.entries(mobileConfigSettings?.labels?.xAxis ?? {}));
-      for (const [key, value] of labels) {
-        if (!value) {
-          hiddenLabels.push(key);
-        }
+  if (isNotDesktopPreview || isNotEditingAndIsMobileCustomizationEnabled) {
+    ticks = Number.parseInt(mobileConfigSettings.yAxisTickValues);
+    const labels = new Map(Object.entries(mobileConfigSettings?.labels?.xAxis ?? {}));
+    for (const [key, value] of labels) {
+      if (!value) {
+        hiddenLabels.push(key);
       }
+    }
   }
 
   if (options?.data && hasData > 0) {
-    let filteredData = applyFilter(options.data)    
+    let filteredData = applyFilter(options.data)
     const xDomain = [];
     filteredData.forEach(series => {
       if (series && Array.isArray(series.data)) {
@@ -592,7 +592,7 @@ const Chart = ({
 
           // Ensure last index points to the last domain value
           idxs[total - 1] = xDomain.length - 1;
-          
+
           // Map to values
           computedXTicks = idxs.map(i => xDomain[i]);
         }
@@ -601,7 +601,7 @@ const Chart = ({
       const every = Math.max(1, parseInt(lineXAxisTickEvery));
       if (xDomain.length > 0) {
         const vals = [];
-        for (let i = 0; i < xDomain.length; i++){ 
+        for (let i = 0; i < xDomain.length; i++) {
           if (i % every === 0) {
             vals.push(xDomain[i]);
           }
@@ -613,12 +613,12 @@ const Chart = ({
 
         computedXTicks = vals;
       }
-    } 
-    
+    }
+
     return (
       <div style={{ height: height }}>
         <ResponsiveLine
-        curve={lineCurve}
+          curve={lineCurve}
           key={new Date()}
           data={filteredData}
           margin={margins}
@@ -636,25 +636,25 @@ const Chart = ({
           axisRight={
             showRightAxis
               ? {
-                  tickSize: 5,
-                  tickValues: ticks,
-                  tickPadding: 5,
-                  tickRotation: 0,
-                  legend: legends.right,
-                  legendPosition: "middle",
-                  legendOffset: parseInt(offsetRight),
-                  format: (value) => {
-                    const effectiveFormat = customAxisFormat
-                      ? customAxisFormat
-                      : format;
-                    return intl.formatNumber(
-                      effectiveFormat.style === "percent" ? value / 100 : value,
-                      {
-                        ...effectiveFormat,
-                      }
-                    );
-                  },
-                }
+                tickSize: 5,
+                tickValues: ticks,
+                tickPadding: 5,
+                tickRotation: 0,
+                legend: legends.right,
+                legendPosition: "middle",
+                legendOffset: parseInt(offsetRight),
+                format: (value) => {
+                  const effectiveFormat = customAxisFormat
+                    ? customAxisFormat
+                    : format;
+                  return intl.formatNumber(
+                    effectiveFormat.style === "percent" ? value / 100 : value,
+                    {
+                      ...effectiveFormat,
+                    }
+                  );
+                },
+              }
               : null
           }
           enableGridY={enableGridY}
@@ -672,13 +672,13 @@ const Chart = ({
             return colorGenerator.getColor(d.id, d);
           }}
           axisBottom={
-            (isNotDesktopPreview || isNotEditingAndIsMobileCustomizationEnabled) && mobileConfigSettings?.xAxisDisabled === true ? null :{
-            ...(computedXTicks ? { tickValues: computedXTicks } : {}),
-            renderTick: CustomTick,
-            legend: legends.bottom,
-            legendPosition: "middle",
-            legendOffset: Number.parseInt(offsetBottom),
-          }}
+            (isNotDesktopPreview || isNotEditingAndIsMobileCustomizationEnabled) && mobileConfigSettings?.xAxisDisabled === true ? null : {
+              ...(computedXTicks ? { tickValues: computedXTicks } : {}),
+              renderTick: CustomTick,
+              legend: legends.bottom,
+              legendPosition: "middle",
+              legendOffset: Number.parseInt(offsetBottom),
+            }}
           axisLeft={{
             tickSize: 5,
             tickValues: ticks,

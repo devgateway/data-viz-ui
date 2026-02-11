@@ -4,7 +4,7 @@ import { injectIntl } from 'react-intl';
 import { DataContext } from './DataContext'
 import { getData, setData } from "../reducers/data";
 import { Container, Dimmer, Loader, Segment } from "semantic-ui-react";
-import debounce from 'lodash/debounce'
+
 
 class DataProvider extends React.Component {
 
@@ -14,94 +14,45 @@ class DataProvider extends React.Component {
             showLoading: false
         }
         this.checkLoadingTime = this.checkLoadingTime.bind(this)
-        this.debounces = []
 
+        // Timer references
+        this.loadingTimeout = null;
+        this.fallbackTimeout = null;
+        this.initialFilterTimeout = null;
     }
-
-
-    debouncedLoadData(time, args) {
-        const db = debounce((args) => {
-
-            console.log(`🔄 [DataProvider] Debounced load triggered (${time}ms delay)`, {
-                args,
-                timestamp: new Date().toISOString()
-            })
-            this.setState({ showLoading: false })
-            this.props.onLoadData(args)
-            this.dataLoaded = true
-            this.checkLoadingTime = this.checkLoadingTime.bind(this)
-            setTimeout(this.checkLoadingTime, 0)
-        }, time)
-
-        this.debounces.push(db(args))
-    }
-
 
     componentDidMount() {
-        const { app, source, store, params, csv, group, editing, waitForFilters = false } = this.props
+        const { app, csv, store, params, source, group, editing, waitForFilters = false } = this.props
+        console.log("Group & Store ", store, this.props.mySelf)
 
         if (app === "csv") {
             this.props.onSetData({ app, csv, store, params, group })
         } else {
-            if (editing) {
-                // params.v = (Math.random() + 1).toString(36).substring(7)
-            }
-
             this.setState({ showLoading: false })
+
             if (!waitForFilters || editing) {
-                console.log('📥 [DataProvider] Initial data load triggered', {
-                    app,
-                    source,
-                    store,
-                    params,
-                    group,
-                    waitForFilters,
-                    editing,
-                    timestamp: new Date().toISOString()
-                })
-                this.props.onLoadData({ app, source, store, params, group })
-                setTimeout(this.checkLoadingTime, 100);
-            } else {
-                console.log('⏳ [DataProvider] Waiting for filters before loading data', {
-                    app,
-                    source,
-                    store,
-                    params,
-                    group,
-                    waitForFilters,
-                    timestamp: new Date().toISOString()
-                })
+                console.log('📥 [D3 Map DataProvider] Initial data load triggered', { app, editing, waitForFilters });
+                this.loadData({ app, source, store, params, group });
+            }
+
+            if (!editing && waitForFilters) {
+                this.fallbackTimeout = setTimeout(() => {
+                    if (!this.props.data && !this.props.loading) {
+                        console.warn('⚠️ [D3 Map DataProvider] Fallback loading triggered');
+                        this.loadData({ app, source, store, params, group });
+                    }
+                }, 2000);
             }
         }
-        if (!editing && waitForFilters) {
-            this.fallbackTimeout = setTimeout(() => {
-                if (!this.dataLoaded) {
-                    console.warn('⚠️ [DataProvider] Fallback loading triggered - filters took too long', {
-                        app,
-                        source,
-                        store,
-                        params,
-                        group,
-                        dataLoaded: this.dataLoaded,
-                        timestamp: new Date().toISOString()
-                    });
-                    this.setState({ showLoading: false });
-                    this.props.onLoadData({ app, source, store, params, group });
-                    setTimeout(this.checkLoadingTime, 100);
-                }
-            }, 1000); // You can adjust this delay
-        }
-
-
     }
 
     componentWillUnmount() {
         clearTimeout(this.fallbackTimeout);
-        clearTimeout(this.debounceTimeout);
-        this.debounces.forEach(d => d ? d.cancel() : null)
+        clearTimeout(this.loadingTimeout);
+        clearTimeout(this.initialFilterTimeout);
     }
 
-    componentDidUpdate(prevProps, prevState, snapshot) {
+    componentDidUpdate(prevProps) {
         const {
             app,
             filters,
@@ -112,127 +63,78 @@ class DataProvider extends React.Component {
             csv,
             group,
             autoApply,
-            editing,
             lastInitialFilterChange,
-            lastUserFilterChange
+            lastUserFilterChange,
+            waitForFilters
         } = this.props
 
-        const initialChanged = lastInitialFilterChange !== prevProps.lastInitialFilterChange;
-        const userChanged = lastUserFilterChange !== prevProps.lastUserFilterChange;
-
-
-        //
-        //log filters
-
-        const timeOut = true
-
-        let doApply = false
-
-
-        if (apply !== undefined && apply !== null && apply != prevProps.apply) {
-            doApply = true;
+        // 1. Manual Apply
+        if (apply !== undefined && apply !== null && apply !== prevProps.apply) {
+            console.log('🔄 [DataProvider] Manual reload (apply button)');
+            this.loadData({ app, source, store, params, group });
+            return;
         }
 
+        // 2. Auto Apply Logic
         if (autoApply !== false) {
-            if (filters != prevProps.filters || JSON.stringify(params) != JSON.stringify(prevProps.params)
-                || app != prevProps.app
-                || JSON.stringify(prevProps.source) != JSON.stringify(source)
-                || csv != prevProps.csv) {
+            const significantPropChange =
+                filters !== prevProps.filters ||
+                JSON.stringify(params) !== JSON.stringify(prevProps.params) ||
+                app !== prevProps.app ||
+                JSON.stringify(prevProps.source) !== JSON.stringify(source) ||
+                csv !== prevProps.csv;
 
-
+            if (significantPropChange) {
                 if (app === "csv") {
-                    this.props.onSetData({ app, csv, store, params, group })
+                    this.props.onSetData({ app, csv, store, params, group });
                 } else {
+                    const initialChanged = lastInitialFilterChange !== prevProps.lastInitialFilterChange;
+                    const userChanged = lastUserFilterChange !== prevProps.lastUserFilterChange;
 
-                    this.setState({ showLoading: true });
-                    if (editing) {
-                        this.props.onLoadData({ app, source, store, params, group })
-                    }
+                    if (initialChanged && waitForFilters) {
+                        console.log('ℹ️ [DataProvider] Initial filters changing, debouncing...');
 
-                    if (initialChanged && this.props.waitForFilters) { //if this timestamp is different, it means that the initial filters still on initial setup
+                        if (this.initialFilterTimeout) clearTimeout(this.initialFilterTimeout);
 
-
-                        // console.log("initial filters updated", filters, params);
-                        clearTimeout(this.debounceTimeout);
-                        clearTimeout(this.fallbackTimeout); // Cancel fallback because actual trigger happened
-
-
-                        this.debounceTimeout = setTimeout(() => {
-                            this.dataLoaded = true;
-                            this.setState({ showLoading: false });
-                            console.log('🔄 [DataProvider] Loading data after initial filter setup', {
-                                app,
-                                source,
-                                store,
-                                params,
-                                group,
-                                filters,
-                                debounceDelay: '100ms',
-                                timestamp: new Date().toISOString()
-                            })
-                            this.props.onLoadData({ app, source, store, params, group })
-                            setTimeout(this.checkLoadingTime, 100);
-                        }, 100);
+                        this.initialFilterTimeout = setTimeout(() => {
+                            console.log('✅ [DataProvider] Initial filters settled, loading data');
+                            this.loadData({ app, source, store, params, group });
+                        }, 500);
 
                     } else if (userChanged) {
-                        console.log('🔧 [DataProvider] User filter change detected', {
-                            currentFilters: filters,
-                            previousFilters: prevProps.filters,
-                            currentParams: params,
-                            previousParams: prevProps.params,
-                            app,
-                            source,
-                            store,
-                            group,
-                            debounceDelay: '400ms',
-                            timestamp: new Date().toISOString()
-                        })
-                        this.setState({ showLoading: false })
-
-                        this.debouncedLoadData(400, { app, source, store, params, group })
-                        setTimeout(this.checkLoadingTime, 100);
-                    } else {
-                        console.log('ℹ️ [DataProvider] Component updated but no filter changes detected', {
-                            initialChanged,
-                            userChanged,
-                            waitForFilters: this.props.waitForFilters,
-                            timestamp: new Date().toISOString()
-                        })
+                        console.log('ℹ️ [DataProvider] User filters changed, loading data');
+                        this.loadData({ app, source, store, params, group });
+                    } else if (!initialChanged && !userChanged) {
+                        // Fallback for prop changes that aren't explicitly filter timestamps
+                        // Only load if we are not waiting for initial filters
+                        if (!waitForFilters) {
+                            // console.log('ℹ️ [DataProvider] Props changed, loading data');
+                            //this.loadData({ app, source, store, params, group });
+                        }
                     }
-
-
                 }
-
             }
-
-        } else if (doApply) {
-            console.log('🔄 [DataProvider] Manual reload triggered (apply button)', {
-                app,
-                source,
-                store,
-                params,
-                group,
-                apply,
-                previousApply: prevProps.apply,
-                timestamp: new Date().toISOString()
-            })
-            this.props.onLoadData({ app, source, store, params, group })
-            this.setState({ showLoading: false })
-            setTimeout(this.checkLoadingTime, 100);
         }
-
-
     }
 
+    loadData(params) {
+        console.log("Loading data for map", params)
+        this.setState({ showLoading: false });
+        this.props.onLoadData(params);
+
+        if (this.loadingTimeout) clearTimeout(this.loadingTimeout);
+        this.loadingTimeout = setTimeout(this.checkLoadingTime, 200);
+    }
 
     checkLoadingTime() {
-        const { data, loading, time, error, verbose = true } = this.props
-        const loadingTime = Date.now() - time
-
-        if (loading && time && loadingTime > 1000) {
-            this.setState({ showLoading: true })
-        } else if (loading) {
-            setTimeout(this.checkLoadingTime, 100);
+        const { loading, time } = this.props
+        if (loading && time) {
+            const loadingTime = Date.now() - time;
+            if (loadingTime > 1000) {
+                this.setState({ showLoading: true });
+            } else {
+                this.loadingTimeout = setTimeout(this.checkLoadingTime, 200);
+            }
         }
     }
 
