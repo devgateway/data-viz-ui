@@ -38,7 +38,7 @@ export const setMeasures = ({ app, group, mGroup }) => (dispatch, getState) => {
 
 
 export const loadFilterItems = ({ app, type, group, param, autoApply, params, parentParam, parentType, parentSelectedItems, uniqueStorage, dvzProxyDatasetId }) => (dispatch, getState) => {
-    debugger;
+
     const newPrams = { ...params }
     newPrams[parentParam] = parentSelectedItems
 
@@ -285,7 +285,6 @@ export default (state = initialState, action) => {
 
         case SET_FILTERS: {
 
-            debugger;
 
             const now = Date.now();
             const { app, group, filters, autoApply } = action
@@ -298,7 +297,6 @@ export default (state = initialState, action) => {
 
         case RELOAD_CHILD_FILTER_ITEMS: {
 
-            debugger;
             const { data, app, group, param, uniqueStorage, dvzProxyDatasetId, filterType, parentType, autoApply } = action
             const now = Date.now();
 
@@ -347,7 +345,6 @@ export default (state = initialState, action) => {
             const consolidatedFilters = Array.from(new Set([...onlySelectedPresentOnItems, ...addedItems]))
 
 
-            debugger;
 
             return state.setIn([...path, "items"], newItems)
                 .setIn(["filters", app, group, param], Array.from(consolidatedFilters))

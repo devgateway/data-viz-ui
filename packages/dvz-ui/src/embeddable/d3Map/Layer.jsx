@@ -84,7 +84,6 @@ class BaseLayer extends React.Component {
         if (this.props.zoom && this.gRef.current) {
             this.applyInitialTransform()
         }
-        debugger;
         this.create()
     }
 

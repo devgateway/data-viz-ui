@@ -205,7 +205,7 @@ class DataLayer extends BaseLayer {
 
         } = this.props
 
-
+        console.log("useGradients", useGradients)
         if (this.gRef && this.gRef.current) {
             //eslint-disable-next-line
 
@@ -423,7 +423,7 @@ class DataLayer extends BaseLayer {
 
 
             pointsGroup.append("circle")
-                .attr("fill", d => useGradients ? getGradientColors(data).getColor(d.properties._value) : brStyles.getColor(d.properties._value, true))
+                .attr("fill", d => useGradients === true ? getGradientColors(data).getColor(d.properties._value) : brStyles.getColor(d.properties._value, true))
                 .attr("stroke", markBorderColor)
                 .attr("class", "point")
                 .attr("stroke-width", 2)
@@ -441,8 +441,8 @@ class DataLayer extends BaseLayer {
                                 value: p.properties._value
                             }
                         }
-                        debugger;
-                        this.showToolTip(tooltip, variables, useGradients ? getGradientColors(data).getColor(p.properties._value) : brStyles.getColor(p.properties._value))
+
+                        this.showToolTip(tooltip, variables, useGradients === true ? getGradientColors(data).getColor(p.properties._value) : brStyles.getColor(p.properties._value))
                     }
                 })
                 .on("mouseleave", (d) => {
@@ -660,12 +660,11 @@ class DataLayer extends BaseLayer {
                                     .attr("fill", d => {
                                         return "transparent"
                                     })
-
                                     .attr("style", () => {
                                         return "none;fill:url(#" + toId(p) + ");"
                                     })
                                     .on("mouseenter", () => {
-                                        this.showToolTip(tooltip, this.getTooltipVariables(d), useGradients ? getGradientColors(data).getColor(d.properties._value) : brStyles.getColor(d.properties._value))
+                                        this.showToolTip(tooltip, this.getTooltipVariables(d), useGradients === true ? getGradientColors(data).getColor(d.properties._value) : brStyles.getColor(d.properties._value))
                                     }).on("mousemove", (d) => {
                                         this.moveToolTip()
                                     }).on("mouseleave", (d) => {
