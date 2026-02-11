@@ -136,37 +136,37 @@ const BigNumberGroup = (props) => {
 
         const missing = appliedFilters ? appliedFilters.filter(val => !filteredValues.includes(val)) : []//
         if (blockName == "ds")
-            debugger;
 
-        if (hasParentFilters && (parentAppliedFilters.length == 0)) {//remove all selected items
-            console.log(blockName, "RESETING FILTER; PARENT IS EMPTY")
 
-            onSetFilter({ app, group, param: dimension, value: [Number.MIN_SAFE_INTEGER] })
-            onUnSetFilter({ app, group: selfGroup, param: dimension }) //keep isolated self selected filter
-            setLocalFilters([]);
+            if (hasParentFilters && (parentAppliedFilters.length == 0)) {//remove all selected items
+                console.log(blockName, "RESETING FILTER; PARENT IS EMPTY")
 
-        } else if (missing.length > 0) {
-
-            if (blockName == "ds") {
-                debugger
-            }
-            const cleanedFilters = appliedFilters.filter(val => filteredValues.indexOf(val) > -1)
-
-            if (cleanedFilters.length == 0) {
-                setLocalFilters([]);
                 onSetFilter({ app, group, param: dimension, value: [Number.MIN_SAFE_INTEGER] })
                 onUnSetFilter({ app, group: selfGroup, param: dimension }) //keep isolated self selected filter
+                setLocalFilters([]);
+
+            } else if (missing.length > 0) {
+
+                if (blockName == "ds") {
+                    debugger
+                }
+                const cleanedFilters = appliedFilters.filter(val => filteredValues.indexOf(val) > -1)
+
+                if (cleanedFilters.length == 0) {
+                    setLocalFilters([]);
+                    onSetFilter({ app, group, param: dimension, value: [Number.MIN_SAFE_INTEGER] })
+                    onUnSetFilter({ app, group: selfGroup, param: dimension }) //keep isolated self selected filter
+
+                } else {
+
+                    onSetFilter({ app, group, param: dimension, value: cleanedFilters })//write on global filters  group(charts)
+                    onSetFilter({ app, group: selfGroup, parent, param: dimension, value: cleanedFilters }) //keep update self selected filter
+
+                }
 
             } else {
-
-                onSetFilter({ app, group, param: dimension, value: cleanedFilters })//write on global filters  group(charts)
-                onSetFilter({ app, group: selfGroup, parent, param: dimension, value: cleanedFilters }) //keep update self selected filter
-
+                setLocalFilters(appliedFilters);
             }
-
-        } else {
-            setLocalFilters(appliedFilters);
-        }
     }, [data]);
 
     // Use localFilters for display count to reflect immediate user action
