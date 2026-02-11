@@ -1,5 +1,7 @@
 
 const sequentialColors = [
+
+
     {
         "value": "blues",
         "label": "blues",
@@ -113,19 +115,28 @@ const sequentialColors = [
 class GradientColors {
 
     constructor(props) {
-        const { gradientScheme, gradientReverse, data = [], defaultFillColor, measure } = props;
+        const { gradientScheme, gradientReverse, data = [], defaultFillColor, measure, gradientStartColor, gradientEndColor } = props;
         this.defaultFillColor = defaultFillColor;
         this.measure = measure;
+        this.gradientStartColor = gradientStartColor;
+        this.gradientEndColor = gradientEndColor;
         this.valueColors = this.createGradient(gradientScheme, data, gradientReverse);
         this.getColor = this.getColor.bind(this)
     }
 
     createGradient(gradientScheme, data, gradientReverse) {
 
-        const gradientLimits = sequentialColors.find(sc => sc.value == gradientScheme) || {
-            "startColor": "#ffffff",
-            "endColor": "#000000"
+        let gradientLimits = {
+            "startColor": this.gradientStartColor || "#ffffff",
+            "endColor": this.gradientEndColor || "#000000"
         };
+
+        if (gradientScheme !== 'custom') {
+            gradientLimits = sequentialColors.find(sc => sc.value == gradientScheme) || {
+                "startColor": "#ffffff",
+                "endColor": "#000000"
+            };
+        }
         const dataSorted = data.slice().sort((a, b) => a[this.measure] - b[this.measure]);
 
         function hexToRgb(hex) {

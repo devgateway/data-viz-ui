@@ -286,6 +286,8 @@ class DataLayer extends BaseLayer {
 
         } = this.props
 
+        const { gradientStartColor, gradientEndColor } = this.props;
+
         const brStyles = new BreaksStyles({
             breaks: breaks,
             defaultFillColor: markFillColor,
@@ -298,7 +300,9 @@ class DataLayer extends BaseLayer {
             measure: measures[0],
             defaultFillColor: markFillColor,
             gradientScheme: gradientScheme,
-            gradientReverse: gradientReverse
+            gradientReverse: gradientReverse,
+            gradientStartColor: gradientStartColor,
+            gradientEndColor: gradientEndColor
         })
         if (this.g) {
 
@@ -533,13 +537,14 @@ class DataLayer extends BaseLayer {
 
         const patternWidth = 10 * 1 / k
         const patternHeight = 10 * 1 / k
-
         const getGradientColors = (data) => new GradientColors({
             data: data.children,
             measure: measures[0],
             defaultFillColor: markFillColor,
             gradientScheme: gradientScheme,
-            gradientReverse: gradientReverse
+            gradientReverse: gradientReverse,
+            gradientStartColor: gradientStartColor,
+            gradientEndColor: gradientEndColor
         })
 
 
