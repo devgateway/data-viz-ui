@@ -43,8 +43,8 @@ const BigNumberGroup = (props) => {
 
     const [localFilters, setLocalFilters] = useState([]);
 
-    console.log("localFilters", blockName, localFilters)
-    console.log("effectiveFilter", effectiveFilter)
+    // console.log("localFilters", blockName, localFilters)
+    // console.log("effectiveFilter", effectiveFilter)
     const formatObject = measures[app] && measures[app].format ? measures[app].format : {
         style: "percent",
         minimumFractionDigits: 1,
@@ -88,7 +88,7 @@ const BigNumberGroup = (props) => {
                 onSetFilter({ app, group, param: type, parent, value: [...newFilters] });
                 onSetFilter({ app, group: blockName, param: type, parent, value: [...newFilters] });
             }
-        }, 400) // 400ms delay
+        }, 200) // 400ms delay
     ).current;
 
 
@@ -135,38 +135,35 @@ const BigNumberGroup = (props) => {
         //this is consilation script here we need to compare selected vs new items remove the non existing ones from applied filters if no longer available
 
         const missing = appliedFilters ? appliedFilters.filter(val => !filteredValues.includes(val)) : []//
-        if (blockName == "ds")
 
 
-            if (hasParentFilters && (parentAppliedFilters.length == 0)) {//remove all selected items
-                console.log(blockName, "RESETING FILTER; PARENT IS EMPTY")
+        if (hasParentFilters && (parentAppliedFilters.length == 0)) {//remove all selected items
+            console.log(blockName, "RESETING FILTER; PARENT IS EMPTY")
 
+            onSetFilter({ app, group, param: dimension, value: [Number.MIN_SAFE_INTEGER] })
+            onUnSetFilter({ app, group: selfGroup, param: dimension }) //keep isolated self selected filter
+            setLocalFilters([]);
+
+        } else if (missing.length > 0) {
+
+            const cleanedFilters = appliedFilters.filter(val => filteredValues.indexOf(val) > -1)
+
+            if (cleanedFilters.length == 0) {
+                setLocalFilters([]);
                 onSetFilter({ app, group, param: dimension, value: [Number.MIN_SAFE_INTEGER] })
                 onUnSetFilter({ app, group: selfGroup, param: dimension }) //keep isolated self selected filter
-                setLocalFilters([]);
-
-            } else if (missing.length > 0) {
-
-                if (blockName == "ds") {
-                    debugger
-                }
-                const cleanedFilters = appliedFilters.filter(val => filteredValues.indexOf(val) > -1)
-
-                if (cleanedFilters.length == 0) {
-                    setLocalFilters([]);
-                    onSetFilter({ app, group, param: dimension, value: [Number.MIN_SAFE_INTEGER] })
-                    onUnSetFilter({ app, group: selfGroup, param: dimension }) //keep isolated self selected filter
-
-                } else {
-
-                    onSetFilter({ app, group, param: dimension, value: cleanedFilters })//write on global filters  group(charts)
-                    onSetFilter({ app, group: selfGroup, parent, param: dimension, value: cleanedFilters }) //keep update self selected filter
-
-                }
 
             } else {
-                setLocalFilters(appliedFilters);
+
+                onSetFilter({ app, group, param: dimension, value: cleanedFilters })//write on global filters  group(charts)
+                onSetFilter({ app, group: selfGroup, parent, param: dimension, value: cleanedFilters }) //keep update self selected filter
+
             }
+
+        } else {
+            setLocalFilters(appliedFilters);
+            // onSetFilter({ app, group, param: dimension, value: appliedFilters })//write on global filters  group(charts)
+        }
     }, [data]);
 
     // Use localFilters for display count to reflect immediate user action
