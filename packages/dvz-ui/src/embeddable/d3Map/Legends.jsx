@@ -344,7 +344,6 @@ const DataLayerLegend = (props) => {
 
 
     const getMinDataValue = (data) => {
-        debugger;
         return Math.min(...(data.children.map(d => d[measures[0]])))
     }
 
@@ -399,11 +398,8 @@ const DataLayerLegend = (props) => {
             {(useGradients && data && data.children && data.children.length > 0 && visible != false) &&
                 <div className='gradient-container'>
 
-
-                    <div className={"gradient-label"} style={{ float: "right" }}>{intl.formatNumber(getMinDataValue(data), numberFormat)}</div>
-                    <div className={"gradient-label"} style={{ float: "left" }}>{intl.formatNumber(getMaxDataValue(data), numberFormat)}</div>
-
-
+                    <div className={"gradient-label"} style={{ float: "right" }}>{intl.formatNumber(getMaxDataValue(data), numberFormat)}</div>
+                    <div className={"gradient-label"} style={{ float: "left" }}>{intl.formatNumber(getMinDataValue(data), numberFormat)}</div>
 
                     <div className="gradient-bar" style={{
                         background: `linear-gradient(to right, ${getGradientColors(data).getStartColor()}, ${getGradientColors(data).getEndColor()})`,
