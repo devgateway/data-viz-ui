@@ -294,7 +294,9 @@ const DataLayerLegend = (props) => {
         gradientScheme,
         gradientReverse,
         toggleColorLayer,
-        colorLayerVisible = true
+        colorLayerVisible = true,
+        gradientStartColor,
+        gradientEndColor,
     } = props
     let measureLabel = ""
 
@@ -311,7 +313,9 @@ const DataLayerLegend = (props) => {
         measure: measures[0],
         defaultFillColor: markFillColor,
         gradientScheme: gradientScheme,
-        gradientReverse: gradientReverse
+        gradientReverse: gradientReverse,
+        gradientStartColor: gradientStartColor,
+        gradientEndColor: gradientEndColor
     }))
 
     if (app != "csv" && customMeasuresLabels) {
