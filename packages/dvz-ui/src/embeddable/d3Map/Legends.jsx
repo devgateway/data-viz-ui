@@ -338,6 +338,19 @@ const DataLayerLegend = (props) => {
     }
 
 
+    if (data) {
+        console.log("COLOR", getGradientColors(data).getStartColor())
+    }
+
+
+    const getMinDataValue = (data) => {
+        debugger;
+        return Math.min(...(data.children.map(d => d[measures[0]])))
+    }
+
+    const getMaxDataValue = (data) => {
+        return Math.max(...(data.children.map(d => d[measures[0]])))
+    }
 
     return <div className={`legend layer_${toId(id)}`} id={toId(`${group} ${name} ${id}`)}>
         <div>
@@ -386,8 +399,11 @@ const DataLayerLegend = (props) => {
             {(useGradients && data && data.children && data.children.length > 0 && visible != false) &&
                 <div className='gradient-container'>
 
-                    <div className={"gradient-label"} style={{ float: "right" }}>{intl.formatNumber(Math.max(...(data.children.map(d => d[measures[0]]))), numberFormat)}</div>
-                    <div className={"gradient-label"} style={{ float: "left" }}>{intl.formatNumber(data.children.length > 1 ? Math.min(...data.children.map(d => d[measures[0]])) : 0, numberFormat)}</div>
+
+                    <div className={"gradient-label"} style={{ float: "right" }}>{intl.formatNumber(getMinDataValue(data), numberFormat)}</div>
+                    <div className={"gradient-label"} style={{ float: "left" }}>{intl.formatNumber(getMaxDataValue(data), numberFormat)}</div>
+
+
 
                     <div className="gradient-bar" style={{
                         background: `linear-gradient(to right, ${getGradientColors(data).getStartColor()}, ${getGradientColors(data).getEndColor()})`,
@@ -443,11 +459,12 @@ const Legends = (props) => {
                         params.dvzProxyDatasetId = l.dvzProxyDatasetId;
                     }
 
+                    debugger;
                     return (<div key={l.id}>
 
                         {l.type == "base" && <BaseLayerLegend {...l} group={group} onItemClick={onItemClick} />}
 
-                        {l.type == "data" && l.apiJoinAttribute != 'none' &&
+                        {l.type == "data" && l.apiJoinAttribute &&
                             <DataProvider
                                 waitForFilters={true}
                                 editing={l.editing}
@@ -458,7 +475,8 @@ const Legends = (props) => {
                                 group={group}
                                 ignoreErrors={true}
                                 isSvg={true}
-                                store={[l.app, l.unique, l.id]}
+                                mySelf="Legends"
+                                store={[l.app, props.unique, l.id]}
                                 source={l.apiJoinAttribute + (l.patternDiscriminator != 'none' ? "/" + l.patternDiscriminator : '')}>
                                 <DataConsumer>
                                     <DataLayerLegend group={group} patternsData={patternsData ? patternsData[l.id] : null} divRef={divRef} {...l} intl={props.intl} onItemClick={onItemClick} toggleColorLayer={toggleColorLayer} />

@@ -86,7 +86,7 @@ class BaseLayer extends Layer {
                 .attr("text-anchor", "middle")
                 .attr("dominant-baseline", "middle")
             if (k < minLabelZoomVisible) {
-                console.log("remove layers")
+
                 this.g.selectAll(".feature-label").transition().style("display", "none")
             } else {
                 this.g.selectAll(".feature-label").style("display", "")
@@ -105,11 +105,11 @@ class BaseLayer extends Layer {
         //eslint-disable-next-line
 
         const k = this.props.transform ? this.props.transform.k : 1
-        console.log("minLabelZoomVisible", minLabelZoomVisible, k)
+        //console.log("minLabelZoomVisible", minLabelZoomVisible, k)
 
 
         if (k < minLabelZoomVisible) {
-            console.log("remove layers")
+
             this.g.selectAll(".feature-label").transition().style("display", "none")
         } else {
             this.g.selectAll(".feature-label").style("display", "")
