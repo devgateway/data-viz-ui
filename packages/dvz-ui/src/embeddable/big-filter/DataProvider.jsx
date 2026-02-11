@@ -23,7 +23,7 @@ class BigFilterDataProvider extends React.Component {
     componentDidUpdate(prevProps, prevState, snapshot) {
         const { app, filters, useAncestor, parent, source, store, params, csv, group, editing } = this.props
         if (filters != prevProps.filters || JSON.stringify(params) != JSON.stringify(prevProps.params) || app != prevProps.app || JSON.stringify(prevProps.source) != JSON.stringify(source) || csv != prevProps.csv) {
-            console.log("loading data", source)
+            //  console.log("loading data", source)
             this.props.onLoadData({ app, source, store, params, group })
         }
     }

@@ -152,7 +152,7 @@ const mapStateToProps = (state, ownProps) => {
 
     let appliedFilters = currentFilter ? currentFilter.toJS()[dimension] : []
     //console.log("applied filter", blockName, appliedFilters)
-    console.log(effectiveFilter)
+    //console.log(effectiveFilter)
     return {
         hasParentFilters, //util flag
         effectiveFilter, //all filter toghether
