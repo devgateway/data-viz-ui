@@ -1,5 +1,11 @@
 # @devgateway/dvz-ui-react
 
+## 1.6.19
+
+### Patch Changes
+
+- [#152](https://github.com/devgateway/data-viz-ui/pull/152) [`c681989`](https://github.com/devgateway/data-viz-ui/commit/c68198912793c068e78c7fd7ed59fc384b220f28) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Fix Inline List link width to not exceed the screen width
+
 ## 1.6.12
 
 ### Patch Changes
