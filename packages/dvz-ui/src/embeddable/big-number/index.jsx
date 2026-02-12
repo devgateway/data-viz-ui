@@ -215,7 +215,7 @@ const BigNumber = ({ dataItem, format, measureField, measure, numberColor, numbe
                     </animated.span>
                 )}
             </div>
-            {label && (
+            {measure?.customLabel && (
                 <div style={labelStyle} className="big-number-label">
                     {measure.customLabel}
                 </div>
