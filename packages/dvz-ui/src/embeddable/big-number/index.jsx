@@ -28,6 +28,9 @@ const Chart = (props) => {
         'data-number-color': numberColor = '#000000',
         'data-label-color': labelColor = '#000000',
         'data-label': label = '',
+        'data-group-label': groupLabel = '',
+        'data-group-label-color': groupLabelColor = '',
+        'data-group-label-font-size': groupLabelFontSize = '',
         "data-wait-for-filters": waitForFilters = "false",
         "data-no-data-text": noDataText = "-",
     } = props
@@ -87,10 +90,11 @@ const Chart = (props) => {
         dimensions.push(dimension1);
     }
 
+
     return (<div ref={ref}>
 
         <Container className={"chart container big-number-container"} style={{ "height": height + 'px' }} fluid={true}>
-            <DataProvider
+            {app && app != "none" && <DataProvider
                 style={{ "height": `${contentHeight}px` }}
                 params={params}
                 app={app}
@@ -115,11 +119,14 @@ const Chart = (props) => {
                         labelFontSize={labelFontSize}
                         labelColor={labelColor}
                         noDataText={noDataText}
+                        groupLabel={groupLabel}
+                        groupLabelColor={groupLabelColor}
+                        groupLabelFontSize={groupLabelFontSize}
                     >
                     </Group>
                 </DataConsumer>
             </DataProvider>
-
+            }
         </Container>
     </div>)
 
@@ -128,18 +135,17 @@ const Chart = (props) => {
 const Group = (props) => {
     const {
         app, measures, data, format, label, numberColor, numberFontSize, dimension,
-        labelColor, labelFontSize, noDataText = '-', intl
+        labelColor, labelFontSize, noDataText = '-', intl, groupLabel, groupLabelColor, groupLabelFontSize
     } = props;
 
-
-    const measuresKeys = Object.keys(measures[app]).filter(k => measures[app][k].selected)
+    const measuresKeys = measures && measures[app] ? Object.keys(measures[app]).filter(k => measures[app][k].selected) : []
     if (dimension != "none") {
         const metadata = data.metadata.types.filter(t => t.dimension === dimension)[0]
 
         return data.children.map(dataItem => {
             const dimensionLabel = metadata.items.filter(i => i.code == dataItem.value)[0].value
             return <div style={{ "display": "flex", flexDirection: "column" }}>
-                {dimensionLabel} {label}
+                <span style={{ color: groupLabelColor, fontSize: groupLabelFontSize + "px" }}>{dimensionLabel} {groupLabel}</span>
                 <div style={{ "display": "flex", flexDirection: "row" }}>
                     {measuresKeys.map(k => <div style={{ width: "400px", height: "200px", "border": "1px solid red" }}> <BigNumber showDimensionLabel={true} metadata={metadata} dataItem={dataItem} measureField={k} measure={measures[app][k]} {...props}></BigNumber></div>)}
                 </div>
@@ -149,7 +155,10 @@ const Group = (props) => {
         })
 
     } else {
-        return measuresKeys.map(k => <BigNumber dataItem={data} measureField={k} measure={measures[app][k]} {...props}></BigNumber>)
+        return <div>
+            <span style={{ color: groupLabelColor, fontSize: groupLabelFontSize + "px" }}> {groupLabel}</span>
+            {measuresKeys.map(k => <BigNumber dataItem={data} measureField={k} measure={measures[app][k]} {...props}></BigNumber>)}
+        </div>
     }
 
 };
