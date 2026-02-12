@@ -46,7 +46,11 @@ const ListOfPost: React.FC<ListOfPostProps> = (props) => {
         const linkText = show ? getTranslatedLabel(readLessLabel, 'Read less') : getTranslatedLabel(readMoreLabel, 'Read more');
         return (
             <div>
-                <div style={{ position: 'relative', left: contentToggleHPosition + '%' }}>
+                <div style={{ 
+                    display: 'flex', 
+                    justifyContent: contentToggleHPosition < 33 ? 'flex-start' : 
+                                     contentToggleHPosition < 66 ? 'center' : 'flex-end' 
+                }}>
                     <a className="link" onClick={() => {
                         if (postTopRef.current && show) {
                             postTopRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
