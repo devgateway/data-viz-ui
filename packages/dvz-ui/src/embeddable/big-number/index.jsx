@@ -144,10 +144,15 @@ const Group = (props) => {
 
         return data.children.map(dataItem => {
             const dimensionLabel = metadata.items.filter(i => i.code == dataItem.value)[0].value
-            return <div style={{ "display": "flex", flexDirection: "column" }}>
-                <span style={{ color: groupLabelColor, fontSize: groupLabelFontSize + "px" }}>{dimensionLabel} {groupLabel}</span>
-                <div style={{ "display": "flex", flexDirection: "row" }}>
-                    {measuresKeys.map(k => <div style={{ width: "400px", height: "200px", "border": "1px solid red" }}> <BigNumber showDimensionLabel={true} metadata={metadata} dataItem={dataItem} measureField={k} measure={measures[app][k]} {...props}></BigNumber></div>)}
+            return <div className="big-number-group" style={{ "display": "flex", flexDirection: "column" }}>
+                <span className="big-number-title"
+                      style={{color: groupLabelColor, fontSize: groupLabelFontSize + "px"}}>
+                    <span className="dimension-text">{dimensionLabel}</span>
+                    <span className="group-text"> {groupLabel}</span>
+                </span>
+                <div className="big-number-row" style={{"display": "flex", flexDirection: "row"}}>
+                    {measuresKeys.map(k => <div className="big-number-parent"><BigNumber showDimensionLabel={true}
+                                                                                         metadata={metadata} dataItem={dataItem} measureField={k} measure={measures[app][k]} {...props}></BigNumber></div>)}
                 </div>
             </div >
 
@@ -208,7 +213,7 @@ const BigNumber = ({ dataItem, format, measureField, measure, numberColor, numbe
     return (
         <div className="big-number">
 
-            <div style={numberStyle} className="big-number">
+            <div style={numberStyle} className="big-number-value">
                 {value === null ? noDataText : (
                     <animated.span>
                         {number.to((n) => formatNumber(n))}
