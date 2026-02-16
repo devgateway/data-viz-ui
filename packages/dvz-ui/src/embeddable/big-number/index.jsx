@@ -53,7 +53,13 @@ const Chart = (props) => {
         return null
     }
 
-    const formatObject = parse(format)
+
+    const measuresObj = parse(measures)
+
+    const formatObject = measuresObj[app].format
+
+    console.log(formatObject)
+
     const numberFormat = formatObject ? {
         style: (formatObject.style === 'compacted') ? 'decimal' : formatObject.style,
         notation: (formatObject.style === 'compacted') ? 'compact' : "standard",
@@ -146,13 +152,13 @@ const Group = (props) => {
             const dimensionLabel = metadata.items.filter(i => i.code == dataItem.value)[0].value
             return <div className="big-number-group" style={{ "display": "flex", flexDirection: "column" }}>
                 <span className="big-number-title"
-                      style={{color: groupLabelColor, fontSize: groupLabelFontSize + "px"}}>
+                    style={{ color: groupLabelColor, fontSize: groupLabelFontSize + "px" }}>
                     <span className="dimension-text">{dimensionLabel}</span>
                     <span className="group-text"> {groupLabel}</span>
                 </span>
-                <div className="big-number-row" style={{"display": "flex", flexDirection: "row"}}>
+                <div className="big-number-row" style={{ "display": "flex", flexDirection: "row" }}>
                     {measuresKeys.map(k => <div className="big-number-parent"><BigNumber showDimensionLabel={true}
-                                                                                         metadata={metadata} dataItem={dataItem} measureField={k} measure={measures[app][k]} {...props}></BigNumber></div>)}
+                        metadata={metadata} dataItem={dataItem} measureField={k} measure={measures[app][k]} {...props}></BigNumber></div>)}
                 </div>
             </div >
 
