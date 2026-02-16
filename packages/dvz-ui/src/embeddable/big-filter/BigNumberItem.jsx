@@ -1,12 +1,36 @@
 import React from 'react';
 import { Grid } from "semantic-ui-react";
 
+
+function parseBoolean(value) {
+    if (typeof value === 'boolean') return value;
+    if (typeof value !== 'string') return !!value; // Handle non-string truthy/falsy
+
+    switch (value.trim().toLowerCase()) {
+        case "true":
+        case "yes":
+        case "1":
+        case "on":
+            return true;
+        case "false":
+        case "no":
+        case "0":
+        case "off":
+            return false;
+        default:
+            return false; // Default behavior for unknown strings
+    }
+}
+
+
 export const BigNumberItem = (props) => {
     const {
         child,
         selectedKey,
         appliedFilters,
-        dimension,
+        dimension1,
+        dimension2,
+
         app,
         group,
         parent,
@@ -90,11 +114,16 @@ export const BigNumberItem = (props) => {
         return intl.formatNumber(val, { ...numberFormat })
     };
 
+    let highlighted = false
+    if (dimension2 !== "none") {
+        highlighted = child && child.children ? child.children.map(c => parseBoolean(c.value)).reduce((a, b) => a && b, true) : false
+    }
 
 
-
-    return (<Grid.Column className={` big filter item ${isSelected ? "selected" : "unselected"}`} key={idx} onClick={click} style={cellStyle(isSelected)} >
+    return (<Grid.Column className={` big filter item ${isSelected ? "selected" : "unselected"} ${highlighted ? `highlighted ${dimension2}` : ''}`} key={idx} onClick={click} style={cellStyle(isSelected)} >
         <p style={numberStyle(isSelected)} className="big-number">{formatNumber(value)}</p>
+
+        <p>{highlighted ? <div>Zoonotic</div> : ""}</p>
         <p style={labelStyle(isSelected)} className="big-number-label">{getLabel ? getLabel(child.value) : (child.label || child.value)}</p>
     </Grid.Column >
     )
