@@ -14,7 +14,8 @@ const BigFilter = (props) => {
         unique,
         intl,
         "data-csv": csv = "",
-        "data-dimension1": dimension = "none",
+        "data-dimension1": dimension1 = "none",
+        "data-dimension2": dimension2 = "none",
         "data-dvz-proxy-dataset-id": dvzProxyDatasetId,
         "data-no-data-message": noDataMsg = "No data matches your selection",
         "data-view-mode": editMode = 'info',
@@ -63,8 +64,13 @@ const BigFilter = (props) => {
         })
     }
 
-
     const dimensions = []
+    if (dimension1 != "none") {
+        dimensions.push(dimension1);
+    }
+    if (dimension2 != "none") {
+        dimensions.push(dimension2);
+    }
 
     const writeGroup = group //where to write final filters
     const readGroup = parent ? parent : blockName + Math.random(0, 1) //were to read my linked filters
@@ -73,8 +79,8 @@ const BigFilter = (props) => {
     return (<div ref={ref}>
         <Container fluid={true} style={{ padding: '0px', margin: '0px', height: `${height}px` }}>
             {(!app || app === 'csv') && <p><h2>Big Filter:</h2><h4>Please select an API! </h4></p>}
-            {(app !== 'csv' && dimension == 'none') && <p><h2>Big Filter:</h2><h4>Please select dimension! </h4></p>}
-            {app && dimension != 'none' &&
+            {(app !== 'csv' && dimension1 == 'none') && <p><h2>Big Filter:</h2><h4>Please select dimension! </h4></p>}
+            {app && dimension1 != 'none' &&
 
                 <BigFilterDataProvider
                     style={{ "height": `${contentHeight}px` }}
@@ -86,8 +92,9 @@ const BigFilter = (props) => {
 
                     editing={editing}
                     waitForFilters={waitForFilters === "true"}
-                    store={[app, unique, ...dimensions]}
-                    source={dimension}>
+                    store={[app, unique]}
+                    source={dimensions.join("/")}
+                >
 
                     <DataConsumer noDataMessage={<h1>No data</h1>}>
                         <BigNumberGroup
@@ -121,8 +128,9 @@ const BigFilter = (props) => {
                             hasParentFilters={hasParentFilters} //util flag
                             effectiveFilter={effectiveFilter} //all filter toghether
                             parentAppliedFilters={parentAppliedFilters} //parent applied filter
-
-                            dimension={dimension}>
+                            dimension1={dimension1}
+                            dimension2={dimension2}
+                        >
                         </BigNumberGroup>
                     </DataConsumer>
                 </BigFilterDataProvider>

@@ -14,7 +14,8 @@ const BigNumberGroup = (props) => {
         height,
         blockName,
         measures,
-        dimension,
+        dimension1,
+        dimension2,
         data,
         numberFontSize,
         backgroundColor,
@@ -71,7 +72,7 @@ const BigNumberGroup = (props) => {
 
     const getLabel = (type) => {
         if (!data || !data.metadata || !data.metadata.types) return null;
-        const l = data.metadata.types.filter(d => d.dimension == dimension)
+        const l = data.metadata.types.filter(d => d.dimension == dimension1)
         return l && l.length > 0 ? l[0].items.filter(i => i.code == type)[0]?.value : null;
     }
 
@@ -88,7 +89,7 @@ const BigNumberGroup = (props) => {
                 onSetFilter({ app, group, param: type, parent, value: [...newFilters] });
                 onSetFilter({ app, group: blockName, param: type, parent, value: [...newFilters] });
             }
-        }, 200) // 400ms delay
+        }, 400) // 400ms delay
     ).current;
 
 
@@ -122,8 +123,8 @@ const BigNumberGroup = (props) => {
 
 
     useEffect(() => {
-        onSetFilter({ app, group, param: dimension, value: [Number.MIN_SAFE_INTEGER] }) //this is for global group the one connected to charts
-        onUnSetFilter({ app, group: blockName, parent, param: dimension }) //this one is internal state to filter other linked big filters
+        onSetFilter({ app, group, param: dimension1, value: [Number.MIN_SAFE_INTEGER] }) //this is for global group the one connected to charts
+        onUnSetFilter({ app, group: blockName, parent, param: dimension1 }) //this one is internal state to filter other linked big filters
 
     }, []);
 
@@ -140,8 +141,8 @@ const BigNumberGroup = (props) => {
         if (hasParentFilters && (parentAppliedFilters.length == 0)) {//remove all selected items
             console.log(blockName, "RESETING FILTER; PARENT IS EMPTY")
 
-            onSetFilter({ app, group, param: dimension, value: [Number.MIN_SAFE_INTEGER] })
-            onUnSetFilter({ app, group: selfGroup, param: dimension }) //keep isolated self selected filter
+            onSetFilter({ app, group, param: dimension1, value: [Number.MIN_SAFE_INTEGER] })
+            onUnSetFilter({ app, group: selfGroup, param: dimension1 }) //keep isolated self selected filter
             setLocalFilters([]);
 
         } else if (missing.length > 0) {
@@ -150,13 +151,13 @@ const BigNumberGroup = (props) => {
 
             if (cleanedFilters.length == 0) {
                 setLocalFilters([]);
-                onSetFilter({ app, group, param: dimension, value: [Number.MIN_SAFE_INTEGER] })
-                onUnSetFilter({ app, group: selfGroup, param: dimension }) //keep isolated self selected filter
+                onSetFilter({ app, group, param: dimension1, value: [Number.MIN_SAFE_INTEGER] })
+                onUnSetFilter({ app, group: selfGroup, param: dimension1 }) //keep isolated self selected filter
 
             } else {
 
-                onSetFilter({ app, group, param: dimension, value: cleanedFilters })//write on global filters  group(charts)
-                onSetFilter({ app, group: selfGroup, parent, param: dimension, value: cleanedFilters }) //keep update self selected filter
+                onSetFilter({ app, group, param: dimension1, value: cleanedFilters })//write on global filters  group(charts)
+                onSetFilter({ app, group: selfGroup, parent, param: dimension1, value: cleanedFilters }) //keep update self selected filter
 
             }
 
@@ -173,8 +174,8 @@ const BigNumberGroup = (props) => {
 
 
 
-    if (dimension == null) {
-        return <h2>Select a dimensiosn to start configuring the component</h2>
+    if (dimension1 == null) {
+        return <h2>Select a dimension to start configuring the component</h2>
     } else {
         return <Container fluid={true} style={{ padding: '0px', margin: '0px', height: `${height}px` }}>
             <Grid fluid={true} celled={true} stackable columns={nColumns} style={{ border: '1px solid #EEE' }}>
@@ -190,7 +191,8 @@ const BigNumberGroup = (props) => {
                         child={child}
                         selectedKey={selectedKey} //which measure will be shown
                         appliedFilters={localFilters} // Use overriding filters
-                        dimension={dimension}
+                        dimension1={dimension1}
+                        dimension2={dimension2}
                         app={app}
                         group={group}
                         parent={parent}

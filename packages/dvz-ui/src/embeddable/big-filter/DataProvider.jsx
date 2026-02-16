@@ -16,6 +16,7 @@ class BigFilterDataProvider extends React.Component {
 
     componentDidMount() {
         const { app, useAncestor, parent, source, store, params, csv, group, editing, waitForFilters = false } = this.props
+
         this.props.onLoadData({ app, source, store, params, group }) //read filters from read group
     }
 
