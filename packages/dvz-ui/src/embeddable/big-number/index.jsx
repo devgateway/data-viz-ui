@@ -56,7 +56,7 @@ const Chart = (props) => {
 
     const measuresObj = parse(measures)
 
-    const formatObject = measuresObj[app].format
+    const formatObject = measuresObj && measuresObj[app] ? measuresObj[app].format : null
 
     console.log(formatObject)
 
