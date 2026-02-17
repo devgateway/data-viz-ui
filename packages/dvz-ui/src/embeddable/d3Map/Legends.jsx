@@ -438,7 +438,7 @@ const Legends = (props) => {
     return (<div className={`legends ${collapsed ? 'collapsed' : ''}`} ref={divRef}>
 
         <div className='legend-collapsible-control' onClick={() => setCollapsed(!collapsed)}>
-            {collapsed ? <div> <ChevronRight size={14} />   Show Legends</div> : <div><ChevronDown size={14} />   Hidden Legends</div>}
+            {collapsed ? <div> <ChevronRight size={14} />   Show Legends</div> : <div><ChevronDown size={14} />Hide Legends</div>}
         </div>
 
         <div className="legends-content">
