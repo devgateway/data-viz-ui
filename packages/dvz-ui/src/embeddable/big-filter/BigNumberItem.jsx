@@ -1,10 +1,9 @@
 import React from 'react';
 import { Grid } from "semantic-ui-react";
 
-
 function parseBoolean(value) {
     if (typeof value === 'boolean') return value;
-    if (typeof value !== 'string') return !!value; // Handle non-string truthy/falsy
+    if (typeof value !== 'string') return !!value;
 
     switch (value.trim().toLowerCase()) {
         case "true":
@@ -18,13 +17,13 @@ function parseBoolean(value) {
         case "off":
             return false;
         default:
-            return false; // Default behavior for unknown strings
+            return false;
     }
 }
 
-
 export const BigNumberItem = (props) => {
     const {
+        isDisabled, // 1. ADDED: New prop to check if we are locked
         child,
         selectedKey,
         appliedFilters,
@@ -49,26 +48,24 @@ export const BigNumberItem = (props) => {
         unselectedLabelColor,
         formatObject,
         decode,
-        getLabel, // Received from parent
+        getLabel,
         idx
     } = props;
-
 
     const isSelected = appliedFilters.indexOf(child.value) > -1;
     const value = child[selectedKey]
 
     const click = () => {
+        if (isDisabled) return; // 2. ADDED: Prevent any click action if disabled
 
         if (props.handleClick) {
             props.handleClick();
         }
-
-
     }
 
     const numberStyle = (selected) => {
         return {
-            cursor: 'pointer',
+            cursor: isDisabled ? 'not-allowed' : 'pointer', // 3. UPDATED: Change cursor
             color: selected ? decode(numberColor) : decode(unselectedNumberColor),
             fontSize: numberFontSize + 'px',
             textAlign: 'center',
@@ -82,7 +79,7 @@ export const BigNumberItem = (props) => {
 
     const labelStyle = (selected) => {
         return {
-            cursor: 'pointer',
+            cursor: isDisabled ? 'not-allowed' : 'pointer', // 3. UPDATED: Change cursor
             color: selected ? decode(labelColor) : decode(unselectedLabelColor),
             fontSize: labelFontSize + 'px',
             textAlign: 'center',
@@ -90,19 +87,17 @@ export const BigNumberItem = (props) => {
             margin: '0px'
         }
     };
-    const cellStyle = (selected) => {
 
+    const cellStyle = (selected) => {
         return {
             border: '1px solid #EEE',
             backgroundColor: selected ? decode(backgroundColor) : decode(unselectedBackgroundColor),
-
+            opacity: isDisabled ? 0.4 : 1, // 4. ADDED: Dim the card to 40% if disabled
+            cursor: isDisabled ? 'not-allowed' : 'pointer', // 4. ADDED: Change cursor on the whole cell
         }
     };
 
-
-
     const formatNumber = (val) => {
-
         const numberFormat = {
             style: (formatObject.style === 'compacted') ? 'decimal' : formatObject.style,
             notation: (formatObject.style === 'compacted') ? 'compact' : "standard",
@@ -119,12 +114,19 @@ export const BigNumberItem = (props) => {
         highlighted = child && child.children ? child.children.map(c => parseBoolean(c.value)).reduce((a, b) => a && b, true) : false
     }
 
+    // 5. UPDATED: Added a 'disabled' class to the Grid.Column for potential external CSS targeting
+    return (
+        <Grid.Column
+            className={`big filter item ${isSelected ? "selected" : "unselected"} ${highlighted ? `highlighted ${dimension2}` : ''} ${isDisabled ? "disabled" : ""}`}
+            key={idx}
+            onClick={click}
+            style={cellStyle(isSelected)}
+        >
+            <p style={numberStyle(isSelected)} className="big-number">{formatNumber(value)}</p>
 
-    return (<Grid.Column className={` big filter item ${isSelected ? "selected" : "unselected"} ${highlighted ? `highlighted ${dimension2}` : ''}`} key={idx} onClick={click} style={cellStyle(isSelected)} >
-        <p style={numberStyle(isSelected)} className="big-number">{formatNumber(value)}</p>
+            {highlighted && <p><div className={"highlighted-pill"}>Zoonotic</div></p>}
 
-        <p>{highlighted ? <div>Zoonotic</div> : ""}</p>
-        <p style={labelStyle(isSelected)} className="big-number-label">{getLabel ? getLabel(child.value) : (child.label || child.value)}</p>
-    </Grid.Column >
+            <p style={labelStyle(isSelected)} className="big-number-label">{getLabel ? getLabel(child.value) : (child.label || child.value)}</p>
+        </Grid.Column >
     )
 }

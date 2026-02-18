@@ -41,11 +41,8 @@ const BigNumberGroup = (props) => {
     const readGroup = parent ? parent : blockName + Math.random(0, 1) //were to read my linked filters, if parent we need to use parent filters parameters to load the data
     const selfGroup = blockName //where to store my  state
 
-
     const [localFilters, setLocalFilters] = useState([]);
 
-    // console.log("localFilters", blockName, localFilters)
-    // console.log("effectiveFilter", effectiveFilter)
     const formatObject = measures[app] && measures[app].format ? measures[app].format : {
         style: "percent",
         minimumFractionDigits: 1,
@@ -76,13 +73,9 @@ const BigNumberGroup = (props) => {
         return l && l.length > 0 ? l[0].items.filter(i => i.code == type)[0]?.value : null;
     }
 
-
-
-
     const debouncedApplyFilter = useRef(
         _.debounce((newFilters, type) => {
             if (newFilters.length == 0) {
-
                 onSetFilter({ app, group, parent, param: type, value: [] });
                 onUnSetFilter({ app, group: blockName, parent, param: type });
             } else {
@@ -91,7 +84,6 @@ const BigNumberGroup = (props) => {
             }
         }, 400) // 400ms delay
     ).current;
-
 
     // Handler called by BigNumberItem
     const handleSetLocalFilter = (childValue, type) => {
@@ -108,7 +100,6 @@ const BigNumberGroup = (props) => {
         setLocalFilters(newFilters);
         // 2. Trigger the debounced server update
         debouncedApplyFilter(newFilters, type);
-
     };
 
     // -------------------------------------------------------------------------
@@ -121,22 +112,17 @@ const BigNumberGroup = (props) => {
         }
     }).sort(sortFunc)
 
-
     useEffect(() => {
         onSetFilter({ app, group, param: dimension1, value: [Number.MIN_SAFE_INTEGER] }) //this is for global group the one connected to charts
         onUnSetFilter({ app, group: blockName, parent, param: dimension1 }) //this one is internal state to filter other linked big filters
-
     }, []);
-
 
     const items = data.children.map(d => d.value)
     const filteredValues = filteredFilters.map(d => d.value)
 
     useEffect(() => {
         //this is consilation script here we need to compare selected vs new items remove the non existing ones from applied filters if no longer available
-
         const missing = appliedFilters ? appliedFilters.filter(val => !filteredValues.includes(val)) : []//
-
 
         if (hasParentFilters && (parentAppliedFilters.length == 0)) {//remove all selected items
             console.log(blockName, "RESETING FILTER; PARENT IS EMPTY")
@@ -153,17 +139,13 @@ const BigNumberGroup = (props) => {
                 setLocalFilters([]);
                 onSetFilter({ app, group, param: dimension1, value: [Number.MIN_SAFE_INTEGER] })
                 onUnSetFilter({ app, group: selfGroup, param: dimension1 }) //keep isolated self selected filter
-
             } else {
-
                 onSetFilter({ app, group, param: dimension1, value: cleanedFilters })//write on global filters  group(charts)
                 onSetFilter({ app, group: selfGroup, parent, param: dimension1, value: cleanedFilters }) //keep update self selected filter
-
             }
 
         } else {
             setLocalFilters(appliedFilters);
-            // onSetFilter({ app, group, param: dimension, value: appliedFilters })//write on global filters  group(charts)
         }
     }, [data]);
 
@@ -171,8 +153,8 @@ const BigNumberGroup = (props) => {
     const selected = localFilters ? localFilters.length : 0;
     const total = filteredFilters ? filteredFilters.length : 0
 
-
-
+    // ADDED: Calculate if the component should be locked because the parent is empty
+    const isParentMissing = hasParentFilters && (!parentAppliedFilters || parentAppliedFilters.length === 0);
 
     if (dimension1 == null) {
         return <h2>Select a dimension to start configuring the component</h2>
@@ -183,12 +165,13 @@ const BigNumberGroup = (props) => {
                     <Grid.Column width={16} textAlign='right'>Selected    {selected}/{total}</Grid.Column>
                 </Grid.Row>
                 {data.children && filteredFilters.map((child, idx) => {
-                    // We override the appliedFilters prop passed to item to use our localFilters
-                    // This ensures the item looks selected immediately
                     return <BigNumberItem
                         key={idx}
                         idx={idx}
                         child={child}
+
+                        isDisabled={isParentMissing} // ADDED: Pass the locked state down to the child
+
                         selectedKey={selectedKey} //which measure will be shown
                         appliedFilters={localFilters} // Use overriding filters
                         dimension1={dimension1}
@@ -198,29 +181,9 @@ const BigNumberGroup = (props) => {
                         parent={parent}
                         blockName={blockName}
                         hasParentFilters={hasParentFilters}
-                        onSetFilter={(params) => {
-                            // Intercept the call from BigNumberItem
-                            // Note: BigNumberItem calls onSetFilter with complex object, 
-                            // but we essentially just need to know which item was clicked.
-                            // However, since we are rewriting the logic here, we can just pass
-                            // our simple handler if we modify BigNumberItem or keep the signature compatible.
-                            //
-                            // Wait! BigNumberItem implements its own toggle logic inside 'click'. 
-                            // We should probably pass a custom handler instead of onSetFilter
-                            // OR modify BigNumberItem to accept a simple 'onClick' handler.
-                            //
-                            // Let's pass a special prop `customClickHandler` and check for it in BigNumberItem
-                            // OR just pass our handler as `onSetFilter` but that might break strict prop types if checked.
-                            // The cleanest way without modifying BigNumberItem heavily is to pass this new handler
-                            // as a prop, but BigNumberItem needs to be updated to use it.
-                        }}
-                        // We will pass our new handler as a specific prop to intercept logic
+                        onSetFilter={(params) => {}}
                         handleClick={() => handleSetLocalFilter(child.value, child.type)}
-
-                        // We pass the original handlers too just in case, but they won't be used for the click
-                        // if we update BigNumberItem to prefer handleClick
                         onUnSetFilter={onUnSetFilter}
-
                         intl={intl}
                         numberFontSize={numberFontSize}
                         labelFontSize={labelFontSize}
@@ -236,7 +199,6 @@ const BigNumberGroup = (props) => {
                     />
                 })}
             </Grid>
-
         </Container>
     }
 }
