@@ -638,6 +638,23 @@ const DataFrame = (props) => {
                     ranked.slice(0, n).map(item => item[dimensionField])
                 );
                 dataItems = dataItems.filter(item => allowed.has(item[dimensionField]));
+            } else {
+                // Multiple measures but no main measure: rank by sum of all measures (descending)
+                const ranked = [...rawDataItems].sort((a, b) => {
+                    const aSum = selected.reduce((sum, sm) => {
+                        const v = ((a.vars && a.vars[sm.name]) ?? a[sm.name] ?? 0) || 0;
+                        return sum + v;
+                    }, 0);
+                    const bSum = selected.reduce((sum, sm) => {
+                        const v = ((b.vars && b.vars[sm.name]) ?? b[sm.name] ?? 0) || 0;
+                        return sum + v;
+                    }, 0);
+                    return bSum - aSum;
+                });
+                const allowed = new Set(
+                    ranked.slice(0, n).map(item => item[dimensionField])
+                );
+                dataItems = dataItems.filter(item => allowed.has(item[dimensionField]));
             }           
         }
     }
