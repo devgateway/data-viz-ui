@@ -148,7 +148,7 @@ export const getData = (props) => (dispatch, getState) => {
 
     let filters = getState().get('data').getIn(['filters', app, group])
 
-    if (parent)
+    //if (parent)
         if (params) {
             const presetFilters = Object.keys(params);
             presetFilters.forEach(k => {
