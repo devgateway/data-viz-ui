@@ -5,6 +5,12 @@ import { CategoriesContext } from './DataContext'
 import { getCategories, loadFilterItems } from "../reducers/data";
 import { Container, Segment } from "semantic-ui-react";
 
+const MemoizedCategoriesContextProvider = ({ data, children }) => {
+    const dataValue = React.useMemo(() => (data ? data.toJS() : null), [data])
+
+    return <CategoriesContext.Provider value={dataValue}>{children}</CategoriesContext.Provider>
+}
+
 
 class DataProvider extends React.Component {
 
@@ -54,7 +60,8 @@ class DataProvider extends React.Component {
 
 
         if (data) {
-            return <CategoriesContext.Provider value={data.toJS()}>{this.props.children}</CategoriesContext.Provider>
+            // return <CategoriesContext.Provider value={data.toJS()}>{this.props.children}</CategoriesContext.Provider>
+            return <MemoizedCategoriesContextProvider data={data}>{this.props.children}</MemoizedCategoriesContextProvider>
         } else if (error) {
             return <Segment color={"red"}>
                 <h1>500</h1>

@@ -459,7 +459,6 @@ const Legends = (props) => {
                         params.dvzProxyDatasetId = l.dvzProxyDatasetId;
                     }
 
-                    debugger;
                     return (<div key={l.id}>
 
                         {l.type == "base" && <BaseLayerLegend {...l} group={group} onItemClick={onItemClick} />}
