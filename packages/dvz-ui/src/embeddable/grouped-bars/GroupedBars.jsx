@@ -550,6 +550,7 @@ const DataFrame = (props) => {
         barSizeCriteria,
         selectedMeasures,
         mainMeasureName,
+        sortMeasureName,
         barSizeUseGroup = false,
         showMeasureLabels = false,
         onHeightChange
@@ -601,7 +602,7 @@ const DataFrame = (props) => {
     let dataItems;
     if (sorting === 'measure') {
         // Prefer main measure for sorting when in multi-measure mode
-        const sortMeasure = mainMeasureName || measureField || (selected[0] ? selected[0].name : null);
+        const sortMeasure = mainMeasureName || sortMeasureName || measureField || (selected[0] ? selected[0].name : null);
         dataItems = rawDataItems.sort((a, b) => {
             const aValue = sortMeasure
                 ? (((a.vars && a.vars[sortMeasure]) ?? a[sortMeasure] ?? 0))
@@ -892,6 +893,7 @@ const Chart = (props) => {
         "data-label-format": labelFormat,
         "data-sorting": sorting,
         "data-sort-direction": sortDirection,
+        "data-sort-measure": sortMeasure,
         "data-top-n": topN,
         "data-bar-size-criteria": barSizeCriteria,
         "data-main-measure": mainMeasure,
@@ -925,6 +927,11 @@ const Chart = (props) => {
     const normalizedMain = decodedMain && decodedMain.toLowerCase() === 'none' ? null : (decodedMain || null);
     const effectiveMainMeasure = selectedMeasures.length > 1
         ? (normalizedMain === null ? null : (selectedNames.includes(normalizedMain) ? normalizedMain : selectedNames[0]))
+        : null;
+    const decodedSort = (typeof sortMeasure === 'string' && sortMeasure.length > 0) ? decodeValue(sortMeasure) : null;
+    const normalizedSort = decodedSort && decodedSort.toLowerCase() === 'none' ? null : (decodedSort || null);
+    const effectiveSortMeasure = selectedMeasures.length > 1
+        ? (normalizedSort === null ? null : (selectedNames.includes(normalizedSort) ? normalizedSort : selectedNames[0]))
         : null;
 
     const params = buildParams(parsedFilters, dvzProxyDatasetId);
@@ -985,6 +992,7 @@ const Chart = (props) => {
                             barSizeUseGroup={barSizeUseGroupBool}
                             selectedMeasures={selectedMeasures}
                             mainMeasureName={effectiveMainMeasure}
+                            sortMeasureName={effectiveSortMeasure}
                             mainValueFontSize={mainValueFontSizeNum}
                             showMeasureLabels={showMeasureLabelsBool}
                             showZeroNullMeasures={showZeroNullMeasuresBool}
