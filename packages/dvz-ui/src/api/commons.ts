@@ -29,20 +29,33 @@ export const post = (url : string, params : Record<string, unknown>, isBlob = fa
     })
 }
 
-export const get = async <T extends any>(url: string, params = {}): Promise<T> => {
+export const get = async <T extends any>(url: string, fetchOptions: RequestInit = {}, withHeaders = false): Promise<T | { data: T; meta: Record<string, string> }> => {
     try {
+        const { headers: extraHeaders, ...restOptions } = fetchOptions as any;
         const response = await fetch(url, {
             headers: {
                 Accept: 'application/json',
-                'Content-Type': 'application/json'
-            }
+                'Content-Type': 'application/json',
+                ...extraHeaders,
+            },
+            ...restOptions,
         });
 
         if (!response.ok) {
             throw response;
         }
 
-        return await response.json();
+        const data: T = await response.json();
+
+        if (withHeaders) {
+            const meta: Record<string, string> = {};
+            response.headers.forEach((value, key) => {
+                meta[key] = value;
+            });
+            return { data, meta };
+        }
+
+        return data;
     } catch (error) {
         throw error;
     }
