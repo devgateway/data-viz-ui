@@ -250,6 +250,16 @@ const DataFrame = (props) => {
     const percentStyle = {
         color: decodeURIComponent(props.percentColor), fontSize: percentFontSize + 'px',
     }
+    const yoyStyle = {
+        color: decodeURIComponent(props.percentColor),
+        fontSize: percentFontSize + 'px',
+        lineHeight: 1.1
+    }
+    const percentBlockStyle = {
+        display: 'inline-flex',
+        flexDirection: 'column',
+        alignItems: 'center'
+    }
     const labelStyle = {
         color: decodeURIComponent(textColor), fontSize: labelFontSize + 'px'
     }
@@ -282,17 +292,25 @@ const DataFrame = (props) => {
                 <img className={`icon up ${percentChange > 0 ? 'visible' : 'hidden'}`} src={props.iconUp}></img>
                 <img className={`icon up ${percentChange < 0 ? 'visible' : 'hidden'}`} s src={props.iconDown}></img>
 
-                {showPercentageChange && percentChange && (
+                {showPercentageChange && percentChange != null && (
                     props.showTooltip && tooltip ? (
                         <Popup
                             content={tooltip}
                             position="top center"
                             inverted={props.tooltipStyle === 'dark'}
                             size="small"
-                            trigger={<div className="percentage" style={percentStyle}> {percentChange > 0 ? '+' : ''}{percentChange == 0 ? '=' : ''}{percentChangeFormatted}</div>}
+                            trigger={
+                                <div style={percentBlockStyle}>
+                                    <div className="percentage" style={percentStyle}> {percentChange > 0 ? '+' : ''}{percentChange == 0 ? '=' : ''}{percentChangeFormatted}</div>
+                                    <div className="percentage-yoy" style={yoyStyle}>YoY</div>
+                                </div>
+                            }
                         />
                     ) : (
-                        <div className="percentage" style={percentStyle}> {percentChange > 0 ? '+' : ''}{percentChange == 0 ? '=' : ''}{percentChangeFormatted}</div>
+                        <div style={percentBlockStyle}>
+                            <div className="percentage" style={percentStyle}> {percentChange > 0 ? '+' : ''}{percentChange == 0 ? '=' : ''}{percentChangeFormatted}</div>
+                            <div className="percentage-yoy" style={yoyStyle}>YoY</div>
+                        </div>
                     )
                 )}
             </Grid.Column>
