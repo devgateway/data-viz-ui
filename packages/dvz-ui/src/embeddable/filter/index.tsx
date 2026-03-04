@@ -102,7 +102,7 @@ const FilterDropDown = (props: FilterPros) => {
         });
     }
 
-    const filterProps = { ...props, options: sortedOptions };
+    const filterProps = { ...props };
 
     if (isRange) {
         return <RangeFilterSelectorBoxFilter {...filterProps} />;
