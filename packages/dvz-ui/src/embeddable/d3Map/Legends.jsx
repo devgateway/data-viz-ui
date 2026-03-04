@@ -342,10 +342,6 @@ const DataLayerLegend = (props) => {
     }
 
 
-    if (data) {
-        console.log("COLOR", getGradientColors(data).getStartColor())
-    }
-
 
     const getMinDataValue = (data) => {
         return Math.min(...(data.children.map(d => d[measures[0]])))
