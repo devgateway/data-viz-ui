@@ -1,45 +1,37 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Navigate, Outlet, useLocation, useParams } from 'react-router';
 import {
     getComponentByNameIgnoreCase
 } from '@/embeddable';
-import { injectIntl, IntlProvider } from 'react-intl';
+import { IntlProvider } from 'react-intl';
 import { AppContextProvider, SettingProvider, SettingsConsumer } from '@devgateway/wp-react-lib';
 import { Provider } from 'react-redux';
 import { CustomizerWrapper } from '@/layout';
 import { Config } from '@/conf';
-import { englishTranslations, frenchTranslations, afrikaansTranslations } from '@/translations';
+import { englishTranslations, frenchTranslations, afrikaansTranslations, amharicTranslations } from '@/translations';
 import { updateIntl } from '@/lib';
 import { store } from '@/redux';
 
-type Locale = 'en' | 'fr' | 'am';
+type Locale = 'en' | 'fr' | 'am' | 'af';
 
 const messages: Record<Locale, any> = {
     'en': englishTranslations,
     'fr': frenchTranslations,
-    'am': afrikaansTranslations
+    'am': amharicTranslations,
+    'af': afrikaansTranslations
 };
 
-const InjectTitle = injectIntl((props) => {
-
-    // @ts-expect-error description
-    document.title = props.settings.description
-    return <></>
-});
-
-interface LayoutProps {
-    children: React.DetailedReactHTMLElement<any, HTMLElement>;
-}
 
 const RootLayout = () => {
     const pathParams = useParams();
     const location = useLocation();
     const defaultLocale = Config.DEFAULT_LOCALE;
-    console.log("defaultLocale", defaultLocale);
+    const [isClient, setIsClient] = useState(false);
     const locale = pathParams.lan;
     const pathname = location.pathname;
-    console.log("pathParams", pathParams);
     useEffect(() => {
+        setIsClient(true);
+
         if (process.env.NODE_ENV === "development") {
             console.log("----------.env-----------");
             console.log(process.env);
@@ -47,14 +39,16 @@ const RootLayout = () => {
         }
 
 
-        window && window.setTimeout(() => {
-            if (window && window.location.hash) {
-                const element = document.getElementById(window.location.hash.substring(1));
-                if (element) {
-                    element.scrollIntoView({ behavior: "auto", block: "start" });
+        if (typeof window !== 'undefined') {
+            window.setTimeout(() => {
+                if (window.location.hash) {
+                    const element = document.getElementById(window.location.hash.substring(1));
+                    if (element) {
+                        element.scrollIntoView({ behavior: "auto", block: "start" });
+                    }
                 }
-            }
-        }, 2000);
+            }, 2000);
+        }
     }, []);
 
     useEffect(() => {
@@ -86,9 +80,7 @@ const RootLayout = () => {
                 <AppContextProvider getComponent={getComponentByNameIgnoreCase} store={store} locale={locale}>
                     <SettingProvider locale={locale} changeUUID={null}>
                         <SettingsConsumer>
-                            <CustomizerWrapper>
-                                <InjectTitle />
-                            </CustomizerWrapper>
+                            <CustomizerWrapper/>
                             <Outlet />
                         </SettingsConsumer>
                     </SettingProvider>
@@ -98,4 +90,4 @@ const RootLayout = () => {
     );
 }
 
-export default RootLayout;
+export default RootLayout as any;

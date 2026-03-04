@@ -10,10 +10,10 @@ class CustomColors extends Colors {
 
         this._manualColor[overallLabel] = manualColors ? manualColors['Overall'] : null
 
-        //1 dimension by id == by measure        
+        //1 dimension by id == by measure
         if (app != 'csv') {
             const mapByDimension = (whichDimension) => {
-                
+
                 const selectedDimension = [...dimensionsMetadata][whichDimension]
 
                 if (selectedDimension) {
@@ -85,12 +85,13 @@ class CustomColors extends Colors {
                 mapByDimension(whichDimension)
             }
         } else {
-            this._manualColor = manualColors
+            // For CSV, colors are nested by colorBy mode: manualColors['index'] or manualColors['id']
+            // Get the colors for the current colorBy mode, or empty object if not set
+            this._manualColor = (manualColors && manualColors[colorBy]) ? manualColors[colorBy] : {};
         }
     }
 
     getColor(id, datum) {
-
         if (this.colorBy === "index") {
             const color = this._manualColor[id] || this._manualColor[datum[this.indexBy]]
             return color ? color : "#5555"

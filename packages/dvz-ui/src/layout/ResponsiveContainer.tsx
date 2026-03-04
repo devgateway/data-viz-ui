@@ -2,7 +2,7 @@ import React from 'react'
 
 import {Container,} from 'semantic-ui-react'
 import {SettingsConsumer} from '@devgateway/wp-react-lib'
-import {Media} from "@/utils/AppMedia"
+import {Media} from "@/utils/AppMedia.js"
 import Footer from "./Footer.jsx";
 import Header from "./Header.jsx";
 import TopNavigator from "./TopNavigator.jsx";
@@ -21,6 +21,7 @@ const DesktopContainer = ({ children, fixed = false, header }: DesktopContainerP
         <Container fluid={true}>
             <SettingsConsumer>
                 <CustomizerWrapper>
+                    {/* @ts-ignore */}
                    { header ? header : <Header />}
                 </CustomizerWrapper>
             </SettingsConsumer>

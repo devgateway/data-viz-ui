@@ -167,4 +167,3 @@ class BaseLayer extends Layer {
 
 
 export default BaseLayer
-

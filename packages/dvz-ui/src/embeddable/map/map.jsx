@@ -8,16 +8,46 @@ import {
   Dimmer,
   Loader,
   Segment,
-  Message
+  Message,
 } from "semantic-ui-react";
 import React from "react";
 import * as topojson from "topojson-client";
 import Legend from "./legend";
 import { formatContent } from "../common/MapTooltip";
-import getDeviceCategory from '../../utils/deviceType';
-import geostats from 'geostats';
+import getDeviceCategory from "../../utils/deviceType";
+import geostats from "geostats";
 
 import { Config } from "@/conf";
+
+export function getTranslatedItemLabel(
+  data,
+  itemNameOrCode,
+  locale
+) {
+  if (!data?.length) return itemNameOrCode;
+
+  const items = data[0]?.items ?? [];
+  const norm = (s) => s?.trim().toLowerCase() ?? "";
+  const want = norm(itemNameOrCode);
+  const localeKey = norm(locale).toUpperCase(); // e.g. "am" -> "AM"
+
+  // Find by value (name) or by code
+  const item =
+    items.find(
+      (it) => norm(it.value) === want || it.code.trim().toLowerCase() === want
+    ) ?? null;
+
+  if (!item) return itemNameOrCode;
+
+  // Prefer translated label if present; otherwise fallback to the canonical value
+  const label =
+    localeKey && item.labels && item.labels[localeKey]
+      ? item.labels[localeKey]
+      : item.value;
+
+  return label?.trim() || item.value.trim();
+}
+
 const COLOR_VARIABLE = "_Color_";
 const LOCATION = "location";
 const SHOW_ALL = "showAll";
@@ -26,59 +56,57 @@ const MAX_LABEL_LEN = 10;
 
 const breakpoints = {
   mobile: {
-      min: 320,
-      max: 480
+    min: 320,
+    max: 480,
   },
   tablet: {
-      min: 481,
-      max: 768
+    min: 481,
+    max: 768,
   },
   midTablet: {
-      min: 769,
-      max: 852,
+    min: 769,
+    max: 852,
   },
   laptop: {
-      min: 852,
-      max: 1024
+    min: 852,
+    max: 1024,
   },
   desktop: {
-      min: 1025,
-      max: 1365
+    min: 1025,
+    max: 1365,
   },
   wide: {
-      min: 1366,
-      max: Infinity
-  }
+    min: 1366,
+    max: Infinity,
+  },
 };
 
-
 const deviceTranslateMap = {
-  'mobile': 4,
-  'tablet': 4,
-  'midTablet': 2,
-  'laptop': 2,
-  'desktop': 2,
-  'wide': 2
-}
+  mobile: 4,
+  tablet: 4,
+  midTablet: 2,
+  laptop: 2,
+  desktop: 2,
+  wide: 2,
+};
 
 const deviceMapHeight = {
-  'mobile': 330,
-  'tablet': 250,
-  'midTablet': 250,
-  'laptop': 200,
-  'desktop': 100,
-  'wide': 100
-}
+  mobile: 330,
+  tablet: 250,
+  midTablet: 250,
+  laptop: 200,
+  desktop: 100,
+  wide: 100,
+};
 
 const deviceMapWidth = {
-  'mobile': 250,
-  'tablet': 250,
-  'midTablet': 250,
-  'laptop': 0,
-  'desktop': 0,
-  'wide': 0
-}
-
+  mobile: 250,
+  tablet: 250,
+  midTablet: 250,
+  laptop: 0,
+  desktop: 0,
+  wide: 0,
+};
 
 const colorSchemes = {
   greens: [
@@ -155,9 +183,10 @@ const colorSchemes = {
   ],
 };
 
-const isMobile = ['mobile', 'tablet', 'midTablet'].includes(getDeviceCategory());
-const isMobileOrTablet = ['mobile', 'tablet'].includes(getDeviceCategory());
-
+const isMobile = ["mobile", "tablet", "midTablet"].includes(
+  getDeviceCategory()
+);
+const isMobileOrTablet = ["mobile", "tablet"].includes(getDeviceCategory());
 
 class Map extends React.Component {
   constructor(props) {
@@ -222,6 +251,7 @@ class Map extends React.Component {
       selectedPolygon: null,
       layersLoading: false,
     };
+    this.metadataTypes = props.transformedData?.types || [];
   }
 
   componentDidMount() {
@@ -233,6 +263,8 @@ class Map extends React.Component {
       .append("div")
       .style("position", "absolute")
       .style("visibility", "hidden");
+
+    console.log("Map props", this.metadataTypes);
   }
 
   componentDidCatch(error, info) {
@@ -270,10 +302,28 @@ class Map extends React.Component {
           new Promise((resolve, reject) => {
             d3.json(Config.REACT_APP_WP_API + "/wp/v2/media/" + l.id)
               .then((data) => {
-                resolve({ id: l.id, url: data.source_url, index: l.index });
+                resolve({
+                  id: l.id,
+                  url: data.source_url,
+                  index: l.index,
+                  layerMappingField: l.layerMappingField,
+                  layerDatasource: l.datasource,
+                  layerApiField: l.apiField,
+                  layerLocale: l.locale,
+                  displayLayerLabels: l.displayLayerLabels,
+                });
               })
               .catch(function (error) {
-                resolve({ id: l.id, url: null, index: l.index });
+                resolve({
+                  id: l.id,
+                  url: null,
+                  index: l.index,
+                  layerMappingField: l.layerMappingField,
+                  layerDatasource: l.datasource,
+                  layerApiField: l.apiField,
+                  layerLocale: l.locale,
+                  displayLayerLabels: l.displayLayerLabels,
+                });
               });
           })
         );
@@ -286,7 +336,16 @@ class Map extends React.Component {
             layerFuncs.push(
               new Promise((resolve, reject) => {
                 d3.json(m.url).then((data) => {
-                  resolve({ id: m.id, data, index: m.index });
+                  resolve({
+                    id: m.id,
+                    data,
+                    index: m.index,
+                    layerMappingField: m.layerMappingField,
+                    layerDatasource: m.layerDatasource,
+                    layerApiField: m.layerApiField,
+                    layerLocale: m.layerLocale,
+                    displayLayerLabels: m.displayLayerLabels,
+                  });
                 });
               })
             );
@@ -303,7 +362,19 @@ class Map extends React.Component {
     } else {
       d3.json(source).then((data) => {
         this.setState({
-          layers: [{ id: null, url: source, data, index: 0 }],
+          layers: [
+            {
+              id: null,
+              url: source,
+              data,
+              index: 0,
+              layerMappingField: null,
+              layerDatasource: null,
+              layerApiField: null,
+              layerLocale: null,
+              displayLayerLabels: false,
+            },
+          ],
           layersLoading: false,
         });
       });
@@ -774,7 +845,8 @@ class Map extends React.Component {
       .style("display", (d) => {
         if (
           showAdminUnitLabel === SHOW_ALL ||
-          (showAdminUnitLabel === SHOW_IF_HAS_DATA && d.properties.hasDataRow)
+          (showAdminUnitLabel === SHOW_IF_HAS_DATA && d.properties.hasDataRow) ||
+          d.properties.displayLayerLabels
         ) {
           return "block";
         }
@@ -808,6 +880,22 @@ class Map extends React.Component {
       });
   }
 
+  getTranslatedLocationName(d, mappingField, intl) {
+    // Check if we should use translated labels for this layer
+    if (d.properties.displayLayerLabels && d.properties.layerLocale) {
+      // Use the layer's mapping field if available, otherwise fall back to the default mappingField
+      const labelField = d.properties.layerMappingField || mappingField;
+      const rawLabel = d.properties[labelField];
+
+      // Get translated label using the layer's locale
+      const translatedLabel = getTranslatedItemLabel(this.metadataTypes, rawLabel, d.properties.layerLocale);
+      return translatedLabel;
+    }
+
+    // Fall back to the default behavior
+    return d.properties[mappingField];
+  }
+
   createLabel(d) {
     const {
       mapLabelField,
@@ -822,9 +910,19 @@ class Map extends React.Component {
     let label = "";
     if (
       showAdminUnitLabel == SHOW_ALL ||
-      (showAdminUnitLabel == SHOW_IF_HAS_DATA && d.properties.hasDataRow)
+      (showAdminUnitLabel == SHOW_IF_HAS_DATA && d.properties.hasDataRow) ||
+      d.properties.displayLayerLabels
     ) {
-      label = d.properties[mapLabelField];
+      // Get the raw label from properties
+      // If displayLayerLabels is true, use the layer's mapping field, otherwise use the default mapLabelField
+      const labelField = d.properties.displayLayerLabels && d.properties.layerMappingField
+        ? d.properties.layerMappingField
+        : mapLabelField;
+      const rawLabel = d.properties[labelField];
+
+      // Use getTranslatedItemLabel to get translated label if available
+      const locale = d.properties.layerLocale || intl?.locale;
+      label = getTranslatedItemLabel(this.metadataTypes, rawLabel, locale);
       const abbrev = d.properties["abbrev"];
       if (label && label.length > MAX_LABEL_LEN && abbrev) {
         label = abbrev;
@@ -1259,7 +1357,8 @@ class Map extends React.Component {
         value: d.properties.value,
         measure: this.getSelectedMeasure(),
         measureLabel: d.properties.measureLabel,
-        locationName: d.properties[mappingField],
+        locationName: this.getTranslatedLocationName(d, mappingField, intl),
+        label: this.getTranslatedLocationName(d, mappingField, intl),
         ...dataVars,
       };
       this.tooltip
@@ -1345,7 +1444,7 @@ class Map extends React.Component {
               value: null,
               measure: this.getSelectedMeasure(),
               measureLabel: d.properties.measureLabel,
-              locationName: d.properties[mappingField],
+              locationName: this.getTranslatedLocationName(d, mappingField, intl),
               ...dataVars,
             };
             html += formatContent(format, variables, intl, noDataText);
@@ -1500,6 +1599,24 @@ class Map extends React.Component {
         features = this.extractFeatures(mainLayer);
         features.map((f) => {
           f.properties.layerId = mainLayerId;
+          // Add layer properties from the resolved metadata in this.state.layers
+          const layerMetadata = layers.find(layer => String(layer.id) === String(mainLayerId));
+          if (layerMetadata) {
+            // Add the resolved layer properties
+            f.properties.layerMappingField = layerMetadata.layerMappingField;
+            f.properties.layerDatasource = layerMetadata.layerDatasource;
+            f.properties.layerApiField = layerMetadata.layerApiField;
+            f.properties.layerLocale = layerMetadata.layerLocale;
+            f.properties.displayLayerLabels = layerMetadata.displayLayerLabels;
+          }
+          // Also add original layer properties from enabledLayers for backward compatibility
+          enabledLayers.forEach((layer) => {
+            if (String(layer.id) == mainLayerId) {
+              Object.keys(layer || {}).forEach((key) => {
+                f.properties[key] = layer[key];
+              });
+            }
+          });
           return f;
         });
         if (layers) {
@@ -1508,6 +1625,12 @@ class Map extends React.Component {
               let tt = this.extractFeatures(layer.data);
               tt = tt.map((f) => {
                 f.properties.layerId = layer.id;
+                // Add the resolved layer properties
+                f.properties.layerMappingField = layer.layerMappingField;
+                f.properties.layerDatasource = layer.layerDatasource;
+                f.properties.layerApiField = layer.layerApiField;
+                f.properties.layerLocale = layer.layerLocale;
+                f.properties.displayLayerLabels = layer.displayLayerLabels;
                 return f;
               });
               features = [...tt, ...features];
@@ -1816,6 +1939,33 @@ class Map extends React.Component {
     return dataItem;
   }
 
+  getTranslatedHighlightedLocationName() {
+    const { highlightedLocation, mapLabelField, intl } = this.props;
+
+    if (!highlightedLocation) {
+      return null;
+    }
+
+    // Find the feature that matches the highlighted location
+    const features = this.getFeatures();
+    const matchingFeature = features.find(
+      (f) => f.properties[mapLabelField] === highlightedLocation
+    );
+
+    if (matchingFeature && matchingFeature.properties.displayLayerLabels && matchingFeature.properties.layerLocale) {
+      // Use the layer's mapping field if available, otherwise fall back to mapLabelField
+      const labelField = matchingFeature.properties.layerMappingField || mapLabelField;
+      const rawLabel = matchingFeature.properties[labelField];
+
+      // Get translated label using the layer's locale
+      const translatedLabel = getTranslatedItemLabel(this.metadataTypes, rawLabel, matchingFeature.properties.layerLocale);
+      return translatedLabel;
+    }
+
+    // Fall back to the original highlighted location name
+    return highlightedLocation;
+  }
+
   getHighlightedLocationColor(data) {
     const breaks = this.getBreaks();
     const { mapNoDataColor } = this.props;
@@ -1992,7 +2142,7 @@ class Map extends React.Component {
                   "px",
               }}
             >
-              {highlightedLocData && highlightedLocData.value && (
+              {highlightedLocData ? (
                 <div
                   className="highlighted-loc-info"
                   style={highlightedLocStyle}
@@ -2003,7 +2153,7 @@ class Map extends React.Component {
                       highlightedLocLabelFormat,
                       {
                         value: highlightedLocData.value,
-                        locationName: highlightedLocData.label,
+                        locationName: this.getTranslatedHighlightedLocationName() || highlightedLocData.label,
                         measureName: highlightedLocData.measure,
                       },
                       intl,
@@ -2011,6 +2161,8 @@ class Map extends React.Component {
                     )}
                   </span>
                 </div>
+              ) : (
+                <> </>
               )}
 
               {(editing || zoomEnabled) && !isMobile && (

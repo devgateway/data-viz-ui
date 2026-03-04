@@ -241,6 +241,7 @@ class DataProvider extends React.Component {
         const { data, style, loading, time, error, editing, isSvg, verbose = true } = this.props
 
 
+
         if ((loading && this.state.showLoading && !editing)) {
             const foreignObjectStyle = {
                 width: "100%", height: "100%", background: "transparent", verticalAlign: "middle", overflow: "hidden"
@@ -249,6 +250,7 @@ class DataProvider extends React.Component {
             const segmentStyle = Object.assign({}, style, {
                 height: "90%", background: "transparent", textAlign: "center", margin: "30px"
             })
+
 
 
             const spinner = <Segment basic={true} padded={true} style={segmentStyle}>
@@ -269,6 +271,7 @@ class DataProvider extends React.Component {
                 </Container>)
             }
 
+
         } else if (!error) {
             return <DataContext.Provider value={data}>{this.props.children}</DataContext.Provider>
         } else if (error) {
@@ -287,6 +290,7 @@ class DataProvider extends React.Component {
         }
     }
 }
+
 
 const mapStateToProps = (state, ownProps) => {
     const { store, group, app } = ownProps
