@@ -1,5 +1,5 @@
 [submodule "packages/react-lib"]
 	path = packages/react-lib
 	url = git@github.com:devgateway/wp-react-lib.git
-	branch = main
+	branch = vTCDI_4.0.0_za
 
