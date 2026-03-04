@@ -123,6 +123,16 @@ class DataProvider extends React.Component {
                         console.log("filters has been updated", filters)
                         this.props.onLoadData({app, source, store, params, group})
                         setTimeout(this.checkLoadingTime, 100);
+                    } else if (!editing && (
+                        JSON.stringify(params) !== JSON.stringify(prevProps.params) ||
+                        app !== prevProps.app ||
+                        JSON.stringify(source) !== JSON.stringify(prevProps.source)
+                    )) {
+                        // Props-based params changed (e.g., from postMessage via PreviewComponent)
+                        // but no Redux filter timestamps changed — reload data with updated params.
+                        this.setState({showLoading: false})
+                        this.props.onLoadData({app, source, store, params, group})
+                        setTimeout(this.checkLoadingTime, 100);
                     } else {
                         console.log("no changes detected ............")
                     }
