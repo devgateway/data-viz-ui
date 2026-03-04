@@ -50,26 +50,25 @@ const CategoricalFilter = (props: CategoricalFilterProps) => {
             }));
             if (categories) {
                 const filteredTaxonomyOptions = taxonomyOptions.filter((option: any) => categories.indexOf(option.value.toString()) > -1);
-                setTaxonomyOptions([])
                 setTaxonomyOptions(filteredTaxonomyOptions);
             } else {
-                setTaxonomyOptions([]);
                 setTaxonomyOptions(taxonomyOptions);
             }
         }
     }
 
+    const categoriesKey = JSON.stringify(categories);
     useEffect(() => {
         let ignore = false;
         if (!ignore) {
-            setTaxonomyOptions([]);
             getPostTypeBySlug();
         }
         // cleanup
         return () => {
             ignore = true;
         }
-    }, [type,taxonomy, categories]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [type, taxonomy, categoriesKey]);
 
     return (
         <PostsFilterDropdown
