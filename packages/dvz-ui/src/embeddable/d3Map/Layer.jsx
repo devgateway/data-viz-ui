@@ -30,8 +30,14 @@ class BaseLayer extends React.Component {
 
     applyInitialTransform() {
         const { editing, initialPosition, width, height } = this.props
-        d3.select(this.gRef.current).attr("transform", `translate(${initialPosition.x},${initialPosition.y}) scale(${initialPosition.k})`);
-
+        if (initialPosition && initialPosition.width) {
+            const { x, y, k, width: oW, height: oH } = initialPosition;
+            const nx = x + (width - oW) / 2 * (1 - k);
+            const ny = y + (height - oH) / 2 * (1 - k);
+            d3.select(this.gRef.current).attr("transform", `translate(${nx},${ny}) scale(${k})`);
+        } else {
+            d3.select(this.gRef.current).attr("transform", `translate(${initialPosition.x},${initialPosition.y}) scale(${initialPosition.k})`);
+        }
     }
 
     create() {
@@ -43,8 +49,8 @@ class BaseLayer extends React.Component {
             this.createLayer(this.state.json)
         } else {
             this.loadJSON(file).then(json => {
+                this.setState({ json }) // cache so subsequent calls skip the network
                 this.createLayer(json)
-
             })
         }
     }
@@ -79,7 +85,6 @@ class BaseLayer extends React.Component {
 
 
     componentDidMount() {
-        console.log("MAP MOUNTED.....")
         //eslint-disable-next-line
         if (this.props.zoom && this.gRef.current) {
             this.applyInitialTransform()

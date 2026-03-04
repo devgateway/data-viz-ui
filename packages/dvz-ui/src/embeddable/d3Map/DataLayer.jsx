@@ -870,7 +870,7 @@ class DataLayer extends BaseLayer {
 
         //TODO:Check if data has changed using JSON.stringify
 
-        if (editing || JSON.stringify(prevProps.data) !== JSON.stringify(data)) {
+        if (editing || prevProps.data !== data || prevProps.path !== this.props.path) {
             this.create()
         }
 

@@ -1,4 +1,4 @@
-import React, {Children} from 'react';
+import React, { Children } from 'react';
 import * as d3 from 'd3'
 
 
@@ -11,7 +11,7 @@ class ProjectedContainer extends React.Component {
     }
 
     createProjection() {
-        const {editing, height, width, scale = 200, center = [0, 0], projectionName} = this.props
+        const { editing, height, width, scale = 200, center = [0, 0], projectionName } = this.props
         const projection = d3[projectionName]()
             .fitSize([width, height])
             .scale(scale)
@@ -19,41 +19,37 @@ class ProjectedContainer extends React.Component {
             .translate([width / 2, height / 2])
 
         const path = d3.geoPath().projection(projection);
-        return {path, projection}
+        return { path, projection }
     }
 
     componentDidMount() {
 
-        const {svg} = this.props
-        const {path, projection} = this.createProjection()
+        const { svg } = this.props
+        const { path, projection } = this.createProjection()
 
-        this.setState({path, projection})
+        this.setState({ path, projection })
     }
 
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         if (prevProps.height !== this.props.height || prevProps.width !== this.props.width || prevProps.projectionName !== this.props.projectionName) {
-            const {path, projection} = this.createProjection()
-            this.setState({path, projection})
+            const { path, projection } = this.createProjection()
+            this.setState({ path, projection })
         }
     }
 
     render() {
-        
-        const {editing, backgroundColor, height, width, scale = 190, center = [0, 0], initialPosition, settings} = this.props
+
+        const { editing, backgroundColor, height, width, scale = 190, center = [0, 0], initialPosition, settings } = this.props
         const arrayChildren = Children.toArray(this.props.children);
         return <div
             className={"projected"}
-            width={width}
-            height={height}
             style={{
                 margin: "auto",
                 backgroundColor: backgroundColor,
                 height: `${height}px`,
-                width: `${width}px`,
-
-            }
-            }
+                width: '100%',
+            }}
         >
             {Children.map(arrayChildren, child => {
                 return React.cloneElement(child, {

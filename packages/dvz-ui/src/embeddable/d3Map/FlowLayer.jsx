@@ -257,71 +257,61 @@ class DataLayer extends BaseLayer {
     }
 
 
-    create() {
+    _buildLayer(rawJson) {
         const {
-            app,
-            name,
-            file,
-            path,
-            csv,
-            zoom,
-            labelFilter = [],
-            labelField,
-            labelFontSize,
-            labelColor,
-            fillColor,
-            borderColor,
             featureJoinAttribute,
-            editing,
+            app,
             data,
-            breaks,
-            markFillColor,
-            markSizeScale,
             measures,
-            flowValuesFrom
+            csv,
         } = this.props
 
+        const features = rawJson.features.map(d => {
+            const joinValue = d.properties[featureJoinAttribute]
+            if (app != 'csv' && data && data.children) {
+                const values = data.children.filter(d => d.value.indexOf(joinValue) > -1)
+                if (values.length > 0) {
+                    const measureValue = (values[0][measures[0]])
+                    d.properties.meta = values[0]
+                    d.properties._value = measureValue
+                    d.properties.destinations = values[0].children
+                }
+            } else if (app == 'csv') {
+                const parsed = Papa.parse(csv, { header: true, dynamicTyping: true });
+                const origin = d.properties[featureJoinAttribute]
+                const record = parsed.data.filter(r => r.origin == origin)[0]
+                if (record != undefined) {
+                    alert("CSV Not implemented Yet, please do it if you have time")
+                    d.properties.meta = record
+                    d.properties._value = record.value
+                    d.properties.destinations = record.destination
+                }
+            }
+            return d
+        })
+
+        this.createDataLayer({ ...rawJson, features });
+    }
+
+    create() {
+        const { file } = this.props
 
         if (file != "none") {
-            this.loadJSON(file).then(json => {
-                const features = json.features.map(d => {
-                    const joinValue = d.properties[featureJoinAttribute]
-                    if (app != 'csv' && data && data.children) {
-                        const values = data.children.filter(d => d.value.indexOf(joinValue) > -1)
-
-                        if (values.length > 0) {
-                            const measureValue = (values[0][measures[0]])
-                            d.properties.meta = values[0]
-                            d.properties._value = measureValue
-                            d.properties.destinations = values[0].children
-                        }
-                    } else if (app == 'csv') {
-
-                        const parsed = Papa.parse(csv, { header: true, dynamicTyping: true });
-
-                        const origin = d.properties[featureJoinAttribute]
-                        parsed.data.filter(r => r.origin == origin)
-                        const record = parsed.data.filter(r => r.origin == origin)[0]
-                        if (record != undefined) {
-                            alert("CSV Not implemented Yet, please do it if you have time")
-                            d.properties.meta = record
-                            d.properties._value = record.value
-                            d.properties.destinations = record.destination
-                        }
-
-
-                    }
-                    return d
-                })
-                const newJson = { ...json, features }
-                this.createDataLayer(newJson);
-            });
+            if (this.state.json) {
+                // GeoJSON already cached — skip network request, just re-join and redraw
+                this._buildLayer(this.state.json);
+            } else {
+                this.loadJSON(file).then(json => {
+                    this.setState({ json }) // cache raw GeoJSON for future calls
+                    this._buildLayer(json);
+                });
+            }
         }
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         const { projection, editing, data } = this.props
-        if (editing || JSON.stringify(prevProps.data) !== JSON.stringify(data)) {
+        if (editing || prevProps.data !== data || prevProps.path !== this.props.path) {
             this.create()
         }
 

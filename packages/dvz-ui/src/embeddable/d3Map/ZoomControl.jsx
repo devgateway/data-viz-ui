@@ -203,19 +203,18 @@ class ZoomControl extends React.Component {
         const { x = 100, y = 23, k = 1, width: oW, height: oH } = initialPosition;
         if (!oW || !oH || !k) return;
 
-        const dx = x / oW;
-        const dy = y / oH;
-        const nx = width * dx;
-        const ny = height * dy;
+        // Scale the saved translation proportionally to the current container size.
+        // The position was recorded at (oW × oH); we need to remap it to (width × height).
+        // The mathematically correct transform preserves the geographic coordinate at the center of the viewport.
+        // Because the base projection `translate` shifts with container size, we compensate.
+        const nx = x + (width - oW) / 2 * (1 - k);
+        const ny = y + (height - oH) / 2 * (1 - k);
 
         const selection = this.getSelection();
         if (selection) {
-            //print svg parent client sizes before zoooming
-            console.log("SVG parent client sizes:", selection.node().parentNode.clientWidth, selection.node().parentNode.clientHeight);
-
             selection.transition().duration(transition ? 750 : 0)
                 .attr("transform", transform)
-                .call(this.zoom.transform, d3.zoomIdentity.translate(x, y).scale(k));
+                .call(this.zoom.transform, d3.zoomIdentity.translate(nx, ny).scale(k));
         }
     }
 
