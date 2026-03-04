@@ -52,10 +52,13 @@ class DataProvider extends React.Component {
         const { data, loading, error } = this.props
 
         if (loading) {
-            return (<Container>
-
-
-            </Container>)
+            return (
+                <Container>
+                    <div className="filter-skeleton-placeholder">
+                        <div className="filter-skeleton-shimmer" />
+                    </div>
+                </Container>
+            )
         }
 
 
