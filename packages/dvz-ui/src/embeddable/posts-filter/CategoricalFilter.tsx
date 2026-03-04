@@ -57,7 +57,6 @@ const CategoricalFilter = (props: CategoricalFilterProps) => {
         }
     }
 
-    const categoriesKey = JSON.stringify(categories);
     useEffect(() => {
         let ignore = false;
         if (!ignore) {
@@ -68,7 +67,7 @@ const CategoricalFilter = (props: CategoricalFilterProps) => {
             ignore = true;
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [type, taxonomy, categoriesKey]);
+    }, [type, taxonomy]);
 
     return (
         <PostsFilterDropdown
