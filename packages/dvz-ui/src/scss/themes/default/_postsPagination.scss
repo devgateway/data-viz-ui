@@ -1,0 +1,14 @@
+.ui.fluid.container {
+    .posts-pagination {
+        display: flex;
+        padding: 10px 0;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .posts-pagination-dropdown {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+}

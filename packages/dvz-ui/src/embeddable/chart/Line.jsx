@@ -292,7 +292,7 @@ const Chart = ({
                   ...theme.axis.ticks.text,
                   fill: xLabelColor === "null" ? "black" : xLabelColor,
                   fontSize: "12px",
-                  fontFamily: "Roboto",
+                  fontFamily: "sans-serif",
                 }}
               >
                 {line}
@@ -366,7 +366,7 @@ const Chart = ({
                 ...theme.axis.ticks.text,
                 fill: xLabelColor === "null" ? "black" : xLabelColor,
                 fontSize: "12px",
-                fontFamily: "Roboto",
+                fontFamily: "sans-serif",
               }}
             >
               {line}
@@ -565,6 +565,10 @@ const Chart = ({
     }
   }
 
+  const filtered = applyFilter(options.data);
+  const baseLayers = ["grid", "axes", "lines", "legends"]
+  const emptyLayers = ["grid", "axes", "legends"]
+
   if (options?.data && hasData > 0) {
     let filteredData = applyFilter(options.data)
     const xDomain = [];
@@ -620,7 +624,7 @@ const Chart = ({
         <ResponsiveLine
           curve={lineCurve}
           key={new Date()}
-          data={filteredData}
+          data={filtered}
           margin={margins}
           xScale={{ type: "point" }}
           yScale={{
@@ -631,7 +635,7 @@ const Chart = ({
             reverse: false,
             clamp: minMaxClamp,
           }}
-          layers={layers}
+          layers={filtered.length === 0 ? emptyLayers : layers}
           axisTop={null}
           axisRight={
             showRightAxis
@@ -723,13 +727,15 @@ const Chart = ({
         {(legendPosition === "top" || legendPosition === "bottom") && (
           <div
             className={`legends container has-standard-12-font-size ${legendPosition}`}
+            style={legendPosition === "top" ? { marginTop: isMobileOrTablet && `${newMarginTop}px` } : legendPosition === "bottom" ? { marginBottom: `${newMarginBottom}px` } : {}}
           >
             <div className="legend-sections">
               <div className="title-section">{legendTitle()}</div>
               <FlexWrapDetector
                 onWrapChange={(count) => {
                   if (legendPosition === "top") {
-                    setNewMarginTop(marginTop + (count / 2) * 40);
+                    const newMarginTop = marginTop + (count / 2) * 40;
+                    setNewMarginTop(newMarginTop);
                     setWrapCount(count);
                   } else {
                     setNewMarginBottom(marginBottom + (count / 2) * 25);

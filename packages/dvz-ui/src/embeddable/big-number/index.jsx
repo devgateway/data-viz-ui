@@ -215,7 +215,6 @@ const BigNumber = ({ dataItem, format, measureField, measure, numberColor, numbe
     const formatNumber = (val) =>
         intl.formatNumber(val, { ...format });
 
-
     return (
         <div className="big-number">
 

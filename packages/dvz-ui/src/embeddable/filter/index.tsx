@@ -16,6 +16,7 @@ import CategoriesProvider from "../data/CategoriesProvider";
 import { connect } from "react-redux";
 import { setFilter, setInitialFilters } from "../reducers/data";
 import { injectIntl } from "react-intl";
+import { SettingProvider, SettingsConsumer } from "@devgateway/wp-react-lib";
 
 const FILTER_TYPE_MULTI_SELECT = "multi-select";
 const FILTER_TYPE_SINGLE_SELECT = "single-select";
@@ -83,9 +84,8 @@ const mapActionCreators = {
 
 const FilterDropDown = (props: FilterPros) => {
     const { isRange, options, alphabeticalSort, ascOrder } = props;
-    let sortedOptions: any[] = [];
     if (booleanParameter(alphabeticalSort)) {
-        sortedOptions = options.sort(function (a, b) {
+        options.sort(function (a, b) {
             const aText = a.text ? a.text.toLowerCase() : "";
             const bText = b.text ? b.text.toLowerCase() : "";
             if (booleanParameter(ascOrder)) {
@@ -95,7 +95,7 @@ const FilterDropDown = (props: FilterPros) => {
             }
         });
     } else {
-        sortedOptions = options.sort(function (a, b) {
+        options.sort(function (a, b) {
             return booleanParameter(ascOrder)
                 ? a.position - b.position
                 : b.position - a.position;
@@ -283,7 +283,7 @@ const FilterSelectorBox = connect(
                     onInit({ app, group, param, value: selected });
                 }
             } else {
-                if (app == "csv") {                    
+                if (app == "csv") {
                     let filterValues: any[] = [];
                     if (defaultValueCriteria === DEFAULT_VALUE_INPUT) {
                         filterValues = defaultValues ? defaultValues.split(",") : [];
@@ -296,7 +296,7 @@ const FilterSelectorBox = connect(
                                 : [];
                     }
                     onInit({ app, group, param, value: filterValues });
-                } else {                  
+                } else {
                     if (defaultTopNEnabled) {
                         const selectedTop1 = options.slice(0, 1).map((o) => o.value);
                         onInit({ app, group, param, value: selectedTop1 });
@@ -364,7 +364,7 @@ const FilterSelectorBox = connect(
             text={getSelected()}
             scrolling={false}
             button
-            icon={"angle down"}
+            icon={"angle down ignore"}
             multiple={true}
             search
             floating={false}
@@ -512,7 +512,7 @@ const RangeFilterSelectorBoxFilter = connect(
                 multiple={true}
                 search
                 floating={false}
-                icon="angle down"
+                icon="angle down ignore"
                 className={`${current && current.length > 0 ? "applied " : ""} range`}
             >
                 <Dropdown.Menu>
@@ -652,8 +652,11 @@ const CSVFilter = (props) => {
 
 const FilterWrapper = (props) => {
     return (
-        <Filter {...props}></Filter>
-
+        <SettingProvider locale={props.intl.locale} changeUUID={props.unique}>
+            <SettingsConsumer>
+                <Filter {...props}></Filter>
+            </SettingsConsumer>
+        </SettingProvider>
     );
 };
 
@@ -734,6 +737,7 @@ const Filter = ({
                 startLabel={startLabel}
                 endLabel={endLabel}
                 param={param}
+                ascOrder={ascOrder}
                 useSingleColumn={useSingleColumn === "true"}
                 enableTextSearch={enableTextSearch === "true"}
                 filterType={defaultFilterType}

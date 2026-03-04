@@ -2,7 +2,6 @@ import React, { lazy } from 'react'
 import data from './reducers/data'
 import embeddable from './reducers/embeddable'
 import { injectIntl } from "react-intl";
-import * as Immutable from 'immutable';
 
 // components
 const PageGallery = lazy(() => import("./pagegallery"));
@@ -41,7 +40,10 @@ const SupersetDashboard = lazy(() => import("./superset-dashboard"));
 const BigNumber = lazy(() => import("./big-number"));
 const GroupedBars = lazy(() => import("./grouped-bars"));
 const BigNumberTrend = lazy(() => import("./big-number-trend"));
-const PostsWithFilters = lazy(() => import("./posts-with-filters"));
+const PostsFilter = lazy(() => import("./posts-filter"));
+const FilteredPosts = lazy(() => import("./filtered-posts"));
+const PostsFiltersResetButton = lazy(() => import("./posts-filters-reset-button"));
+const PostsPagination = lazy(() => import("./posts-pagination"));
 const DataParagraph = lazy(() => import("./data-paragraph"));
 const BigFilter = lazy(() => import("./big-filter"));
 
@@ -83,11 +85,15 @@ export const components = {
     bigNumber: BigNumber,
     groupedBars: GroupedBars,
     bigNumberTrend: BigNumberTrend,
-    postsWithFilters: PostsWithFilters,
+    postsFilter: PostsFilter,
+    filteredPosts: FilteredPosts,
+    postsFiltersReset: PostsFiltersResetButton,
+    postsPagination: PostsPagination,
     dataParagraph: DataParagraph,
     bigFilter: BigFilter,
     redirect: () => null
 }
+
 
 export const customizer = {
     components: {},
@@ -134,6 +140,5 @@ export const getComponentByNameIgnoreCase = (name: string) => {
 
     return null
 }
-
 
 export const reducers = { data, embeddable, ...customizer.getReducers() };

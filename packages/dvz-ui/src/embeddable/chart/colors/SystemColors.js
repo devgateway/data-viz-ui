@@ -13,13 +13,34 @@ class SystemColors extends Colors {
     indexBy,
     dimensionsMetadata,
     measuresMetadata,
-    locale
+    locale,
+    options
   ) {
     super(colorBy, scheme, data, keys, indexBy);
     this.colorMap = {};
     this._colorBy = type == "line" ? "id" : colorBy;
+    const updateItemLabels = (items) => {
+      const updatedItems = items?.map((item) => {
+        const groupName = item.group.label;
+        if (item.label.includes(groupName)) return item;
+        return {
+          ...item,
+          label: `${groupName} - ${item.label}`,
+        };
+      });
+      return updatedItems;
+    };
 
-    if (this._indexBy && dimensionsMetadata) {
+    const ifNoMeasuresUseOptionMeasures = () => {
+      if (measuresMetadata && measuresMetadata.size > 0) {
+        return measuresMetadata;
+      } else if (options?.metadata?.measures.length > 0) {
+        options.metadata.measures = updateItemLabels(options.metadata.measures);
+        return options.metadata.measures;
+      }
+      return [];
+    };
+    if (this._indexBy && dimensionsMetadata?.size > 0) {
       [...dimensionsMetadata].forEach((c) => {
         if (c && c.items) {
           c.items.forEach((s) => {
@@ -33,6 +54,7 @@ class SystemColors extends Colors {
       });
     }
     if (measuresMetadata) {
+      measuresMetadata = ifNoMeasuresUseOptionMeasures();
       [...measuresMetadata].forEach((c) => {
         if (c && c.styles) {
           if (locale && c.labels && c.labels[locale.toUpperCase()]) {

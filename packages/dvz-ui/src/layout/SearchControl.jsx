@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useRef } from "react";
-import { utils, SearchConsumer, SearchProvider } from "@devgateway/wp-react-lib";
+import React, { useEffect, useState, useRef, useContext } from "react";
+import { utils, SearchConsumer, SearchProvider, SearchContext } from "@devgateway/wp-react-lib";
 import CustomSemanticSearch from "./CustomSemanticSearch";
 import { createPortal } from "react-dom";
 import { Icon } from "semantic-ui-react";
@@ -7,10 +7,10 @@ import { IntlProvider, injectIntl } from "react-intl";
 
 // Utility function to highlight search terms
 const boldSearchTerm = (text, searchTerm) => {
-  if (!searchTerm) return text;
+  if (!text || !searchTerm) return text || '';
   const regex = new RegExp(`(${searchTerm})`, 'gi');
   return text.replace(regex, '<strong>$1</strong>');
-}
+};
 
 // ResultRenderer component with highlighting
 const ResultRenderer = injectIntl(({
@@ -26,17 +26,15 @@ const ResultRenderer = injectIntl(({
   terms,
   subtype,
   bread_crumbs = [],
-  metadata: { redirect_url },
+  metadata,
   intl: { locale },
   searchTerm, // Added searchTerm prop
 }) => {
   let target = parent_link
     ? utils.replaceLink(parent_link, locale) + `#${slug}`
     : utils.replaceLink(link, locale);
+  const redirect_url = metadata?.redirect_url;
   target = redirect_url ? redirect_url + `#${slug}` : target;
-  
-
- 
 
   const boldedTitle = boldSearchTerm(String(title), searchTerm);
   const boldedExtract = boldSearchTerm(extract, searchTerm);
@@ -71,7 +69,7 @@ const ResultRenderer = injectIntl(({
         <div
           className="search-content"
           dangerouslySetInnerHTML={{
-            __html:  utils.replaceHTMLinks(boldedExtract, locale)
+            __html: utils.replaceHTMLinks(boldedExtract, locale)
           }}
         />
       </div>
@@ -142,9 +140,35 @@ const FloatingSearchController = ({
   locale,
   intl,
   searchTerm, // Added search from SearchConsumer
+  selected, // Added selected prop to track menu selection
 }) => {
   const [showSearchInput, setShowSearchInput] = useState(false);
   const containerRef = useRef(null);
+
+  const hide = () => {
+    setShowSearchInput(false);
+  };
+
+  const addListenerToHeaderElements = () => {
+    const itemWithChildren = document.getElementsByClassName("has-child-items");
+    for (let i = 0; i < itemWithChildren.length; i++) {
+      const itemElement = itemWithChildren[i];
+      const spans = itemElement.getElementsByTagName("span");
+      if (spans.length > 0) {
+        spans[0].addEventListener("mouseover", hide);
+      }
+    }
+  };
+  const removeListenerToHeaderElements = () => {
+    const itemWithChildren = document.getElementsByClassName("has-child-items");
+    for (let i = 0; i < itemWithChildren.length; i++) {
+      const itemElement = itemWithChildren[i];
+      const spans = itemElement.getElementsByTagName("span");
+      if (spans.length > 0) {
+        spans[0].removeEventListener("mouseover", hide);
+      }
+    }
+  }
 
   useEffect(() => {
     const newContainer = document.createElement("div");
@@ -167,15 +191,17 @@ const FloatingSearchController = ({
     if (containerRef.current) {
       containerRef.current.style.display = showSearchInput ? "block" : "none";
     }
+    
+    // Add or remove listeners based on search input visibility
+    if (showSearchInput) {
+      addListenerToHeaderElements();
+    } else {
+      removeListenerToHeaderElements();
+    }
   }, [showSearchInput]);
 
   const show = () => {
-    onSetSelected(null);
     setShowSearchInput(true);
-  };
-
-  const hide = () => {
-    setShowSearchInput(false);
   };
 
   return (
@@ -277,13 +303,34 @@ const SearchComponent = injectIntl((props) => {
     return () => window.removeEventListener("resize", updateScreenSize);
   }, []);
 
+  return (
+    <SearchProvider search={query} perPage={5} locale={intl.locale}>
+        <SearchComponentInner
+          {...props}
+          onSetSelected={onSetSelected}
+          setQuery={setQuery}
+          query={query}
+          isSmallScreen={isSmallScreen}
+          intl={intl}
+        />
+    </SearchProvider>
+  );
+});
+
+// Inner component that uses the SearchContext
+const SearchComponentInner = ({ onSetSelected, selected, setQuery, query, isSmallScreen, intl, ...props }) => {
+  const searchContext = useContext(SearchContext);
+
   const component =
     props.settings.react_search_type === "floating" || isSmallScreen ? (
       <FloatingSearchController
         onSetSelected={onSetSelected}
+        selected={selected}
         onSearch={setQuery}
         perPage={5}
+        intl={intl}
         {...props}
+        {...searchContext}
         searchTerm={query}
       />
     ) : (
@@ -291,15 +338,13 @@ const SearchComponent = injectIntl((props) => {
         onSetSelected={onSetSelected}
         onSearch={setQuery}
         perPage={5}
+        intl={intl}
         {...props}
+        {...searchContext}
       />
     );
 
-  return (
-    <SearchProvider search={query} perPage={5} locale={intl.locale}>
-      <SearchConsumer>{component}</SearchConsumer>
-    </SearchProvider>
-  );
-});
+  return component;
+};
 
 export default SearchComponent;

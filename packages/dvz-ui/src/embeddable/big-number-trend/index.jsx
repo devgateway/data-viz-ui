@@ -1,7 +1,7 @@
-import React, {useRef, useState} from "react";
+import React, { useRef, useState } from "react";
 import Classic from './Classic.jsx'
 import Alternative from './Alternative.jsx'
-import {connect} from "react-redux";
+import { connect } from "react-redux";
 
 
 const BigNumber = (props) => {
