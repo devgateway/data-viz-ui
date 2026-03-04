@@ -35,9 +35,8 @@ const MapWrapper = (props) => {
     // Preserve the aspect ratio defined by the data-width / data-height attributes
     const aspectRatio = Number(dataHeight) / Number(dataWidth);
     const width = containerWidth;
-    const height = containerWidth ? Math.round(containerWidth * aspectRatio) : Number(dataHeight);
-
-
+    const height = Number(dataHeight);
+    //containerWidth ? Math.round(containerWidth * aspectRatio) :
 
     const [paramMapPosition, setParamMapPosition] = useState(parse(dataMapPosition, editing), [])
 
