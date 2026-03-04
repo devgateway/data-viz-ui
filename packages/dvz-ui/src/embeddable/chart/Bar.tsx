@@ -151,7 +151,7 @@ const Chart = ({
   customAxisFormat,
   previewMode,
   showLegendsInColumns = false,
-  numberOfLegendColumns = 4,,
+  numberOfLegendColumns = 4,
   lineXAxisTickMode = 'none',
   lineXAxisTickCount = 10,
   lineXAxisTickEvery = 1

@@ -124,7 +124,6 @@ export const setData = ({ app, group, csv, store, params }) => (dispatch, getSta
     }
 
     const data = Papa.parse(csv, { header: true, dynamicTyping: true });
-    const data = Papa.parse(csv, { header: true, dynamicTyping: true });
 
     const filtered = data.data.filter(d => {
         let filtered = false;
@@ -391,9 +390,6 @@ export default (state = initialState, action) => {
         }
         case CLEAN_MEASURES: {
             const { app, group, measure } = action
-            const { app, group, measure } = action
-
-                ;
             return state.deleteIn(['measures', app, group])
 
         }
