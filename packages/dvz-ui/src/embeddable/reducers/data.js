@@ -93,8 +93,6 @@ export const getCategories = (props) => (dispatch, getState) => {
     const { app, params, dvzProxyDatasetId, uniqueStorage } = props
     dispatch({ type: LOAD_CATEGORIES, params, app, uniqueStorage, dvzProxyDatasetId })
 
-
-    api.getCategories({ app, params })
     api.getCategories({ app, params })
         .then(data => {
             data.appliedFilters = params;
