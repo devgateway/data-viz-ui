@@ -81,6 +81,10 @@ export interface BarChartProps {
   editing: boolean;
   showLegendsInColumns?: boolean;
   numberOfLegendColumns?: number;
+  // X-axis tick mode controls (mirror Line.jsx)
+  lineXAxisTickMode?: 'none' | 'count' | 'every';
+  lineXAxisTickCount?: number;
+  lineXAxisTickEvery?: number;
 }
 
 const Chart = ({
@@ -148,6 +152,9 @@ const Chart = ({
   previewMode,
   showLegendsInColumns = false,
   numberOfLegendColumns = 4,
+  lineXAxisTickMode = 'none',
+  lineXAxisTickCount = 10,
+  lineXAxisTickEvery = 1
 }: BarChartProps) => {
   const isMobileOrTablet = ["mobile", "tablet", "midTablet"].includes(
     deviceType(),
@@ -928,9 +935,9 @@ const Chart = ({
           }
           const value = data.value
             ? intl.formatNumber(
-                format.style === "percent" ? data.value / 100 : data.value,
-                format,
-              )
+              format.style === "percent" ? data.value / 100 : data.value,
+              format,
+            )
             : "";
           const valueLength = value.length;
           let yPos;
@@ -1324,6 +1331,52 @@ const Chart = ({
     }
   }
 
+  // Compute X-axis tick values for vertical layout, similar to Line chart
+  // Only applies when the x-axis shows categories (vertical bar layout)
+  let computedXTicks: any[] | undefined;
+  if (layout === 'vertical' && options?.data && options.data.length > 0) {
+    const filteredData = applyFilter(options.data, false);
+    const xDomain: any[] = [];
+    filteredData.forEach((d: any) => {
+      const xv = d?.[options.indexBy];
+      if (xv !== undefined && xDomain.indexOf(xv) === -1) {
+        xDomain.push(xv);
+      }
+    });
+
+    if (lineXAxisTickMode === 'count') {
+      const total = Math.max(1, parseInt(String(lineXAxisTickCount)));
+      if (xDomain.length > 0 && total > 0) {
+        if (xDomain.length <= total) {
+          computedXTicks = xDomain.slice();
+        } else {
+          const step = (xDomain.length - 1) / (total - 1);
+          const idxs = new Array(total);
+          for (let i = 0; i < total; i++) {
+            idxs[i] = Math.floor(i * step);
+          }
+          // ensure last index points to the last domain value
+          idxs[total - 1] = xDomain.length - 1;
+          computedXTicks = idxs.map((i) => xDomain[i]);
+        }
+      }
+    } else if (lineXAxisTickMode === 'every') {
+      const every = Math.max(1, parseInt(String(lineXAxisTickEvery)));
+      if (xDomain.length > 0) {
+        const vals: any[] = [];
+        for (let i = 0; i < xDomain.length; i++) {
+          if (i % every === 0) {
+            vals.push(xDomain[i]);
+          }
+        }
+        if (vals[vals.length - 1] !== xDomain[xDomain.length - 1]) {
+          vals.push(xDomain[xDomain.length - 1]);
+        }
+        computedXTicks = vals;
+      }
+    }
+  }
+
   let newHeight = parseInt(height + "") - newMarginBottom;
 
   return (
@@ -1359,8 +1412,46 @@ const Chart = ({
                     tickSize:
                       (layout == "horizontal" && showTickLine) ||
                       layout === "vertical"
-                        ? 5
-                        : 0,
+                      ? 5
+                      : 0,
+                  tickPadding: 5,
+                  tickRotation: 0,
+                  tickValues: ticks,
+                  legend: legends.right,
+                  legendPosition: "middle",
+                  legendOffset: parseInt(offsetRight),
+                  format: (value) => {
+                    if (!value) return "";
+                    if (layout == "vertical") {
+                      const effectiveFormat = customAxisFormat
+                        ? customAxisFormat
+                        : format;
+                      return intl.formatNumber(
+                        effectiveFormat.style === "percent"
+                          ? value / 100
+                          : value,
+                        {
+                          ...effectiveFormat,
+                        },
+                      );
+                    }
+
+                    return value;
+                  },
+                }
+                : null
+            }
+            // @ts-ignore
+            axisBottom={
+              (isNotDesktopPreview ||
+                isNotEditingAndIsMobileCustomizationEnabled) &&
+                mobileConfigSettings?.xAxisDisabled === true
+                ? null
+                : layout === "horizontal"
+                  ? {
+                    legend: legends.bottom,
+                    legendPosition: "middle",
+                    legendOffset: parseInt(offsetBottom),
                     tickPadding: 5,
                     tickRotation: 0,
                     tickValues: ticks,
@@ -1421,11 +1512,12 @@ const Chart = ({
                       },
                     }
                   : {
-                      legend: legends.bottom,
-                      legendPosition: "middle",
-                      legendOffset: parseInt(offsetBottom),
-                      renderTick: CustomTick,
-                    }
+                    legend: legends.bottom,
+                    legendPosition: "middle",
+                    legendOffset: parseInt(offsetBottom),
+                    ...(computedXTicks ? { tickValues: computedXTicks } : {}),
+                    renderTick: CustomTick,
+                  }
             }
             // TODO: Check why we are ignoring this
             // @ts-ignore
@@ -1442,27 +1534,27 @@ const Chart = ({
               legendPosition: "middle",
               legendOffset: Number.parseInt(offsetY),
               ...(isNotDesktopPreview ||
-              isNotEditingAndIsMobileCustomizationEnabled
+                isNotEditingAndIsMobileCustomizationEnabled
                 ? { renderTick: AxisLeftCustomTick }
                 : {
-                    format: (value) => {
-                      if (!value) return "";
-                      if (layout === "vertical") {
-                        const effectiveFormat = customAxisFormat
-                          ? customAxisFormat
-                          : format;
-                        return intl.formatNumber(
-                          effectiveFormat.style === "percent"
-                            ? value / 100
-                            : value,
-                          {
-                            ...effectiveFormat,
-                          },
-                        );
-                      }
-                      return value;
-                    },
-                  }),
+                  format: (value) => {
+                    if (!value) return "";
+                    if (layout === "vertical") {
+                      const effectiveFormat = customAxisFormat
+                        ? customAxisFormat
+                        : format;
+                      return intl.formatNumber(
+                        effectiveFormat.style === "percent"
+                          ? value / 100
+                          : value,
+                        {
+                          ...effectiveFormat,
+                        },
+                      );
+                    }
+                    return value;
+                  },
+                }),
             }}
             enableGridY={enableGridY}
             enableGridX={enableGridX}

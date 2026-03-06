@@ -1,13 +1,5 @@
 # @devgateway/dvz-ui-react
 
-## 1.6.20
-
-### Patch Changes
-
-- [#165](https://github.com/devgateway/data-viz-ui/pull/165) [`3f35de6`](https://github.com/devgateway/data-viz-ui/commit/3f35de6c45f78e6808bba92163f608816252778c) Thanks [@timothygachengo](https://github.com/timothygachengo)! - - Fix chart rendering but refactoring the PreviewComponent.
-  - Fix posts pagination by adding headers to the response.
-  - Fix posts filter to prevent reloading when posts load.
-
 ## 1.6.19
 
 ### Patch Changes

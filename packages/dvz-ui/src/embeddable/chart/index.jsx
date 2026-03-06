@@ -181,6 +181,9 @@ const Chart = (props) => {
     "data-line-curve": lineCurve = "linear",
     "data-show-legends-in-columns": showLegendsInColumns = "false",
     "data-number-of-legend-columns": numberOfLegendColumns = 4,
+    "data-line-x-axis-tick-mode": lineXAxisTickMode = "none",
+    "data-line-x-axis-tick-count": lineXAxisTickCount = 10,
+    "data-line-x-axis-tick-every": lineXAxisTickEvery = 1,
     pageModuleProps,
   } = props;
   const originalEditValue = editing;
@@ -400,21 +403,21 @@ const Chart = (props) => {
 
   const numberFormat = selectedFormat
     ? {
-        style:
-          selectedFormat.style === "compacted"
-            ? "decimal"
-            : selectedFormat.style,
-        notation: selectedFormat.style === "compacted" ? "compact" : "standard",
-        currency: selectedFormat.currency,
-        minimumFractionDigits: parseInt(selectedFormat.minimumFractionDigits),
-        maximumFractionDigits: parseInt(selectedFormat.maximumFractionDigits),
-      }
+      style:
+        selectedFormat.style === "compacted"
+          ? "decimal"
+          : selectedFormat.style,
+      notation: selectedFormat.style === "compacted" ? "compact" : "standard",
+      currency: selectedFormat.currency,
+      minimumFractionDigits: parseInt(selectedFormat.minimumFractionDigits),
+      maximumFractionDigits: parseInt(selectedFormat.maximumFractionDigits),
+    }
     : {
-        notation: "standard",
-        currency: "USD",
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      };
+      notation: "standard",
+      currency: "USD",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    };
 
   const customAxisFormat = getCustomAxisFormat();
 
@@ -446,7 +449,7 @@ const Chart = (props) => {
 
   const showXAxisTitle = () =>
     (isNotDesktopPreview || isNotEditingAndIsMobileOrTablet) &&
-    !mobileConfigSettings?.showXAxisTitle
+      !mobileConfigSettings?.showXAxisTitle
       ? ""
       : bottom;
 
@@ -597,8 +600,8 @@ const Chart = (props) => {
       tooltipEnableMarkdown == true || tooltipEnableMarkdown == "true"
         ? tooltipForSelectedMeasure
         : tooltipForSelectedMeasure
-            .replace(/\r\n/g, "<hr/>")
-            .replace(/[\r\n]/g, "<hr/>"),
+          .replace(/\r\n/g, "<hr/>")
+          .replace(/[\r\n]/g, "<hr/>"),
     colors: colors,
     groupMode: groupMode,
     format: numberFormat,
@@ -673,6 +676,9 @@ const Chart = (props) => {
       isNotDesktopPreview || isNotEditingAndIsMobileOrTablet
         ? (mobileConfigSettings.xAxisTickValues ?? xAxisTickValues)
         : xAxisTickValues,
+    lineXAxisTickMode,
+    lineXAxisTickCount: parseInt(lineXAxisTickCount) || 10,
+    lineXAxisTickEvery: parseInt(lineXAxisTickEvery) || 1,
     enableGridY: enableGridY == true || enableGridY == "true",
     enableGridX: enableGridX == true || enableGridX == "true",
     offsetText,
@@ -857,9 +863,8 @@ const Chart = (props) => {
                 // Delay adjustment if elements are not fully visible yet
                 setTimeout(() => {
                   if (dataSourceRect.top < legendsRect.bottom) {
-                    dataSourceParagraph.style.marginTop = `${
-                      legendsRect.bottom - dataSourceRect.top + 1
-                    }px`;
+                    dataSourceParagraph.style.marginTop = `${legendsRect.bottom - dataSourceRect.top + 1
+                      }px`;
                   }
                 }, 1000);
               }
