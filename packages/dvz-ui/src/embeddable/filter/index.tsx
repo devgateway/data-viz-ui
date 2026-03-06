@@ -83,9 +83,8 @@ const mapActionCreators = {
 
 const FilterDropDown = (props: FilterPros) => {
     const { isRange, options, alphabeticalSort, ascOrder } = props;
-    let sortedOptions: any[] = [];
     if (booleanParameter(alphabeticalSort)) {
-        sortedOptions = options.sort(function (a, b) {
+        options.sort(function (a, b) {
             const aText = a.text ? a.text.toLowerCase() : "";
             const bText = b.text ? b.text.toLowerCase() : "";
             if (booleanParameter(ascOrder)) {
@@ -95,14 +94,14 @@ const FilterDropDown = (props: FilterPros) => {
             }
         });
     } else {
-        sortedOptions = options.sort(function (a, b) {
+        options.sort(function (a, b) {
             return booleanParameter(ascOrder)
                 ? a.position - b.position
                 : b.position - a.position;
         });
     }
 
-    const filterProps = { ...props, options: sortedOptions };
+    const filterProps = { ...props };
 
     if (isRange) {
         return <RangeFilterSelectorBoxFilter {...filterProps} />;
@@ -283,7 +282,7 @@ const FilterSelectorBox = connect(
                     onInit({ app, group, param, value: selected });
                 }
             } else {
-                if (app == "csv") {                    
+                if (app == "csv") {
                     let filterValues: any[] = [];
                     if (defaultValueCriteria === DEFAULT_VALUE_INPUT) {
                         filterValues = defaultValues ? defaultValues.split(",") : [];
@@ -296,7 +295,7 @@ const FilterSelectorBox = connect(
                                 : [];
                     }
                     onInit({ app, group, param, value: filterValues });
-                } else {                  
+                } else {
                     if (defaultTopNEnabled) {
                         const selectedTop1 = options.slice(0, 1).map((o) => o.value);
                         onInit({ app, group, param, value: selectedTop1 });
@@ -364,7 +363,7 @@ const FilterSelectorBox = connect(
             text={getSelected()}
             scrolling={false}
             button
-            icon={"angle down"}
+            icon={"angle down ignore"}
             multiple={true}
             search
             floating={false}
@@ -512,7 +511,7 @@ const RangeFilterSelectorBoxFilter = connect(
                 multiple={true}
                 search
                 floating={false}
-                icon="angle down"
+                icon="angle down ignore"
                 className={`${current && current.length > 0 ? "applied " : ""} range`}
             >
                 <Dropdown.Menu>
@@ -582,7 +581,7 @@ const CategoryFilter = (props) => {
         ? toOptions(filteredCategories, props.locale)
         : [];
 
-    const filterDefinitions = data.find((d) => (d.type = "FilterDefinition"));
+    const filterDefinitions = data.find((d) => (d.type === "FilterDefinition"));
 
     const placeholder = filterDefinitions
         ? filterDefinitions.items.find((i) => i.fieldType == type)
@@ -653,7 +652,6 @@ const CSVFilter = (props) => {
 const FilterWrapper = (props) => {
     return (
         <Filter {...props}></Filter>
-
     );
 };
 
@@ -691,7 +689,6 @@ const Filter = ({
     "data-auto-apply": autoApply = "true",
     "data-default-top-n-enabled": defaultTopNEnabled = "false",
     "data-default-top-n-count": defaultTopNCount = "0",
-    settings,
     intl,
 }) => {
     const params = {};
@@ -734,6 +731,7 @@ const Filter = ({
                 startLabel={startLabel}
                 endLabel={endLabel}
                 param={param}
+                ascOrder={ascOrder}
                 useSingleColumn={useSingleColumn === "true"}
                 enableTextSearch={enableTextSearch === "true"}
                 filterType={defaultFilterType}

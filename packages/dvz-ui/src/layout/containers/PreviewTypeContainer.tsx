@@ -12,13 +12,14 @@ interface PreviewTypeContainerProps {
     footer?: React.ReactNode;
 }
 
-const PreviewTypeContainer = ({ header, footer }: PreviewTypeContainerProps) => {
+const PreviewTypeContainer: React.FC<PreviewTypeContainerProps> = (props) => {
+    const { header, footer } = props;
     const location = useLocation();
-    const props = useParams();
+    const params = useParams();
 
     const searchParams = new URLSearchParams(location.search)
     const preview = searchParams.get("preview")
-    const type = props.type == 'post' ? 'posts' : props.type;
+    const type = params.type == 'post' ? 'posts' : params.type;
     const previewNonce = searchParams.get("_wpnonce");
 
     return (
@@ -27,9 +28,9 @@ const PreviewTypeContainer = ({ header, footer }: PreviewTypeContainerProps) => 
                 store={"preview"}
                 perPage={1}
                 view={preview}
-                locale={props.lan}
+                locale={params.lan}
                 previewNonce={previewNonce}
-                previewId={props.id}>
+                previewId={params.id}>
                 <PostConsumer>
                     <Post preview={true} showIntro={true} />
                 </PostConsumer>

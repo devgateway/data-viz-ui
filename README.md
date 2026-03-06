@@ -1,8 +1,8 @@
-# data-viz-front
+# data-viz-ui
 
 Data Viz Front provides a generic UI which utilizes the react-wp-lib library, which allows React components to be embedded into WordPress Gutenberg blocks, enabling dynamic content visualization.
 
-The data-viz-front submodule offers a set of embeddable React components that can be used in WordPress during the page editing mode. Each component is available as a separate WordPress plugin, making it easy for users to embed and configure these React components within the Gutenberg editor. React-wp-lib ensures seamless integration of these components during the UI render process, connecting them with the Redux store to manage state and data flow across the application.
+The data-viz-ui submodule offers a set of embeddable React components that can be used in WordPress during the page editing mode. Each component is available as a separate WordPress plugin, making it easy for users to embed and configure these React components within the Gutenberg editor. React-wp-lib ensures seamless integration of these components during the UI render process, connecting them with the Redux store to manage state and data flow across the application.
 
 ## Requirements
 

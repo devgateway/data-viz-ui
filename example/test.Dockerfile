@@ -10,37 +10,34 @@ RUN corepack prepare pnpm@10.10.0 --activate
 
 from base as local-packages
 WORKDIR /app
-
-# Copy manifests so pnpm can resolve/link workspace deps (dvz-ui, wp-react-lib)
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-# Replace versions with workspace:* for local development
-RUN node -e "const fs=require('fs');const p='./package.json';const j=JSON.parse(fs.readFileSync(p,'utf8'));['@devgateway/dvz-ui-react','@devgateway/wp-react-lib'].forEach(k=>{if(j.dependencies&&j.dependencies[k]) j.dependencies[k]='workspace:*';});fs.writeFileSync(p, JSON.stringify(j,null,2));"
-
-COPY  --from=data-viz-ui /package.json ./data-viz-ui/package.json
-COPY --from=data-viz-ui packages/dvz-ui/package.json ./data-viz-ui/packages/dvz-ui/package.json
-COPY --from=data-viz-ui packages/react-lib/wp-react-lib/package.json ./data-viz-ui/packages/react-lib/wp-react-lib/package.json
+# Building data-viz local deps
+# Copy all files from data-viz-ui context
+COPY --from=data-viz-ui / ./
+# Install dependencies for all workspace packages
 RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store pnpm install --no-frozen-lockfile
-
-COPY --from=data-viz-ui / ./data-viz-ui
-# Copy the rest of the source and build local packages used by the app
+# Build all workspace packages
 RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store pnpm -r --filter @devgateway/* build
 
+#--------------
 
 from base as build-env
 WORKDIR /app
 # Bring in workspace package manifests and build outputs from local-packages
-COPY --from=local-packages /app/data-viz-ui/package.json ./data-viz-ui/package.json
-COPY --from=local-packages /app/data-viz-ui/packages/dvz-ui/package.json ./data-viz-ui/packages/dvz-ui/package.json
-COPY --from=local-packages /app/data-viz-ui/packages/react-lib/wp-react-lib/package.json ./data-viz-ui/packages/react-lib/wp-react-lib/package.json
-COPY --from=local-packages /app/data-viz-ui/packages/dvz-ui/dist ./data-viz-ui/packages/dvz-ui/dist
-COPY --from=local-packages /app/data-viz-ui/packages/react-lib/wp-react-lib/dist ./data-viz-ui/packages/react-lib/wp-react-lib/dist
-# Copy workspace file so pnpm sees the monorepo
-COPY pnpm-workspace.yaml ./pnpm-workspace.yaml
-# Copy remaining project files (may re-copy original package.json)
+#COPY --from=local-packages /app/data-viz-ui/ ./data-viz-ui/
+COPY --from=local-packages /app/package.json ./data-viz-ui/package.json
+COPY --from=local-packages /app/packages/dvz-ui/package.json ./data-viz-ui/packages/dvz-ui/package.json
+COPY --from=local-packages /app/packages/react-lib/wp-react-lib/package.json ./data-viz-ui/packages/react-lib/wp-react-lib/package.json
+
+COPY --from=local-packages /app/packages/dvz-ui/dist ./data-viz-ui/packages/dvz-ui/dist
+COPY --from=local-packages /app/packages/react-lib/wp-react-lib/dist ./data-viz-ui/packages/react-lib/wp-react-lib/dist
+
 COPY *.* ./
 COPY app ./app
 # Ensure the modified package.json (with workspace:*) is in place for install
-COPY --from=local-packages /app/package.json ./package.json
+RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store pnpm  install ./data-viz-ui/packages/dvz-ui -w &&  pnpm install ./data-viz-ui/packages/react-lib/wp-react-lib -w
+
+#2
+#COPY pnpm-workspace.yaml ./pnpm-workspace.yaml
 
 # Build (VITE_* envs scoped to this RUN only)
 ARG VITE_REACT_APP_WP_API
@@ -54,7 +51,6 @@ ARG VITE_REACT_APP_WP_STYLES
 # Install with workspace links
 RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store pnpm install --no-frozen-lockfile
 # Optional: verify linked workspaces (should show link: paths)
-RUN pnpm list --depth 0 | grep '@devgateway' || true
 
 RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store \
     VITE_REACT_APP_WP_API=$VITE_REACT_APP_WP_API \
@@ -70,15 +66,18 @@ RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store pnpm prune --prod
 
 
 
+
+
 # Final runtime image
 FROM node:22-slim AS runtime
 ENV NODE_ENV=production
 WORKDIR /app
 COPY pnpm-lock.yaml ./
-COPY --from=local-packages /app/package.json ./package.json
+COPY --from=build-env /app/package.json ./package.json
 # Use pruned production-only node_modules from build stage
 COPY --from=build-env /app/node_modules /app/node_modules
 COPY --from=build-env /app/build /app/build
 #TODO: print container ininital message
 ENV INIT_MESSAGE="==============================\n===  TESTING CONTAINER RUNNING  ===\n=============================="
 CMD ["sh", "-lc", "echo '--- package.json (runtime) ---'; cat package.json; echo \"$INIT_MESSAGE\"; exec npm run start"]
+

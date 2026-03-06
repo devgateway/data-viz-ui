@@ -1,10 +1,10 @@
-import {reactRouter} from "@react-router/dev/vite";
-import {defineConfig} from "vite";
+import { reactRouter } from "@react-router/dev/vite";
+import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
-import Environment from 'vite-plugin-env-compatible';
+import Environment from 'vite-plugin-environment';
 import commonjs from 'vite-plugin-commonjs';
-import {libInjectCss} from 'vite-plugin-lib-inject-css';
-import {resolve} from 'path';
+import { libInjectCss } from 'vite-plugin-lib-inject-css';
+import { resolve } from 'path';
 
 
 const devConfig = defineConfig({
@@ -38,9 +38,11 @@ const devConfig = defineConfig({
             // Direct source imports for instant hot reloading
             "@devgateway/dvz-ui-react": resolve(__dirname, "../data-viz-ui/packages/dvz-ui/src"),
             "@devgateway/wp-react-lib": resolve(__dirname, "../data-viz-ui/packages/react-lib/wp-react-lib/src"),
+            "@devgateway/dvz-ui-react/layout": resolve(__dirname, "../data-viz-ui/packages/dvz-ui/src/layout"),
             // Handle subpath imports
             "@devgateway/wp-react-lib/api": resolve(__dirname, "../data-viz-ui/packages/react-lib/wp-react-lib/src/api"),
             "@devgateway/wp-react-lib/hooks": resolve(__dirname, "../data-viz-ui/packages/react-lib/wp-react-lib/src/hooks"),
+            "@devgateway/wp-react-lib/utils": resolve(__dirname, "../data-viz-ui/packages/react-lib/wp-react-lib/src/utils"),
             // Handle internal aliases within dvz-ui package
             "@/conf": resolve(__dirname, "../data-viz-ui/packages/dvz-ui/src/conf"),
             "@/embeddable": resolve(__dirname, "../data-viz-ui/packages/dvz-ui/src/embeddable"),
@@ -51,9 +53,19 @@ const devConfig = defineConfig({
             "@/translations": resolve(__dirname, "../data-viz-ui/packages/dvz-ui/src/translations"),
             "@/tracker": resolve(__dirname, "../data-viz-ui/packages/dvz-ui/src/tracker"),
             "@/api": resolve(__dirname, "../data-viz-ui/packages/dvz-ui/src/api"),
+
         },
         // Avoid duplicate React instances between app and linked packages
-        dedupe: ["react", "react-dom"],
+        dedupe: [
+            "react",
+            "react-dom",
+            "react-router",
+            "react-router-dom",
+            "redux",
+            "react-intl",
+            "react-redux",
+            "semantic-ui-react",
+        ],
     },
     optimizeDeps: {
         include: [
@@ -90,7 +102,7 @@ const devConfig = defineConfig({
         },
         watch: {
             // Watch local package source directories
-          //  ignored: ['!/../data-viz-ui/**', '!data-viz-wordpress/**'],
+            //  ignored: ['!/../data-viz-ui/**', '!data-viz-wordpress/**'],
             // Polling can help when editors or networked FS miss native FS events
             usePolling: true,
             interval: 200,
@@ -108,14 +120,18 @@ const devConfig = defineConfig({
 
 
 const prodConfig = defineConfig({
-
+    define: {
+        'process.env.VITE_REACT_APP_WP_API': JSON.stringify(process.env.VITE_REACT_APP_WP_API),
+        'process.env.VITE_REACT_APP_DEFAULT_LOCALE': JSON.stringify(process.env.VITE_REACT_APP_DEFAULT_LOCALE),
+        'process.env.VITE_REACT_APP_USE_HASH_LINKS': JSON.stringify(process.env.VITE_REACT_APP_USE_HASH_LINKS),
+        'process.env.VITE_REACT_APP_WP_HOSTS': JSON.stringify(process.env.VITE_REACT_APP_WP_HOSTS),
+        'process.env.VITE_REACT_APP_API_ROOT': JSON.stringify(process.env.VITE_REACT_APP_API_ROOT),
+        'process.env.VITE_REACT_APP_WP_SEARCH_END_POINT': JSON.stringify(process.env.VITE_REACT_APP_WP_SEARCH_END_POINT),
+        'process.env.VITE_REACT_APP_WP_STYLES': JSON.stringify(process.env.VITE_REACT_APP_WP_STYLES),
+    },
     plugins: [
-        // reactRouterDevTools(),
         reactRouter(),
         tsconfigPaths(),
-        // nodePolyfills({
-        //   include: ["querystring"]
-        // }),
         // @ts-ignore
         Environment({
             prefix: "VITE_",
@@ -126,14 +142,26 @@ const prodConfig = defineConfig({
     optimizeDeps: {
         include: [
             "@devgateway/wp-react-lib",
+            "@devgateway/dvz-ui-react",
             "semantic-ui-react",
             "@nivo/*",
         ]
     },
+    ssr: {
+        noExternal: ["@devgateway/wp-react-lib", "@devgateway/dvz-ui-react"],
+        optimizeDeps: {
+            include: [
+                "@devgateway/wp-react-lib",
+                "@devgateway/dvz-ui-react",
+            ]
+        }
+    },
+    build: {
+        cssCodeSplit: true,
+    },
 });
 
 
-export default defineConfig(({command}) => {
+export default defineConfig(({ command }) => {
     return command === 'serve' ? devConfig : prodConfig;
 });
-

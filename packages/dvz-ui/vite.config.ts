@@ -7,7 +7,6 @@ import * as packageJson from './package.json';
 import preserveDirectives from "rollup-plugin-preserve-directives";
 import autoprefixer from 'autoprefixer';
 
-
 // https://vite.dev/config/
 export default defineConfig({
     plugins: [
@@ -28,6 +27,7 @@ export default defineConfig({
     // },
     build: {
         copyPublicDir: false,
+        cssMinify: true,
         cssCodeSplit: true,
         lib: {
             entry: {
@@ -46,6 +46,7 @@ export default defineConfig({
             exclude: ['node_modules'],
         },
         rollupOptions: {
+            treeshake: true,
             external: [
                 ...Object.keys(packageJson.dependencies || {}),
                 ...Object.keys(packageJson.devDependencies || {}),
@@ -62,6 +63,7 @@ export default defineConfig({
                 "common.css": resolve(__dirname, 'src/scss/common.scss'),
                 "tracker/index": resolve(__dirname, 'src/tracker/index.ts'),
                 "layout/index": resolve(__dirname, 'src/layout/index.ts'),
+                "utils/index": resolve(__dirname, 'src/utils/index.ts'),
             },
             plugins: [preserveDirectives()],
             output: [

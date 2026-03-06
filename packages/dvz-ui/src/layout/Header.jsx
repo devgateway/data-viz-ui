@@ -33,10 +33,24 @@ const getPath = (menu, params) => {
 
 const localReplaceLink = (url, locale) => {
     if (url) {
-        if (!url.substr(url.indexOf("/wp") + 3).startsWith("/" + locale)) {
-            return "/" + locale + url.substr(url.indexOf("/wp") + 3);
+        const wpIndex = url.indexOf("/wp");
+
+        if (wpIndex !== -1) {
+            // URL contains "/wp" - extract the part after "/wp"
+            const pathAfterWp = url.substr(wpIndex + 3);
+            if (!pathAfterWp.startsWith("/" + locale)) {
+                const newUrl = "/" + locale + pathAfterWp;
+                return newUrl;
+            }
+            return pathAfterWp;
+        } else {
+            // URL doesn't contain "/wp" - just prepend locale if not already present
+            if (!url.startsWith("/" + locale)) {
+                const newUrl = "/" + locale + url;
+                return newUrl;
+            }
+            return url;
         }
-        return url.substr(url.indexOf("/wp") + 3);
     }
     return "";
 };
@@ -48,10 +62,9 @@ const BreadCrumbs = injectIntl(({ menu, intl }) => {
         <React.Fragment>
             {path
                 .filter((i) => i.url != "#wpm-languages")
-                .map((i, index) =>
+                .map((i) =>
                     !i.child_items ? (
                         <a
-                            key={index}
                             className={i.slug == params.slug ? "active" : ""}
                             href={utils.replaceLink(i.url, intl.locale)}
                         >
@@ -59,16 +72,17 @@ const BreadCrumbs = injectIntl(({ menu, intl }) => {
                             {i.post_title}
                         </a>
                     ) : (
-                        <span key={index}>{i.post_title} </span>
+                        <span>{i.post_title} </span>
                     )
                 )}
         </React.Fragment>
     );
-})
+});
 
 /*
 Setting objects will inject customization preview
 * */
+
 const MenuItems = injectIntl(
     ({
         settings,
@@ -83,15 +97,15 @@ const MenuItems = injectIntl(
         const params = useParams();
         useEffect(
             (e) => {
-                if (!selected) {
-                    const pathSelected = getPath(menu, params);
-                    const items = pathSelected.filter((i) => i.menu_item_parent == 0);
-                    if (items) {
-                        onSetSelected(items[0]);
-                    }
+                const pathSelected = getPath(menu, params);
+                const items = pathSelected.filter((i) => i.menu_item_parent == 0);
+                if (items && items.length > 0) {
+                    onSetSelected(items[0]);
+                } else {
+                    onSetSelected(null);
                 }
             },
-            [menu, onSetSelected, selected]
+            [menu, onSetSelected, params.slug]
         );
 
         /*Original menu mixed with customization changes*/
@@ -174,7 +188,6 @@ const MenuItems = injectIntl(
             // Cleanup on unmount
             return () => window.removeEventListener("resize", handleResize);
         }, []);
-
         return (
             mixedMenu && (
                 <React.Fragment>
@@ -214,7 +227,10 @@ const MenuItems = injectIntl(
                                             </a>
                                         )
                                     ) : item.child_items ? (
-                                        <span onMouseOver={(e) => onSetSelected(item)}>
+                                        <span
+                                            onMouseOver={(e) => onSetSelected(item)}
+                                            onClick={() => onSetSelected(selected === item ? null : item)}
+                                        >
                                             {item.title}
                                         </span>
                                     ) : (
@@ -255,10 +271,11 @@ const MenuItems = injectIntl(
     }
 );
 
-const Header = ({ intl, settings = {} }) => {
+const Header = ({ intl, settings }) => {
     const [selected, setSelected] = useState();
     const [isMenuVisible, setMenuVisible] = useState(false);
     const [isSmallScreen, setIsSmallScreen] = useState(false);
+    const [isTransitioning, setIsTransitioning] = useState(false);
     const [hasInteracted, setHasInteracted] = useState(false);
 
     const { slug } = useParams();
@@ -303,45 +320,42 @@ const Header = ({ intl, settings = {} }) => {
         };
     }, []);
 
-    const isNowSmallScreen = window.innerWidth <= 1200;
+    //const isNowSmallScreen = window.innerWidth <= 1200;
 
     // Debounced resize logic
     useEffect(() => {
         let resizeTimeout;
 
         const updateScreenSize = () => {
+            const currentIsSmallScreen = window.innerWidth <= 1200;
 
-            if (isNowSmallScreen && !isSmallScreen && isMenuVisible) {
-                // Reset menu visibility when switching to mobile view
-                setMenuVisible(false);
-
-            }
-
-            setIsSmallScreen(isNowSmallScreen);
+            setIsSmallScreen(currentIsSmallScreen);
+            setIsTransitioning(false); // Stop transition after resize settles
         };
 
         const handleResize = () => {
+            setIsTransitioning(true); // Begin transition immediately
             clearTimeout(resizeTimeout);
-            resizeTimeout = setTimeout(updateScreenSize, 200); // Debounce the resize event
+            resizeTimeout = setTimeout(updateScreenSize, 300); // Debounced style update
         };
 
-        // Initial check and add event listener
-        updateScreenSize();
+        updateScreenSize(); // Initial check
         window.addEventListener("resize", handleResize);
 
-        // Cleanup on unmount
         return () => {
             clearTimeout(resizeTimeout);
             window.removeEventListener("resize", handleResize);
         };
     }, []);
 
+
+
     const [isMediumScreen, setIsMediumScreen] = useState(false); // State to track small screen
 
     useEffect(() => {
         // Function to update isMediumScreen state
         const updateScreenSize = () => {
-            setIsMediumScreen(window.innerWidth <= 1365); // Check if width is 1365px or lower
+            setIsMediumScreen(window.innerWidth <= 1364); // Check if width is 1365px or lower
         };
 
         // Initial check
@@ -368,29 +382,15 @@ const Header = ({ intl, settings = {} }) => {
         settings.landing_page_url !== "";
     const SITE_URL_WITH_LOCALE = hasLandingPageSettings ? settings.landing_page_url : `/${intl.locale}`;
 
-    console.log("isMenuVisible", isMenuVisible);
-
-
 
     return (
         <React.Fragment>
             <MenuProvider slug={"main"} locale={intl.locale}>
                 <Container key="header-container" fluid={true} className="header">
-                    <div
-                        ref={hamburgerRef}
-                        className={`hamburger-menu ${hasInteracted ? "animate" : ""} ${isMenuVisible ? "open" : "close"
-                            }`}
-                        onClick={toggleMenu}
-                    >
-                        <div></div>
-                        <div className={"middle-line"}></div>
-                        <div></div>
-                    </div>
-
                     <Container fluid={true} className={"background"} ref={menuRef}>
                         <Menu className={"branding"} text>
                             <Menu.Item>
-                                <a href={`${SITE_URL_WITH_LOCALE}`} target={hasLandingPageSettings ? "_blank" : "_self"} rel="noopener noreferrer">
+                                <a href={`${SITE_URL_WITH_LOCALE}`} target={hasLandingPageSettings ? "_blank" : "_self"} rel="noopener noreferrer" id="site_url">
                                     {settings.site_logo !== 0 && !isMediumScreen && (
                                         <MediaProvider id={settings.site_logo}>
                                             <MediaConsumer>
@@ -410,7 +410,7 @@ const Header = ({ intl, settings = {} }) => {
                                         <img
                                             className="brand logo small"
                                             size="small"
-                                            src="/TCDI-Icon-small_02.png"
+                                            src="/wp-media/TCDI-Icon-small_02.png"
                                         />
                                     )}
                                 </a>
@@ -426,10 +426,24 @@ const Header = ({ intl, settings = {} }) => {
                             </Menu.Item>
 
                             {/* Conditional Menu Rendering */}
-                            {isSmallScreen ? (
-                                <Menu className={`pages ${isMenuVisible ? "show" : ""}`}>
-                                    <Container fluid>
-                                        {/* Side Menu Content */}
+                            {!isTransitioning && (
+                                isSmallScreen ? (
+                                    <Menu className={`pages ${isMenuVisible ? "show" : ""}`}>
+                                        <Container fluid>
+                                            <MenuConsumer>
+                                                <MenuItems
+                                                    key="items"
+                                                    settings={settings}
+                                                    active={slug}
+                                                    selected={selected}
+                                                    onSetSelected={setSelected}
+                                                    isSmallScreen={isSmallScreen}
+                                                />
+                                            </MenuConsumer>
+                                        </Container>
+                                    </Menu>
+                                ) : (
+                                    <Menu.Menu className={"pages"}>
                                         <MenuConsumer>
                                             <MenuItems
                                                 key="items"
@@ -437,25 +451,12 @@ const Header = ({ intl, settings = {} }) => {
                                                 active={slug}
                                                 selected={selected}
                                                 onSetSelected={setSelected}
-                                                isSmallScreen={isSmallScreen}
                                             />
                                         </MenuConsumer>
-                                    </Container>
-                                </Menu>
-                            ) : (
-                                <Menu.Menu className={"pages"}>
-                                    {/* Original Menu Content */}
-                                    <MenuConsumer>
-                                        <MenuItems
-                                            key={"items"}
-                                            settings={settings}
-                                            active={slug}
-                                            selected={selected}
-                                            onSetSelected={setSelected}
-                                        ></MenuItems>
-                                    </MenuConsumer>
-                                </Menu.Menu>
+                                    </Menu.Menu>
+                                )
                             )}
+
 
                             <Menu.Item>
                                 <MenuConsumer>
@@ -466,11 +467,24 @@ const Header = ({ intl, settings = {} }) => {
                                 </MenuConsumer>
                             </Menu.Item>
                             <Menu.Item fitted>
-                                <SearchComponent
-                                    onSetSelected={setSelected}
-                                    settings={settings}
-                                />
+                                <MenuConsumer>
+                                    <SearchComponent
+                                        onSetSelected={setSelected}
+                                        // selected={selected}
+                                        settings={settings}
+                                    />
+                                </MenuConsumer>
                             </Menu.Item>
+                            <div
+                                ref={hamburgerRef}
+                                className={`hamburger-menu ${hasInteracted ? "animate" : ""} ${isMenuVisible ? "open" : "close"
+                                    }`}
+                                onClick={toggleMenu}
+                            >
+                                <div></div>
+                                <div className={"middle-line"}></div>
+                                <div></div>
+                            </div>
                         </Menu>
                     </Container>
                     <Container fluid className={"child"}>

@@ -7,18 +7,22 @@ import {
     PostIcon,
     PostProvider,
     PostTitle,
-    PostContent
+    PostContent,
+    Media,
+    MediaContext
 } from "@devgateway/wp-react-lib";
 import PostIntro from "../connected-templates/PostIntro";
 import { useWindowDimensionsAndDevice } from '@/lib/hooks/window-dimensions';
 import { connect } from 'react-redux';
+
 
 interface FeaturedTabsProps {
     posts?: any[],
     width: number,
     height: number,
     color: string,
-    moreLabel: string
+    moreLabel: string,
+    closeLabel?: string
 }
 
 export interface FeatureTabsProps {
@@ -30,6 +34,7 @@ export interface FeatureTabsProps {
     "data-items": any,
     "data-color": string,
     "data-read-more-label": string,
+    "data-close-label": string,
     "data-use-scrolls": string,
     "data-preview-mode": string,
     pageModuleProps: any,
@@ -44,6 +49,7 @@ interface FeaturedPostProps {
     onClick: () => void;
     active?: boolean;
     moreLabel: string;
+    mediaData: Media | null;
 }
 
 interface GetFigureFromPostProps {
@@ -58,11 +64,12 @@ interface AccordionContentProps {
 }
 
 // Desktop FeaturedPost Component
-const FeaturedPost: React.FC<FeaturedPostProps> = ({ post, onClick, active, moreLabel }) => {
+const FeaturedPost: React.FC<FeaturedPostProps> = ({ post, onClick, active, moreLabel, mediaData }) => {
     const media = post['_embedded'] ? post['_embedded']["wp:featuredmedia"] : null;
+    const mediaUrl = mediaData ? mediaData.source_url : (media && media.length > 0 ? media[0].source_url : null);
 
     return (
-        <div className="cover" style={{ "backgroundImage": `url(${media ? media[0].source_url : ''})` }}>
+        <div className="cover" style={{ "backgroundImage": `url(${mediaUrl ? mediaUrl : ''})` }}>
             <PostIntro post={post} />
             {!active ?
                 <Label onClick={onClick}><Icon name='search' size="large" /> {moreLabel}</Label> :
@@ -75,18 +82,18 @@ const GetFigureFromPost: React.FC<GetFigureFromPostProps> = ({ post }) => {
     const parser = new DOMParser();
     const doc = parser.parseFromString(post.content.rendered, 'text/html');
     const figureElement = doc.querySelector('figure');
-    if(!figureElement) {
+    if (!figureElement) {
         return null;
     }
     return (
         <div style={{
             flex: '0 0 40px'
-        }}dangerouslySetInnerHTML={{ __html: figureElement.outerHTML }} />
+        }} dangerouslySetInnerHTML={{ __html: figureElement.outerHTML }} />
     );
 };
 
 // Desktop FeaturedTabs Component
-const FeaturedTabs: React.FC<FeaturedTabsProps> = ({ posts, width, height, color, moreLabel }) => {
+const FeaturedTabs: React.FC<FeaturedTabsProps> = ({ posts, width, height, color, moreLabel, closeLabel }) => {
     const [active, setActive] = useState<string | null>(null);
     const [visible, setVisible] = useState(false);
     const [scrollPos, setScrollPos] = useState<[number, number]>([0, 0]);
@@ -136,8 +143,16 @@ const FeaturedTabs: React.FC<FeaturedTabsProps> = ({ posts, width, height, color
                         >
                             <a id={post.slug} />
                             {/* @ts-ignore */}
-                            <FeaturedPost post={post} moreLabel={moreLabel} onClick={() => toggleAnimation(post.slug)} />
-                        </Grid.Column>
+                            <MediaProvider id={post.featured_media}>
+                                <MediaContext.Consumer>
+                                    {({media }) =>(
+                                        <FeaturedPost post={post} mediaData={media} moreLabel={moreLabel} onClick={() => toggleAnimation(post.slug)} />
+                                    )}
+                                        
+
+                            </MediaContext.Consumer>
+                        </MediaProvider>
+                    </Grid.Column>
 
                         <Grid.Column
                             className="expanded"
@@ -156,7 +171,7 @@ const FeaturedTabs: React.FC<FeaturedTabsProps> = ({ posts, width, height, color
                             </Segment>
                             <PostContent as={"div"} fluid={true} post={post} style={{ maxHeight: `calc(${height}px - 150px)` }}
                             />
-                            <Label className={"closeIconText"} style={{ backgroundColor: `${arrayColors[i]}` }} onClick={() => setActive(null)}><Icon name='times circle outline' size="large" /> Close </Label>
+                            <Label className={"closeIconText"} style={{ backgroundColor: `${arrayColors[i]}` }} onClick={() => setActive(null)}><Icon name='times circle outline' size="large" /> {closeLabel || 'Close'} </Label>
                         </Grid.Column>
                     </React.Fragment>
                 ))}
@@ -190,7 +205,7 @@ const AccordionContent: React.FC<AccordionContentProps> = ({ posts, activeItem, 
     const findElementAndAddStyles = (elementClass: string, containerClass: string, hasContainerClass: string) => {
         const elements = document.querySelectorAll(elementClass);
         elements.forEach((element) => {
-            if(element.querySelector(containerClass)) {
+            if (element.querySelector(containerClass)) {
                 element.classList.add(hasContainerClass);
             }
         });
@@ -256,7 +271,7 @@ const AccordionContent: React.FC<AccordionContentProps> = ({ posts, activeItem, 
                             active={activeIndex === index}
                             index={index}
                             onClick={handleClick as any}
-                            style={{ backgroundColor: arrayColors[index]  }}
+                            style={{ backgroundColor: arrayColors[index] }}
                         >
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
 
@@ -296,6 +311,7 @@ const Wrapper: React.FC<FeatureTabsProps> = (props) => {
         "data-color": color,
         "data-use-scrolls": useScrolls,
         "data-read-more-label": moreLabel = "READ More",
+        "data-close-label": closeLabel = "Close",
         "data-preview-mode": previewMode = "Desktop",
         editing,
         parent,
@@ -304,14 +320,14 @@ const Wrapper: React.FC<FeatureTabsProps> = (props) => {
     } = props;
     const locale = props.intl.locale;
 
-    if(pageModuleProps?.editing  && pageModuleProps?.previewMode) {
+    if (pageModuleProps?.editing && pageModuleProps?.previewMode) {
         editing = pageModuleProps.editing;
         previewMode = pageModuleProps.previewMode;
     }
 
     const scrollable = useScrolls == 'true';
 
-    const { width: deviceWidth} = useWindowDimensionsAndDevice();
+    const { width: deviceWidth } = useWindowDimensionsAndDevice();
 
     // Determine screen width and conditionally render components
     const isMobile = deviceWidth <= 1250;
@@ -338,16 +354,17 @@ const Wrapper: React.FC<FeatureTabsProps> = (props) => {
                             posts={items}
                             activeItem={items?.[0]?.slug}
                             color={color}
-                            setActive={() => {}}
+                            setActive={() => { }}
                         />
                     ) : (
                         <FeaturedTabs
                             moreLabel={moreLabel}
+                            closeLabel={closeLabel}
                             color={color}
                             width={width}
                             height={height}
                         />
-                    ) }
+                    )}
                 </PostConsumer>
             </PostProvider>
         </Container>
@@ -355,15 +372,15 @@ const Wrapper: React.FC<FeatureTabsProps> = (props) => {
 };
 
 const mapStateToProps = (state, _ownProps) => {
-  const pageModuleProps = state.getIn([
-    "data",
-    "pageModuleProps"
-  ]);
-  const _props: { pageModuleProps?: Record<string, unknown> } = {};
-  if(pageModuleProps) {
-    _props.pageModuleProps = pageModuleProps;
-  }
-  return _props;
+    const pageModuleProps = state.getIn([
+        "data",
+        "pageModuleProps"
+    ]);
+    const _props: { pageModuleProps?: Record<string, unknown> } = {};
+    if (pageModuleProps) {
+        _props.pageModuleProps = pageModuleProps;
+    }
+    return _props;
 };
 const mapActionCreators = {};
 export default connect(mapStateToProps, mapActionCreators)(Wrapper);

@@ -11,6 +11,9 @@ import {
 import * as d3 from "d3";
 import { v4 as uuidv4 } from "uuid";
 import FlexWrapDetector from "../../layout/FlexWrapDetector";
+import deviceType from '@/utils/deviceType'
+
+const isMobileDevice = deviceType() === 'mobile';
 
 const Chart = ({
   legends,
@@ -359,12 +362,13 @@ const Chart = ({
           {(legendPosition === "top" || legendPosition === "bottom") && (
             <div
               className={`legends container has-standard-12-font-size ${legendPosition}`}
+              style={legendPosition === "top" ? { marginTop: isMobileDevice && `${newMarginTop}px` } : legendPosition === "bottom" ? { marginBottom: `${newMarginBottom}px` } : {}}
             >
               <div className="legend-sections">
                 <div className="title-section">{legendTitle()}</div>
                 <FlexWrapDetector
                   onWrapChange={(count) => {
-                    if (legendPosition === "top") {
+                    if (legendPosition === "top" && isMobileDevice) {
                       setNewMarginTop(marginTop + (count / 2) * 40);
                       setWrapCount(count);
                     } else {
