@@ -16,7 +16,6 @@ import CategoriesProvider from "../data/CategoriesProvider";
 import { connect } from "react-redux";
 import { setFilter, setInitialFilters } from "../reducers/data";
 import { injectIntl } from "react-intl";
-import { SettingProvider, SettingsConsumer } from "@devgateway/wp-react-lib";
 
 const FILTER_TYPE_MULTI_SELECT = "multi-select";
 const FILTER_TYPE_SINGLE_SELECT = "single-select";
@@ -652,11 +651,7 @@ const CSVFilter = (props) => {
 
 const FilterWrapper = (props) => {
     return (
-        <SettingProvider locale={props.intl.locale} changeUUID={props.unique}>
-            <SettingsConsumer>
-                <Filter {...props}></Filter>
-            </SettingsConsumer>
-        </SettingProvider>
+        <Filter {...props}></Filter>
     );
 };
 
@@ -694,7 +689,6 @@ const Filter = ({
     "data-auto-apply": autoApply = "true",
     "data-default-top-n-enabled": defaultTopNEnabled = "false",
     "data-default-top-n-count": defaultTopNCount = "0",
-    settings,
     intl,
 }) => {
     const params = {};
