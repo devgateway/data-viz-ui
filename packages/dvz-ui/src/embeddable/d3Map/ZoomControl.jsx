@@ -1,7 +1,7 @@
 import React from 'react';
 import * as d3 from 'd3';
-import {Icon, Popup} from "semantic-ui-react";
-import {FormattedMessage} from "react-intl";
+import { Icon, Popup } from "semantic-ui-react";
+import { FormattedMessage } from "react-intl";
 
 class ZoomControl extends React.Component {
     constructor(props) {
@@ -30,31 +30,26 @@ class ZoomControl extends React.Component {
 
     componentDidMount() {
 
-        const {zoomEnabled = true} = this.props;
+        const { zoomEnabled = true } = this.props;
         const selection = this.getSelection();
         this._fullView(false)
         if (zoomEnabled) {
+            selection.on("dblclick.zoom", null);
+            selection.on("dblclick", (event) => {
+                event.preventDefault();
 
-            if (!this.props.editing) {
+                selection.transition().duration(250).call(this.zoom.scaleBy, 1.5);
+            });
 
-                selection.on("dblclick.zoom", null);
-                selection.on("dblclick", (event) => {
-                    event.preventDefault();
+            selection.on("wheel.zoom", null);
+            selection.on("wheel", (event) => {
 
-                    selection.transition().duration(250).call(this.zoom.scaleBy, 1.5);
-                });
+                event.preventDefault();
+                const direction = event.deltaY > 0 ? 1 / 1.5 : 1.5;
+                selection.transition().duration(250).call(this.zoom.scaleBy, direction);
+            });
+            selection.call(this.zoom);
 
-                selection.on("wheel.zoom", null);
-                selection.on("wheel", (event) => {
-
-                    event.preventDefault();
-                    const direction = event.deltaY > 0 ? 1 / 1.5 : 1.5;
-                    selection.transition().duration(250).call(this.zoom.scaleBy, direction);
-                });
-                selection.call(this.zoom);
-            } else {
-
-            }
         }
         this.fullView();
 
@@ -75,13 +70,14 @@ class ZoomControl extends React.Component {
         }
 
         const zoomChanged = JSON.stringify(prevProps.initialPosition) !== JSON.stringify(initialPosition);
+        console.log("zoomChanged", zoomChanged)
 
-        if (prevProps.zoomEnabled !== zoomEnabled || zoomChanged) {
+        if (prevProps.zoomEnabled !== zoomEnabled || (zoomChanged && !editing)) {
             if (zoomEnabled && selection || editing) {
                 if (initialPosition && this.lastInternalZoom) {
                     const round = (v, p = 3) => Number(v.toFixed(p));
-                    const {x, y, k} = initialPosition;
-                    const {x: lx, y: ly, k: lk} = this.lastInternalZoom;
+                    const { x, y, k } = initialPosition;
+                    const { x: lx, y: ly, k: lk } = this.lastInternalZoom;
 
                     const same = Math.abs(round(x) - round(lx)) < 1 && Math.abs(round(y) - round(ly)) < 1 && Math.abs(round(k) - round(lk)) < 1e-3;
 
@@ -125,7 +121,7 @@ class ZoomControl extends React.Component {
     }
 
     zoomEnd(event) {
-        const {identifier, editing, width, height, postMessageOrigin = "*"} = this.props;
+        const { identifier, editing, width, height, postMessageOrigin = "*" } = this.props;
         const transform = this.lastUserTransform || event.transform;
         this.lastUserTransform = null;
 
@@ -133,8 +129,8 @@ class ZoomControl extends React.Component {
 
         if (editing) {
             const round = (v, p = 3) => Number(v.toFixed(p));
-            const {x, y, k} = transform;
-            const rounded = {x: round(x), y: round(y), k: round(k)};
+            const { x, y, k } = transform;
+            const rounded = { x: round(x), y: round(y), k: round(k) };
 
             this.lastInternalZoom = rounded;
 
@@ -200,26 +196,25 @@ class ZoomControl extends React.Component {
 
     _fullView(transition = true) {
 
-        const {initialPosition, width, height, transform} = this.props;
+        const { initialPosition, width, height, transform } = this.props;
 
         if (!initialPosition) return;
 
-        const {x = 100, y = 23, k = 1, width: oW, height: oH} = initialPosition;
+        const { x = 100, y = 23, k = 1, width: oW, height: oH } = initialPosition;
         if (!oW || !oH || !k) return;
 
-        const dx = x / oW;
-        const dy = y / oH;
-        const nx = width * dx;
-        const ny = height * dy;
+        // Scale the saved translation proportionally to the current container size.
+        // The position was recorded at (oW × oH); we need to remap it to (width × height).
+        // The mathematically correct transform preserves the geographic coordinate at the center of the viewport.
+        // Because the base projection `translate` shifts with container size, we compensate.
+        const nx = x + (width - oW) / 2 * (1 - k);
+        const ny = y + (height - oH) / 2 * (1 - k);
 
         const selection = this.getSelection();
         if (selection) {
-            //print svg parent client sizes before zoooming
-            console.log("SVG parent client sizes:", selection.node().parentNode.clientWidth, selection.node().parentNode.clientHeight);
-
             selection.transition().duration(transition ? 750 : 0)
                 .attr("transform", transform)
-                .call(this.zoom.transform, d3.zoomIdentity.translate(x, y).scale(k));
+                .call(this.zoom.transform, d3.zoomIdentity.translate(nx, ny).scale(k));
         }
     }
 
@@ -233,20 +228,20 @@ class ZoomControl extends React.Component {
     }
 
     render() {
-        const {editing, zoomEnabled = true} = this.props;
+        const { editing, zoomEnabled = true } = this.props;
 
-        return (<div ref={this.zoomRef} className={`zoom ${zoomEnabled ? '' : 'disabled'}`}>
+        return (<div ref={this.zoomRef} className={`zoom ignore ${zoomEnabled ? '' : 'disabled'}`}>
             {(editing || zoomEnabled) && (<div>
                 <div className="button plus" onClick={this.zoomIn}>
-                    <Icon name='plus' size='small'/>
+                    <Icon name='plus' size='small' />
                 </div>
                 <div className="button minus" onClick={this.zoomOut}>
-                    <Icon name='minus' size='small'/>
+                    <Icon name='minus' size='small' />
                 </div>
                 <Popup
-                    content={<FormattedMessage id="map.reset.tooltip" defaultMessage="Reset zoom"/>}
+                    content={<FormattedMessage id="map.reset.tooltip" defaultMessage="Reset zoom" />}
                     trigger={<div className="button reset" onClick={this.reset}>
-                        <Icon name='repeat' size='small'/>
+                        <Icon name='repeat' size='small' />
                     </div>}
                 />
             </div>)}

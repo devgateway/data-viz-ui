@@ -1,9 +1,9 @@
 import React from 'react';
 import DataProvider from "../data/DataProvider";
 import DataConsumer from "../data/DataConsumer";
-import {parse} from "../utils/parseUtils";
+import { parse } from "../utils/";
 import * as d3 from "d3";
-import {injectIntl} from "react-intl";
+import { injectIntl } from "react-intl";
 import * as ReactDOM from "react-dom";
 import Tooltip from "./Tooltip";
 
@@ -44,7 +44,7 @@ class DataLayer extends React.Component {
             .style("top", (event.pageY - 50) + "px")
 
         ReactDOM.render(<Tooltip intl={this.props.intl} tooltip={content} data={data}
-                                 tooltipEnableMarkdown={false}/>, tip._groups[0][0])
+            tooltipEnableMarkdown={false} />, tip._groups[0][0])
 
     }
 
@@ -113,12 +113,12 @@ class DataLayer extends React.Component {
 
             points = data.children.map((d) => {
                 const latLong = d.value.split(',')
-                let pointStyle = {color: markFillColor, size: markSizeScale, border: markBorderColor}
+                let pointStyle = { color: markFillColor, size: markSizeScale, border: markBorderColor }
                 let value = 1
                 if (pointStyleBy === "measure") {
                     value = d[measures[0]]
 
-                    pointStyle = {color: colorScale(value), size: sizeScale(value), border: borderScale(value)}
+                    pointStyle = { color: colorScale(value), size: sizeScale(value), border: borderScale(value) }
 
                 } else if (pointStyleBy === "dimension") {
                     if (d.children && showDim2OnLegends) {
@@ -145,7 +145,7 @@ class DataLayer extends React.Component {
             const valueField = data.meta.fields[2]
 
             points = data.data.map((d) => {
-                let pointStyle = {color: markFillColor, size: markSizeScale, border: markBorderColor}
+                let pointStyle = { color: markFillColor, size: markSizeScale, border: markBorderColor }
                 return {
                     x: d[latField], y: d[longField], value: d[valueField], meta: d, pointStyle
                 }
@@ -156,12 +156,12 @@ class DataLayer extends React.Component {
 
 
         const getTooltipVariables = (d) => {
-            const {pointStyleBy, dimension2} = this.props
+            const { pointStyleBy, dimension2 } = this.props
             const dimensionVariable = {}
             if (dimension2 != 'none') {
                 dimensionVariable[dimension2] = d.metadata.children[0].value
             }
-            return {...dimensionVariable, ...d, ...d.metadata}
+            return { ...dimensionVariable, ...d, ...d.metadata }
         }
 
         const k = this.props.transform ? this.props.transform.k : 1
@@ -193,10 +193,10 @@ class DataLayer extends React.Component {
             .on("mouseenter", (event, d) => {
                 this.showToolTip(tooltip, getTooltipVariables(d), d.pointStyle.color, event)
             }).on("mousemove", (event, d) => {
-            this.moveToolTip(event)
-        }).on("mouseleave", (event, d) => {
-            this.hiddenToolTip(event)
-        })
+                this.moveToolTip(event)
+            }).on("mouseleave", (event, d) => {
+                this.hiddenToolTip(event)
+            })
 
         pointGroups.append("text")
             .attr("class", "point-label")
@@ -214,12 +214,12 @@ class DataLayer extends React.Component {
                 return intl.formatNumber(d.value, numberFormat)
 
             }).on("mouseenter", (event, d) => {
-            this.showToolTip(tooltip, getTooltipVariables(d), d.pointStyle.color, event)
-        }).on("mousemove", (event, d) => {
-            this.moveToolTip(event)
-        }).on("mouseleave", (event, d) => {
-            this.hiddenToolTip(event)
-        })
+                this.showToolTip(tooltip, getTooltipVariables(d), d.pointStyle.color, event)
+            }).on("mousemove", (event, d) => {
+                this.moveToolTip(event)
+            }).on("mouseleave", (event, d) => {
+                this.hiddenToolTip(event)
+            })
 
         if (this.props.transform) {
             g.attr("transform", this.props.transform)
@@ -230,10 +230,10 @@ class DataLayer extends React.Component {
 
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        const {editing, selectedItem, onZoomToPoint,data} = this.props
+        const { editing, selectedItem, onZoomToPoint, data } = this.props
         const g = d3.select(this.gRef.current)
 
-        if (editing || JSON.stringify(prevProps.data) !== JSON.stringify(data)) {
+        if (editing || prevProps.data !== data || prevProps.path !== this.props.path) {
             this.create()
 
         }
@@ -250,7 +250,7 @@ class DataLayer extends React.Component {
                 return d.metadata.children.find(d => d.value == selectedItem) != undefined
             })
 
-            onZoomToPoint({x: filtered.datum().x, y: filtered.datum().y})
+            onZoomToPoint({ x: filtered.datum().x, y: filtered.datum().y })
 
 
         }
@@ -260,7 +260,7 @@ class DataLayer extends React.Component {
     }
 
     resize() {
-        const {markerLabelSize} = this.props
+        const { markerLabelSize } = this.props
         const g = d3.select(this.gRef.current)
         const k = this.props.transform ? this.props.transform.k : 1
 
@@ -284,7 +284,7 @@ class DataLayer extends React.Component {
 
         } = this.props
 
-        return <g className={"latLong " + id} ref={this.gRef}/>
+        return <g className={"latLong " + id} ref={this.gRef} />
     }
 
 }

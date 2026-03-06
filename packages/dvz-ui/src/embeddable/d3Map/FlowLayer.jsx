@@ -3,7 +3,7 @@ import BaseLayer from "./BaseLayer.jsx";
 import DataProvider from "../data/DataProvider.jsx";
 import DataConsumer from "../data/DataConsumer.jsx";
 import * as d3 from "d3";
-import {injectIntl} from "react-intl";
+import { injectIntl } from "react-intl";
 import Papa from "papaparse";
 import BreaksStyles from "./BreaksStyles.js";
 
@@ -71,7 +71,9 @@ class DataLayer extends BaseLayer {
 
         }
         this.g = d3.select(this.gRef.current)
-        this.g.attr("class", "base-layer zoomable") //add unique name
+
+        this.g.attr("class", "base-layer zoomable flow") //add unique name
+
         if (this.props.transform) {
             this.g.attr("transform", this.props.transform)
         }
@@ -89,12 +91,12 @@ class DataLayer extends BaseLayer {
             //collect starting points ro be rendered later and keep them on top of the svg layers
             originPoints.push(d1) //started points to be rendered later
 
-            d1.properties.destinations.sort((a,b)=>a[measure]-b[measure]).forEach(child => {
+            d1.properties.destinations.sort((a, b) => a[measure] - b[measure]).forEach(child => {
 
                 const value = child[measure] //value by target country
                 json.features.filter(feature => feature.properties[featureJoinAttribute] == child.value)
                     .forEach(d2 => {
-                        d2.properties.meta=child
+                        d2.properties.meta = child
                         const originID = d1.properties[featureJoinAttribute]
                         const id = d1.properties[featureJoinAttribute] + "--" + d2.properties[featureJoinAttribute];
 
@@ -125,7 +127,7 @@ class DataLayer extends BaseLayer {
                         // Change these data to see ho the great circle reacts
                         //d1 is origin
                         //d2 is destination
-                        const theG=this.g.append("g")
+                        const theG = this.g
 
                         this.g.select("defs")
                             .append("marker")
@@ -153,16 +155,15 @@ class DataLayer extends BaseLayer {
                             .style("cursor", "pointer")
                             .style("stroke-dasharray", "0")
                             .style("stroke", d => {
-
                                 return brStyles.getColor(value)
                             })
                             .style("stroke-width", d => {
-""
                                 return brStyles.getSize(value)
                             })
                             .attr("marker-end", "url(#arrow" + id + ")")
 
                             .on("mouseenter", (event, d) => {
+
                                 theG.selectAll("marker").transition().duration("200").style("opacity", 0)
                                 theG.selectAll(".start-point").transition().duration("200").style("opacity", 0)
                                 theG.selectAll(".flow-line").transition().duration("200")
@@ -215,7 +216,7 @@ class DataLayer extends BaseLayer {
                         theG.append("text")
                             .append("textPath") //append a textPath to the text element
                             .attr("xlink:href", id) //place the ID of the path here
-                            .style("text-anchor","middle") //place the text halfway on the arc
+                            .style("text-anchor", "middle") //place the text halfway on the arc
                             .attr("startOffset", "50%")
                             .attr("fill", "#fff")
                             .text("Yay, my text is on a wavy path");
@@ -256,75 +257,67 @@ class DataLayer extends BaseLayer {
     }
 
 
-    create() {
+    _buildLayer(rawJson) {
         const {
-            app,
-            name,
-            file,
-            path,
-            csv,
-            zoom,
-            labelFilter = [],
-            labelField,
-            labelFontSize,
-            labelColor,
-            fillColor,
-            borderColor,
             featureJoinAttribute,
-            editing,
+            app,
             data,
-            breaks,
-            markFillColor,
-            markSizeScale,
             measures,
-            flowValuesFrom
+            csv,
         } = this.props
 
+        const features = rawJson.features.map(d => {
+            const joinValue = d.properties[featureJoinAttribute]
+            if (app != 'csv' && data && data.children) {
+                const values = data.children.filter(d => d.value.indexOf(joinValue) > -1)
+                if (values.length > 0) {
+                    const measureValue = (values[0][measures[0]])
+                    d.properties.meta = values[0]
+                    d.properties._value = measureValue
+                    d.properties.destinations = values[0].children
+                }
+            } else if (app == 'csv') {
+                const parsed = Papa.parse(csv, { header: true, dynamicTyping: true });
+                const origin = d.properties[featureJoinAttribute]
+                const record = parsed.data.filter(r => r.origin == origin)[0]
+                if (record != undefined) {
+                    alert("CSV Not implemented Yet, please do it if you have time")
+                    d.properties.meta = record
+                    d.properties._value = record.value
+                    d.properties.destinations = record.destination
+                }
+            }
+            return d
+        })
+
+        this.createDataLayer({ ...rawJson, features });
+    }
+
+    create() {
+        const { file } = this.props
 
         if (file != "none") {
-            this.loadJSON(file).then(json => {
-                const features = json.features.map(d => {
-                    const joinValue = d.properties[featureJoinAttribute]
-                    if (app != 'csv' && data && data.children) {
-                        const values = data.children.filter(d => d.value.indexOf(joinValue) > -1)
-
-                        if (values.length > 0) {
-                            const measureValue = (values[0][measures[0]])
-                            d.properties.meta = values[0]
-                            d.properties._value = measureValue
-                            d.properties.destinations = values[0].children
-                        }
-                    } else if (app == 'csv') {
-
-                        const parsed = Papa.parse(csv, {header: true, dynamicTyping: true});
-
-                        const origin = d.properties[featureJoinAttribute]
-                        parsed.data.filter(r => r.origin == origin)
-                        const record = parsed.data.filter(r => r.origin == origin)[0]
-                        if (record != undefined) {
-                            alert("CSV Not implemented Yet, please do it if you have time")
-                            d.properties.meta = record
-                            d.properties._value = record.value
-                            d.properties.destinations = record.destination
-                        }
-
-
-                    }
-                    return d
-                })
-                const newJson = {...json, features}
-                this.createDataLayer(newJson);
-            });
+            if (this.state.json) {
+                // GeoJSON already cached — skip network request, just re-join and redraw
+                this._buildLayer(this.state.json);
+            } else {
+                this.loadJSON(file).then(json => {
+                    this.setState({ json }) // cache raw GeoJSON for future calls
+                    this._buildLayer(json);
+                });
+            }
         }
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        const {projection,editing,data} = this.props
-        if (editing || JSON.stringify(prevProps.data) !== JSON.stringify(data)) {
+        const { projection, editing, data } = this.props
+        if (editing || prevProps.data !== data || prevProps.path !== this.props.path) {
             this.create()
         }
 
         if (prevProps.visible != this.props.visible) {
+            //eslint-disable-next-line
+
             this.g.style("display", this.props.visible ? "" : "none")
         }
     }
@@ -336,7 +329,7 @@ class DataLayer extends BaseLayer {
 
     render() {
 
-        const {id} = this.props
+        const { id } = this.props
 
         return <g id={"data-" + id} className={"data " + id} ref={this.gRef}>
             <defs>
@@ -364,7 +357,7 @@ const DataWrapper = (props) => {
         waitForFilters
     } = props
 
-    const params = {dvzProxyDatasetId}
+    const params = { dvzProxyDatasetId }
 
     const ff = filters || {}
 

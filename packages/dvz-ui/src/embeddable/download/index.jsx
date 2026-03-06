@@ -28,6 +28,7 @@ const DownloadComponent = (props) => {
     "data-section-title": sectionTitle = "",
     "data-download-tooltip": tooltip = "",
     "data-include-source-url": includeSourceURL = "false",
+    "data-include-filters": includeFilters = "false",
     "data-source-urlmargin-left": sourceURLMarginLeft = 70,
     "data-source-urlmargin-top": sourceURLMarginTop = 10,
     "data-source-urlfont-size": sourceURLFontSize = 18,
@@ -67,13 +68,32 @@ const DownloadComponent = (props) => {
     }
 
     if (node.classList) {
-      return !node.classList.contains("ignore");
+      // Exclude explicit "ignore" UI
+      if (node.classList.contains("ignore")) return false;
+      // By default, exclude filter UI from exports unless allowed
+      const includeFiltersBool = includeFilters === true || includeFilters === 'true';
+      if (!includeFiltersBool) {
+        const excludeClasses = [
+          'filter-component',
+          'data-filters-reset',
+          'data-filters-apply',
+          'filter-search'
+        ];
+        for (const cls of excludeClasses) {
+          if (node.classList.contains(cls)) return false;
+        }
+      }
+      return true;
     }
 
     return true;
   }
 
-  const options = { filter, bgcolor: "#FFF" };
+  // Use a tiny transparent PNG as a safe fallback for images that fail to load
+  const transparentPngDataUrl =
+    'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8Xw8AAoMBgQb9Z3kAAAAASUVORK5CYII=';
+
+  const options = { filter, bgcolor: "#FFF", imagePlaceholder: transparentPngDataUrl, cacheBust: true };
 
   const save = (type) => {
     domtoimage.cloneNode(componentRef.current).then(function (node) {
@@ -97,21 +117,36 @@ const DownloadComponent = (props) => {
         node.appendChild(urlNode);
       }
 
-      options.height = componentRef.current.scrollHeight + 90;
-      options.width = componentRef.current.scrollWidth + 30;
-      node.style.padding = "20px";
+      const PADDING = 50;
+      options.height = componentRef.current.scrollHeight + PADDING;
+      options.width = componentRef.current.scrollWidth + (PADDING * 2);
+      node.style.padding = `${PADDING}px`;
 
       if (type === "PNG") {
         domtoimage.toPng(node, options)
+          .then(function (dataUrl) {
+            if (!dataUrl) throw new Error('PNG render returned empty result');
+            return fetch(dataUrl).then(r => r.blob());
+          })
           .then(function (blob) {
             saveAs(blob, pngLabel);
+          })
+          .catch(function (err) {
+            console.error('PNG download failed:', err);
           });
       }
 
       if (type === "JPG") {
         domtoimage.toJpeg(node, options)
+          .then(function (dataUrl) {
+            if (!dataUrl) throw new Error('JPEG render returned empty result');
+            return fetch(dataUrl).then(r => r.blob());
+          })
           .then(function (blob) {
             saveAs(blob, jpgLabel);
+          })
+          .catch(function (err) {
+            console.error('JPG download failed:', err);
           });
       }
     });

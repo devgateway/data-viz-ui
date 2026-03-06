@@ -4,7 +4,7 @@ import * as d3 from "d3";
 class BreaksStyles {
 
     constructor(props) {
-        const {breaks, defaultFillColor, defaultBorderColor, defaultSize} = props;
+        const { breaks, defaultFillColor, defaultBorderColor, defaultSize } = props;
         this.breaks = breaks;
         this.defaultFillColor = defaultFillColor
         this.defaultBorderColor = defaultBorderColor
@@ -33,13 +33,17 @@ class BreaksStyles {
 
     getSize(value) {
 
+        let size = 0
         if (this.breaks.length > 0) {
             if (value > Math.max(...this.domain)) {
                 return this.graterThanStyle.size
             }
-            return this.defaultSize + this.sizeScale(value)
+            size = this.defaultSize + this.sizeScale(value)
+        } else {
+            size = this.defaultSize
         }
-        return this.defaultSize
+        console.log("size", size)
+        return size
     }
 
 

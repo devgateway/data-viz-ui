@@ -9,20 +9,20 @@ import { useWindowDimensionsAndDevice } from '@/lib/hooks/window-dimensions';
 const ItemMenu = ({ posts, activeItem, setActive, showLabels }) => {
   return posts
     ? posts.map((post) => (
-        <Menu.Item
-          key={post.id}
-          onClick={() => setActive(post.slug)}
-          className={post.slug === activeItem ? "active" : ""}
-        >
-          {showLabels ? (
-            <PostLabel post={post} />
-          ) : (
-            <Label>
-              <span dangerouslySetInnerHTML={{ __html: post.title.rendered }} />
-            </Label>
-          )}
-        </Menu.Item>
-      ))
+      <Menu.Item
+        key={post.id}
+        onClick={() => setActive(post.slug)}
+        className={post.slug === activeItem ? "active" : ""}
+      >
+        {showLabels ? (
+          <PostLabel post={post} />
+        ) : (
+          <Label>
+            <span dangerouslySetInnerHTML={{ __html: post.title.rendered }} />
+          </Label>
+        )}
+      </Menu.Item>
+    ))
     : null;
 };
 
@@ -36,81 +36,81 @@ const GriNavigator = ({
   const count = posts.length;
   return posts
     ? posts.map((post) => {
-        const iconUrl =
-          post["_embedded"]?.["wp:featuredmedia"]
-            ? post["_embedded"]["wp:featuredmedia"][0].source_url
-            : null;
-        return (
-          <Grid.Column
-            key={post.id}
-            className={
-              (post.slug === activeItem ? "active" : "") +
-              (showIcons ? " has-icon" : "")
-            }
+      const iconUrl =
+        post["_embedded"]?.["wp:featuredmedia"]
+          ? post["_embedded"]["wp:featuredmedia"][0].source_url
+          : null;
+      return (
+        <Grid.Column
+          key={post.id}
+          className={
+            (post.slug === activeItem ? "active" : "") +
+            (showIcons ? " has-icon" : "")
+          }
+        >
+          <Button
+            onClick={() => setActive(post.slug)}
+            className={`nav  ${count === 1 ? "one" : ""}`}
           >
-            <Button
-              onClick={() => setActive(post.slug)}
-              className={`nav  ${count === 1 ? "one" : ""}`}
-            >
-              {showIcons && (
-                <MediaProvider
-                  id={
-                    post.meta_fields?.icon
-                      ? post.meta_fields.icon[0]
-                      : null
-                  }
-                >
-                  <MediaConsumer>
-                    <PostIcon className={"icon"} />
-                  </MediaConsumer>
-                </MediaProvider>
-              )}
-              {showLabels ? (
-                <PostLabel post={post} />
-              ) : (
-                <Label>
-                  <span
-                    dangerouslySetInnerHTML={{ __html: post.title.rendered }}
-                  />
-                </Label>
-              )}
-            </Button>
-          </Grid.Column>
-        );
-      })
+            {showIcons && (
+              <MediaProvider
+                id={
+                  post.meta_fields?.icon
+                    ? post.meta_fields.icon[0]
+                    : null
+                }
+              >
+                <MediaConsumer>
+                  <PostIcon className={"icon"} />
+                </MediaConsumer>
+              </MediaProvider>
+            )}
+            {showLabels ? (
+              <PostLabel post={post} />
+            ) : (
+              <Label>
+                <span
+                  dangerouslySetInnerHTML={{ __html: post.title.rendered }}
+                />
+              </Label>
+            )}
+          </Button>
+        </Grid.Column>
+      );
+    })
     : null;
 };
 
 const TabContent = ({ posts, activeItem }) => {
-    useEffect(() => {
-        const contentContainer = document.querySelector('.ui.container.content-tab');
-        if (contentContainer) {
-            contentContainer.scrollTop = 0;
-        }
-    }, [activeItem]);
+  useEffect(() => {
+    const contentContainer = document.querySelector('.ui.container.content-tab');
+    if (contentContainer) {
+      contentContainer.scrollTop = 0;
+    }
+  }, [activeItem]);
 
-    return posts ? (
-        posts.map((p) => {
-            let style = {};
-            if (p.slug !== activeItem) {
-                style = {
-                    position: 'absolute',
-                    left: '-3000px',
-                    width: 'auto',
-                    height: '0px',
-                    overflow: 'hidden',
-                    visibility: 'hidden',
-                };
-            } else {
-                style = {
-                    visibility: 'visible',
-                    position: 'relative',
-                    width: 'auto',
-                };
-            }
-            return <PostIntro key={p.slug} as={Container} fluid post={p} style={style} />;
-        })
-    ) : null;
+  return posts ? (
+    posts.map((p) => {
+      let style = {};
+      if (p.slug !== activeItem) {
+        style = {
+          position: 'absolute',
+          left: '-3000px',
+          width: 'auto',
+          height: '0px',
+          overflow: 'hidden',
+          visibility: 'hidden',
+        };
+      } else {
+        style = {
+          visibility: 'visible',
+          position: 'relative',
+          width: 'auto',
+        };
+      }
+      return <PostIntro key={p.slug} as={Container} fluid post={p} style={style} />;
+    })
+  ) : null;
 };
 
 const AccordionContent = ({ posts, activeItem, setActive }) => {
@@ -338,114 +338,114 @@ const AccordionContent = ({ posts, activeItem, setActive }) => {
 };
 
 const SingleTabbedView = ({ posts, showLabels, height }) => {
-    const [activeItem, setActive] = useState(posts ? posts[0].slug : null);
+  const [activeItem, setActive] = useState(posts ? posts[0].slug : null);
 
-    useEffect(() => {
-        setTimeout(() => {
-            if (window.location.hash) {
-                const slug = window.location.hash.substr(1);
-                const element = document.getElementById(slug);
+  useEffect(() => {
+    setTimeout(() => {
+      if (window.location.hash) {
+        const slug = window.location.hash.substr(1);
+        const element = document.getElementById(slug);
 
-                if (element && posts.map((p) => p.slug).indexOf(slug) > -1) {
-                    setActive(slug);
-                    element.scrollIntoView({ behavior: 'auto', block: 'start' });
-                }
-            }
-        }, 0);
-    }, [posts]);
+        if (element && posts.map((p) => p.slug).indexOf(slug) > -1) {
+          setActive(slug);
+          element.scrollIntoView({ behavior: 'auto', block: 'start' });
+        }
+      }
+    }, 0);
+  }, [posts]);
 
-    return (
-        <React.Fragment>
-            {posts.map((p) => (
-                <anchor id={p.slug} key={p.slug}></anchor>
-            ))}
+  return (
+    <React.Fragment>
+      {posts.map((p) => (
+        <anchor id={p.slug} key={p.slug}></anchor>
+      ))}
 
-            <Menu className="tabbed posts" text>
-                <ItemMenu showLabels={showLabels} posts={posts} setActive={setActive} activeItem={activeItem} />
-            </Menu>
-            <Container className={'content-tab'} style={{ height: `${height}px` }}>
-                <TabContent posts={posts} activeItem={activeItem} />
-            </Container>
-        </React.Fragment>
-    );
+      <Menu className="tabbed posts" text>
+        <ItemMenu showLabels={showLabels} posts={posts} setActive={setActive} activeItem={activeItem} />
+      </Menu>
+      <Container className={'content-tab'} style={{ height: `${height}px` }}>
+        <TabContent posts={posts} activeItem={activeItem} />
+      </Container>
+    </React.Fragment>
+  );
 };
 
 const GridTabbedView = ({ posts, showLabels, showIcons, height }) => {
-    const [activeItem, setActive] = useState(posts ? posts[0].slug : null);
+  const [activeItem, setActive] = useState(posts ? posts[0].slug : null);
 
-    return (
-        <React.Fragment>
-            <Grid stackable className="tabbed posts" columns={posts.length} style={{ height: height + "px" }}>
-                <GriNavigator showIcons={showIcons} showLabels={showLabels} posts={posts} activeItem={activeItem} setActive={setActive} />
-                <Grid.Row style={{ height: `${height}px` }}>
-                    <Grid.Column width={16} className={"content"}>
-                        <Container className={'content-tab'} style={{ height: `${height}px` }}>
-                            <TabContent className={"content-tab"} posts={posts} activeItem={activeItem} />
-                        </Container>
-                    </Grid.Column>
-                </Grid.Row>
-            </Grid>
-        </React.Fragment>
-    );
+  return (
+    <React.Fragment>
+      <Grid stackable className="tabbed posts" columns={posts.length} style={{ height: height + "px" }}>
+        <GriNavigator showIcons={showIcons} showLabels={showLabels} posts={posts} activeItem={activeItem} setActive={setActive} />
+        <Grid.Row style={{ height: `${height}px` }}>
+          <Grid.Column width={16} className={"content"}>
+            <Container className={'content-tab'} style={{ height: `${height}px` }}>
+              <TabContent className={"content-tab"} posts={posts} activeItem={activeItem} />
+            </Container>
+          </Grid.Column>
+        </Grid.Row>
+      </Grid>
+    </React.Fragment>
+  );
 };
 
 const Wrapper = (props) => {
-    let {
-        "data-type": type,
-        "data-taxonomy": taxonomy,
-        "data-categories": categories,
-        "data-items": items,
-        "data-theme": theme = 'light',
-        "data-show-icons": showIcons,
-        "data-use-scrolls": useScrolls,
-        "data-show-labels": showLabels,
-        "data-height": height,
-        "data-preview-mode": previewMode = 'Desktop',
-        pageModuleProps,
-        parent, editing, unique
-    } = props;
-    if (pageModuleProps?.previewMode &&  pageModuleProps?.editing) {
-        previewMode = pageModuleProps.previewMode;
-        editing = pageModuleProps.editing;
-    }
-    const locale = props.intl.locale;
+  let {
+    "data-type": type,
+    "data-taxonomy": taxonomy,
+    "data-categories": categories,
+    "data-items": items,
+    "data-theme": theme = 'light',
+    "data-show-icons": showIcons,
+    "data-use-scrolls": useScrolls,
+    "data-show-labels": showLabels,
+    "data-height": height,
+    "data-preview-mode": previewMode = 'Desktop',
+    pageModuleProps,
+    parent, editing, unique
+  } = props;
+  if (pageModuleProps?.previewMode && pageModuleProps?.editing) {
+    previewMode = pageModuleProps.previewMode;
+    editing = pageModuleProps.editing;
+  }
+  const locale = props.intl.locale;
 
-    const scrollable = useScrolls === 'true';
-    const conditionalHeight = scrollable ? height : undefined;
+  const scrollable = useScrolls === 'true';
+  const conditionalHeight = scrollable ? height : undefined;
 
-    const { width: deviceWidth} = useWindowDimensionsAndDevice();
+  const { width: deviceWidth } = useWindowDimensionsAndDevice();
 
-    const isMobile = deviceWidth <= 1024;
-    const isNotDesktopPreview = previewMode !== 'Desktop' && editing;
-    const isMobileRenderMode = isMobile && !editing;
+  const isMobile = deviceWidth <= 1024;
+  const isNotDesktopPreview = previewMode !== 'Desktop' && editing;
+  const isMobileRenderMode = isMobile && !editing;
 
-    return (
-        <Container className={`viz tabbed posts ${editing ? 'editing' : ''} ${scrollable ? 'scrollable' : ''}`} fluid={true}>
-            <PostProvider
-                locale={locale}
-                type={type}
-                taxonomy={taxonomy}
-                categories={categories}
-                store={`tabbedposts_${parent}_${unique}`} page={1}
-                perPage={items}>
-                <PostConsumer>
-                    <PostConsumer>
-                        {(isMobileRenderMode || isNotDesktopPreview) ? (
-                            <AccordionContent posts={items} activeItem={items[0]?.slug} setActive={() => { }} />
-                        ) : theme === 'light' ? (
-                            <SingleTabbedView height={conditionalHeight} showLabels={showLabels === 'true'} />
-                        ) : (
-                            <GridTabbedView
-                                height={conditionalHeight}
-                                showLabels={showLabels === 'true'}
-                                showIcons={showIcons === 'true'}
-                            />
-                        )}
-                    </PostConsumer>
-                </PostConsumer>
-            </PostProvider>
-        </Container>
-    );
+  return (
+    <Container className={`viz tabbed posts ${editing ? 'editing' : ''} ${scrollable ? 'scrollable' : ''}`} fluid={true}>
+      <PostProvider
+        locale={locale}
+        type={type}
+        taxonomy={taxonomy}
+        categories={categories}
+        store={`tabbedposts_${parent}_${unique}`} page={1}
+        perPage={items}>
+        <PostConsumer>
+          <PostConsumer>
+            {(isMobileRenderMode || isNotDesktopPreview) ? (
+              <AccordionContent posts={items} activeItem={items[0]?.slug} setActive={() => { }} />
+            ) : theme === 'light' ? (
+              <SingleTabbedView height={conditionalHeight} showLabels={showLabels === 'true'} />
+            ) : (
+              <GridTabbedView
+                height={conditionalHeight}
+                showLabels={showLabels === 'true'}
+                showIcons={showIcons === 'true'}
+              />
+            )}
+          </PostConsumer>
+        </PostConsumer>
+      </PostProvider>
+    </Container>
+  );
 };
 
 const mapStateToProps = (state, ownProps) => {
@@ -454,7 +454,7 @@ const mapStateToProps = (state, ownProps) => {
     "pageModuleProps"
   ]);
   const _props = {};
-  if(pageModuleProps) {
+  if (pageModuleProps) {
     _props.pageModuleProps = pageModuleProps;
   }
   return _props;
