@@ -61,72 +61,8 @@ export const getCategory = ({ app, type, params }) => {
     const finalUrl = `${API_ROOT ? API_ROOT : ''}/api/${app}/categories/${type}${params ? '?' + queryParams(params) : ''}`
     console.log("categories==>", finalUrl)
 
-export const getData = ({ source, app, params }) => {
-    const finalUrl = `${API_ROOT ? API_ROOT : fallbackUrl}/api/${app}/stats/${source}${params ? '?' + queryParams(params) : ''}`;
-    return requestWithDeduplication(finalUrl);
-};
-
-export const getCustomPosts = ({ postType, taxonomy, category, taxonomyFilters, before, perPage, page, locale, after, ordering, orderingDirection }) => {
-    const url = `${Config.REACT_APP_WP_API}/wp/v2/${postType}`;
-    const queryParams = new URLSearchParams();
-
-    // Collect taxonomy values per key, then serialize as comma-separated lists
-    const taxonomyToValues = new Map();
-
-    const addTaxValues = (tax, values) => {
-        if (!tax || values == null) return;
-        const existing = taxonomyToValues.get(tax) || [];
-        if (Array.isArray(values)) {
-            values.forEach(v => {
-                if (v == null) return;
-                existing.push(String(v));
-            });
-        } else {
-            existing.push(String(values));
-        }
-        taxonomyToValues.set(tax, existing);
-    };
-
-    // support multiple taxonomy filters at once via taxonomyFilters map
-    if (taxonomyFilters && taxonomyFilters instanceof Map) {
-        taxonomyFilters.forEach((values, tax) => {
-            addTaxValues(tax, values);
-        });
-    }
-
-    // Backwards compatibility: support legacy single taxonomy+category params
-    if (taxonomy && category != null) {
-        addTaxValues(taxonomy, category);
-    }
-
-    // Serialize taxonomy params: join duplicate taxonomy values with commas
-    taxonomyToValues.forEach((values, tax) => {
-        const uniqueOrdered = Array.from(new Set(values));
-        if (uniqueOrdered.length === 0) {
-            return;
-        }
-        queryParams.set(tax, uniqueOrdered.join(','));
-    });
-
-
-    if (before) queryParams.append("before", before.toISOString());
-    if (perPage) queryParams.append("per_page", perPage.toString());
-    if (page) queryParams.append("page", page.toString());
-    if (locale) queryParams.append("locale", locale);
-    if (after) queryParams.append("after", after.toISOString());
-
-    // append ordering
-    if (ordering) queryParams.append("orderby", ordering);
-    if (orderingDirection) queryParams.append("order", orderingDirection);
-
-    // Preserve commas for taxonomy value lists for readability and parity with WordPress APIs
-    const queryString = queryParams.toString().replace(/%2C/g, ',');
-    return get(`${url}?${queryString}`, {
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-    }, true);
+    return requestWithDeduplication(finalUrl)
+}
 
 export const getData = ({ source, app, params }) => {
     const finalUrl = `${API_ROOT ? API_ROOT : fallbackUrl}/api/${app}/stats/${source}${params ? '?' + queryParams(params) : ''}`;
