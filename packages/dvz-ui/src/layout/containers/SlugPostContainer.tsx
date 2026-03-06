@@ -30,6 +30,7 @@ const SlugPostContainer = ({ header, footer, posts }: SlugPostContainerProps = {
 
     return (
         <PostProvider
+            type={parent}
             slug={slug}
             store={slug}
             locale={locale}

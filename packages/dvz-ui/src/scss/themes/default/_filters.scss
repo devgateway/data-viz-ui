@@ -1,11 +1,14 @@
 @import "../../vars";
+
 .ui.container.filter {
   margin-left: 0 !important;
   margin-right: 0 !important;
   padding: 0 2px;
+
   input {
     display: none;
   }
+
   .ui.button {
     text-wrap: none;
     cursor: pointer !important;
@@ -13,27 +16,32 @@
     border: 1px solid #ced0da;
     font-size: 16px;
     height: 38px;
-    padding:2px;
+    padding: 2px;
     font-weight: 400;
     background-color: #f5f6f9;
   }
+
   .ui.button.applied {
     color: $light-blue;
   }
+
   .angle.down.icon {
     float: right;
     margin-right: 4px;
     margin-left: auto;
     margin-top: 9px;
   }
+
   .ui.dropdown {
     width: 100%;
+
     .divider.text {
       cursor: pointer;
       width: 100%;
       font-size: 14px;
       line-height: 25px;
     }
+
     .ui.label {
       cursor: pointer;
       border: 0px;
@@ -42,13 +50,16 @@
       margin: 0px;
       padding: 5px 0px;
     }
+
     i {
       margin-right: -1em;
       margin-top: .5em;
     }
+
     .item {
       height: 25px;
     }
+
     .ui.segment {
       color: $gray;
       border-radius: 0px;
@@ -59,9 +70,11 @@
       font-size: 14px;
       font-weight: 300;
     }
+
     .menu {
       min-height: 100px;
     }
+
     .ui.container {
       margin: 0px;
       width: auto;
@@ -72,12 +85,14 @@
       font-weight: 200;
       padding: 0px 15px 10px 15px;
       max-height: 200px;
+
       .item {
         height: 25px;
         box-sizing: border-box;
         border: 1px;
         max-width: 50%;
       }
+
       .ui.checkbox label {
         padding-left: 1.6em;
         font-size: 15px;
@@ -87,33 +102,41 @@
 }
 
 // Special style for direct cost chart filter
-.dropdown-single-column{
+.dropdown-single-column {
   max-height: none !important;
 }
-.dropdown-item-single-column{
+
+.dropdown-item-single-column {
   max-width: $extend !important;
   width: $extend !important;
 }
-.filter-search{
+
+.filter-search {
   display: inline-flex !important;
 }
-.clear-icon{
+
+.clear-icon {
   margin-right: auto !important;
   margin-top: auto !important;
 }
-[data-group='directcost'] .ui.container.filter .ui.dropdown .ui.container{
+
+[data-group='directcost'] .ui.container.filter .ui.dropdown .ui.container {
   max-height: none;
 }
-[data-group='directcost'] .ui.container.filter .ui.dropdown .ui.container .item{
+
+[data-group='directcost'] .ui.container.filter .ui.dropdown .ui.container .item {
   max-width: $extend;
   width: $extend;
 }
-[data-group='datamap'] .ui.container.filter .ui.dropdown .ui.container{
+
+[data-group='datamap'] .ui.container.filter .ui.dropdown .ui.container {
   // max-height: none;
 }
+
 .editing {
   .ui.container.filter {
     margin: 3px !important;
+
     .menu {
       display: none !important;
     }
@@ -127,10 +150,41 @@
 .ui.container.filter {
   width: 100% !important;
   padding: 0 !important;
+
   .item {
     display: block !important;
   }
+
   .item.dropdown-item-single-column {
     display: block !important;
+  }
+}
+
+/* Filter loading skeleton */
+@keyframes filter-shimmer {
+  0% {
+    background-position: -400px 0;
+  }
+
+  100% {
+    background-position: 400px 0;
+  }
+}
+
+.filter-skeleton-placeholder {
+  padding: 0 2px;
+  width: 100%;
+
+  .filter-skeleton-shimmer {
+    height: 38px;
+    width: 100%;
+    border-radius: 4px;
+    border: 1px solid #ced0da;
+    background: linear-gradient(90deg,
+        #f5f6f9 25%,
+        #e8eaee 50%,
+        #f5f6f9 75%);
+    background-size: 800px 100%;
+    animation: filter-shimmer 1.4s infinite linear;
   }
 }

@@ -57,6 +57,13 @@ export const getCategories = ({ app, params }) => {
     return requestWithDeduplication(finalUrl);
 };
 
+export const getCategory = ({ app, type, params }) => {
+    const finalUrl = `${API_ROOT ? API_ROOT : ''}/api/${app}/categories/${type}${params ? '?' + queryParams(params) : ''}`
+    console.log("categories==>", finalUrl)
+
+    return requestWithDeduplication(finalUrl)
+}
+
 export const getData = ({ source, app, params }) => {
     const finalUrl = `${API_ROOT ? API_ROOT : fallbackUrl}/api/${app}/stats/${source}${params ? '?' + queryParams(params) : ''}`;
     return requestWithDeduplication(finalUrl);

@@ -3,7 +3,7 @@ import {Container} from 'semantic-ui-react'
 import { PostConsumer, PostProvider} from "@devgateway/wp-react-lib";
 import {Parallax, ParallaxLayer} from '@react-spring/parallax'
 import PostContent from "../connected-templates/PostContent";
-import {parse} from "../utils/parseUtils";
+import {parse} from "../utils/index.js";
 
 interface ListOfPostProps {
     posts?: any[],

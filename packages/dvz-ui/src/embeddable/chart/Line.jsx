@@ -104,7 +104,10 @@ const Chart = ({
   customAxisFormat,
   mobileCustomization,
   lineCurve,
-  customLabels
+  customLabels,
+  lineXAxisTickMode,
+  lineXAxisTickCount,
+  lineXAxisTickEvery
 }) => {
   const mobileConfigSettings = JSON.parse(decodeURIComponent(mobileCustomization));
   const isMobileConfigEnabled = isMobileOrTablet && (mobileConfigSettings?.showCustomization ?? false);
@@ -122,6 +125,9 @@ const Chart = ({
     label: customLabels && customLabels[d.id] ? customLabels[d.id] : (d.label || d.id),
     color: colorGenerator.getColor(d.id, d),
   }));
+
+
+
 
   const legendItems = () => {
     if (reverseLegend) {
@@ -549,14 +555,14 @@ const Chart = ({
     options.data && options.data?.filter((d) => d?.data?.length > 0)?.length;
 
   const hiddenLabels = [];
-  if(isNotDesktopPreview || isNotEditingAndIsMobileCustomizationEnabled) {
-      ticks = Number.parseInt(mobileConfigSettings.yAxisTickValues);
-      const labels = new Map(Object.entries(mobileConfigSettings?.labels?.xAxis ?? {}));
-      for (const [key, value] of labels) {
-        if (!value) {
-          hiddenLabels.push(key);
-        }
+  if (isNotDesktopPreview || isNotEditingAndIsMobileCustomizationEnabled) {
+    ticks = Number.parseInt(mobileConfigSettings.yAxisTickValues);
+    const labels = new Map(Object.entries(mobileConfigSettings?.labels?.xAxis ?? {}));
+    for (const [key, value] of labels) {
+      if (!value) {
+        hiddenLabels.push(key);
       }
+    }
   }
 
   const filtered = applyFilter(options.data);
@@ -565,6 +571,54 @@ const Chart = ({
 
   if (options?.data && hasData > 0) {
     let filteredData = applyFilter(options.data)
+    const xDomain = [];
+    filteredData.forEach(series => {
+      if (series && Array.isArray(series.data)) {
+        series.data.forEach(p => {
+          const xv = p && p.x;
+          if (xv !== undefined && xDomain.indexOf(xv) === -1) xDomain.push(xv);
+        });
+      }
+    });
+
+    let computedXTicks;
+    if (lineXAxisTickMode === 'count') {
+      const total = Math.max(1, parseInt(lineXAxisTickCount));
+      if (xDomain.length > 0 && total > 0) {
+        if (xDomain.length <= total) {
+          computedXTicks = xDomain.slice();
+        } else {
+          const step = (xDomain.length - 1) / (total - 1);
+          const idxs = new Array(total);
+          for (let i = 0; i < total; i++) {
+            idxs[i] = Math.floor(i * step);
+          }
+
+          // Ensure last index points to the last domain value
+          idxs[total - 1] = xDomain.length - 1;
+
+          // Map to values
+          computedXTicks = idxs.map(i => xDomain[i]);
+        }
+      }
+    } else if (lineXAxisTickMode === 'every') {
+      const every = Math.max(1, parseInt(lineXAxisTickEvery));
+      if (xDomain.length > 0) {
+        const vals = [];
+        for (let i = 0; i < xDomain.length; i++) {
+          if (i % every === 0) {
+            vals.push(xDomain[i]);
+          }
+        }
+
+        if (vals[vals.length - 1] !== xDomain[xDomain.length - 1]) {
+          vals.push(xDomain[xDomain.length - 1]);
+        }
+
+        computedXTicks = vals;
+      }
+    }
+
     return (
       <div style={{ height: height }}>
         <ResponsiveLine
@@ -586,25 +640,25 @@ const Chart = ({
           axisRight={
             showRightAxis
               ? {
-                  tickSize: 5,
-                  tickValues: ticks,
-                  tickPadding: 5,
-                  tickRotation: 0,
-                  legend: legends.right,
-                  legendPosition: "middle",
-                  legendOffset: parseInt(offsetRight),
-                  format: (value) => {
-                    const effectiveFormat = customAxisFormat
-                      ? customAxisFormat
-                      : format;
-                    return intl.formatNumber(
-                      effectiveFormat.style === "percent" ? value / 100 : value,
-                      {
-                        ...effectiveFormat,
-                      }
-                    );
-                  },
-                }
+                tickSize: 5,
+                tickValues: ticks,
+                tickPadding: 5,
+                tickRotation: 0,
+                legend: legends.right,
+                legendPosition: "middle",
+                legendOffset: parseInt(offsetRight),
+                format: (value) => {
+                  const effectiveFormat = customAxisFormat
+                    ? customAxisFormat
+                    : format;
+                  return intl.formatNumber(
+                    effectiveFormat.style === "percent" ? value / 100 : value,
+                    {
+                      ...effectiveFormat,
+                    }
+                  );
+                },
+              }
               : null
           }
           enableGridY={enableGridY}
@@ -622,12 +676,13 @@ const Chart = ({
             return colorGenerator.getColor(d.id, d);
           }}
           axisBottom={
-            (isNotDesktopPreview || isNotEditingAndIsMobileCustomizationEnabled) && mobileConfigSettings?.xAxisDisabled === true ? null :{
-            renderTick: CustomTick,
-            legend: legends.bottom,
-            legendPosition: "middle",
-            legendOffset: Number.parseInt(offsetBottom),
-          }}
+            (isNotDesktopPreview || isNotEditingAndIsMobileCustomizationEnabled) && mobileConfigSettings?.xAxisDisabled === true ? null : {
+              ...(computedXTicks ? { tickValues: computedXTicks } : {}),
+              renderTick: CustomTick,
+              legend: legends.bottom,
+              legendPosition: "middle",
+              legendOffset: Number.parseInt(offsetBottom),
+            }}
           axisLeft={{
             tickSize: 5,
             tickValues: ticks,
@@ -671,9 +726,9 @@ const Chart = ({
 
         {(legendPosition === "top" || legendPosition === "bottom") && (
           <div
-              className={`legends container has-standard-12-font-size ${legendPosition}`}
-              style={legendPosition === "top" ? { marginTop: isMobileOrTablet && `${newMarginTop}px` } : legendPosition === "bottom" ? { marginBottom: `${newMarginBottom}px` } : {}}
-            >
+            className={`legends container has-standard-12-font-size ${legendPosition}`}
+            style={legendPosition === "top" ? { marginTop: isMobileOrTablet && `${newMarginTop}px` } : legendPosition === "bottom" ? { marginBottom: `${newMarginBottom}px` } : {}}
+          >
             <div className="legend-sections">
               <div className="title-section">{legendTitle()}</div>
               <FlexWrapDetector

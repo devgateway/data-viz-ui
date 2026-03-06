@@ -85,11 +85,11 @@ class BaseLayer extends Layer {
                 })
                 .attr("text-anchor", "middle")
                 .attr("dominant-baseline", "middle")
-            if (k < minLabelZoomVisible){
-                console.log("remove layers")
-                this.g.selectAll(".feature-label").transition().style("display","none")
-            }else{
-                this.g.selectAll(".feature-label").style("display","")
+            if (k < minLabelZoomVisible) {
+
+                this.g.selectAll(".feature-label").transition().style("display", "none")
+            } else {
+                this.g.selectAll(".feature-label").style("display", "")
             }
 
         }
@@ -99,18 +99,20 @@ class BaseLayer extends Layer {
     resize() {
         const {
             labelFontSize,
-            minLabelZoomVisible=-1
+            minLabelZoomVisible = -1
 
         } = this.props
+        //eslint-disable-next-line
+
         const k = this.props.transform ? this.props.transform.k : 1
-        console.log("minLabelZoomVisible",minLabelZoomVisible,k)
+        //console.log("minLabelZoomVisible", minLabelZoomVisible, k)
 
 
-        if (k < minLabelZoomVisible){
-            console.log("remove layers")
-            this.g.selectAll(".feature-label").transition().style("display","none")
-        }else{
-            this.g.selectAll(".feature-label").style("display","")
+        if (k < minLabelZoomVisible) {
+
+            this.g.selectAll(".feature-label").transition().style("display", "none")
+        } else {
+            this.g.selectAll(".feature-label").style("display", "")
         }
         this.g.selectAll(".feature-label").attr("font-size", d => {
             return Math.max(.5, labelFontSize / k) + "px";
@@ -127,7 +129,7 @@ class BaseLayer extends Layer {
 
         if (this.props.onReady) {
             //eslint-disable-next-line
-            debugger;
+
             this.props.onReady();
         }
     }
@@ -141,24 +143,25 @@ class BaseLayer extends Layer {
         const {
             editing
         } = this.props
-        //eslint-disable-next-line
 
-        if (editing) {
+        // Redraw when editing, OR when the D3 projection changed (container was resized).
+        // path is a new object reference every time ProjectedContainer recomputes the projection.
+        if (editing || prevProps.path !== this.props.path) {
             this.create()
         }
         if (prevProps.visible != this.props.visible) {
             this.g.style("display", this.props.visible ? "block" : "none")
 
         }
-        if(this.g){
+        if (this.g) {
             this.resize()
         }
 
     }
 
     render() {
-        const {name, height, width} = this.props
-        return <g ref={this.gRef}/>
+        const { name, height, width } = this.props
+        return <g ref={this.gRef} />
     }
 }
 
