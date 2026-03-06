@@ -1,7 +1,8 @@
 import React from 'react';
 
-const MapDataFrame = ({children, data, measures, customMeasureLabels}) => {
-    
+const MapDataFrame = (props) => {
+    const {data, measures, customMeasureLabels, children, source} = props;
+
     const transformedData = {
         locationsData: [],
         nationalData: {},
@@ -28,7 +29,6 @@ const MapDataFrame = ({children, data, measures, customMeasureLabels}) => {
                     label: item.value,
                     value: item[measure],
                     measure: measure
-
                 }
 
 
@@ -42,12 +42,13 @@ const MapDataFrame = ({children, data, measures, customMeasureLabels}) => {
                 transformedData.locationsData.push(newItem);
             })
         })
-
         transformedData.measures = measuresArray.length > 1 ? measuresArray : null;
         transformedData.nationalData.value = data[measures];
     }
-    
-    return React.Children.map(children, child => React.cloneElement(child, {transformedData: transformedData}))
+
+    return React.Children.map(children, child => React.cloneElement(child, {transformedData: {
+        ...transformedData, types: data.metadata ? data.metadata.types : []
+    }}))
 }
 
 export default MapDataFrame;

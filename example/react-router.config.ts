@@ -1,5 +1,5 @@
 import type { Config } from "@react-router/dev/config";
-import { getPages } from "@devgateway/wp-react-lib/api";
+import { getPages } from "@devgateway/wp-react-lib";
 
 export default {
   // Config options...
@@ -9,7 +9,9 @@ export default {
   routeDiscovery: {
     mode: "initial",
   },
-  // prerender: ["/", "/en", "/en/home"],
+  prerender: [
+    // add routes that can be prerendered here. The pages should be static.
+  ],
   future: {
 
   }

@@ -178,7 +178,6 @@ const Group = (props) => {
 
 const BigNumber = ({ dataItem, format, measureField, measure, numberColor, numberFontSize, labelColor, labelFontSize, noDataText, label, intl }) => {
 
-    debugger;
     const rawValue = dataItem?.[measureField] ?? null;
     const value = rawValue ? (format?.style === 'percent' ? rawValue / 100 : rawValue) : null;
     const [targetValue, setTargetValue] = useState(value);
@@ -214,7 +213,6 @@ const BigNumber = ({ dataItem, format, measureField, measure, numberColor, numbe
 
     const formatNumber = (val) =>
         intl.formatNumber(val, { ...format });
-
 
     return (
         <div className="big-number">

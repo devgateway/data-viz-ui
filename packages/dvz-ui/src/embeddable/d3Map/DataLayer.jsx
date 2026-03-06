@@ -560,7 +560,7 @@ class DataLayer extends BaseLayer {
                 }
             })
         } else if (patternDiscriminator != 'none') {
-            const types = data.metadata ? data.metadata.types.filter(d => d.dimension == patternDiscriminator) : []
+            const types = (data && data.metadata) ? data.metadata.types.filter(d => d.dimension == patternDiscriminator) : []
             patternsData = types && types.length > 0 ? types[0].items.map(item => {
                 const key = item.value
                 return {
