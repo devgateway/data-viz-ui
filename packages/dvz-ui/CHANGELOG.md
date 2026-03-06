@@ -1,5 +1,11 @@
 # @devgateway/dvz-ui-react
 
+## 1.7.0
+
+### Minor Changes
+
+- [#170](https://github.com/devgateway/data-viz-ui/pull/170) [`a81ccee`](https://github.com/devgateway/data-viz-ui/commit/a81ccee0bedfc732f576cf315a571c6e3074cb98) Thanks [@sdimunzio](https://github.com/sdimunzio)! - New embedded components created: Big Filter, Big Numbers, custom bars etc. + Bug fixing
+
 ## 1.6.19
 
 ### Patch Changes
