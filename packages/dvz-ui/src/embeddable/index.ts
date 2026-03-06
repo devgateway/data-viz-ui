@@ -38,11 +38,14 @@ const Body = lazy(() => import("./body"));
 const SupersetChart = lazy(() => import("./superset-chart"));
 const SupersetDashboard = lazy(() => import("./superset-dashboard"));
 const BigNumber = lazy(() => import("./big-number"));
+const GroupedBars = lazy(() => import("./grouped-bars"));
 const BigNumberTrend = lazy(() => import("./big-number-trend"));
 const PostsFilter = lazy(() => import("./posts-filter"));
 const FilteredPosts = lazy(() => import("./filtered-posts"));
 const PostsFiltersResetButton = lazy(() => import("./posts-filters-reset-button"));
 const PostsPagination = lazy(() => import("./posts-pagination"));
+const DataParagraph = lazy(() => import("./data-paragraph"));
+const BigFilter = lazy(() => import("./big-filter"));
 
 
 export const components = {
@@ -76,15 +79,18 @@ export const components = {
     sankeyChart: SankeyChart,
     dataLabel: DataLabel,
     body: Body,
-	supersetChart: SupersetChart,
+    supersetChart: SupersetChart,
     supersetDashboard: SupersetDashboard,
     agreeAndDownload: AgreeAndDownload,
-	bigNumber: BigNumber,
+    bigNumber: BigNumber,
+    groupedBars: GroupedBars,
     bigNumberTrend: BigNumberTrend,
     postsFilter: PostsFilter,
     filteredPosts: FilteredPosts,
     postsFiltersReset: PostsFiltersResetButton,
     postsPagination: PostsPagination,
+    dataParagraph: DataParagraph,
+    bigFilter: BigFilter,
     redirect: () => null
 }
 
@@ -99,7 +105,7 @@ export const customizer = {
             customizer.components[key] = value
         }
     },
-    getComponentByNameIgnoreCase : (name: string) => {
+    getComponentByNameIgnoreCase: (name: string) => {
         const k = Object.keys(customizer.components).find(value => value.toLowerCase() === name.toLowerCase())
         if (k) {
             const Component = customizer.components[k]
@@ -135,4 +141,4 @@ export const getComponentByNameIgnoreCase = (name: string) => {
     return null
 }
 
-export const reducers =  { data, embeddable, ...customizer.getReducers() };
+export const reducers = { data, embeddable, ...customizer.getReducers() };

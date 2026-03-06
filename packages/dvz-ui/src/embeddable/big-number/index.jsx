@@ -1,9 +1,9 @@
-import React, {useRef, useState,useEffect} from "react";
-import {Container} from "semantic-ui-react";
+import React, { useRef, useState, useEffect } from "react";
+import { Container, Grid } from "semantic-ui-react";
 import DataProvider from "../data/DataProvider";
 import DataConsumer from "../data/DataConsumer";
-import {PostContent} from "@devgateway/wp-react-lib";
-import {connect} from "react-redux";
+import { PostContent } from "@devgateway/wp-react-lib";
+import { connect } from "react-redux";
 import { useSpring, animated } from '@react-spring/web';
 
 const Chart = (props) => {
@@ -13,6 +13,7 @@ const Chart = (props) => {
         intl,
         childContent,
         "data-csv": csv = "",
+        "data-dimension1": dimension1 = "none",
         "data-dvz-proxy-dataset-id": dvzProxyDatasetId,
         "data-no-data-message": noDataMsg = "No data matches your selection",
         "data-view-mode": editMode = 'info',
@@ -27,6 +28,9 @@ const Chart = (props) => {
         'data-number-color': numberColor = '#000000',
         'data-label-color': labelColor = '#000000',
         'data-label': label = '',
+        'data-group-label': groupLabel = '',
+        'data-group-label-color': groupLabelColor = '',
+        'data-group-label-font-size': groupLabelFontSize = '',
         "data-wait-for-filters": waitForFilters = "false",
         "data-no-data-text": noDataText = "-",
     } = props
@@ -49,7 +53,13 @@ const Chart = (props) => {
         return null
     }
 
-    const formatObject = parse(format)
+
+    const measuresObj = parse(measures)
+
+    const formatObject = measuresObj && measuresObj[app] ? measuresObj[app].format : null
+
+    console.log(formatObject)
+
     const numberFormat = formatObject ? {
         style: (formatObject.style === 'compacted') ? 'decimal' : formatObject.style,
         notation: (formatObject.style === 'compacted') ? 'compact' : "standard",
@@ -79,60 +89,97 @@ const Chart = (props) => {
 
     if (dvzProxyDatasetId) {
         params.dvzProxyDatasetId = dvzProxyDatasetId;
-      }
+    }
 
     const dimensions = []
+    if (dimension1 != "none") {
+        dimensions.push(dimension1);
+    }
+
+
     return (<div ref={ref}>
-        <Container className={"chart container big-number-container"} style={{"height": height + 'px'}} fluid={true}>
-            <DataProvider
-                style={{"height": `${contentHeight}px`}}
+
+        <Container className={"chart container big-number-container"} style={{ "height": height + 'px' }} fluid={true}>
+            {app && app != "none" && <DataProvider
+                style={{ "height": `${contentHeight}px` }}
                 params={params}
                 app={app}
                 group={group}
+                source={dimensions.join("/")}
                 csv={csv}
                 editing={editing}
                 waitForFilters={waitForFilters === "true"}
-                store={[app, unique, ...dimensions]} source={dimensions.join("/")}>
-                    <DataConsumer>
-                        <DataFrame
-                          locale={locale}
-                          intl={intl}
-                          app={app}
-                          format={numberFormat}
-                          measure={parse(measures)[0] || null}
-                            label={label}
-                            numberFontSize={numberFontSize}
-                            numberColor={numberColor}
-                            labelFontSize={labelFontSize}
-                            labelColor={labelColor}
-                            noDataText={noDataText}
-                          >
-                       </DataFrame>
-                    </DataConsumer>
+                store={[app, unique, ...dimensions]}
+            >
+                <DataConsumer>
+                    <Group
+                        dimension={dimension1}
+                        locale={locale}
+                        intl={intl}
+                        app={app}
+                        format={numberFormat}
+                        measures={parse(measures)}
+                        label={label}
+                        numberFontSize={numberFontSize}
+                        numberColor={numberColor}
+                        labelFontSize={labelFontSize}
+                        labelColor={labelColor}
+                        noDataText={noDataText}
+                        groupLabel={groupLabel}
+                        groupLabelColor={groupLabelColor}
+                        groupLabelFontSize={groupLabelFontSize}
+                    >
+                    </Group>
+                </DataConsumer>
             </DataProvider>
-
+            }
         </Container>
     </div>)
 
 }
 
-const DataFrame = (props) => {
+const Group = (props) => {
     const {
-        app, measure, data, format, label, numberColor, numberFontSize,
-        labelColor, labelFontSize, noDataText = '-', intl
+        app, measures, data, format, label, numberColor, numberFontSize, dimension,
+        labelColor, labelFontSize, noDataText = '-', intl, groupLabel, groupLabelColor, groupLabelFontSize
     } = props;
 
-    let measureField = measure;
-    let dataItem = data;
+    const measuresKeys = measures && measures[app] ? Object.keys(measures[app]).filter(k => measures[app][k].selected) : []
+    if (dimension != "none") {
+        const metadata = data.metadata.types.filter(t => t.dimension === dimension)[0]
 
-    if (app === 'csv' && data?.meta?.fields && data?.data?.length) {
-        measureField = data.meta.fields[0];
-        dataItem = data.data[0];
+        return data.children.map(dataItem => {
+            const dimensionLabel = metadata.items.filter(i => i.code == dataItem.value)[0].value
+            return <div className="big-number-group" style={{ "display": "flex", flexDirection: "column" }}>
+                <span className="big-number-title"
+                    style={{ color: groupLabelColor, fontSize: groupLabelFontSize + "px" }}>
+                    <span className="dimension-text">{dimensionLabel}</span>
+                    <span className="group-text"> {groupLabel}</span>
+                </span>
+                <div className="big-number-row" style={{ "display": "flex", flexDirection: "row" }}>
+                    {measuresKeys.map(k => <div className="big-number-parent"><BigNumber showDimensionLabel={true}
+                        metadata={metadata} dataItem={dataItem} measureField={k} measure={measures[app][k]} {...props}></BigNumber></div>)}
+                </div>
+            </div >
+
+
+        })
+
+    } else {
+        return <div>
+            <span style={{ color: groupLabelColor, fontSize: groupLabelFontSize + "px" }}> {groupLabel}</span>
+            {measuresKeys.map(k => <BigNumber dataItem={data} measureField={k} measure={measures[app][k]} {...props}></BigNumber>)}
+        </div>
     }
+
+};
+
+
+
+const BigNumber = ({ dataItem, format, measureField, measure, numberColor, numberFontSize, labelColor, labelFontSize, noDataText, label, intl }) => {
 
     const rawValue = dataItem?.[measureField] ?? null;
     const value = rawValue ? (format?.style === 'percent' ? rawValue / 100 : rawValue) : null;
-
     const [targetValue, setTargetValue] = useState(value);
 
     useEffect(() => {
@@ -144,10 +191,12 @@ const DataFrame = (props) => {
     const { number } = useSpring({
         from: { number: 0 },
         to: { number: targetValue ?? 0 },
-       // reset: true,
-        config: { mass: 1,
+        // reset: true,
+        config: {
+            mass: 1,
             tension: 120,
-            friction: 30, },
+            friction: 30,
+        },
     });
 
     const numberStyle = {
@@ -166,26 +215,26 @@ const DataFrame = (props) => {
         intl.formatNumber(val, { ...format });
 
     return (
-        <div>
-            <div style={numberStyle} className="big-number">
+        <div className="big-number">
+
+            <div style={numberStyle} className="big-number-value">
                 {value === null ? noDataText : (
                     <animated.span>
                         {number.to((n) => formatNumber(n))}
                     </animated.span>
                 )}
             </div>
-            {label && (
+            {measure?.customLabel && (
                 <div style={labelStyle} className="big-number-label">
-                    {label}
+                    {measure.customLabel}
                 </div>
             )}
         </div>
     );
-};
-
+}
 
 const mapStateToProps = (state, ownProps) => {
-    const {"data-app": app, "data-group": group,} = ownProps
+    const { "data-app": app, "data-group": group, } = ownProps
     const injectedMeasures = state.getIn(['data', 'measures', app, group])
     if (injectedMeasures) {
         return {

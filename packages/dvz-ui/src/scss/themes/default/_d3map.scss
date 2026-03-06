@@ -2,16 +2,19 @@ body {
   background-color: transparent !important;
 }
 
-// Mixins for reusable patterns
+// -----------------------------------------------------------------------------
+// Mixins
+// -----------------------------------------------------------------------------
+
 @mixin control-button {
   box-sizing: border-box;
   width: 25px;
   height: 20px;
-  background-color: #ffffff;
-  margin: 2px;
-  cursor: pointer;
   padding: 4px;
+  margin: 2px;
+  background-color: #ffffff;
   box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+  cursor: pointer;
 
   i {
     margin-left: 1.5px;
@@ -20,34 +23,34 @@ body {
 }
 
 @mixin legend-container {
-  padding: 7px !important;
-  min-width: 15%;
-  min-height: 30%;
-  max-height: 75%;
-  overflow: auto;
-  margin: 2px;
-  background: #fff;
-  opacity: 0.9;
-  font-family: Roboto;
+  z-index: 1500;
+  min-width: 120px;
   position: absolute;
   top: 2px;
   left: 2px;
+  max-height: 75%;
+  margin: 2px;
+  overflow: auto;
+  background: #fff;
   box-shadow: 0 0 10px rgba(0, 0, 0, 1);
+  opacity: 0.9;
+  font-family: Roboto;
+
 }
 
 @mixin legend-item-base {
   display: flex;
   margin-bottom: 5px;
-  font-size: 11px;
   font-family: Roboto;
+  font-size: 11px;
 }
 
 @mixin legend-checkbox {
-  text-align: center;
-  line-height: 14px;
-  font-size: 14px;
-  cursor: pointer;
   border: 1px solid #3c434a;
+  font-size: 14px;
+  line-height: 14px;
+  text-align: center;
+  cursor: pointer;
 }
 
 @mixin legend-color-swatch {
@@ -58,58 +61,60 @@ body {
 }
 
 @mixin legend-breaks-container {
-  padding-bottom: 5px;
   margin-top: -5px;
   margin-left: 10px;
-  font-size: 11px;
+  padding-bottom: 5px;
   font-family: Roboto;
+  font-size: 11px;
 }
 
 @mixin legend-section-title {
-
-  height: auto !important;
-  border: none !important;
   display: flex;
   align-items: center;
+  width: 100% !important;
+  height: auto !important;
+  border: none !important;
   font-weight: bold;
-  width: 100%!important;
 }
 
 @mixin break-item-base {
-  font-weight: bold;
-  font-size: 11px;
   width: 15px;
   height: 15px;
-
+  font-weight: bold;
+  font-size: 11px;
 }
+
+// -----------------------------------------------------------------------------
+// D3 Map Container
+// -----------------------------------------------------------------------------
 
 .d3map-container {
   overflow: hidden;
 
+  // Rendered Map Area
   .projected {
-    cursor: pointer;
     position: relative;
+    cursor: pointer;
 
     .map {
       position: relative;
       background-color: transparent;
 
       svg {
-
         background-color: transparent;
         cursor: pointer;
         vector-effect: non-scaling-stroke;
 
         path {
-          vector-effect: non-scaling-stroke;
           stroke-width: 1px;
+          vector-effect: non-scaling-stroke;
         }
 
         text {
-          text-anchor: middle;
-          dominant-baseline: middle;
           font-family: "Open Sans";
           font-weight: bold;
+          text-anchor: middle;
+          dominant-baseline: middle;
         }
       }
 
@@ -138,14 +143,17 @@ body {
     }
   }
 
+  // General SVG overrides within container
   svg {
     height: auto;
+
     text {
+
       &.patterns-labels,
       &.patterns-title {
+        transform: translate(5px, 10px);
         font-family: Roboto;
         font-size: 11px;
-        transform: translate(5px, 10px);
       }
 
       &.patterns-title {
@@ -154,8 +162,20 @@ body {
     }
   }
 
+  // Legends
   .legends {
     @include legend-container;
+
+    .legend-collapsible-control {
+      height: 28px;
+      min-width: 120px;
+      font-size: 11px;
+      text-align: left;
+      line-height: 16px;
+      width: 80%;
+      margin-left: -10px;
+      line-height: 20px;
+    }
 
     .legend-item {
       @include legend-item-base;
@@ -169,55 +189,57 @@ body {
       }
 
       .legend-label {
+        font-size: 11px;
         font-weight: bold;
         line-height: 14px;
-        font-size: 11px;
+        white-space: nowrap;
+        word-break: normal;
+        overflow-wrap: normal;
       }
+
+
     }
 
     .legend-breaks {
-
       @include legend-breaks-container;
-
-      .legend-section-title-checkbox {
-
-      }
 
       .measure-label {
         width: 100% !important;
         height: 22px;
-
       }
 
-      .legend-section-title-checkbox::before {
-        content: "\2610";
-        display: block;
-        font-size: 21px;
-        font-weight: 100;
+      .legend-section-title-checkbox {
+        &::before {
+          display: block;
+          content: "\2610";
+          font-weight: 100;
+          font-size: 21px;
+        }
 
-      }
-
-      .legend-section-title-checkbox.checked::before {
-        content: "\2611";
-        display: block;
-        font-size: 23px;
-        font-weight: 100;
+        &.checked::before {
+          display: block;
+          content: "\2611";
+          font-weight: 100;
+          font-size: 23px;
+        }
       }
 
       .legend-section-title {
         @include legend-section-title;
       }
 
+
+
+
+
       .break {
-        line-height: 22px;
         display: flex;
         flex-direction: row;
         padding-left: 5px;
+        line-height: 22px;
 
-
-        .dim2-item{
+        .dim2-item {
           border-radius: 50%;
-
         }
 
         .break-item {
@@ -225,36 +247,56 @@ body {
 
           &.point {
             border-radius: 50%;
+
+            &.checked {
+              &::before {
+                position: absolute;
+                display: block;
+                margin-top: -4px;
+                margin-left: 2px;
+                content: "\2713";
+                font-size: 11px;
+              }
+            }
           }
         }
 
-
-
-        .break-item.point.checked {
-
-        }
-
-        .break-item.point.checked::before {
-          display: block;
-          content: "\2713";
-          position: absolute;
-          margin-top: -4px;
-          margin-left: 2px;
+        .break-label {
           font-size: 11px;
-        }
-
-        .break-label, .gradient-label {
           line-height: 20px;
-        }
-
-        .gradient-label {
-          font-size: 11px;
-          margin-top: 4px;
+          white-space: nowrap;
         }
       }
     }
+
+    .gradient-container {
+      width: 120px;
+      margin-left: 20px;
+      margin-right: 20px;
+      height: 28px;
+
+      .gradient-bar {
+        height: 10px;
+      }
+
+      .gradient-label {
+        border: 1px solid red($color: #000000);
+        font-size: 11px;
+        line-height: 20px;
+        white-space: nowrap;
+        margin-top: 10px;
+        font-size: 11px;
+        color: #000000;
+      }
+    }
+
+
   }
 }
+
+// -----------------------------------------------------------------------------
+// Tooltips
+// -----------------------------------------------------------------------------
 
 .d3MapTooltip {
   br {
@@ -265,8 +307,8 @@ body {
   }
 
   h2 {
+    margin: 0 !important;
     color: #FFF !important;
     font-size: 1.2em !important;
-    margin: 0 !important;
   }
 }

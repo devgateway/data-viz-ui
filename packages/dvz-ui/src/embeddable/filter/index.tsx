@@ -1,4 +1,4 @@
-import React, {LegacyRef, useEffect, useRef, useState} from "react";
+import React, { LegacyRef, useEffect, useRef, useState } from "react";
 import {
     Checkbox,
     Container,
@@ -13,10 +13,9 @@ import {
 } from "semantic-ui-react";
 import CategoriesConsumer from "../data/CategoriesConsumer";
 import CategoriesProvider from "../data/CategoriesProvider";
-import {connect} from "react-redux";
-import {setFilter, setInitialFilters} from "../reducers/data";
-import {injectIntl} from "react-intl";
-import {SettingProvider, SettingsConsumer} from "@devgateway/wp-react-lib";
+import { connect } from "react-redux";
+import { setFilter, setInitialFilters } from "../reducers/data";
+import { injectIntl } from "react-intl";
 
 const FILTER_TYPE_MULTI_SELECT = "multi-select";
 const FILTER_TYPE_SINGLE_SELECT = "single-select";
@@ -69,7 +68,7 @@ const parse = (value) => {
 };
 
 const mapStateToProps = (state, ownProps) => {
-    const {app, group, param} = ownProps;
+    const { app, group, param } = ownProps;
     return {
         current: state.getIn(["data", "filters", app, group, param]),
     };
@@ -80,15 +79,10 @@ const mapActionCreators = {
     onChange: setFilter,
 };
 
-interface FilterDropDownProps {
-    isRange?: boolean;
-    options: any[];
-    alphabeticalSort?: boolean;
-    ascOrder?: boolean;
-}
 
-const FilterDropDown = (props: FilterDropDownProps) => {
-    const {isRange, options, alphabeticalSort, ascOrder} = props;
+
+const FilterDropDown = (props: FilterPros) => {
+    const { isRange, options, alphabeticalSort, ascOrder } = props;
     if (booleanParameter(alphabeticalSort)) {
         options.sort(function (a, b) {
             const aText = a.text ? a.text.toLowerCase() : "";
@@ -100,23 +94,23 @@ const FilterDropDown = (props: FilterDropDownProps) => {
             }
         });
     } else {
-       options.sort(function (a, b) {
+        options.sort(function (a, b) {
             return booleanParameter(ascOrder)
                 ? a.position - b.position
                 : b.position - a.position;
         });
     }
 
-    const filterProps = {...props, options};
+    const filterProps = { ...props };
 
     if (isRange) {
-        return <RangeFilterDropDown {...filterProps} />;
+        return <RangeFilterSelectorBoxFilter {...filterProps} />;
     } else {
-        return <ListFilterDropDown {...filterProps} />;
+        return <FilterSelectorBox {...filterProps} />;
     }
 };
 
-export interface ListFilterDropDownProps {
+export interface FilterPros {
     allLabel: string;
     noneLabel: string;
     placeholder: string;
@@ -137,12 +131,24 @@ export interface ListFilterDropDownProps {
     closeOnSelect: boolean;
     hiddenFilters: any[];
     autoApply: boolean;
+    childFilter: String;
+    childFilterParam: String;
+    params: any[];
+    isRange?: boolean;
+    alphabeticalSort?: boolean;
+    ascOrder?: boolean;
+    startLabel: string;
+    endLabel: string;
+    uniqueStorage?: string;
+    dvzProxyDatasetId?: string;
+    defaultTopNEnabled?: boolean;
+    defaultTopNCount?: number;
 }
 
-const ListFilterDropDown = connect(
+const FilterSelectorBox = connect(
     mapStateToProps,
     mapActionCreators
-)((props: ListFilterDropDownProps) => {
+)((props: FilterPros) => {
     const {
         allLabel,
         noneLabel,
@@ -164,6 +170,13 @@ const ListFilterDropDown = connect(
         closeOnSelect,
         hiddenFilters,
         autoApply,
+        childFilter,
+        childFilterParam,
+        params,
+        uniqueStorage,
+        dvzProxyDatasetId,
+        defaultTopNEnabled,
+        defaultTopNCount,
     } = props;
 
     const [searchFilter, setSearchFilter] = useState("");
@@ -185,8 +198,8 @@ const ListFilterDropDown = connect(
         } else {
             newValue = [value];
         }
-        onChange({app, group, param, value: newValue, autoApply});
 
+        onChange({ app, group, param, value: newValue, autoApply, childFilter, childFilterParam, params, uniqueStorage, dvzProxyDatasetId });
         if (closeOnSelect && refContainer.current) {
             refContainer.current.close();
         }
@@ -210,6 +223,7 @@ const ListFilterDropDown = connect(
             param,
             value: matchingItems.map((v) => v.value),
             autoApply,
+            childFilter,
         });
         if (closeOnSelect && refContainer.current) {
             refContainer.current.close();
@@ -248,11 +262,27 @@ const ListFilterDropDown = connect(
         if (!current) {
             const filterItems = options.map((o) => o.value);
             if (filterType == FILTER_TYPE_MULTI_SELECT || filterType == "") {
-                //if multiple select select all  elements
-                onInit({app, group, param, value: filterItems});
+                if (defaultTopNEnabled) {
+                    const n = defaultTopNCount && defaultTopNCount > 0 ? defaultTopNCount : 0;
+                    const selectedTopN = options.slice(0, n).map((o) => o.value);
+                    onInit({ app, group, param, value: selectedTopN });
+                } else {
+                    const defaultsArr = defaultValues
+                        ? defaultValues
+                            .split(",")
+                            .map((v) => v.trim())
+                            .filter((v) => v.length > 0)
+                        : [];
+                    const selected =
+                        defaultsArr.length > 0
+                            ? options
+                                .filter((o) => defaultsArr.indexOf(String(o.value)) > -1)
+                                .map((o) => o.value)
+                            : filterItems;
+                    onInit({ app, group, param, value: selected });
+                }
             } else {
                 if (app == "csv") {
-                    //if single select select base on default value criteria
                     let filterValues: any[] = [];
                     if (defaultValueCriteria === DEFAULT_VALUE_INPUT) {
                         filterValues = defaultValues ? defaultValues.split(",") : [];
@@ -264,9 +294,29 @@ const ListFilterDropDown = connect(
                                 ? [filterItems[filterItems.length - 1]]
                                 : [];
                     }
-                    onInit({app, group, param, value: filterValues});
+                    onInit({ app, group, param, value: filterValues });
                 } else {
-                    onInit({app, group, param, value: [filterItems[0]], autoApply});
+                    if (defaultTopNEnabled) {
+                        const selectedTop1 = options.slice(0, 1).map((o) => o.value);
+                        onInit({ app, group, param, value: selectedTop1 });
+                    } else {
+                        const defaultsArr = defaultValues
+                            ? defaultValues
+                                .split(",")
+                                .map((v) => v.trim())
+                                .filter((v) => v.length > 0)
+                            : [];
+                        const selectedSingle =
+                            defaultsArr.length > 0
+                                ? options
+                                    .filter((o) => defaultsArr.indexOf(String(o.value)) > -1)
+                                    .map((o) => o.value)
+                                    .slice(0, 1)
+                                : filterItems.length > 0
+                                    ? [filterItems[0]]
+                                    : [];
+                        onInit({ app, group, param, value: selectedSingle });
+                    }
                 }
             }
         }
@@ -280,28 +330,26 @@ const ListFilterDropDown = connect(
                     : null;
             return `${placeholder} ${selectedItem ? selectedItem.text : ""}`;
         } else {
-            return `${placeholder} (${
-                current
-                    ? current.filter((v) => {
-                        if (v == Number.MIN_SAFE_INTEGER) {
-                            return false;
-                        }
+            return `${placeholder} (${current
+                ? current.filter((v) => {
+                    if (v == Number.MIN_SAFE_INTEGER) {
+                        return false;
+                    }
 
-                        if (hiddenFilters && hiddenFilters.length > 0) {
-                            return !(hiddenFilters.indexOf(v) != -1);
-                        }
+                    if (hiddenFilters && hiddenFilters.length > 0) {
+                        return !(hiddenFilters.indexOf(v) != -1);
+                    }
 
-                        return true;
-                    }).length
-                    : 0
-            }/${
-                options.filter((f) => {
+                    return true;
+                }).length
+                : 0
+                }/${options.filter((f) => {
                     if (hiddenFilters && hiddenFilters.length > 0) {
                         return !(hiddenFilters.indexOf(f.id) != -1);
                     }
                     return true;
                 }).length
-            }) `;
+                }) `;
         }
     };
     const refContainer = useRef<DropdownProps>(null);
@@ -361,7 +409,7 @@ const ListFilterDropDown = connect(
                                         </div>
                                     </Dropdown.Item>
                                 </Container>
-                                <Divider/>
+                                <Divider />
                             </>
                         )}
                     </>
@@ -380,7 +428,7 @@ const ListFilterDropDown = connect(
                             }
                             return true;
                         })
-                        .map(({value, text}, index) => (
+                        .map(({ value, text }, index) => (
                             <Dropdown.Item
                                 key={index}
                                 className={useSingleColumn ? "dropdown-item-single-column" : ""}
@@ -398,10 +446,10 @@ const ListFilterDropDown = connect(
                                     <Checkbox
                                         checked={
                                             current &&
-                                            current.indexOf(value) > -1 &&
-                                            !(
-                                                options.length == current.length && allNoneSameBehaviour
-                                            )
+                                                current.indexOf(value) > -1 &&
+                                                !(
+                                                    options.length == current.length && allNoneSameBehaviour
+                                                )
                                                 ? true
                                                 : false
                                         }
@@ -417,35 +465,23 @@ const ListFilterDropDown = connect(
     );
 });
 
-interface RangeFilterDropDownProps {
-    placeholder: string;
-    startLabel: string;
-    endLabel: string;
-    options: any[];
-    app: string;
-    group: string;
-    param: string;
-    current: any[];
-    onChange: any;
-    autoApply: boolean;
-}
 
-const RangeFilterDropDown = connect(
+const RangeFilterSelectorBoxFilter = connect(
     mapStateToProps,
     mapActionCreators
 )(
     ({
-         placeholder,
-         startLabel,
-         endLabel,
-         options,
-         onChange,
-         app,
-         group,
-         param,
-         current,
-         autoApply,
-     }: RangeFilterDropDownProps) => {
+        placeholder,
+        startLabel,
+        endLabel,
+        options,
+        onChange,
+        app,
+        group,
+        param,
+        current,
+        autoApply,
+    }: FilterPros) => {
         const [start, setStart] = useState(options[0].position);
         const [end, setEnd] = useState(options[options.length - 1].position);
 
@@ -457,7 +493,7 @@ const RangeFilterDropDown = connect(
                         (v.position < end || v.position === end)
                 )
                 .map((o) => o.value);
-            onChange({app, group, param, value: current, autoApply});
+            onChange({ app, group, param, value: current, autoApply });
         }, [start, end]);
 
         const refContainer = useRef<DropdownProps>(null);
@@ -466,11 +502,10 @@ const RangeFilterDropDown = connect(
             <Dropdown
                 ref={refContainer as unknown as LegacyRef<HTMLDivElement>}
                 fluid
-                text={`${placeholder} (${
-                    current
-                        ? current.filter((v) => v != Number.MIN_SAFE_INTEGER).length
-                        : 0
-                }/${options.length})`}
+                text={`${placeholder} (${current
+                    ? current.filter((v) => v != Number.MIN_SAFE_INTEGER).length
+                    : 0
+                    }/${options.length})`}
                 scrolling={false}
                 button
                 multiple={true}
@@ -487,7 +522,7 @@ const RangeFilterDropDown = connect(
                         </Dropdown.Item>
                     </Segment>
                     <Container>
-                        {options.map(({value, text, position}) => (
+                        {options.map(({ value, text, position }) => (
                             <Dropdown.Item>
                                 <Radio
                                     disabled={position > end}
@@ -505,7 +540,7 @@ const RangeFilterDropDown = connect(
                         </Dropdown.Item>
                     </Segment>
                     <Container>
-                        {options.map(({value, text, position}) => (
+                        {options.map(({ value, text, position }) => (
                             <Dropdown.Item>
                                 <Radio
                                     disabled={position < start}
@@ -523,10 +558,14 @@ const RangeFilterDropDown = connect(
 );
 
 const CategoryFilter = (props) => {
-    const {data, type, showNoDataOption} = props;
+
+    const { data, type, showNoDataOption } = props;
+
+
+    const parentSelectedFilters = null
+
 
     const cat = data.filter((d) => d.type === type)[0];
-
     const filteredCategories = cat
         ? cat.items.filter((f) => {
             if (!showNoDataOption && f.code == NO_DATA) {
@@ -542,15 +581,17 @@ const CategoryFilter = (props) => {
         ? toOptions(filteredCategories, props.locale)
         : [];
 
-    const filterDefinitions = data.find((d) => (d.type = "FilterDefinition"));
+    const filterDefinitions = data.find((d) => (d.type === "FilterDefinition"));
 
     const placeholder = filterDefinitions
         ? filterDefinitions.items.find((i) => i.fieldType == type)
         : null;
     const value = placeholder ? placeholder.value : "Filter";
 
+
+
     return (
-        <Container fluid={true} className={`filter`}>
+        <Container fluid={true} className={`filter filter-component`}>
             <FilterDropDown
                 {...props}
                 options={options}
@@ -580,14 +621,14 @@ const BooleanFilter = connect(
         },
     ];
     return (
-        <Container fluid={true} className={`filter`}>
+        <Container fluid={true} className={`filter filter-component`}>
             <FilterDropDown options={options} {...props} />
         </Container>
     );
 });
 
 const CSVFilter = (props) => {
-    const {csvValue} = props;
+    const { csvValue } = props;
     let idx = 0;
     const options = csvValue.split(",").map((o) => {
         return {
@@ -600,7 +641,7 @@ const CSVFilter = (props) => {
     });
 
     return (
-        <Container fluid={true} className={`filter`}>
+        <Container fluid={true} className={`filter filter-component`}>
             <FilterDropDown options={options} {...props}>
                 {" "}
             </FilterDropDown>
@@ -610,50 +651,50 @@ const CSVFilter = (props) => {
 
 const FilterWrapper = (props) => {
     return (
-        <SettingProvider locale={props.intl.locale} changeUUID={props.unique}>
-            <SettingsConsumer>
-                <Filter {...props}></Filter>
-            </SettingsConsumer>
-        </SettingProvider>
+        <Filter {...props}></Filter>
     );
 };
 
 const Filter = ({
-                    unique,
-                    "data-group": group,
-                    "data-app": app,
-                    "data-dvz-proxy-dataset-id": dvzProxyDatasetId,
-                    "data-param": param,
-                    "data-icon": icon,
-                    "data-type": type,
-                    "data-place-holder": placeholder,
-                    "data-is-range": isRange = "false",
-                    "data-all-label": allLabel,
-                    "data-none-label": noneLabel,
-                    "data-start-label": startLabel,
-                    "data-end-label": endLabel,
-                    "data-csv-value": csvValue,
-                    "data-filters": filters = "[]",
-                    "data-use-single-column": useSingleColumn = "false",
-                    "data-enable-text-search": enableTextSearch = "false",
-                    "data-filter-type": filterType,
-                    "data-default-values": defaultValues,
-                    "data-show-no-data-option": showNoDataOption = "true",
-                    "data-default-value-criteria": defaultValueCriteria = "DEFAULT_VALUE_INPUT",
-                    "data-hidden-filters": hiddenFilters = "[]",
-                    "data-all-none-same-behaviour": allNoneSameBehaviour = "false",
-                    "data-close-on-select": closeOnSelect = "false",
-                    "data-alphabetical-sort": alphabeticalSort = "true",
-                    "data-asc-order": ascOrder = "true",
-                    "data-auto-apply": autoApply = "true",
-                    settings,
-                    intl,
-                }) => {
+    unique,
+    "data-group": group,
+    "data-app": app,
+    "data-child-filter": childFilter,
+    "data-child-filter-param": childFilterParam,
+    "data-parent-filter": parentFilter,
+    "data-parent-filter-param": parentFilterParam,
+    "data-dvz-proxy-dataset-id": dvzProxyDatasetId,
+    "data-param": param,
+    "data-icon": icon,
+    "data-type": type,
+    "data-place-holder": placeholder,
+    "data-is-range": isRange = "false",
+    "data-all-label": allLabel,
+    "data-none-label": noneLabel,
+    "data-start-label": startLabel,
+    "data-end-label": endLabel,
+    "data-csv-value": csvValue,
+    "data-filters": filters = "[]",
+    "data-use-single-column": useSingleColumn = "false",
+    "data-enable-text-search": enableTextSearch = "false",
+    "data-filter-type": filterType,
+    "data-default-values": defaultValues,
+    "data-show-no-data-option": showNoDataOption = "true",
+    "data-default-value-criteria": defaultValueCriteria = "DEFAULT_VALUE_INPUT",
+    "data-hidden-filters": hiddenFilters = "[]",
+    "data-all-none-same-behaviour": allNoneSameBehaviour = "false",
+    "data-close-on-select": closeOnSelect = "false",
+    "data-alphabetical-sort": alphabeticalSort = "true",
+    "data-asc-order": ascOrder = "true",
+    "data-auto-apply": autoApply = "true",
+    "data-default-top-n-enabled": defaultTopNEnabled = "false",
+    "data-default-top-n-count": defaultTopNCount = "0",
+    intl,
+}) => {
     const params = {};
     const ff = filters ? parse(filters) : {};
 
     //eslint-disable-next-line
-
 
     if (ff && ff.forEach) {
         ff.forEach((f) => {
@@ -706,8 +747,14 @@ const Filter = ({
             return (
                 <CategoriesProvider
                     dvzProxyDatasetId={dvzProxyDatasetId}
+                    type={type}
+                    autoApply={booleanParameter(autoApply)}
+                    parentType={parentFilter}
                     params={params}
+                    param={param}
+                    parentParam={parentFilterParam}
                     app={app}
+                    group={group}
                     uniqueStorage={ff.length > 0 ? unique : null}
                     hiddenFilters={hiddenFiltersArr || []}
                 >
@@ -734,6 +781,10 @@ const Filter = ({
                             {type !== "Boolean" && (
                                 <CategoriesConsumer type={type}>
                                     <CategoryFilter
+                                        params={params}
+                                        childFilter={childFilter}
+                                        parentFilter={parentFilter}
+                                        childFilterParam={childFilterParam}
                                         startLabel={startLabel}
                                         endLabel={endLabel}
                                         allLabel={allLabel}
@@ -752,11 +803,15 @@ const Filter = ({
                                         filterType={defaultFilterType}
                                         defaultValues={defaultValues}
                                         defaultValueCriteria={defaultValueCriteria}
+                                        defaultTopNEnabled={booleanParameter(defaultTopNEnabled)}
+                                        defaultTopNCount={defaultTopNCount ? parseInt(defaultTopNCount) : 0}
                                         hiddenFilters={hiddenFiltersArr || []}
                                         allNoneSameBehaviour={allNoneSameBehaviour == "true"}
                                         autoApply={booleanParameter(autoApply)}
                                         closeOnSelect={booleanParameter(closeOnSelect)}
                                         locale={intl.locale}
+                                        uniqueStorage={ff.length > 0 ? unique : null}
+                                        dvzProxyDatasetId={dvzProxyDatasetId}
                                     ></CategoryFilter>
                                 </CategoriesConsumer>
                             )}
