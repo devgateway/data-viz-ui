@@ -147,14 +147,10 @@ export const getData = (props) => (dispatch, getState) => {
 
     let filters = getState().get('data').getIn(['filters', app, group]);
 
-    // do not overwrite preset filters in params with filters from state if they exist,
-    // because they should be applied on top of each other (except if parent filter is
-    // involved, then we should sync them)
     if (params) {
-        Object.keys(params).forEach(k => {
-            // If we have parent filter we should sync filters from state with preset
-            // filters in params, otherwise we should keep them separated.
+        Object.keys(params).forEach(k => {            
             if (parent) {
+                // When parent is truthy, sync by intersection (filters[k] becomes only values also in params[k]).
                 if (filters && filters.has(k)) {
                     let a = params[k]
                     let b = filters.get(k)
@@ -165,6 +161,7 @@ export const getData = (props) => (dispatch, getState) => {
                     filters = filters.set(k, newB)
                 }
             } else {
+                // When parent is falsy, overwrite filters with params values (filters[k] becomes params[k]).
                 if (filters) {
                     filters = filters.set(k, params[k])
                 }
