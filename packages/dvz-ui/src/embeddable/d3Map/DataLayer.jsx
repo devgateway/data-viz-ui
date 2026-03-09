@@ -560,7 +560,7 @@ class DataLayer extends BaseLayer {
                 }
             })
         } else if (patternDiscriminator != 'none') {
-            const types = data.metadata ? data.metadata.types.filter(d => d.dimension == patternDiscriminator) : []
+            const types = (data && data.metadata) ? data.metadata.types.filter(d => d.dimension == patternDiscriminator) : []
             patternsData = types && types.length > 0 ? types[0].items.map(item => {
                 const key = item.value
                 return {
@@ -870,7 +870,7 @@ class DataLayer extends BaseLayer {
 
         //TODO:Check if data has changed using JSON.stringify
 
-        if (editing || JSON.stringify(prevProps.data) !== JSON.stringify(data)) {
+        if (editing || prevProps.data !== data || prevProps.path !== this.props.path) {
             this.create()
         }
 

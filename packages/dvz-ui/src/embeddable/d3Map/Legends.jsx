@@ -159,6 +159,7 @@ const DataPointsLayerLegend = (props) => {
         selectedItem
     } = props
 
+
     const numberFormat = {
         style: (format.style === 'compacted') ? 'decimal' : format.style,
         notation: (format.style === 'compacted') ? 'compact' : "standard",
@@ -177,6 +178,7 @@ const DataPointsLayerLegend = (props) => {
 
     const fieldLabel = pointStyleBy === "dimension" || showDim2OnLegends ? dimension2 : measureLabel
 
+
     return <div className={"legend"}>
         <div>
 
@@ -189,6 +191,7 @@ const DataPointsLayerLegend = (props) => {
                 </div>
                 <div className={"legend-label"}>{name} </div>
             </div>
+
 
             {(pointStyleBy === "measure" && visible != false) && <div className={"legend-breaks"}>
                 {breaks.map((b, i) => {
@@ -212,6 +215,7 @@ const DataPointsLayerLegend = (props) => {
                     </div>
                 </div>
             }
+
 
             {(visible != false && showDim2OnLegends != false) && <div className={"legend-breaks"}>
                 {dimensionValues.map((d) => {
@@ -237,6 +241,7 @@ const DataPointsLayerLegend = (props) => {
                 })}
             </div>
             }
+
 
 
         </div>
@@ -342,10 +347,6 @@ const DataLayerLegend = (props) => {
     }
 
 
-    if (data) {
-        console.log("COLOR", getGradientColors(data).getStartColor())
-    }
-
 
     const getMinDataValue = (data) => {
         return Math.min(...(data.children.map(d => d[measures[0]])))
@@ -438,7 +439,7 @@ const Legends = (props) => {
     return (<div className={`legends ${collapsed ? 'collapsed' : ''}`} ref={divRef}>
 
         <div className='legend-collapsible-control' onClick={() => setCollapsed(!collapsed)}>
-            {collapsed ? <div> <ChevronRight size={14} />   Show Legends</div> : <div><ChevronDown size={14} />Hide Legends</div>}
+            {collapsed ? <div> <ChevronRight size={14} />   Show Legend</div> : <div><ChevronDown size={14} />Hide Legend</div>}
         </div>
 
         <div className="legends-content">

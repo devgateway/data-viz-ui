@@ -1,4 +1,4 @@
-import DOMPurify from 'dompurify';
+import {decode as decodeHtmlEntities} from 'html-entities';
 
 // Utility functions to safely convert props to proper types
 export const toBoolean = (value: any): boolean => {
@@ -25,12 +25,21 @@ export const uriStringToArray = (value: string | string[]): any[] => {
 }
 
 export const decodeHtmlEntitiesToText = (html: string) => {
-    const doc = new DOMParser().parseFromString(html, 'text/html');
-    return doc.documentElement.textContent;
+    if (!html) return '';
+    return decodeHtmlEntities(html);
 }
 
 export const decodeHtmlEntitiesToHtml = (html: string) => {
-    const doc = new DOMParser().parseFromString(html, 'text/html');
-    const sanitized = DOMPurify.sanitize(doc.documentElement.innerHTML);
+    if (!html) return '';
+    const sanitized = decodeHtmlEntities(html);
     return sanitized;
 }
+
+export function stringToArray(str: string) {
+    return str.replace(/^\[|\]$/g, '').split(',').map(item => {
+      const trimmed = item.trim();
+      // Try to convert to number if it's numeric
+      const num = Number(trimmed);
+      return isNaN(num) ? trimmed : num;
+    });
+  }

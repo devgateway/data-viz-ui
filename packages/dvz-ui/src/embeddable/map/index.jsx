@@ -101,6 +101,7 @@ const MapEntry = (props) => {
         'data-custom-measure-labels': customMeasureLabels = "{}",
         'data-show-shading-layer-labels': showShadingLayerLabels = "ifUnitHasData",
         "data-dvz-proxy-dataset-id": dvzProxyDatasetId,
+        'data-recently-toggled-layer-id': recentlyToggledLayerId = null,
         intl,
         settings
     } = props
@@ -178,7 +179,7 @@ const MapEntry = (props) => {
     const multipleMeasures = hasMultipleMeasures == true || hasMultipleMeasures == "true"
 
     const levels = [dimension1, dimension2]
-    const source = levels.filter(l => l != 'none' && l != null).join('/')
+    let source = levels.filter(l => l != 'none' && l != null).join('/')
 
     const mapProps = {
         unique,
@@ -246,6 +247,14 @@ const MapEntry = (props) => {
         labelsExclusionList: labelsExclusionList.split(',').map(l => l.trim()),
         showShadingLayerLabels,
         dvzProxyDatasetId,
+        recentlyToggledLayerId,
+    }
+    // filter enabled layers to find recently toggled layer
+    if (mapProps.recentlyToggledLayerId) {
+        const toggledLayer = mapProps.enabledLayers.find(l => String(l.id) === String(mapProps.recentlyToggledLayerId))
+        if (toggledLayer && toggledLayer?.apiField) {
+            source = toggledLayer.apiField?.toLowerCase();
+        }
     }
 
     const measureLabels = parse(customMeasureLabels) || {}
@@ -268,7 +277,8 @@ const MapEntry = (props) => {
             store={[app, unique, ...source.split("/")]} source={source}>
             <DataConsumer>
                 <DataFrame measures={measuresCSV} multipleMeasures={multipleMeasures} mapType={mapType}
-                           aggregationFormula={aggregationFormula} customMeasureLabels={measureLabels}>
+                           aggregationFormula={aggregationFormula} customMeasureLabels={measureLabels}
+                           source={source}>
                     <Map  {...mapProps} />
                 </DataFrame>
             </DataConsumer>

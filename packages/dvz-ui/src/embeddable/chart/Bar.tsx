@@ -2,13 +2,12 @@ import React, { Fragment, useEffect, useState } from "react";
 import Tooltip from "./Tooltip";
 import { ResponsiveBar } from "@nivo/bar";
 import { injectIntl } from "react-intl";
-import { useTheme } from '@nivo/theming';
+import { useTheme } from "@nivo/theming";
 import { line } from "d3-shape";
 import LineLayer from "./LineLayer";
 import Papa from "papaparse";
-import FlexWrapDetector from '@/layout/FlexWrapDetector';
-import deviceType from '@/utils/deviceType';
-import { parse } from "path";
+import FlexWrapDetector from "@/layout/FlexWrapDetector";
+import deviceType from "@/utils/deviceType";
 
 const POSITION_MIDDLE = "middle";
 const POSITION_TOP = "top";
@@ -158,17 +157,21 @@ const Chart = ({
   lineXAxisTickEvery = 1
 }: BarChartProps) => {
   const isMobileOrTablet = ["mobile", "tablet", "midTablet"].includes(
-    deviceType()
+    deviceType(),
   );
   const isTabletDevice = ["tablet", "midTablet"].includes(deviceType());
   const isMobileDevice = deviceType() === "mobile";
   const LABEL_SKIP_WIDTH = 30; // important for vertical layout
   const LABEL_SKIP_HEIGHT = 15; // important for horizontal layout
-  const mobileConfigSettings = JSON.parse(decodeURIComponent(mobileCustomization));
+  const mobileConfigSettings = JSON.parse(
+    decodeURIComponent(mobileCustomization),
+  );
   const isMobileCustomizationEnabled =
     isMobileOrTablet && (mobileConfigSettings?.showCustomization ?? false);
-  const isNotDesktopPreview = isMobileCustomizationEnabled && (previewMode !== 'Desktop');
-  const isNotEditingAndIsMobileCustomizationEnabled = !editing && isMobileCustomizationEnabled;
+  const isNotDesktopPreview =
+    isMobileCustomizationEnabled && previewMode !== "Desktop";
+  const isNotEditingAndIsMobileCustomizationEnabled =
+    !editing && isMobileCustomizationEnabled;
 
   const normalizeLabelColor = () => {
     if (barLabelColor === "null" || barLabelColor === null || !barLabelColor) {
@@ -189,60 +192,82 @@ const Chart = ({
   const [newMarginTop, setNewMarginTop] = useState(marginTop);
   const [wrapCount, setWrapCount] = useState(0);
   const [newMarginBottom, setNewMarginBottom] = useState(marginBottom);
+  const [isLegendReady, setIsLegendReady] = useState(false);
+
+  // Delay legend rendering to ensure iframe layout is complete
+  // Using requestAnimationFrame ensures we wait for the browser's paint cycle
+  useEffect(() => {
+    let rafId: number;
+    let timeoutId: ReturnType<typeof setTimeout>;
+
+    // Use requestAnimationFrame to wait for initial paint, then a small delay
+    // to ensure iframe layout is fully computed
+    rafId = requestAnimationFrame(() => {
+      rafId = requestAnimationFrame(() => {
+        timeoutId = setTimeout(() => {
+          setIsLegendReady(true);
+        }, 50);
+      });
+    });
+
+    return () => {
+      cancelAnimationFrame(rafId);
+      clearTimeout(timeoutId);
+    };
+  }, []);
 
   const generateChartLegends = (
     options,
     colors,
     filter,
     DEFAULT_COLOR,
-    colorGenerator
+    colorGenerator,
   ) => {
-
     type ChartLegends = {
       enabled: boolean;
       color: string;
       id: string;
       label: string;
-    }
+    };
     let chartLegends: ChartLegends[] = [];
 
     if (options.data) {
       chartLegends =
         colors.colorBy === "index"
           ? options.data.map((d) => {
-            let theColor;
-            let enabled = true;
-            if (filter.indexOf(d[options.indexBy]) > -1) {
-              enabled = false;
-              theColor = DEFAULT_COLOR;
-            } else {
-              theColor = d[COLOR_VARIABLE]
-                ? d[COLOR_VARIABLE]
-                : colorGenerator.getColor(d.id, d);
-            }
-            return {
-              enabled: enabled,
-              color: theColor,
-              id: d[options.indexBy],
-              label: d[options.indexBy],
-            };
-          })
+              let theColor;
+              let enabled = true;
+              if (filter.indexOf(d[options.indexBy]) > -1) {
+                enabled = false;
+                theColor = DEFAULT_COLOR;
+              } else {
+                theColor = d[COLOR_VARIABLE]
+                  ? d[COLOR_VARIABLE]
+                  : colorGenerator.getColor(d.id, d);
+              }
+              return {
+                enabled: enabled,
+                color: theColor,
+                id: d[options.indexBy],
+                label: d[options.indexBy],
+              };
+            })
           : options.keys.map((k) => {
-            let theColor;
-            let enabled = true;
-            if (filter.indexOf(k) > -1) {
-              enabled = false;
-              theColor = DEFAULT_COLOR;
-            } else {
-              theColor = colorGenerator.getColorByKey(k);
-            }
-            return {
-              enabled: enabled,
-              color: theColor,
-              id: k,
-              label: k,
-            };
-          });
+              let theColor;
+              let enabled = true;
+              if (filter.indexOf(k) > -1) {
+                enabled = false;
+                theColor = DEFAULT_COLOR;
+              } else {
+                theColor = colorGenerator.getColorByKey(k);
+              }
+              return {
+                enabled: enabled,
+                color: theColor,
+                id: k,
+                label: k,
+              };
+            });
     }
 
     return chartLegends;
@@ -253,7 +278,7 @@ const Chart = ({
     colors,
     filter,
     DEFAULT_COLOR,
-    colorGenerator
+    colorGenerator,
   );
   const legendItems = () => {
     if (reverseLegend) {
@@ -334,7 +359,7 @@ const Chart = ({
               className={"range min"}
               style={{
                 backgroundColor: colorGenerator.getColorByValue(
-                  colorGenerator.minValue
+                  colorGenerator.minValue,
                 ),
                 color: "#fff",
               }}
@@ -347,7 +372,7 @@ const Chart = ({
                 {
                   ...format,
                   minimumFractionDigits: 0,
-                }
+                },
               )}
             </label>
           </div>
@@ -359,7 +384,7 @@ const Chart = ({
               className={"range max"}
               style={{
                 backgroundColor: colorGenerator.getColorByValue(
-                  colorGenerator.maxValue
+                  colorGenerator.maxValue,
                 ),
                 color: "#fff",
               }}
@@ -374,7 +399,7 @@ const Chart = ({
                 {
                   ...format,
                   minimumFractionDigits: 0,
-                }
+                },
               )}
             </label>
           </div>
@@ -436,6 +461,12 @@ const Chart = ({
     adjustBottomForLegends();
   }, [chartLegends]);
 
+  useEffect(() => {
+    // Reset margins when legend position changes
+    setNewMarginTop(marginTop);
+    setNewMarginBottom(marginBottom);
+  }, [legendPosition, marginTop, marginBottom]);
+
   const rightLegendDynamicStyle = {
     bottom: `-${bottomSpacing}px`,
   };
@@ -464,7 +495,7 @@ const Chart = ({
   };
 
   const createHighLowLine = (data) => {
-    const { yScale, bars } = data;
+    const { yScale, xScale, bars } = data;
 
     return (
       <Fragment>
@@ -480,43 +511,78 @@ const Chart = ({
             }
 
             const confidenceInterval = confidenceIntervals.filter(
-              (c) => c.serieLabel == seriedId
+              (c) => c.serieLabel == seriedId,
             )[0];
             if (
               confidenceInterval &&
               confidenceInterval.low &&
               confidenceInterval.high
             ) {
-              const low = yScale(parseFloat(confidenceInterval.low));
-              const high = yScale(parseFloat(confidenceInterval.high));
-              return (
-                <g>
-                  <line
-                    y1={low}
-                    y2={high}
-                    x1={bar.x + bar.width / 2}
-                    x2={bar.x + bar.width / 2}
-                    strokeWidth={1}
-                    stroke={ZERO_LINE_COLOR}
-                  />
-                  <line
-                    y1={low}
-                    y2={low}
-                    x1={bar.x + bar.width / 2 - 3}
-                    x2={bar.x + bar.width / 2 + 3}
-                    strokeWidth={1}
-                    stroke={ZERO_LINE_COLOR}
-                  />
-                  <line
-                    y1={high}
-                    y2={high}
-                    x1={bar.x + bar.width / 2 - 3}
-                    x2={bar.x + bar.width / 2 + 3}
-                    strokeWidth={1}
-                    stroke={ZERO_LINE_COLOR}
-                  />
-                </g>
-              );
+              if (layout === "horizontal") {
+                // For horizontal layout, use xScale for the confidence interval values
+                const low = xScale(parseFloat(confidenceInterval.low));
+                const high = xScale(parseFloat(confidenceInterval.high));
+                return (
+                  <g>
+                    <line
+                      x1={low}
+                      x2={high}
+                      y1={bar.y + bar.height / 2}
+                      y2={bar.y + bar.height / 2}
+                      strokeWidth={1}
+                      stroke={ZERO_LINE_COLOR}
+                    />
+                    <line
+                      x1={low}
+                      x2={low}
+                      y1={bar.y + bar.height / 2 - 3}
+                      y2={bar.y + bar.height / 2 + 3}
+                      strokeWidth={1}
+                      stroke={ZERO_LINE_COLOR}
+                    />
+                    <line
+                      x1={high}
+                      x2={high}
+                      y1={bar.y + bar.height / 2 - 3}
+                      y2={bar.y + bar.height / 2 + 3}
+                      strokeWidth={1}
+                      stroke={ZERO_LINE_COLOR}
+                    />
+                  </g>
+                );
+              } else {
+                // For vertical layout, use yScale
+                const low = yScale(parseFloat(confidenceInterval.low));
+                const high = yScale(parseFloat(confidenceInterval.high));
+                return (
+                  <g>
+                    <line
+                      y1={low}
+                      y2={high}
+                      x1={bar.x + bar.width / 2}
+                      x2={bar.x + bar.width / 2}
+                      strokeWidth={1}
+                      stroke={ZERO_LINE_COLOR}
+                    />
+                    <line
+                      y1={low}
+                      y2={low}
+                      x1={bar.x + bar.width / 2 - 3}
+                      x2={bar.x + bar.width / 2 + 3}
+                      strokeWidth={1}
+                      stroke={ZERO_LINE_COLOR}
+                    />
+                    <line
+                      y1={high}
+                      y2={high}
+                      x1={bar.x + bar.width / 2 - 3}
+                      x2={bar.x + bar.width / 2 + 3}
+                      strokeWidth={1}
+                      stroke={ZERO_LINE_COLOR}
+                    />
+                  </g>
+                );
+              }
             }
           })}
       </Fragment>
@@ -530,7 +596,7 @@ const Chart = ({
     if (axis == "X") {
       points = [0, innerWidth];
       lineGenerator = line()
-      // @ts-ignore
+        // @ts-ignore
         .x((xPoint, index) => {
           if (index === 0) {
             return -10;
@@ -584,7 +650,9 @@ const Chart = ({
         //  @ts-ignore
         return values.filter((d) => filter.indexOf(d[options.indexBy]) === -1);
       } else {
-        return values ? values.filter((d: any) => filter.indexOf(d) === -1) : [];
+        return values
+          ? values.filter((d: any) => filter.indexOf(d) === -1)
+          : [];
       }
     } else {
       return values;
@@ -596,8 +664,7 @@ const Chart = ({
     if (!tick.value) return "";
     const tickObject = Object.assign({}, tick);
     if (
-      (isNotEditingAndIsMobileCustomizationEnabled ||
-      isNotDesktopPreview) &&
+      (isNotEditingAndIsMobileCustomizationEnabled || isNotDesktopPreview) &&
       hiddenLabels.includes(String(tickObject.value))
     ) {
       tickObject.value = "";
@@ -613,12 +680,20 @@ const Chart = ({
     if (isNotDesktopPreview || isNotEditingAndIsMobileCustomizationEnabled) {
       const words = String(tickObject.value).split(" ");
       let maxLineLength = 25;
-      if ((editing && previewMode === "Mobile") || (isMobileDevice && !editing)) {
+      if (
+        (editing && previewMode === "Mobile") ||
+        (isMobileDevice && !editing)
+      ) {
         maxLineLength = mobileConfigSettings?.mobileMaxTickLength ?? 25;
-      } else if ((editing && previewMode === "Tablet") || (isTabletDevice && !editing)) {
+      } else if (
+        (editing && previewMode === "Tablet") ||
+        (isTabletDevice && !editing)
+      ) {
         maxLineLength = mobileConfigSettings?.tabletMaxTickLength ?? 25;
       } else if (
-        window.matchMedia("(min-width: 768px) and (max-width: 1250px)").matches && !editing
+        window.matchMedia("(min-width: 768px) and (max-width: 1250px)")
+          .matches &&
+        !editing
       ) {
         maxLineLength = 15;
       }
@@ -669,7 +744,7 @@ const Chart = ({
                   ...theme.axis.ticks.text,
                   fill: xLabelColor === "null" ? "black" : xLabelColor,
                   fontSize: "12px",
-                  fontFamily: "Roboto",
+                  fontFamily: "sans-serif",
                 }}
               >
                 {line}
@@ -703,7 +778,7 @@ const Chart = ({
                   ...theme.axis.ticks.text,
                   fill: xLabelColor === "null" ? "black" : xLabelColor,
                   fontSize: "12px",
-                  fontFamily: "Roboto",
+                  fontFamily: "sans-serif",
                 }}
               >
                 {line}
@@ -714,37 +789,37 @@ const Chart = ({
       );
     }
     return (
-        <g transform={`translate(${tick.x},${tick.y + 30})`}>
-          {showTickLine && (
-            <line
-              stroke={effectiveTickColor}
-              strokeWidth={1.5}
-              y1={-32}
-              y2={-12}
-            />
-          )}
+      <g transform={`translate(${tick.x},${tick.y + 30})`}>
+        {showTickLine && (
+          <line
+            stroke={effectiveTickColor}
+            strokeWidth={1.5}
+            y1={-32}
+            y2={-12}
+          />
+        )}
 
-          <g transform={`translate(0, ${tick.y + offsetText})`}>
-            {lines.map((line, i) => (
-              <text
-                key={i}
-                transform={`rotate(${tickRotation})`}
-                textAnchor="middle"
-                y={typeof tick.value === "number" ? 0 : i * lineHeight}
-                dominantBaseline="middle"
-                style={{
-                  ...theme.axis.ticks.text,
-                  fill: xLabelColor === "null" ? "black" : xLabelColor,
-                  fontSize: "12px",
-                  fontFamily: "Roboto",
-                }}
-              >
-                {line}
-              </text>
-            ))}
-          </g>
+        <g transform={`translate(0, ${tick.y + offsetText})`}>
+          {lines.map((line, i) => (
+            <text
+              key={i}
+              transform={`rotate(${tickRotation})`}
+              textAnchor="middle"
+              y={typeof tick.value === "number" ? 0 : i * lineHeight}
+              dominantBaseline="middle"
+              style={{
+                ...theme.axis.ticks.text,
+                fill: xLabelColor === "null" ? "black" : xLabelColor,
+                fontSize: "12px",
+                fontFamily: "sans-serif",
+              }}
+            >
+              {line}
+            </text>
+          ))}
         </g>
-      );
+      </g>
+    );
   };
 
   const AxisLeftCustomTick = (tick) => {
@@ -763,7 +838,7 @@ const Chart = ({
         effectiveFormat.style === "percent" ? tickValue / 100 : tickValue,
         {
           ...effectiveFormat,
-        }
+        },
       );
     }
     let maxLineLength = 25;
@@ -820,7 +895,7 @@ const Chart = ({
             style={{
               fill: xLabelColor === "null" ? "black" : xLabelColor,
               fontSize: "12px",
-              fontFamily: "Roboto",
+              fontFamily: "sans-serif",
             }}
           >
             {line}
@@ -860,9 +935,9 @@ const Chart = ({
           }
           const value = data.value
             ? intl.formatNumber(
-                format.style === "percent" ? data.value / 100 : data.value,
-                format
-              )
+              format.style === "percent" ? data.value / 100 : data.value,
+              format,
+            )
             : "";
           const valueLength = value.length;
           let yPos;
@@ -903,7 +978,7 @@ const Chart = ({
       <g>
         {indexes
           .filter(
-            (key) => bars.filter((b) => b.data.indexValue == key).length > 0
+            (key) => bars.filter((b) => b.data.indexValue == key).length > 0,
           )
           .map((key) => {
             const barsInGroup = bars.filter((b) => b.data.indexValue == key);
@@ -976,7 +1051,7 @@ const Chart = ({
                     const index = barsInGroup.length / 2;
                     y = Math.max(
                       barsInGroup[index].height,
-                      barsInGroup[index - 1].height
+                      barsInGroup[index - 1].height,
                     );
                   }
                   if (reverse) {
@@ -989,7 +1064,7 @@ const Chart = ({
             }
 
             const group = options.data.filter(
-              (d) => d[options.indexBy] === key
+              (d) => d[options.indexBy] === key,
             )[0];
             let total = group.parent_variables
               ? group.parent_variables[groupTotalMeasure]
@@ -997,8 +1072,8 @@ const Chart = ({
             const sumOfVariablesToFilterOut =
               colorBy !== "index"
                 ? filter
-                  ?.map((item) => group[item])
-                  ?.reduce((acc, curr) => acc + curr, 0)
+                    ?.map((item) => group[item])
+                    ?.reduce((acc, curr) => acc + curr, 0)
                 : 0;
             total -= sumOfVariablesToFilterOut;
 
@@ -1008,7 +1083,7 @@ const Chart = ({
                   {groupTotalLabel ? groupTotalLabel + " " : ""}
                   {intl.formatNumber(
                     groupTotalFormat.style === "percent" ? total / 100 : total,
-                    groupTotalFormat
+                    groupTotalFormat,
                   )}
                 </tspan>
               </text>
@@ -1019,9 +1094,9 @@ const Chart = ({
   };
 
   const margins = {
-    top: newMarginTop,
+    top: marginTop,
     right: marginRight,
-    bottom: newMarginBottom,
+    bottom: marginBottom,
     left: marginLeft,
   };
 
@@ -1037,11 +1112,10 @@ const Chart = ({
     overLayMin = Math.min(...overlayData.data.map((d) => d[1]));
   }
 
-
-
-
   const getValuesFromData = () => {
-    const values: number [] = [];
+    const values: number[] = [];
+
+    // Include confidence intervals
     if (confidenceIntervals) {
       confidenceIntervals.forEach((c) => {
         if (c.low) {
@@ -1051,77 +1125,104 @@ const Chart = ({
           values.push(parseFloat(c.high));
         }
       });
-
-      if (options.data) {
-        const filteredData = applyFilter(options.data, false)
-        const filteredKeys = applyFilter(options.keys, true)
-        filteredData.forEach((d) => {
-          filteredKeys.forEach((k) => {
-            if (d[k]) {
-              values.push(d[k]);
-            }
-          });
-        });
-      }
     }
+
+    // Include filtered bar data
+    if (options.data) {
+      const filteredData = applyFilter(options.data, false);
+      const filteredKeys = applyFilter(options.keys, true);
+      filteredData.forEach((d) => {
+        filteredKeys.forEach((k) => {
+          if (d[k]) {
+            values.push(d[k]);
+          }
+        });
+      });
+    }
+
+    // Include ALL active line overlay data
+    if (lineLayerEnabled && overlays) {
+      overlays.forEach((o, idx) => {
+        if (showLine[idx] !== false) {
+          // Include if line is visible
+          if (o.app === "csv" && o.csvLineLayerData) {
+            const overlayData = Papa.parse(o.csvLineLayerData, {
+              header: false,
+              dynamicTyping: true,
+            });
+            if (overlayData.data) {
+              overlayData.data
+                .filter((d: any) => d[1] !== null && typeof d[1] === "number")
+                .forEach((d: any) => values.push(d[1]));
+            }
+          } else if (o.measure[0] && options.data) {
+            options.data.forEach((d) => {
+              const value = d.variables?.[o.measure[0]];
+              if (value !== null && typeof value === "number") {
+                values.push(value);
+              }
+            });
+          }
+        }
+      });
+    }
+
     return values;
   };
 
-  const values = getValuesFromData();
-  const dataMax = Math.max(...values);
-  const dataMin = Math.min(...values);
-
   const getMaxValueFromData = () => {
-    const filteredData = applyFilter(options.data, false)
-    const filteredKeys = applyFilter(options.keys, true)
-    if (
-      (groupMode === "stacked" && maxValue !== "fixed") ||
-      (maxValue === "fixed" && fixedMaxValue === null) ||
-      // @ts-ignore
-      fixedMaxValue === ""
-    ) {
+    const values = getValuesFromData();
+    const dataMax = values.length > 0 ? Math.max(...values) : 0;
 
-      let keys = filteredKeys.length > 0 ? filteredKeys : options.keys;
-      return (
-        Math.max(
-          Math.max(
-            ...filteredData
-              .map((d) => keys.map((x) => (d[x] ? d[x] : 0)))
-              .map((l) =>
-                l.reduce((a, b) => {
-                  return Math.max(a + b, a + 0);
-                })
-              )
-          ),
-          overLayMax
-        ) * 1.1
-      );
+    // If fixed max value is set, use it
+    if (
+      maxValue === "fixed" &&
+      fixedMaxValue !== null &&
+      fixedMaxValue !== ""
+    ) {
+      return Number(fixedMaxValue);
     }
 
-    return maxValue === "fixed" &&
-      fixedMaxValue !== null &&
-      // @ts-ignore
-      fixedMaxValue !== ""
-      ? fixedMaxValue
-      : Math.max(overLayMax, dataMax) * 1.05;
+    // For stacked mode, calculate stacked totals and compare with overlay data
+    if (groupMode === "stacked" && maxValue !== "fixed") {
+      const filteredData = applyFilter(options.data, false);
+      const filteredKeys = applyFilter(options.keys, true);
+      let keys = filteredKeys.length > 0 ? filteredKeys : options.keys;
+
+      const stackedMax = Math.max(
+        ...filteredData
+          .map((d) => keys.map((x) => (d[x] ? d[x] : 0)))
+          .map((l) => (l.length > 0 ? l.reduce((a, b) => a + b, 0) : 0)),
+      );
+
+      return Math.max(stackedMax, dataMax) * 1.1;
+    }
+
+    // For non-stacked mode, use the maximum from all data sources
+    return dataMax * 1.05;
   };
 
   const getMinValueFromData = () => {
-    const minVal = Math.min(overLayMin, dataMin);
-    return maxValue === "fixed" &&
+    const values = getValuesFromData();
+    const dataMin = values.length > 0 ? Math.min(...values) : 0;
+
+    if (
+      maxValue === "fixed" &&
       fixedMinValue !== null &&
-      // @ts-ignore
-      fixedMinValue !== ""
-      ? fixedMinValue
-      : minVal > 0
-        ? minVal * 0.9
-        : minVal * 1.1;
+      String(fixedMinValue) !== ""
+    ) {
+      return Number(fixedMinValue);
+    }
+
+    return dataMin > 0 ? dataMin * 0.9 : dataMin * 1.1;
   };
 
-  const maxValueFromData = getMaxValueFromData();
-  const minValueFromData = getMinValueFromData();
+  const maxValueFromData = Number(getMaxValueFromData());
+  const minValueFromData = Number(getMinValueFromData());
+  const domainMin = Math.min(0, minValueFromData);
+  const domainMax = Math.max(0, maxValueFromData);
 
-  const layers: any [] = ["grid", "axes", "bars"];
+  const layers: any[] = ["grid", "axes", "bars"];
   if (showGroupTotal) {
     layers.push(groupTotalLayer);
   }
@@ -1151,7 +1252,9 @@ const Chart = ({
             overlayData.data &&
             overlayData.data.filter((d: any) => d[1] !== null).length > 0
           ) {
-            overlayData.data = overlayData.data.filter((d: any) => d[1] !== null);
+            overlayData.data = overlayData.data.filter(
+              (d: any) => d[1] !== null,
+            );
             const line = LineLayer(
               overlayData,
               lineColor,
@@ -1160,7 +1263,7 @@ const Chart = ({
               applyFilter(options.keys, true),
               tooltip,
               o.title,
-              ""
+              "",
             );
             layers.push(line);
           }
@@ -1183,7 +1286,7 @@ const Chart = ({
               applyFilter(options.keys, true),
               tooltip,
               o.title,
-              measure.length > 0 ? measure[0].label : ""
+              measure.length > 0 ? measure[0].label : "",
             );
             layers.push(line);
           }
@@ -1215,10 +1318,12 @@ const Chart = ({
     );
   };
 
-  const hiddenLabels: any [] = [];
+  const hiddenLabels: any[] = [];
   if (isNotEditingAndIsMobileCustomizationEnabled || isNotDesktopPreview) {
     ticks = Number.parseInt(mobileConfigSettings.yAxisTickValues);
-    const labels = new Map(Object.entries(mobileConfigSettings?.labels?.xAxis ?? {}));
+    const labels = new Map(
+      Object.entries(mobileConfigSettings?.labels?.xAxis ?? {}),
+    );
     for (const [key, value] of labels) {
       if (!value) {
         hiddenLabels.push(key);
@@ -1272,28 +1377,25 @@ const Chart = ({
     }
   }
 
-let newHeight = parseInt(height + '') - newMarginBottom;
+  let newHeight = parseInt(height + "") - newMarginBottom;
 
-return (
+  return (
     <div style={{ height: newHeight + "px" }} className="bar-chart">
       {options?.data && options.data.length > 0 && (
         <>
           <ResponsiveBar
-           colorBy={colors.colorBy}
+            colorBy={colors.colorBy}
             animate={true}
             enableLabel={barLabelPosition == POSITION_MIDDLE}
             {...options}
-            maxValue={maxValueFromData as number}
-            minValue={minValueFromData}
+            maxValue={domainMax}
+            minValue={domainMin}
             keys={applyFilter(options.keys, true)}
             data={applyFilter(options.data, false)}
             groupMode={groupMode ? groupMode : "grouped"}
             margin={margins}
             innerPadding={barInnerPadding}
-            valueScale={{
-              type: valueScale,
-              clamp: maxValue === "fixed" && minMaxClamp,
-            }}
+            valueScale={{ type: valueScale, clamp: true }}
             colors={(d) => {
               if (d && d.data[COLOR_VARIABLE]) {
                 return d.data[COLOR_VARIABLE];
@@ -1307,8 +1409,8 @@ return (
             axisRight={
               showRightAxis
                 ? {
-                  tickSize:
-                    (layout == "horizontal" && showTickLine) ||
+                    tickSize:
+                      (layout == "horizontal" && showTickLine) ||
                       layout === "vertical"
                       ? 5
                       : 0,
@@ -1330,7 +1432,7 @@ return (
                           : value,
                         {
                           ...effectiveFormat,
-                        }
+                        },
                       );
                     }
 
@@ -1341,18 +1443,24 @@ return (
             }
             // @ts-ignore
             axisBottom={
-              (isNotDesktopPreview || isNotEditingAndIsMobileCustomizationEnabled ) && mobileConfigSettings?.xAxisDisabled === true ? null :
-                layout === "horizontal"
+              (isNotDesktopPreview ||
+                isNotEditingAndIsMobileCustomizationEnabled) &&
+                mobileConfigSettings?.xAxisDisabled === true
+                ? null
+                : layout === "horizontal"
                   ? {
                     legend: legends.bottom,
                     legendPosition: "middle",
                     legendOffset: parseInt(offsetBottom),
                     tickPadding: 5,
                     tickRotation: 0,
-                    tickValues: parseInt(xAxisTickValues),
+                    tickValues: ticks,
+                    legend: legends.right,
+                    legendPosition: "middle",
+                    legendOffset: parseInt(offsetRight),
                     format: (value) => {
                       if (!value) return "";
-                      if (layout == "horizontal") {
+                      if (layout == "vertical") {
                         const effectiveFormat = customAxisFormat
                           ? customAxisFormat
                           : format;
@@ -1362,12 +1470,47 @@ return (
                             : value,
                           {
                             ...effectiveFormat,
-                          }
+                          },
                         );
                       }
+
                       return value;
                     },
                   }
+                : null
+            }
+            // @ts-ignore
+            axisBottom={
+              (isNotDesktopPreview ||
+                isNotEditingAndIsMobileCustomizationEnabled) &&
+              mobileConfigSettings?.xAxisDisabled === true
+                ? null
+                : layout === "horizontal"
+                  ? {
+                      legend: legends.bottom,
+                      legendPosition: "middle",
+                      legendOffset: parseInt(offsetBottom),
+                      tickPadding: 5,
+                      tickRotation: 0,
+                      tickValues: parseInt(xAxisTickValues),
+                      format: (value) => {
+                        if (!value) return "";
+                        if (layout == "horizontal") {
+                          const effectiveFormat = customAxisFormat
+                            ? customAxisFormat
+                            : format;
+                          return intl.formatNumber(
+                            effectiveFormat.style === "percent"
+                              ? value / 100
+                              : value,
+                            {
+                              ...effectiveFormat,
+                            },
+                          );
+                        }
+                        return value;
+                      },
+                    }
                   : {
                     legend: legends.bottom,
                     legendPosition: "middle",
@@ -1381,7 +1524,7 @@ return (
             axisLeft={{
               tickSize:
                 (layout === "horizontal" && showTickLine) ||
-                  layout === "vertical"
+                layout === "vertical"
                   ? 5
                   : 0,
               tickPadding: 5,
@@ -1390,7 +1533,9 @@ return (
               legend: legends.left,
               legendPosition: "middle",
               legendOffset: Number.parseInt(offsetY),
-              ...((isNotDesktopPreview || isNotEditingAndIsMobileCustomizationEnabled) ? { renderTick: AxisLeftCustomTick }
+              ...(isNotDesktopPreview ||
+                isNotEditingAndIsMobileCustomizationEnabled
+                ? { renderTick: AxisLeftCustomTick }
                 : {
                   format: (value) => {
                     if (!value) return "";
@@ -1404,7 +1549,7 @@ return (
                           : value,
                         {
                           ...effectiveFormat,
-                        }
+                        },
                       );
                     }
                     return value;
@@ -1420,13 +1565,13 @@ return (
             labelTextColor={normalizeLabelColor()}
             label={(l) =>
               intl.formatNumber(
-              (format.style === "percent" && l.value) ? l.value / 100 : l.value,
-                format
+                format.style === "percent" && l.value ? l.value / 100 : l.value,
+                format,
               )
             }
             layers={layers as any}
-            onMouseEnter={(_data) => { }}
-            onMouseLeave={(_data) => { }}
+            onMouseEnter={(_data) => {}}
+            onMouseLeave={(_data) => {}}
             // TODO: Check why we are ignoring this
             // @ts-ignore
             motionStiffness={130 as any}
@@ -1463,44 +1608,49 @@ return (
               },
             }}
           />
-          {(legendPosition === "top" || legendPosition === "bottom") && (
-            <div
-              className={`legends container has-standard-12-font-size ${legendPosition}`}   >
-              <div className="legend-sections">
-                <div className="title-section">{legendTitle()}</div>
-                <FlexWrapDetector
-                  onWrapChange={(count) => {
-                    if (legendPosition === "top") {
-                      setNewMarginTop(marginTop + (count / 2) * 40);
-                      setWrapCount(count);
-                    } else {
-                      setNewMarginBottom(marginBottom + (count / 2) * 25);
-                      setWrapCount(count);
-                    }
-                  }}
-                  className={`legends container has-standard-12-font-size items-section`}
-                  useColumns={showLegendsInColumns}
-                  numberOfLegendColumns={numberOfLegendColumns}
-                >
-                  {legendItems()}
-                </FlexWrapDetector>
+          {(legendPosition === "top" || legendPosition === "bottom") &&
+            isLegendReady && (
+              <div
+                className={`legends container has-standard-12-font-size ${legendPosition}`}
+                style={
+                  legendPosition === "bottom" ? { marginBottom: `${newMarginBottom}px` } : {}
+                }
+              >
+                <div className="legend-sections">
+                  <div className="title-section">{legendTitle()}</div>
+                  <FlexWrapDetector
+                    onWrapChange={(count) => {
+                      if (legendPosition === "top" && isMobileOrTablet) {
+                        const newMarginTop = marginTop + (count / 2) * 40;
+                        setNewMarginTop(newMarginTop);
+                        setWrapCount(count);
+                      } else {
+                        setNewMarginBottom(marginBottom + (count / 2) * 25);
+                        setWrapCount(count);
+                      }
+                    }}
+                    className={`legends container has-standard-12-font-size items-section`}
+                  >
+                    {legendItems()}
+                  </FlexWrapDetector>
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {(legendPosition === "right" || legendPosition === "left") && (
-            <div
-              className={`legends container has-standard-12-font-size  ${legendPosition}`}
-              style={
-                legendPosition === "right"
-                  ? rightLegendDynamicStyle
-                  : leftLegendDynamicStyle
-              }
-            >
-              {legendTitle()}
-              {legendItems()}
-            </div>
-          )}
+          {(legendPosition === "right" || legendPosition === "left") &&
+            isLegendReady && (
+              <div
+                className={`legends container has-standard-12-font-size  ${legendPosition}`}
+                style={
+                  legendPosition === "right"
+                    ? rightLegendDynamicStyle
+                    : leftLegendDynamicStyle
+                }
+              >
+                {legendTitle()}
+                {legendItems()}
+              </div>
+            )}
         </>
       )}
     </div>

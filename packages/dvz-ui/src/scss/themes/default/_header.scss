@@ -48,7 +48,7 @@
         height: 20px;
         margin-top: -3px;
         background-repeat: no-repeat !important;
-        // background: url("/flags/za-flag.png");
+        background: url("/flags/za-flag.png");
       }
 
       &:after {
@@ -187,7 +187,7 @@
           height: 17px;
           background-size: 15px 15px;
           margin-right: 11px;
-          // background-image: url("/child-menu-arrow.svg");
+          background-image: url("/child-menu-arrow.svg");
           background-repeat: no-repeat;
         }
       }
@@ -211,7 +211,7 @@
       .item.active {
         .mark {
           @extend .mark;
-          // background-image: url("/child-menu-arrow-active.svg");
+          background-image: url("/child-menu-arrow-active.svg");
         }
 
         a {

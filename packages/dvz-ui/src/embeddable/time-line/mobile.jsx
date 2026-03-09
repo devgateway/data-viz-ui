@@ -1,6 +1,6 @@
 import { PostConsumer, PostProvider } from "@devgateway/wp-react-lib";
 import PostIntro from "../connected-templates/PostIntro";
-import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, { useCallback, useLayoutEffect, useRef, useState } from "react";
 import { Container } from "semantic-ui-react";
 import * as d3 from "d3";
 import { Modal } from "semantic-ui-react";
@@ -335,7 +335,7 @@ const TimeLine = (props) => {
       .style("font-weight", "400")
       .style("color", "#4C4D50")
       .html((d) => d.meta_fields.subtitle);
-  }, [deviceType, orientation]);
+  }, [deviceType, orientation, height]);
 
   return (
     <div
@@ -375,7 +375,7 @@ const TimeLine = (props) => {
             />
           );
         })}
-      <svg height={height} width={parentWidth} ref={ref} />
+      <svg height={height} width={parentWidth} ref={ref} style={{ overflow: 'visible'}} />
     </div>
   );
 };
@@ -439,8 +439,8 @@ const PostCarousel = (props) => {
 
   return (
     <Container
-      style={{ height: `${height}px` }}
-      className={`viz time line ${editing ? "editing" : ""}`}
+      style={{ height: 'auto' }}
+      className={`viz time line ${editing ? "editing" : ""} mobile`}
       fluid={true}
     >
       <PostProvider

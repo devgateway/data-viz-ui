@@ -10,13 +10,20 @@ interface ListOfPostProps {
     showIcons: boolean,
     showContentToggle: boolean,
     contentToggleHPosition: number,
-    locale: string
+    locale: string,
+    readMoreLabel?: string,
+    readLessLabel?: string
 }
 
 const ListOfPost: React.FC<ListOfPostProps> = (props) => {
-    const { posts, showIcons, showContentToggle, contentToggleHPosition, locale } = props
+    const { posts, showIcons, showContentToggle, contentToggleHPosition, locale, readMoreLabel, readLessLabel } = props
     const [toggleState, setToggleState] = useState({});
     const postTopRef: RefObject<HTMLDivElement> = React.createRef();
+
+    const getTranslatedLabel = (label?: string, fallback: string = 'Read More') => {
+        return label && label.trim() !== '' ? label : fallback;
+    };
+
     useEffect(() => {
         window.setTimeout(() => {
             if (window.location.hash) {
@@ -36,10 +43,14 @@ const ListOfPost: React.FC<ListOfPostProps> = (props) => {
     }
     const getContentToggle = (slug) => {
         const show = toggleState[slug] || false;
-        const linkText = show ? 'Read less' : 'Read more';
+        const linkText = show ? getTranslatedLabel(readLessLabel, 'Read less') : getTranslatedLabel(readMoreLabel, 'Read more');
         return (
             <div>
-                <div style={{ position: 'relative', left: contentToggleHPosition + '%' }}>
+                <div style={{ 
+                    display: 'flex', 
+                    justifyContent: contentToggleHPosition < 33 ? 'flex-start' : 
+                                     contentToggleHPosition < 66 ? 'center' : 'flex-end' 
+                }}>
                     <a className="link" onClick={() => {
                         if (postTopRef.current && show) {
                             postTopRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -118,7 +129,7 @@ const ListOfPost: React.FC<ListOfPostProps> = (props) => {
                                     )}
                                     {!showContentToggle && (
                                         <a href={utils.replaceLink(p.link, locale)} className="link">
-                                            Read More
+                                            {getTranslatedLabel(readMoreLabel)}
                                         </a>
                                     )}
                                 </Container>
@@ -142,6 +153,8 @@ interface InlineListProps {
     "data-show-post-icons"?: string,
     "data-show-content-toggle"?: string,
     "data-content-toggle-h-position"?: string,
+    "data-read-more-label"?: string,
+    "data-read-less-label"?: string,
     parent?: string,
     editing: boolean,
     component?: string,
@@ -163,6 +176,8 @@ const Root: React.FC<InlineListProps> = (props) => {
         "data-show-post-icons": showIcons,
         "data-show-content-toggle": showContentToggle,
         "data-content-toggle-h-position": contentToggleHPosition, //horizontal position
+        "data-read-more-label": readMoreLabel,
+        "data-read-less-label": readLessLabel,
         parent,
         editing,
         component, unique
@@ -183,8 +198,15 @@ const Root: React.FC<InlineListProps> = (props) => {
                 perPage={items}
             >
                 <PostConsumer>
-                    {/* @ts-expect-error Posts are retrived from Wordpress */}
-                    <ListOfPost locale={locale ?? 'en'} showIcons={showIcons === "true"} showContentToggle={showContentToggle === "true"} contentToggleHPosition={contentToggleHPosition}/>
+                    {/* @ts-expect-error Posts are retrieved from Wordpress */}
+                    <ListOfPost
+                        locale={locale ?? 'en'}
+                        showIcons={showIcons === "true"}
+                        showContentToggle={showContentToggle === "true"}
+                        contentToggleHPosition={parseInt(contentToggleHPosition || '50', 10)}
+                        readMoreLabel={readMoreLabel}
+                        readLessLabel={readLessLabel}
+                    />
                 </PostConsumer>
             </PostProvider>
         </Container>

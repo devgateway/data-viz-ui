@@ -1,6 +1,6 @@
-import * as api from './data-api'
-import * as Immutable from 'immutable'
-import Papa from 'papaparse'
+import * as api from './data-api';
+import * as Immutable from 'immutable';
+import Papa from 'papaparse';
 
 const LOAD_DATA = 'LOAD_DATA'
 const LOAD_DATA_DONE = 'LOAD_DATA_DONE'
@@ -93,17 +93,16 @@ export const getCategories = (props) => (dispatch, getState) => {
     const { app, params, dvzProxyDatasetId, uniqueStorage } = props
     dispatch({ type: LOAD_CATEGORIES, params, app, uniqueStorage, dvzProxyDatasetId })
 
-
     api.getCategories({ app, params })
         .then(data => {
-            data.appliedFilters = params
+            data.appliedFilters = params;
             return dispatch({
                 type: LOAD_CATEGORIES_DONE,
                 app,
                 data,
                 uniqueStorage,
                 dvzProxyDatasetId
-            })
+            });
         })
         .catch(error => dispatch({
             type: LOAD_CATEGORIES_ERROR,
@@ -115,28 +114,28 @@ export const getCategories = (props) => (dispatch, getState) => {
 }
 export const setData = ({ app, group, csv, store, params }) => (dispatch, getState) => {
 
-    const filters = getState().get('data').getIn(['filters', app, group])
+    const filters = getState().get('data').getIn(['filters', app, group]);
     if (filters) {
         params = { ...params, ...filters.toJS() }
     } else {
-        params = params || {}
+        params = params || {};
     }
 
     const data = Papa.parse(csv, { header: true, dynamicTyping: true });
 
     const filtered = data.data.filter(d => {
-        let filtered = false
+        let filtered = false;
         Object.keys(params).forEach(k => {
-            const field = k
-            const value = params[k]
+            const field = k;
+            const value = params[k];
             if (d[k]) {
                 const filterValue = d[k].toString().trim().toLowerCase();
-                filtered = value.filter(v => v && v.toString().trim().toLowerCase() == filterValue).length == 0
+                filtered = value.filter(v => v && v.toString().trim().toLowerCase() == filterValue).length == 0;
             }
-        })
+        });
 
-        return !filtered
-    })
+        return !filtered;
+    });
 
     const d2 = { ...data, data: filtered, appliedFilters: params }
     dispatch({ type: LOAD_DATA_DONE, app, group, store, data: { count: d2.data.length, itemsSize: d2.data.length, ...d2 } })
@@ -146,12 +145,15 @@ export const getData = (props) => (dispatch, getState) => {
     const { app, group, source, store, params, parent } = props
 
 
-    let filters = getState().get('data').getIn(['filters', app, group])
+    let filters = getState().get('data').getIn(['filters', app, group]);
 
-    // do not overwrite preset filters in params with filters from state if they exist, because they should be applied on top of each other (except if parent filter is involved, then we should sync them)
+    // do not overwrite preset filters in params with filters from state if they exist,
+    // because they should be applied on top of each other (except if parent filter is
+    // involved, then we should sync them)
     if (params) {
         Object.keys(params).forEach(k => {
-            //if we have parent filter we should sync filters from state with preset filters in params, otherwise we should keep them separated
+            // If we have parent filter we should sync filters from state with preset
+            // filters in params, otherwise we should keep them separated.
             if (parent) {
                 if (filters && filters.has(k)) {
                     let a = params[k]
@@ -161,11 +163,11 @@ export const getData = (props) => (dispatch, getState) => {
                     //We should remove other options from preset filter and turn on off the matching ones
                     let newB = b.filter(c => a.indexOf(c) > -1);
                     filters = filters.set(k, newB)
-                } 
+                }
             } else {
                 if (filters) {
-                     filters = filters.set(k, params[k])
-                }                
+                    filters = filters.set(k, params[k])
+                }
             }
 
         })
@@ -199,7 +201,7 @@ export default (state = initialState, action) => {
             return state.deleteIn([...store, 'error'])
                 .setIn([...store, 'loading'], true)
                 .setIn([...store, 'time'], time)
-                .setIn([...store, 'presetFilter'], params)
+                .setIn([...store, 'presetFilter'], params);
 
         }
         case LOAD_DATA_ERROR: {
@@ -207,7 +209,7 @@ export default (state = initialState, action) => {
             return state
                 .setIn([...store, 'loading'], false)
                 .setIn([...store, 'error'], error)
-                .setIn(['filters-settings', app, group, "apply"], null)
+                .setIn(['filters-settings', app, group, "apply"], null);
         }
         case LOAD_DATA_DONE: {
             const { data, app, group, store } = action
@@ -215,42 +217,42 @@ export default (state = initialState, action) => {
                 .setIn([...store, 'loading'], false)
                 .deleteIn([...store, 'error'])
                 .setIn([...store, 'data'], data)
-                .setIn(['filters-settings', app, group, "apply"], null)
+                .setIn(['filters-settings', app, group, "apply"], null);
         }
 
         case SET_PAGE_MODULE_PROPS: {
             const { data } = action
             return state
-                .setIn(['pageModuleProps'], data)
+                .setIn(['pageModuleProps'], data);
         }
         case LOAD_CATEGORIES: {
             const { data, app, uniqueStorage, dvzProxyDatasetId } = action
             const path = ["categories", app]
             if (uniqueStorage) {
-                path.push(uniqueStorage)
+                path.push(uniqueStorage);
             }
 
             if (dvzProxyDatasetId) {
-                path.push(dvzProxyDatasetId)
+                path.push(dvzProxyDatasetId);
             }
 
             return state.setIn([...path, "loading"], true)
-                .deleteIn([...path, "error"])
+                .deleteIn([...path, "error"]);
         }
 
         case LOAD_CATEGORIES_DONE: {
             const { data, app, uniqueStorage, dvzProxyDatasetId } = action
             const path = ["categories", app]
             if (dvzProxyDatasetId) {
-                path.push(dvzProxyDatasetId)
+                path.push(dvzProxyDatasetId);
             }
             if (uniqueStorage) {
-                path.push(uniqueStorage)
+                path.push(uniqueStorage);
             }
 
 
             return state.setIn([...path, "loading"], false)
-                .setIn([...path, "items"], Immutable.fromJS(data))
+                .setIn([...path, "items"], Immutable.fromJS(data));
         }
 
 
@@ -260,14 +262,14 @@ export default (state = initialState, action) => {
             const { data, app, uniqueStorage, dvzProxyDatasetId } = action
             const path = ["categories", app]
             if (uniqueStorage) {
-                path.push(uniqueStorage)
+                path.push(uniqueStorage);
             }
             if (dvzProxyDatasetId) {
-                path.push(dvzProxyDatasetId)
+                path.push(dvzProxyDatasetId);
             }
 
             return state.setIn([...path, "loading"], false)
-                .setIn([...path, "error"], data)
+                .setIn([...path, "error"], data);
 
 
         }
@@ -371,7 +373,8 @@ export default (state = initialState, action) => {
 
             return state.setIn(['filters', 'initial', app, group, param], value.length === 0 ? [Number.MIN_SAFE_INTEGER] : value)
                 .setIn(['filters', app, group, param], value.length === 0 ? [Number.MIN_SAFE_INTEGER] : value)
-                .setIn(['filters-settings', app, group, 'lastInitialFilterChange'], now);
+                .setIn(['filters-settings', app, group, 'lastInitialFilterChange'], now)
+                .setIn(['filters-settings', app, group, 'lastUserFilterChange'], now);
         }
 
         case UNSET_FILTER: {
@@ -396,13 +399,21 @@ export default (state = initialState, action) => {
         }
         case CLEAN_MEASURES: {
             const { app, group, measure } = action
-
-                ;
             return state.deleteIn(['measures', app, group])
 
         }
 
         default:
-            return state
+            return state;
     }
+};
+
+export const clearPostsFilter = ({ group, dispatch, initialFilters }) => {
+    dispatch({
+        type: SET_INITIAL_POSTS_FILTER,
+        group,
+        ...initialFilters,
+        reset: true,
+        page: 1
+    });
 }

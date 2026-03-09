@@ -144,7 +144,9 @@ class BaseLayer extends Layer {
             editing
         } = this.props
 
-        if (editing) {
+        // Redraw when editing, OR when the D3 projection changed (container was resized).
+        // path is a new object reference every time ProjectedContainer recomputes the projection.
+        if (editing || prevProps.path !== this.props.path) {
             this.create()
         }
         if (prevProps.visible != this.props.visible) {
@@ -165,4 +167,3 @@ class BaseLayer extends Layer {
 
 
 export default BaseLayer
-
