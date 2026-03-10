@@ -34,7 +34,7 @@ const SlugPostContainer = ({ header, footer, posts }: SlugPostContainerProps = {
             slug={slug}
             store={slug}
             locale={locale}
-            type={parent}
+
             year={year}
             month={month}
             day={day}
