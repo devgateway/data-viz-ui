@@ -38,8 +38,8 @@ const getOptionsNoDimension = (props) => {
 
       selectedMeasures.forEach((m) => {
         const row = {};
-        const label =
-          customLabels[m.value] || getTranslatedValue(mMap[m.value], locale);
+        const label = customLabels[m.value] || getTranslatedValue(mMap[m.value], locale);
+        debugger;
         row.type = "measure";
         row["measureFieldName"] = m.value;
         row["measure"] = label;
@@ -150,22 +150,23 @@ const LineOneDimension = (props) => {
     const firstDimensionItems = data?.metadata?.types?.find(d => d.dimension == selectedDimensions[0])?.items || [];
     if (props.sort == "alphabetically") {
       firstDimensionItems.sort((a, b) =>
-          alphaSort(props.sortReverse, locale, a.value, b.value)
+        alphaSort(props.sortReverse, locale, a.value, b.value)
       );
     } else if (props.sort == "values") {
       firstDimensionItems.sort((a, b) =>
-          numericSort(props.sortReverse, a.value, b.value)
+        numericSort(props.sortReverse, a.value, b.value)
       );
     } else if (props.sort == "date") {
       firstDimensionItems.sort((a, b) =>
-          dateSort(props.sortReverse, a.value, b.value)
+        dateSort(props.sortReverse, a.value, b.value)
       );
     }
 
     measures.forEach(measure => {
-      const serie = {variables: {}};
+      const serie = { variables: {} };
       serie.id = getTranslatedValue(mMap[measure], locale);
-      serie.label = getTranslatedValue(mMap[measure], locale);
+      debugger;
+      serie.label = customLabels[measure] || getTranslatedValue(mMap[measure], locale);
       const serieData = [];
       firstDimensionItems.forEach(fdi => {// first dimension
         const itemData = data.children.find(c => c.value === fdi.value)
@@ -177,7 +178,7 @@ const LineOneDimension = (props) => {
           variables["value"] = itemData[measure];
           variables[itemData.type] = itemData.value.toString();
           dimensionsMetadata.add(tMap[itemData.type]);
-          serieData.push({x: itemData.value, y: itemData[measure], variables: variables});
+          serieData.push({ x: itemData.value, y: itemData[measure], variables: variables });
           serie.data = serieData;
         }
       });
@@ -240,18 +241,18 @@ const Line2Dimensions = (props) => {
     const secondDimensionItems = data?.metadata?.types?.find(d => d.dimension == selectedDimensions[1])?.items || [];
     if (props.sortSecondDimension == "alphabetically") {
       secondDimensionItems.sort((a, b) =>
-          alphaSort(props.sortReverseSecondDimension, locale, a.value, b.value)
+        alphaSort(props.sortReverseSecondDimension, locale, a.value, b.value)
       );
     } else if (props.sortSecondDimension == "date") {
       secondDimensionItems.sort((a, b) =>
-          dateSort(props.sortReverseSecondDimension, a.value, b.value)
+        dateSort(props.sortReverseSecondDimension, a.value, b.value)
       );
     }
 
     measuresMetadata.add(mMap[field])
 
     secondDimensionItems.forEach(sdi => {
-      const serie = {variables: {}};
+      const serie = { variables: {} };
       serie.id = sdi.value;
       serie.label = sdi.value;
       const serieData = [];
@@ -268,7 +269,7 @@ const Line2Dimensions = (props) => {
           variables["value"] = childItemData[measures[0]];
           variables[itemData.type] = itemData.value.toString();
           variables[childItemData.type] = childItemData.value.toString();
-          serieData.push({x: itemData.value, y: childItemData[measures[0]], variables});
+          serieData.push({ x: itemData.value, y: childItemData[measures[0]], variables });
 
           if (keys.indexOf(itemData.value) == -1) {
             keys.push(itemData.value);
@@ -283,7 +284,7 @@ const Line2Dimensions = (props) => {
     series.forEach((s) => {
       keys.forEach((k) => {
         if (!s.data.find((d) => d.x == k)) {
-          s.data.push({x: k, y: null, variables: {}})
+          s.data.push({ x: k, y: null, variables: {} })
         }
       });
     })

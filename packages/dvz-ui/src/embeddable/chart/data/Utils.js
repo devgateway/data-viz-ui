@@ -1,10 +1,12 @@
 const updateItemLabels = (items) => {
   const updatedItems = items?.map((item) => {
     const groupName = item.group.label;
+    debugger;
     if (item.label.includes(groupName)) return item;
     return {
       ...item,
-      label: `${groupName} - ${item.label}`,
+      //label: `${groupName} - ${item.label}`,
+      label: `${item.label}`,
     };
   });
   return updatedItems;
@@ -70,7 +72,7 @@ export const numericSort = (reverse, a, b) => {
 const parseMonthYear = (str) => {
   const [monthStr, yearStr] = str.split(" ");
   const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
-                      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   const month = monthNames.indexOf(monthStr);
   const year = parseInt(yearStr, 10);
 
