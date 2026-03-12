@@ -29,8 +29,9 @@ const MapWrapper = (props) => {
         intl
     } = props
 
-    // Measure the real container width so every child uses fluid dimensions
-    const [containerWidth, setContainerWidth] = useState(null);
+    // Measure the real container width so every child uses fluid dimensions.
+    // Fall back to data-width so layers pre-load while the tab is hidden.
+    const [containerWidth, setContainerWidth] = useState(Number(dataWidth));
 
     // Preserve the aspect ratio defined by the data-width / data-height attributes
     const aspectRatio = Number(dataHeight) / Number(dataWidth);
@@ -133,11 +134,7 @@ const MapWrapper = (props) => {
         }
     }
 
-    // Don't render until we have a real measured width to avoid
-    // building the D3 projection against the wrong number.
-    if (!containerWidth) {
-        return <div ref={ref} className={"d3map-container"} style={{ width: '100%', height: `${dataHeight}px` }} />;
-    }
+
 
     return (
         <div ref={ref} className={"d3map-container"} style={{ width: '100%' }}>
