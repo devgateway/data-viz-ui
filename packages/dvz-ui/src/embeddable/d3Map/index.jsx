@@ -46,20 +46,20 @@ const MapWrapper = (props) => {
     useEffect(() => {
         if (!ref.current) return;
 
-        // Measure synchronously on mount to avoid placeholder flash
-        const w = ref.current.clientWidth;
-        if (w > 0) setContainerWidth(w);
-
         // Coalesce resize events to one redraw per animation frame (~60fps max)
         let rafId = null;
         const measure = () => {
             if (rafId) cancelAnimationFrame(rafId);
             rafId = requestAnimationFrame(() => {
                 if (!ref.current) return;
+                // Skip when a parent hides the tab (visibility:hidden collapses clientWidth)
+                if (getComputedStyle(ref.current).visibility === 'hidden') return;
                 const w = ref.current.clientWidth;
                 if (w > 0) setContainerWidth(w);
             });
         };
+
+        measure(); // initial measurement – deferred one frame, same as resize events
 
         const ro = new ResizeObserver(measure);
         ro.observe(ref.current);
