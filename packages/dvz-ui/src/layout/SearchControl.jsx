@@ -109,6 +109,7 @@ const FloatSearchInput = ({
   results,
   meta,
   intl,
+  searchTerm,
 }) => {
   const total = meta ? meta["x-wp-total"] : 0;
   const totalPages = meta ? meta["x-wp-totalpages"] : 0;
@@ -122,6 +123,7 @@ const FloatSearchInput = ({
       type={"text"}
       className={"input search"}
       name={"search"}
+      value={searchTerm}
       onChange={(e) => {
         onSearch(e.target.value);
       }}
@@ -149,27 +151,6 @@ const FloatingSearchController = ({
     setShowSearchInput(false);
   };
 
-  const addListenerToHeaderElements = () => {
-    const itemWithChildren = document.getElementsByClassName("has-child-items");
-    for (let i = 0; i < itemWithChildren.length; i++) {
-      const itemElement = itemWithChildren[i];
-      const spans = itemElement.getElementsByTagName("span");
-      if (spans.length > 0) {
-        spans[0].addEventListener("mouseover", hide);
-      }
-    }
-  };
-  const removeListenerToHeaderElements = () => {
-    const itemWithChildren = document.getElementsByClassName("has-child-items");
-    for (let i = 0; i < itemWithChildren.length; i++) {
-      const itemElement = itemWithChildren[i];
-      const spans = itemElement.getElementsByTagName("span");
-      if (spans.length > 0) {
-        spans[0].removeEventListener("mouseover", hide);
-      }
-    }
-  }
-
   useEffect(() => {
     const newContainer = document.createElement("div");
     newContainer.setAttribute("id", "float-input-container");
@@ -190,13 +171,6 @@ const FloatingSearchController = ({
   useEffect(() => {
     if (containerRef.current) {
       containerRef.current.style.display = showSearchInput ? "block" : "none";
-    }
-    
-    // Add or remove listeners based on search input visibility
-    if (showSearchInput) {
-      addListenerToHeaderElements();
-    } else {
-      removeListenerToHeaderElements();
     }
   }, [showSearchInput]);
 
