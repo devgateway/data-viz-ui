@@ -1,5 +1,11 @@
 # @devgateway/dvz-ui-react
 
+## 1.7.1
+
+### Patch Changes
+
+- [#177](https://github.com/devgateway/data-viz-ui/pull/177) [`e1fb629`](https://github.com/devgateway/data-viz-ui/commit/e1fb62960ae3977c475b247ae1df56f6cec203b9) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Fix floating search input
+
 ## 1.7.0
 
 ### Minor Changes
