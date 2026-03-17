@@ -182,7 +182,7 @@ const FloatingSearchController = ({
     <>
       <div
         id="ui-float-search"
-        className="ui float-search"
+        className={`ui float-search${showSearchInput ? " ui-float-search-active" : ""}`}
         onMouseOver={show}
       >
         <Icon name="search" size="small" />
