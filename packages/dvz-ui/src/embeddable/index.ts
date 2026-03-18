@@ -46,7 +46,7 @@ const PostsFiltersResetButton = lazy(() => import("./posts-filters-reset-button"
 const PostsPagination = lazy(() => import("./posts-pagination"));
 const DataParagraph = lazy(() => import("./data-paragraph"));
 const BigFilter = lazy(() => import("./big-filter"));
-
+const DataTable = lazy(() => import("./data-table"));
 
 export const components = {
     pageGallery: PageGallery,
@@ -91,6 +91,7 @@ export const components = {
     postsPagination: PostsPagination,
     dataParagraph: DataParagraph,
     bigFilter: BigFilter,
+    dataTable: DataTable,
     redirect: () => null
 }
 
