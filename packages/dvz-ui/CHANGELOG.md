@@ -1,5 +1,11 @@
 # @devgateway/dvz-ui-react
 
+## 1.7.2
+
+### Patch Changes
+
+- [#179](https://github.com/devgateway/data-viz-ui/pull/179) [`a0a0742`](https://github.com/devgateway/data-viz-ui/commit/a0a07420f14bd0bdb8ece8562f998c8b3a77710f) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Add missing class to floating search
+
 ## 1.7.1
 
 ### Patch Changes
