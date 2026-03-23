@@ -43,8 +43,9 @@ The component (`src/embeddable/data-table/index.jsx`) uses:
 - `DataProvider` – fetches data from the configured source (CSV parsing, REST API, Superset proxy).
 - `DataConsumer` – receives the fetched dataset and passes it to the inner table renderer.
 - The inner `DataTableInner` component builds a proper `<table>` with:
-  - One header column for the **dimension** (rows).
-  - One header column per **selected measure** (columns).
+  - One header column for the primary **dimension** (rows).
+  - One header column per **selected measure** (columns) in the default layout.
+  - A pivot-style layout when exactly one measure and two dimensions are selected: the first dimension stays as rows and the second dimension becomes dynamic columns.
   - Formatted numbers using `Intl.NumberFormat` respecting each measure's format configuration.
 
 ## Block Editor Configuration
@@ -55,7 +56,7 @@ The component (`src/embeddable/data-table/index.jsx`) uses:
 | Size | Table container max-height |
 | API & Source | Select data source app (CSV / API / Superset) |
 | CSV Data | Paste raw CSV (first row = headers, first column = dimension) |
-| Dimension (rows) | Pick one field to use as row labels |
+| Dimension (rows) | Pick one or two dimensions. When two dimensions are selected and exactly one measure is enabled, the second dimension becomes dynamic table columns |
 | Measures (columns) | Toggle which numeric fields appear as columns; set custom labels & number formats per measure |
 | Filters | Add/remove API filters to pre-filter the dataset |
 | Display | Font size, striped rows, border style, no-data text |
