@@ -672,11 +672,13 @@ const DataTableInner = ({
         height: `${Math.max(fontSize + 4, 18)}px`,
         padding: "0 4px",
         borderRadius: "999px",
-        opacity: isActive || isHovered ? 1 : 0.72,
+        opacity: isActive || isHovered ? 1 : 0,
+        visibility: isActive || isHovered ? "visible" : "hidden",
         fontSize: `${Math.max(fontSize - 1, 12)}px`,
         lineHeight: 1,
         backgroundColor: isActive ? "rgba(255,255,255,0.22)" : "rgba(255,255,255,0.12)",
         boxShadow: isHovered ? "inset 0 0 0 1px rgba(255,255,255,0.24)" : "none",
+        transition: "opacity 120ms ease, visibility 120ms ease, box-shadow 120ms ease",
     });
 
     const exportButtonStyle = {
@@ -726,10 +728,6 @@ const DataTableInner = ({
 
     const renderHeaderContent = ({ scope, columnType, columnKey, label, textAlign = "left" }) => {
         const direction = getColumnSortDirection(scope, columnType, columnKey);
-
-        if (editing) {
-            return label || "";
-        }
 
         const nextDirection = getNextSortDirection(direction);
         const accessibleLabel = String(
@@ -794,7 +792,7 @@ const DataTableInner = ({
     };
 
     const handleExport = () => {
-        if (editing || exportMatrix.length <= 1 || typeof window === "undefined") {
+        if (exportMatrix.length <= 1 || typeof window === "undefined") {
             return;
         }
 
@@ -815,7 +813,7 @@ const DataTableInner = ({
 
     return (
         <div className="data-table-wrapper" style={{ overflowX: "auto", width: "100%" }}>
-            {showExportButton && !editing && exportMatrix.length > 1 && (
+            {showExportButton && exportMatrix.length > 1 && (
                 <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "12px" }}>
                     <button type="button" onClick={handleExport} style={exportButtonStyle}>
                         {intl?.formatMessage({
@@ -842,17 +840,13 @@ const DataTableInner = ({
                             <th
                                 key={`dimension-header-${index}`}
                                 style={thStyle}
-                                aria-sort={
-                                    editing
-                                        ? undefined
-                                        : getSortAriaValue(
-                                              getColumnSortDirection(
-                                                  tableModel.mode,
-                                                  "dimension",
-                                                  displayDimensionKeys[index],
-                                              ),
-                                          )
-                                }
+                                aria-sort={getSortAriaValue(
+                                    getColumnSortDirection(
+                                        tableModel.mode,
+                                        "dimension",
+                                        displayDimensionKeys[index],
+                                    ),
+                                )}
                             >
                                 {renderHeaderContent({
                                     scope: tableModel.mode,
@@ -867,17 +861,13 @@ const DataTableInner = ({
                                   <th
                                       key={`pivot-column-${index}-${String(columnValue)}`}
                                       style={{ ...thStyle, textAlign: "right" }}
-                                      aria-sort={
-                                          editing
-                                              ? undefined
-                                              : getSortAriaValue(
-                                                    getColumnSortDirection(
-                                                        tableModel.mode,
-                                                        "pivot",
-                                                        columnValue,
-                                                    ),
-                                                )
-                                      }
+                                      aria-sort={getSortAriaValue(
+                                          getColumnSortDirection(
+                                              tableModel.mode,
+                                              "pivot",
+                                              columnValue,
+                                          ),
+                                      )}
                                   >
                                       {renderHeaderContent({
                                           scope: tableModel.mode,
@@ -892,17 +882,13 @@ const DataTableInner = ({
                                   <th
                                       key={measure.name}
                                       style={{ ...thStyle, textAlign: "right" }}
-                                      aria-sort={
-                                          editing
-                                              ? undefined
-                                              : getSortAriaValue(
-                                                    getColumnSortDirection(
-                                                        tableModel.mode,
-                                                        "measure",
-                                                        measure.name,
-                                                    ),
-                                                )
-                                      }
+                                      aria-sort={getSortAriaValue(
+                                          getColumnSortDirection(
+                                              tableModel.mode,
+                                              "measure",
+                                              measure.name,
+                                          ),
+                                      )}
                                   >
                                       {renderHeaderContent({
                                           scope: tableModel.mode,
