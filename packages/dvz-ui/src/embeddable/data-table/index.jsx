@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { connect } from "react-redux";
 import { injectIntl } from "react-intl";
 import DataProvider from "../data/DataProvider";
@@ -12,6 +12,8 @@ const defaultFormat = {
 
 const decodeValue = (value, editing) =>
     editing ? value : decodeURIComponent(value);
+
+const toBoolean = (value) => value === true || value === "true";
 
 const parseJSON = (value, editing) => {
     try {
@@ -81,6 +83,110 @@ const getNodeDimensionValue = (node) => node?.value ?? node?.id ?? "";
 
 const hasMeaningfulValue = (value) =>
     value !== undefined && value !== null && value !== "";
+
+const compareTableValues = (left, right, locale) => {
+    const leftHasValue = hasMeaningfulValue(left);
+    const rightHasValue = hasMeaningfulValue(right);
+
+    if (!leftHasValue && !rightHasValue) {
+        return 0;
+    }
+    if (!leftHasValue) {
+        return 1;
+    }
+    if (!rightHasValue) {
+        return -1;
+    }
+
+    const leftString = String(left).trim();
+    const rightString = String(right).trim();
+    const leftNumber = Number(left);
+    const rightNumber = Number(right);
+
+    if (
+        leftString !== "" &&
+        rightString !== "" &&
+        !Number.isNaN(leftNumber) &&
+        !Number.isNaN(rightNumber)
+    ) {
+        return leftNumber - rightNumber;
+    }
+
+    return String(left).localeCompare(String(right), locale || undefined, {
+        numeric: true,
+        sensitivity: "base",
+    });
+};
+
+const getNextSortDirection = (currentDirection) => {
+    if (currentDirection === "asc") {
+        return "desc";
+    }
+    if (currentDirection === "desc") {
+        return null;
+    }
+    return "asc";
+};
+
+const getSortIndicator = (direction) => {
+    if (direction === "asc") {
+        return "↑";
+    }
+    if (direction === "desc") {
+        return "↓";
+    }
+    return "↕";
+};
+
+const getSortAriaValue = (direction) => {
+    if (direction === "asc") {
+        return "ascending";
+    }
+    if (direction === "desc") {
+        return "descending";
+    }
+    return "none";
+};
+
+const escapeCsvCell = (value) => {
+    const normalizedValue = value === null || value === undefined ? "" : String(value);
+    if (/[,"\n\r]/.test(normalizedValue)) {
+        return `"${normalizedValue.replace(/"/g, '""')}"`;
+    }
+    return normalizedValue;
+};
+
+const buildCsvContent = (rows) => rows.map((row) => row.map(escapeCsvCell).join(",")).join("\n");
+
+const sanitizeFilename = (value) => {
+    const normalizedValue = String(value || "data-table")
+        .trim()
+        .replace(/[^a-z0-9-_]+/gi, "-")
+        .replace(/^-+|-+$/g, "");
+
+    return normalizedValue || "data-table";
+};
+
+const isValidSortDirection = (value) => value === "asc" || value === "desc";
+
+const parseSortColumnToken = (value) => {
+    if (!value || typeof value !== "string" || !value.includes(":")) {
+        return null;
+    }
+
+    const separatorIndex = value.indexOf(":");
+    const columnType = value.slice(0, separatorIndex);
+    const columnKey = value.slice(separatorIndex + 1);
+
+    if (!columnType || !columnKey) {
+        return null;
+    }
+
+    return {
+        columnType,
+        columnKey,
+    };
+};
 
 const appendMetadataPathValues = (path, metadataChildren, dimensionKeys) => {
     const nextPath = [...path];
@@ -277,6 +383,138 @@ const buildTableModel = ({ rows, dimensionKeys, dimensionHeaders, selectedMeasur
     };
 };
 
+const getRowSortValue = ({ row, rowIndex, tableModel, sortConfig }) => {
+    if (!sortConfig) {
+        return undefined;
+    }
+
+    if (tableModel.mode === "pivot") {
+        if (sortConfig.columnType === "dimension") {
+            return row.dimensionValue;
+        }
+        if (sortConfig.columnType === "pivot") {
+            return row.values.get(sortConfig.columnKey);
+        }
+        return undefined;
+    }
+
+    if (sortConfig.columnType === "dimension") {
+        return sortConfig.columnKey ? row?.[sortConfig.columnKey] : rowIndex + 1;
+    }
+    if (sortConfig.columnType === "measure") {
+        return row?.[sortConfig.columnKey];
+    }
+
+    return undefined;
+};
+
+const buildExportMatrix = ({
+    tableModel,
+    tableRows,
+    displayDimensionKeys,
+    displayDimensionHeaders,
+    selectedMeasures,
+    locale,
+    intl,
+}) => {
+    const headerRow =
+        tableModel.mode === "pivot"
+            ? [tableModel.rowHeader || "", ...tableModel.columns.map((columnValue) => String(columnValue))]
+            : [
+                  ...displayDimensionHeaders.map((header) => header || ""),
+                  ...selectedMeasures.map((measure) => measure.label || measure.name),
+              ];
+
+    const bodyRows = tableRows.map((row, rowIdx) => {
+        if (tableModel.mode === "pivot") {
+            return [
+                row.dimensionValue,
+                ...tableModel.columns.map((columnValue) =>
+                    formatNumber(
+                        row.values.get(columnValue),
+                        tableModel.measure.format,
+                        locale || intl?.locale,
+                    ),
+                ),
+            ];
+        }
+
+        return [
+            ...displayDimensionKeys.map((dimensionKey) =>
+                dimensionKey ? row?.[dimensionKey] ?? "" : rowIdx + 1,
+            ),
+            ...selectedMeasures.map((measure) =>
+                formatNumber(row?.[measure.name], measure.format, locale || intl?.locale),
+            ),
+        ];
+    });
+
+    return [headerRow, ...bodyRows];
+};
+
+const buildResolvedDefaultSortConfig = ({
+    defaultSortColumn,
+    defaultSortDirection,
+    tableModel,
+    dimensionKeys,
+    selectedMeasures,
+}) => {
+    if (!isValidSortDirection(defaultSortDirection)) {
+        return null;
+    }
+
+    const parsedToken = parseSortColumnToken(defaultSortColumn);
+    if (!parsedToken) {
+        return null;
+    }
+
+    if (parsedToken.columnType === "dimension") {
+        if (tableModel.mode === "pivot") {
+            return dimensionKeys[0] === parsedToken.columnKey
+                ? {
+                      scope: tableModel.mode,
+                      columnType: "dimension",
+                      columnKey: null,
+                      direction: defaultSortDirection,
+                  }
+                : null;
+        }
+
+        return dimensionKeys.includes(parsedToken.columnKey)
+            ? {
+                  scope: tableModel.mode,
+                  columnType: "dimension",
+                  columnKey: parsedToken.columnKey,
+                  direction: defaultSortDirection,
+              }
+            : null;
+    }
+
+    if (parsedToken.columnType === "measure" && tableModel.mode === "standard") {
+        return selectedMeasures.some((measure) => measure.name === parsedToken.columnKey)
+            ? {
+                  scope: tableModel.mode,
+                  columnType: "measure",
+                  columnKey: parsedToken.columnKey,
+                  direction: defaultSortDirection,
+              }
+            : null;
+    }
+
+    if (parsedToken.columnType === "pivot" && tableModel.mode === "pivot") {
+        return tableModel.columns.includes(parsedToken.columnKey)
+            ? {
+                  scope: tableModel.mode,
+                  columnType: "pivot",
+                  columnKey: parsedToken.columnKey,
+                  direction: defaultSortDirection,
+              }
+            : null;
+    }
+
+    return null;
+};
+
 const DataTableInner = ({
     data,
     dimensionKeys,
@@ -290,7 +528,15 @@ const DataTableInner = ({
     borderStyle,
     fontSize,
     intl,
+    editing,
+    showExportButton,
+    exportFileNameBase,
+    defaultSortColumn,
+    defaultSortDirection,
 }) => {
+    const [sortConfig, setSortConfig] = useState(null);
+    const [hasUserSorted, setHasUserSorted] = useState(false);
+    const [hoveredSortKey, setHoveredSortKey] = useState(null);
     const rows = useMemo(() => buildRows(data, dimensionKeys), [data, dimensionKeys]);
     const tableModel = useMemo(
         () => buildTableModel({ rows, dimensionKeys, dimensionHeaders, selectedMeasures }),
@@ -299,6 +545,79 @@ const DataTableInner = ({
     const displayDimensionKeys = tableModel.mode === "standard" ? tableModel.dimensionKeys : [null];
     const displayDimensionHeaders =
         tableModel.mode === "standard" ? tableModel.dimensionHeaders : [tableModel.rowHeader || ""];
+    const resolvedDefaultSortConfig = useMemo(
+        () =>
+            buildResolvedDefaultSortConfig({
+                defaultSortColumn,
+                defaultSortDirection,
+                tableModel,
+                dimensionKeys,
+                selectedMeasures,
+            }),
+        [defaultSortColumn, defaultSortDirection, tableModel, dimensionKeys, selectedMeasures],
+    );
+
+    useEffect(() => {
+        if (editing || !hasUserSorted) {
+            setSortConfig(resolvedDefaultSortConfig);
+        }
+    }, [resolvedDefaultSortConfig, hasUserSorted, editing]);
+
+    const displayedRows = useMemo(() => {
+        const tableRows = tableModel.mode === "pivot" ? tableModel.rows : rows;
+
+        if (!sortConfig?.direction) {
+            return tableRows;
+        }
+
+        return tableRows
+            .map((row, index) => ({ row, index }))
+            .sort((left, right) => {
+                const comparison = compareTableValues(
+                    getRowSortValue({
+                        row: left.row,
+                        rowIndex: left.index,
+                        tableModel,
+                        sortConfig,
+                    }),
+                    getRowSortValue({
+                        row: right.row,
+                        rowIndex: right.index,
+                        tableModel,
+                        sortConfig,
+                    }),
+                    locale || intl?.locale,
+                );
+
+                if (comparison === 0) {
+                    return left.index - right.index;
+                }
+
+                return sortConfig.direction === "desc" ? comparison * -1 : comparison;
+            })
+            .map(({ row }) => row);
+    }, [rows, tableModel, sortConfig, locale, intl]);
+    const exportMatrix = useMemo(
+        () =>
+            buildExportMatrix({
+                tableModel,
+                tableRows: displayedRows,
+                displayDimensionKeys,
+                displayDimensionHeaders,
+                selectedMeasures,
+                locale,
+                intl,
+            }),
+        [
+            tableModel,
+            displayedRows,
+            displayDimensionKeys,
+            displayDimensionHeaders,
+            selectedMeasures,
+            locale,
+            intl,
+        ],
+    );
 
     if (!rows || rows.length === 0) {
         return (
@@ -327,8 +646,185 @@ const DataTableInner = ({
         verticalAlign: "top",
     });
 
+    const sortButtonStyle = (textAlign) => ({
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: textAlign === "right" ? "flex-end" : "flex-start",
+        gap: "6px",
+        width: "100%",
+        padding: "4px 6px",
+        margin: 0,
+        border: "none",
+        borderRadius: "6px",
+        background: "transparent",
+        color: "inherit",
+        font: "inherit",
+        fontWeight: "inherit",
+        cursor: "pointer",
+        transition: "background-color 120ms ease, box-shadow 120ms ease, color 120ms ease",
+    });
+
+    const sortIndicatorStyle = (isActive, isHovered) => ({
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+        minWidth: `${Math.max(fontSize + 4, 18)}px`,
+        height: `${Math.max(fontSize + 4, 18)}px`,
+        padding: "0 4px",
+        borderRadius: "999px",
+        opacity: isActive || isHovered ? 1 : 0.72,
+        fontSize: `${Math.max(fontSize - 1, 12)}px`,
+        lineHeight: 1,
+        backgroundColor: isActive ? "rgba(255,255,255,0.22)" : "rgba(255,255,255,0.12)",
+        boxShadow: isHovered ? "inset 0 0 0 1px rgba(255,255,255,0.24)" : "none",
+    });
+
+    const exportButtonStyle = {
+        padding: "8px 12px",
+        borderRadius: "6px",
+        border: "1px solid #cbd5e0",
+        backgroundColor: "#ffffff",
+        color: "#1a202c",
+        fontSize: `${Math.max(fontSize - 1, 12)}px`,
+        fontWeight: 600,
+        cursor: "pointer",
+    };
+
+    const handleSortToggle = (scope, columnType, columnKey) => {
+        setHasUserSorted(true);
+        setSortConfig((currentSort) => {
+            const isSameColumn =
+                currentSort?.scope === scope &&
+                currentSort?.columnType === columnType &&
+                currentSort?.columnKey === columnKey;
+            const nextDirection = getNextSortDirection(
+                isSameColumn ? currentSort?.direction : null,
+            );
+
+            if (!nextDirection) {
+                return null;
+            }
+
+            return {
+                scope,
+                columnType,
+                columnKey,
+                direction: nextDirection,
+            };
+        });
+    };
+
+    const getColumnSortDirection = (scope, columnType, columnKey) =>
+        sortConfig?.scope === scope &&
+        sortConfig?.columnType === columnType &&
+        sortConfig?.columnKey === columnKey
+            ? sortConfig.direction
+            : null;
+
+    const getSortKey = (scope, columnType, columnKey) =>
+        `${scope}:${columnType}:${columnKey === null ? "__null__" : String(columnKey)}`;
+
+    const renderHeaderContent = ({ scope, columnType, columnKey, label, textAlign = "left" }) => {
+        const direction = getColumnSortDirection(scope, columnType, columnKey);
+
+        if (editing) {
+            return label || "";
+        }
+
+        const nextDirection = getNextSortDirection(direction);
+        const accessibleLabel = String(
+            label ||
+                intl?.formatMessage({
+                    id: "dataTable.column",
+                    defaultMessage: "Column",
+                }) ||
+                "Column",
+        );
+        const nextDirectionLabel =
+            nextDirection === null
+                ? intl?.formatMessage({
+                      id: "dataTable.clearSorting",
+                      defaultMessage: "clear sorting",
+                  }) || "clear sorting"
+                : nextDirection === "desc"
+                ? intl?.formatMessage({
+                      id: "dataTable.descending",
+                      defaultMessage: "descending",
+                  }) || "descending"
+                : intl?.formatMessage({
+                      id: "dataTable.ascending",
+                      defaultMessage: "ascending",
+                  }) || "ascending";
+        const ariaLabel =
+            intl?.formatMessage(
+                {
+                    id: "dataTable.sortToggle",
+                    defaultMessage: "Sort by {column} {direction}",
+                },
+                {
+                    column: accessibleLabel,
+                    direction: nextDirectionLabel,
+                },
+            ) || `Sort by ${accessibleLabel} ${nextDirectionLabel}`;
+        const sortKey = getSortKey(scope, columnType, columnKey);
+        const isHovered = hoveredSortKey === sortKey;
+        const isActive = direction === "asc" || direction === "desc";
+
+        return (
+            <button
+                type="button"
+                onClick={() => handleSortToggle(scope, columnType, columnKey)}
+                onMouseEnter={() => setHoveredSortKey(sortKey)}
+                onMouseLeave={() => setHoveredSortKey((currentKey) => currentKey === sortKey ? null : currentKey)}
+                onFocus={() => setHoveredSortKey(sortKey)}
+                onBlur={() => setHoveredSortKey((currentKey) => currentKey === sortKey ? null : currentKey)}
+                aria-label={ariaLabel}
+                style={{
+                    ...sortButtonStyle(textAlign),
+                    backgroundColor: isHovered ? "rgba(255,255,255,0.12)" : "transparent",
+                    boxShadow: isHovered ? "inset 0 0 0 1px rgba(255,255,255,0.2)" : "none",
+                }}
+            >
+                <span>{label || ""}</span>
+                <span aria-hidden="true" style={sortIndicatorStyle(isActive, isHovered)}>
+                    {getSortIndicator(direction)}
+                </span>
+            </button>
+        );
+    };
+
+    const handleExport = () => {
+        if (editing || exportMatrix.length <= 1 || typeof window === "undefined") {
+            return;
+        }
+
+        const csvContent = buildCsvContent(exportMatrix);
+        const blob = new Blob([`\uFEFF${csvContent}`], {
+            type: "text/csv;charset=utf-8;",
+        });
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+
+        link.href = url;
+        link.download = `${sanitizeFilename(exportFileNameBase)}.csv`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+    };
+
     return (
         <div className="data-table-wrapper" style={{ overflowX: "auto", width: "100%" }}>
+            {showExportButton && !editing && exportMatrix.length > 1 && (
+                <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "12px" }}>
+                    <button type="button" onClick={handleExport} style={exportButtonStyle}>
+                        {intl?.formatMessage({
+                            id: "dataTable.exportCsv",
+                            defaultMessage: "Export CSV",
+                        }) || "Export CSV"}
+                    </button>
+                </div>
+            )}
             <table
                 className="data-table"
                 style={{
@@ -343,8 +839,27 @@ const DataTableInner = ({
                 <thead>
                     <tr>
                         {displayDimensionHeaders.map((header, index) => (
-                            <th key={`dimension-header-${index}`} style={thStyle}>
-                                {header || ""}
+                            <th
+                                key={`dimension-header-${index}`}
+                                style={thStyle}
+                                aria-sort={
+                                    editing
+                                        ? undefined
+                                        : getSortAriaValue(
+                                              getColumnSortDirection(
+                                                  tableModel.mode,
+                                                  "dimension",
+                                                  displayDimensionKeys[index],
+                                              ),
+                                          )
+                                }
+                            >
+                                {renderHeaderContent({
+                                    scope: tableModel.mode,
+                                    columnType: "dimension",
+                                    columnKey: displayDimensionKeys[index],
+                                    label: header || "",
+                                })}
                             </th>
                         ))}
                         {tableModel.mode === "pivot"
@@ -352,19 +867,56 @@ const DataTableInner = ({
                                   <th
                                       key={`pivot-column-${index}-${String(columnValue)}`}
                                       style={{ ...thStyle, textAlign: "right" }}
+                                      aria-sort={
+                                          editing
+                                              ? undefined
+                                              : getSortAriaValue(
+                                                    getColumnSortDirection(
+                                                        tableModel.mode,
+                                                        "pivot",
+                                                        columnValue,
+                                                    ),
+                                                )
+                                      }
                                   >
-                                      {String(columnValue)}
+                                      {renderHeaderContent({
+                                          scope: tableModel.mode,
+                                          columnType: "pivot",
+                                          columnKey: columnValue,
+                                          label: String(columnValue),
+                                          textAlign: "right",
+                                      })}
                                   </th>
                               ))
                             : selectedMeasures.map((measure) => (
-                                  <th key={measure.name} style={{ ...thStyle, textAlign: "right" }}>
-                                      {measure.label || measure.name}
+                                  <th
+                                      key={measure.name}
+                                      style={{ ...thStyle, textAlign: "right" }}
+                                      aria-sort={
+                                          editing
+                                              ? undefined
+                                              : getSortAriaValue(
+                                                    getColumnSortDirection(
+                                                        tableModel.mode,
+                                                        "measure",
+                                                        measure.name,
+                                                    ),
+                                                )
+                                      }
+                                  >
+                                      {renderHeaderContent({
+                                          scope: tableModel.mode,
+                                          columnType: "measure",
+                                          columnKey: measure.name,
+                                          label: measure.label || measure.name,
+                                          textAlign: "right",
+                                      })}
                                   </th>
                               ))}
                     </tr>
                 </thead>
                 <tbody>
-                    {(tableModel.mode === "pivot" ? tableModel.rows : rows).map((row, rowIdx) => {
+                    {displayedRows.map((row, rowIdx) => {
                         const rowBg =
                             stripedRows === "true" || stripedRows === true
                                 ? rowIdx % 2 === 0
@@ -441,6 +993,10 @@ const DataTable = (props) => {
         "data-border-style": borderStyle = "rows",
         "data-font-size": fontSize = 14,
         "data-height": height = 400,
+        "data-show-export-button": showExportButton = "false",
+        "data-export-file-name": exportFileName = "",
+        "data-default-sort-column": defaultSortColumn = "",
+        "data-default-sort-direction": defaultSortDirection = "none",
     } = props;
 
     const locale = intl?.locale;
@@ -518,6 +1074,11 @@ const DataTable = (props) => {
                         borderStyle={borderStyle}
                         fontSize={parseInt(fontSize, 10) || 14}
                         intl={intl}
+                        editing={editing}
+                        showExportButton={toBoolean(showExportButton)}
+                        exportFileNameBase={decode(exportFileName) || group || "data-table"}
+                        defaultSortColumn={decode(defaultSortColumn)}
+                        defaultSortDirection={decode(defaultSortDirection)}
                     />
                 </DataConsumer>
             </DataProvider>

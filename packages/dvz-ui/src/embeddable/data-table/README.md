@@ -30,6 +30,10 @@ The block is registered as `dvz/datatable` and renders a `<div>` in the page HTM
   data-header-text-color="%232d3748"
   data-striped-rows="true"
   data-border-style="rows"
+  data-show-export-button="false"
+  data-export-file-name="budget-table"
+  data-default-sort-column="measure:population"
+  data-default-sort-direction="desc"
   data-no-data-text="No data available"
 ></div>
 ```
@@ -47,6 +51,9 @@ The component (`src/embeddable/data-table/index.jsx`) uses:
   - One header column per **selected measure** (columns) in the default layout.
   - A pivot-style layout when exactly one measure and two dimensions are selected: the first dimension stays as rows and the second dimension becomes dynamic columns.
   - Formatted numbers using `Intl.NumberFormat` respecting each measure's format configuration.
+  - Frontend-only sortable headers so end users can sort by any visible column.
+  - An optional CSV export button that downloads the currently displayed table.
+  - Optional initial sort column/direction settings applied on first render.
 
 ## Block Editor Configuration
 
@@ -59,7 +66,7 @@ The component (`src/embeddable/data-table/index.jsx`) uses:
 | Dimension (rows) | Pick one or two dimensions. When two dimensions are selected and exactly one measure is enabled, the second dimension becomes dynamic table columns |
 | Measures (columns) | Toggle which numeric fields appear as columns; set custom labels & number formats per measure |
 | Filters | Add/remove API filters to pre-filter the dataset |
-| Display | Font size, striped rows, border style, no-data text |
+| Display | Font size, striped rows, border style, no-data text, show/hide CSV export button, export filename, default sort column, default sort direction |
 | Header Colors | Background and text color for the header row |
 
 ## Measures format

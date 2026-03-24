@@ -39,6 +39,7 @@
     "provenance": false
   },
   "dependencies": {
+    "@devgateway/wp-react-lib": "workspace:*",
     "@artsy/fresnel": "^8.1.0",
     "@nivo/bar": "^0.96.0",
     "@nivo/bump": "^0.96.0",
@@ -92,7 +93,6 @@
     "uuid": "^11.1.0"
   },
   "devDependencies": {
-    "@devgateway/wp-react-lib": "workspace:*",
     "@eslint/js": "^9.37.0",
     "@fullhuman/postcss-purgecss": "^7.0.2",
     "@stylistic/eslint-plugin-js": "^4.2.0",
