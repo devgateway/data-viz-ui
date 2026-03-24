@@ -120,6 +120,8 @@ const Chart = ({
 
   const [filter, setFilter] = useState([]);
 
+
+
   const chartLegends = options.data.map((d) => ({
     id: d.id,
     label: customLabels && customLabels[d.id] ? customLabels[d.id] : (d.label || d.id),

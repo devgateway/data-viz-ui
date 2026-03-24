@@ -354,6 +354,7 @@ const Chart = (props) => {
     return [];
   };
   const getCustomLabels = () => {
+
     const customLabels = {};
     if (measuresObject?.[app]) {
       const hasCustomLabels = Object.keys(measuresObject[app])
@@ -708,8 +709,7 @@ const Chart = (props) => {
     dimension1,
     previewMode,
     lineCurve,
-    showLegendsInColumns:
-      showLegendsInColumns == true || showLegendsInColumns == "true",
+    showLegendsInColumns: showLegendsInColumns == true || showLegendsInColumns == "true",
     numberOfLegendColumns: parseInt(numberOfLegendColumns) || 4,
   };
 
