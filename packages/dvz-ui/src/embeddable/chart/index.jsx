@@ -13,6 +13,7 @@ import Line from "./Line";
 
 import { PostContent } from "@devgateway/wp-react-lib";
 import dataFrames from "./data/index";
+import { getTranslatedValue } from "./data/Utils";
 
 import CSVDataFrame from "./CSVDataFrame";
 import ColorProvider from "./colors/ColorProvider";
@@ -184,6 +185,9 @@ const Chart = (props) => {
     "data-line-x-axis-tick-mode": lineXAxisTickMode = "none",
     "data-line-x-axis-tick-count": lineXAxisTickCount = 10,
     "data-line-x-axis-tick-every": lineXAxisTickEvery = 1,
+    "data-enable-measure-selector": enableMeasureSelector = "false",
+    "data-measure-selector-label": measureSelectorLabel = "Measure",
+    "data-measure-selector-default-measure": defaultMeasure = "",
     pageModuleProps,
   } = props;
   const originalEditValue = editing;
@@ -304,17 +308,38 @@ const Chart = (props) => {
   const getMeasuresObject = () => {
     return parse(measures);
   };
+  const getAppSettings = () => {
+    return measuresObject?.[app] || null;
+  };
+
+  const getAppMeasures = () => {
+    const appSettings = getAppSettings();
+    if (!appSettings) {
+      return null;
+    }
+
+    return appSettings.measures || appSettings;
+  };
+
+  const getMeasureConfig = (measureName) => {
+    const appMeasures = getAppMeasures();
+    return measureName && appMeasures ? appMeasures[measureName] : null;
+  };
+
   const getSelectedFormat = () => {
-    if (measuresObject?.[app]) {
-      let format = measuresObject?.[app]?.format;
+    const appSettings = getAppSettings();
+    const appMeasures = getAppMeasures();
+
+    if (appSettings) {
+      let format = appSettings?.format;
       if (!format) {
-        const keys = Object.keys(measuresObject?.[app]);
+        const keys = Object.keys(appMeasures || {});
         for (let i = 0; i < keys.length; i++) {
           if (
-            measuresObject?.[app][keys[i]].selected &&
-            measuresObject?.[app][keys[i]].format
+            appMeasures?.[keys[i]]?.selected &&
+            appMeasures?.[keys[i]]?.format
           ) {
-            format = measuresObject?.[app][keys[i]].format;
+            format = appMeasures?.[keys[i]]?.format;
             break;
           }
         }
@@ -327,10 +352,11 @@ const Chart = (props) => {
 
   const getCustomAxisFormat = () => {
     let format = null;
-    if (measuresObject?.[app]) {
-      const useCustomAxisFormat = measuresObject[app].useCustomAxisFormat;
-      if (useCustomAxisFormat && measuresObject[app].customFormat) {
-        format = measuresObject[app].customFormat;
+    const appSettings = getAppSettings();
+    if (appSettings) {
+      const useCustomAxisFormat = appSettings.useCustomAxisFormat;
+      if (useCustomAxisFormat && appSettings.customFormat) {
+        format = appSettings.customFormat;
       }
     } else {
       if (measuresObject?.["csv"]) {
@@ -345,9 +371,10 @@ const Chart = (props) => {
   };
 
   const getSelectedMeasures = () => {
-    if (measuresObject?.[app]) {
-      return Object.keys(measuresObject[app])
-        .map((s) => ({ value: s, ...measuresObject[app][s] }))
+    const appMeasures = getAppMeasures();
+    if (appMeasures) {
+      return Object.keys(appMeasures)
+        .map((s) => ({ value: s, ...appMeasures[s] }))
         .filter((m) => m.selected)
         .map((s) => s.value);
     }
@@ -355,9 +382,10 @@ const Chart = (props) => {
   };
   const getCustomLabels = () => {
     const customLabels = {};
-    if (measuresObject?.[app]) {
-      const hasCustomLabels = Object.keys(measuresObject[app])
-        .map((s) => ({ value: s, ...measuresObject[app][s] }))
+    const appMeasures = getAppMeasures();
+    if (appMeasures) {
+      const hasCustomLabels = Object.keys(appMeasures)
+        .map((s) => ({ value: s, ...appMeasures[s] }))
         .filter((m) => m.selected && m.hasCustomLabel);
       hasCustomLabels.forEach((m) => {
         customLabels[m.value] = m.customLabel;
@@ -366,10 +394,9 @@ const Chart = (props) => {
     return customLabels;
   };
   const getUserMeasures = () => {
-    if (measuresObject?.[app]) {
-      return Object.keys(measuresObject[app]).filter(
-        (k) => measuresObject[app][k].allowSelection,
-      );
+    const appMeasures = getAppMeasures();
+    if (appMeasures) {
+      return Object.keys(appMeasures).filter((k) => appMeasures[k].allowSelection);
     }
     return [];
   };
@@ -377,8 +404,6 @@ const Chart = (props) => {
   let measuresObject = getMeasuresObject();
   let selectedMeasures = getSelectedMeasures();
 
-  let selectedFormat = getSelectedFormat();
-  const userMeasures = getUserMeasures();
   let leftLegendForSelectedMeasure = left;
   let rightLegendForSelectedMeasure = rightLegend;
 
@@ -392,7 +417,6 @@ const Chart = (props) => {
       .map((s) => s.value);
     measuresObject = injectedMeasures;
     selectedMeasures = selected;
-    selectedFormat = getSelectedFormat();
 
     leftLegendForSelectedMeasure = injectedMeasures.leftTitle;
     rightLegendForSelectedMeasure = injectedMeasures.rightTitle;
@@ -400,6 +424,60 @@ const Chart = (props) => {
       tooltipForSelectedMeasure = injectedMeasures.customTooltip;
     }
   }
+
+  const customLabels = getCustomLabels();
+  const userMeasures = getUserMeasures();
+  const decodedMeasureSelectorLabel = decode(measureSelectorLabel || "");
+  const normalizedMeasureSelectorLabel =
+    typeof decodedMeasureSelectorLabel === "string"
+      ? decodedMeasureSelectorLabel.trim()
+      : "";
+  const singleMeasureSelectorEnabled =
+    (enableMeasureSelector === true || enableMeasureSelector === "true") &&
+    (((type === "line" || type === "bar") && dimension2 !== "none") ||
+      (type === "pie" && (dimension1 !== "none" || dimension2 !== "none")));
+  const selectedMeasuresKey = selectedMeasures.join("|");
+  const [activeMeasure, setActiveMeasure] = useState(selectedMeasures[0] || "");
+
+  useEffect(() => {
+    if (selectedMeasures.length === 0) {
+      if (activeMeasure !== "") {
+        setActiveMeasure("");
+      }
+      return;
+    }
+
+    const preferredMeasure =
+      defaultMeasure && selectedMeasures.includes(defaultMeasure)
+        ? defaultMeasure
+        : selectedMeasures[0];
+
+    if (!selectedMeasures.includes(activeMeasure)) {
+      setActiveMeasure(preferredMeasure);
+    }
+  }, [activeMeasure, defaultMeasure, selectedMeasuresKey]);
+
+  useEffect(() => {
+    if (defaultMeasure && selectedMeasures.includes(defaultMeasure)) {
+      setActiveMeasure(defaultMeasure);
+    }
+  }, [defaultMeasure, selectedMeasuresKey]);
+
+  const showMeasureSelector =
+    singleMeasureSelectorEnabled && selectedMeasures.length > 1;
+  const effectiveSelectedMeasures =
+    showMeasureSelector && activeMeasure ? [activeMeasure] : selectedMeasures;
+  const getFormatForMeasures = (measureNames) => {
+    if (measureNames?.length === 1) {
+      const selectedMeasureFormat = getMeasureConfig(measureNames[0])?.format;
+      if (selectedMeasureFormat) {
+        return selectedMeasureFormat;
+      }
+    }
+
+    return getSelectedFormat();
+  };
+  const selectedFormat = getFormatForMeasures(effectiveSelectedMeasures);
 
   const numberFormat = selectedFormat
     ? {
@@ -446,6 +524,8 @@ const Chart = (props) => {
   };
   const child = null;
   const contentHeight = editing ? height - 80 : height;
+  const measureSelectorHeight = showMeasureSelector ? 48 : 0;
+  const chartContentHeight = Math.max(contentHeight - measureSelectorHeight, 120);
 
   const showXAxisTitle = () =>
     (isNotDesktopPreview || isNotEditingAndIsMobileOrTablet) &&
@@ -593,7 +673,7 @@ const Chart = (props) => {
       Number.parseInt(mobileConfigSettings?.marginBottom),
       Number.parseInt(marginBottom),
     ),
-    height: `${contentHeight}px`,
+    height: `${chartContentHeight}px`,
     legendPosition: determineLegendPosition(),
     legends,
     tooltip:
@@ -682,7 +762,7 @@ const Chart = (props) => {
     enableGridY: enableGridY == true || enableGridY == "true",
     enableGridX: enableGridX == true || enableGridX == "true",
     offsetText,
-    selectedMeasures,
+    selectedMeasures: effectiveSelectedMeasures,
     overallLabel,
     minMaxClamp,
     reverseLegend: reverseLegend == true || reverseLegend == "true",
@@ -932,6 +1012,206 @@ const Chart = (props) => {
     };
   }, []);
 
+  const ChartFrameContent = ({ options, sourceData }) => {
+    const humanizeMeasureName = (measureName) => {
+      const tokenLabels = {
+        avg: "Average",
+        ha: "Hectares",
+        pct: "Percent",
+        perc: "Percent",
+        prod: "Production",
+        qty: "Quantity",
+      };
+
+      return measureName
+        ?.toString()
+        .split("_")
+        .filter(Boolean)
+        .map((token) => {
+          const normalizedToken = token.toLowerCase();
+          return (
+            tokenLabels[normalizedToken] ||
+            `${normalizedToken.charAt(0).toUpperCase()}${normalizedToken.slice(1)}`
+          );
+        })
+        .join(" ");
+    };
+
+    const getExplicitMeasureLabel = (measure) => {
+      if (!measure) {
+        return "";
+      }
+
+      const normalizeLabelValue = (value) =>
+        value != null ? value.toString().trim().toLowerCase() : "";
+
+      const isMachineMeasureLabel = (label) => {
+        const normalizedLabel = normalizeLabelValue(label);
+        const normalizedMeasureValue = normalizeLabelValue(measure?.value);
+
+        if (normalizedLabel === "") {
+          return true;
+        }
+
+        if (
+          normalizedMeasureValue !== "" &&
+          normalizedLabel === normalizedMeasureValue
+        ) {
+          return true;
+        }
+
+        const groupedLabelSuffix = normalizedLabel
+          .split(" - ")
+          .map((segment) => segment.trim())
+          .filter(Boolean)
+          .pop();
+
+        return (
+          normalizedMeasureValue !== "" &&
+          groupedLabelSuffix === normalizedMeasureValue
+        );
+      };
+
+      const translatedLabel = measure?.labels?.[locale?.toUpperCase?.()];
+      if (
+        translatedLabel &&
+        translatedLabel.toString().trim().length > 0 &&
+        !isMachineMeasureLabel(translatedLabel)
+      ) {
+        return translatedLabel;
+      }
+
+      if (
+        measure?.label &&
+        measure.label.toString().trim().length > 0 &&
+        !isMachineMeasureLabel(measure.label)
+      ) {
+        return measure.label;
+      }
+
+      return "";
+    };
+
+    const resolveMeasureLabel = (measureName) => {
+      const measureConfig = getMeasureConfig(measureName);
+      const metadataMeasures = [
+        ...(sourceData?.metadata?.measures || []),
+        ...(options?.metadata?.measures || []),
+        ...Array.from(options?.measuresMetadata || []).filter(Boolean),
+      ];
+      const metadataLabel = metadataMeasures
+        .filter((measure) => measure?.value === measureName)
+        .map((measure) => getExplicitMeasureLabel(measure))
+        .find((label) => label && label.toString().trim().length > 0);
+      const configuredLabel =
+        customLabels?.[measureName] ||
+        measureConfig?.customLabel ||
+        measureConfig?.overrideMeasureLabel ||
+        measureConfig?.overrrideMeasureLabel ||
+        metadataLabel ||
+        getExplicitMeasureLabel(measureConfig);
+
+      if (configuredLabel && configuredLabel.toString().trim().length > 0) {
+        return configuredLabel;
+      }
+
+
+      return humanizeMeasureName(measureName) || measureName;
+    };
+
+    const measureSelectorOptions = selectedMeasures.map((measureName) => ({
+      value: measureName,
+      label: resolveMeasureLabel(measureName),
+    }));
+
+    return (
+      <>
+        {showMeasureSelector && (
+            <div className={"chart-measure-selector-row"}>
+              <div className={"chart-measure-selector-control"}>
+                {normalizedMeasureSelectorLabel !== "" && (
+                  <label
+                    className={"chart-measure-selector-label"}
+                    htmlFor={`${unique || group || "chart"}-measure-selector`}
+                  >
+                    {normalizedMeasureSelectorLabel}
+                  </label>
+                )}
+                <div className={"chart-measure-selector-input-wrap"}>
+                  <select
+                    className={"chart-measure-selector-select"}
+                    id={`${unique || group || "chart"}-measure-selector`}
+                    aria-label={
+                      normalizedMeasureSelectorLabel ||
+                      ((props.intl?.formatMessage &&
+                        props.intl.formatMessage({
+                          id: "chart.measureSelector.ariaLabel",
+                          defaultMessage: "Select measure",
+                        })) ||
+                        "Select measure")
+                    }
+                    onChange={(event) => setActiveMeasure(event.target.value)}
+                    value={activeMeasure}
+                  >
+                    {measureSelectorOptions.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+        )}
+        <ColorProvider
+          options={options}
+          type={type}
+          app={app}
+          locale={locale}
+          overallLabel={overallLabel}
+          customLabels={customLabels}
+          manualColors={getManualColor()}
+          colorBy={colorBy}
+          scheme={scheme}
+          barColor={chartProps.barColor}
+        >
+          <Chart {...chartProps}></Chart>
+        </ColorProvider>
+      </>
+    );
+  };
+
+  const ChartDataConsumerContent = ({ data }) => (
+    <>
+      <Messages app={app} group={group} noDataMsg={noDataMsg} data={data}>
+        {" "}
+      </Messages>
+      <ChartDataFrame
+        data={data}
+        locale={locale}
+        colorBy={colorBy}
+        hiddenBars={hiddenBars}
+        swap={swap === "true" || swap === true}
+        type={type}
+        includeTotal={true}
+        includeOverall={includeOverall === true || includeOverall === "true"}
+        overallLabel={overallLabel}
+        measures={effectiveSelectedMeasures}
+        dimensions={[...dimensions]}
+        sort={sort}
+        sortReverse={sortReverse === true || sortReverse === "true"}
+        sortSecondDimension={sortSecondDimension}
+        sortReverseSecondDimension={
+          sortReverseSecondDimension === true ||
+          sortReverseSecondDimension === "true"
+        }
+        customLabels={getCustomLabels()}
+      >
+        <ChartFrameContent sourceData={data} />
+      </ChartDataFrame>
+    </>
+  );
+
   return (
     <div ref={ref}>
       <Container
@@ -956,52 +1236,18 @@ const Chart = (props) => {
           source={dimensions.join("/")}
         >
           <Container
-            style={{ height: `${contentHeight}px` }}
-            className={"body"}
+            style={{
+              height: `${contentHeight}px`,
+              paddingTop: showMeasureSelector ? `${measureSelectorHeight}px` : 0,
+              boxSizing: "border-box",
+            }}
+            className={`body${showMeasureSelector ? " has-measure-selector" : ""}`}
             fluid={true}
           >
             {showNotEnoughParameters && <Messages editing={editing}></Messages>}
             {!showNotEnoughParameters && (
               <DataConsumer>
-                <Messages app={app} group={group} noDataMsg={noDataMsg}>
-                  {" "}
-                </Messages>
-                <ChartDataFrame
-                  locale={locale}
-                  colorBy={colorBy}
-                  hiddenBars={hiddenBars}
-                  swap={swap === "true" || swap === true}
-                  type={type}
-                  includeTotal={true}
-                  includeOverall={
-                    includeOverall === true || includeOverall === "true"
-                  }
-                  overallLabel={overallLabel}
-                  measures={selectedMeasures}
-                  dimensions={[...dimensions]}
-                  sort={sort}
-                  sortReverse={sortReverse === true || sortReverse === "true"}
-                  sortSecondDimension={sortSecondDimension}
-                  sortReverseSecondDimension={
-                    sortReverseSecondDimension === true ||
-                    sortReverseSecondDimension === "true"
-                  }
-                  customLabels={getCustomLabels()}
-                >
-                  <ColorProvider
-                    type={type}
-                    app={app}
-                    locale={locale}
-                    overallLabel={overallLabel}
-                    customLabels={getCustomLabels()}
-                    manualColors={getManualColor()}
-                    colorBy={colorBy}
-                    scheme={scheme}
-                    barColor={chartProps.barColor}
-                  >
-                    <Chart {...chartProps}></Chart>
-                  </ColorProvider>
-                </ChartDataFrame>
+                <ChartDataConsumerContent />
               </DataConsumer>
             )}
           </Container>
