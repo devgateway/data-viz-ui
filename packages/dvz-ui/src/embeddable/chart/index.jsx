@@ -275,6 +275,7 @@ const Chart = (props) => {
 
     return null;
   };
+  const legacyFormat = parse(format);
 
   const getManualColor = () => {
     const parsedColors = parse(manualColors);
@@ -347,7 +348,7 @@ const Chart = (props) => {
 
       return format;
     }
-    return measuresObject?.["csv"] ? measuresObject["csv"].format : null;
+    return measuresObject?.["csv"] ? measuresObject["csv"].format : legacyFormat;
   };
 
   const getCustomAxisFormat = () => {
@@ -467,14 +468,7 @@ const Chart = (props) => {
     singleMeasureSelectorEnabled && selectedMeasures.length > 1;
   const effectiveSelectedMeasures =
     showMeasureSelector && activeMeasure ? [activeMeasure] : selectedMeasures;
-  const getFormatForMeasures = (measureNames) => {
-    if (measureNames?.length === 1) {
-      const selectedMeasureFormat = getMeasureConfig(measureNames[0])?.format;
-      if (selectedMeasureFormat) {
-        return selectedMeasureFormat;
-      }
-    }
-
+  const getFormatForMeasures = () => {
     return getSelectedFormat();
   };
   const selectedFormat = getFormatForMeasures(effectiveSelectedMeasures);
