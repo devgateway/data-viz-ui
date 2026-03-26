@@ -48,8 +48,7 @@ const Diverging = (props) => {
   );
 };
 
-const Chart = (props) => {
-  console.log("manual colors...", props["data-manual-colors"]);
+const Chart = (props) => { 
   let {
     parent,
     editing = false,
@@ -276,27 +275,21 @@ const Chart = (props) => {
     const parsedColors = parse(manualColors);
     if (!parsedColors) return null;
     const appColors = parsedColors[app];
-    // For CSV app with manual scheme, ensure proper structure for colorBy mode
+    // For CSV, merge flat (legacy) colors with nested colorBy-specific colors.
+    // Nested colors take priority over flat ones.
     if (app === "csv" && appColors && scheme === "manual") {
-      // If appColors is already structured by colorBy, return as-is
-      if (appColors[colorBy] !== undefined) {
-        return appColors;
-      }
-      // If appColors is flat (direct color mapping), wrap it in the colorBy structure
-      if (
-        typeof appColors === "object" &&
-        appColors !== null &&
-        !Array.isArray(appColors)
-      ) {
-        // Check if it looks like a color map (has color-like values)
-        const hasColorValues = Object.values(appColors).some(
-          (v) =>
-            typeof v === "string" && (v.startsWith("#") || v.startsWith("rgb")),
-        );
-        if (hasColorValues) {
-          return { [colorBy]: appColors };
+      const flatColors = {};
+      const nestedColors = {};
+      Object.keys(appColors).forEach((k) => {
+        const v = appColors[k];
+        if (typeof v === "string") {
+          flatColors[k] = v;
+        } else if (typeof v === "object" && v !== null) {
+          nestedColors[k] = v;
         }
-      }
+      });
+      const colorBySpecific = nestedColors[colorBy] || {};
+      return { [colorBy]: { ...flatColors, ...colorBySpecific } };
     }
     return appColors;
   };
