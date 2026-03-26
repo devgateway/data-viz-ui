@@ -11,6 +11,32 @@ import Legends from "./Legends"
 import FlowLayer from "./FlowLayer";
 
 
+const MEASURABLE_LAYER_TYPES = new Set(['data', 'flow', 'dataPoints']);
+
+const humanizeMeasureName = (measureName) => {
+    const tokenLabels = {
+        avg: 'Average',
+        ha: 'Hectares',
+        pct: 'Percent',
+        perc: 'Percent',
+        prod: 'Production',
+        qty: 'Quantity',
+    };
+
+    return measureName
+        ?.toString()
+        .split('_')
+        .filter(Boolean)
+        .map((token) => {
+            const normalizedToken = token.toLowerCase();
+            return tokenLabels[normalizedToken] || `${normalizedToken.charAt(0).toUpperCase()}${normalizedToken.slice(1)}`;
+        })
+        .join(' ');
+};
+
+const getLayerMeasures = (layer) => Array.isArray(layer?.measures) ? layer.measures.filter(Boolean) : [];
+
+
 const MapWrapper = (props) => {
     const {
         unique,
@@ -25,6 +51,9 @@ const MapWrapper = (props) => {
         "data-projection": projectionName = "geoMercator",
         "data-zoom-enabled": zoomEnabled = true,
         "data-rotation-enabled": rotationEnabled = false,
+        "data-enable-measure-selector": enableMeasureSelector = false,
+        "data-measure-selector-label": measureSelectorLabel = 'Measure',
+        "data-measure-selector-default-measure": defaultMeasure = '',
         "data-wait-for-filters": waitForFilters = "false",
         intl
     } = props
@@ -32,11 +61,7 @@ const MapWrapper = (props) => {
     // Measure the real container width so every child uses fluid dimensions
     const [containerWidth, setContainerWidth] = useState(null);
 
-    // Preserve the aspect ratio defined by the data-width / data-height attributes
-    const aspectRatio = Number(dataHeight) / Number(dataWidth);
     const width = containerWidth;
-    const height = Number(dataHeight);
-    //containerWidth ? Math.round(containerWidth * aspectRatio) :
 
     const [paramMapPosition, setParamMapPosition] = useState(parse(dataMapPosition, editing), [])
 
@@ -74,6 +99,82 @@ const MapWrapper = (props) => {
 
     const [selectedItem, setSelectedItem] = useState(null)
     const [selectedPoint, setSelectedPoint] = useState(null)
+    const selectorEnabled = enableMeasureSelector == true || enableMeasureSelector == "true";
+    const decodedMeasureSelectorLabel = decode(measureSelectorLabel || '');
+    const normalizedMeasureSelectorLabel = typeof decodedMeasureSelectorLabel === 'string'
+        ? decodedMeasureSelectorLabel.trim()
+        : '';
+    const effectiveMeasureSelectorLabel = normalizedMeasureSelectorLabel || (selectorEnabled ? 'Measure' : '');
+
+    const selectorEligibleLayers = layers.filter((layer) => {
+        return MEASURABLE_LAYER_TYPES.has(layer?.type) && getLayerMeasures(layer).length > 1;
+    });
+
+    const commonSelectableMeasures = selectorEligibleLayers.reduce((commonMeasures, layer, index) => {
+        const layerMeasures = getLayerMeasures(layer);
+        if (index === 0) {
+            return [...layerMeasures];
+        }
+
+        return commonMeasures.filter((measure) => layerMeasures.includes(measure));
+    }, []);
+
+    const measureLabelMap = selectorEligibleLayers.reduce((labels, layer) => {
+        const customLabels = layer?.customMeasuresLabels || {};
+        getLayerMeasures(layer).forEach((measureName) => {
+            const configuredLabel = customLabels?.[measureName];
+            if (!labels[measureName] && configuredLabel && configuredLabel.toString().trim().length > 0) {
+                labels[measureName] = configuredLabel;
+            }
+        });
+
+        return labels;
+    }, {});
+
+    const measureSelectorOptions = commonSelectableMeasures.map((measureName) => ({
+        value: measureName,
+        label: measureLabelMap[measureName] || humanizeMeasureName(measureName) || measureName,
+    }));
+    const showMeasureSelector = selectorEnabled && measureSelectorOptions.length > 1;
+    const measureSelectorOptionsKey = measureSelectorOptions.map((option) => option.value).join('|');
+    const [activeMeasure, setActiveMeasure] = useState(measureSelectorOptions[0]?.value || '');
+
+    useEffect(() => {
+        if (measureSelectorOptions.length === 0) {
+            if (activeMeasure !== '') {
+                setActiveMeasure('');
+            }
+            return;
+        }
+
+        const preferredMeasure = defaultMeasure && measureSelectorOptions.some((option) => option.value === defaultMeasure)
+            ? defaultMeasure
+            : measureSelectorOptions[0].value;
+
+        if (!measureSelectorOptions.some((option) => option.value === activeMeasure)) {
+            setActiveMeasure(preferredMeasure);
+        }
+    }, [activeMeasure, defaultMeasure, measureSelectorOptionsKey]);
+
+    useEffect(() => {
+        if (defaultMeasure && measureSelectorOptions.some((option) => option.value === defaultMeasure)) {
+            setActiveMeasure(defaultMeasure);
+        }
+    }, [defaultMeasure, measureSelectorOptionsKey]);
+
+    const renderedLayers = layers.map((layer) => {
+        const layerMeasures = getLayerMeasures(layer);
+        if (!showMeasureSelector || !activeMeasure || layerMeasures.length === 0 || !layerMeasures.includes(activeMeasure)) {
+            return layer;
+        }
+
+        return {
+            ...layer,
+            measures: [activeMeasure],
+        };
+    });
+    const measureSelectorHeight = showMeasureSelector ? 48 : 0;
+    const height = Math.max(Number(dataHeight) - measureSelectorHeight, 120);
 
     useEffect(() => {
         const newPosition = parse(dataMapPosition, editing)
@@ -140,17 +241,59 @@ const MapWrapper = (props) => {
     }
 
     return (
-        <div ref={ref} className={"d3map-container"} style={{ width: '100%' }}>
-            <ProjectedContainer
-                backgroundColor={decode(bgColorParam)}
-                height={height}
-                width={width}
-                projectionName={projectionName}
-                editing={editing}
-                initialPosition={paramMapPosition}>
+        <div ref={ref} className={"d3map-container"} style={{ width: '100%', height: `${dataHeight}px` }}>
+            {showMeasureSelector && (
+                <div className={"chart-measure-selector-row"}>
+                    <div className={"chart-measure-selector-control"}>
+                        {effectiveMeasureSelectorLabel !== '' && (
+                            <label
+                                className={"chart-measure-selector-label"}
+                                htmlFor={`${unique || group || 'd3map'}-measure-selector`}
+                            >
+                                {effectiveMeasureSelectorLabel}
+                            </label>
+                        )}
+                        <div className={"chart-measure-selector-input-wrap"}>
+                            <select
+                                className={"chart-measure-selector-select"}
+                                id={`${unique || group || 'd3map'}-measure-selector`}
+                                aria-label={
+                                    effectiveMeasureSelectorLabel ||
+                                    ((intl?.formatMessage && intl.formatMessage({
+                                        id: 'd3map.measureSelector.ariaLabel',
+                                        defaultMessage: 'Select measure',
+                                    })) || 'Select measure')
+                                }
+                                onChange={(event) => setActiveMeasure(event.target.value)}
+                                value={activeMeasure}
+                            >
+                                {measureSelectorOptions.map((option) => (
+                                    <option key={option.value} value={option.value}>
+                                        {option.label}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            )}
+            <div
+                className={`d3map-body${showMeasureSelector ? ' has-measure-selector' : ''}`}
+                style={{
+                    height: `${dataHeight}px`,
+                    paddingTop: showMeasureSelector ? `${measureSelectorHeight}px` : 0,
+                    boxSizing: 'border-box',
+                }}>
+                <ProjectedContainer
+                    backgroundColor={decode(bgColorParam)}
+                    height={height}
+                    width={width}
+                    projectionName={projectionName}
+                    editing={editing}
+                    initialPosition={paramMapPosition}>
 
                 <Map rotationEnabled={parse(rotationEnabled, editing)}>
-                    {layers.map((layer, i) => {
+                    {renderedLayers.map((layer, i) => {
 
 
                         if (layer.type === 'base') {
@@ -210,7 +353,7 @@ const MapWrapper = (props) => {
                 <Legends selectedItem={selectedItem}
                     unique={unique}
                     d2Click={e => setSelectedItem(e)} patternsData={null}
-                    layers={layers} group={group}
+                    layers={renderedLayers} group={group}
                     onItemClick={toggleLayerView} toggleColorLayer={toggleColorLayer}></Legends>
 
 
@@ -222,7 +365,8 @@ const MapWrapper = (props) => {
                     height={height} ref={zoomRef} group={group} identifier={identifier}
                     editing={editing} />
 
-            </ProjectedContainer>
+                </ProjectedContainer>
+            </div>
 
         </div>
     );

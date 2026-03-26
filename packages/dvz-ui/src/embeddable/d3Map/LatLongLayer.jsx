@@ -230,10 +230,11 @@ class DataLayer extends React.Component {
 
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        const { editing, selectedItem, onZoomToPoint, data } = this.props
+        const { editing, selectedItem, onZoomToPoint, data, measures } = this.props
         const g = d3.select(this.gRef.current)
+        const measuresChanged = (prevProps.measures || []).join('|') !== (measures || []).join('|')
 
-        if (editing || prevProps.data !== data || prevProps.path !== this.props.path) {
+        if (editing || prevProps.data !== data || prevProps.path !== this.props.path || measuresChanged) {
             this.create()
 
         }

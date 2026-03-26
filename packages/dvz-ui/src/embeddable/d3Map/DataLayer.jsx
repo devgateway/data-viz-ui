@@ -867,10 +867,11 @@ class DataLayer extends BaseLayer {
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         const { app, file, featureJoinAttribute, data, measures, patternDiscriminator, editing, usePattern } = this.props
+        const measuresChanged = (prevProps.measures || []).join('|') !== (measures || []).join('|')
 
         //TODO:Check if data has changed using JSON.stringify
 
-        if (editing || prevProps.data !== data || prevProps.path !== this.props.path) {
+        if (editing || prevProps.data !== data || prevProps.path !== this.props.path || measuresChanged) {
             this.create()
         }
 

@@ -310,8 +310,9 @@ class DataLayer extends BaseLayer {
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        const { projection, editing, data } = this.props
-        if (editing || prevProps.data !== data || prevProps.path !== this.props.path) {
+        const { projection, editing, data, measures } = this.props
+        const measuresChanged = (prevProps.measures || []).join('|') !== (measures || []).join('|')
+        if (editing || prevProps.data !== data || prevProps.path !== this.props.path || measuresChanged) {
             this.create()
         }
 
