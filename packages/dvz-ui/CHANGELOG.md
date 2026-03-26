@@ -1,5 +1,11 @@
 # @devgateway/dvz-ui-react
 
+## 1.7.3
+
+### Patch Changes
+
+- [#181](https://github.com/devgateway/data-viz-ui/pull/181) [`d080903`](https://github.com/devgateway/data-viz-ui/commit/d08090388cb506671fe615f79fc5d877269f85fd) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Fix manual colors for csv charts
+
 ## 1.7.2
 
 ### Patch Changes
