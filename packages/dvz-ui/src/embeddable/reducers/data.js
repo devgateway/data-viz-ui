@@ -144,30 +144,19 @@ export const getData = (props) => (dispatch, getState) => {
 
     const { app, group, source, store, params, parent } = props
 
-
     let filters = getState().get('data').getIn(['filters', app, group]);
 
-    if (parent)
-        if (params) {
-            const presetFilters = Object.keys(params);
-            presetFilters.forEach(k => {
-                if (filters && filters.has(k)) {
-                    let a = params[k]
-                    let b = filters.get(k)
-                    //[A,B,C,E]
-                    //[C,D]
-                    //We should remove other options from preset filter and turn on off the matching ones
-                    let newB = b.filter(c => a.indexOf(c) > -1);
-                    filters = filters.set(k, newB)
-                }
-            })
-        }
+
+
+
     let newParams = { ...params }
     if (filters) {
-        newParams = { ...newParams, ...filters.toJS() }
+        //preset filters overrides selected filters
+        newParams = { ...filters.toJS(), ...params }
     }
 
     dispatch({ type: LOAD_DATA, app, group, params: newParams, store })
+
     api.getData({ app, source, params: newParams })
         .then(data => {
             data.appliedFilters = newParams

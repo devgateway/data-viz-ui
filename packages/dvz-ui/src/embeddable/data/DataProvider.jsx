@@ -102,6 +102,8 @@ class DataProvider extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
+
+
         const {
             app,
             filters,
@@ -198,8 +200,8 @@ class DataProvider extends React.Component {
                     )) {
                         // Props-based params changed (e.g., from postMessage via PreviewComponent)
                         // but no Redux filter timestamps changed — reload data with updated params.
-                        this.setState({showLoading: false})
-                        this.props.onLoadData({app, source, store, params, group})
+                        this.setState({ showLoading: false })
+                        this.props.onLoadData({ app, source, store, params, group })
                         setTimeout(this.checkLoadingTime, 100);
                     } else {
                         console.log('ℹ️ [DataProvider] Component updated but no filter changes detected', {
@@ -299,8 +301,8 @@ class DataProvider extends React.Component {
                 </Segment>
             </Container>
         }
-        }
     }
+}
 
 
 
