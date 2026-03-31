@@ -179,8 +179,6 @@ const Chart = (props) => {
     "data-preview-mode": previewMode = "Desktop",
     "data-wait-for-filters": waitForFilters = "false",
     "data-line-curve": lineCurve = "linear",
-    "data-show-legends-in-columns": showLegendsInColumns = "false",
-    "data-number-of-legend-columns": numberOfLegendColumns = 4,
     "data-line-x-axis-tick-mode": lineXAxisTickMode = "none",
     "data-line-x-axis-tick-count": lineXAxisTickCount = 10,
     "data-line-x-axis-tick-every": lineXAxisTickEvery = 1,
@@ -709,8 +707,6 @@ const Chart = (props) => {
     dimension1,
     previewMode,
     lineCurve,
-    showLegendsInColumns: showLegendsInColumns == true || showLegendsInColumns == "true",
-    numberOfLegendColumns: parseInt(numberOfLegendColumns) || 4,
   };
 
   const params = {};
