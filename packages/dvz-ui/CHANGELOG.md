@@ -1,5 +1,29 @@
 # @devgateway/dvz-ui-react
 
+## 1.7.3
+
+### Patch Changes
+
+- [#181](https://github.com/devgateway/data-viz-ui/pull/181) [`d080903`](https://github.com/devgateway/data-viz-ui/commit/d08090388cb506671fe615f79fc5d877269f85fd) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Fix manual colors for csv charts
+
+## 1.7.2
+
+### Patch Changes
+
+- [#179](https://github.com/devgateway/data-viz-ui/pull/179) [`a0a0742`](https://github.com/devgateway/data-viz-ui/commit/a0a07420f14bd0bdb8ece8562f998c8b3a77710f) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Add missing class to floating search
+
+## 1.7.1
+
+### Patch Changes
+
+- [#177](https://github.com/devgateway/data-viz-ui/pull/177) [`e1fb629`](https://github.com/devgateway/data-viz-ui/commit/e1fb62960ae3977c475b247ae1df56f6cec203b9) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Fix floating search input
+
+## 1.7.0
+
+### Minor Changes
+
+- [#170](https://github.com/devgateway/data-viz-ui/pull/170) [`a81ccee`](https://github.com/devgateway/data-viz-ui/commit/a81ccee0bedfc732f576cf315a571c6e3074cb98) Thanks [@sdimunzio](https://github.com/sdimunzio)! - New embedded components created: Big Filter, Big Numbers, custom bars etc. + Bug fixing
+
 ## 1.6.19
 
 ### Patch Changes
