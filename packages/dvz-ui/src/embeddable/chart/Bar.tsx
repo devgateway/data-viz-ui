@@ -79,8 +79,6 @@ export interface BarChartProps {
   customAxisFormat: any;
   previewMode: string;
   editing: boolean;
-  showLegendsInColumns?: boolean;
-  numberOfLegendColumns?: number;
   // X-axis tick mode controls (mirror Line.jsx)
   lineXAxisTickMode?: 'none' | 'count' | 'every';
   lineXAxisTickCount?: number;
@@ -150,8 +148,6 @@ const Chart = ({
   enableGridX,
   customAxisFormat,
   previewMode,
-  showLegendsInColumns = false,
-  numberOfLegendColumns = 4,
   lineXAxisTickMode = 'none',
   lineXAxisTickCount = 10,
   lineXAxisTickEvery = 1
