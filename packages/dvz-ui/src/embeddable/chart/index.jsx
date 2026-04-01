@@ -387,15 +387,18 @@ const Chart = (props) => {
     return [];
   };
 
-  const getMeasureOptionLabel = (measure) => {
-    const configuredMeasure = measuresObject?.[app]?.[measure] || {};
-
-    return (
-      configuredMeasure.overrrideMeasureLabel ||
-      configuredMeasure.overrideMeasureLabel ||
-      configuredMeasure.customLabel ||
-      measure
-    );
+  const buildSelectorOptions = () => {
+    return selectorMeasures.map((measure) => ({
+      value: measure,
+      label:
+        (typeof measuresObject?.[app]?.[measure]?.customLabel === "string" &&
+          measuresObject?.[app]?.[measure]?.customLabel.trim().length > 0 &&
+          measuresObject?.[app]?.[measure]?.hasCustomLabel)
+          ? measuresObject[app][measure].customLabel.trim()
+          : (measuresObject?.[app]?.[measure]?.labels?.[locale?.toUpperCase?.()] ||
+            measuresObject?.[app]?.[measure]?.label ||
+            measure),
+    }));
   };
 
   let measuresObject = getMeasuresObject();
@@ -462,10 +465,6 @@ const Chart = (props) => {
 
   const effectiveSelectedMeasures =
     selectorEnabled && selectedUserMeasure ? [selectedUserMeasure] : selectedMeasures;
-  const selectorOptions = selectorMeasures.map((measure) => ({
-    value: measure,
-    label: getMeasureOptionLabel(measure),
-  }));
   selectedFormat = getSelectedFormat(effectiveSelectedMeasures);
   const effectiveCustomLabels = getCustomLabels(effectiveSelectedMeasures);
 
@@ -999,6 +998,76 @@ const Chart = (props) => {
     };
   }, []);
 
+  const ChartFrameContent = ({ data, options }) => {
+    const selectorOptions = buildSelectorOptions();
+
+    return (
+      <>
+        {selectorEnabled && (
+          <MeasureSelector
+            label={decode(measureSelectorLabel) || "Measure"}
+            options={selectorOptions}
+            data={data}
+            metadataMeasures={options?.metadata?.measures}
+            locale={locale}
+            value={effectiveSelectedMeasures[0] || selectorOptions[0]?.value || ""}
+            onChange={setSelectedUserMeasure}
+          />
+        )}
+        <ColorProvider
+          type={type}
+          app={app}
+          locale={locale}
+          overallLabel={overallLabel}
+          customLabels={effectiveCustomLabels}
+          manualColors={getManualColor()}
+          colorBy={colorBy}
+          scheme={scheme}
+          barColor={chartProps.barColor}
+          options={options}
+        >
+          <Chart {...chartProps}></Chart>
+        </ColorProvider>
+      </>
+    );
+  };
+
+  const ChartRuntimeContent = ({ data }) => {
+
+    return (
+      <>
+        <Messages data={data} app={app} group={group} noDataMsg={noDataMsg}>
+          {" "}
+        </Messages>
+        <ChartDataFrame
+          data={data}
+          locale={locale}
+          colorBy={colorBy}
+          hiddenBars={hiddenBars}
+          swap={swap === "true" || swap === true}
+          type={type}
+          includeTotal={true}
+          includeOverall={
+            includeOverall === true || includeOverall === "true"
+          }
+          overallLabel={overallLabel}
+          measures={effectiveSelectedMeasures}
+          dimensions={[...dimensions]}
+          sort={sort}
+          sortReverse={sortReverse === true || sortReverse === "true"}
+          sortSecondDimension={sortSecondDimension}
+          sortReverseSecondDimension={
+            sortReverseSecondDimension === true ||
+            sortReverseSecondDimension === "true"
+          }
+          customLabels={effectiveCustomLabels}
+        >
+          <ChartFrameContent data={data} />
+        </ChartDataFrame>
+      </>
+    );
+  };
+
   return (
     <div ref={ref}>
       <Container
@@ -1030,53 +1099,7 @@ const Chart = (props) => {
             {showNotEnoughParameters && <Messages editing={editing}></Messages>}
             {!showNotEnoughParameters && (
               <DataConsumer>
-                {selectorEnabled && (
-                  <MeasureSelector
-                    label={decode(measureSelectorLabel) || "Measure"}
-                    options={selectorOptions}
-                    value={effectiveSelectedMeasures[0] || selectorOptions[0]?.value || ""}
-                    onChange={setSelectedUserMeasure}
-                  />
-                )}
-                <Messages app={app} group={group} noDataMsg={noDataMsg}>
-                  {" "}
-                </Messages>
-                <ChartDataFrame
-                  locale={locale}
-                  colorBy={colorBy}
-                  hiddenBars={hiddenBars}
-                  swap={swap === "true" || swap === true}
-                  type={type}
-                  includeTotal={true}
-                  includeOverall={
-                    includeOverall === true || includeOverall === "true"
-                  }
-                  overallLabel={overallLabel}
-                  measures={effectiveSelectedMeasures}
-                  dimensions={[...dimensions]}
-                  sort={sort}
-                  sortReverse={sortReverse === true || sortReverse === "true"}
-                  sortSecondDimension={sortSecondDimension}
-                  sortReverseSecondDimension={
-                    sortReverseSecondDimension === true ||
-                    sortReverseSecondDimension === "true"
-                  }
-                  customLabels={effectiveCustomLabels}
-                >
-                  <ColorProvider
-                    type={type}
-                    app={app}
-                    locale={locale}
-                    overallLabel={overallLabel}
-                    customLabels={effectiveCustomLabels}
-                    manualColors={getManualColor()}
-                    colorBy={colorBy}
-                    scheme={scheme}
-                    barColor={chartProps.barColor}
-                  >
-                    <Chart {...chartProps}></Chart>
-                  </ColorProvider>
-                </ChartDataFrame>
+                <ChartRuntimeContent />
               </DataConsumer>
             )}
           </Container>

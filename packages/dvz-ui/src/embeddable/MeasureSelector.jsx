@@ -5,23 +5,62 @@ const MeasureSelector = ({
   options = [],
   value = "",
   data,
+  metadataMeasures,
+  locale,
   onChange,
 }) => {
   if (!options || options.length <= 1) {
     return null;
   }
 
-  const metadataMeasures = data?.metadata?.measures || [];
+  const resolvedMetadataMeasures = metadataMeasures || data?.metadata?.measures || [];
+  const normalizedLocale = typeof locale === "string" ? locale.toUpperCase() : "";
+
+  const humanizeValue = (rawValue = "") => {
+    if (typeof rawValue !== "string" || rawValue.length === 0) {
+      return rawValue;
+    }
+
+    const humanized = rawValue
+      .replace(/[_-]+/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+
+    if (!humanized) {
+      return rawValue;
+    }
+
+    return humanized.replace(/\b\w/g, (letter) => letter.toUpperCase());
+  };
+
+
+  const getMetadataLabel = (optionValue) => {
+    const metadataMeasure = resolvedMetadataMeasures.find(
+      (measure) => measure.value === optionValue,
+    );
+
+    if (!metadataMeasure) {
+      return "";
+    }
+
+    return (
+      metadataMeasure.labels?.[normalizedLocale] ||
+      metadataMeasure.labels?.[locale] ||
+      metadataMeasure.label ||
+      metadataMeasure.title ||
+      metadataMeasure.name ||
+      ""
+    );
+  };
+
   const getOptionLabel = (option) => {
-    const metadataLabel = metadataMeasures.find(
-      (measure) => measure.value === option.value,
-    )?.label;
+    const metadataLabel = getMetadataLabel(option.value);
 
     if (option.label && option.label !== option.value) {
       return option.label;
     }
 
-    return metadataLabel || option.label || option.value;
+    return metadataLabel || option.label || humanizeValue(option.value);
   };
 
   return (

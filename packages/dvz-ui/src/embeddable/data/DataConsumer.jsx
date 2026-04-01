@@ -9,8 +9,9 @@ const DataConsumer = (props) => {
             {(data) => {
                 return data && <React.Fragment>
                     {React.Children.map(props.children, (child => {
-                        return React.cloneElement(child, { data }
-                        )
+                        return React.isValidElement(child)
+                            ? React.cloneElement(child, { data })
+                            : child
                     }))}
                 </React.Fragment>
             }}
