@@ -165,7 +165,7 @@ export const getData = (props) => (dispatch, getState) => {
         newParams = { ...userFilters, ...params };
 
         if (params) {
-            debugger;
+
             Object.keys(params).forEach(key => {
                 if (userFilters[key] !== undefined) {
                     const presetValues = Array.isArray(params[key]) ? params[key] : [params[key]];

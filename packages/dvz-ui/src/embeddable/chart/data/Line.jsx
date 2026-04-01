@@ -39,7 +39,7 @@ const getOptionsNoDimension = (props) => {
       selectedMeasures.forEach((m) => {
         const row = {};
         const label = customLabels[m.value] || getTranslatedValue(mMap[m.value], locale);
-        debugger;
+
         row.type = "measure";
         row["measureFieldName"] = m.value;
         row["measure"] = label;
@@ -165,7 +165,7 @@ const LineOneDimension = (props) => {
     measures.forEach(measure => {
       const serie = { variables: {} };
       serie.id = getTranslatedValue(mMap[measure], locale);
-      debugger;
+
       serie.label = customLabels[measure] || getTranslatedValue(mMap[measure], locale);
       const serieData = [];
       firstDimensionItems.forEach(fdi => {// first dimension
