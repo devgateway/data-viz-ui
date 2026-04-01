@@ -391,9 +391,11 @@ export default (state = initialState, action) => {
 
 
         case CLEAN_FILTER: {
+            const now = Date.now();
             const { app, group } = action
             const initial = state.getIn(['filters', 'initial', app, group])
             return state.setIn(['filters', app, group], initial)
+                .setIn(['filters-settings', app, group, 'lastUserFilterChange'], now)
         }
 
         case SET_MEASURES: {
