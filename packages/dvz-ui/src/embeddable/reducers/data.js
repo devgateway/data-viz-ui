@@ -21,6 +21,9 @@ const UNSET_FILTER = 'UNSET_FILTER'
 const initialState = Immutable.Map({ mode: 'info' })
 const SET_MEASURES = 'SET_MEASURES'
 const CLEAN_MEASURES = 'CLEAN_MEASURES'
+const SET_POSTS_PAGINATION = 'SET_POSTS_PAGINATION'
+const SET_POSTS_FILTER = 'SET_POSTS_FILTER'
+const SET_INITIAL_POSTS_FILTER = 'SET_INITIAL_POSTS_FILTER'
 export const cleanMeasures = ({ app, group }) => (dispatch, getState) => {
     dispatch({ type: CLEAN_MEASURES, app, group })
 }
@@ -390,6 +393,23 @@ export default (state = initialState, action) => {
             const { app, group, measure } = action
             return state.deleteIn(['measures', app, group])
 
+        }
+
+        case SET_POSTS_PAGINATION: {
+            const { group, totalPages, totalItems } = action;
+            return state.setIn(['postsPagination', group], { totalPages, totalItems });
+        }
+
+        case SET_POSTS_FILTER: {
+            const { type: _type, group, ...data } = action;
+            return state.setIn(['posts', group], data);
+        }
+
+        case SET_INITIAL_POSTS_FILTER: {
+            const { type: _type, group, ...data } = action;
+            return state
+                .setIn(['posts', group], data)
+                .setIn(['posts', 'initialFilters', group], data);
         }
 
         default:
