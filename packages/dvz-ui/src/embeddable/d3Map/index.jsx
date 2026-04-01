@@ -9,6 +9,43 @@ import ZoomControl from "./ZoomControl";
 import ProjectedContainer from "./ProjectedContainer";
 import Legends from "./Legends"
 import FlowLayer from "./FlowLayer";
+import MeasureSelector from "../MeasureSelector";
+
+const SELECTABLE_LAYER_TYPES = ['data', 'dataPoints', 'flow'];
+
+const getLayerMeasures = (layer) => {
+    if (!layer || !layer.measures || !Array.isArray(layer.measures)) {
+        return [];
+    }
+
+    return [...new Set(layer.measures.filter(Boolean))];
+}
+
+const getSharedMeasures = (layers = []) => {
+    const layerMeasures = layers
+        .filter(layer => SELECTABLE_LAYER_TYPES.includes(layer.type))
+        .map(getLayerMeasures)
+        .filter(measures => measures.length > 0);
+
+    if (layerMeasures.length === 0) {
+        return [];
+    }
+
+    return layerMeasures.slice(1).reduce((shared, measures) => {
+        return shared.filter(measure => measures.includes(measure));
+    }, [...layerMeasures[0]]);
+}
+
+const getMeasureLabel = (layers = [], measure) => {
+    if (!measure) {
+        return '';
+    }
+
+    const layerWithMeasure = layers.find(layer => getLayerMeasures(layer).includes(measure));
+    const customLabel = layerWithMeasure?.customMeasuresLabels?.[measure];
+
+    return customLabel && customLabel.toString().trim().length > 0 ? customLabel : measure;
+}
 
 
 const MapWrapper = (props) => {
@@ -25,6 +62,9 @@ const MapWrapper = (props) => {
         "data-projection": projectionName = "geoMercator",
         "data-zoom-enabled": zoomEnabled = true,
         "data-rotation-enabled": rotationEnabled = false,
+        "data-enable-measure-selector": enableMeasureSelector = false,
+        "data-measure-selector-label": measureSelectorLabel = "Measure",
+        "data-measure-selector-default-measure": defaultMeasure = "",
         "data-wait-for-filters": waitForFilters = "false",
         intl
     } = props
@@ -74,6 +114,29 @@ const MapWrapper = (props) => {
 
     const [selectedItem, setSelectedItem] = useState(null)
     const [selectedPoint, setSelectedPoint] = useState(null)
+    const [selectedMeasure, setSelectedMeasure] = useState(null)
+
+    const selectorEnabled = enableMeasureSelector == true || enableMeasureSelector == "true";
+    const availableMeasures = getSharedMeasures(layers);
+    const selectorOptions = availableMeasures.map(measure => ({
+        value: measure,
+        label: getMeasureLabel(layers, measure)
+    }));
+
+    useEffect(() => {
+        if (!selectorEnabled || availableMeasures.length <= 1) {
+            setSelectedMeasure(null)
+            return
+        }
+
+        const nextMeasure = availableMeasures.includes(defaultMeasure)
+            ? defaultMeasure
+            : availableMeasures[0]
+
+        setSelectedMeasure(previousMeasure => {
+            return availableMeasures.includes(previousMeasure) ? previousMeasure : nextMeasure
+        })
+    }, [selectorEnabled, defaultMeasure, availableMeasures])
 
     useEffect(() => {
         const newPosition = parse(dataMapPosition, editing)
@@ -141,6 +204,14 @@ const MapWrapper = (props) => {
 
     return (
         <div ref={ref} className={"d3map-container"} style={{ width: '100%' }}>
+            {selectorEnabled && availableMeasures.length > 1 && (
+                <MeasureSelector
+                    label={decode(measureSelectorLabel) || "Measure"}
+                    options={selectorOptions}
+                    value={selectedMeasure || availableMeasures[0] || ""}
+                    onChange={setSelectedMeasure}
+                />
+            )}
             <ProjectedContainer
                 backgroundColor={decode(bgColorParam)}
                 height={height}
@@ -174,6 +245,7 @@ const MapWrapper = (props) => {
                                 unique={unique}
                                 key={layer.id} {...layer}
                                 settings={props.wordress}
+                                selectedMeasure={selectedMeasure}
                                 togglePatterns={togglePatterns}
                                 initialPosition={paramMapPosition}
                                 waitForFilters={waitForFilters == "true" || waitForFilters == true}
@@ -186,6 +258,7 @@ const MapWrapper = (props) => {
                                 onReady={handleLayerReady}
                                 transform={transform} intl={intl} group={group} zoom={zoomRef}
                                 unique={unique}
+                                selectedMeasure={selectedMeasure}
                                 key={layer.id} {...layer}
                                 waitForFilters={waitForFilters == "true" || waitForFilters == true}
                             />
@@ -197,6 +270,7 @@ const MapWrapper = (props) => {
                                 transform={transform} intl={intl}
                                 group={group} zoom={zoomRef}
                                 unique={unique}
+                                selectedMeasure={selectedMeasure}
                                 key={layer.id} {...layer}
                                 waitForFilters={waitForFilters == "true" || waitForFilters == true}
                             />
@@ -208,6 +282,7 @@ const MapWrapper = (props) => {
                 </Map>
 
                 <Legends selectedItem={selectedItem}
+                    selectedMeasure={selectedMeasure}
                     unique={unique}
                     d2Click={e => setSelectedItem(e)} patternsData={null}
                     layers={layers} group={group}

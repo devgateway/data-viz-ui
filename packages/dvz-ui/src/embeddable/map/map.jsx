@@ -16,6 +16,7 @@ import Legend from "./legend";
 import { formatContent } from "../common/MapTooltip";
 import getDeviceCategory from "../../utils/deviceType";
 import geostats from "geostats";
+import MeasureSelector from "../MeasureSelector";
 
 import { Config } from "@/conf";
 
@@ -2054,6 +2055,10 @@ class Map extends React.Component {
       color: labelFontColor,
       fontSize: legendFontSize + "px",
     };
+    const measureSelectorOptions = transformedData?.measures?.map((measure) => ({
+      value: measure,
+      label: transformedData.measureLabelMap[measure] || measure,
+    })) || [];
     if (editing) {
       highlightedLocStyle.marginTop = "25px";
     }
@@ -2097,32 +2102,12 @@ class Map extends React.Component {
             </Grid.Column>
           </Grid>
         }
-        <div className="measure-selector">
-          <ul>
-            {measureSelectorLabel && (
-              <li>
-                <span className="label">{measureSelectorLabel}</span>
-              </li>
-            )}
-            {transformedData &&
-              transformedData.measures &&
-              transformedData.measures.length > 1 &&
-              transformedData.measures.map((measure) => {
-                return (
-                  <li onClick={this.selectedMeasureChanged.bind(this, measure)}>
-                    <input
-                      checked={this.getSelectedMeasure() === measure}
-                      type="radio"
-                      value={measure}
-                    />
-                    <label>
-                      {transformedData.measureLabelMap[measure] || measure}
-                    </label>
-                  </li>
-                );
-              })}
-          </ul>
-        </div>
+        <MeasureSelector
+          label={measureSelectorLabel || "Measure"}
+          options={measureSelectorOptions}
+          value={this.getSelectedMeasure()}
+          onChange={this.selectedMeasureChanged.bind(this)}
+        />
       </Container>
     );
 

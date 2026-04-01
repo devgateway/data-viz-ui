@@ -30,7 +30,18 @@ class DataLayer extends React.Component {
         this.showToolTip = this.showToolTip.bind(this)
         this.moveToolTip = this.moveToolTip.bind(this)
         this.resize = this.resize.bind(this)
+        this.getActiveMeasure = this.getActiveMeasure.bind(this)
         this.gRef = React.createRef();
+    }
+
+    getActiveMeasure(props = this.props) {
+        const { measures = [], selectedMeasure } = props
+
+        if (selectedMeasure && measures.includes(selectedMeasure)) {
+            return selectedMeasure
+        }
+
+        return measures[0]
     }
 
 
@@ -84,6 +95,7 @@ class DataLayer extends React.Component {
             showDim2OnLegends,
             dim2LegendLabel
         } = this.props
+        const activeMeasure = this.getActiveMeasure()
 
 
         const numberFormat = {
@@ -116,7 +128,7 @@ class DataLayer extends React.Component {
                 let pointStyle = { color: markFillColor, size: markSizeScale, border: markBorderColor }
                 let value = 1
                 if (pointStyleBy === "measure") {
-                    value = d[measures[0]]
+                    value = d[activeMeasure]
 
                     pointStyle = { color: colorScale(value), size: sizeScale(value), border: borderScale(value) }
 
@@ -232,8 +244,9 @@ class DataLayer extends React.Component {
     componentDidUpdate(prevProps, prevState, snapshot) {
         const { editing, selectedItem, onZoomToPoint, data } = this.props
         const g = d3.select(this.gRef.current)
+        const measureChanged = prevProps.selectedMeasure !== this.props.selectedMeasure
 
-        if (editing || prevProps.data !== data || prevProps.path !== this.props.path) {
+        if (editing || prevProps.data !== data || prevProps.path !== this.props.path || measureChanged) {
             this.create()
 
         }

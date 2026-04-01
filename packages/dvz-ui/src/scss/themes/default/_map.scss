@@ -291,35 +291,33 @@ body {
   }
 
   .measure-selector {
-    margin-top: 5px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    margin: 0 0 10px;
 
     .label {
-      font-weight: bold;
+      margin: 0;
+      font-size: 13px;
+      font-weight: 600;
+      color: #2c3338;
+      white-space: nowrap;
     }
 
-    ul {
-      margin: 5px auto 0 $base-unit;
-      overflow: hidden;
-    }
-
-    li {
-      display: inline-flex;
-      float: left;
-      margin-bottom: 5px;
-      margin-right: 10px;
-      font-size: 14px;
-      padding: 5px 5px 5px 0px;
-      color: #66676d;
-      cursor: pointer;
-
-      @media print {
-        white-space: nowrap;
-      }
-
-      input[type=radio] {
-        margin-top: 0.1rem;
-        margin-bottom: 0.25rem;
-      }
+    .selector {
+      min-width: 180px;
+      max-width: 260px;
+      height: 32px;
+      padding: 0 10px;
+      border: 1px solid #c3c4c7;
+      border-radius: 4px;
+      background-color: #fff;
+      color: #2c3338;
+      font-size: 13px;
+      line-height: 30px;
+      box-sizing: border-box;
     }
 
   }

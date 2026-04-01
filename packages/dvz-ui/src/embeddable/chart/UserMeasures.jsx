@@ -1,30 +1,47 @@
 import React from "react";
 
-const UserMeasures = ({options, multiMeasure, userMeasures, currentMeasures = [], onMeasureChange, measuresObject}) => {
+const UserMeasures = ({
+    options,
+    data,
+    label = "View data by:",
+    multiMeasure,
+    userMeasures = [],
+    currentMeasures = [],
+    onMeasureChange,
+    measuresObject
+}) => {
 
 
-    console.log("multiMeasure:" + multiMeasure)
+    const metadataMeasures = data?.metadata?.measures || options?.metadata?.measures || [];
+    const getMeasureLabel = (measure) => {
+        const configuredMeasure = measuresObject?.[measure] || {};
+        const metadataLabel = metadataMeasures.find((item) => item.value == measure)?.label;
+
+        return configuredMeasure.overrrideMeasureLabel
+            || configuredMeasure.overrideMeasureLabel
+            || configuredMeasure.customLabel
+            || metadataLabel
+            || measure;
+    }
+
     return <div className={"measures"}>
-        <div className="label-item"><label>View data by:</label></div>
+        {label && <div className="label-item"><label>{label}</label></div>}
         {measuresObject && userMeasures.map(u => {
 
             if (multiMeasure) {
-                return (<div onClick={e => onMeasureChange(u)}>
+                return (<div key={u} onClick={e => onMeasureChange(u)}>
                     <div className={`measure item  ${currentMeasures.indexOf(u) > -1 ? 'active' : ''}`}>
-                        {measuresObject && measuresObject[u] && measuresObject[u].overrrideMeasureLabel ?
-                            measuresObject[u].overrrideMeasureLabel :
-                            (options.metadata ? options.metadata.measures.filter(f => f.value == u)[0].label : '')}
+                        {getMeasureLabel(u)}
                     </div></div>)
             } else {
-                return (<div className={`item single-select`} onClick={e => onMeasureChange(u)}>
+                return (<div key={u} className={`item single-select`} onClick={e => onMeasureChange(u)}>
                     <label>
                         <input checked={currentMeasures.indexOf(u) > -1}
+                            readOnly
                             type="radio"
-                            value={measuresObject[u].overrrideMeasureLabel} />
+                            value={getMeasureLabel(u)} />
                     </label>
-                    <label > {measuresObject && measuresObject[u] && measuresObject[u].overrrideMeasureLabel ?
-                        measuresObject[u].overrrideMeasureLabel :
-                        (options.metadata ? options.metadata.measures.filter(f => f.value == u)[0].label : '')}</label>
+                    <label > {getMeasureLabel(u)}</label>
                 </div>)
             }
 

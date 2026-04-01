@@ -48,13 +48,21 @@ class DataLayer extends BaseLayer {
         this.createPatterns = this.createPatterns.bind(this)
         this.createPaths = this.createPaths.bind(this)
         this.animateRefresh = this.animateRefresh.bind(this)
+        this.getActiveMeasure = this.getActiveMeasure.bind(this)
 
     }
 
 
     createLayer(json) {
         //eslint-disable-next-line
-        const joined = this.joinData(json, this.props.app, this.props.featureJoinAttribute, this.props.data, this.props.measures, this.props.patternDiscriminator)
+        const joined = this.joinData(
+            json,
+            this.props.app,
+            this.props.featureJoinAttribute,
+            this.props.data,
+            this.getActiveMeasure(),
+            this.props.patternDiscriminator
+        )
         this.createDataLayer(joined)
         if (this.props.onReady) {
             //eslint-disable-next-line
@@ -158,6 +166,16 @@ class DataLayer extends BaseLayer {
         }
         return {}
 
+    }
+
+    getActiveMeasure(props = this.props) {
+        const { measures = [], selectedMeasure } = props
+
+        if (selectedMeasure && measures.includes(selectedMeasure)) {
+            return selectedMeasure
+        }
+
+        return measures[0]
     }
 
     animateRefresh() {
@@ -317,6 +335,7 @@ class DataLayer extends BaseLayer {
         } = this.props
 
         const { gradientStartColor, gradientEndColor } = this.props;
+        const activeMeasure = this.getActiveMeasure();
 
         const brStyles = new BreaksStyles({
             breaks: breaks,
@@ -327,7 +346,7 @@ class DataLayer extends BaseLayer {
 
         const gradientColors = new GradientColors({
             data: data ? data.children : [],
-            measure: measures[0],
+            measure: activeMeasure,
             defaultFillColor: markFillColor,
             gradientScheme: gradientScheme,
             gradientReverse: gradientReverse,
@@ -425,9 +444,10 @@ class DataLayer extends BaseLayer {
             defaultSize: markSizeScale
         })
 
+        const activeMeasure = this.getActiveMeasure();
         const getGradientColors = (data) => new GradientColors({
             data: data.children,
-            measure: measures[0],
+            measure: activeMeasure,
             defaultFillColor: markFillColor,
             gradientScheme: gradientScheme,
             gradientReverse: gradientReverse
@@ -567,9 +587,10 @@ class DataLayer extends BaseLayer {
 
         const patternWidth = 10 * 1 / k
         const patternHeight = 10 * 1 / k
+        const activeMeasure = this.getActiveMeasure();
         const getGradientColors = (data) => new GradientColors({
             data: data.children,
-            measure: measures[0],
+            measure: activeMeasure,
             defaultFillColor: markFillColor,
             gradientScheme: gradientScheme,
             gradientReverse: gradientReverse,
@@ -851,7 +872,7 @@ class DataLayer extends BaseLayer {
     }
 
 
-    joinData(json, app, featureJoinAttribute, data, measures, patternDiscriminator) {
+    joinData(json, app, featureJoinAttribute, data, measure, patternDiscriminator) {
 
         const features = json.features.map(d => {
             const joinValue = d.properties[featureJoinAttribute]
@@ -860,7 +881,7 @@ class DataLayer extends BaseLayer {
                     return d.value == joinValue
                 })
                 if (values.length > 0) {
-                    const measureValue = (values[0][measures[0]])
+                    const measureValue = (values[0][measure])
                     d.properties.meta = values[0]
                     d.properties._value = measureValue
                     if (patternDiscriminator && patternDiscriminator != 'none') {
@@ -899,12 +920,13 @@ class DataLayer extends BaseLayer {
         const { app, file, featureJoinAttribute, data, measures, patternDiscriminator, editing, usePattern } = this.props
         const dataChanged = prevProps.data !== data
         const pathChanged = prevProps.path !== this.props.path
+        const measureChanged = prevProps.selectedMeasure !== this.props.selectedMeasure
 
         //TODO:Check if data has changed using JSON.stringify
 
         if (editing || pathChanged) {
             this.create()
-        } else if (dataChanged) {
+        } else if (dataChanged || measureChanged) {
             if (this.props.animateOnDataRefresh) {
                 this.animateRefresh()
             } else {

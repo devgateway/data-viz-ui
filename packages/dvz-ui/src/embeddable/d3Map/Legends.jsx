@@ -88,6 +88,27 @@ const Breaks = ({ breaks, isPoint, numberFormat, intl }) => {
     </div>
 
 }
+
+const getActiveMeasure = (measures = [], selectedMeasure) => {
+    if (selectedMeasure && measures.includes(selectedMeasure)) {
+        return selectedMeasure
+    }
+
+    return measures[0]
+}
+
+const getMeasureLabel = (measures = [], selectedMeasure, customMeasuresLabels = {}) => {
+    const activeMeasure = getActiveMeasure(measures, selectedMeasure)
+
+    if (!activeMeasure) {
+        return ''
+    }
+
+    return customMeasuresLabels && customMeasuresLabels[activeMeasure]
+        ? customMeasuresLabels[activeMeasure]
+        : activeMeasure
+}
+
 const FlowLayerLegend = (props) => {
     const {
         name,
@@ -103,7 +124,8 @@ const FlowLayerLegend = (props) => {
         intl,
         id,
         onItemClick,
-        customMeasuresLabels
+        customMeasuresLabels,
+        selectedMeasure
     } = props
     const numberFormat = {
         style: (format.style === 'compacted') ? 'decimal' : format.style,
@@ -112,10 +134,7 @@ const FlowLayerLegend = (props) => {
         minimumFractionDigits: parseInt(format.minimumFractionDigits),
         maximumFractionDigits: parseInt(format.maximumFractionDigits)
     }
-    let measureLabel = measures[0]
-    if (customMeasuresLabels) {
-        measureLabel = customMeasuresLabels[measures[0]]
-    }
+    const measureLabel = getMeasureLabel(measures, selectedMeasure, customMeasuresLabels)
     const dimensionOptions = [...new Set(Object.keys(pointDimensionStyles).map(k => k.split('_')[0]))]
     return <div className={"legend"}>
         <div>
@@ -156,7 +175,8 @@ const DataPointsLayerLegend = (props) => {
         dim2LegendLabel,
         type,
         d2Click,
-        selectedItem
+        selectedItem,
+        selectedMeasure
     } = props
 
 
@@ -167,10 +187,7 @@ const DataPointsLayerLegend = (props) => {
         minimumFractionDigits: parseInt(format.minimumFractionDigits),
         maximumFractionDigits: parseInt(format.maximumFractionDigits)
     }
-    let measureLabel = measures[0]
-    if (customMeasuresLabels) {
-        measureLabel = customMeasuresLabels[measures[0]]
-    }
+    const measureLabel = getMeasureLabel(measures, selectedMeasure, customMeasuresLabels)
 
     const cats = dimension2 && allCategories ? allCategories.filter(c => c.type.toUpperCase() == dimension2.toUpperCase()) : []
     const items = cats.length > 0 ? cats[0].items : []
@@ -302,8 +319,10 @@ const DataLayerLegend = (props) => {
         colorLayerVisible = true,
         gradientStartColor,
         gradientEndColor,
+        selectedMeasure,
     } = props
     let measureLabel = ""
+    const activeMeasure = getActiveMeasure(measures, selectedMeasure)
 
     const numberFormat = {
         style: (format.style === 'compacted') ? 'decimal' : format.style,
@@ -315,7 +334,7 @@ const DataLayerLegend = (props) => {
 
     const getGradientColors = (data) => (new GradientColors({
         data: data.children,
-        measure: measures[0],
+        measure: activeMeasure,
         defaultFillColor: markFillColor,
         gradientScheme: gradientScheme,
         gradientReverse: gradientReverse,
@@ -323,8 +342,8 @@ const DataLayerLegend = (props) => {
         gradientEndColor: gradientEndColor
     }))
 
-    if (app != "csv" && customMeasuresLabels) {
-        measureLabel = customMeasuresLabels[measures[0]]
+    if (app != "csv") {
+        measureLabel = customMeasuresLabels?.[activeMeasure] || activeMeasure || ''
     } else {
         const parsed = Papa.parse(csv, { header: true, dynamicTyping: true });
         measureLabel = parsed.meta.fields.length > 0 ? parsed.meta.fields[1] : ''
@@ -349,11 +368,11 @@ const DataLayerLegend = (props) => {
 
 
     const getMinDataValue = (data) => {
-        return Math.min(...(data.children.map(d => d[measures[0]])))
+        return Math.min(...(data.children.map(d => d[activeMeasure])))
     }
 
     const getMaxDataValue = (data) => {
-        return Math.max(...(data.children.map(d => d[measures[0]])))
+        return Math.max(...(data.children.map(d => d[activeMeasure])))
     }
 
     return <div className={`legend layer_${toId(id)}`} id={toId(`${group} ${name} ${id}`)}>
@@ -433,7 +452,7 @@ const Legends = (props) => {
         <Icon name="chevron right"></Icon>
     );
 
-    const { layers = [], onItemClick, patternsData, group, intl, toggleColorLayer } = props;
+    const { layers = [], onItemClick, patternsData, group, intl, toggleColorLayer, selectedMeasure } = props;
 
 
     return (<div className={`legends ${collapsed ? 'collapsed' : ''}`} ref={divRef}>
@@ -479,14 +498,14 @@ const Legends = (props) => {
                                 store={[l.app, props.unique, l.id]}
                                 source={l.apiJoinAttribute + (l.patternDiscriminator != 'none' ? "/" + l.patternDiscriminator : '')}>
                                 <DataConsumer>
-                                    <DataLayerLegend group={group} patternsData={patternsData ? patternsData[l.id] : null} divRef={divRef} {...l} intl={props.intl} onItemClick={onItemClick} toggleColorLayer={toggleColorLayer} />
+                                    <DataLayerLegend selectedMeasure={selectedMeasure} group={group} patternsData={patternsData ? patternsData[l.id] : null} divRef={divRef} {...l} intl={props.intl} onItemClick={onItemClick} toggleColorLayer={toggleColorLayer} />
                                 </DataConsumer>
                             </DataProvider>
                         }
 
-                        {l.type == "dataPoints" && <DataPointsLayerLegend selectedItem={props.selectedItem} d2Click={props.d2Click} intl={props.intl} group={group} {...l} onItemClick={onItemClick} />}
+                        {l.type == "dataPoints" && <DataPointsLayerLegend selectedMeasure={selectedMeasure} selectedItem={props.selectedItem} d2Click={props.d2Click} intl={props.intl} group={group} {...l} onItemClick={onItemClick} />}
 
-                        {l.type == "flow" && <FlowLayerLegend group={group} {...l} onItemClick={onItemClick} intl={props.intl} />}
+                        {l.type == "flow" && <FlowLayerLegend selectedMeasure={selectedMeasure} group={group} {...l} onItemClick={onItemClick} intl={props.intl} />}
 
                     </div>)
 

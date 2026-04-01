@@ -12,7 +12,18 @@ class DataLayer extends BaseLayer {
     constructor() {
         super();
         this.createDataLayer = this.createDataLayer.bind(this)
+        this.getActiveMeasure = this.getActiveMeasure.bind(this)
 
+    }
+
+    getActiveMeasure(props = this.props) {
+        const { measures = [], selectedMeasure } = props
+
+        if (selectedMeasure && measures.includes(selectedMeasure)) {
+            return selectedMeasure
+        }
+
+        return measures[0]
     }
 
 
@@ -35,7 +46,7 @@ class DataLayer extends BaseLayer {
             waitForFilters,
         } = this.props
 
-        const measure = measures[0];
+        const measure = this.getActiveMeasure();
 
 
         const brStyles = new BreaksStyles({
@@ -265,13 +276,14 @@ class DataLayer extends BaseLayer {
             measures,
             csv,
         } = this.props
+        const activeMeasure = this.getActiveMeasure()
 
         const features = rawJson.features.map(d => {
             const joinValue = d.properties[featureJoinAttribute]
             if (app != 'csv' && data && data.children) {
                 const values = data.children.filter(d => d.value.indexOf(joinValue) > -1)
                 if (values.length > 0) {
-                    const measureValue = (values[0][measures[0]])
+                    const measureValue = (values[0][activeMeasure])
                     d.properties.meta = values[0]
                     d.properties._value = measureValue
                     d.properties.destinations = values[0].children
@@ -311,7 +323,8 @@ class DataLayer extends BaseLayer {
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         const { projection, editing, data } = this.props
-        if (editing || prevProps.data !== data || prevProps.path !== this.props.path) {
+        const measureChanged = prevProps.selectedMeasure !== this.props.selectedMeasure
+        if (editing || prevProps.data !== data || prevProps.path !== this.props.path || measureChanged) {
             this.create()
         }
 

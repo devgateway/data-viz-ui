@@ -10,6 +10,7 @@ import * as Immutable from "immutable";
 import Radar from "./Radar";
 import Bar from "./Bar";
 import Line from "./Line";
+import MeasureSelector from "../MeasureSelector";
 
 import { PostContent } from "@devgateway/wp-react-lib";
 import dataFrames from "./data/index";
@@ -184,6 +185,9 @@ const Chart = (props) => {
     "data-line-x-axis-tick-mode": lineXAxisTickMode = "none",
     "data-line-x-axis-tick-count": lineXAxisTickCount = 10,
     "data-line-x-axis-tick-every": lineXAxisTickEvery = 1,
+    "data-enable-measure-selector": enableMeasureSelector = "false",
+    "data-measure-selector-label": measureSelectorLabel = "Measure",
+    "data-measure-selector-default-measure": defaultMeasure = "",
     pageModuleProps,
   } = props;
   const originalEditValue = editing;
@@ -304,14 +308,17 @@ const Chart = (props) => {
   const getMeasuresObject = () => {
     return parse(measures);
   };
-  const getSelectedFormat = () => {
+  const getSelectedFormat = (activeMeasures = null) => {
     if (measuresObject?.[app]) {
       let format = measuresObject?.[app]?.format;
       if (!format) {
-        const keys = Object.keys(measuresObject?.[app]);
+        const keys = activeMeasures && activeMeasures.length > 0
+          ? activeMeasures
+          : Object.keys(measuresObject?.[app]);
         for (let i = 0; i < keys.length; i++) {
           if (
-            measuresObject?.[app][keys[i]].selected &&
+            measuresObject?.[app][keys[i]] &&
+            (activeMeasures ? true : measuresObject?.[app][keys[i]].selected) &&
             measuresObject?.[app][keys[i]].format
           ) {
             format = measuresObject?.[app][keys[i]].format;
@@ -353,13 +360,18 @@ const Chart = (props) => {
     }
     return [];
   };
-  const getCustomLabels = () => {
+  const getCustomLabels = (activeMeasures = null) => {
 
     const customLabels = {};
     if (measuresObject?.[app]) {
       const hasCustomLabels = Object.keys(measuresObject[app])
         .map((s) => ({ value: s, ...measuresObject[app][s] }))
-        .filter((m) => m.selected && m.hasCustomLabel);
+        .filter((m) => {
+          if (activeMeasures && activeMeasures.length > 0) {
+            return activeMeasures.includes(m.value) && m.hasCustomLabel;
+          }
+          return m.selected && m.hasCustomLabel;
+        });
       hasCustomLabels.forEach((m) => {
         customLabels[m.value] = m.customLabel;
       });
@@ -375,11 +387,23 @@ const Chart = (props) => {
     return [];
   };
 
+  const getMeasureOptionLabel = (measure) => {
+    const configuredMeasure = measuresObject?.[app]?.[measure] || {};
+
+    return (
+      configuredMeasure.overrrideMeasureLabel ||
+      configuredMeasure.overrideMeasureLabel ||
+      configuredMeasure.customLabel ||
+      measure
+    );
+  };
+
   let measuresObject = getMeasuresObject();
   let selectedMeasures = getSelectedMeasures();
 
   let selectedFormat = getSelectedFormat();
   const userMeasures = getUserMeasures();
+  const selectorMeasures = userMeasures.length > 0 ? userMeasures : selectedMeasures;
   let leftLegendForSelectedMeasure = left;
   let rightLegendForSelectedMeasure = rightLegend;
 
@@ -401,6 +425,49 @@ const Chart = (props) => {
       tooltipForSelectedMeasure = injectedMeasures.customTooltip;
     }
   }
+
+  const enableMeasureSelectorBool =
+    enableMeasureSelector === true || enableMeasureSelector === "true";
+  const selectorEnabled =
+    enableMeasureSelectorBool && !injectedMeasures?.[app] && selectorMeasures.length > 1;
+  const [selectedUserMeasure, setSelectedUserMeasure] = useState("");
+
+  useEffect(() => {
+    if (!selectorEnabled) {
+      setSelectedUserMeasure("");
+      return;
+    }
+
+    const availableMeasures = selectorMeasures.filter((measure) =>
+      measuresObject?.[app]?.[measure],
+    );
+
+    const fallbackMeasure = availableMeasures.includes(defaultMeasure)
+      ? defaultMeasure
+      : availableMeasures.find((measure) => selectedMeasures.includes(measure)) ||
+        availableMeasures[0] ||
+        "";
+
+    setSelectedUserMeasure((previousMeasure) =>
+      availableMeasures.includes(previousMeasure) ? previousMeasure : fallbackMeasure,
+    );
+  }, [
+    selectorEnabled,
+    defaultMeasure,
+    app,
+    measuresObject,
+    selectorMeasures,
+    selectedMeasures,
+  ]);
+
+  const effectiveSelectedMeasures =
+    selectorEnabled && selectedUserMeasure ? [selectedUserMeasure] : selectedMeasures;
+  const selectorOptions = selectorMeasures.map((measure) => ({
+    value: measure,
+    label: getMeasureOptionLabel(measure),
+  }));
+  selectedFormat = getSelectedFormat(effectiveSelectedMeasures);
+  const effectiveCustomLabels = getCustomLabels(effectiveSelectedMeasures);
 
   const numberFormat = selectedFormat
     ? {
@@ -683,7 +750,7 @@ const Chart = (props) => {
     enableGridY: enableGridY == true || enableGridY == "true",
     enableGridX: enableGridX == true || enableGridX == "true",
     offsetText,
-    selectedMeasures,
+    selectedMeasures: effectiveSelectedMeasures,
     overallLabel,
     minMaxClamp,
     reverseLegend: reverseLegend == true || reverseLegend == "true",
@@ -758,20 +825,20 @@ const Chart = (props) => {
     case "bar":
       Chart = Bar;
       showNotEnoughParameters =
-        app != "csv" && dimension1 == "none" && selectedMeasures.length == 0;
+        app != "csv" && dimension1 == "none" && effectiveSelectedMeasures.length == 0;
       break;
     case "line":
       Chart = Line;
       showNotEnoughParameters =
         app !== "csv" &&
-        (selectedMeasures.length === 0 || dimension1 === "none");
+        (effectiveSelectedMeasures.length === 0 || dimension1 === "none");
       break;
     case "pie":
-      showNotEnoughParameters = app != "csv" && selectedMeasures.length == 0;
+      showNotEnoughParameters = app != "csv" && effectiveSelectedMeasures.length == 0;
       Chart = HalfPie;
       break;
     case "radar":
-      showNotEnoughParameters = app != "csv" && selectedMeasures.length == 0;
+      showNotEnoughParameters = app != "csv" && effectiveSelectedMeasures.length == 0;
       Chart = Radar;
       break;
     default:
@@ -963,6 +1030,14 @@ const Chart = (props) => {
             {showNotEnoughParameters && <Messages editing={editing}></Messages>}
             {!showNotEnoughParameters && (
               <DataConsumer>
+                {selectorEnabled && (
+                  <MeasureSelector
+                    label={decode(measureSelectorLabel) || "Measure"}
+                    options={selectorOptions}
+                    value={effectiveSelectedMeasures[0] || selectorOptions[0]?.value || ""}
+                    onChange={setSelectedUserMeasure}
+                  />
+                )}
                 <Messages app={app} group={group} noDataMsg={noDataMsg}>
                   {" "}
                 </Messages>
@@ -977,7 +1052,7 @@ const Chart = (props) => {
                     includeOverall === true || includeOverall === "true"
                   }
                   overallLabel={overallLabel}
-                  measures={selectedMeasures}
+                  measures={effectiveSelectedMeasures}
                   dimensions={[...dimensions]}
                   sort={sort}
                   sortReverse={sortReverse === true || sortReverse === "true"}
@@ -986,14 +1061,14 @@ const Chart = (props) => {
                     sortReverseSecondDimension === true ||
                     sortReverseSecondDimension === "true"
                   }
-                  customLabels={getCustomLabels()}
+                  customLabels={effectiveCustomLabels}
                 >
                   <ColorProvider
                     type={type}
                     app={app}
                     locale={locale}
                     overallLabel={overallLabel}
-                    customLabels={getCustomLabels()}
+                    customLabels={effectiveCustomLabels}
                     manualColors={getManualColor()}
                     colorBy={colorBy}
                     scheme={scheme}
