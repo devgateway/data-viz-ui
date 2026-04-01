@@ -47,6 +47,7 @@ class DataLayer extends BaseLayer {
         this.createCentroids = this.createCentroids.bind(this)
         this.createPatterns = this.createPatterns.bind(this)
         this.createPaths = this.createPaths.bind(this)
+        this.animateRefresh = this.animateRefresh.bind(this)
 
     }
 
@@ -157,6 +158,35 @@ class DataLayer extends BaseLayer {
         }
         return {}
 
+    }
+
+    animateRefresh() {
+        if (!this.gRef || !this.gRef.current || !this.state.json) {
+            this.create()
+            return
+        }
+
+        const g = d3.select(this.gRef.current)
+        const fadeOutDuration = 180
+        const fadeInDuration = 300
+        const minOpacity = 0.25
+
+        g.interrupt()
+        g.selectAll("*").interrupt()
+
+        g.transition()
+            .duration(fadeOutDuration)
+            .style("opacity", minOpacity)
+            .on("end", () => {
+                this.create()
+
+                const refreshedGroup = d3.select(this.gRef.current)
+                refreshedGroup.interrupt()
+                refreshedGroup.style("opacity", minOpacity)
+                refreshedGroup.transition()
+                    .duration(fadeInDuration)
+                    .style("opacity", 1)
+            })
     }
 
     createDataLayer(json) {
@@ -867,11 +897,19 @@ class DataLayer extends BaseLayer {
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         const { app, file, featureJoinAttribute, data, measures, patternDiscriminator, editing, usePattern } = this.props
+        const dataChanged = prevProps.data !== data
+        const pathChanged = prevProps.path !== this.props.path
 
         //TODO:Check if data has changed using JSON.stringify
 
-        if (editing || prevProps.data !== data || prevProps.path !== this.props.path) {
+        if (editing || pathChanged) {
             this.create()
+        } else if (dataChanged) {
+            if (this.props.animateOnDataRefresh) {
+                this.animateRefresh()
+            } else {
+                this.create()
+            }
         }
 
         if (prevProps.visible != this.props.visible) {
