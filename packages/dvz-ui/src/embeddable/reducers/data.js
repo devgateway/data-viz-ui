@@ -143,16 +143,42 @@ export const setData = ({ app, group, csv, store, params }) => (dispatch, getSta
 export const getData = (props) => (dispatch, getState) => {
 
     const { app, group, source, store, params, parent } = props
-
     let filters = getState().get('data').getIn(['filters', app, group]);
-
-
-
-
     let newParams = { ...params }
+
+
     if (filters) {
         //preset filters overrides selected filters
-        newParams = { ...filters.toJS(), ...params }
+        /*
+         // Example: If the component has a preset `Gender=Female` filter, 
+        // selecting anything other than "Female" should result in no data being shown.
+
+        dvzProxyDatasetId: "122"
+        meta_source: ['aadgg']
+                sex: ['Female']
+
+        for those components that were using preset filter as default filter, please use the new 
+        default selected filter setting of Filter Component
+        */
+
+        const userFilters = filters.toJS();
+        newParams = { ...userFilters, ...params };
+
+        if (params) {
+            debugger;
+            Object.keys(params).forEach(key => {
+                if (userFilters[key] !== undefined) {
+                    const presetValues = Array.isArray(params[key]) ? params[key] : [params[key]];
+                    const userValues = Array.isArray(userFilters[key]) ? userFilters[key] : [userFilters[key]];
+
+                    const hasPreset = presetValues.some(val => userValues.includes(val));
+
+                    if (!hasPreset) {
+                        newParams[key] = [Number.MIN_SAFE_INTEGER];
+                    }
+                }
+            });
+        }
     }
 
     dispatch({ type: LOAD_DATA, app, group, params: newParams, store })
