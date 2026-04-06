@@ -6,7 +6,6 @@ import { useParams } from "react-router";
 import { getPages } from "@devgateway/wp-react-lib";
 import { getMetaSeo } from "../utils/meta-seo";
 import { DEFAULT_LOCALE } from "~/utils/constants";
-import Header from "~/embeddable/Header";
 import { getApiUrl } from "~/utils/api-utils";
 
 export async function loader({ request, params }: Route.LoaderArgs) {
@@ -51,6 +50,7 @@ const Home = ({
   const locale = params.lan ?? DEFAULT_LOCALE;
 
   return (
+
     <ResponsiveContainer locale={locale}>
       <Page pages={[loaderData.post]} />
     </ResponsiveContainer>

@@ -12,7 +12,7 @@ const devConfig = defineConfig({
     plugins: [
         reactRouter(),
         tsconfigPaths(),
-        EnvironmentPlugin({
+        Environment({
             prefix: "VITE_",
         }),
         commonjs(),
