@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import type { PostType } from '@devgateway/wp-react-lib';
 import { Container, Grid, GridRow, Loader, SemanticWIDTHS } from 'semantic-ui-react';
 import PostIntro from "../connected-templates/PostIntro";
@@ -115,6 +115,8 @@ const FilteredPosts = (props: FilteredPostsProps) => {
     const [loading, setLoading] = useState(false);
     const postsReducer: any = useSelector((state: any) => state).getIn(["data", "posts", group]);
     const [posts, setPosts] = useState<any>([]);
+    const containerRef = useRef<HTMLDivElement>(null);
+    const [minHeight, setMinHeight] = useState<number | undefined>(undefined);
     const enableSortingValue = toBoolean(enableSorting);
 
     const sortFirstByValue = (enableSortingValue && sortFirstBy !== "none") ? toNumber(sortFirstBy) : null;
@@ -244,6 +246,9 @@ const FilteredPosts = (props: FilteredPostsProps) => {
     };
 
     const getPosts = async () => {
+        if (containerRef.current) {
+            setMinHeight(containerRef.current.offsetHeight);
+        }
         setLoading(true);
         const filters = generateFilters();
 
@@ -315,7 +320,7 @@ const FilteredPosts = (props: FilteredPostsProps) => {
                     const totalPages = metaData['x-wp-totalpages'] ? metaData['x-wp-totalpages'] : 1;
                     const totalItems = metaData['x-wp-total'] ? metaData['x-wp-total'] : 0;
 
-                    if (totalPages && totalItems) {
+                    if (totalPages) {
                         dispatch({
                             type: 'SET_POSTS_PAGINATION',
                             group,
@@ -329,6 +334,7 @@ const FilteredPosts = (props: FilteredPostsProps) => {
             }
         }).finally(() => {
             setLoading(false);
+            setMinHeight(undefined);
         });
     }
 
@@ -340,23 +346,27 @@ const FilteredPosts = (props: FilteredPostsProps) => {
 
 
     return (
-        <Container fluid>
-            {
-                loading ? (
-                    <Loader active inline='centered' />
-                ) : !loading && posts && posts.length > 0 ? (
-                    <PostGridContent
-                        posts={posts}
-                        postWidth={Number(postWidth)}
-                        postHeight={Number(postHeight)}
-                        numberOfColumns={Number(numberOfColumns)}
-                        sortFirstBy={sortFirstByValue}
-                        countryCategory={sortingTaxonomy} />
-                ) : (
-                    <NoData noDataMsg="No posts found" group={group} />
-                )
-            }
-        </Container>
+        <div ref={containerRef} id={`filtered-posts-${group}`} style={minHeight !== undefined ? { minHeight, border: '1px solid #e0e0e0', borderRadius: '4px' } : undefined}>
+            <Container fluid>
+                {
+                    loading ? (
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: minHeight ?? '100%' }}>
+                            <Loader active inline='centered' />
+                        </div>
+                    ) : !loading && posts && posts.length > 0 ? (
+                        <PostGridContent
+                            posts={posts}
+                            postWidth={Number(postWidth)}
+                            postHeight={Number(postHeight)}
+                            numberOfColumns={Number(numberOfColumns)}
+                            sortFirstBy={sortFirstByValue}
+                            countryCategory={sortingTaxonomy} />
+                    ) : (
+                        <NoData noDataMsg="No posts found" group={group} />
+                    )
+                }
+            </Container>
+        </div>
     )
 }
 
