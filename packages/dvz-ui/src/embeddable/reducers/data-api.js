@@ -69,8 +69,9 @@ export const getData = ({ source, app, params }) => {
     return requestWithDeduplication(finalUrl);
 };
 
-export const getCustomPosts = ({ postType, taxonomy, category, taxonomyFilters, before, perPage, page, locale, after, ordering, orderingDirection }) => {
-    const url = `${Config.REACT_APP_WP_API}/wp/v2/${postType}`;
+export const getCustomPosts = ({ postType, taxonomy, category, taxonomyFilters, before, perPage, page, locale, after, ordering, orderingDirection, wpApiBase }) => {
+    const apiBase = wpApiBase ? wpApiBase.replace(/\/+$/, '') : Config.REACT_APP_WP_API;
+    const url = `${apiBase}/wp/v2/${postType}`;
     const queryParams = new URLSearchParams();
 
     // Collect taxonomy values per key, then serialize as comma-separated lists
