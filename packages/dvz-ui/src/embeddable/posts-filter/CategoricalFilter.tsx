@@ -6,6 +6,7 @@ interface CategoricalFilterProps extends PostFilterDropdownProps {
     taxonomies?: any[] | null
     type?: string;
     categories?: any[] | null;
+    wpApiBase?: string;
 }
 
 const CategoricalFilter = (props: CategoricalFilterProps) => {
@@ -27,6 +28,7 @@ const CategoricalFilter = (props: CategoricalFilterProps) => {
         type,
         categories,
         onChange,
+        wpApiBase,
         ...restProps
     } = props;
 
@@ -39,7 +41,8 @@ const CategoricalFilter = (props: CategoricalFilterProps) => {
             return;
         };
 
-        const response: any = await fetch(Config.REACT_APP_WP_API + "/wp/v2/" + taxonomy);
+        const apiBase = wpApiBase ?? Config.REACT_APP_WP_API;
+        const response: any = await fetch(apiBase + "/wp/v2/" + taxonomy);
         const data = await response.json();
 
         if (data) {
@@ -69,7 +72,7 @@ const CategoricalFilter = (props: CategoricalFilterProps) => {
         return () => {
             ignore = true;
         }
-    }, [type,taxonomy, categories]);
+    }, [type, taxonomy, categories, wpApiBase]);
 
     return (
         <PostsFilterDropdown

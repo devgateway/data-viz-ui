@@ -7,6 +7,7 @@ import { useAppDispatch } from "@/redux/hooks";
 import { useSelector } from "react-redux";
 import CategoricalFilter from "./CategoricalFilter";
 import YearFilter from "./YearFilter";
+import { resolveWpApiBase } from '../filtered-posts/utils';
 
 
 interface PostsFilterProps {
@@ -31,6 +32,8 @@ interface PostsFilterProps {
     "data-type"?: string;
     "data-sort-first-by"?: string;
     "data-default-values"?: string;
+    "data-wordpress-source-type"?: string;
+    "data-wordpress-source"?: string;
     editing?: boolean;
 }
 const PostsFilter = (props: PostsFilterProps) => {
@@ -55,6 +58,8 @@ const PostsFilter = (props: PostsFilterProps) => {
         "data-type": type,
         "data-sort-first-by": sortFirstBy,
         "data-default-values": defaultValues = "[]",
+        "data-wordpress-source-type": wordpressSourceType,
+        "data-wordpress-source": wordpressSource,
         editing = false
     } = props;
 
@@ -63,6 +68,12 @@ const PostsFilter = (props: PostsFilterProps) => {
     const postsFilters = filters || {};
     const isMultiSelectFilter = filterType === "multi-select";
     const resetKey = useRef(0);
+
+    const [wpApiBase, setWpApiBase] = useState<string | null>(null);
+
+    useEffect(() => {
+        resolveWpApiBase(wordpressSourceType, wordpressSource).then(setWpApiBase);
+    }, [wordpressSourceType, wordpressSource]);
 
     const decode = (value: string) => {
         if (editing) {
@@ -338,6 +349,7 @@ const PostsFilter = (props: PostsFilterProps) => {
                         }}
                         categories={categories ? categories.split(',') : []}
                         resetKey={resetKey.current}
+                        wpApiBase={wpApiBase ?? undefined}
                     />
 
                 )

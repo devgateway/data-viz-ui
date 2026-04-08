@@ -3,7 +3,7 @@ import type { PostType } from '@devgateway/wp-react-lib';
 import { Container, Grid, GridRow, Loader, SemanticWIDTHS } from 'semantic-ui-react';
 import PostIntro from "../connected-templates/PostIntro";
 import { injectIntl, WrappedComponentProps } from 'react-intl';
-import { getStartDateAndEndDateFromYear } from './utils';
+import { getStartDateAndEndDateFromYear, resolveWpApiBase } from './utils';
 import NoData from './NoData';
 import { useDispatch, useSelector } from 'react-redux';
 import { getCustomPosts } from '../reducers/data-api';
@@ -17,6 +17,8 @@ interface PostGridContentProps {
     countryCategory: string;
     postWidth: number;
     postHeight: number;
+    wordpressSourceType?: string;
+    wordpressSource?: string;
 }
 
 interface NormalizedFilterValues {
@@ -87,6 +89,8 @@ interface FilteredPostsProps extends WrappedComponentProps {
     "data-sort-first-by": number | string;
     "data-sorting-type": string;
     "data-sorting-taxonomy": string;
+    "data-wordpress-source-type"?: string;
+    "data-wordpress-source"?: string;
     editing?: boolean;
 }
 
@@ -106,6 +110,8 @@ const FilteredPosts = (props: FilteredPostsProps) => {
         "data-enable-sorting": enableSorting,
         "data-sort-first-by": sortFirstBy,
         "data-sorting-taxonomy": sortingTaxonomy,
+        "data-wordpress-source-type": wordpressSourceType,
+        "data-wordpress-source": wordpressSource,
         editing,
     } = props;
 
@@ -113,6 +119,7 @@ const FilteredPosts = (props: FilteredPostsProps) => {
     const { locale } = useParams();
 
     const [loading, setLoading] = useState(false);
+    const [wpApiBase, setWpApiBase] = useState<string | null>(null);
     const postsReducer: any = useSelector((state: any) => state).getIn(["data", "posts", group]);
     const [posts, setPosts] = useState<any>([]);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -298,6 +305,7 @@ const FilteredPosts = (props: FilteredPostsProps) => {
             taxonomyFilters,
             ordering: "date",
             orderingDirection: "desc",
+            wpApiBase: wpApiBase ?? undefined,
         };
 
         await getCustomPosts(args).then((response: any) => {
@@ -339,10 +347,14 @@ const FilteredPosts = (props: FilteredPostsProps) => {
     }
 
     useEffect(() => {
+        resolveWpApiBase(wordpressSourceType, wordpressSource).then(setWpApiBase);
+    }, [wordpressSourceType, wordpressSource]);
+
+    useEffect(() => {
         (async () => {
             await getPosts();
         })();
-    }, [postsReducer, type, taxonomy, numberOfItemsPerPage, categories, sortingTaxonomy]);
+    }, [postsReducer, type, taxonomy, numberOfItemsPerPage, categories, sortingTaxonomy, wpApiBase]);
 
 
     return (
