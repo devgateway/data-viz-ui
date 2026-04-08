@@ -67,13 +67,7 @@ const PostsFilter = (props: PostsFilterProps) => {
     const filters: any = useSelector((state: any) => state.getIn(["data", "posts", group]));
     const postsFilters = filters || {};
     const isMultiSelectFilter = filterType === "multi-select";
-    const resetKey = useRef(0);
-
-    const [wpApiBase, setWpApiBase] = useState<string | null>(null);
-
-    useEffect(() => {
-        resolveWpApiBase(wordpressSourceType, wordpressSource).then(setWpApiBase);
-    }, [wordpressSourceType, wordpressSource]);
+    const resetKey = useRef(0); 
 
     const decode = (value: string) => {
         if (editing) {
@@ -349,7 +343,7 @@ const PostsFilter = (props: PostsFilterProps) => {
                         }}
                         categories={categories ? categories.split(',') : []}
                         resetKey={resetKey.current}
-                        wpApiBase={wpApiBase ?? undefined}
+                        wpApiBase={wordpressSource ?? undefined}
                     />
 
                 )
