@@ -7,7 +7,6 @@ import { useAppDispatch } from "@/redux/hooks";
 import { useSelector } from "react-redux";
 import CategoricalFilter from "./CategoricalFilter";
 import YearFilter from "./YearFilter";
-import { resolveWpApiBase } from '../filtered-posts/utils';
 
 
 interface PostsFilterProps {
