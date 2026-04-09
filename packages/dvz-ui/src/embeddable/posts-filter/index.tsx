@@ -67,7 +67,7 @@ const PostsFilter = (props: PostsFilterProps) => {
     const filters: any = useSelector((state: any) => state.getIn(["data", "posts", group]));
     const postsFilters = filters || {};
     const isMultiSelectFilter = filterType === "multi-select";
-    const resetKey = useRef(0);
+    const [resetKey, setResetKey] = useState(0);
 
     const decode = (value: string) => {
         if (editing) {
@@ -314,7 +314,7 @@ const PostsFilter = (props: PostsFilterProps) => {
                     onChange={(_e, value) => {
                         handleYearChange(value as any);
                     }}
-                    resetKey={resetKey.current}
+                    resetKey={resetKey}
                 />
             )}
             {
@@ -342,7 +342,7 @@ const PostsFilter = (props: PostsFilterProps) => {
                             handleCategoryChange(value as any);
                         }}
                         categories={categories ? categories.split(',') : []}
-                        resetKey={resetKey.current}
+                        resetKey={resetKey}
                         wpApiBase={wordpressSource ?? undefined}
                     />
 
