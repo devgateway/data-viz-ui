@@ -67,7 +67,7 @@ const PostsFilter = (props: PostsFilterProps) => {
     const filters: any = useSelector((state: any) => state.getIn(["data", "posts", group]));
     const postsFilters = filters || {};
     const isMultiSelectFilter = filterType === "multi-select";
-    const resetKey = useRef(0); 
+    const resetKey = useRef(0);
 
     const decode = (value: string) => {
         if (editing) {
