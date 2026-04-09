@@ -13,20 +13,12 @@ async function getYearsToDisplay() {
     return yearRange;
 }
 
-/**
- * Resolves the WP REST API base URL based on the configured source type.
- *
- * - internal: returns null (callers use Config.REACT_APP_WP_API)
- * - landing:  wordpressSource is pre-populated by the block editor with the landing URL + /wp,
- *             so we just append /wp-json
- * - custom:   same — user URL already ends with /wp, append /wp-json
- */
 async function resolveWpApiBase(
     wordpressSourceType: string | undefined,
     wordpressSource: string | undefined
 ): Promise<string | null> {
     if ((wordpressSourceType === 'custom' || wordpressSourceType === 'landing') && wordpressSource) {
-        return wordpressSource.replace(/\/+$/, '') + '/wp-json';
+        return wordpressSource;
     }
     return null;
 }

@@ -349,6 +349,7 @@ const FilteredPosts = (props: FilteredPostsProps) => {
 
 
     useEffect(() => {
+        if (!type) return;
         (async () => {
             await getPosts();
         })();
