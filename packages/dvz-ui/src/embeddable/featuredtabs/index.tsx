@@ -78,19 +78,23 @@ const FeaturedPost: React.FC<FeaturedPostProps> = ({ post, onClick, active, more
     );
 };
 
-const GetFigureFromPost: React.FC<GetFigureFromPostProps> = ({ post }) => {
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(post.content.rendered, 'text/html');
-    const figureElement = doc.querySelector('figure');
-    if (!figureElement) {
+const GetFigureFromPost: React.FC<GetFigureFromPostProps> = React.memo(({ post }) => {
+    const figureHtml = React.useMemo(() => {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(post.content.rendered, 'text/html');
+        const figureElement = doc.querySelector('figure');
+        return figureElement ? figureElement.outerHTML : null;
+    }, [post.content.rendered]);
+
+    if (!figureHtml) {
         return null;
     }
     return (
         <div style={{
             flex: '0 0 40px'
-        }} dangerouslySetInnerHTML={{ __html: figureElement.outerHTML }} />
+        }} dangerouslySetInnerHTML={{ __html: figureHtml }} />
     );
-};
+});
 
 // Desktop FeaturedTabs Component
 const FeaturedTabs: React.FC<FeaturedTabsProps> = ({ posts, width, height, color, moreLabel, closeLabel }) => {
