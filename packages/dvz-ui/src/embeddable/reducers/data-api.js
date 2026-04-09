@@ -69,8 +69,8 @@ export const getData = ({ source, app, params }) => {
 };
 
 export const getCustomPosts = ({ postType, taxonomy, category, taxonomyFilters, before, perPage, page, locale, after, ordering, orderingDirection, wpApiBase }) => {
-
-    const apiBase = wpApiBase ? wpApiBase + '/wp-json' : Config.REACT_APP_WP_API;
+    const hasApiBase = wpApiBase !== undefined && wpApiBase !== null && wpApiBase !== "";
+    const apiBase = hasApiBase ? wpApiBase : Config.REACT_APP_WP_API;
     console.log("Using API base:", apiBase);
     const url = `${apiBase}/wp/v2/${postType}`;
     const queryParams = new URLSearchParams();

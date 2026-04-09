@@ -41,7 +41,8 @@ const CategoricalFilter = (props: CategoricalFilterProps) => {
             return;
         };
 
-        const apiBase = wpApiBase ?? Config.REACT_APP_WP_API;
+        const hasApiBase = wpApiBase !== undefined && wpApiBase !== null && wpApiBase !== "";
+        const apiBase = hasApiBase ? wpApiBase : Config.REACT_APP_WP_API;
         console.log("Fetching taxonomy options from API base:", apiBase);
         const response: any = await fetch(apiBase + "/wp/v2/" + taxonomy);
         const data = await response.json();
