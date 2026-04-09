@@ -58,8 +58,7 @@ export const getCategories = ({ app, params }) => {
 };
 
 export const getCategory = ({ app, type, params }) => {
-    const finalUrl = `${API_ROOT ? API_ROOT : ''}/api/${app}/categories/${type}${params ? '?' + queryParams(params) : ''}`
-    console.log("categories==>", finalUrl)
+    const finalUrl = `${API_ROOT ? API_ROOT : ''}/api/${app}/categories/${type}${params ? '?' + queryParams(params) : ''}`;
 
     return requestWithDeduplication(finalUrl)
 }
@@ -70,7 +69,9 @@ export const getData = ({ source, app, params }) => {
 };
 
 export const getCustomPosts = ({ postType, taxonomy, category, taxonomyFilters, before, perPage, page, locale, after, ordering, orderingDirection, wpApiBase }) => {
-    const apiBase = wpApiBase ? wpApiBase.replace(/\/+$/, '') : Config.REACT_APP_WP_API;
+
+    const apiBase = wpApiBase ? wpApiBase + '/wp-json' : Config.REACT_APP_WP_API;
+    console.log("Using API base:", apiBase);
     const url = `${apiBase}/wp/v2/${postType}`;
     const queryParams = new URLSearchParams();
 
@@ -128,8 +129,7 @@ export const getCustomPosts = ({ postType, taxonomy, category, taxonomyFilters, 
     return get(`${url}?${queryString}`, {
         headers: {
             'Content-Type': 'application/json',
-        },
-        credentials: 'include',
+        }, 
     }, true);
 
 };

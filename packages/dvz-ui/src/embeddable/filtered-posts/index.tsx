@@ -102,7 +102,7 @@ const FilteredPosts = (props: FilteredPostsProps) => {
         "data-number-of-columns": numberOfColumns,
         "data-type": type,
         "data-taxonomy": taxonomy,
-        "data-categories": categories,
+        "data-categories": categories = "[]",
         "data-height": _height,
         "data-post-width": postWidth,
         "data-post-height": postHeight,
@@ -115,11 +115,12 @@ const FilteredPosts = (props: FilteredPostsProps) => {
         editing,
     } = props;
 
+
     const dispatch = useDispatch();
     const { locale } = useParams();
 
     const [loading, setLoading] = useState(false);
-    const [wpApiBase, setWpApiBase] = useState<string | null>(null);
+
     const postsReducer: any = useSelector((state: any) => state).getIn(["data", "posts", group]);
     const [posts, setPosts] = useState<any>([]);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -305,7 +306,7 @@ const FilteredPosts = (props: FilteredPostsProps) => {
             taxonomyFilters,
             ordering: "date",
             orderingDirection: "desc",
-            wpApiBase: wpApiBase ?? undefined,
+            wpApiBase: wordpressSource ?? undefined,
         };
 
         await getCustomPosts(args).then((response: any) => {
@@ -346,15 +347,12 @@ const FilteredPosts = (props: FilteredPostsProps) => {
         });
     }
 
-    useEffect(() => {
-        resolveWpApiBase(wordpressSourceType, wordpressSource).then(setWpApiBase);
-    }, [wordpressSourceType, wordpressSource]);
 
     useEffect(() => {
         (async () => {
             await getPosts();
         })();
-    }, [postsReducer, type, taxonomy, numberOfItemsPerPage, categories, sortingTaxonomy, wpApiBase]);
+    }, [postsReducer, type, taxonomy, numberOfItemsPerPage, categories, sortingTaxonomy]);
 
 
     return (
