@@ -1,26 +1,30 @@
+'use client';
+
 import React, { MutableRefObject, useCallback, useEffect, useRef, useState } from "react";
 import deviceType from '../utils/deviceType';
 
-const FlexWrapDetector = ({ children, onWrapChange, className }) => {
+interface FlexWrapDetectorProps {
+  children: React.ReactNode;
+  onWrapChange?: (wrapCount: number) => void;
+  className?: string;
+}
+
+const FlexWrapDetector = ({ children, onWrapChange, className }: FlexWrapDetectorProps) => {
   const containerRef: MutableRefObject<HTMLDivElement | null> = useRef(null);
   const [wrapCount, setWrapCount] = useState(0);
+
+  // deviceType() is safe here because this is a 'use client' component —
+  // it only runs in the browser. The SSR guard in deviceType.ts provides
+  // an additional safety net but is not load-bearing in this file.
   const isMobileOrTablet = deviceType() === 'mobile' || deviceType() === 'tablet' || deviceType() === 'midTablet';
 
   const makeFlexWrap = useCallback(() => {
     if (containerRef.current) {
       containerRef.current.style.setProperty("display", "flex", "important");
       if (wrapCount > 0 || isMobileOrTablet) {
-        containerRef.current.style.setProperty(
-          "flex-wrap",
-          "wrap",
-          "important"
-        );
+        containerRef.current.style.setProperty("flex-wrap", "wrap", "important");
       } else {
-        containerRef.current.style.setProperty(
-          "flex-wrap",
-          "nowrap",
-          "important"
-        );
+        containerRef.current.style.setProperty("flex-wrap", "nowrap", "important");
       }
     }
   }, [wrapCount, isMobileOrTablet]);
@@ -36,7 +40,6 @@ const FlexWrapDetector = ({ children, onWrapChange, className }) => {
         }
       });
     }
-
     if (count !== wrapCount) {
       setWrapCount(count);
     }
@@ -55,14 +58,14 @@ const FlexWrapDetector = ({ children, onWrapChange, className }) => {
   }, [wrapCount, onWrapChange]);
 
   useEffect(() => {
-    makeFlexWrap()
+    makeFlexWrap();
   }, [makeFlexWrap]);
 
   return (
     <div ref={containerRef} className={className}>
-      {makeFlexWrap()}
       {children}
     </div>
   );
 };
+
 export default FlexWrapDetector;

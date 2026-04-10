@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { Navigate, Outlet, useLocation, useParams } from 'react-router';
 import {
     getComponentByNameIgnoreCase
@@ -11,83 +11,59 @@ import { Config } from '@/conf';
 import { englishTranslations, frenchTranslations, afrikaansTranslations, amharicTranslations } from '@/translations';
 import { updateIntl } from '@/lib';
 import { store } from '@/redux';
+import { ClientEffects } from './ClientEffects';
 
 type Locale = 'en' | 'fr' | 'am' | 'af';
 
-const messages: Record<Locale, any> = {
+const messages: Record<Locale, Record<string, string>> = {
     'en': englishTranslations,
     'fr': frenchTranslations,
     'am': amharicTranslations,
     'af': afrikaansTranslations
 };
 
+// ── Server shell (no 'use client') ──────────────────────────────────────────
+// This component contains no useEffect, no useState, and no browser-global
+// access. It is safe to render server-side (Next.js RSC / renderToString).
+export const RootLayoutShell = ({ locale, children }: { locale: string; children: React.ReactNode }) => (
+    <Provider store={store}>
+        <IntlProvider key={locale} locale={locale} messages={messages[locale as Locale]}>
+            <AppContextProvider getComponent={getComponentByNameIgnoreCase} store={store} locale={locale}>
+                <SettingProvider locale={locale} changeUUID={null}>
+                    <SettingsConsumer>
+                        <CustomizerWrapper />
+                        {children}
+                    </SettingsConsumer>
+                </SettingProvider>
+            </AppContextProvider>
+        </IntlProvider>
+    </Provider>
+);
 
+// ── Route component (no 'use client') ────────────────────────────────────────
+// Uses React Router hooks which are safe without 'use client' in RSC
+// because React Router's server renderer provides the context.
 const RootLayout = () => {
     const pathParams = useParams();
     const location = useLocation();
     const defaultLocale = Config.DEFAULT_LOCALE;
-    const [isClient, setIsClient] = useState(false);
     const locale = pathParams.lan;
     const pathname = location.pathname;
-    useEffect(() => {
-        setIsClient(true);
-
-        if (process.env.NODE_ENV === "development") {
-            console.log("----------.env-----------");
-            console.log(process.env);
-            console.log("----------.env-----------");
-        }
-
-
-        if (typeof window !== 'undefined') {
-            window.setTimeout(() => {
-                if (window.location.hash) {
-                    const element = document.getElementById(window.location.hash.substring(1));
-                    if (element) {
-                        element.scrollIntoView({ behavior: "auto", block: "start" });
-                    }
-                }
-            }, 2000);
-        }
-    }, []);
-
-    useEffect(() => {
-        // This effect runs on every update, equivalent to componentDidUpdate
-        store.dispatch(updateIntl({ locale, formats: {}, messages: messages[locale as Locale ?? 'en'] }));
-    }, [locale]);
-
-    // const urlParams = new URLSearchParams(window && window.location.search);
-    // const customize_changeset_uuid = urlParams.get('customize_changeset_uuid');
-    //
-    //
-    // useEffect(() => {
-    //     // @ts-ignore
-    //     window.isCustomizedPreview = customize_changeset_uuid != null;
-    // }, [customize_changeset_uuid]);
-
 
     if (!locale) {
-        return <Navigate to={defaultLocale} replace></Navigate>
+        return <Navigate to={defaultLocale} replace />;
     }
 
     if (!Object.keys(messages).includes(locale)) {
-        return <Navigate to={`/${defaultLocale}${pathname}`} replace></Navigate>
+        return <Navigate to={`/${defaultLocale}${pathname}`} replace />;
     }
 
     return (
-        <Provider store={store}>
-            <IntlProvider key={locale} locale={locale} messages={messages[locale as Locale]}>
-                <AppContextProvider getComponent={getComponentByNameIgnoreCase} store={store} locale={locale}>
-                    <SettingProvider locale={locale} changeUUID={null}>
-                        <SettingsConsumer>
-                            <CustomizerWrapper/>
-                            <Outlet />
-                        </SettingsConsumer>
-                    </SettingProvider>
-                </AppContextProvider>
-            </IntlProvider>
-        </Provider>
+        <RootLayoutShell locale={locale}>
+            <ClientEffects locale={locale} />
+            <Outlet />
+        </RootLayoutShell>
     );
-}
+};
 
-export default RootLayout as any;
+export default RootLayout as React.ComponentType;

@@ -7,15 +7,25 @@ import {
     Post,
     PostType
 } from "@devgateway/wp-react-lib"
+import type { ContainerSSRProps } from './types';
 
-interface SlugPostContainerProps {
+interface SlugPostContainerProps extends ContainerSSRProps {
     header?: React.ReactNode;
     footer?: React.ReactNode;
     posts?: PostType;
 }
 
-const SlugPostContainer = ({ header, footer, posts }: SlugPostContainerProps = {}) => {
+const SlugPostContainer = ({ header, footer, posts, initialData }: SlugPostContainerProps = {}) => {
     const { lan: locale, slug, parent, year, month, day } = useParams();
+
+    // SSR path: initialData injected by server — bypass Redux fetching entirely
+    if (initialData) {
+        return (
+            <ResponsiveContainer header={header} footer={footer}>
+                <Post posts={initialData as unknown as PostType[]} />
+            </ResponsiveContainer>
+        );
+    }
 
     if (posts) {
         const renderedPosts = typeof posts === 'object' ? [posts] : posts;
@@ -26,15 +36,12 @@ const SlugPostContainer = ({ header, footer, posts }: SlugPostContainerProps = {
         )
     }
 
-    console.log('SlugPostContainer falling back to PostProvider');
-
     return (
         <PostProvider
             type={parent}
             slug={slug}
             store={slug}
             locale={locale}
-
             year={year}
             month={month}
             day={day}

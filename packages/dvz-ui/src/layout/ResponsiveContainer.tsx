@@ -1,12 +1,12 @@
 import React from 'react'
 
-import {Container,} from 'semantic-ui-react'
-import {SettingsConsumer} from '@devgateway/wp-react-lib'
-import {Media} from "@/utils/AppMedia.js"
-import Footer from "./Footer.jsx";
-import Header from "./Header.jsx";
-import TopNavigator from "./TopNavigator.jsx";
-import { CustomizerWrapper } from "./Customizer.jsx";
+import { Container } from '@devgateway/ui'
+import { SettingsConsumer } from '@devgateway/wp-react-lib'
+import { Media, MediaContextProvider, mediaStyle } from "@/utils/AppMedia"
+import Footer from "./Footer";
+import Header from "./Header";
+import TopNavigator from "./TopNavigator";
+import { CustomizerWrapper } from "./Customizer";
 
 
 export interface DesktopContainerProps {
@@ -17,12 +17,13 @@ export interface DesktopContainerProps {
 
 
 const DesktopContainer = ({ children, fixed = false, header }: DesktopContainerProps) => {
+    const AnyHeader = Header as React.ComponentType<{ settings?: unknown }>;
     return (
         <Container fluid={true}>
             <SettingsConsumer>
+                {/* @ts-ignore – settings is injected at runtime by SettingsConsumer via cloneElement */}
                 <CustomizerWrapper>
-                    {/* @ts-ignore */}
-                   { header ? header : <Header />}
+                    { header ? header : <AnyHeader />}
                 </CustomizerWrapper>
             </SettingsConsumer>
             <Container className="desktop">
@@ -38,7 +39,7 @@ export interface ResponsiveContainerProps {
     children: React.ReactNode;
     fixed?: boolean;
     locale?: string;
-    pages?: any[];
+    pages?: unknown[];
     header?: React.ReactNode;
     footer?: React.ReactNode;
 }
@@ -47,18 +48,19 @@ export interface ResponsiveContainerProps {
 function ResponsiveContainer (props: ResponsiveContainerProps) {
 
     const {children, fixed, locale, pages, header, footer} = props;
-    const page = pages ? pages[0] : null;
+    const page = pages ? pages[0] as { template?: string } : null;
 
-        return (<div>
-            <style>
-                {/* @ts-ignore */}
-                {Media.mediaStyles}
-            </style>
-            <DesktopContainer fixed={fixed!} header={header}>
-                {children}
-            </DesktopContainer>
-            {footer ? footer : (page && page.template === "noofoter.php" ? "" : <Footer />)}
-        </div>)
+    return (
+        <MediaContextProvider>
+            <div>
+                <style>{mediaStyle}</style>
+                <DesktopContainer fixed={fixed!} header={header}>
+                    {children}
+                </DesktopContainer>
+                {footer ? footer : (page && page.template === "noofoter.php" ? "" : <Footer />)}
+            </div>
+        </MediaContextProvider>
+    )
 }
 
 
