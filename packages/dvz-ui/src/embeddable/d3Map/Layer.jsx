@@ -61,7 +61,7 @@ class BaseLayer extends React.Component {
             const tip = d3.select("body").append("div")
                 .attr("class", "d3MapTooltip")
                 .style("position", "absolute")
-                //.style("background-color", color)
+                .style("z-index", "9999")
                 .html("")
                 .style("left", (window.event.pageX + 15) + "px")
                 .style("top", (window.event.pageY - 50) + "px")

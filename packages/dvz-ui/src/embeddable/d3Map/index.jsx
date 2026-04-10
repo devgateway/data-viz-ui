@@ -9,9 +9,11 @@ import ZoomControl from "./ZoomControl";
 import ProjectedContainer from "./ProjectedContainer";
 import Legends from "./Legends"
 import FlowLayer from "./FlowLayer";
+import TileBasemapLayer from "./TileBasemapLayer";
+import PixelLayer from "./PixelLayer";
 import MeasureSelector from "../MeasureSelector";
 
-const SELECTABLE_LAYER_TYPES = ['data', 'dataPoints', 'flow'];
+const SELECTABLE_LAYER_TYPES = ['data', 'dataPoints', 'flow', 'pixelGrid'];
 
 const getLayerMeasures = (layer) => {
     if (!layer || !layer.measures || !Array.isArray(layer.measures)) {
@@ -220,6 +222,23 @@ const MapWrapper = (props) => {
                 editing={editing}
                 initialPosition={paramMapPosition}>
 
+                {/* Tile basemap layers are rendered as absolutely-positioned divs BEHIND the SVG */}
+                {layers.map((layer) => {
+                    if (layer.type === 'tileBasemap') {
+                        return (
+                            <TileBasemapLayer
+                                key={layer.id}
+                                tileSource={layer.tileSource}
+                                tileOpacity={layer.tileOpacity != null ? layer.tileOpacity : 1}
+                                transform={transform}
+                                visible={layer.visible !== false}
+                                onReady={handleLayerReady}
+                            />
+                        );
+                    }
+                    return null;
+                })}
+
                 <Map rotationEnabled={parse(rotationEnabled, editing)}>
                     {layers.map((layer, i) => {
 
@@ -269,6 +288,19 @@ const MapWrapper = (props) => {
                                 onZoomToPoint={zoomToPoint} selectedItem={selectedItem}
                                 transform={transform} intl={intl}
                                 group={group} zoom={zoomRef}
+                                unique={unique}
+                                selectedMeasure={selectedMeasure}
+                                key={layer.id} {...layer}
+                                waitForFilters={waitForFilters == "true" || waitForFilters == true}
+                            />
+                        }
+                        if (layer.type === 'pixelGrid') {
+                            return <PixelLayer
+                                onReady={handleLayerReady}
+                                transform={transform}
+                                intl={intl}
+                                group={group}
+                                zoom={zoomRef}
                                 unique={unique}
                                 selectedMeasure={selectedMeasure}
                                 key={layer.id} {...layer}

@@ -49,6 +49,7 @@ class ProjectedContainer extends React.Component {
                 backgroundColor: backgroundColor,
                 height: `${height}px`,
                 width: '100%',
+                position: 'relative',
             }}
         >
             {Children.map(arrayChildren, child => {

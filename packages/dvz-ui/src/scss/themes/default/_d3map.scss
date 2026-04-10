@@ -127,6 +127,17 @@ body {
     position: relative;
     cursor: pointer;
 
+    // Tile basemap sits at the very bottom of the stacking order
+    .tile-basemap-layer {
+      z-index: 0;
+    }
+
+    // SVG map wrapper sits above tile basemap, below legends/zoom controls
+    .map-svg-wrapper {
+      position: relative;
+      z-index: 1;
+    }
+
     .map {
       position: relative;
       background-color: transparent;
@@ -330,6 +341,7 @@ body {
 // -----------------------------------------------------------------------------
 
 .d3MapTooltip {
+  z-index: 9999;
   br {
     display: block;
     margin-bottom: 2px;

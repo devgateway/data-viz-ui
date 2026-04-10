@@ -74,13 +74,15 @@ class Map extends React.Component {
         const {projection, width, height, path} = this.props
        
         return (
-            <svg viewBox={`0 0 ${width} ${height}`} className={"map"} height={height} width={"100%"} ref={this.svgRef}>
-                {projection && this.props.children ? this.props.children.map(child => React.cloneElement(child, {
-                    ...this.props,
-                    svg: this.svgRef.current,
-                    ...this.state
-                })) : null}
-            </svg>)
+            <div className="map-svg-wrapper" style={{ position: 'relative', zIndex: 1 }}>
+                <svg viewBox={`0 0 ${width} ${height}`} className={"map"} height={height} width={"100%"} ref={this.svgRef}>
+                    {projection && this.props.children ? this.props.children.filter(Boolean).map(child => React.cloneElement(child, {
+                        ...this.props,
+                        svg: this.svgRef.current,
+                        ...this.state
+                    })) : null}
+                </svg>
+            </div>)
     }
 }
 
