@@ -5,12 +5,13 @@ import { clearPostsFilter } from '../reducers/data';
 
 interface NoDataProps {
     noDataMsg?: string;
+    clearFilterMsg?: string;
     editing?: boolean;
     group: string;
 }
 
 const NoData = (props: NoDataProps) => {
-    const { noDataMsg, editing, group } = props;
+    const { noDataMsg, clearFilterMsg, editing, group } = props;
     const dispatch = useAppDispatch();
     const initialFilters = useAppSelector((state: any) => state.getIn(["data", "posts", "initialFilters", group]));
 
@@ -39,10 +40,10 @@ const NoData = (props: NoDataProps) => {
                         c43,35.3,70.5,88.8,70.5,148.7C442.3,356,356,442.3,250,442.3z"/>
             </svg>
 
-            {editing&&<div className = "WPnoDataMsg">{'Not enough parameters to render the chart'}</div>}
+            {/* {editing&&<div className = "WPnoDataMsg">{'Not enough parameters to render the chart'}</div>} */}
             <div className = "WPnoDataMsg">{noDataMsg}</div>
         </Header>
-        <Button size='medium' onClick={e => cleanFilters(e)}>Clear Filter</Button>
+        <Button size='medium' onClick={e => cleanFilters(e)}>{clearFilterMsg || 'Clear Filter'}</Button>
     </Segment>)
 }
 

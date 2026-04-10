@@ -91,6 +91,8 @@ interface FilteredPostsProps extends WrappedComponentProps {
     "data-sorting-taxonomy": string;
     "data-wordpress-source-type"?: string;
     "data-wordpress-source"?: string;
+    "data-no-data-msg"?: string;
+    "data-clear-filter-msg"?: string;
     editing?: boolean;
 }
 
@@ -112,6 +114,8 @@ const FilteredPosts = (props: FilteredPostsProps) => {
         "data-sorting-taxonomy": sortingTaxonomy,
         "data-wordpress-source-type": wordpressSourceType,
         "data-wordpress-source": wordpressSource,
+        "data-no-data-msg": noDataMsg,
+        "data-clear-filter-msg": clearFilterMsg,
         editing,
     } = props;
 
@@ -373,7 +377,7 @@ const FilteredPosts = (props: FilteredPostsProps) => {
                             sortFirstBy={sortFirstByValue}
                             countryCategory={sortingTaxonomy} />
                     ) : (
-                        <NoData noDataMsg="No posts found" group={group} />
+                        <NoData noDataMsg={noDataMsg} clearFilterMsg={clearFilterMsg} group={group} />
                     )
                 }
             </Container>
