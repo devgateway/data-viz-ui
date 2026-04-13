@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
     Container
 } from "semantic-ui-react";
@@ -118,15 +118,6 @@ const PostsFilter = (props: PostsFilterProps) => {
         return value || undefined;
     };
 
-    // Helper function to compare filter values
-    const areFilterValuesEqual = (a: any, b: any): boolean => {
-        if (Array.isArray(a) && Array.isArray(b)) {
-            if (a.length !== b.length) return false;
-            return a.every((val, idx) => val === b[idx]);
-        }
-        return a === b;
-    };
-
     // Memoize normalized filter values to prevent unnecessary re-renders
     const normalizedCountryFilter = useMemo(
         () => normalizeFilterValue(postsFilters.countryFilter, isMultiSelectFilter),
@@ -141,51 +132,13 @@ const PostsFilter = (props: PostsFilterProps) => {
         [postsFilters.yearFilter, isMultiSelectFilter, isYearFilterValue]
     );
 
-    const [selectedYear, setSelectedYear] = useState<any>(normalizedYearFilter);
-    const [selectedCountry, setSelectedCountry] = useState<any>(normalizedCountryFilter);
-    const [selectedCategory, setSelectedCategory] = useState<any>(normalizedCategoryFilter);
-
-    // Use refs to track previous values to avoid unnecessary updates
-    const prevFiltersRef = useRef({
-        countryFilter: normalizedCountryFilter,
-        categoryFilter: normalizedCategoryFilter,
-        yearFilter: normalizedYearFilter,
-        isMultiSelectFilter
-    });
-
-    useEffect(() => {
-        const prev = prevFiltersRef.current;
-
-        // Check if any filter values actually changed
-        const countryChanged = !areFilterValuesEqual(prev.countryFilter, normalizedCountryFilter);
-        const categoryChanged = !areFilterValuesEqual(prev.categoryFilter, normalizedCategoryFilter);
-        const yearChanged = isYearFilterValue && !areFilterValuesEqual(prev.yearFilter, normalizedYearFilter);
-        const multiSelectChanged = prev.isMultiSelectFilter !== isMultiSelectFilter;
-
-        if (countryChanged || categoryChanged || yearChanged || multiSelectChanged) {
-            if (countryChanged) {
-                setSelectedCountry(normalizedCountryFilter);
-            }
-            if (categoryChanged) {
-                setSelectedCategory(normalizedCategoryFilter);
-            }
-            if (yearChanged) {
-                setSelectedYear(normalizedYearFilter);
-            }
-
-            // Update ref with current values
-            prevFiltersRef.current = {
-                countryFilter: normalizedCountryFilter,
-                categoryFilter: normalizedCategoryFilter,
-                yearFilter: normalizedYearFilter,
-                isMultiSelectFilter
-            };
-        }
-    }, [normalizedCountryFilter, normalizedCategoryFilter, normalizedYearFilter, isMultiSelectFilter, isYearFilterValue]);
+    const categoriesArray = useMemo(
+        () => categories ? categories.split(',') : [],
+        [categories]
+    );
 
 
     const handleYearChange = (value: any) => {
-        setSelectedYear(value);
         dispatch({
             type: "SET_POSTS_FILTER",
             group,
@@ -203,12 +156,6 @@ const PostsFilter = (props: PostsFilterProps) => {
     }
 
     const handleCategoryChange = (value: string) => {
-        if (isCountryFilterValue) {
-            setSelectedCountry(value);
-        } else {
-            setSelectedCategory(value);
-        }
-
         dispatch({
             type: "SET_POSTS_FILTER",
             group,
@@ -235,13 +182,13 @@ const PostsFilter = (props: PostsFilterProps) => {
         const categoryFilter = !isCountryFilterValue
             ? (hasDefaultValues
                 ? defaultValue
-                : (isMultiSelectFilter ? categories ? categories.split(',').map(Number) : [] : postsFilters.categoryFilter))
+                : (isMultiSelectFilter ? categoriesArray.map(Number) : postsFilters.categoryFilter))
             : postsFilters.categoryFilter;
 
         const countryFilter = isCountryFilterValue
             ? (hasDefaultValues
                 ? defaultValue
-                : (isMultiSelectFilter ? categories ? categories.split(',').map(Number) : [] : postsFilters.countryFilter))
+                : (isMultiSelectFilter ? categoriesArray.map(Number) : postsFilters.countryFilter))
             : postsFilters.countryFilter;
 
         const yearFilter = isYearFilterValue ?
@@ -259,7 +206,7 @@ const PostsFilter = (props: PostsFilterProps) => {
             yearFilter: isYearFilterValue ? yearFilter : null,
             categoryCategory: !isCountryFilterValue ? postsFilters.categoryCategory : null,
             categoryTaxonomy: !isCountryFilterValue ? taxonomy : null,
-            countryCategory: isCountryFilterValue ? postsFilters.countryCategory : null,
+            countryCategory: isCountryFilterValue ? taxonomy : null,
             countryTaxonomy: isCountryFilterValue ? taxonomy : null,
             page: 1
         });
@@ -305,7 +252,7 @@ const PostsFilter = (props: PostsFilterProps) => {
                     alphabeticalSort={alphabeticalSortValue}
                     ascOrder={ascOrderValue}
                     options={yearOptions}
-                    value={selectedYear}
+                    value={normalizedYearFilter}
                     yearOptions={yearOptions}
                     setYearOptions={setYearOptions}
                     yearFilterLoading={yearFilterLoading}
@@ -333,14 +280,11 @@ const PostsFilter = (props: PostsFilterProps) => {
                         autoApply={autoApplyValue}
                         taxonomy={taxonomy}
                         type={type}
-                        value={isMultiSelectFilter
-                            ? (isCountryFilterValue ? selectedCountry : selectedCategory)
-                            : (isCountryFilterValue ? selectedCountry : selectedCategory)
-                        }
+                        value={isCountryFilterValue ? normalizedCountryFilter : normalizedCategoryFilter}
                         onChange={(_e, value) => {
                             handleCategoryChange(value as any);
                         }}
-                        categories={categories ? categories.split(',') : []}
+                        categories={categoriesArray}
                         resetKey={resetKey}
                         wpApiBase={wordpressSource ?? undefined}
                     />
