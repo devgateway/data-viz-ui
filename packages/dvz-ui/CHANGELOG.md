@@ -1,5 +1,14 @@
 # @devgateway/dvz-ui-react
 
+## 1.7.5
+
+### Patch Changes
+
+- [#189](https://github.com/devgateway/data-viz-ui/pull/189) [`a303060`](https://github.com/devgateway/data-viz-ui/commit/a303060ef23f6a8a49bc086b511541504f961612) Thanks [@timothygachengo](https://github.com/timothygachengo)! - - _(TCDICORE-522)_ Add WordPress source URL to posts components `ComponentWithSettings`
+  - _(TCDICORE-522)_ Add missing blocks and append `/wp-json` to landing URL
+  - _(TCDICORE-522)_ Remove logging
+  - _(TCDICORE-525)_ Make "no data" message configurable
+
 ## 1.7.3
 
 ### Patch Changes
