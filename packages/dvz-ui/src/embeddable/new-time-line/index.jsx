@@ -1,7 +1,7 @@
 import {PostConsumer, PostProvider} from "@devgateway/wp-react-lib";
 import PostIntro from "../connected-templates/PostIntro";
 import React, {useState} from "react";
-import {Container} from "semantic-ui-react";
+import { Container } from '@devgateway/ui';
 import {CarouselProvider, Slide, Slider} from "pure-react-carousel";
 import TimeLine from "./timeline";
 

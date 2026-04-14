@@ -1,4 +1,4 @@
-import {Container, Flag, Image, Menu} from "semantic-ui-react";
+import { Container, Flag, Image, Menu, MenuItem, MenuSection } from "@devgateway/ui";
 import React, {useEffect, useState, useRef} from "react";
 import {
     AppContextProvider,
@@ -170,7 +170,7 @@ const MenuItems = ({
 
                         return (
                             <React.Fragment key={item.ID}>
-                                <Menu.Item
+                                <MenuItem
                                     onMouseEnter={() => {
                                         if (item.child_items) {
                                             onSetSelected(item);
@@ -228,9 +228,7 @@ const MenuItems = ({
                                     ) : (
                                         <Link to={localReplaceLink(item.url, locale)}>{item.title}</Link>
                                     )}
-                                </Menu.Item>
-
-                                {/* Render child items in mobile only */}
+                                </MenuItem>
                                 {isMobileResolution &&
                                     selected &&
                                     selected.ID === item.ID &&
@@ -241,7 +239,7 @@ const MenuItems = ({
                                                 const isActive = childPath === window.location.pathname;
 
                                                 return (
-                                                    <Menu.Item
+                                                    <MenuItem
                                                         key={childItem.ID}
                                                         className={`divided child-item ${isActive ? "active" : ""}`}
                                                     >
@@ -257,7 +255,7 @@ const MenuItems = ({
                                                         ) : (
                                                             <a href={childPath}>{childItem.title}</a>
                                                         )}
-                                                    </Menu.Item>
+                                                    </MenuItem>
                                                 );
                                             })}
 
@@ -378,7 +376,7 @@ const Header = ({locale, settings = {}, SearchComponent = null, LangSwitcher = n
     return (
         <React.Fragment>
             <AppContextProvider locale={locale}>
-                <MenuProvider slug={"main"} locale={locale}>
+                <MenuProvider name={"main"} locale={locale}>
                     <Container key="header-container" fluid className="header">
                         <div
                             ref={hamburgerRef}
@@ -397,7 +395,7 @@ const Header = ({locale, settings = {}, SearchComponent = null, LangSwitcher = n
                         >
                             <Container fluid className="background" ref={menuRef}>
                                 <Menu className="branding" text>
-                                    <Menu.Item className="branding-logo">
+                                    <MenuItem className="branding-logo">
                                         <a
                                             href={`${SITE_URL_WITH_LOCALE}`}
                                             target={hasLandingPageSettings ? "_blank" : "_self"}
@@ -413,11 +411,11 @@ const Header = ({locale, settings = {}, SearchComponent = null, LangSwitcher = n
                                                 <img className="brand logo" size="large" src="/logo_full.png" />
                                             )}
                                         </a>
-                                    </Menu.Item>
+                                    </MenuItem>
 
-                                    <Menu.Item className="divider"><div></div></Menu.Item>
+                                    <MenuItem className="divider"><div></div></MenuItem>
 
-                                    {settings && (<Menu.Item fitted href="/"><Flag name="za"/><div className="site name">{settings.name}</div></Menu.Item>)}
+                                    {settings && (<MenuItem fitted href="/"><Flag name="za"/><div className="site name">{settings.name}</div></MenuItem>)}
 
                                     {/* Main menu */}
                                     {isSmallScreen && (
@@ -440,7 +438,7 @@ const Header = ({locale, settings = {}, SearchComponent = null, LangSwitcher = n
                                     )}
 
                                     {!isSmallScreen && (
-                                        <Menu.Menu className="pages">
+                                        <MenuSection className="pages">
                                             <MenuConsumer>
                                                 <MenuItems
                                                     key="items"
@@ -451,19 +449,19 @@ const Header = ({locale, settings = {}, SearchComponent = null, LangSwitcher = n
                                                     locale={locale}
                                                 />
                                             </MenuConsumer>
-                                        </Menu.Menu>
+                                        </MenuSection>
                                     )}
 
 
                                     {LangSwitcher && (
-                                        <Menu.Item>
+                                        <MenuItem>
                                             <MenuConsumer>
                                                 <LangSwitcher key="lang" locale={locale} />
                                             </MenuConsumer>
-                                        </Menu.Item>
+                                        </MenuItem>
                                     )}
                                     {SearchComponent && (
-                                        <Menu.Item fitted>
+                                        <MenuItem fitted>
                                             <MenuConsumer>
                                                 <SearchComponent
                                                     onSetSelected={setSelected}
@@ -471,7 +469,7 @@ const Header = ({locale, settings = {}, SearchComponent = null, LangSwitcher = n
                                                     settings={settings}
                                                 />
                                             </MenuConsumer>
-                                        </Menu.Item>
+                                        </MenuItem>
                                     )}
                                 </Menu>
                             </Container>

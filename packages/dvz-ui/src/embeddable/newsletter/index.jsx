@@ -1,5 +1,5 @@
 import React from 'react'
-import {Button, Input, Message} from 'semantic-ui-react'
+import { Button, Input, Alert } from '@devgateway/ui'
 import {connect} from "react-redux";
 import {newsletterSubscription, setEmail} from "../reducers/embeddable";
 
@@ -29,15 +29,15 @@ const Index = (props) => {
     let message = ""
 
     if (status === "OK" || editing) {
-        message = (<Message success>
+        message = (<Alert color="success">
             <p>{successmessage}</p>
-        </Message>)
+        </Alert>)
     }
 
     if (status === "ERROR" || editing) {
-        message = (<Message negative>
+        message = (<Alert color="negative">
             <p>{failuremessage}</p>
-        </Message>)
+        </Alert>)
     }
 
     const valid = expresion.test(email)

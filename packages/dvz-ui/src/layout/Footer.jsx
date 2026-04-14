@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import {Container} from "semantic-ui-react";
+import { Container } from '@devgateway/ui';
 
 import {Page, PageConsumer, PageProvider} from "@devgateway/wp-react-lib";
 import {injectIntl} from "react-intl";

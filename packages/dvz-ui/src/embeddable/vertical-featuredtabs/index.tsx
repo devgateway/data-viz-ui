@@ -1,5 +1,5 @@
 import React, { useLayoutEffect, useEffect, useRef, useState } from "react";
-import { Container, Accordion, Icon } from "semantic-ui-react";
+import { Container, Accordion, AccordionItem, AccordionTrigger, AccordionContent as AccordionPanel, Icon } from "@devgateway/ui";
 import {
   PostConsumer,
   PostIcon,
@@ -64,9 +64,11 @@ const AccordionContent: React.FC<AccordionContentProps> = ({
   setActive,
   colors,
 }) => {
-  const [activeIndex, setActiveIndex] = useState(
-    posts.findIndex((p) => p.slug === activeItem),
-  );
+  const [openItems, setOpenItems] = useState<string[]>(() => {
+    const idx = posts.findIndex((p) => p.slug === activeItem);
+    return idx >= 0 ? [String(idx)] : [];
+  });
+  const activeIndex = openItems.length > 0 ? parseInt(openItems[0]) : -1;
   const [scrollTarget, setScrollTarget] = useState<HTMLElement | null>(null);
 
   const findElementAndAddStyles = (
@@ -276,30 +278,31 @@ const AccordionContent: React.FC<AccordionContentProps> = ({
     };
   }, [activeIndex]);
 
-  const handleClick = (e: React.MouseEvent, titleProps: { index: number }) => {
-    const { index } = titleProps;
-    const newIndex = activeIndex === index ? -1 : index;
-    setActiveIndex(newIndex);
-    setActive(posts[index].slug);
+  const handleClick = (e: React.MouseEvent, index: number) => {
+    const isOpening = !openItems.includes(String(index));
+    const newOpenItems = isOpening ? [String(index)] : [];
+    setOpenItems(newOpenItems);
+    const newIndex = isOpening ? index : -1;
+    if (newIndex >= 0) {
+      setActive(posts[newIndex].slug);
+    }
 
     // Set the scroll target after updating the activeIndex
-    if (newIndex !== -1) {
+    if (isOpening) {
       setScrollTarget(e.currentTarget as HTMLElement);
     }
   };
 
   return (
-    <Accordion fluid styled>
+    <Accordion fluid openItems={openItems} onOpenItemsChange={(val) => setOpenItems(Array.isArray(val) ? val : [val])}>
       {posts.map((post, index) => {
         const iconUrl = post.meta_fields?.icon
           ? post.meta_fields.icon[0]
           : null;
         return (
-          <React.Fragment key={post.id}>
-            <Accordion.Title
-              active={activeIndex === index}
-              index={index}
-              onClick={(e) => handleClick(e, { index })}
+          <AccordionItem key={post.id} value={String(index)}>
+            <AccordionTrigger
+              onClick={(e) => handleClick(e, index)}
               style={{ backgroundColor: colors[`color_${index}`] }}
             >
               <div
@@ -320,16 +323,15 @@ const AccordionContent: React.FC<AccordionContentProps> = ({
                   )}
                   <PostIntro post={post} className="vt-accordion-post-intro" />
                 </div>
-                <Icon name="chevron down" />
+                <Icon name="chevron-down" />
               </div>
-            </Accordion.Title>
-            <Accordion.Content
+            </AccordionTrigger>
+            <AccordionPanel
               className={"accordion-post-content accordion-post-vft-content"}
-              active={activeIndex === index}
             >
               <PostContent post={post} />
-            </Accordion.Content>
-          </React.Fragment>
+            </AccordionPanel>
+          </AccordionItem>
         );
       })}
     </Accordion>

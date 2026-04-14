@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import {Container, Grid} from "semantic-ui-react";
+import { Container, Grid, GridColumn } from '@devgateway/ui';
 
 // Hook
 function useLocalStorage(key, initialValue) {
@@ -65,9 +65,9 @@ const Dummy = (props) => {
         <input type={"text"} value={filter} onChange={e => setFilter(e.target.value)}></input>
         <Grid celled={true} stretched={true}
               columns={3}>{Object.keys(props).filter(k => k.indexOf(filter) > -1).map(k => {
-                return <>  <Grid.Column stretched style={{"padding": "2px", "font-family": "Roboto"}}>
+                return <>  <GridColumn stretched style={{"padding": "2px", "font-family": "Roboto"}}>
                     <pre> {k}:{getVal(k, props)} </pre>
-                </Grid.Column>
+                </GridColumn>
                 </>
             }
         )}

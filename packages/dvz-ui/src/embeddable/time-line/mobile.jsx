@@ -1,9 +1,8 @@
 import { PostConsumer, PostProvider } from "@devgateway/wp-react-lib";
 import PostIntro from "../connected-templates/PostIntro";
 import React, { useCallback, useLayoutEffect, useRef, useState } from "react";
-import { Container } from "semantic-ui-react";
+import { Container, Dialog, DialogContent, DialogHeader } from "@devgateway/ui";
 import * as d3 from "d3";
-import { Modal } from "semantic-ui-react";
 import { useWindowDimensionsAndDevice } from "@/lib/hooks/window-dimensions";
 import { useScreenOrientation } from "@/lib/hooks/screen-orientation";
 
@@ -65,31 +64,31 @@ const TimeLine = (props) => {
       return html;
     };
     return (
-      <Modal
+      <Dialog
         key={`${content.props.children.key}modal`}
         open={isOpen}
-        onClose={() => setDisplayTooltip(false)}
-        size="fullscreen"
-        closeIcon
-        centered
-        style={{
-          maxHeight: "80vh",
-          overflowY: "auto",
-          padding: "0.5rem",
-          ...style,
-        }}
+        onOpenChange={(open) => !open && setDisplayTooltip(false)}
       >
-        <Modal.Header style={{ ...style, borderBottom: "none" }} />
-        <Modal.Content
-          className="styled-list-content"
-          style={{ ...style }}
-          dangerouslySetInnerHTML={{
-            __html: addInlineStylesToHTML(
-              content.props.children.props.post.content.rendered
-            ),
+        <DialogContent
+          style={{
+            maxHeight: "80vh",
+            overflowY: "auto",
+            padding: "0.5rem",
+            ...style,
           }}
-        />
-      </Modal>
+        >
+          <DialogHeader style={{ ...style, borderBottom: "none" }} />
+          <div
+            className="styled-list-content"
+            style={{ ...style }}
+            dangerouslySetInnerHTML={{
+              __html: addInlineStylesToHTML(
+                content.props.children.props.post.content.rendered
+              ),
+            }}
+          />
+        </DialogContent>
+      </Dialog>
     );
   };
 

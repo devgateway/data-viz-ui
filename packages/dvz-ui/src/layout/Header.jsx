@@ -1,4 +1,4 @@
-import { Container, Flag, Image, Menu } from "semantic-ui-react";
+import { Container, Flag, Image, Menu, MenuItem, MenuSection } from '@devgateway/ui';
 import React, { useEffect, useState, useRef } from "react";
 import {
     MediaConsumer,
@@ -196,7 +196,7 @@ const MenuItems = injectIntl(
                         .map((item, index) => (
                             <React.Fragment key={item.ID}>
                                 {/* Render parent menu item */}
-                                <Menu.Item
+                                <MenuItem
                                     className={`divided ${item.child_items ? "has-child-items" : ""
                                         }
                             ${selected && selected.ID === item.ID
@@ -242,7 +242,7 @@ const MenuItems = injectIntl(
                                             {item.title}
                                         </a>
                                     )}
-                                </Menu.Item>
+                                </MenuItem>
                                 {/* Render child items below the parent if mobile resolution */}
                                 {isMobileResolution &&
                                     selected &&
@@ -250,7 +250,7 @@ const MenuItems = injectIntl(
                                     selected.child_items && (
                                         <React.Fragment>
                                             {selected.child_items.map((childItem) => (
-                                                <Menu.Item
+                                                <MenuItem
                                                     key={childItem.ID}
                                                     className={`divided child-item ${active === childItem.slug ? "active" : ""
                                                         }`}
@@ -259,7 +259,7 @@ const MenuItems = injectIntl(
                                                     <a href={localReplaceLink(childItem.url, locale)}>
                                                         {childItem.title}
                                                     </a>
-                                                </Menu.Item>
+                                                </MenuItem>
                                             ))}
                                         </React.Fragment>
                                     )}
@@ -385,11 +385,11 @@ const Header = ({ intl, settings }) => {
 
     return (
         <React.Fragment>
-            <MenuProvider slug={"main"} locale={intl.locale}>
+            <MenuProvider name={"main"} locale={intl.locale}>
                 <Container key="header-container" fluid={true} className="header">
                     <Container fluid={true} className={"background"} ref={menuRef}>
                         <Menu className={"branding"} text>
-                            <Menu.Item>
+                            <MenuItem>
                                 <a href={`${SITE_URL_WITH_LOCALE}`} target={hasLandingPageSettings ? "_blank" : "_self"} rel="noopener noreferrer" id="site_url">
                                     {settings.site_logo !== 0 && !isMediumScreen && (
                                         <MediaProvider id={settings.site_logo}>
@@ -414,16 +414,16 @@ const Header = ({ intl, settings }) => {
                                         />
                                     )}
                                 </a>
-                            </Menu.Item>
+                            </MenuItem>
 
-                            <Menu.Item className={"divider"}>
+                            <MenuItem className={"divider"}>
                                 <div></div>
-                            </Menu.Item>
+                            </MenuItem>
 
-                            <Menu.Item fitted href="/">
+                            <MenuItem fitted href="/">
                                 <Flag name="za" />
                                 <div className={"site name"}>{settings.name}</div>
-                            </Menu.Item>
+                            </MenuItem>
 
                             {/* Conditional Menu Rendering */}
                             {!isTransitioning && (
@@ -443,7 +443,7 @@ const Header = ({ intl, settings }) => {
                                         </Container>
                                     </Menu>
                                 ) : (
-                                    <Menu.Menu className={"pages"}>
+                                    <MenuSection className={"pages"}>
                                         <MenuConsumer>
                                             <MenuItems
                                                 key="items"
@@ -453,20 +453,20 @@ const Header = ({ intl, settings }) => {
                                                 onSetSelected={setSelected}
                                             />
                                         </MenuConsumer>
-                                    </Menu.Menu>
+                                    </MenuSection>
                                 )
                             )}
 
 
-                            <Menu.Item>
+                            <MenuItem>
                                 <MenuConsumer>
                                     <LangSwitcher
                                         key={"lang"}
                                         locale={intl.locale}
                                     ></LangSwitcher>
                                 </MenuConsumer>
-                            </Menu.Item>
-                            <Menu.Item fitted>
+                            </MenuItem>
+                            <MenuItem fitted>
                                 <MenuConsumer>
                                     <SearchComponent
                                         onSetSelected={setSelected}
@@ -474,7 +474,7 @@ const Header = ({ intl, settings }) => {
                                         settings={settings}
                                     />
                                 </MenuConsumer>
-                            </Menu.Item>
+                            </MenuItem>
                             <div
                                 ref={hamburgerRef}
                                 className={`hamburger-menu ${hasInteracted ? "animate" : ""} ${isMenuVisible ? "open" : "close"

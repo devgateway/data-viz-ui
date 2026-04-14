@@ -1,7 +1,7 @@
 import { PostConsumer, PostProvider } from "@devgateway/wp-react-lib";
 import PostIntro from "../connected-templates/PostIntro";
 import React, { useEffect, useRef, useState } from "react";
-import { Container } from "semantic-ui-react";
+import { Container } from '@devgateway/ui';
 import * as d3 from "d3";
 
 const visibleStyle = {

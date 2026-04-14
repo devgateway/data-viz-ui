@@ -1,6 +1,6 @@
 import React from 'react';
 import * as d3 from 'd3';
-import { Icon, Popup } from "semantic-ui-react";
+import { Icon, Tooltip } from '@devgateway/ui';
 import { FormattedMessage } from "react-intl";
 
 class ZoomControl extends React.Component {
@@ -238,12 +238,13 @@ class ZoomControl extends React.Component {
                 <div className="button minus" onClick={this.zoomOut}>
                     <Icon name='minus' size='small' />
                 </div>
-                <Popup
+                <Tooltip
                     content={<FormattedMessage id="map.reset.tooltip" defaultMessage="Reset zoom" />}
-                    trigger={<div className="button reset" onClick={this.reset}>
+                >
+                    <div className="button reset" onClick={this.reset}>
                         <Icon name='repeat' size='small' />
-                    </div>}
-                />
+                    </div>
+                </Tooltip>
             </div>)}
         </div>);
     }

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Button, Container, Grid, Label, Menu, Accordion, Icon } from 'semantic-ui-react';
+import { Button, Container, Grid, GridColumn, GridRow, Badge, Menu, MenuItem, Accordion, AccordionItem, AccordionTrigger, AccordionContent as AccordionPanel, Icon } from '@devgateway/ui';
 import { MediaConsumer, MediaProvider, PostConsumer, PostIcon, PostLabel, PostProvider } from "@devgateway/wp-react-lib";
 import { injectIntl } from "react-intl";
 import { connect } from "react-redux";
@@ -9,7 +9,7 @@ import { useWindowDimensionsAndDevice } from '@/lib/hooks/window-dimensions';
 const ItemMenu = ({ posts, activeItem, setActive, showLabels }) => {
   return posts
     ? posts.map((post) => (
-      <Menu.Item
+      <MenuItem
         key={post.id}
         onClick={() => setActive(post.slug)}
         className={post.slug === activeItem ? "active" : ""}
@@ -17,11 +17,11 @@ const ItemMenu = ({ posts, activeItem, setActive, showLabels }) => {
         {showLabels ? (
           <PostLabel post={post} />
         ) : (
-          <Label>
+          <Badge>
             <span dangerouslySetInnerHTML={{ __html: post.title.rendered }} />
-          </Label>
+          </Badge>
         )}
-      </Menu.Item>
+      </MenuItem>
     ))
     : null;
 };
@@ -41,7 +41,7 @@ const GriNavigator = ({
           ? post["_embedded"]["wp:featuredmedia"][0].source_url
           : null;
       return (
-        <Grid.Column
+        <GridColumn
           key={post.id}
           className={
             (post.slug === activeItem ? "active" : "") +
@@ -68,14 +68,14 @@ const GriNavigator = ({
             {showLabels ? (
               <PostLabel post={post} />
             ) : (
-              <Label>
+              <Badge>
                 <span
                   dangerouslySetInnerHTML={{ __html: post.title.rendered }}
                 />
-              </Label>
+              </Badge>
             )}
           </Button>
-        </Grid.Column>
+        </GridColumn>
       );
     })
     : null;
@@ -114,9 +114,7 @@ const TabContent = ({ posts, activeItem }) => {
 };
 
 const AccordionContent = ({ posts, activeItem, setActive }) => {
-  const [activeIndex, setActiveIndex] = useState(
-    posts.findIndex((p) => p.slug === activeItem)
-  );
+  const [openItems, setOpenItems] = useState([])
   const [scrollTarget, setScrollTarget] = useState(null);
   const ref = useRef(null);
   const [isMobileOrTablet, setIsMobileOrTablet] = useState(window.innerWidth <= 1250);
@@ -271,20 +269,17 @@ const AccordionContent = ({ posts, activeItem, setActive }) => {
   }, [activeIndex, isMobileOrTablet, orientation]);
 
 
-  const handleClick = (e, titleProps) => {
-    const { index } = titleProps;
-    const newIndex = activeIndex === index ? -1 : index;
-    setActiveIndex(newIndex);
+  const handleItemClick = (index, e) => {
+    const newOpenItems = activeIndex === index ? [] : [String(index)];
+    setOpenItems(newOpenItems);
     setActive(posts[index].slug);
-
-    // Set the scroll target after updating the activeIndex
-    if (newIndex !== -1) {
+    if (newOpenItems.length > 0) {
       setScrollTarget(e.currentTarget);
     }
   };
 
   return (
-    <Accordion fluid styled>
+    <Accordion openItems={openItems} onOpenItemsChange={setOpenItems}>
       {posts.map((post, index) => {
         const iconUrl =
           post.meta_fields?.icon
@@ -293,11 +288,8 @@ const AccordionContent = ({ posts, activeItem, setActive }) => {
 
         return (
           <React.Fragment key={post.id}>
-            <Accordion.Title
-              active={activeIndex === index}
-              index={index}
-              onClick={handleClick}
-            >
+            <AccordionItem value={String(index)}>
+            <AccordionTrigger onClick={(e) => handleItemClick(index, e)}>
               <div
                 style={{
                   display: "flex",
@@ -319,17 +311,15 @@ const AccordionContent = ({ posts, activeItem, setActive }) => {
                     style={{ marginLeft: iconUrl ? "10px" : "0" }}
                   />
                 </div>
-                <Icon name="chevron down" />
+                <Icon name="chevron-down" />
               </div>
-            </Accordion.Title>
-            <Accordion.Content
-              className={"accordion-post-content"}
-              active={activeIndex === index}
-            >
+            </AccordionTrigger>
+            <AccordionPanel className={"accordion-post-content"}>
               <div ref={ref}>
                 <PostIntro post={post} as={Container} fluid />
               </div>
-            </Accordion.Content>
+            </AccordionPanel>
+            </AccordionItem>
           </React.Fragment>
         );
       })}
@@ -377,13 +367,13 @@ const GridTabbedView = ({ posts, showLabels, showIcons, height }) => {
     <React.Fragment>
       <Grid stackable className="tabbed posts" columns={posts.length} style={{ height: height + "px" }}>
         <GriNavigator showIcons={showIcons} showLabels={showLabels} posts={posts} activeItem={activeItem} setActive={setActive} />
-        <Grid.Row style={{ height: `${height}px` }}>
-          <Grid.Column width={16} className={"content"}>
+        <GridRow style={{ height: `${height}px` }}>
+          <GridColumn width={16} className={"content"}>
             <Container className={'content-tab'} style={{ height: `${height}px` }}>
               <TabContent className={"content-tab"} posts={posts} activeItem={activeItem} />
             </Container>
-          </Grid.Column>
-        </Grid.Row>
+          </GridColumn>
+        </GridRow>
       </Grid>
     </React.Fragment>
   );

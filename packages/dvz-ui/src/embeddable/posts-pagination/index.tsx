@@ -1,10 +1,10 @@
 import * as Immutable from 'immutable';
 import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Container, Dropdown, Icon } from 'semantic-ui-react';
+import { Container, Icon } from '@devgateway/ui';
 import { injectIntl, WrappedComponentProps} from 'react-intl';
 
-interface PostsPaginationProps extends WrappedComponentProps {
+export interface PostsPaginationProps extends WrappedComponentProps {
     "data-group": string;
     "data-number-of-items-per-page": number;
 }
@@ -66,14 +66,13 @@ const PostsPagination = (props: PostsPaginationProps) => {
             <Container fluid className="posts-pagination">
             <div className="posts-pagination-dropdown">
                 <span>Page</span>
-                <Dropdown
-                    options={options}
-                    placeholder='Select Item'
-                    selection
-                    compact
+                <select
                     value={currentPage}
-                    onChange={(e, data) => handlePageChange(Number(data.value))}
-                />
+                    onChange={(e) => handlePageChange(parseInt(e.target.value))}
+                    className="border border-sui-border rounded-sui px-2 py-1 text-sm"
+                >
+                    {options.map(opt => <option key={opt.key} value={opt.value}>{opt.text}</option>)}
+                </select>
                 <div>
                     <span>of {postsState && postsState?.totalPages}</span>
                 </div>
@@ -83,14 +82,14 @@ const PostsPagination = (props: PostsPaginationProps) => {
                     size="large"
                     style={{ cursor: 'pointer' }}
                     onClick={() => handlePageChange(currentPage - 1)}
-                    name='angle left'
+                    name='chevron-left'
                     disabled={currentPage === 1}
                 />
                 <Icon
                     size="large"
                     style={{ cursor: 'pointer' }}
                     onClick={() => handlePageChange(currentPage + 1)}
-                    name='angle right'
+                    name='chevron-right'
                     disabled={currentPage === totalPages}
                 />
             </div>

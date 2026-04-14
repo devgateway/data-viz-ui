@@ -1,5 +1,5 @@
 import React, {useRef, useState} from "react";
-import {Container, Grid, GridColumn, Popup} from "semantic-ui-react";
+import { Container, Grid, GridColumn, GridRow, Tooltip } from '@devgateway/ui';
 import DataProvider from "../data/DataProvider.jsx";
 import DataConsumer from "../data/DataConsumer.jsx";
 import {PostContent} from "@devgateway/wp-react-lib";
@@ -152,15 +152,15 @@ const DataFrame2 = (props) => {
 
     return <div class={""} fluid={true}>
         <Grid columns={2}>
-            <Grid.Row>
-                <Grid.Column>
+            <GridRow>
+                <GridColumn>
                     <img src={props.iconImage}></img>
-                </Grid.Column>
-                <Grid.Column>
+                </GridColumn>
+                <GridColumn>
                     <img src={props.iconUp}></img>
                     <img src={props.iconDown}></img>
-                </Grid.Column>
-            </Grid.Row>
+                </GridColumn>
+            </GridRow>
 
         </Grid>
     </div>
@@ -282,30 +282,24 @@ const DataFrame = (props) => {
     const tooltip = (props.showTooltip && props.tooltipText) ? template(props.tooltipText, templateContext) : undefined
 
     return <Grid padded={true}>
-        <Grid.Row>
-            <Grid.Column width={4}>
+        <GridRow>
+            <GridColumn width={4}>
 
                 {props.iconImage && props.iconImage != "" && <img className={"icon main"} src={props.iconImage}></img>}
-            </Grid.Column>
-            <Grid.Column textAlign={"right"} width={12}>
+            </GridColumn>
+            <GridColumn textAlign={"right"} width={12}>
 
                 <img className={`icon up ${percentChange > 0 ? 'visible' : 'hidden'}`} src={props.iconUp}></img>
                 <img className={`icon up ${percentChange < 0 ? 'visible' : 'hidden'}`} s src={props.iconDown}></img>
 
                 {showPercentageChange && percentChange != null && (
                     props.showTooltip && tooltip ? (
-                        <Popup
-                            content={tooltip}
-                            position="top center"
-                            inverted={props.tooltipStyle === 'dark'}
-                            size="small"
-                            trigger={
-                                <div style={percentBlockStyle}>
-                                    <div className="percentage" style={percentStyle}> {percentChange > 0 ? '+' : ''}{percentChange == 0 ? '=' : ''}{percentChangeFormatted}</div>
-                                    <div className="percentage-yoy" style={yoyStyle}>YoY</div>
-                                </div>
-                            }
-                        />
+                        <Tooltip content={tooltip} position="top">
+                            <div style={percentBlockStyle}>
+                                <div className="percentage" style={percentStyle}> {percentChange > 0 ? '+' : ''}{percentChange == 0 ? '=' : ''}{percentChangeFormatted}</div>
+                                <div className="percentage-yoy" style={yoyStyle}>YoY</div>
+                            </div>
+                        </Tooltip>
                     ) : (
                         <div style={percentBlockStyle}>
                             <div className="percentage" style={percentStyle}> {percentChange > 0 ? '+' : ''}{percentChange == 0 ? '=' : ''}{percentChangeFormatted}</div>
@@ -313,20 +307,20 @@ const DataFrame = (props) => {
                         </div>
                     )
                 )}
-            </Grid.Column>
+            </GridColumn>
 
-        </Grid.Row>
-        <Grid.Row>
-            <Grid.Column width={16}>
+        </GridRow>
+        <GridRow>
+            <GridColumn width={16}>
                 <span className="number" style={numberStyle}>{formattedNumber}</span>
-            </Grid.Column>
+            </GridColumn>
 
-        </Grid.Row>
-        <Grid.Row>
-            <Grid.Column>
+        </GridRow>
+        <GridRow>
+            <GridColumn>
                 <div className="label" style={labelStyle}>{template(label, templateContext)}</div>
-            </Grid.Column>
-        </Grid.Row>
+            </GridColumn>
+        </GridRow>
 
     </Grid>
 

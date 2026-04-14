@@ -1,4 +1,4 @@
-import { Container, Image, Menu } from "semantic-ui-react";
+import { Container, Image, Menu, MenuItem } from "@devgateway/ui";
 import { InView } from "react-intersection-observer";
 import React, { useState, useCallback, useEffect } from "react";
 import { MediaConsumer, MediaProvider, PageConsumer, PageProvider, PostContent } from "@devgateway/wp-react-lib";
@@ -26,21 +26,21 @@ interface SectionHeaderProps {
 }
 
 export const SectionHeader: React.FC<SectionHeaderProps> = ({ title, subtitle, icon, media }) => {
-    return <Menu className="header title" text>
-        <Menu.Item>
+    return <Menu className="header title">
+        <MenuItem>
 
             <Image src={media && media.guid ? media.guid.rendered : icon}
                 alt={media && media.alt_text ? media.alt_text : ""}
             />
-        </Menu.Item>
-        <Menu.Header>
+        </MenuItem>
+        <div className="px-[1.14285714em] py-[.92857143em]">
             <div>
                 <h2 className="page-module-title">
                     {title}
                     <span style={{ display: 'block' }} className="page-module-subtitle">{subtitle}</span>
                 </h2>
             </div>
-        </Menu.Header>
+        </div>
     </Menu>
 }
 

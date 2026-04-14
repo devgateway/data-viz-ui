@@ -1,5 +1,5 @@
 import React, { useRef, useState} from 'react'
-import {Container} from 'semantic-ui-react'
+import { Container } from '@devgateway/ui'
 import { PostConsumer, PostProvider} from "@devgateway/wp-react-lib";
 import {Parallax, ParallaxLayer} from '@react-spring/parallax'
 import PostContent from "../connected-templates/PostContent";

@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from "react-redux";
-import { Container, Icon } from "semantic-ui-react";
+import { Container, Icon } from "@devgateway/ui";
 import { cleanFilter } from "../reducers/data";
 import {applyFilter} from "../reducers/data";
 
@@ -51,7 +51,7 @@ const FiltersResetComponent = (props) => {
         onApply({ app, group })
         }}>
             <span>{resetLabel}</span>
-            <span><Icon name="undo alternate" className="custom-undo-icon" /></span>
+            <span><Icon name="rotate-ccw" className="custom-undo-icon" /></span>
         </Container>
     );
 };

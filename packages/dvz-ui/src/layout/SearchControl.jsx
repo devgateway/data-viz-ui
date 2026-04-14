@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef, useContext } from "react";
 import { utils, SearchConsumer, SearchProvider, SearchContext } from "@devgateway/wp-react-lib";
 import CustomSemanticSearch from "./CustomSemanticSearch";
 import { createPortal } from "react-dom";
-import { Icon } from "semantic-ui-react";
+import { Icon } from '@devgateway/ui';
 import { IntlProvider, injectIntl } from "react-intl";
 
 // Utility function to highlight search terms

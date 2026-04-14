@@ -5,7 +5,7 @@ import { injectIntl } from "react-intl";
 import DataProvider from "../data/D3MapDataProvider.jsx";
 import DataConsumer from "../data/D3MapDataConsumer.jsx";
 import GradientColors from "@/embeddable/d3Map/GradientColors.js";
-import { Icon } from 'semantic-ui-react';
+import { Icon } from '@devgateway/ui';
 
 /*
   id: Date.now(),

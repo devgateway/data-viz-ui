@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { injectIntl } from 'react-intl';
 import { DataContext } from './DataContext'
 import { getData, setData } from "../reducers/data";
-import { Container, Dimmer, Loader, Segment } from "semantic-ui-react";
+import { Container, Dimmer, Spinner, Segment } from "@devgateway/ui";
 import debounce from 'lodash/debounce'
 
 class DataProvider extends React.Component {
@@ -266,7 +266,7 @@ class DataProvider extends React.Component {
 
             const spinner = <Segment basic={true} padded={true} style={segmentStyle}>
                 <Dimmer active inverted style={{ background: "transparent" }}>
-                    <Loader size='medium' style={{ background: "transparent" }}></Loader>
+                    <Spinner size='medium' style={{ background: "transparent" }} />
                 </Dimmer>
             </Segment>
 

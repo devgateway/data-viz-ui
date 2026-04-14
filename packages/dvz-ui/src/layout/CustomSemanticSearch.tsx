@@ -1,12 +1,10 @@
-import { Search, Segment, Input } from "semantic-ui-react";
+import { Segment, SearchInput } from "@devgateway/ui";
 import React from "react";
 import clsx from "clsx";
-import { partitionHTMLProps, htmlInputAttrs, useKeyOnly, useValueAndKey, getUnhandledProps } from "@/utils/semanticUtils";
 
 
 const CustomSearch = (props) => {
     const { results, resultRenderer, onSearchChange, value, showNoResults, onResultSelect, loading } = props;
-    const [searchClasses, setSearchClasses] = React.useState('');
     const [focus, setFocus] = React.useState(false);
     const [open, setOpen] = React.useState(false);
 
@@ -30,15 +28,12 @@ const CustomSearch = (props) => {
             <React.Fragment>
                 {renderHeader()}
                 {results.map((result, index) => (
-                    <Search.Result key={index} {...result} />
+                    <div key={index} className="result" onClick={() => onResultSelect && onResultSelect(null, result)}>
+                        {resultRenderer ? resultRenderer(result) : result.title}
+                    </div>
                 ))}
             </React.Fragment>
         );
-    };
-
-    const renderSearchInput = (htmlInputProps) => {
-        // Assuming there is an existing renderSearchInput logic
-        return <Input {...htmlInputProps} />;
     };
 
     const handleBlur = (e, data) => {
@@ -64,47 +59,34 @@ const CustomSearch = (props) => {
 
     const { aligned, category, className, fluid, size, searchTextHandler } = props;
 
-
     const classes = clsx(
         'ui',
         open && 'active visible',
         size,
-        searchClasses,
-        useKeyOnly(category, 'category'),
-        useKeyOnly(fluid, 'fluid'),
-        useKeyOnly(loading, 'loading'),
-        useValueAndKey(aligned, 'aligned'),
+        category && 'category',
+        fluid && 'fluid',
+        loading && 'loading',
+        aligned && `${aligned} aligned`,
         'search',
         className
     );
 
-
-    const unhandled = getUnhandledProps(Search, props);
-    // const ElementType = getComponentType(Search, props);
-    const [htmlInputProps, rest] = partitionHTMLProps(unhandled, {
-        htmlProps: htmlInputAttrs,
-    });
-
     return (
-        <>
-            <Search
-                {...rest}
-                className={classes}
-                placeholder={props.placeholder}
-                onBlur={handleBlur}
-                size="tiny"
-                onFocus={handleFocus}
-                onMouseDown={handleMouseDown}
-                resultRenderer={resultRenderer}
-                onSearchChange={onSearchChange}
-                results={results}
-                value={value}
-                showNoResults={showNoResults}
-                onResultSelect={onResultSelect}
-                loading={loading}
-            />
-        </>
-
+        <SearchInput
+            className={classes}
+            placeholder={props.placeholder}
+            onBlur={(e) => handleBlur(e, null)}
+            onFocus={(e) => handleFocus(e, null)}
+            onMouseDown={handleMouseDown}
+            onSearchChange={onSearchChange}
+            results={results}
+            value={value}
+            showNoResults={showNoResults}
+            onResultSelect={onResultSelect}
+            loading={loading}
+            resultRenderer={resultRenderer}
+            renderResults={results && results.length > 0 ? renderResults : undefined}
+        />
     );
 };
 

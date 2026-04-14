@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { injectIntl } from 'react-intl';
-import { Container, Dimmer, Loader, Segment } from "semantic-ui-react";
+import { Container, Dimmer, Spinner, Segment } from '@devgateway/ui';
 import DataContext from '../data/DataContext';
 import { getData, setData } from '../reducers/data'
 

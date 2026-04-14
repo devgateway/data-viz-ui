@@ -58,7 +58,6 @@ const devConfig = defineConfig({
     },
     optimizeDeps: {
         include: [
-            "semantic-ui-react",
             "@nivo/*",
         ],
         exclude: [
@@ -128,7 +127,6 @@ const prodConfig = defineConfig({
     optimizeDeps: {
         include: [
             "@devgateway/wp-react-lib",
-            "semantic-ui-react",
             "@nivo/*",
         ]
     },

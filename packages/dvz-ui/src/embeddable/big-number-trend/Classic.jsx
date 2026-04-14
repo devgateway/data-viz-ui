@@ -1,5 +1,5 @@
 import React, {useRef, useState} from "react";
-import {Container, Grid, Popup} from "semantic-ui-react";
+import { Container, Grid, Tooltip } from '@devgateway/ui';
 import DataProvider from "../data/DataProvider.jsx";
 import DataConsumer from "../data/DataConsumer.jsx";
 import {PostContent} from "@devgateway/wp-react-lib";
@@ -270,13 +270,9 @@ const DataFrame = (props) => {
         </div>
         {showPercentageChange && percentChange && (
             props.showTooltip && tooltip ? (
-                <Popup
-                    content={tooltip}
-                    position="top center"
-                    inverted={props.tooltipStyle === 'dark'}
-                    size="small"
-                    trigger={<div className="percentage" style={percentStyle}>{percentChangeFormatted}</div>}
-                />
+                <Tooltip content={tooltip} position="top">
+                    <div className="percentage" style={percentStyle}>{percentChangeFormatted}</div>
+                </Tooltip>
             ) : (
                 <div className="percentage" style={percentStyle}>{percentChangeFormatted}</div>
             )

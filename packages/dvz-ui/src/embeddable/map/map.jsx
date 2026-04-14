@@ -3,13 +3,14 @@ import * as d3 from "d3"; // d3 plugin
 import {
   Container,
   Grid,
+  GridColumn,
   Icon,
-  Popup,
+  Tooltip,
   Dimmer,
-  Loader,
+  Spinner,
   Segment,
-  Message,
-} from "semantic-ui-react";
+  Alert,
+} from "@devgateway/ui";
 import React from "react";
 import * as topojson from "topojson-client";
 import Legend from "./legend";
@@ -2001,7 +2002,7 @@ class Map extends React.Component {
           style={{ margin: "30px" }}
         >
           <Dimmer active inverted>
-            <Loader size="medium"></Loader>
+            <Spinner size="medium" />
           </Dimmer>
         </Segment>
       </Container>
@@ -2010,13 +2011,13 @@ class Map extends React.Component {
 
   noMapSelected() {
     return (
-      <Message icon warning>
-        <Icon name="map outline" />
-        <Message.Content>
-          <Message.Header>No map selected</Message.Header>
-          Pick one from the list in the <strong>Map Layers</strong> section.
-        </Message.Content>
-      </Message>
+      <Alert color="warning">
+        <Icon name="map" />
+        <div>
+          <strong>No map selected</strong>
+          {" "}Pick one from the list in the <strong>Map Layers</strong> section.
+        </div>
+      </Alert>
     );
   }
 
@@ -2063,7 +2064,7 @@ class Map extends React.Component {
         {
           <Grid columns={2}>
             {app !== "csv" && showOverallValue && (
-              <Grid.Column textAlign={"left"} width={4}>
+              <GridColumn textAlign={"left"} width={4}>
                 <div className="national-average-div">
                   <span className="national-avg-label">
                     {nationalAverageLabel}
@@ -2077,9 +2078,9 @@ class Map extends React.Component {
                     )}
                   </span>
                 </div>
-              </Grid.Column>
+              </GridColumn>
             )}
-            <Grid.Column
+            <GridColumn
               textAlign={"right"}
               width={app !== "csv" && showOverallValue ? 12 : 16}
             >
@@ -2094,7 +2095,7 @@ class Map extends React.Component {
                 selectedMeasure={this.state.selectedMeasure}
                 {...this.props}
               />
-            </Grid.Column>
+            </GridColumn>
           </Grid>
         }
         <div className="measure-selector">
@@ -2173,19 +2174,18 @@ class Map extends React.Component {
                   <div className="zoom minus" onClick={this.onZoomOut}>
                     <Icon name="minus" size="large" />
                   </div>
-                  <Popup
+                  <Tooltip
                     content={
                       <FormattedMessage
                         id="map.reset.tooltip"
                         defaultMessage="Reset zoom"
                       />
                     }
-                    trigger={
-                      <div className="reset" onClick={this.onReset}>
-                        <Icon name="repeat" size="large" />
-                      </div>
-                    }
-                  />
+                  >
+                    <div className="reset" onClick={this.onReset}>
+                      <Icon name="rotate-ccw" size="large" />
+                    </div>
+                  </Tooltip>
                 </div>
               )}
             </div>

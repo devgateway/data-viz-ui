@@ -1,4 +1,4 @@
-import { Container, Grid, Segment, SemanticWIDTHS } from "semantic-ui-react";
+import { Container, Grid, GridColumn, GridRow, Segment, type ColSpan } from "@devgateway/ui";
 import { PageConsumer, PageProvider, PostIntro } from "@devgateway/wp-react-lib";
 import React from "react";
 import { injectIntl } from "react-intl";
@@ -8,11 +8,11 @@ const VerticalDashboardGallery = ({ pages, width }) => {
     return (
         <Grid columns={3} stackable={true}>
             {childPages.map(p =>
-                <Grid.Column className={"item"}>
+                <GridColumn className={"item"}>
                     <Container fluid={true} className={"preview"}>
                         <PostIntro as={"div"} post={p}></PostIntro>
                     </Container>
-                </Grid.Column>
+                </GridColumn>
             )}
         </Grid>
     )
@@ -29,20 +29,20 @@ const HorizontalDashboardGallery: React.FC<HorizontalDashboardGalleryProps> = ({
     let index = -1
 
     return (<div>
-        <Grid columns={columns as SemanticWIDTHS}>
+        <Grid columns={columns as unknown as ColSpan}>
             {/* @ts-ignore */}
             {[...Array(parseInt(rows)).keys()]
                 .map((r, idx) => {
 
 
-                    return (<Grid.Row key={idx}>
+                    return (<GridRow key={idx}>
                         {[...Array(parseInt(columns)).keys()].map((c, _) => {
                             index++
-                            return (<Grid.Column key={_}>
+                            return (<GridColumn key={_}>
                                 <PostIntro as={"div"} post={childPages[index]}></PostIntro>
-                            </Grid.Column>)
+                            </GridColumn>)
                         })}
-                    </Grid.Row>)
+                    </GridRow>)
                 })}
 
         </Grid></div>)

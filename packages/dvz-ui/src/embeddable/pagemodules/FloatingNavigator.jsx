@@ -1,5 +1,5 @@
 import React from 'react'
-import {Image, Label, Menu} from 'semantic-ui-react'
+import { Image, Badge, Menu, MenuItem } from '@devgateway/ui'
 
 
 function smoothscroll(idx) {
@@ -32,13 +32,13 @@ const Navigator = (props) => {
     return (
         <div className="left navigator">
             <Menu vertical>
-                <Menu.Item header>{navTitle}</Menu.Item>
+                <div className="menu-header">{navTitle}</div>
 
                 {sections.map(s => (
-                    <Menu.Item key={s.label} active={s.active} onClick={() => smoothscroll(s.id)}>
+                    <MenuItem key={s.label} active={s.active} onClick={() => smoothscroll(s.id)}>
                         {s.iconComponent ? s.iconComponent : <Image src={s.icon} />}
-                        <Label basic>{decodeHtmlEntity(s.label)}</Label>
-                    </Menu.Item>
+                        <Badge>{decodeHtmlEntity(s.label)}</Badge>
+                    </MenuItem>
                 ))}
             </Menu>
         </div>

@@ -1,5 +1,5 @@
 import React, {useCallback, useEffect, useImperativeHandle, useState, useRef} from 'react'
-import {Button, Container, Dropdown, Form, Grid, Input, Label, Message, TextArea, Icon} from 'semantic-ui-react'
+import { Button, Container, Grid, GridColumn, GridRow, Input, Badge, Alert, Textarea, Icon } from '@devgateway/ui'
 import countryOptions from '../../countries'
 import {reset, sendShowCaseForm} from "../reducers/embeddable";
 import {connect} from "react-redux";
@@ -71,7 +71,7 @@ function FileUploader({onSelectionChange, showValidation, inputRef, name}) {
                 <input {...getInputProps()}/>
                 <p>Drag 'n' drop files here, or click select button to select files. The maximum file size allowed is {configData.maxUploadFileSize}MB.</p>
                 {files.length > 0 ? <ul>
-                    {files.map((f, i) => <li key={i}><Label color="green" icon='file'>{f.name}</Label>
+                    {files.map((f, i) => <li key={i}><Badge color="green" icon='file'>{f.name}</Badge>
                     <Icon color="red" name='remove' size='large' onClick={(e) =>{ e.stopPropagation(); remove(i);}}/>
                     </li>)}
                 </ul> : null}
@@ -110,22 +110,15 @@ const ValidatedDropDown = ({options, placeholder, name, required, showValidation
         }
     }));
 
-    return <Form.Dropdown
-        value={value}
-
-        error={error && showValidation}
+    return <select
+        value={value || ''}
         name={name}
-        onChange={(e, value) => {
-            setValue(value.value)
-
-        }}
-        multiple={false}
-        search
-        selection
-        options={options}
-        placeholder={placeholder}
-
-    />
+        className={`ui dropdown selection${error && showValidation ? ' error' : ''}`}
+        onChange={(e) => setValue(e.target.value)}
+    >
+        <option value="">{placeholder}</option>
+        {options.map(o => <option key={o.value} value={o.value}>{o.text}</option>)}
+    </select>
 }
 
 
@@ -223,66 +216,66 @@ const Index = (props) => {
     return (
         <Container fluid={true} className="viz showcase">
             <Grid columns={1} className={showValidation ? 'validated' : ''}>
-                <Grid.Column>
+                <GridColumn>
                     <ValidatedField inputRef={el => setInput(el)} showValidation={showValidation} required={true}
                                     icon={"building"}
                                     name={"organization"} placeholder={organization}/>
-                </Grid.Column>
+                </GridColumn>
 
-                <Grid.Column>
+                <GridColumn>
                     <ValidatedField inputRef={el => setInput(el)} showValidation={showValidation} required={true}
                                     icon={"user"}
                                     name={"name"}
                                     placeholder={name}/>
-                </Grid.Column>
+                </GridColumn>
 
-                <Grid.Column>
+                <GridColumn>
                     <ValidatedField
                         inputRef={el => setInput(el)} showValidation={showValidation} required={true}
                         pattern={/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/}
                         icon={"envelope"}
                         placeholder={email}
                         name={"email"}/>
-                </Grid.Column>
+                </GridColumn>
 
-                <Grid.Column>
-                    <Form.Field>
+                <GridColumn>
+                    <div>
                         <ValidatedDropDown inputRef={el => setInput(el)}
                                            showValidation={showValidation}
                                            name={"country"}
                                            required={true}
                                            options={options}
                                            placeholder={country}/>
-                    </Form.Field>
-                </Grid.Column>
+                    </div>
+                </GridColumn>
 
-                <Grid.Column>
+                <GridColumn>
                     <FileUploader inputRef={el => setInput(el)}
                                   showValidation={showValidation}
                                   name="files"></FileUploader>
-                </Grid.Column>
+                </GridColumn>
 
-                <Grid.Column>
+                <GridColumn>
                     <ValidatedField inputRef={el => setInput(el)} placeholder={message} name={"message"}
-                                    as={TextArea}/>
-                </Grid.Column>
+                                    as={Textarea}/>
+                </GridColumn>
 
-                <Grid.Row>
-                    <Grid.Column textAlign={"left"} width={12} verticalAlign="bottom" className="form-buttons">
+                <GridRow>
+                    <GridColumn textAlign={"left"} width={12} verticalAlign="bottom" className="form-buttons">
                         <Button className="btn-reset"
                                 onClick={e => reset()}>{resetlabel}</Button>
                         <Button secondary={true}
                                 onClick={e => submitForm()}>{submitlabel}</Button>
-                    </Grid.Column>
-                    {(status == 'OK' || editing) && <Grid.Column width={16}> <Message
+                    </GridColumn>
+                    {(status == 'OK' || editing) && <GridColumn width={16}> <Alert
                         success
                         content={<p>{successmessage}</p>}
-                    /></Grid.Column>}
+                    /></GridColumn>}
 
-                    {(status == 'ERROR' || editing) && <Grid.Column width={16}> <Message negative>
+                    {(status == 'ERROR' || editing) && <GridColumn width={16}> <Alert negative>
                         <p>{failuremessage}</p>
-                    </Message></Grid.Column>}
-                </Grid.Row>
+                    </Alert></GridColumn>}
+                </GridRow>
             </Grid>
         </Container>
     );

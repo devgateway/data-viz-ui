@@ -1,16 +1,12 @@
-import React, { LegacyRef, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
     Checkbox,
     Container,
-    Divider,
-    Dropdown,
-    DropdownProps,
+    Separator,
     Icon,
     Input,
-    Label,
-    Radio,
     Segment,
-} from "semantic-ui-react";
+} from "@devgateway/ui";
 import CategoriesConsumer from "../data/CategoriesConsumer";
 import CategoriesProvider from "../data/CategoriesProvider";
 import { connect } from "react-redux";
@@ -180,6 +176,20 @@ const FilterSelectorBox = connect(
     } = props;
 
     const [searchFilter, setSearchFilter] = useState("");
+    const [isOpen, setIsOpen] = useState(false);
+    const dropdownRef = useRef<HTMLDivElement>(null);
+
+    // Close on outside click
+    useEffect(() => {
+        const handleOutsideClick = (e: MouseEvent) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+                setIsOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleOutsideClick);
+        return () => document.removeEventListener('mousedown', handleOutsideClick);
+    }, []);
+
     const changeFilter = (value) => {
         let newValue: any[] = [];
         if (
@@ -200,8 +210,8 @@ const FilterSelectorBox = connect(
         }
 
         onChange({ app, group, param, value: newValue, autoApply, childFilter, childFilterParam, params, uniqueStorage, dvzProxyDatasetId });
-        if (closeOnSelect && refContainer.current) {
-            refContainer.current.close();
+        if (closeOnSelect) {
+            setIsOpen(false);
         }
     };
     const all = (value) => {
@@ -225,8 +235,8 @@ const FilterSelectorBox = connect(
             autoApply,
             childFilter,
         });
-        if (closeOnSelect && refContainer.current) {
-            refContainer.current.close();
+        if (closeOnSelect) {
+            setIsOpen(false);
         }
     };
     const none = () => {
@@ -249,8 +259,8 @@ const FilterSelectorBox = connect(
             value: allNoneSameBehaviour ? matchingItems.map((v) => v.value) : [],
             autoApply,
         });
-        if (closeOnSelect && refContainer.current) {
-            refContainer.current.close();
+        if (closeOnSelect) {
+            setIsOpen(false);
         }
     };
 
@@ -352,116 +362,113 @@ const FilterSelectorBox = connect(
                 }) `;
         }
     };
-    const refContainer = useRef<DropdownProps>(null);
     const [searchText, setSearchText] = useState("");
 
     return (
-        // @ts-ignore
-        <Dropdown
-            ref={refContainer as unknown as LegacyRef<HTMLDivElement>}
-            fluid
-            text={getSelected()}
-            scrolling={false}
-            button
-            icon={"angle down ignore"}
-            multiple={true}
-            search
-            floating={false}
-            className={`${current && current.length > 0 ? "applied " : ""}`}
-        >
-            <Dropdown.Menu>
-                {filterType != FILTER_TYPE_SINGLE_SELECT && (
-                    <>
-                        <Segment>
-                            <Dropdown.Item>
-                                <Label basic onClick={all}>
-                                    {allLabel}
-                                </Label>{" "}
-                                |{" "}
-                                <Label basic onClick={none}>
-                                    {noneLabel}
-                                </Label>
-                            </Dropdown.Item>
-                        </Segment>
-                        {enableTextSearch && (
-                            <>
-                                <Container>
-                                    <Dropdown.Item>
-                                        <div className="ui action input">
-                                            <Input placeholder="Search...">
-                                                <input
-                                                    className="filter-search"
-                                                    value={searchText}
-                                                    onChange={(e) => {
-                                                        freeTextSelect(e.target.value);
-                                                    }}
-                                                />
-
-                                                <Icon
-                                                    name="remove"
-                                                    link
-                                                    className="clear-icon ignore"
-                                                    onClick={(e) => {
-                                                        freeTextSelect("");
-                                                    }}
-                                                ></Icon>
-                                            </Input>
+        <div ref={dropdownRef} className={`relative${current && current.length > 0 ? " applied" : ""}`}>
+            <button
+                type="button"
+                onClick={() => setIsOpen(v => !v)}
+                className="flex items-center gap-2 border border-sui-border rounded-sui px-[1em] py-[.78571429em] bg-white hover:bg-[rgba(0,0,0,.03)] w-full"
+            >
+                <span className="flex-1 text-left">{getSelected()}</span>
+                <Icon name="chevron-down" size="small" />
+            </button>
+            {isOpen && (
+                <div className="absolute top-full left-0 z-50 w-full bg-white border border-sui-border rounded-sui shadow-sui-dropdown">
+                    {filterType != FILTER_TYPE_SINGLE_SELECT && (
+                        <>
+                            <Segment>
+                                <div className="px-[1.14285714em] py-[.78571429em]">
+                                    <button type="button" onClick={all} className="text-sui-blue hover:underline cursor-pointer">
+                                        {allLabel}
+                                    </button>{" "}
+                                    |{" "}
+                                    <button type="button" onClick={none} className="text-sui-blue hover:underline cursor-pointer">
+                                        {noneLabel}
+                                    </button>
+                                </div>
+                            </Segment>
+                            {enableTextSearch && (
+                                <>
+                                    <Container>
+                                        <div className="px-[1.14285714em] py-[.78571429em]">
+                                            <div className="ui action input">
+                                                <div className="relative flex items-center">
+                                                    <input
+                                                        className="filter-search border border-sui-border rounded-sui px-2 py-1 w-full"
+                                                        value={searchText}
+                                                        placeholder="Search..."
+                                                        onChange={(e) => {
+                                                            freeTextSelect(e.target.value);
+                                                        }}
+                                                    />
+                                                    <Icon
+                                                        name="x"
+                                                        className="clear-icon ignore cursor-pointer absolute right-2"
+                                                        onClick={(e) => {
+                                                            freeTextSelect("");
+                                                        }}
+                                                    />
+                                                </div>
+                                            </div>
                                         </div>
-                                    </Dropdown.Item>
-                                </Container>
-                                <Divider />
-                            </>
-                        )}
-                    </>
-                )}
-                <br></br>
-                <Container className={useSingleColumn ? "dropdown-single-column" : ""}>
-                    {options
-                        .filter((o) => {
-                            if (
-                                enableTextSearch &&
-                                searchText &&
-                                searchText.trim().length > 0 &&
-                                o.text
-                            ) {
-                                return o.text.toLowerCase().includes(searchText.toLowerCase());
-                            }
-                            return true;
-                        })
-                        .map(({ value, text }, index) => (
-                            <Dropdown.Item
-                                key={index}
-                                className={useSingleColumn ? "dropdown-item-single-column" : ""}
-                            >
-                                {filterType == FILTER_TYPE_SINGLE_SELECT && (
-                                    <Radio
-                                        checked={
-                                            current && current.indexOf(value) > -1 ? true : false
-                                        }
-                                        onChange={(e) => changeFilter(value)}
-                                        label={text}
-                                    />
-                                )}
-                                {filterType == FILTER_TYPE_MULTI_SELECT && (
-                                    <Checkbox
-                                        checked={
-                                            current &&
-                                                current.indexOf(value) > -1 &&
-                                                !(
-                                                    options.length == current.length && allNoneSameBehaviour
-                                                )
-                                                ? true
-                                                : false
-                                        }
-                                        onChange={(e) => changeFilter(value)}
-                                        label={text}
-                                    />
-                                )}
-                            </Dropdown.Item>
-                        ))}
-                </Container>
-            </Dropdown.Menu>
-        </Dropdown>
+                                    </Container>
+                                    <Separator />
+                                </>
+                            )}
+                        </>
+                    )}
+                    <br />
+                    <Container className={useSingleColumn ? "dropdown-single-column" : ""}>
+                        {options
+                            .filter((o) => {
+                                if (
+                                    enableTextSearch &&
+                                    searchText &&
+                                    searchText.trim().length > 0 &&
+                                    o.text
+                                ) {
+                                    return o.text.toLowerCase().includes(searchText.toLowerCase());
+                                }
+                                return true;
+                            })
+                            .map(({ value, text }, index) => (
+                                <div
+                                    key={index}
+                                    className={`px-[1.14285714em] py-[.78571429em]${useSingleColumn ? " dropdown-item-single-column" : ""}`}
+                                >
+                                    {filterType == FILTER_TYPE_SINGLE_SELECT && (
+                                        <label className="flex items-center gap-2 cursor-pointer">
+                                            <input
+                                                type="radio"
+                                                checked={current && current.indexOf(value) > -1 ? true : false}
+                                                onChange={(e) => changeFilter(value)}
+                                            />
+                                            <span>{text}</span>
+                                        </label>
+                                    )}
+                                    {filterType == FILTER_TYPE_MULTI_SELECT && (
+                                        <Checkbox
+                                            checked={
+                                                current &&
+                                                    current.indexOf(value) > -1 &&
+                                                    !(
+                                                        options.length == current.length && allNoneSameBehaviour
+                                                    )
+                                                    ? true
+                                                    : false
+                                            }
+                                            onChange={(e) => changeFilter(value)}
+                                            label={text}
+                                        />
+                                    )}
+                                </div>
+                            ))}
+                    </Container>
+                </div>
+            )}
+        </div>
     );
 });
 
@@ -484,6 +491,18 @@ const RangeFilterSelectorBoxFilter = connect(
     }: FilterPros) => {
         const [start, setStart] = useState(options[0].position);
         const [end, setEnd] = useState(options[options.length - 1].position);
+        const [isOpen, setIsOpen] = useState(false);
+        const dropdownRef = useRef<HTMLDivElement>(null);
+
+        useEffect(() => {
+            const handleOutsideClick = (e: MouseEvent) => {
+                if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+                    setIsOpen(false);
+                }
+            };
+            document.addEventListener('mousedown', handleOutsideClick);
+            return () => document.removeEventListener('mousedown', handleOutsideClick);
+        }, []);
 
         useEffect(() => {
             const current = options
@@ -496,63 +515,66 @@ const RangeFilterSelectorBoxFilter = connect(
             onChange({ app, group, param, value: current, autoApply });
         }, [start, end]);
 
-        const refContainer = useRef<DropdownProps>(null);
+        const displayText = `${placeholder} (${current
+            ? current.filter((v) => v != Number.MIN_SAFE_INTEGER).length
+            : 0
+            }/${options.length})`;
 
         return (
-            <Dropdown
-                ref={refContainer as unknown as LegacyRef<HTMLDivElement>}
-                fluid
-                text={`${placeholder} (${current
-                    ? current.filter((v) => v != Number.MIN_SAFE_INTEGER).length
-                    : 0
-                    }/${options.length})`}
-                scrolling={false}
-                button
-                multiple={true}
-                search
-                floating={false}
-                icon="angle down ignore"
-                className={`${current && current.length > 0 ? "applied " : ""} range`}
-            >
-                <Dropdown.Menu>
-                    <Segment>
-                        <Dropdown.Item>
-                            {" "}
-                            <Label basic>{startLabel}</Label>
-                        </Dropdown.Item>
-                    </Segment>
-                    <Container>
-                        {options.map(({ value, text, position }) => (
-                            <Dropdown.Item>
-                                <Radio
-                                    disabled={position > end}
-                                    checked={start === position}
-                                    onChange={(e) => setStart(position)}
-                                    label={text}
-                                />
-                            </Dropdown.Item>
-                        ))}
-                    </Container>
-                    <Segment>
-                        <Dropdown.Item>
-                            {" "}
-                            <Label basic>{endLabel}</Label>
-                        </Dropdown.Item>
-                    </Segment>
-                    <Container>
-                        {options.map(({ value, text, position }) => (
-                            <Dropdown.Item>
-                                <Radio
-                                    disabled={position < start}
-                                    checked={end === position}
-                                    onChange={(e) => setEnd(position)}
-                                    label={text}
-                                />
-                            </Dropdown.Item>
-                        ))}
-                    </Container>
-                </Dropdown.Menu>
-            </Dropdown>
+            <div ref={dropdownRef} className={`relative${current && current.length > 0 ? " applied" : ""} range`}>
+                <button
+                    type="button"
+                    onClick={() => setIsOpen(v => !v)}
+                    className="flex items-center gap-2 border border-sui-border rounded-sui px-[1em] py-[.78571429em] bg-white hover:bg-[rgba(0,0,0,.03)] w-full"
+                >
+                    <span className="flex-1 text-left">{displayText}</span>
+                    <Icon name="chevron-down" size="small" />
+                </button>
+                {isOpen && (
+                    <div className="absolute top-full left-0 z-50 w-full bg-white border border-sui-border rounded-sui shadow-sui-dropdown">
+                        <Segment>
+                            <div className="px-[1.14285714em] py-[.78571429em]">
+                                <span className="font-medium">{startLabel}</span>
+                            </div>
+                        </Segment>
+                        <Container>
+                            {options.map(({ value, text, position }) => (
+                                <div key={value} className="px-[1.14285714em] py-[.78571429em]">
+                                    <label className={`flex items-center gap-2${position > end ? " opacity-50" : " cursor-pointer"}`}>
+                                        <input
+                                            type="radio"
+                                            disabled={position > end}
+                                            checked={start === position}
+                                            onChange={(e) => setStart(position)}
+                                        />
+                                        <span>{text}</span>
+                                    </label>
+                                </div>
+                            ))}
+                        </Container>
+                        <Segment>
+                            <div className="px-[1.14285714em] py-[.78571429em]">
+                                <span className="font-medium">{endLabel}</span>
+                            </div>
+                        </Segment>
+                        <Container>
+                            {options.map(({ value, text, position }) => (
+                                <div key={value} className="px-[1.14285714em] py-[.78571429em]">
+                                    <label className={`flex items-center gap-2${position < start ? " opacity-50" : " cursor-pointer"}`}>
+                                        <input
+                                            type="radio"
+                                            disabled={position < start}
+                                            checked={end === position}
+                                            onChange={(e) => setEnd(position)}
+                                        />
+                                        <span>{text}</span>
+                                    </label>
+                                </div>
+                            ))}
+                        </Container>
+                    </div>
+                )}
+            </div>
         );
     }
 );

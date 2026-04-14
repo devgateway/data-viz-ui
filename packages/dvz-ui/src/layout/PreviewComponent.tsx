@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useSearchParams } from 'react-router';
-import { Container, Segment } from 'semantic-ui-react';
+import { Container, Segment } from '@devgateway/ui';
 import { SettingsConsumer } from '@devgateway/wp-react-lib';
 import { getComponentByNameIgnoreCase } from '@/embeddable';
 
@@ -52,7 +52,7 @@ const PreviewComponentParameterParser = () => {
             <Container fluid={true} className={"editing"}>
                 {/* @ts-ignore */}
                 {UIComponent ? <UIComponent {...paramProps} editing={true} /> :
-                    <Segment.Group color={"red"} textAlign={"center"}><h1>Wrong Component Name</h1></Segment.Group>}
+                    <div className="border-t-2 border-t-sui-red text-center p-4"><h1>Wrong Component Name</h1></div>}
             </Container>
         </div>
     );

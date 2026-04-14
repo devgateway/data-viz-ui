@@ -1,5 +1,5 @@
 import React from 'react';
-import {Dropdown, Icon} from 'semantic-ui-react'
+import { Icon } from '@devgateway/ui'
 import {connect} from 'react-redux'
 import {injectIntl} from 'react-intl';
 import {toPng} from 'html-to-image';
@@ -49,41 +49,42 @@ export const DropDownFilter = ({
                                    onChange
                                }) => {
 
-    return <Dropdown
-        fluid
-        placeholder={placeholder}
-        icon={icon}
-        onChange={onChange}
-        header={<Dropdown.Header content={<div>All / None</div>}/>}
-        floating
-        labeled
-        button
-        multiple
-        className='icon'
-        options={toOptions(getItems(categories, type))}
-    >
-
-    </Dropdown>
+    const opts = toOptions(getItems(categories, type));
+    return (
+        <select
+            className="icon fluid labeled button dropdown-filter"
+            multiple
+            onChange={(e) => {
+                const values = [...e.target.selectedOptions].map(o => o.value);
+                onChange && onChange(e, { value: values });
+            }}
+        >
+            <option value="" disabled>{placeholder}</option>
+            {opts.map(o => (
+                <option key={o.key} value={o.value}>{o.text}</option>
+            ))}
+        </select>
+    );
 }
 
 
 export const SingleDropDown = (({options, placeholder, selected, icon = 'filter', onChange}) => {
 
-    return <Dropdown
-        fluid
-        placeholder={placeholder}
-        icon={icon}
-        onChange={onChange}
-        header={<Dropdown.Header content={<div>All / None</div>}/>}
-        floating
-        labeled
-        button
-        multiple
-        className='icon'
-        options={options}
-    >
-
-    </Dropdown>
+    return (
+        <select
+            className="icon fluid labeled button single-dropdown"
+            multiple
+            onChange={(e) => {
+                const values = [...e.target.selectedOptions].map(o => o.value);
+                onChange && onChange(e, { value: values });
+            }}
+        >
+            <option value="" disabled>{placeholder}</option>
+            {options.map(o => (
+                <option key={o.key} value={o.value}>{o.text}</option>
+            ))}
+        </select>
+    );
 })
 
 

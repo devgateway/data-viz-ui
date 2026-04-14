@@ -1,4 +1,4 @@
-import { Container, Image, Menu } from "semantic-ui-react";
+import { Container, Image, Menu, MenuItem, MenuSection } from '@devgateway/ui';
 import React, { useEffect, useState } from "react";
 import { MediaConsumer, MediaProvider, MenuConsumer, MenuProvider, utils } from "@devgateway/wp-react-lib";
 import { injectIntl } from "react-intl";
@@ -137,7 +137,7 @@ const MenuItems = injectIntl(({
     return mixedMenu && <React.Fragment>
 
         {mixedMenu.items.filter(i => i.url != "#wpm-languages").map(i => {
-            return (<Menu.Item
+            return (<MenuItem
             as={Link}
                 className={`divided ${i.child_items ? 'has-child-items' : ''} ${selected && selected.ID == i.ID ? 'selected' : ''}  ${active == i.slug ? "active" : ""}`}>
                 {i.child_items ?
@@ -148,7 +148,7 @@ const MenuItems = injectIntl(({
                     </Link>}
 
 
-            </Menu.Item>)
+            </MenuItem>)
 
         })}
 
@@ -168,12 +168,12 @@ const Header = ({ intl,  settings }) => {
     return <React.Fragment>
 
 
-        <MenuProvider slug={"main"} locale={intl.locale}>
+        <MenuProvider name={"main"} locale={intl.locale}>
             <Container fluid={true} className="header classic">
                 <Container fluid={true} className={"background"}>
 
                     <Menu className={"branding"} text>
-                        <Menu.Item>
+                        <MenuItem>
                             <NavLink to="/">
                             {settings.site_logo != 0 && <MediaProvider id={settings.site_logo}>
                                     <MediaConsumer>
@@ -184,31 +184,31 @@ const Header = ({ intl,  settings }) => {
                                 {!window.isCustomizedPreview && settings.site_logo == 0 &&
                                     <img className="brand logo" size="large" src='/dc-logo_01.png' />}
                             </NavLink>
-                        </Menu.Item>
+                        </MenuItem>
 
-                        <Menu.Item className={"divider"}>
+                        <MenuItem className={"divider"}>
                             <div></div>
-                        </Menu.Item>
+                        </MenuItem>
 
-                        <Menu.Item as={Link} fitted href="/">
+                        <MenuItem as={Link} fitted href="/">
                             <div className={"site name"}>{settings.name}</div>
-                        </Menu.Item>
+                        </MenuItem>
 
-                        <Menu.Menu className={"pages"}>
+                        <MenuSection className={"pages"}>
                             <MenuConsumer>
                                 <MenuItems settings={settings} active={slug} selected={selected}
                                     onSetSelected={setSelected}></MenuItems>
                             </MenuConsumer>
-                        </Menu.Menu>
+                        </MenuSection>
 
-                        <Menu.Item>
+                        <MenuItem>
                             <MenuConsumer>
                                 <LangSwitcher locale={intl.locale}></LangSwitcher>
                             </MenuConsumer>
-                        </Menu.Item>
-                        <Menu.Item fitted>
+                        </MenuItem>
+                        <MenuItem fitted>
                             <SearchControl></SearchControl>
-                        </Menu.Item>
+                        </MenuItem>
                     </Menu>
 
                 </Container>

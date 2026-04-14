@@ -1,5 +1,5 @@
 import React, { RefObject, useEffect, useState } from 'react'
-import { Container, Grid, Label } from 'semantic-ui-react'
+import { Container, Grid, GridColumn, GridRow, Badge } from '@devgateway/ui'
 import { MediaConsumer, MediaProvider, PostConsumer, PostIcon, PostProvider, utils } from "@devgateway/wp-react-lib";
 import PostIntro from "../connected-templates/PostIntro";
 import { useParams } from 'react-router';
@@ -87,7 +87,7 @@ const ListOfPost: React.FC<ListOfPostProps> = (props) => {
                 posts.map((p) => (
                     <Grid>
                         {showIcons && (
-                            <Grid.Column textAlign={"center"} width={1}>
+                            <GridColumn textAlign={"center"} width={1}>
                                 <a id={p.slug}></a>
                                 <MediaProvider
                                     id={
@@ -97,12 +97,12 @@ const ListOfPost: React.FC<ListOfPostProps> = (props) => {
                                     }
                                 >
                                     <MediaConsumer>
-                                        <PostIcon as={Label}></PostIcon>
+                                        <PostIcon as={Badge}></PostIcon>
                                     </MediaConsumer>
                                 </MediaProvider>
-                            </Grid.Column>
+                            </GridColumn>
                         )}
-                        <Grid.Column width={showIcons ? 15 : 16}>
+                        <GridColumn width={showIcons ? 15 : 16}>
                             {getIntro(p) && (
                                 <PostIntro as={Container} fluid post={p} ref={postTopRef} />
                             )}
@@ -134,7 +134,7 @@ const ListOfPost: React.FC<ListOfPostProps> = (props) => {
                                     )}
                                 </Container>
                             )}
-                        </Grid.Column>
+                        </GridColumn>
                     </Grid>
                 ))}
         </Container>
@@ -142,7 +142,7 @@ const ListOfPost: React.FC<ListOfPostProps> = (props) => {
 
 }
 
-interface InlineListProps {
+export interface InlineListProps {
     "data-width"?: string,
     "data-height"?: string,
     "data-type"?: string,

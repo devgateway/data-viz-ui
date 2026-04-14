@@ -1,5 +1,5 @@
 import React from "react";
-import { Popup} from 'semantic-ui-react'
+import { Tooltip } from '@devgateway/ui'
 import {connect} from "react-redux";
 
 const decodeContent=(content) => {
@@ -20,12 +20,12 @@ const Reference = ({
 
                    }) => {
 
-    return <Popup className="reference-popup" hoverable size={"mini"} offset={[-16, 0]} content={<div>
-
+    return <Tooltip content={<div>
         <p>{decodeContent(description)}</p>
         <a href={link} target="_blank">{link}</a>
-    </div>}
-                  trigger={<a data-index={index} data-description={description} data-link={link} href={`#ref_${index}`} className={"wp-reference"}>{index}</a>}/>
+    </div>}>
+        <a data-index={index} data-description={description} data-link={link} href={`#ref_${index}`} className={"wp-reference"}>{index}</a>
+    </Tooltip>
 }
 
 

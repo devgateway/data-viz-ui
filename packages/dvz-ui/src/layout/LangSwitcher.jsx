@@ -1,11 +1,10 @@
 import { Config } from "@/conf";
-import React, {useEffect, useState} from "react";
-import {Dropdown, Image} from 'semantic-ui-react'
+import React, { useEffect, useRef, useState } from "react";
+import { Image } from '@devgateway/ui';
 
 const changeLanguage = (locale) => {
     window.location = window.location.origin + "/" + locale.toLowerCase() + window.location.pathname.toString().substring(3)
 }
-
 
 const toOptions = (languages, show, locale) => {
     return Object.keys(languages).map(k => ({
@@ -19,40 +18,63 @@ const toOptions = (languages, show, locale) => {
 }
 
 const Drop = (props) => {
-
     const {menu: {menu_item_languages_show: show}, settings: {languages}, locale} = props
     const options = toOptions(languages, show, locale)
+    const [isOpen, setIsOpen] = useState(false)
+    const dropdownRef = useRef(null)
 
-    return (<Dropdown
-        button
-        className='icon language selector'
-        floating
-        labeled
-        icon={'world'}
-        options={options}
-        onChange={(e, {name, value}) => {
-
-            changeLanguage(value)
+    useEffect(() => {
+        const handleOutside = (e) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(e.target)) setIsOpen(false)
         }
-        }
-        text='Language'
-    />)
+        document.addEventListener('mousedown', handleOutside)
+        return () => document.removeEventListener('mousedown', handleOutside)
+    }, [])
 
+    const selected = options.find(o => o.selected)
+
+    return (
+        <div ref={dropdownRef} className="icon language selector" style={{ position: 'relative', display: 'inline-block' }}>
+            <button
+                className="ui button labeled icon"
+                onClick={() => setIsOpen(v => !v)}
+            >
+                <i className="world icon" />
+                {selected ? selected.text : 'Language'}
+            </button>
+            {isOpen && (
+                <div className="menu" style={{ position: 'absolute', top: '100%', left: 0, zIndex: 100, background: '#fff', border: '1px solid rgba(34,36,38,.15)', borderRadius: '.28571429rem', minWidth: '100%' }}>
+                    {options.map(o => (
+                        <div
+                            key={o.key}
+                            className={`item ${o.selected ? 'active selected' : ''}`}
+                            style={{ padding: '.78571429rem 1.14285714rem', cursor: 'pointer' }}
+                            onClick={() => { setIsOpen(false); changeLanguage(o.value); }}
+                        >
+                            {o.icon}{o.text}
+                        </div>
+                    ))}
+                </div>
+            )}
+        </div>
+    )
 }
+
 const Inline = (props) => {
     const {menu: {menu_item_languages_show: show}, settings: {languages}, locale} = props
     const options = toOptions(languages, show, locale)
 
     return <p className={"inline language selector"}>
-        {options.map(o => <span className={o.selected?'selected':''} >{o.icon}<a onClick={e => changeLanguage(o.value)}>{o.text}</a>  </span>)}
+        {options.map(o => <span key={o.key} className={o.selected?'selected':''}>{o.icon}<a onClick={e => changeLanguage(o.value)}>{o.text}</a>  </span>)}
     </p>
 }
+
 const Single = (props) => {
     const {menu: {menu_item_languages_show: show}, settings: {languages}, locale} = props
     const options = toOptions(languages, show, locale)
 
     return <p className={"single language selector"}>
-        {options.map(o => <a className={o.selected?'selected':''} onClick={e => changeLanguage(o.value)}>{o.value}</a> )}
+        {options.map(o => <a key={o.key} className={o.selected?'selected':''} onClick={e => changeLanguage(o.value)}>{o.value}</a>)}
     </p>
 }
 
@@ -69,7 +91,7 @@ const Toggler = (props) => {
         circle.classList.toggle('fr');
         setTimeout(() => {
             changeLanguage(nextLanguage);
-        }, 300); // Adjust the delay time as needed
+        }, 300);
     };
 
     return (
@@ -83,13 +105,11 @@ const Toggler = (props) => {
     );
 }
 
-
 const Selector = (props) => {
     const {locale, menu} = props
     const languages = menu.items.filter(i => i.url === "#wpm-languages");
     const hasLanguages = languages.length > 0
     const [settings, setSettings] = useState(null);
-
 
     useEffect(() => {
         async function fetchData() {
@@ -97,37 +117,32 @@ const Selector = (props) => {
                 Config.REACT_APP_WP_API + '/dg/v1/settings', {
                     headers: {
                         'Content-Type': 'application/json'
-                        // 'Content-Type': 'application/x-www-form-urlencoded',
                     }
                 }
             );
-
             const json = await response.json()
             setSettings(json);
         }
-
         fetchData()
     }, []);
 
     if (hasLanguages && settings) {
-
         return languages.map(l => {
             const type = l.menu_item_languages_type
             const show = l.menu_item_languages_show
 
             switch (type) {
                 case 'dropdown':
-                    return <Drop locale={locale} menu={l} settings={settings}></Drop>
+                    return <Drop key={l.ID} locale={locale} menu={l} settings={settings} />
                 case 'inline':
-                    return <Inline locale={locale} menu={l} settings={settings}></Inline>
+                    return <Inline key={l.ID} locale={locale} menu={l} settings={settings} />
                 case 'single':
-                    return <Single locale={locale} menu={l} settings={settings}></Single>
+                    return <Single key={l.ID} locale={locale} menu={l} settings={settings} />
                 case 'toggler':
-                    return <Toggler locale={locale} menu={l} settings={settings}></Toggler>
+                    return <Toggler key={l.ID} locale={locale} menu={l} settings={settings} />
             }
             return null;
         })
-        //
     } else {
         return null
     }

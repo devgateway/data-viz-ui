@@ -64,12 +64,10 @@ const devConfig = defineConfig({
             "redux",
             "react-intl",
             "react-redux",
-            "semantic-ui-react",
         ],
     },
     optimizeDeps: {
         include: [
-            "semantic-ui-react",
             "@nivo/*",
         ],
         exclude: [
@@ -143,7 +141,6 @@ const prodConfig = defineConfig({
         include: [
             "@devgateway/wp-react-lib",
             "@devgateway/dvz-ui-react",
-            "semantic-ui-react",
             "@nivo/*",
         ]
     },

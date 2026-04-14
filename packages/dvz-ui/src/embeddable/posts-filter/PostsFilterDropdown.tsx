@@ -1,15 +1,11 @@
-import React, { LegacyRef, useEffect, useRef, useState, useMemo } from "react";
+import React, { useEffect, useRef, useState, useMemo } from "react";
 import {
     Checkbox,
     Container,
-    Divider,
-    Dropdown,
-    DropdownProps,
+    Separator,
     Icon,
-    Label,
-    Radio,
     Segment,
-} from "semantic-ui-react";
+} from "@devgateway/ui";
 // import { setPostsFilter } from "@/embeddable/reducers/data";
 
 const FILTER_TYPE_MULTI_SELECT = "multi-select";
@@ -23,7 +19,7 @@ const toValueKey = (value: any): string | null => {
     return String(value);
 };
 
-export interface PostFilterDropdownProps extends DropdownProps {
+export interface PostFilterDropdownProps {
     allLabel?: string;
     noneLabel?: string;
     group: string;
@@ -37,9 +33,15 @@ export interface PostFilterDropdownProps extends DropdownProps {
     alphabeticalSort?: boolean;
     ascOrder?: boolean;
     placeholder?: string;
-    taxonomy?: string
+    taxonomy?: string;
     type?: string;
     noneFunction?: (e: any) => void;
+    options?: Array<{ key?: any; value: any; text: any }>;
+    current?: any[];
+    onChange?: (e: any, value: any) => void;
+    value?: any;
+    hiddenFilters?: any[];
+    resetKey?: number;
 }
 
 const PostsFilterDropdown = (props: PostFilterDropdownProps) => {
@@ -81,6 +83,19 @@ const PostsFilterDropdown = (props: PostFilterDropdownProps) => {
         : rawSelectedValues;
     const [searchText, setSearchText] = useState("");
     // const [searchFilter, setSearchFilter] = useState("");
+    const [isOpen, setIsOpen] = useState(false);
+    const dropdownRef = useRef<HTMLDivElement>(null);
+
+    // Close on outside click
+    useEffect(() => {
+        const handleOutsideClick = (e: MouseEvent) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+                setIsOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleOutsideClick);
+        return () => document.removeEventListener('mousedown', handleOutsideClick);
+    }, []);
     const changeFilter = (e: any, candidateValue: any) => {
         if (filterType === FILTER_TYPE_MULTI_SELECT) {
             const candidateKey = toValueKey(candidateValue);
@@ -102,10 +117,10 @@ const PostsFilterDropdown = (props: PostFilterDropdownProps) => {
         }
 
 
-        if (closeOnSelect && refContainer.current) {
-            refContainer.current.close();
-        }
-    };
+        if (closeOnSelect && isOpen) {
+                setIsOpen(false);
+            }
+        };
     const all = () => {
         const matchingValues = (options || [])
             .filter((o) => {
@@ -125,10 +140,10 @@ const PostsFilterDropdown = (props: PostFilterDropdownProps) => {
             onChange({} as any, matchingValues);
         }
 
-        if (!isMultiSelect && closeOnSelect && refContainer.current) {
-            refContainer.current.close();
-        }
-    };
+        if (!isMultiSelect && closeOnSelect && isOpen) {
+                setIsOpen(false);
+            }
+        };
     const none = (e: any) => {
         if (noneFunction) {
             noneFunction(e);
@@ -151,8 +166,8 @@ const PostsFilterDropdown = (props: PostFilterDropdownProps) => {
                 const finalValues = allNoneSameBehaviour ? matchingItems.map((v) => v.value) : [NONE_SELECTION_VALUE];
                 onChange({} as any, finalValues);
             }
-            if (!isMultiSelect && closeOnSelect && refContainer.current) {
-                refContainer.current.close();
+            if (!isMultiSelect && closeOnSelect && isOpen) {
+                setIsOpen(false);
             }
         }
 
@@ -215,7 +230,7 @@ const PostsFilterDropdown = (props: PostFilterDropdownProps) => {
 
             const totalCount = options?.filter((f) => {
                 if (hiddenFilters && hiddenFilters.length > 0) {
-                    return !(hiddenFilters.indexOf(f.id) != -1);
+                    return !(hiddenFilters.indexOf(f.value) != -1);
                 }
                 return true;
             }).length || 0;
@@ -223,9 +238,6 @@ const PostsFilterDropdown = (props: PostFilterDropdownProps) => {
             return `${placeholder} (${selectedCount}/${totalCount})`;
         }
     }, [options, selectedValues, filterType]);
-    const refContainer = useRef<DropdownProps>(null);
-
-
     const selectedText = getSelected;
     const selectedString = typeof selectedText === 'string' ? selectedText : '';
     const displayText = (selectedString && selectedString.length > 0) ? selectedString : (placeholder || "");
@@ -242,147 +254,133 @@ const PostsFilterDropdown = (props: PostFilterDropdownProps) => {
         : (current && current.length > 0);
 
     return (
-        // @ts-ignore
-        <Dropdown
-            {...restProps}
-            ref={refContainer as unknown as LegacyRef<HTMLDivElement>}
-            fluid
-            text={displayText}
-            scrolling={false}
-            button
-            icon={"angle down"}
-            multiple={isMultiSelect}
-            search
-            floating={false}
-            value={value}
-            closeOnChange={closeOnSelect}
-            {...(isMultiSelect ? { renderLabel: () => null } : {})}
-            className={`multiple ${isAppliedClass ? "applied " : ""}`}
-        >
-            <Dropdown.Menu>
-                {filterType != FILTER_TYPE_SINGLE_SELECT && (
-                    <>
-                        <Segment>
-                            <Dropdown.Item>
-                                <Label basic onClick={all}>
-                                    {allLabel}
-                                </Label>{" "}
-                                |{" "}
-                                <Label basic onClick={none}>
-                                    {noneLabel}
-                                </Label>
-                            </Dropdown.Item>
-                        </Segment>
-                        {enableTextSearch && (
-                            <>
-                                <Container>
-                                    <Dropdown.Item>
-                                        <div className="ui action input">
-                                            <div className="ui input">
-                                                <input
-                                                    className="filter-search"
-                                                    value={searchText}
-                                                    placeholder="Search..."
-                                                    onChange={(e) => {
-                                                        if (e && e.nativeEvent && e.nativeEvent.stopImmediatePropagation) {
-                                                            // @ts-ignore
-                                                            e.nativeEvent.stopImmediatePropagation();
-                                                        }
-                                                        freeTextSelect(e.target.value);
-                                                    }}
-                                                    onKeyDown={(e) => {
-                                                        if (e && e.nativeEvent && e.nativeEvent.stopImmediatePropagation) {
-                                                            // @ts-ignore
-                                                            e.nativeEvent.stopImmediatePropagation();
-                                                        }
-                                                    }}
-                                                    onKeyUp={(e) => {
-                                                        if (e && e.nativeEvent && e.nativeEvent.stopImmediatePropagation) {
-                                                            // @ts-ignore
-                                                            e.nativeEvent.stopImmediatePropagation();
-                                                        }
-                                                    }}
-                                                    onKeyPress={(e) => {
-                                                        if (e && e.nativeEvent && e.nativeEvent.stopImmediatePropagation) {
-                                                            // @ts-ignore
-                                                            e.nativeEvent.stopImmediatePropagation();
-                                                        }
-                                                    }}
-                                                    onMouseDown={(e) => {
-                                                        e.stopPropagation();
-                                                    }}
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                    }}
-                                                    onFocus={(e) => {
-                                                        e.stopPropagation();
-                                                    }}
-                                                    type="text"
-                                                    autoComplete="off"
-                                                />
-
-                                                <Icon
-                                                    name="remove"
-                                                    link
-                                                    className="clear-icon ignore"
-                                                    onClick={(_e) => {
-                                                        freeTextSelect("");
-                                                    }}
-                                                ></Icon>
+        <div ref={dropdownRef} className={`relative${isAppliedClass ? " applied" : ""}`}>
+            <button
+                type="button"
+                onClick={() => setIsOpen(v => !v)}
+                className="flex items-center gap-2 border border-sui-border rounded-sui px-[1em] py-[.78571429em] bg-white hover:bg-[rgba(0,0,0,.03)] w-full"
+            >
+                <span className="flex-1 text-left">{displayText}</span>
+                <Icon name="chevron-down" size="small" />
+            </button>
+            {isOpen && (
+                <div className="absolute top-full left-0 z-50 w-full bg-white border border-sui-border rounded-sui shadow-sui-dropdown">
+                    {filterType != FILTER_TYPE_SINGLE_SELECT && (
+                        <>
+                            <Segment>
+                                <div className="px-[1.14285714em] py-[.78571429em]">
+                                    <button type="button" onClick={all} className="text-sui-blue hover:underline cursor-pointer">
+                                        {allLabel}
+                                    </button>{" "}
+                                    |{" "}
+                                    <button type="button" onClick={none} className="text-sui-blue hover:underline cursor-pointer">
+                                        {noneLabel}
+                                    </button>
+                                </div>
+                            </Segment>
+                            {enableTextSearch && (
+                                <>
+                                    <Container>
+                                        <div className="px-[1.14285714em] py-[.78571429em]">
+                                            <div className="ui action input">
+                                                <div className="ui input">
+                                                    <input
+                                                        className="filter-search"
+                                                        value={searchText}
+                                                        placeholder="Search..."
+                                                        onChange={(e) => {
+                                                            if (e && e.nativeEvent && e.nativeEvent.stopImmediatePropagation) {
+                                                                // @ts-ignore
+                                                                e.nativeEvent.stopImmediatePropagation();
+                                                            }
+                                                            freeTextSelect(e.target.value);
+                                                        }}
+                                                        onKeyDown={(e) => {
+                                                            if (e && e.nativeEvent && e.nativeEvent.stopImmediatePropagation) {
+                                                                // @ts-ignore
+                                                                e.nativeEvent.stopImmediatePropagation();
+                                                            }
+                                                        }}
+                                                        onKeyUp={(e) => {
+                                                            if (e && e.nativeEvent && e.nativeEvent.stopImmediatePropagation) {
+                                                                // @ts-ignore
+                                                                e.nativeEvent.stopImmediatePropagation();
+                                                            }
+                                                        }}
+                                                        onMouseDown={(e) => {
+                                                            e.stopPropagation();
+                                                        }}
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                        }}
+                                                        onFocus={(e) => {
+                                                            e.stopPropagation();
+                                                        }}
+                                                        type="text"
+                                                        autoComplete="off"
+                                                    />
+                                                    <Icon
+                                                        name="x"
+                                                        className="clear-icon ignore cursor-pointer"
+                                                        onClick={(_e) => {
+                                                            freeTextSelect("");
+                                                        }}
+                                                    />
+                                                </div>
                                             </div>
                                         </div>
-                                    </Dropdown.Item>
-                                </Container>
-                                <Divider />
-                            </>
-                        )}
-                    </>
-                )}
-                <br></br>
-                <Container className={useSingleColumn ? "dropdown-single-column" : ""}>
-                    {options?.filter((o) => {
-                        if (
-                            enableTextSearch &&
-                            searchText &&
-                            searchText.trim().length > 0 &&
-                            o.text
-                        ) {
-                            return o.text?.toString().toLowerCase().includes(searchText.toLowerCase());
-                        }
-                        return true;
-                    })
-                        .map(({ value: optionValue, text }, index) => (
-                            <Dropdown.Item
-                                key={index}
-                                className={useSingleColumn ? "dropdown-item-single-column" : ""}
-                            >
-
-                                {filterType === FILTER_TYPE_SINGLE_SELECT && (
-                                    <Radio
-                                        checked={value == optionValue}
-                                        onChange={(e) => {
-                                            changeFilter(e, optionValue)
-                                        }}
-                                        label={text}
-                                    />
-                                )}
-                                {filterType === FILTER_TYPE_MULTI_SELECT && (
-                                    <Checkbox
-                                        checked={
-                                            selectedValues &&
-                                            selectedValues.some(
-                                                (selectedValue) => toValueKey(selectedValue) === toValueKey(optionValue)
-                                            )
-                                        }
-                                        onChange={() => changeFilter(null, optionValue)}
-                                        label={text}
-                                    />
-                                )}
-                            </Dropdown.Item>
-                        ))}
-                </Container>
-            </Dropdown.Menu>
-        </Dropdown>
+                                    </Container>
+                                    <Separator />
+                                </>
+                            )}
+                        </>
+                    )}
+                    <br />
+                    <Container className={useSingleColumn ? "dropdown-single-column" : ""}>
+                        {options?.filter((o) => {
+                            if (
+                                enableTextSearch &&
+                                searchText &&
+                                searchText.trim().length > 0 &&
+                                o.text
+                            ) {
+                                return o.text?.toString().toLowerCase().includes(searchText.toLowerCase());
+                            }
+                            return true;
+                        })
+                            .map(({ value: optionValue, text }, index) => (
+                                <div
+                                    key={index}
+                                    className={`px-[1.14285714em] py-[.78571429em]${useSingleColumn ? " dropdown-item-single-column" : ""}`}
+                                >
+                                    {filterType === FILTER_TYPE_SINGLE_SELECT && (
+                                        <label className="flex items-center gap-2 cursor-pointer">
+                                            <input
+                                                type="radio"
+                                                checked={value == optionValue}
+                                                onChange={(e) => changeFilter(e, optionValue)}
+                                            />
+                                            <span>{text}</span>
+                                        </label>
+                                    )}
+                                    {filterType === FILTER_TYPE_MULTI_SELECT && (
+                                        <Checkbox
+                                            checked={
+                                                selectedValues &&
+                                                selectedValues.some(
+                                                    (selectedValue) => toValueKey(selectedValue) === toValueKey(optionValue)
+                                                )
+                                            }
+                                            onChange={() => changeFilter(null, optionValue)}
+                                            label={text}
+                                        />
+                                    )}
+                                </div>
+                            ))}
+                    </Container>
+                </div>
+            )}
+        </div>
     );
 };
 

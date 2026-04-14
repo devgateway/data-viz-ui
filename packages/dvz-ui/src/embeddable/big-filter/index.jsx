@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import { Container } from "semantic-ui-react";
+import { Container } from '@devgateway/ui';
 import { connect } from "react-redux";
 import DataConsumer from "../data/DataConsumer";
 import { setFilter, unsetFilter } from "../reducers/data";

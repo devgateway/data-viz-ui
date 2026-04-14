@@ -1,5 +1,5 @@
 import React from "react";
-import { Icon, Popup } from 'semantic-ui-react'
+import { Icon, Tooltip } from '@devgateway/ui'
 
 const decodeContent=(content) => {
     let result;
@@ -12,14 +12,16 @@ const decodeContent=(content) => {
     return result
 }
 
-const Tooltip = ({
-
+const TooltipComponent = ({
                      "data-description": description = ""
                  }) => {
 
-
-    return <Popup className="title-popup" size={"mini"} offset={[-10,0]} content={decodeContent(description)} trigger={<Icon  name='question circle' />} />
+    return (
+      <Tooltip content={decodeContent(description)} className="title-popup">
+        <Icon name="help-circle" />
+      </Tooltip>
+    );
 }
 
 
-export default Tooltip
+export default TooltipComponent

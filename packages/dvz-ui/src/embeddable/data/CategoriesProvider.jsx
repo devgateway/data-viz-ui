@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { injectIntl } from 'react-intl';
 import { CategoriesContext } from './DataContext'
 import { getCategories, loadFilterItems } from "../reducers/data";
-import { Container, Segment } from "semantic-ui-react";
+import { Container, Segment } from '@devgateway/ui';
 
 const MemoizedCategoriesContextProvider = ({ data, children }) => {
     const dataValue = React.useMemo(() => (data ? data.toJS() : null), [data])

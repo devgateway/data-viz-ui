@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {connect} from "react-redux";
-import {Button, Container, Icon} from "semantic-ui-react";
+import { Button, Container, Icon } from "@devgateway/ui";
 import {applyFilter} from "../reducers/data";
 
 
@@ -63,7 +63,7 @@ const FiltersResetComponent = (props) => {
                    }}>
 
             <span>{label}</span>
-            <span><Icon name="chevron circle right" className="custom-apply-icon"/></span>
+            <span><Icon name="chevron-right-circle" className="custom-apply-icon"/></span>
 
         </Container>
     );

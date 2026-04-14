@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Button, Container, Dropdown, Grid, Icon } from "semantic-ui-react";
+import { Button, Container, Grid, GridColumn, Icon } from '@devgateway/ui';
 import { PostContent } from "@devgateway/wp-react-lib";
 import { domtoimage } from "./dom-to-image";
 import { saveAs } from 'file-saver';
@@ -40,6 +40,7 @@ const DownloadComponent = (props) => {
   } = props;
 
   const [fileType, setFileType] = useState(defaultFormat);
+  const [isFormatOpen, setIsFormatOpen] = useState(false);
   const isCheckPNG = checkPNG == 'true' || checkPNG === true;
   const isCheckJPG = checkJPG == 'true' || checkJPG === true;
 
@@ -172,43 +173,50 @@ const DownloadComponent = (props) => {
       <DownloadableContent ref={componentRef}>
         <Grid stackable reversed={"mobile"} className={"download-header"}>
           {!editing && useTitle === "true" &&
-            <Grid.Column width={12}>
+            <GridColumn width={12}>
               <PostContent parentUnique={props.unique}
                 post={{ content: { rendered: decodeURIComponent(sectionTitle) } }} />
-            </Grid.Column>}
-          <Grid.Column className={editing ? "editing ignore" : "ignore"} width={(editing || useTitle !== "true") ? 16 : 4}
+            </GridColumn>}
+          <GridColumn className={editing ? "editing ignore" : "ignore"} width={(editing || useTitle !== "true") ? 16 : 4}
             textAlign={"right"}>
             <div className={"wrapper"}>
               <Button className={"download"} onClick={() => onClickHandler(fileType)}>
                 {buttonLabel} {fileType === 'PNG' ? 'PNG' : 'JPG'}
               </Button>
-              <Dropdown className={"download"} data-tooltip={decodeURIComponent(tooltip)}
-                trigger={(isCheckJPG && isCheckPNG) ?
-                  <Icon name={"download"} className='download-icon'></Icon> : null}>
-                <Dropdown.Menu>
-                  {title}
-                  {(isCheckPNG === true) && (
-                    <Dropdown.Item onClick={() => {
-                      setFileType('PNG');
-                      onClickHandler('PNG');
-                    }}>
-                      <input type='radio' value='PNG' checked={fileType === 'PNG'} onChange={handleChange} />
-                      <label>{pngText}</label>
-                    </Dropdown.Item>
+              {(isCheckJPG && isCheckPNG) && (
+                <div className={"download format-selector"} style={{position:"relative",display:"inline-block"}} data-tooltip={decodeURIComponent(tooltip)}>
+                  <button className="ui icon button download" onClick={() => setIsFormatOpen(v => !v)} type="button">
+                    <Icon name={"download"} className='download-icon' />
+                  </button>
+                  {isFormatOpen && (
+                    <div className="menu" style={{position:"absolute",top:"100%",right:0,zIndex:100,background:"#fff",border:"1px solid rgba(34,36,38,.15)",borderRadius:".28571429rem",minWidth:"10rem"}}>
+                      {title}
+                      {(isCheckPNG === true) && (
+                        <div className="item" style={{padding:".78571429rem 1.14285714rem",cursor:"pointer"}} onClick={() => {
+                          setFileType('PNG');
+                          setIsFormatOpen(false);
+                          onClickHandler('PNG');
+                        }}>
+                          <input type='radio' value='PNG' checked={fileType === 'PNG'} onChange={handleChange} />
+                          <label>{pngText}</label>
+                        </div>
+                      )}
+                      {(isCheckJPG === true) && (
+                        <div className="item" style={{padding:".78571429rem 1.14285714rem",cursor:"pointer"}} onClick={() => {
+                          setFileType('JPG');
+                          setIsFormatOpen(false);
+                          onClickHandler('JPG');
+                        }}>
+                          <input type='radio' value='JPG' checked={fileType === 'JPG'} onChange={handleChange} />
+                          <label>{jpgText}</label>
+                        </div>
+                      )}
+                    </div>
                   )}
-                  {(isCheckJPG === true) && (
-                    <Dropdown.Item onClick={() => {
-                      setFileType('JPG');
-                      onClickHandler('JPG');
-                    }}>
-                      <input type='radio' value='JPG' checked={fileType === 'JPG'} onChange={handleChange} />
-                      <label>{jpgText}</label>
-                    </Dropdown.Item>
-                  )}
-                </Dropdown.Menu>
-              </Dropdown>
+                </div>
+              )}
             </div>
-          </Grid.Column>
+          </GridColumn>
         </Grid>
         {!editing &&
           <Container fluid={true} className={`download area ${editing || pageModuleProps?.editing ? 'editing' : ''}`}>

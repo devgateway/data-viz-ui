@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Accordion, Container, Grid, Icon, Label, Segment } from 'semantic-ui-react'
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent as AccordionPanel, Container, Grid, GridColumn, GridRow, Icon, Badge, Segment, type ColSpan } from '@devgateway/ui'
 import {
     MediaConsumer,
     MediaProvider,
@@ -72,8 +72,8 @@ const FeaturedPost: React.FC<FeaturedPostProps> = ({ post, onClick, active, more
         <div className="cover" style={{ "backgroundImage": `url(${mediaUrl ? mediaUrl : ''})` }}>
             <PostIntro post={post} />
             {!active ?
-                <Label onClick={onClick}><Icon name='search' size="large" /> {moreLabel}</Label> :
-                <Label onClick={onClick}><Icon name='arrow alternate circle left outline' size="large" /> Back </Label>}
+                <Badge onClick={onClick}><Icon name='search' size="large" /> {moreLabel}</Badge> :
+                <Badge onClick={onClick}><Icon name='arrow-left-circle' size="large" /> Back </Badge>}
         </div>
     );
 };
@@ -134,11 +134,10 @@ const FeaturedTabs: React.FC<FeaturedTabsProps> = ({ posts, width, height, color
 
     return (
         <Container fluid={true} className="featured tabs" style={{ minHeight: `${height}px` }}>
-            {/*  @ts-expect-error */}
-            <Grid stackable columns={active != null ? 1 : posts?.length} className="desktop">
+            <Grid stackable columns={active != null ? 1 : (posts?.length as ColSpan)} className="desktop">
                 {posts?.map((post, i) => (
                     <React.Fragment key={post.slug}>
-                        <Grid.Column
+                        <GridColumn
                             style={active == null ? { display: 'block', visibility: 'visible', backgroundColor: arrayColors[i] } : { display: 'none', visibility: 'hidden' }}
                         >
                             <a id={post.slug} />
@@ -152,9 +151,9 @@ const FeaturedTabs: React.FC<FeaturedTabsProps> = ({ posts, width, height, color
 
                             </MediaContext.Consumer>
                         </MediaProvider>
-                    </Grid.Column>
+                    </GridColumn>
 
-                        <Grid.Column
+                        <GridColumn
                             className="expanded"
                             style={active != post.slug ? { display: 'none', visibility: 'hidden' } : { display: 'block', visibility: 'visible' }}
                         >
@@ -167,12 +166,12 @@ const FeaturedTabs: React.FC<FeaturedTabsProps> = ({ posts, width, height, color
                                     </MediaProvider>
                                 }
                                 <PostTitle as={"h2"} post={post} className={"has-standard-36-font-size has-white-color"} />
-                                <Label className={"closeIcon"} onClick={() => setActive(null)}><Icon name='times circle outline' size="large" /></Label>
+                                <Badge className={"closeIcon"} onClick={() => setActive(null)}><Icon name='x-circle' size="large" /></Badge>
                             </Segment>
                             <PostContent as={"div"} fluid={true} post={post} style={{ maxHeight: `calc(${height}px - 150px)` }}
                             />
-                            <Label className={"closeIconText"} style={{ backgroundColor: `${arrayColors[i]}` }} onClick={() => setActive(null)}><Icon name='times circle outline' size="large" /> {closeLabel || 'Close'} </Label>
-                        </Grid.Column>
+                            <Badge className={"closeIconText"} style={{ backgroundColor: `${arrayColors[i]}` }} onClick={() => setActive(null)}><Icon name='x-circle' size="large" /> {closeLabel || 'Close'} </Badge>
+                        </GridColumn>
                     </React.Fragment>
                 ))}
             </Grid>
@@ -182,7 +181,11 @@ const FeaturedTabs: React.FC<FeaturedTabsProps> = ({ posts, width, height, color
 
 // Mobile AccordionContent Component
 const AccordionContent: React.FC<AccordionContentProps> = ({ posts, activeItem, setActive, color }) => {
-    const [activeIndex, setActiveIndex] = useState(posts.findIndex(p => p.slug === activeItem));
+    const [openItems, setOpenItems] = useState<string[]>(() => {
+        const idx = posts.findIndex(p => p.slug === activeItem);
+        return idx >= 0 ? [String(idx)] : [];
+    });
+    const activeIndex = openItems.length > 0 ? parseInt(openItems[0]) : -1;
     const [scrollTarget, setScrollTarget] = useState<HTMLElement | null>(null);
     const arrayColors = color.split(',');
 
@@ -248,29 +251,30 @@ const AccordionContent: React.FC<AccordionContentProps> = ({ posts, activeItem, 
         };
     }, []);
 
-    const handleClick = (e: React.MouseEvent, titleProps: { index: number }) => {
-        const { index } = titleProps;
-        const newIndex = activeIndex === index ? -1 : index;
-        setActiveIndex(newIndex);
-        setActive(posts[index].slug);
+    const handleClick = (e: React.MouseEvent, index: number) => {
+        const isOpening = !openItems.includes(String(index));
+        const newOpenItems = isOpening ? [String(index)] : [];
+        setOpenItems(newOpenItems);
+        const newIndex = isOpening ? index : -1;
+        if (newIndex >= 0) {
+            setActive(posts[newIndex].slug);
+        }
 
         // Set the scroll target after updating the activeIndex
-        if (newIndex !== -1) {
+        if (isOpening) {
             setScrollTarget(e.currentTarget as HTMLElement);
         }
     };
 
     return (
-        <Accordion fluid styled>
+        <Accordion fluid openItems={openItems} onOpenItemsChange={(val) => setOpenItems(Array.isArray(val) ? val : [val])}>
             {posts.map((post, index) => {
                 const iconUrl = post.meta_fields?.icon ? post.meta_fields.icon[0] : null;
 
                 return (
-                    <React.Fragment key={post.id}>
-                        <Accordion.Title
-                            active={activeIndex === index}
-                            index={index}
-                            onClick={handleClick as any}
+                    <AccordionItem key={post.id} value={String(index)}>
+                        <AccordionTrigger
+                            onClick={(e) => handleClick(e, index)}
                             style={{ backgroundColor: arrayColors[index] }}
                         >
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
@@ -286,13 +290,13 @@ const AccordionContent: React.FC<AccordionContentProps> = ({ posts, activeItem, 
                                     {!iconUrl && <GetFigureFromPost post={post} />}
                                     <p className='accordion-post-ft-title' dangerouslySetInnerHTML={{ __html: post.title.rendered }} style={{ marginLeft: '10px' }} />
                                 </div>
-                                <Icon name="chevron down" />
+                                <Icon name="chevron-down" />
                             </div>
-                        </Accordion.Title>
-                        <Accordion.Content className={"accordion-post-ft-content"} active={activeIndex === index}>
+                        </AccordionTrigger>
+                        <AccordionPanel className={"accordion-post-ft-content"}>
                             <PostContent post={post} />
-                        </Accordion.Content>
-                    </React.Fragment>
+                        </AccordionPanel>
+                    </AccordionItem>
                 );
             })}
         </Accordion>

@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import {Menu} from 'semantic-ui-react'
+import { Menu, MenuItem } from '@devgateway/ui'
 
 
 const TopNavigator = () => {
@@ -31,7 +31,7 @@ const TopNavigator = () => {
         <>
         {show && <div id="top-navigator" className="top-navigator">
             <Menu>
-                <Menu.Item onClick={scrollToTop}>Back to the top</Menu.Item>
+                <MenuItem onClick={scrollToTop}>Back to the top</MenuItem>
             </Menu>
         </div>}
         </>

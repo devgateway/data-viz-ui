@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import type { PostType } from '@devgateway/wp-react-lib';
-import { Container, Grid, GridRow, Loader, SemanticWIDTHS } from 'semantic-ui-react';
+import { Container, Grid, GridColumn, GridRow, Spinner, type ColSpan } from '@devgateway/ui';
 import PostIntro from "../connected-templates/PostIntro";
 import { injectIntl, WrappedComponentProps } from 'react-intl';
 import { getStartDateAndEndDateFromYear } from './utils';
@@ -41,11 +41,11 @@ const PostGridContent = (props: PostGridContentProps) => {
     }
 
     return (
-        <Grid className={"filtered-posts"} columns={numberOfColumns as unknown as SemanticWIDTHS}>
+        <Grid className={"filtered-posts"} columns={numberOfColumns as ColSpan}>
             <GridRow>
                 {
                     allPosts.map((post) => (
-                        <Grid.Column key={post.id}>
+                        <GridColumn key={post.id}>
                             <div className={"filtered-posts-column"} style={{ width: postWidth, height: postHeight, overflow: 'hidden' }}>
                                 <PostIntro
                                     style={{
@@ -62,7 +62,7 @@ const PostGridContent = (props: PostGridContentProps) => {
                                 />
                             </div>
 
-                        </Grid.Column>
+                        </GridColumn>
 
                     ))
                 }
@@ -73,7 +73,7 @@ const PostGridContent = (props: PostGridContentProps) => {
 }
 
 
-interface FilteredPostsProps extends WrappedComponentProps {
+export interface FilteredPostsProps extends WrappedComponentProps {
     "data-group": string;
     "data-number-of-columns": number | string;
     "data-type": string;
@@ -351,7 +351,7 @@ const FilteredPosts = (props: FilteredPostsProps) => {
                 {
                     loading ? (
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: minHeight ?? '100%' }}>
-                            <Loader active inline='centered' />
+                            <Spinner active inline='centered' />
                         </div>
                     ) : !loading && posts && posts.length > 0 ? (
                         <PostGridContent

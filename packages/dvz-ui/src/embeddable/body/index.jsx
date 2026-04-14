@@ -1,5 +1,5 @@
 import React from "react";
-import { Container } from "semantic-ui-react";
+import { Container } from '@devgateway/ui';
 
 import Background from "./Background";
 import Stomach from "./Stomach";

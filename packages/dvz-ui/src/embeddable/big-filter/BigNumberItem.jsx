@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid } from "semantic-ui-react";
+import { Grid, GridColumn } from '@devgateway/ui';
 
 function parseBoolean(value) {
     if (typeof value === 'boolean') return value;
@@ -116,7 +116,7 @@ export const BigNumberItem = (props) => {
 
     // 5. UPDATED: Added a 'disabled' class to the Grid.Column for potential external CSS targeting
     return (
-        <Grid.Column
+        <GridColumn
             className={`big filter item ${isSelected ? "selected" : "unselected"} ${highlighted ? `highlighted ${dimension2}` : ''} ${isDisabled ? "disabled" : ""}`}
             key={idx}
             onClick={click}
@@ -127,6 +127,6 @@ export const BigNumberItem = (props) => {
             {highlighted && <p><div className={"highlighted-pill"}>Zoonotic</div></p>}
 
             <p style={labelStyle(isSelected)} className="big-number-label">{getLabel ? getLabel(child.value) : (child.label || child.value)}</p>
-        </Grid.Column >
+        </GridColumn >
     )
 }

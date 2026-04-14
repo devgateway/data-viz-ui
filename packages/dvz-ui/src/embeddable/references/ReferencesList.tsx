@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Container, Grid, SemanticWIDTHS, GridColumn, GridRow } from 'semantic-ui-react';
+import { Container, Grid, type ColSpan, GridColumn, GridRow } from '@devgateway/ui';
 import { connect } from "react-redux";
 import { useWindowDimensionsAndDevice } from "@/lib/hooks/window-dimensions";
 
@@ -48,7 +48,7 @@ const References = ({
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    const style: { flexDirection: string; height?: string } = { flexDirection }
+    const style: React.CSSProperties = { flexDirection: flexDirection as React.CSSProperties['flexDirection'] }
     const [elements, setElements] = useState<NodeListOf<Element> | []>([])
 
     if (flexDirection == "column" && cols > 1) {
@@ -78,7 +78,7 @@ const References = ({
         {editing &&
             <div className="edit-mode-message"><p>No preview available. The full list of references will be displayed in the live page.</p></div>
         }
-        <Grid fluid stretched={isMobileOrTablet ? true : false} columns={isMobileOrTablet ? 1 : cols as SemanticWIDTHS} style={style}>
+        <Grid fluid stretched={isMobileOrTablet ? true : false} columns={isMobileOrTablet ? 1 : cols as ColSpan} style={style}>
             {/* <GridRow style={style}> */}
             {unique.sort((a, b) => {
                 const indexA = a.getAttribute("data-index") ?? ""; // Handle null case

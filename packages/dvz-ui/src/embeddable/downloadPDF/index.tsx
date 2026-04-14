@@ -1,5 +1,5 @@
 import React, {LegacyRef, useRef, useState} from 'react';
-import {Button, Container} from "semantic-ui-react";
+import { Button, Container } from "@devgateway/ui";
 
 interface DownloadableContentProps {
     children: React.ReactNode;

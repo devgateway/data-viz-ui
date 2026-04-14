@@ -1,4 +1,4 @@
-import { Image, Menu, Popup} from "semantic-ui-react";
+import { Image, Menu, MenuItem, Tooltip } from '@devgateway/ui';
 import React, { useState} from "react";
 import {MediaConsumer, MediaProvider, MenuConsumer, MenuProvider} from "@devgateway/wp-react-lib";
 import {injectIntl} from "react-intl";
@@ -43,24 +43,24 @@ const FloatingMenu = (props) => {
     return menu.items.filter(i => i.url != "#wpm-languages")
         .map((i) => {
 
-            return (<Menu.Item
+            return (<MenuItem
                 className={`divided ${i.child_items ? 'has-child-items' : ''} ${selected && selected.ID == i.ID ? 'selected' : ''}  ${active == i.slug ? "active" : ""}`}>
                 {!i.child_items &&
                     <a onClick={e => onSetSelected(i)} href={localReplaceLink(i.url, locale)}>{i.title}</a>}
                 {i.child_items &&
-                    <Popup position={"top center"}   className={"floating child"} positionFixed hoverable
+                    <Tooltip position={"top center"}   className={"floating child"} positionFixed hoverable
                            trigger={<span>{i.title}</span>}>
                         {i.child_items.map(ch =>
-                            <Menu.Item>
+                            <MenuItem>
                             {ch.icon&&<img className={"child icon"} src={ch.icon.url}/>}
                            <span> <a onClick={e => onSetSelected(i)} href={localReplaceLink(ch.url, locale)}>{ch.title}</a></span>
-                        </Menu.Item>)}
+                        </MenuItem>)}
 
 
-                    </Popup>}
+                    </Tooltip>}
 
 
-            </Menu.Item>)
+            </MenuItem>)
         })
 }
 
@@ -75,9 +75,9 @@ const HeaderFloatingMenu = ({
             <img className="brand logo" size="large" src='/logo_full.png'/>
     }
 
-    return (<MenuProvider slug={"main"} locale={locale}>
+    return (<MenuProvider name={"main"} locale={locale}>
         <Menu className={"header floating branding"} text>
-            <Menu.Item className={"logo"}>
+            <MenuItem className={"logo"}>
                 <a href={`/${locale}`}>
 
                     {settings.site_logo != 0 && <MediaProvider id={settings.site_logo}>
@@ -89,27 +89,27 @@ const HeaderFloatingMenu = ({
                     {!window.isCustomizedPreview && settings.site_logo == 0 &&
                         <img className="brand logo" size="large" src='/dc-logo_01.png'/>}
                 </a>
-            </Menu.Item>
-            <Menu.Item className={"divider"}>
+            </MenuItem>
+            <MenuItem className={"divider"}>
                 <div></div>
-            </Menu.Item>
-            <Menu.Item className={"site name"} fitted href="/">
+            </MenuItem>
+            <MenuItem className={"site name"} fitted href="/">
                 {settings.name}
-            </Menu.Item>
-            <Menu.Item className={"pages"}>
+            </MenuItem>
+            <MenuItem className={"pages"}>
                 <MenuConsumer>
                     <FloatingMenu settings={settings} active={slug} selected={selected}
                                   onSetSelected={setSelected} locale={locale}></FloatingMenu>
                 </MenuConsumer>
-            </Menu.Item>
-            <Menu.Item className={"lang switcher"}>
+            </MenuItem>
+            <MenuItem className={"lang switcher"}>
                 <MenuConsumer>
                     <LangSwitcher locale={locale}></LangSwitcher>
                 </MenuConsumer>
-            </Menu.Item>
-            <Menu.Item fitted>
+            </MenuItem>
+            <MenuItem fitted>
                 <SearchControl></SearchControl>
-            </Menu.Item>
+            </MenuItem>
         </Menu>
     </MenuProvider>)
 

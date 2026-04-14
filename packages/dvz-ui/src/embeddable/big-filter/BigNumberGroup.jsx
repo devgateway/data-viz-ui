@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
-import { Container, Grid } from "semantic-ui-react";
+import { Container, Grid, GridColumn, GridRow } from '@devgateway/ui';
 import { BigNumberItem } from './BigNumberItem';
 import { decode } from '../utils/parseUtils';
 import _ from 'lodash';
@@ -161,9 +161,9 @@ const BigNumberGroup = (props) => {
     } else {
         return <Container fluid={true} style={{ padding: '0px', margin: '0px', height: `${height}px` }}>
             <Grid fluid={true} celled={true} stackable columns={nColumns} style={{ border: '1px solid #EEE' }}>
-                <Grid.Row>
-                    <Grid.Column width={16} textAlign='right'>Selected    {selected}/{total}</Grid.Column>
-                </Grid.Row>
+                <GridRow>
+                    <GridColumn width={16} textAlign='right'>Selected    {selected}/{total}</GridColumn>
+                </GridRow>
                 {data.children && filteredFilters.map((child, idx) => {
                     return <BigNumberItem
                         key={idx}

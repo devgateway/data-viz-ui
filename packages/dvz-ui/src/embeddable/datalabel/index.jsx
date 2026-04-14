@@ -1,5 +1,5 @@
 import React, {useRef, useState} from "react";
-import {Container} from "semantic-ui-react";
+import { Container } from '@devgateway/ui';
 import DataProvider from "../data/DataProvider";
 import DataConsumer from "../data/DataConsumer";
 import {PostContent} from "@devgateway/wp-react-lib";

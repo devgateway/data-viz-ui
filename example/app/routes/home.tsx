@@ -1,12 +1,13 @@
 import React from "react";
 import type { Route } from "./+types/home";
-import { Page } from '@devgateway/wp-react-lib';
+// import { Page } from '@devgateway/wp-react-lib';
 import ResponsiveContainer from "@devgateway/dvz-ui-react/layout";
 import { useParams } from "react-router";
 import { getPages } from "@devgateway/wp-react-lib";
 import { getMetaSeo } from "../utils/meta-seo";
 import { DEFAULT_LOCALE } from "~/utils/constants";
 import { getApiUrl } from "~/utils/api-utils";
+import { PageContainer } from "@devgateway/dvz-ui-react";
 
 export async function loader({ request, params }: Route.LoaderArgs) {
   const posts = await getPages({
@@ -52,7 +53,7 @@ const Home = ({
   return (
 
     <ResponsiveContainer locale={locale}>
-      <Page pages={[loaderData.post]} />
+      <PageContainer page={[loaderData.post]} />
     </ResponsiveContainer>
   )
 };

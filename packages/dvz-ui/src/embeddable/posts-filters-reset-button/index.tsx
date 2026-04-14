@@ -1,6 +1,6 @@
 import React from 'react';
+import { Container, Icon } from "@devgateway/ui";
 import { useDispatch, useSelector } from 'react-redux';
-import { Container, Icon } from "semantic-ui-react";
 import isEqual from 'lodash.isequal'
 
 const PostsFiltersResetButton = (props) => {
@@ -44,7 +44,7 @@ const PostsFiltersResetButton = (props) => {
                 })
             }}>
             <span>{resetLabel}</span>
-            <span><Icon disabled={!enabled} name="undo alternate" className="custom-undo-icon" /></span>
+            <span><Icon disabled={!enabled} name="rotate-ccw" className="custom-undo-icon" /></span>
         </Container>
     );
 };

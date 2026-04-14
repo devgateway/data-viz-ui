@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button, Header, Segment } from 'semantic-ui-react'
+import { Button, Segment } from '@devgateway/ui'
 import {cleanFilter} from "../reducers/data";
 import {connect} from "react-redux";
 
@@ -10,7 +10,7 @@ const Messages = (props) => {
     }
 
     return (<Segment placeholder className = "chartNoDataMessage">
-        <Header icon>
+        <div className="ui icon header">
             <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="noDataSVG"
@@ -31,7 +31,7 @@ const Messages = (props) => {
 
             {editing&&<div className = "WPnoDataMsg">{'Not enough parameters to render the chart'}</div>}
             <div className = "WPnoDataMsg">{noDataMsg}</div>
-        </Header>
+        </div>
         <Button onClick={e => onClean({app, group})}>Clear Filter</Button>
     </Segment>)
 }

@@ -1,7 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import {
-    Container
-} from "semantic-ui-react";
+import { Container } from "@devgateway/ui";
 import { toBoolean, toNumber } from '@/utils/data';
 import { useAppDispatch } from "@/redux/hooks";
 import { useSelector } from "react-redux";
@@ -9,7 +7,7 @@ import CategoricalFilter from "./CategoricalFilter";
 import YearFilter from "./YearFilter";
 
 
-interface PostsFilterProps {
+export interface PostsFilterProps {
     "data-alphabetical-sort": boolean | string;
     "data-asc-order": boolean | string;
     "data-group": string;

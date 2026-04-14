@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { Container } from "semantic-ui-react";
+import { Container } from '@devgateway/ui';
 import DataProvider from "../data/DataProvider.jsx";
 import DataConsumer from "../data/DataConsumer.jsx";
 import { connect } from "react-redux";

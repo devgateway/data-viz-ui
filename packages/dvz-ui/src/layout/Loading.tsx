@@ -1,11 +1,11 @@
 import React from 'react';
-import { Dimmer, Loader, Segment } from 'semantic-ui-react'
+import { Dimmer, Spinner, Segment } from '@devgateway/ui'
 
 const Loading = () => {
   return (
     <Segment className="h-screen w-screen">
       <Dimmer active inverted>
-        <Loader size="large" active inline="centered" inverted/>
+        <Spinner size="large" active inline="centered" inverted/>
       </Dimmer>
     </Segment>
   )

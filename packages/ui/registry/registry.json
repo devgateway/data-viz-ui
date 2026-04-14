@@ -1,0 +1,228 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "dvz-ui",
+  "homepage": "https://github.com/devgateway/data-viz-ui",
+  "items": [
+    {
+      "name": "container",
+      "type": "registry:component",
+      "ssr": "server",
+      "description": "Max-width centred layout wrapper. Replaces SUI Container.",
+      "dependencies": ["class-variance-authority", "clsx", "tailwind-merge"],
+      "files": [{ "path": "components/container.tsx", "type": "registry:component" }]
+    },
+    {
+      "name": "grid",
+      "type": "registry:component",
+      "ssr": "server",
+      "description": "16-column responsive grid. Replaces SUI Grid, GridColumn, GridRow.",
+      "dependencies": ["class-variance-authority", "clsx", "tailwind-merge"],
+      "files": [{ "path": "components/grid.tsx", "type": "registry:component" }]
+    },
+    {
+      "name": "segment",
+      "type": "registry:component",
+      "ssr": "server",
+      "description": "Bordered content panel. Replaces SUI Segment.",
+      "dependencies": ["class-variance-authority", "clsx", "tailwind-merge"],
+      "files": [{ "path": "components/segment.tsx", "type": "registry:component" }]
+    },
+    {
+      "name": "button",
+      "type": "registry:component",
+      "ssr": "server",
+      "description": "Action button with SUI variants. Replaces SUI Button.",
+      "dependencies": ["@radix-ui/react-slot", "class-variance-authority", "clsx", "tailwind-merge"],
+      "files": [{ "path": "components/button.tsx", "type": "registry:component" }]
+    },
+    {
+      "name": "badge",
+      "type": "registry:component",
+      "ssr": "server",
+      "description": "Inline tag/label badge. Replaces SUI Label.",
+      "dependencies": ["class-variance-authority", "clsx", "tailwind-merge"],
+      "files": [{ "path": "components/badge.tsx", "type": "registry:component" }]
+    },
+    {
+      "name": "heading",
+      "type": "registry:component",
+      "ssr": "server",
+      "description": "Typography heading with size variants. Replaces SUI Header.",
+      "dependencies": ["class-variance-authority", "clsx", "tailwind-merge"],
+      "files": [{ "path": "components/heading.tsx", "type": "registry:component" }]
+    },
+    {
+      "name": "alert",
+      "type": "registry:component",
+      "ssr": "server",
+      "description": "Notification / message box with variant colours. Replaces SUI Message.",
+      "dependencies": ["class-variance-authority", "clsx", "tailwind-merge", "lucide-react"],
+      "files": [{ "path": "components/alert.tsx", "type": "registry:component" }]
+    },
+    {
+      "name": "separator",
+      "type": "registry:component",
+      "ssr": "server",
+      "description": "Horizontal rule. Replaces SUI Divider.",
+      "dependencies": ["clsx", "tailwind-merge"],
+      "files": [{ "path": "components/separator.tsx", "type": "registry:component" }]
+    },
+    {
+      "name": "image",
+      "type": "registry:component",
+      "ssr": "server",
+      "description": "Image with sizing and shape helpers. Replaces SUI Image.",
+      "dependencies": ["class-variance-authority", "clsx", "tailwind-merge"],
+      "files": [{ "path": "components/image.tsx", "type": "registry:component" }]
+    },
+    {
+      "name": "flag",
+      "type": "registry:component",
+      "ssr": "server",
+      "description": "Country flag via emoji or image. Replaces SUI Flag.",
+      "dependencies": ["clsx", "tailwind-merge"],
+      "files": [{ "path": "components/flag.tsx", "type": "registry:component" }]
+    },
+    {
+      "name": "input",
+      "type": "registry:component",
+      "ssr": "server",
+      "description": "Text input with icon and label support. Replaces SUI Input.",
+      "dependencies": ["clsx", "tailwind-merge"],
+      "files": [{ "path": "components/input.tsx", "type": "registry:component" }]
+    },
+    {
+      "name": "textarea",
+      "type": "registry:component",
+      "ssr": "server",
+      "description": "Multi-line text input. Replaces SUI TextArea.",
+      "dependencies": ["clsx", "tailwind-merge"],
+      "files": [{ "path": "components/textarea.tsx", "type": "registry:component" }]
+    },
+    {
+      "name": "spinner",
+      "type": "registry:component",
+      "ssr": "server",
+      "description": "Spinner, Dimmer, and LoadingOverlay. Replaces SUI Loader + Dimmer.",
+      "dependencies": ["clsx", "tailwind-merge"],
+      "files": [{ "path": "components/spinner.tsx", "type": "registry:component" }]
+    },
+    {
+      "name": "icon",
+      "type": "registry:component",
+      "ssr": "server",
+      "description": "Lucide icon wrapper with SUI icon name mapping. Replaces SUI Icon.",
+      "dependencies": ["lucide-react", "clsx", "tailwind-merge"],
+      "files": [
+        { "path": "components/icon.tsx", "type": "registry:component" },
+        { "path": "types/icon-names.ts", "type": "registry:lib" }
+      ]
+    },
+    {
+      "name": "checkbox",
+      "type": "registry:component",
+      "ssr": "client",
+      "description": "Accessible checkbox. Replaces SUI Checkbox.",
+      "dependencies": ["@radix-ui/react-checkbox", "lucide-react", "clsx", "tailwind-merge"],
+      "files": [{ "path": "components/checkbox.tsx", "type": "registry:component" }]
+    },
+    {
+      "name": "radio-group",
+      "type": "registry:component",
+      "ssr": "client",
+      "description": "Accessible radio group. Replaces SUI Radio.",
+      "dependencies": ["@radix-ui/react-radio-group", "clsx", "tailwind-merge"],
+      "files": [{ "path": "components/radio-group.tsx", "type": "registry:component" }]
+    },
+    {
+      "name": "accordion",
+      "type": "registry:component",
+      "ssr": "client",
+      "description": "Collapsible sections. Replaces SUI Accordion.",
+      "dependencies": ["@radix-ui/react-accordion", "lucide-react", "clsx", "tailwind-merge"],
+      "files": [{ "path": "components/accordion.tsx", "type": "registry:component" }]
+    },
+    {
+      "name": "dialog",
+      "type": "registry:component",
+      "ssr": "client",
+      "description": "Modal dialog with portal. Replaces SUI Modal.",
+      "dependencies": ["@radix-ui/react-dialog", "lucide-react", "class-variance-authority", "clsx", "tailwind-merge"],
+      "files": [{ "path": "components/dialog.tsx", "type": "registry:component" }]
+    },
+    {
+      "name": "tooltip",
+      "type": "registry:component",
+      "ssr": "client",
+      "description": "Tooltip and Popover. Replaces SUI Popup.",
+      "dependencies": ["@radix-ui/react-tooltip", "@radix-ui/react-popover", "clsx", "tailwind-merge"],
+      "files": [{ "path": "components/tooltip.tsx", "type": "registry:component" }]
+    },
+    {
+      "name": "menu",
+      "type": "registry:component",
+      "ssr": "isomorphic",
+      "description": "Nav menu (horizontal/vertical). Replaces SUI Menu + MenuItem.",
+      "dependencies": ["clsx", "tailwind-merge"],
+      "files": [
+        { "path": "components/menu.tsx", "type": "registry:component" },
+        { "path": "hooks/use-isomorphic-layout-effect.ts", "type": "registry:hook" }
+      ]
+    },
+    {
+      "name": "combobox",
+      "type": "registry:component",
+      "ssr": "client",
+      "description": "Single/multi-select dropdown with search. Replaces SUI Dropdown.",
+      "dependencies": ["@radix-ui/react-popover", "cmdk", "lucide-react", "clsx", "tailwind-merge"],
+      "registryDependencies": ["use-controllable-state"],
+      "files": [{ "path": "components/combobox.tsx", "type": "registry:component" }]
+    },
+    {
+      "name": "search-input",
+      "type": "registry:component",
+      "ssr": "client",
+      "description": "Autocomplete search input. Replaces SUI Search.",
+      "dependencies": ["@radix-ui/react-popover", "cmdk", "lucide-react", "clsx", "tailwind-merge"],
+      "files": [
+        { "path": "components/search-input.tsx", "type": "registry:component" },
+        { "path": "components/spinner.tsx", "type": "registry:component" }
+      ]
+    },
+    {
+      "name": "use-controllable-state",
+      "type": "registry:hook",
+      "ssr": "server",
+      "description": "Controlled/uncontrolled state hook. Replaces SUI useAutoControlledValue.",
+      "files": [{ "path": "hooks/use-controllable-state.ts", "type": "registry:hook" }]
+    },
+    {
+      "name": "use-composed-refs",
+      "type": "registry:hook",
+      "ssr": "server",
+      "description": "Merges multiple React refs. Replaces SUI useMergedRefs.",
+      "files": [{ "path": "hooks/use-composed-refs.ts", "type": "registry:hook" }]
+    },
+    {
+      "name": "use-outside-click",
+      "type": "registry:hook",
+      "ssr": "server",
+      "description": "Click-outside handler. Replaces SUI eventStack.",
+      "files": [{ "path": "hooks/use-outside-click.ts", "type": "registry:hook" }]
+    },
+    {
+      "name": "use-escape-key",
+      "type": "registry:hook",
+      "ssr": "server",
+      "description": "Escape key handler. Replaces SUI eventStack.",
+      "files": [{ "path": "hooks/use-escape-key.ts", "type": "registry:hook" }]
+    },
+    {
+      "name": "use-isomorphic-layout-effect",
+      "type": "registry:hook",
+      "ssr": "server",
+      "description": "SSR-safe layout effect. Mirrors SUI's pattern.",
+      "files": [{ "path": "hooks/use-isomorphic-layout-effect.ts", "type": "registry:hook" }]
+    }
+  ]
+}

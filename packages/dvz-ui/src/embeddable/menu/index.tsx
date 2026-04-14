@@ -1,7 +1,7 @@
 import React, { useState} from "react";
 import {MenuProvider, MenuConsumer} from "@devgateway/wp-react-lib";
 import {injectIntl} from "react-intl";
-import {Container, Menu} from "semantic-ui-react";
+import { Container, Menu, MenuItem } from "@devgateway/ui";
 import {decode} from "../utils/index.js";
 
 const localReplaceLink = (url, locale) => {
@@ -30,7 +30,7 @@ const MenuChild = injectIntl((props: any) => {
     
     return <>
 
-        {menu && menu.items.map((item, index) => (<Menu.Item
+        {menu && menu.items.map((item, index) => (<MenuItem
             className={`divided ${item.child_items ? 'has-child-items' : ''} 
                     ${selected && selected.ID == item.ID ? 'selected' : ''}  
                     ${active == item.slug ? "active" : ""}`}>
@@ -39,9 +39,9 @@ const MenuChild = injectIntl((props: any) => {
             <span><a href={localReplaceLink(item.url,locale)}>{item.title}</a></span>
 
             {item.child_items && item.child_items.map((child, index) => {
-                return <Menu.Item> </Menu.Item>
+                return <MenuItem key={child.ID}> </MenuItem>
             })}
-        </Menu.Item>))}
+        </MenuItem>))}
 
     </>
 
@@ -70,14 +70,14 @@ const InlineMenu = (props) => {
 
     return (<Container fluid textAlign={"right"}>
         {name && name != "" && <Menu className={"inline"} size={"small"}>
-            <Menu.Item header={true}>
+            <MenuItem>
 
 
                 {icon && <img src={decode(icon)} className={"icon"}/>}
                 {label && <span className={"label"}>{label}</span>}
 
-            </Menu.Item>
-            <MenuProvider slug={name} locale={locale}>
+            </MenuItem>
+            <MenuProvider name={name} locale={locale}>
                 <MenuConsumer>
                     <MenuChild onSetSelected={setSelected}></MenuChild>
                 </MenuConsumer>

@@ -1,9 +1,9 @@
 import React, { useEffect } from "react";
-import { Container } from "semantic-ui-react";
+import { Container } from "@devgateway/ui";
 import { cleanMeasures, setMeasures } from "../reducers/data";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 
-interface MeasuresProps {
+export interface MeasuresProps {
     parent?: string,
     editing?: boolean,
     unique?: string,

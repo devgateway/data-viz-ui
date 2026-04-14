@@ -1,6 +1,6 @@
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import React from 'react'
-import { Button, Header, Segment } from 'semantic-ui-react';
+import { Button, Heading, Segment } from '@devgateway/ui';
 import { clearPostsFilter } from '../reducers/data';
 
 interface NoDataProps {
@@ -20,7 +20,7 @@ const NoData = (props: NoDataProps) => {
     }
 
     return (<Segment placeholder className = "chartNoDataMessage">
-        <Header icon>
+        <div className="flex flex-col items-center gap-4">
             <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="noDataSVG"
@@ -41,7 +41,7 @@ const NoData = (props: NoDataProps) => {
 
             {editing&&<div className = "WPnoDataMsg">{'Not enough parameters to render the chart'}</div>}
             <div className = "WPnoDataMsg">{noDataMsg}</div>
-        </Header>
+        </div>
         <Button size='medium' onClick={e => cleanFilters(e)}>Clear Filter</Button>
     </Segment>)
 }
