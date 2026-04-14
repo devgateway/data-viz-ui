@@ -3,7 +3,7 @@ import type { PostType } from '@devgateway/wp-react-lib';
 import { Container, Grid, GridRow, Loader, SemanticWIDTHS } from 'semantic-ui-react';
 import PostIntro from "../connected-templates/PostIntro";
 import { injectIntl, WrappedComponentProps } from 'react-intl';
-import { getStartDateAndEndDateFromYear } from './utils';
+import { getStartDateAndEndDateFromYear, resolveWpApiBase } from './utils';
 import NoData from './NoData';
 import { useDispatch, useSelector } from 'react-redux';
 import { getCustomPosts } from '../reducers/data-api';
@@ -17,6 +17,8 @@ interface PostGridContentProps {
     countryCategory: string;
     postWidth: number;
     postHeight: number;
+    wordpressSourceType?: string;
+    wordpressSource?: string;
 }
 
 interface NormalizedFilterValues {
@@ -87,6 +89,10 @@ interface FilteredPostsProps extends WrappedComponentProps {
     "data-sort-first-by": number | string;
     "data-sorting-type": string;
     "data-sorting-taxonomy": string;
+    "data-wordpress-source-type"?: string;
+    "data-wordpress-source"?: string;
+    "data-no-data-msg"?: string;
+    "data-clear-filter-msg"?: string;
     editing?: boolean;
 }
 
@@ -98,7 +104,7 @@ const FilteredPosts = (props: FilteredPostsProps) => {
         "data-number-of-columns": numberOfColumns,
         "data-type": type,
         "data-taxonomy": taxonomy,
-        "data-categories": categories,
+        "data-categories": categories = "[]",
         "data-height": _height,
         "data-post-width": postWidth,
         "data-post-height": postHeight,
@@ -106,13 +112,19 @@ const FilteredPosts = (props: FilteredPostsProps) => {
         "data-enable-sorting": enableSorting,
         "data-sort-first-by": sortFirstBy,
         "data-sorting-taxonomy": sortingTaxonomy,
+        "data-wordpress-source-type": wordpressSourceType,
+        "data-wordpress-source": wordpressSource,
+        "data-no-data-msg": noDataMsg,
+        "data-clear-filter-msg": clearFilterMsg,
         editing,
     } = props;
+
 
     const dispatch = useDispatch();
     const { locale } = useParams();
 
     const [loading, setLoading] = useState(false);
+
     const postsReducer: any = useSelector((state: any) => state).getIn(["data", "posts", group]);
     const [posts, setPosts] = useState<any>([]);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -298,6 +310,7 @@ const FilteredPosts = (props: FilteredPostsProps) => {
             taxonomyFilters,
             ordering: "date",
             orderingDirection: "desc",
+            wpApiBase: wordpressSource ?? undefined,
         };
 
         await getCustomPosts(args).then((response: any) => {
@@ -338,7 +351,9 @@ const FilteredPosts = (props: FilteredPostsProps) => {
         });
     }
 
+
     useEffect(() => {
+        if (!type) return;
         (async () => {
             await getPosts();
         })();
@@ -362,7 +377,7 @@ const FilteredPosts = (props: FilteredPostsProps) => {
                             sortFirstBy={sortFirstByValue}
                             countryCategory={sortingTaxonomy} />
                     ) : (
-                        <NoData noDataMsg="No posts found" group={group} />
+                        <NoData noDataMsg={noDataMsg} clearFilterMsg={clearFilterMsg} group={group} />
                     )
                 }
             </Container>

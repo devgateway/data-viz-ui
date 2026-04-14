@@ -58,8 +58,7 @@ export const getCategories = ({ app, params }) => {
 };
 
 export const getCategory = ({ app, type, params }) => {
-    const finalUrl = `${API_ROOT ? API_ROOT : ''}/api/${app}/categories/${type}${params ? '?' + queryParams(params) : ''}`
-    console.log("categories==>", finalUrl)
+    const finalUrl = `${API_ROOT ? API_ROOT : ''}/api/${app}/categories/${type}${params ? '?' + queryParams(params) : ''}`;
 
     return requestWithDeduplication(finalUrl)
 }
@@ -69,8 +68,11 @@ export const getData = ({ source, app, params }) => {
     return requestWithDeduplication(finalUrl);
 };
 
-export const getCustomPosts = ({ postType, taxonomy, category, taxonomyFilters, before, perPage, page, locale, after, ordering, orderingDirection }) => {
-    const url = `${Config.REACT_APP_WP_API}/wp/v2/${postType}`;
+export const getCustomPosts = ({ postType, taxonomy, category, taxonomyFilters, before, perPage, page, locale, after, ordering, orderingDirection, wpApiBase }) => {
+    const hasApiBase = wpApiBase !== undefined && wpApiBase !== null && wpApiBase !== "";
+    const apiBase = hasApiBase ? wpApiBase : Config.REACT_APP_WP_API;
+    console.log("Using API base:", apiBase);
+    const url = `${apiBase}/wp/v2/${postType}`;
     const queryParams = new URLSearchParams();
 
     // Collect taxonomy values per key, then serialize as comma-separated lists
@@ -127,8 +129,7 @@ export const getCustomPosts = ({ postType, taxonomy, category, taxonomyFilters, 
     return get(`${url}?${queryString}`, {
         headers: {
             'Content-Type': 'application/json',
-        },
-        credentials: 'include',
+        }, 
     }, true);
 
 };

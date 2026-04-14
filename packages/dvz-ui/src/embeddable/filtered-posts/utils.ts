@@ -1,5 +1,5 @@
-import { Config } from "@/conf";
 import { getYearRange } from '@devgateway/wp-react-lib';
+
 function getStartDateAndEndDateFromYear(year: number) {
     if (!year) return { startDate: null, endDate: null };
     // Always use UTC to avoid timezone issues
@@ -13,4 +13,14 @@ async function getYearsToDisplay() {
     return yearRange;
 }
 
-export { getStartDateAndEndDateFromYear, getYearsToDisplay };
+async function resolveWpApiBase(
+    wordpressSourceType: string | undefined,
+    wordpressSource: string | undefined
+): Promise<string | null> {
+    if ((wordpressSourceType === 'custom' || wordpressSourceType === 'landing') && wordpressSource) {
+        return wordpressSource;
+    }
+    return null;
+}
+
+export { getStartDateAndEndDateFromYear, getYearsToDisplay, resolveWpApiBase };
