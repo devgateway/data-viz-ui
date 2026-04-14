@@ -38,10 +38,10 @@ const devConfig = defineConfig({
             "@devgateway/dvz-ui-react/dist/esm/styles.css?url": resolve(__dirname, "../packages/dvz-ui/src/scss/themes/default/index.scss") + "?url",
             // Direct source imports for instant hot reloading
             "@devgateway/dvz-ui-react": resolve(__dirname, "../packages/dvz-ui/src"),
-            "@devgateway/wp-react-lib": resolve(__dirname, "../packages/react-lib/wp-react-lib/src"),
+            "@devgateway/wp-react-lib": resolve(__dirname, "../packages/wp-react-lib/src"),
             // Handle subpath imports
-            "@devgateway/wp-react-lib/api": resolve(__dirname, "../packages/react-lib/wp-react-lib/src/api"),
-            "@devgateway/wp-react-lib/hooks": resolve(__dirname, "../packages/react-lib/wp-react-lib/src/hooks"),
+            "@devgateway/wp-react-lib/api": resolve(__dirname, "../packages/wp-react-lib/src/api"),
+            "@devgateway/wp-react-lib/hooks": resolve(__dirname, "../packages/wp-react-lib/src/hooks"),
             // Handle internal aliases within dvz-ui package
             "@/conf": resolve(__dirname, "../packages/dvz-ui/src/conf"),
             "@/embeddable": resolve(__dirname, "../packages/dvz-ui/src/embeddable"),

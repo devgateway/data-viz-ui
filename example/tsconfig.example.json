@@ -20,9 +20,9 @@
         "~/*": ["./app/*"],
         "@devgateway/dvz-ui-react": ["../packages/dvz-ui/src"],
         "@devgateway/dvz-ui-react/*": ["../packages/dvz-ui/src/*"],
-        "@devgateway/wp-react-lib": ["../packages/react-lib/wp-react-lib/src"],
-        "@devgateway/wp-react-lib/*": ["../packages/react-lib/wp-react-lib/src/*"],
-        "@devgateway/wp-react-lib/hooks": ["../packages/react-lib/wp-react-lib/src/hooks"],
+        "@devgateway/wp-react-lib": ["../packages/wp-react-lib/src"],
+        "@devgateway/wp-react-lib/*": ["../packages/wp-react-lib/src/*"],
+        "@devgateway/wp-react-lib/hooks": ["../packages/wp-react-lib/src/hooks"],
         // Handle internal aliases within dvz-ui package
         "@/conf": ["../packages/dvz-ui/src/conf"],
         "@/embeddable": ["../packages/dvz-ui/src/embeddable"],

@@ -37,12 +37,12 @@ const devConfig = defineConfig({
             "@devgateway/dvz-ui-react/dist/esm/styles.css?url": resolve(__dirname, "../data-viz-ui/packages/dvz-ui/src/scss/themes/default/index.scss") + "?url",
             // Direct source imports for instant hot reloading
             "@devgateway/dvz-ui-react": resolve(__dirname, "../data-viz-ui/packages/dvz-ui/src"),
-            "@devgateway/wp-react-lib": resolve(__dirname, "../data-viz-ui/packages/react-lib/wp-react-lib/src"),
+            "@devgateway/wp-react-lib": resolve(__dirname, "../data-viz-ui/packages/wp-react-lib/src"),
             "@devgateway/dvz-ui-react/layout": resolve(__dirname, "../data-viz-ui/packages/dvz-ui/src/layout"),
             // Handle subpath imports
-            "@devgateway/wp-react-lib/api": resolve(__dirname, "../data-viz-ui/packages/react-lib/wp-react-lib/src/api"),
-            "@devgateway/wp-react-lib/hooks": resolve(__dirname, "../data-viz-ui/packages/react-lib/wp-react-lib/src/hooks"),
-            "@devgateway/wp-react-lib/utils": resolve(__dirname, "../data-viz-ui/packages/react-lib/wp-react-lib/src/utils"),
+            "@devgateway/wp-react-lib/api": resolve(__dirname, "../data-viz-ui/packages/wp-react-lib/src/api"),
+            "@devgateway/wp-react-lib/hooks": resolve(__dirname, "../data-viz-ui/packages/wp-react-lib/src/hooks"),
+            "@devgateway/wp-react-lib/utils": resolve(__dirname, "../data-viz-ui/packages/wp-react-lib/src/utils"),
             // Handle internal aliases within dvz-ui package
             "@/conf": resolve(__dirname, "../data-viz-ui/packages/dvz-ui/src/conf"),
             "@/embeddable": resolve(__dirname, "../data-viz-ui/packages/dvz-ui/src/embeddable"),
