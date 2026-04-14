@@ -1,5 +1,5 @@
 ---
-"@devgateway/dvz-wp-commons": patch
+"@devgateway/dvz-ui-react": patch
 ---
 
 - _(TCDICORE-522)_ Add WordPress source URL to posts components `ComponentWithSettings`
