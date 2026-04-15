@@ -60,7 +60,7 @@ const MeasureSelector = ({
       return option.label;
     }
 
-    return metadataLabel || option.label || humanizeValue(option.value);
+    return metadataLabel || humanizeValue(option.value);
   };
 
   return (

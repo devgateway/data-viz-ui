@@ -245,8 +245,17 @@ class PixelLayerCore extends React.Component {
         const projectionChanged = prevProps.path !== this.props.path; // path is recreated on resize
         const measureChanged = prevProps.selectedMeasure !== this.props.selectedMeasure;
         const visibilityChanged = prevProps.visible !== this.props.visible;
+        const configChanged =
+            prevProps.gradientScheme !== this.props.gradientScheme ||
+            prevProps.gradientReverse !== this.props.gradientReverse ||
+            prevProps.gradientStartColor !== this.props.gradientStartColor ||
+            prevProps.gradientEndColor !== this.props.gradientEndColor ||
+            prevProps.opacity !== this.props.opacity ||
+            prevProps.fillColor !== this.props.fillColor ||
+            prevProps.pixelSizeDeg !== this.props.pixelSizeDeg ||
+            prevProps.tooltip !== this.props.tooltip;
 
-        if (dataChanged || projectionChanged || measureChanged) {
+        if (dataChanged || projectionChanged || measureChanged || configChanged) {
             this.create();
         } else if (visibilityChanged) {
             if (this.gRef && this.gRef.current) {

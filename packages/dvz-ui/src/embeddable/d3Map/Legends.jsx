@@ -265,8 +265,107 @@ const DataPointsLayerLegend = (props) => {
     </div>
 }
 
+const PixelGridLayerLegend = (props) => {
+    const {
+        id,
+        name,
+        visible,
+        onItemClick,
+        measures = [],
+        selectedMeasure,
+        customMeasuresLabels,
+        gradientScheme,
+        gradientReverse,
+        gradientStartColor,
+        gradientEndColor,
+        fillColor = '#cccccc',
+        format = {},
+        intl,
+        data,
+    } = props;
+
+    const activeMeasure = getActiveMeasure(measures, selectedMeasure);
+    const measureLabel = getMeasureLabel(measures, selectedMeasure, customMeasuresLabels);
+
+    const numberFormat = {
+        style: (format.style === 'compacted') ? 'decimal' : format.style || 'decimal',
+        notation: (format.style === 'compacted') ? 'compact' : 'standard',
+        currency: format.currency,
+        minimumFractionDigits: parseInt(format.minimumFractionDigits) || 0,
+        maximumFractionDigits: parseInt(format.maximumFractionDigits) || 2,
+    };
+
+    const getGradientColors = (pts) => new GradientColors({
+        data: pts,
+        measure: activeMeasure,
+        defaultFillColor: fillColor,
+        gradientScheme,
+        gradientReverse,
+        gradientStartColor,
+        gradientEndColor,
+    });
+
+    // Flatten pixel data points for min/max and gradient
+    let points = [];
+    if (data && data.children) {
+        data.children.forEach(latNode => {
+            const lonNodes = latNode.children || [];
+            lonNodes.forEach(lonNode => {
+                const val = lonNode[activeMeasure];
+                if (val != null && !isNaN(parseFloat(val))) {
+                    points.push({ [activeMeasure]: parseFloat(val) });
+                }
+            });
+        });
+    }
+
+    const hasData = points.length > 0;
+    const minVal = hasData ? Math.min(...points.map(p => p[activeMeasure])) : null;
+    const maxVal = hasData ? Math.max(...points.map(p => p[activeMeasure])) : null;
+    const gradColors = hasData ? getGradientColors(points) : null;
+
+    return (
+        <div className="legend">
+            <div>
+                <div className="legend-item">
+                    <div
+                        className="legend-color legend-check"
+                        onClick={() => onItemClick(id)}
+                        style={{ backgroundColor: fillColor }}
+                    >
+                        {visible !== false && <>&#10003;</>}
+                    </div>
+                    <div className="legend-label">{name}</div>
+                </div>
+
+                {visible !== false && hasData && gradColors && (
+                    <div className="gradient-container">
+                        <div className="legend-item" style={{ fontSize: '11px', color: '#555', marginBottom: '2px' }}>
+                            {measureLabel}
+                        </div>
+                        <div className="gradient-label" style={{ float: 'right' }}>
+                            {intl.formatNumber(maxVal, numberFormat)}
+                        </div>
+                        <div className="gradient-label" style={{ float: 'left' }}>
+                            {intl.formatNumber(minVal, numberFormat)}
+                        </div>
+                        <div
+                            className="gradient-bar"
+                            style={{
+                                background: `linear-gradient(to right, ${gradColors.getStartColor()}, ${gradColors.getEndColor()})`,
+                                width: '120px',
+                                height: '10px',
+                            }}
+                        />
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+};
+
 const BaseLayerLegend = (props) => {
-    const { fillColor, borderColor, name, visible, id, onItemClick } = props
+    const { fillColor, borderColor, name, visible, id, onItemClick } = props;
     return <div className={"legend"}>
         <div className={"legend-item"}>
             <div className={"legend-color legend-check"} onClick={e => onItemClick(id)}
@@ -506,6 +605,43 @@ const Legends = (props) => {
                         {l.type == "dataPoints" && <DataPointsLayerLegend selectedMeasure={selectedMeasure} selectedItem={props.selectedItem} d2Click={props.d2Click} intl={props.intl} group={group} {...l} onItemClick={onItemClick} />}
 
                         {l.type == "flow" && <FlowLayerLegend selectedMeasure={selectedMeasure} group={group} {...l} onItemClick={onItemClick} intl={props.intl} />}
+
+                        {l.type == "pixelGrid" && l.app && l.app !== 'none' && l.latField && l.lonField && (
+                            <DataProvider
+                                waitForFilters={true}
+                                editing={l.editing}
+                                params={params}
+                                app={l.app}
+                                verbose={false}
+                                csv={''}
+                                group={group}
+                                ignoreErrors={true}
+                                isSvg={true}
+                                mySelf="Pixel Grid Legends"
+                                store={[l.app, props.unique, l.id]}
+                                source={`${l.latField || 'lat'}/${l.lonField || 'lon'}`}
+                            >
+                                <DataConsumer>
+                                    <PixelGridLayerLegend
+                                        selectedMeasure={selectedMeasure}
+                                        group={group}
+                                        {...l}
+                                        intl={props.intl}
+                                        onItemClick={onItemClick}
+                                    />
+                                </DataConsumer>
+                            </DataProvider>
+                        )}
+
+                        {l.type == "pixelGrid" && !(l.app && l.app !== 'none' && l.latField && l.lonField) && (
+                            <PixelGridLayerLegend
+                                selectedMeasure={selectedMeasure}
+                                group={group}
+                                {...l}
+                                intl={props.intl}
+                                onItemClick={onItemClick}
+                            />
+                        )}
 
                     </div>)
 
