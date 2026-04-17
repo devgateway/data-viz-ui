@@ -261,6 +261,7 @@ const PostsFilter = (props: PostsFilterProps) => {
                         handleYearChange(value as any);
                     }}
                     resetKey={resetKey}
+                    wpApiBase={wordpressSource ?? undefined}
                 />
             )}
             {
