@@ -99,7 +99,8 @@ export const getCustomPosts = ({ postType, taxonomy, category, taxonomyFilters, 
     }
 
     // Backwards compatibility: support legacy single taxonomy+category params
-    if (taxonomy && category != null) {
+    // Only add if not already covered by taxonomyFilters to avoid duplicate query params.
+    if (taxonomy && category != null && !taxonomyToValues.has(taxonomy)) {
         addTaxValues(taxonomy, category);
     }
 
