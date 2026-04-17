@@ -352,8 +352,11 @@ const FilteredPosts = (props: FilteredPostsProps) => {
                 setPosts([]);
             }
         }).finally(() => {
-            setLoading(false);
-            setMinHeight(undefined);
+            // Only update loading state if this is still the latest request.
+            if (requestId === requestIdRef.current) {
+                setLoading(false);
+                setMinHeight(undefined);
+            }
         });
     }
 
