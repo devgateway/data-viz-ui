@@ -7,6 +7,7 @@ interface CategoricalFilterProps extends PostFilterDropdownProps {
     type?: string;
     categories?: any[] | null;
     wpApiBase?: string;
+    locale?: string;
 }
 
 const CategoricalFilter = (props: CategoricalFilterProps) => {
@@ -29,6 +30,7 @@ const CategoricalFilter = (props: CategoricalFilterProps) => {
         categories,
         onChange,
         wpApiBase,
+        locale,
         ...restProps
     } = props;
 
@@ -43,7 +45,8 @@ const CategoricalFilter = (props: CategoricalFilterProps) => {
 
         const hasApiBase = wpApiBase !== undefined && wpApiBase !== null && wpApiBase !== "";
         const apiBase = hasApiBase ? wpApiBase : Config.REACT_APP_WP_API; 
-        const response: any = await fetch(apiBase + "/wp/v2/" + taxonomy);
+        const langParam = locale ? `?lang=${locale}` : "?lang=en";
+        const response: any = await fetch(apiBase + "/wp/v2/" + taxonomy + langParam);
         const data = await response.json();
 
         if (data) {
@@ -73,7 +76,7 @@ const CategoricalFilter = (props: CategoricalFilterProps) => {
         return () => {
             ignore = true;
         }
-    }, [type, taxonomy, categories, wpApiBase]);
+    }, [type, taxonomy, categories, wpApiBase, locale]);
 
     return (
         <PostsFilterDropdown
