@@ -163,9 +163,9 @@ const PostsFilter = (props: PostsFilterProps) => {
             // Preserve both filters so they can work together
             categoryFilter: isCountryFilterValue ? postsFilters.categoryFilter : value,
             countryFilter: isCountryFilterValue ? value : postsFilters.countryFilter,
-            isYearFilter: isYearFilterValue,
+            isYearFilter: postsFilters.isYearFilter,
             yearFilter: postsFilters.yearFilter,
-            isCountryFilter: isCountryFilterValue,
+            isCountryFilter: postsFilters.isCountryFilter,
             sortFirstBy: isCountryFilterValue ? sortFirstByValue : postsFilters.sortFirstBy,
             countryCategory: isCountryFilterValue ? taxonomy : postsFilters.countryCategory,
             categoryCategory: isCountryFilterValue ? postsFilters.categoryCategory : value,

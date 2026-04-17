@@ -407,9 +407,26 @@ export default (state = initialState, action) => {
 
         case SET_INITIAL_POSTS_FILTER: {
             const { type: _type, group, ...data } = action;
+            // Merge with existing state to handle the race condition where multiple
+            // PostsFilter components sharing a group (e.g. category + country) each
+            // dispatch SET_INITIAL_POSTS_FILTER on mount while both read empty Redux
+            // state.  The full-replace strategy meant whichever filter dispatched last
+            // wiped the other filter's taxonomy values (countryTaxonomy / categoryTaxonomy)
+            // to null.  We now merge: incoming non-null values win; existing non-null
+            // values are preserved when the incoming value is null/undefined.
+            const existing = state.getIn(['posts', group]) || {};
+            const merged = { ...existing };
+            Object.keys(data).forEach(key => {
+                const inVal = data[key];
+                if (inVal !== null && inVal !== undefined) {
+                    merged[key] = inVal;
+                } else if (!(key in merged)) {
+                    merged[key] = inVal;
+                }
+            });
             return state
-                .setIn(['posts', group], data)
-                .setIn(['posts', 'initialFilters', group], data);
+                .setIn(['posts', group], merged)
+                .setIn(['posts', 'initialFilters', group], merged);
         }
 
         default:
