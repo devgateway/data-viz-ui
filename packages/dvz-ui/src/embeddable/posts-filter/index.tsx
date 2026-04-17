@@ -7,9 +7,9 @@ import { useAppDispatch } from "@/redux/hooks";
 import { useSelector } from "react-redux";
 import CategoricalFilter from "./CategoricalFilter";
 import YearFilter from "./YearFilter";
-import { injectIntl, useIntl } from "react-intl";
+import { injectIntl, useIntl, WrappedComponentProps } from "react-intl";
 
-interface PostsFilterProps {
+interface PostsFilterProps extends  WrappedComponentProps {
     "data-alphabetical-sort": boolean | string;
     "data-asc-order": boolean | string;
     "data-group": string;
@@ -300,4 +300,4 @@ const PostsFilter = (props: PostsFilterProps) => {
     );
 }
 
-export default injectIntl(React.memo(PostsFilter) as any);
+export default injectIntl(React.memo(PostsFilter));
