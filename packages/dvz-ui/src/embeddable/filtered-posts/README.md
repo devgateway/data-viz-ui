@@ -5,6 +5,8 @@
 ## Purpose
 Renders a responsive grid of WordPress posts fetched from the REST API, with support for taxonomy filtering (year, country, category), pagination, and sort-first ordering. The component subscribes to a shared Redux filter store so that sibling `filter` components on the same page can dynamically narrow the post list.
 
+Automatically respects the current language/locale from `react-intl` when fetching and displaying posts and taxonomies.
+
 ## Props / Attributes
 All props are received as `data-*` HTML attributes (plus `WrappedComponentProps` from `react-intl`).
 
@@ -22,7 +24,10 @@ All props are received as `data-*` HTML attributes (plus `WrappedComponentProps`
 | `data-enable-sorting` | `string\|boolean` | — | `"true"` to enable sort-first ordering. |
 | `data-sort-first-by` | `number\|string` | — | Term ID of the category whose posts are pinned to the top. |
 | `data-sorting-taxonomy` | `string` | — | Taxonomy used for the sort-first behaviour. |
-| `editing` | `boolean` | `false` | Set by the runtime when rendered inside the block editor. |
+| `intl` | `WrappedComponentProps` | — | react-intl props injected automatically via `injectIntl` HOC. |
+
+### Language / Locale
+The component automatically uses the current locale from `react-intl` (`IntlProvider`) to fetch posts and taxonomies in the correct language. No additional configuration is needed.
 
 ### Redux filter state
 The component reads from `state.data.posts[group]` and reacts to changes in:
