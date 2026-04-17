@@ -5,6 +5,8 @@
 ## Purpose
 A Redux-connected dropdown filter component that dispatches `SET_POSTS_FILTER` actions to narrow a post list by taxonomy, category, year, or country. Supports both single-select and multi-select modes and delegates to `CategoricalFilter` or `YearFilter` sub-components depending on configuration.
 
+Automatically respects the current language/locale from `react-intl` and fetches taxonomy terms in the appropriate language.
+
 ## Props / Attributes
 | Name | Type | Default | Description |
 |------|------|---------|-------------|
@@ -29,7 +31,12 @@ A Redux-connected dropdown filter component that dispatches `SET_POSTS_FILTER` a
 | `data-auto-apply` | boolean \| string | — | Apply filter changes immediately. |
 | `data-sort-first-by` | string | — | Field to sort options by first. |
 | `data-default-values` | string | `"[]"` | JSON-encoded array of pre-selected values. |
+| `data-wordpress-source-type` | string | — | Optional WordPress API type parameter. |
+| `data-wordpress-source` | string | — | Optional custom WordPress API base URL (overrides `Config.REACT_APP_WP_API`). |
 | `editing` | boolean | `false` | Skip URL-decoding of encoded attribute values when `true`. |
+
+### Language / Locale
+The component automatically uses the current locale from `react-intl` (`IntlProvider`) to fetch taxonomy terms in the correct language. No additional configuration is needed.
 
 ## Usage Example
 The component is mounted automatically by the front-end bundle when it finds a `[data-component="postsFilter"]` element, or it can be used directly in TSX:

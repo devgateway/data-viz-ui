@@ -5,6 +5,8 @@
 ## Purpose
 A Redux-connected pagination component that renders previous/next arrow buttons and a page-number dropdown for navigating paginated post listings. It reads total page count from the Redux store and dispatches `SET_POSTS_FILTER` to update the active page.
 
+Automatically respects the current language/locale from `react-intl`.
+
 ## Props / Attributes
 | Name | Type | Default | Description |
 |------|------|---------|-------------|
