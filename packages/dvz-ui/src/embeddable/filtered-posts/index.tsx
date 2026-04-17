@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import type { PostType } from '@devgateway/wp-react-lib';
 import { Container, Grid, GridRow, Loader, SemanticWIDTHS } from 'semantic-ui-react';
 import PostIntro from "../connected-templates/PostIntro";
-import { injectIntl, WrappedComponentProps } from 'react-intl';
+import { injectIntl, useIntl, WrappedComponentProps } from 'react-intl';
 import { getStartDateAndEndDateFromYear, resolveWpApiBase } from './utils';
 import NoData from './NoData';
 import { useDispatch, useSelector } from 'react-redux';
@@ -121,9 +121,12 @@ const FilteredPosts = (props: FilteredPostsProps) => {
 
 
     const dispatch = useDispatch();
-    const { locale } = useParams();
+    const { locale } = useIntl(); 
+
 
     const [loading, setLoading] = useState(false);
+    // Tracks the latest getPosts() call so responses from superseded calls are discarded.
+    const requestIdRef = useRef(0);
 
     const postsReducer: any = useSelector((state: any) => state).getIn(["data", "posts", group]);
     const [posts, setPosts] = useState<any>([]);
@@ -258,6 +261,7 @@ const FilteredPosts = (props: FilteredPostsProps) => {
     };
 
     const getPosts = async () => {
+        const requestId = ++requestIdRef.current;
         if (containerRef.current) {
             setMinHeight(containerRef.current.offsetHeight);
         }
@@ -314,6 +318,8 @@ const FilteredPosts = (props: FilteredPostsProps) => {
         };
 
         await getCustomPosts(args).then((response: any) => {
+            // Discard responses from superseded requests (stale-request race condition).
+            if (requestId !== requestIdRef.current) return;
             if (response) {
                 let postsData: any[] | null = null;
                 let metaData: any = null;
@@ -346,8 +352,11 @@ const FilteredPosts = (props: FilteredPostsProps) => {
                 setPosts([]);
             }
         }).finally(() => {
-            setLoading(false);
-            setMinHeight(undefined);
+            // Only update loading state if this is still the latest request.
+            if (requestId === requestIdRef.current) {
+                setLoading(false);
+                setMinHeight(undefined);
+            }
         });
     }
 
