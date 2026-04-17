@@ -5,6 +5,8 @@
 ## Purpose
 A Redux-connected button that resets all post filters in a named group back to their initial values. The button is automatically disabled (and visually dimmed) when no filters have been changed from their defaults.
 
+Automatically respects the current language/locale from `react-intl`.
+
 ## Props / Attributes
 | Name | Type | Default | Description |
 |------|------|---------|-------------|
