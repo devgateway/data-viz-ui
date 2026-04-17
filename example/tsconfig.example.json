@@ -1,0 +1,46 @@
+{
+    "include": [
+      "**/*",
+      "**/.server/**/*",
+      "**/.client/**/*",
+      ".react-router/types/**/*",
+      "../packages/dvz-ui/src/**/*",
+      "../packages/react-lib/wp-react-lib/src/**/*"
+    ],
+    "compilerOptions": {
+      "lib": ["DOM", "DOM.Iterable", "ES2022"],
+      "types": ["node", "vite/client"],
+      "target": "ES2022",
+      "module": "ES2022",
+      "moduleResolution": "bundler",
+      "jsx": "react-jsx",
+      "rootDirs": [".", "./.react-router/types"],
+      "baseUrl": ".",
+      "paths": {
+        "~/*": ["./app/*"],
+        "@devgateway/dvz-ui-react": ["../packages/dvz-ui/src"],
+        "@devgateway/dvz-ui-react/*": ["../packages/dvz-ui/src/*"],
+        "@devgateway/wp-react-lib": ["../packages/react-lib/wp-react-lib/src"],
+        "@devgateway/wp-react-lib/*": ["../packages/react-lib/wp-react-lib/src/*"],
+        "@devgateway/wp-react-lib/hooks": ["../packages/react-lib/wp-react-lib/src/hooks"],
+        // Handle internal aliases within dvz-ui package
+        "@/conf": ["../packages/dvz-ui/src/conf"],
+        "@/embeddable": ["../packages/dvz-ui/src/embeddable"],
+        "@/layout": ["../packages/dvz-ui/src/layout"],
+        "@/utils": ["../packages/dvz-ui/src/utils"],
+        "@/lib": ["../packages/dvz-ui/src/lib"],
+        "@/redux": ["../packages/dvz-ui/src/redux"],
+        "@/translations": ["../packages/dvz-ui/src/translations"],
+        "@/tracker": ["../packages/dvz-ui/src/tracker"],
+        "@/api": ["../packages/dvz-ui/src/api"]
+      },
+      "esModuleInterop": true,
+      "verbatimModuleSyntax": true,
+      "noEmit": true,
+      "resolveJsonModule": true,
+      "skipLibCheck": true,
+      "strict": true,
+      "allowJs": true,
+      "sourceMap": true
+    }
+  }
