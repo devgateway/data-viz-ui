@@ -7,7 +7,7 @@ import { useAppDispatch } from "@/redux/hooks";
 import { useSelector } from "react-redux";
 import CategoricalFilter from "./CategoricalFilter";
 import YearFilter from "./YearFilter";
-
+import { injectIntl, useIntl } from "react-intl";
 
 interface PostsFilterProps {
     "data-alphabetical-sort": boolean | string;
@@ -63,6 +63,7 @@ const PostsFilter = (props: PostsFilterProps) => {
     } = props;
 
     const dispatch = useAppDispatch();
+    const { locale } = useIntl();
     const filters: any = useSelector((state: any) => state.getIn(["data", "posts", group]));
     const postsFilters = filters || {};
     const isMultiSelectFilter = filterType === "multi-select";
@@ -288,6 +289,7 @@ const PostsFilter = (props: PostsFilterProps) => {
                         categories={categoriesArray}
                         resetKey={resetKey}
                         wpApiBase={wordpressSource ?? undefined}
+                        locale={locale}
                     />
 
                 )
@@ -298,4 +300,4 @@ const PostsFilter = (props: PostsFilterProps) => {
     );
 }
 
-export default PostsFilter;
+export default injectIntl(React.memo(PostsFilter) as any);
