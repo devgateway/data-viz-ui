@@ -1,0 +1,27 @@
+{
+  "name": "data-viz-ui",
+  "version": "1.0.0",
+  "description": "",
+  "workspaces": [
+    "packages/*",
+    "packages/react-lib/*",
+    "example"
+  ],
+  "scripts": {
+    "build": "pnpm --filter @devgateway/* build",
+    "build:example": "pnpm --filter example run build",
+    "version": "changeset version",
+    "dev": "pnpm --filter @devgateway/* dev"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "packageManager": "pnpm@10.10.0",
+  "devDependencies": {
+    "@changesets/changelog-github": "^0.5.1",
+    "@changesets/cli": "^2.29.7"
+  },
+  "dependencies": {
+    "clsx": "^2.1.1"
+  }
+}

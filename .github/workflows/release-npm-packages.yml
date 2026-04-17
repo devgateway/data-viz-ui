@@ -1,0 +1,65 @@
+name: Release NPM Packages
+
+on:
+  workflow_dispatch:
+  push:
+    paths-ignore:
+    - "example/**"
+    branches:
+    - main
+    - next
+
+permissions:
+  contents: write
+  id-token: write
+  pull-requests: write
+  actions: write
+  checks: write
+
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+
+jobs:
+  release-packages:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        fetch-depth: 0
+
+    - name: Install PNPM
+      uses: pnpm/action-setup@v4
+
+    - name: Setup Node.js 22.x
+      uses: actions/setup-node@v4
+      with:
+        node-version: 22.x
+        cache: pnpm
+        registry-url: 'https://registry.npmjs.org'
+
+    - name: Upgrade npm for OIDC support
+      run: |
+          npm_major=$(npm --version | cut -d. -f1)
+          if [ "$npm_major" -lt 11 ]; then
+            npm install -g npm@10 && npm install -g npm@11
+          fi
+
+    - name: Install Dependencies
+      run: pnpm install --frozen-lockfile
+
+    - name: Build packages
+      run: pnpm build
+
+    - name: Create Release
+      uses: changesets/action@v1
+      id: release
+      with:
+        version: pnpm run version
+        publish: pnpm exec changeset publish --git-tag
+        commit: "chore(release): update version"
+        title: "chore(release): update version"
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        NPM_CONFIG_PROVENANCE: false
+

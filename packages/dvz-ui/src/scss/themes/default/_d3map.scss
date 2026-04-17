@@ -1,0 +1,314 @@
+body {
+  background-color: transparent !important;
+}
+
+// -----------------------------------------------------------------------------
+// Mixins
+// -----------------------------------------------------------------------------
+
+@mixin control-button {
+  box-sizing: border-box;
+  width: 25px;
+  height: 20px;
+  padding: 4px;
+  margin: 2px;
+  background-color: #ffffff;
+  box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+  cursor: pointer;
+
+  i {
+    margin-left: 1.5px;
+    color: #464646;
+  }
+}
+
+@mixin legend-container {
+  z-index: 1500;
+  min-width: 120px;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  max-height: 75%;
+  margin: 2px;
+  overflow: auto;
+  background: #fff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 1);
+  opacity: 0.9;
+  font-family: Roboto;
+
+}
+
+@mixin legend-item-base {
+  display: flex;
+  margin-bottom: 5px;
+  font-family: Roboto;
+  font-size: 11px;
+}
+
+@mixin legend-checkbox {
+  border: 1px solid #3c434a;
+  font-size: 14px;
+  line-height: 14px;
+  text-align: center;
+  cursor: pointer;
+}
+
+@mixin legend-color-swatch {
+  width: 14px;
+  height: 14px;
+  margin-right: 5px;
+  border: 1px solid #3c434a;
+}
+
+@mixin legend-breaks-container {
+  margin-top: -5px;
+  margin-left: 10px;
+  padding-bottom: 5px;
+  font-family: Roboto;
+  font-size: 11px;
+}
+
+@mixin legend-section-title {
+  display: flex;
+  align-items: center;
+  width: 100% !important;
+  height: auto !important;
+  border: none !important;
+  font-weight: bold;
+}
+
+@mixin break-item-base {
+  width: 15px;
+  height: 15px;
+  font-weight: bold;
+  font-size: 11px;
+}
+
+// -----------------------------------------------------------------------------
+// D3 Map Container
+// -----------------------------------------------------------------------------
+
+.d3map-container {
+  overflow: hidden;
+
+  // Rendered Map Area
+  .projected {
+    position: relative;
+    cursor: pointer;
+
+    .map {
+      position: relative;
+      background-color: transparent;
+
+      svg {
+        background-color: transparent;
+        cursor: pointer;
+        vector-effect: non-scaling-stroke;
+
+        path {
+          stroke-width: 1px;
+          vector-effect: non-scaling-stroke;
+        }
+
+        text {
+          font-family: "Open Sans";
+          font-weight: bold;
+          text-anchor: middle;
+          dominant-baseline: middle;
+        }
+      }
+
+      .point-label {
+        font-weight: 800 !important;
+      }
+    }
+
+    .zoom {
+      position: absolute;
+      left: 30px;
+      bottom: 50px;
+      font-size: 16px;
+
+      .button {
+        @include control-button;
+
+        &:hover {
+          background-color: #eeeeee;
+        }
+
+        &:active {
+          transform: scale(0.95);
+        }
+      }
+    }
+  }
+
+  // General SVG overrides within container
+  svg {
+    height: auto;
+
+    text {
+
+      &.patterns-labels,
+      &.patterns-title {
+        transform: translate(5px, 10px);
+        font-family: Roboto;
+        font-size: 11px;
+      }
+
+      &.patterns-title {
+        font-weight: bold;
+      }
+    }
+  }
+
+  // Legends
+  .legends {
+    @include legend-container;
+
+    .legend-collapsible-control {
+      height: 28px;
+      min-width: 120px;
+      font-size: 11px;
+      text-align: left;
+      line-height: 16px;
+      width: 80%;
+      margin-left: -10px;
+      line-height: 20px;
+    }
+
+    .legend-item {
+      @include legend-item-base;
+
+      .legend-check {
+        @include legend-checkbox;
+      }
+
+      .legend-color {
+        @include legend-color-swatch;
+      }
+
+      .legend-label {
+        font-size: 11px;
+        font-weight: bold;
+        line-height: 14px;
+        white-space: nowrap;
+        word-break: normal;
+        overflow-wrap: normal;
+      }
+
+
+    }
+
+    .legend-breaks {
+      @include legend-breaks-container;
+
+      .measure-label {
+        width: 100% !important;
+        height: 22px;
+      }
+
+      .legend-section-title-checkbox {
+        &::before {
+          display: block;
+          content: "\2610";
+          font-weight: 100;
+          font-size: 21px;
+        }
+
+        &.checked::before {
+          display: block;
+          content: "\2611";
+          font-weight: 100;
+          font-size: 23px;
+        }
+      }
+
+      .legend-section-title {
+        @include legend-section-title;
+      }
+
+
+
+
+
+      .break {
+        display: flex;
+        flex-direction: row;
+        padding-left: 5px;
+        line-height: 22px;
+
+        .dim2-item {
+          border-radius: 50%;
+        }
+
+        .break-item {
+          @include break-item-base;
+
+          &.point {
+            border-radius: 50%;
+
+            &.checked {
+              &::before {
+                position: absolute;
+                display: block;
+                margin-top: -4px;
+                margin-left: 2px;
+                content: "\2713";
+                font-size: 11px;
+              }
+            }
+          }
+        }
+
+        .break-label {
+          font-size: 11px;
+          line-height: 20px;
+          white-space: nowrap;
+        }
+      }
+    }
+
+    .gradient-container {
+      width: 120px;
+      margin-left: 20px;
+      margin-right: 20px;
+      height: 28px;
+
+      .gradient-bar {
+        height: 10px;
+      }
+
+      .gradient-label {
+        border: 1px solid red($color: #000000);
+        font-size: 11px;
+        line-height: 20px;
+        white-space: nowrap;
+        margin-top: 10px;
+        font-size: 11px;
+        color: #000000;
+      }
+    }
+
+
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Tooltips
+// -----------------------------------------------------------------------------
+
+.d3MapTooltip {
+  br {
+    display: block;
+    margin-bottom: 2px;
+    font-size: 2px;
+    line-height: 2px;
+  }
+
+  h2 {
+    margin: 0 !important;
+    color: #FFF !important;
+    font-size: 1.2em !important;
+  }
+}

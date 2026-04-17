@@ -1,0 +1,27 @@
+import {post} from '../../api/commons'
+import { Config } from '@/conf';
+const API_ROOT = process.env.VITE_REACT_APP_API_ROOT || Config.REACT_APP_API_ROOT || null;
+
+export const sendShowCase = (params) => {
+    const data = new FormData();
+    const {files, organization, name, email, message, country, token} = params
+
+    files.forEach(f => data.append('files', f, f.name))
+    data.append("organization", organization)
+    data.append("name", name)
+    data.append("email", email)
+    data.append("country", country)
+    data.append("message", message)
+    data.append("token", token)
+
+    return fetch((API_ROOT  ? API_ROOT : '') + "/api/utils/showCaseForm", {
+        mode: 'cors',
+        method: 'POST',
+        body: data,
+    });
+
+}
+
+export const subscribe = (params) => {
+    return post((API_ROOT  ? API_ROOT : '') + "/api/utils/subscribe", params)
+}

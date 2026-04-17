@@ -1,0 +1,12 @@
+.DS_Store
+/node_modules/
+
+# React Router
+.react-router/
+/build/
+.env
+.env.*
+!.env.example
+/app/styles/styles.ts
+/tsconfig.json
+/app/scss/
