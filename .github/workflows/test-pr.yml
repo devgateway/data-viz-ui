@@ -5,8 +5,8 @@ on:
   pull_request:
     paths_ignore:
       - example/**
-      - .changesets/**
-      - .github/workflows
+      - .changeset/**
+      - .github/**
 permissions:
   contents: read
   id-token: write
