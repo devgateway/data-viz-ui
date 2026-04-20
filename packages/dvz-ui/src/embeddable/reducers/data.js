@@ -407,13 +407,27 @@ export default (state = initialState, action) => {
 
         case SET_INITIAL_POSTS_FILTER: {
             const { type: _type, group, ...data } = action;
-            // Merge with existing state to handle the race condition where multiple
-            // PostsFilter components sharing a group (e.g. category + country) each
-            // dispatch SET_INITIAL_POSTS_FILTER on mount while both read empty Redux
-            // state.  The full-replace strategy meant whichever filter dispatched last
-            // wiped the other filter's taxonomy values (countryTaxonomy / categoryTaxonomy)
-            // to null.  We now merge: incoming non-null values win; existing non-null
-            // values are preserved when the incoming value is null/undefined.
+
+            /* On an explicit reset the incoming data IS the initial snapshot (spread from
+             * initialFilters). We must do a full replace so that null values (e.g.
+             * yearFilter: null) are restored instead of being skipped by the merge below.
+             * Keep the initialFilters snapshot untouched.
+             */
+            if (data.reset) {
+                const { reset: _reset, ...resetData } = data;
+                return state
+                    .setIn(['posts', group], resetData)
+                    .setIn(['posts', 'initialFilters', group], state.getIn(['posts', 'initialFilters', group]));
+            }
+
+            /* Merge with existing state to handle the race condition where multiple
+             * PostsFilter components sharing a group (e.g. category + country) each
+            * dispatch SET_INITIAL_POSTS_FILTER on mount while both read empty Redux
+            * state.  The full-replace strategy meant whichever filter dispatched last
+            * wiped the other filter's taxonomy values (countryTaxonomy / categoryTaxonomy)
+            * to null.  We now merge: incoming non-null values win; existing non-null
+            * values are preserved when the incoming value is null/undefined.  */
+            // */
             const existing = state.getIn(['posts', group]) || {};
             const merged = { ...existing };
             Object.keys(data).forEach(key => {
