@@ -1,5 +1,12 @@
 # @devgateway/dvz-ui-react
 
+## 1.7.9
+
+### Patch Changes
+
+- [#205](https://github.com/devgateway/data-viz-ui/pull/205) [`af1e3b3`](https://github.com/devgateway/data-viz-ui/commit/af1e3b33f0dc81886ec4d3223f41e43d4275cc39) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Fix single select year filter reset
+  Fix categories loading in the wp editor
+
 ## 1.7.8
 
 ### Patch Changes
