@@ -7,9 +7,9 @@ import { useAppDispatch } from "@/redux/hooks";
 import { useSelector } from "react-redux";
 import CategoricalFilter from "./CategoricalFilter";
 import YearFilter from "./YearFilter";
+import { injectIntl, useIntl, WrappedComponentProps } from "react-intl";
 
-
-interface PostsFilterProps {
+interface PostsFilterProps extends  WrappedComponentProps {
     "data-alphabetical-sort": boolean | string;
     "data-asc-order": boolean | string;
     "data-group": string;
@@ -63,6 +63,7 @@ const PostsFilter = (props: PostsFilterProps) => {
     } = props;
 
     const dispatch = useAppDispatch();
+    const { locale } = useIntl();
     const filters: any = useSelector((state: any) => state.getIn(["data", "posts", group]));
     const postsFilters = filters || {};
     const isMultiSelectFilter = filterType === "multi-select";
@@ -258,6 +259,7 @@ const PostsFilter = (props: PostsFilterProps) => {
                         handleYearChange(value as any);
                     }}
                     resetKey={resetKey}
+                    wpApiBase={wordpressSource ?? undefined}
                 />
             )}
             {
@@ -284,6 +286,7 @@ const PostsFilter = (props: PostsFilterProps) => {
                         categories={categoriesArray}
                         resetKey={resetKey}
                         wpApiBase={wordpressSource ?? undefined}
+                        locale={locale}
                     />
 
                 )
@@ -294,4 +297,4 @@ const PostsFilter = (props: PostsFilterProps) => {
     );
 }
 
-export default PostsFilter;
+export default injectIntl(React.memo(PostsFilter));

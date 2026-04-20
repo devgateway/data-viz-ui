@@ -2,6 +2,7 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Container, Icon } from "semantic-ui-react";
 import isEqual from 'lodash.isequal'
+import { injectIntl } from 'react-intl';
 
 const PostsFiltersResetButton = (props) => {
     const {
@@ -50,4 +51,4 @@ const PostsFiltersResetButton = (props) => {
 };
 
 
-export default PostsFiltersResetButton;
+export default injectIntl(PostsFiltersResetButton);
