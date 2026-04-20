@@ -1,5 +1,11 @@
 # @devgateway/dvz-ui-react
 
+## 1.7.7
+
+### Patch Changes
+
+- [#200](https://github.com/devgateway/data-viz-ui/pull/200) [`eb4e0ac`](https://github.com/devgateway/data-viz-ui/commit/eb4e0ac92201edde1b7d8ff7bbf828bbce81e18c) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Make posts pagination translatable
+
 ## 1.7.6
 
 ### Patch Changes
