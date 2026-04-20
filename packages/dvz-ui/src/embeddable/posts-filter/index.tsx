@@ -211,23 +211,21 @@ const PostsFilter = (props: PostsFilterProps) => {
 
     }, []);
 
+    /**
+     * Used for multi-select year filter to set all years as default value once they are loaded, 
+     * if there are no default values provided.
+     * This ensures that the filter shows all data by default and allows users to deselect specific years if needed.
+     */
     useEffect(() => {
-        if (isYearFilterValue && !yearFilterLoading) {
-
-
-            const yearFilter = isYearFilterValue ?
-                (isMultiSelectFilter ? yearOptions.length > 0 ? yearOptions.map((year: any) => year.value) : [] : postsFilters.yearFilter)
-                : postsFilters.yearFilter;
-
+        if (isYearFilterValue && !yearFilterLoading && isMultiSelectFilter && yearOptions.length > 0) {
+            const yearFilter = yearOptions.map((year: any) => year.value);
             dispatch({
                 type: "SET_INITIAL_POSTS_FILTER",
                 group,
-                ...postsFilters,
                 isYearFilter: isYearFilterValue,
-                yearFilter: isYearFilterValue ? yearFilter : null,
+                yearFilter,
             });
         }
-
     }, [yearFilterLoading]);
 
 
