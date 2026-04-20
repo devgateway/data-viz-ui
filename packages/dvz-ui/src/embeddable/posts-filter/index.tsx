@@ -133,10 +133,12 @@ const PostsFilter = (props: PostsFilterProps) => {
         [postsFilters.yearFilter, isMultiSelectFilter, isYearFilterValue]
     );
 
-    const categoriesArray = useMemo(
-        () => categories ? categories.split(',') : [],
-        [categories]
-    );
+    const categoriesArray = useMemo(() => {
+        if (!categories) return [];
+        const parsed = parse(categories);
+        if (Array.isArray(parsed)) return parsed;
+        return typeof parsed === 'string' ? parsed.split(',').filter(Boolean) : [];
+    }, [categories, editing]);
 
 
     const handleYearChange = (value: any) => {
