@@ -1,5 +1,20 @@
 # @devgateway/dvz-ui-react
 
+## 1.7.7
+
+### Patch Changes
+
+- [#200](https://github.com/devgateway/data-viz-ui/pull/200) [`eb4e0ac`](https://github.com/devgateway/data-viz-ui/commit/eb4e0ac92201edde1b7d8ff7bbf828bbce81e18c) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Make posts pagination translatable
+
+## 1.7.6
+
+### Patch Changes
+
+- [#195](https://github.com/devgateway/data-viz-ui/pull/195) [`8eb9829`](https://github.com/devgateway/data-viz-ui/commit/8eb9829f0b193ce5a10c00f19835a740047e47e7) Thanks [@timothygachengo](https://github.com/timothygachengo)! - - (TCDICORE-528) - Fix year filter by allowing years to be fetched from wordpress source URL.
+  - (TOBACCO-1575) Fix posts sorting when there is category, year and country filter in the same group
+
+- [#195](https://github.com/devgateway/data-viz-ui/pull/195) [`1b5c255`](https://github.com/devgateway/data-viz-ui/commit/1b5c25551b29407fd1e9b70474b3f5d86b455cf6) Thanks [@timothygachengo](https://github.com/timothygachengo)! - TCDICORE-533 - Make posts related components translatable
+
 ## 1.7.5
 
 ### Patch Changes
