@@ -70,8 +70,7 @@ export const getData = ({ source, app, params }) => {
 
 export const getCustomPosts = ({ postType, taxonomy, category, taxonomyFilters, before, perPage, page, locale, after, ordering, orderingDirection, wpApiBase }) => {
     const hasApiBase = wpApiBase !== undefined && wpApiBase !== null && wpApiBase !== "";
-    const apiBase = hasApiBase ? wpApiBase : Config.REACT_APP_WP_API;
-    console.log("Using API base:", apiBase);
+    const apiBase = hasApiBase ? wpApiBase : Config.REACT_APP_WP_API; 
     const url = `${apiBase}/wp/v2/${postType}`;
     const queryParams = new URLSearchParams();
 
@@ -118,7 +117,7 @@ export const getCustomPosts = ({ postType, taxonomy, category, taxonomyFilters, 
     if (before) queryParams.append("before", before.toISOString());
     if (perPage) queryParams.append("per_page", perPage.toString());
     if (page) queryParams.append("page", page.toString());
-    if (locale) queryParams.append("locale", locale);
+    if (locale) queryParams.append("lang", locale);
     if (after) queryParams.append("after", after.toISOString());
 
     // append ordering

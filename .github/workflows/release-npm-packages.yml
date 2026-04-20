@@ -5,6 +5,7 @@ on:
   push:
     paths-ignore:
     - "example/**"
+    - ".github/**"
     branches:
     - main
     - next
