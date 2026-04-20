@@ -149,9 +149,6 @@ const PostsFilter = (props: PostsFilterProps) => {
             categoryFilter: postsFilters.categoryFilter,
             countryFilter: postsFilters.countryFilter,
             sortFirstBy: sortFirstByValue,
-            countryCategory: taxonomy,
-            categoryTaxonomy: taxonomy,
-            countryTaxonomy: taxonomy
         });
     }
 
