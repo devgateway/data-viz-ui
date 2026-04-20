@@ -1,5 +1,11 @@
 # @devgateway/dvz-ui-react
 
+## 1.7.8
+
+### Patch Changes
+
+- [#203](https://github.com/devgateway/data-viz-ui/pull/203) [`760dff9`](https://github.com/devgateway/data-viz-ui/commit/760dff9b48a5f9a623975578ab19ee89ac624770) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Fix year filter to prevent resetting taxonomies when values change"
+
 ## 1.7.7
 
 ### Patch Changes
