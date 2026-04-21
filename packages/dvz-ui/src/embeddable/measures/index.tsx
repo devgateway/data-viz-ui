@@ -35,7 +35,14 @@ const Measures: React.FC<MeasuresProps> = (props) => {
     }
 
     if (dataGroups instanceof String || typeof (dataGroups) == 'string') {
-        groups = JSON.parse(decodeURIComponent(dataGroups as string));
+        const raw = dataGroups as string;
+        let decoded: string;
+        try {
+            decoded = decodeURIComponent(raw);
+        } catch {
+            decoded = raw;
+        }
+        groups = JSON.parse(decoded);
     } else {
         groups = dataGroups
     }
