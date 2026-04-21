@@ -1,5 +1,15 @@
 # @devgateway/dvz-ui-react
 
+## 1.7.10
+
+### Patch Changes
+
+- [#210](https://github.com/devgateway/data-viz-ui/pull/210) [`b26eaa7`](https://github.com/devgateway/data-viz-ui/commit/b26eaa7a383bb58fa98702e9a750590f094f9b97) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Fix extra post filter config options to work
+
+- [#210](https://github.com/devgateway/data-viz-ui/pull/210) [`b26eaa7`](https://github.com/devgateway/data-viz-ui/commit/b26eaa7a383bb58fa98702e9a750590f094f9b97) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Fix extra post filters
+
+- [#209](https://github.com/devgateway/data-viz-ui/pull/209) [`23c71bf`](https://github.com/devgateway/data-viz-ui/commit/23c71bf7d2930d48e3db8853f166b249e08f8005) Thanks [@timothygachengo](https://github.com/timothygachengo)! - TOBACCO-1569 - Fix measures component not rendering in the wp editor
+
 ## 1.7.9
 
 ### Patch Changes
