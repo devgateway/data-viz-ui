@@ -59,7 +59,7 @@ const PostsFilterDropdown = (props: PostFilterDropdownProps) => {
         // defaultValueCriteria,
         allNoneSameBehaviour,
         hiddenFilters,
-        // autoApply,
+        autoApply,
         // taxonomy,
         // type,
         value,
@@ -81,10 +81,32 @@ const PostsFilterDropdown = (props: PostFilterDropdownProps) => {
         : rawSelectedValues;
     const [searchText, setSearchText] = useState("");
     // const [searchFilter, setSearchFilter] = useState("");
+    const [pendingValues, setPendingValues] = useState<any[] | null>(null);
+    const effectiveValues = autoApply === false && pendingValues !== null ? pendingValues : selectedValues;
+    const sortedOptions = useMemo(() => {
+        if (!options) return [];
+        const opts = [...options];
+        if (alphabeticalSort) {
+            opts.sort((a, b) => {
+                const aText = a.text ? String(a.text).toLowerCase() : "";
+                const bText = b.text ? String(b.text).toLowerCase() : "";
+                return ascOrder
+                    ? (aText < bText ? -1 : aText > bText ? 1 : 0)
+                    : (aText < bText ? 1 : aText > bText ? -1 : 0);
+            });
+        } else {
+            opts.sort((a, b) => {
+                const aPos = a.position !== undefined ? a.position : 0;
+                const bPos = b.position !== undefined ? b.position : 0;
+                return ascOrder ? aPos - bPos : bPos - aPos;
+            });
+        }
+        return opts;
+    }, [options, alphabeticalSort, ascOrder]);
     const changeFilter = (e: any, candidateValue: any) => {
         if (filterType === FILTER_TYPE_MULTI_SELECT) {
             const candidateKey = toValueKey(candidateValue);
-            const baseValues = Array.isArray(selectedValues) ? [...selectedValues] : [];
+            const baseValues = Array.isArray(effectiveValues) ? [...effectiveValues] : [];
             const hasValue = baseValues.some((optionValue) => toValueKey(optionValue) === candidateKey);
             let nextValues = hasValue
                 ? baseValues.filter((optionValue) => toValueKey(optionValue) !== candidateKey)
@@ -94,20 +116,31 @@ const PostsFilterDropdown = (props: PostFilterDropdownProps) => {
                 nextValues = [NONE_SELECTION_VALUE];
             }
 
-            return onChange && onChange(e, nextValues);
+            if (autoApply === false) {
+                setPendingValues(nextValues);
+            } else {
+                onChange && onChange(e, nextValues);
+            }
+            if (closeOnSelect && refContainer.current) {
+                refContainer.current.close();
+            }
+            return;
         }
 
         if (filterType === FILTER_TYPE_SINGLE_SELECT) {
-            return onChange && onChange(e, candidateValue);
-        }
-
-
-        if (closeOnSelect && refContainer.current) {
-            refContainer.current.close();
+            if (autoApply === false) {
+                setPendingValues([candidateValue]);
+            } else {
+                onChange && onChange(e, candidateValue);
+            }
+            if (closeOnSelect && refContainer.current) {
+                refContainer.current.close();
+            }
+            return;
         }
     };
     const all = () => {
-        const matchingValues = (options || [])
+        const matchingValues = (sortedOptions || [])
             .filter((o) => {
                 if (
                     enableTextSearch &&
@@ -121,11 +154,15 @@ const PostsFilterDropdown = (props: PostFilterDropdownProps) => {
             })
             .map((v) => v.value);
 
-        if (isMultiSelect && onChange) {
-            onChange({} as any, matchingValues);
+        if (isMultiSelect) {
+            if (autoApply === false) {
+                setPendingValues(matchingValues);
+            } else if (onChange) {
+                onChange({} as any, matchingValues);
+            }
         }
 
-        if (!isMultiSelect && closeOnSelect && refContainer.current) {
+        if (closeOnSelect && refContainer.current) {
             refContainer.current.close();
         }
     };
@@ -134,8 +171,8 @@ const PostsFilterDropdown = (props: PostFilterDropdownProps) => {
             noneFunction(e);
             return;
         } else {
-            if (!options) return [];
-            const matchingItems = options.filter((o) => {
+            if (!sortedOptions) return;
+            const matchingItems = sortedOptions.filter((o) => {
                 if (
                     enableTextSearch &&
                     searchText &&
@@ -147,11 +184,15 @@ const PostsFilterDropdown = (props: PostFilterDropdownProps) => {
                 return true;
             });
 
-            if (isMultiSelect && onChange) {
+            if (isMultiSelect) {
                 const finalValues = allNoneSameBehaviour ? matchingItems.map((v) => v.value) : [NONE_SELECTION_VALUE];
-                onChange({} as any, finalValues);
+                if (autoApply === false) {
+                    setPendingValues(finalValues);
+                } else if (onChange) {
+                    onChange({} as any, finalValues);
+                }
             }
-            if (!isMultiSelect && closeOnSelect && refContainer.current) {
+            if (closeOnSelect && refContainer.current) {
                 refContainer.current.close();
             }
         }
@@ -193,14 +234,15 @@ const PostsFilterDropdown = (props: PostFilterDropdownProps) => {
 
     const getSelected = useMemo(() => {
         if (filterType == FILTER_TYPE_SINGLE_SELECT) {
+            const activeValue = autoApply === false && pendingValues !== null ? pendingValues[0] : value;
             const selectedItem =
-                value
-                    ? options?.filter((v) => v.value == value)[0]
+                activeValue !== undefined && activeValue !== null
+                    ? sortedOptions?.filter((v) => v.value == activeValue)[0]
                     : null;
             return selectedItem ? `${placeholder ? placeholder + " " : ""}${selectedItem.text}` : "";
         } else {
-            const selectedCount = selectedValues
-                ? selectedValues.filter((v) => {
+            const selectedCount = effectiveValues
+                ? effectiveValues.filter((v) => {
                     if (v == Number.MIN_SAFE_INTEGER) {
                         return false;
                     }
@@ -213,7 +255,7 @@ const PostsFilterDropdown = (props: PostFilterDropdownProps) => {
                 }).length
                 : 0;
 
-            const totalCount = options?.filter((f) => {
+            const totalCount = sortedOptions?.filter((f) => {
                 if (hiddenFilters && hiddenFilters.length > 0) {
                     return !(hiddenFilters.indexOf(f.id) != -1);
                 }
@@ -222,7 +264,7 @@ const PostsFilterDropdown = (props: PostFilterDropdownProps) => {
 
             return `${placeholder} (${selectedCount}/${totalCount})`;
         }
-    }, [options, selectedValues, filterType]);
+    }, [sortedOptions, effectiveValues, filterType, autoApply, pendingValues, value]);
     const refContainer = useRef<DropdownProps>(null);
 
 
@@ -283,52 +325,18 @@ const PostsFilterDropdown = (props: PostFilterDropdownProps) => {
                                                     className="filter-search"
                                                     value={searchText}
                                                     placeholder="Search..."
-                                                    onChange={(e) => {
-                                                        if (e && e.nativeEvent && e.nativeEvent.stopImmediatePropagation) {
-                                                            // @ts-ignore
-                                                            e.nativeEvent.stopImmediatePropagation();
-                                                        }
-                                                        freeTextSelect(e.target.value);
-                                                    }}
-                                                    onKeyDown={(e) => {
-                                                        if (e && e.nativeEvent && e.nativeEvent.stopImmediatePropagation) {
-                                                            // @ts-ignore
-                                                            e.nativeEvent.stopImmediatePropagation();
-                                                        }
-                                                    }}
-                                                    onKeyUp={(e) => {
-                                                        if (e && e.nativeEvent && e.nativeEvent.stopImmediatePropagation) {
-                                                            // @ts-ignore
-                                                            e.nativeEvent.stopImmediatePropagation();
-                                                        }
-                                                    }}
-                                                    onKeyPress={(e) => {
-                                                        if (e && e.nativeEvent && e.nativeEvent.stopImmediatePropagation) {
-                                                            // @ts-ignore
-                                                            e.nativeEvent.stopImmediatePropagation();
-                                                        }
-                                                    }}
-                                                    onMouseDown={(e) => {
-                                                        e.stopPropagation();
-                                                    }}
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                    }}
-                                                    onFocus={(e) => {
-                                                        e.stopPropagation();
-                                                    }}
+                                                    onChange={(e) => freeTextSelect(e.target.value)}
+                                                    onMouseDown={(e) => e.stopPropagation()}
+                                                    onClick={(e) => e.stopPropagation()}
                                                     type="text"
                                                     autoComplete="off"
                                                 />
-
                                                 <Icon
                                                     name="remove"
                                                     link
                                                     className="clear-icon ignore"
-                                                    onClick={(_e) => {
-                                                        freeTextSelect("");
-                                                    }}
-                                                ></Icon>
+                                                    onClick={() => freeTextSelect("")}
+                                                />
                                             </div>
                                         </div>
                                     </Dropdown.Item>
@@ -340,7 +348,7 @@ const PostsFilterDropdown = (props: PostFilterDropdownProps) => {
                 )}
                 <br></br>
                 <Container className={useSingleColumn ? "dropdown-single-column" : ""}>
-                    {options?.filter((o) => {
+                    {sortedOptions?.filter((o) => {
                         if (
                             enableTextSearch &&
                             searchText &&
@@ -359,7 +367,7 @@ const PostsFilterDropdown = (props: PostFilterDropdownProps) => {
 
                                 {filterType === FILTER_TYPE_SINGLE_SELECT && (
                                     <Radio
-                                        checked={value == optionValue}
+                                        checked={(autoApply === false && pendingValues !== null ? pendingValues[0] : value) == optionValue}
                                         onChange={(e) => {
                                             changeFilter(e, optionValue)
                                         }}
@@ -369,8 +377,8 @@ const PostsFilterDropdown = (props: PostFilterDropdownProps) => {
                                 {filterType === FILTER_TYPE_MULTI_SELECT && (
                                     <Checkbox
                                         checked={
-                                            selectedValues &&
-                                            selectedValues.some(
+                                            effectiveValues &&
+                                            effectiveValues.some(
                                                 (selectedValue) => toValueKey(selectedValue) === toValueKey(optionValue)
                                             )
                                         }
@@ -381,6 +389,24 @@ const PostsFilterDropdown = (props: PostFilterDropdownProps) => {
                             </Dropdown.Item>
                         ))}
                 </Container>
+                {autoApply === false && (
+                    <Segment>
+                        <Dropdown.Item>
+                            <Label basic onClick={() => {
+                                const applyVal = filterType === FILTER_TYPE_SINGLE_SELECT
+                                    ? (pendingValues !== null ? pendingValues[0] : value)
+                                    : (pendingValues !== null ? pendingValues : selectedValues);
+                                onChange && onChange({} as any, applyVal);
+                                setPendingValues(null);
+                                if (refContainer.current) {
+                                    refContainer.current.close();
+                                }
+                            }}>
+                                Apply
+                            </Label>
+                        </Dropdown.Item>
+                    </Segment>
+                )}
             </Dropdown.Menu>
         </Dropdown>
     );
