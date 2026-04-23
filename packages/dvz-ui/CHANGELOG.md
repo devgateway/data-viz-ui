@@ -1,5 +1,11 @@
 # @devgateway/dvz-ui-react
 
+## 1.7.12
+
+### Patch Changes
+
+- [#217](https://github.com/devgateway/data-viz-ui/pull/217) [`6eeae0e`](https://github.com/devgateway/data-viz-ui/commit/6eeae0e89bef3f51918ac8c3fedb41832d52941d) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Fix content links for filtered posts
+
 ## 1.7.11
 
 ### Patch Changes
