@@ -1,5 +1,11 @@
 # @devgateway/dvz-ui-react
 
+## 1.7.14
+
+### Patch Changes
+
+- [#221](https://github.com/devgateway/data-viz-ui/pull/221) [`6a32735`](https://github.com/devgateway/data-viz-ui/commit/6a327352498287cb982e2b93f40efa97d30b7bd3) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Hide show content in post intro
+
 ## 1.7.13
 
 ### Patch Changes
