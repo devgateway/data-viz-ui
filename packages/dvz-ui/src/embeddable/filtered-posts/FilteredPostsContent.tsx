@@ -86,7 +86,7 @@ const Content = (props: any) => {
 
 export const FilteredPostContent = (props: any) => {
     return <Suspense>
-        <Content {...props} showContent={true}></Content>
+        <Content {...props}></Content>
     </Suspense>
 }
 
