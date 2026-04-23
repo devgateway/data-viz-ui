@@ -1,5 +1,11 @@
 # @devgateway/dvz-ui-react
 
+## 1.7.13
+
+### Patch Changes
+
+- [#219](https://github.com/devgateway/data-viz-ui/pull/219) [`88378a8`](https://github.com/devgateway/data-viz-ui/commit/88378a85ac43d2141b10faf4ef2868320e5210d6) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Make posts links translatable
+
 ## 1.7.12
 
 ### Patch Changes
