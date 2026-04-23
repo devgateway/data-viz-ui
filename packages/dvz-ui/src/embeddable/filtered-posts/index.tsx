@@ -20,6 +20,7 @@ interface PostGridContentProps {
     postHeight: number;
     wordpressSourceType?: string;
     wordpressSource?: string;
+    locale: string;
 }
 
 interface NormalizedFilterValues {
@@ -28,7 +29,7 @@ interface NormalizedFilterValues {
 }
 
 const PostGridContent = (props: PostGridContentProps) => {
-    const { posts, numberOfColumns, sortFirstBy, countryCategory, postWidth, postHeight } = props;
+    const { posts, numberOfColumns, sortFirstBy, countryCategory, postWidth, postHeight, locale } = props;
 
     const allPosts: any[] = [];
 
@@ -79,6 +80,7 @@ const PostGridContent = (props: PostGridContentProps) => {
                                         as={Container}
                                         fluid
                                         post={post}
+                                        locale={locale}
                                     />
                                 )}
 
@@ -407,6 +409,7 @@ const FilteredPosts = (props: FilteredPostsProps) => {
                             countryCategory={sortingTaxonomy}
                             wordpressSourceType={wordpressSourceType}
                             wordpressSource={wordpressSource}
+                            locale={locale}
                         />
                     ) : (
                         <NoData noDataMsg={noDataMsg} clearFilterMsg={clearFilterMsg} group={group} />
