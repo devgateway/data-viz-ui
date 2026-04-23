@@ -1,6 +1,25 @@
 import React, { Suspense } from 'react'
 import { EmbeddedGateway, utils, dvizTranslate } from '@devgateway/wp-react-lib'
-import {Container} from "semantic-ui-react";
+import { Container } from "semantic-ui-react";
+import { useIntl } from 'react-intl';
+
+const injectLocaleIntoLinks = (html: string, locale: string): string => {
+    if (!html || !locale) return html;
+    return html.replace(/href\s*=\s*(['"])(https?:\/\/[^'"]+)\1/ig, (match, quote, href) => {
+        try {
+            const url = new URL(href);
+            const wpIndex = url.pathname.indexOf('/wp/');
+            if (wpIndex === -1) return match;
+            const afterWp = url.pathname.slice(wpIndex + 3); // strip '/wp'
+            url.pathname = afterWp.startsWith('/' + locale)
+                ? afterWp
+                : '/' + locale + afterWp;
+            return `href=${quote}${url.toString()}${quote}`;
+        } catch {
+            return match;
+        }
+    });
+};
 
 const Enhance = (props: any) => {
     const Component = props.as ? props.as : Container;
@@ -15,6 +34,7 @@ const Enhance = (props: any) => {
 }
 
 const Content = (props: any) => {
+    const intl = useIntl();
     const [showContentEnabled, setShowContentEnabled] = React.useState(false);
 
 
@@ -26,8 +46,9 @@ const Content = (props: any) => {
     }, []);
 
     const {
-        post, pageNumber, showTitle, showContent, showIntro, showDate, showLoading, as, locale, messages, preview
+        post, pageNumber, showTitle, showContent, showIntro, showDate, showLoading, as, locale: localeProp, messages, preview
     } = props;
+    const locale = localeProp || intl.locale;
 
     if (post) {
         const contentParts = post.content ? post.content.rendered.split("<!--more-->") : []
@@ -50,9 +71,9 @@ const Content = (props: any) => {
                 {showTitle && <span id={post.slug} className="title"
                                     dangerouslySetInnerHTML={{__html: post.title.rendered}} key="title"/>}
                 {showIntro && <Container fluid className="excerpt"
-                                         dangerouslySetInnerHTML={{__html: utils.removePatternBrackets(dvizTranslate(intro, locale))}} key="intro"/>}
+                                         dangerouslySetInnerHTML={{__html: utils.removePatternBrackets(injectLocaleIntoLinks(dvizTranslate(intro, locale), locale))}} key="intro"/>}
                 {showContent && <Container fluid className="content "
-                                           dangerouslySetInnerHTML={{__html: utils.removePatternBrackets(dvizTranslate(body, locale))}} key="content"/>}
+                                           dangerouslySetInnerHTML={{__html: utils.removePatternBrackets(injectLocaleIntoLinks(dvizTranslate(body, locale), locale))}} key="content"/>}
 
             </Enhance>
             
