@@ -5,11 +5,16 @@ import { useIntl } from 'react-intl';
 
 const injectLocaleIntoLinks = (html: string, locale: string): string => {
     if (!html || !locale) return html;
+    // Not a WP link, return as is
+    if (!html.includes('/wp/')) return html; 
+    if (html.includes('/wp/' + locale + '/')) return html; // Already has locale, return as is
+    if (html.includes('/wp/wp-content/uploads/')) return html; // Skip media links
     return html.replace(/href\s*=\s*(['"])(https?:\/\/[^'"]+)\1/ig, (match, quote, href) => {
         try {
             const url = new URL(href);
             const wpIndex = url.pathname.indexOf('/wp/');
             if (wpIndex === -1) return match;
+            
             const afterWp = url.pathname.slice(wpIndex + 3); // strip '/wp'
             url.pathname = afterWp.startsWith('/' + locale)
                 ? afterWp
