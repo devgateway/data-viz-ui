@@ -1,5 +1,29 @@
 # @devgateway/dvz-ui-react
 
+## 1.7.14
+
+### Patch Changes
+
+- [#221](https://github.com/devgateway/data-viz-ui/pull/221) [`6a32735`](https://github.com/devgateway/data-viz-ui/commit/6a327352498287cb982e2b93f40efa97d30b7bd3) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Hide show content in post intro
+
+## 1.7.13
+
+### Patch Changes
+
+- [#219](https://github.com/devgateway/data-viz-ui/pull/219) [`88378a8`](https://github.com/devgateway/data-viz-ui/commit/88378a85ac43d2141b10faf4ef2868320e5210d6) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Make posts links translatable
+
+## 1.7.12
+
+### Patch Changes
+
+- [#217](https://github.com/devgateway/data-viz-ui/pull/217) [`6eeae0e`](https://github.com/devgateway/data-viz-ui/commit/6eeae0e89bef3f51918ac8c3fedb41832d52941d) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Fix content links for filtered posts
+
+## 1.7.11
+
+### Patch Changes
+
+- [#214](https://github.com/devgateway/data-viz-ui/pull/214) [`52b7dd4`](https://github.com/devgateway/data-viz-ui/commit/52b7dd4e22bc985fe3a10568ee6ba881f3106a07) Thanks [@timothygachengo](https://github.com/timothygachengo)! - TCDICORE-539 - Configure posts to work with external wordpress source urls
+
 ## 1.7.10
 
 ### Patch Changes

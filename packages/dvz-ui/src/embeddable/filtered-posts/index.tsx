@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import type { PostType } from '@devgateway/wp-react-lib';
 import { Container, Grid, GridRow, Loader, SemanticWIDTHS } from 'semantic-ui-react';
 import PostIntro from "../connected-templates/PostIntro";
+import FilteredPostIntro from './FilteredPostsIntro';
 import { injectIntl, useIntl, WrappedComponentProps } from 'react-intl';
 import { getStartDateAndEndDateFromYear, resolveWpApiBase } from './utils';
 import NoData from './NoData';
@@ -19,6 +20,7 @@ interface PostGridContentProps {
     postHeight: number;
     wordpressSourceType?: string;
     wordpressSource?: string;
+    locale: string;
 }
 
 interface NormalizedFilterValues {
@@ -27,7 +29,7 @@ interface NormalizedFilterValues {
 }
 
 const PostGridContent = (props: PostGridContentProps) => {
-    const { posts, numberOfColumns, sortFirstBy, countryCategory, postWidth, postHeight } = props;
+    const { posts, numberOfColumns, sortFirstBy, countryCategory, postWidth, postHeight, locale } = props;
 
     const allPosts: any[] = [];
 
@@ -42,6 +44,8 @@ const PostGridContent = (props: PostGridContentProps) => {
         allPosts.push(...posts);
     }
 
+    const isInternalSource = props.wordpressSourceType === "internal" || !props.wordpressSourceType;
+
     return (
         <Grid className={"filtered-posts"} columns={numberOfColumns as unknown as SemanticWIDTHS}>
             <GridRow>
@@ -49,19 +53,37 @@ const PostGridContent = (props: PostGridContentProps) => {
                     allPosts.map((post) => (
                         <Grid.Column key={post.id}>
                             <div className={"filtered-posts-column"} style={{ width: postWidth, height: postHeight, overflow: 'hidden' }}>
-                                <PostIntro
-                                    style={{
-                                        width: '100%',
-                                        height: '100%',
-                                        overflow: 'hidden',
-                                        margin: 0,
-                                        padding: 0,
-                                    }}
-                                    key={post.id}
-                                    as={Container}
-                                    fluid
-                                    post={post}
-                                />
+                                {isInternalSource ? (
+                                    <PostIntro
+                                        style={{
+                                            width: '100%',
+                                            height: '100%',
+                                            overflow: 'hidden',
+                                            margin: 0,
+                                            padding: 0,
+                                        }}
+                                        key={post.id}
+                                        as={Container}
+                                        fluid
+                                        post={post}
+                                    />
+                                ) : (
+                                    <FilteredPostIntro
+                                        style={{
+                                            width: '100%',
+                                            height: '100%',
+                                            overflow: 'hidden',
+                                            margin: 0,
+                                            padding: 0,
+                                        }}
+                                        key={post.id}
+                                        as={Container}
+                                        fluid
+                                        post={post}
+                                        locale={locale}
+                                    />
+                                )}
+
                             </div>
 
                         </Grid.Column>
@@ -121,7 +143,7 @@ const FilteredPosts = (props: FilteredPostsProps) => {
 
 
     const dispatch = useDispatch();
-    const { locale } = useIntl(); 
+    const { locale } = useIntl();
 
 
     const [loading, setLoading] = useState(false);
@@ -384,7 +406,11 @@ const FilteredPosts = (props: FilteredPostsProps) => {
                             postHeight={Number(postHeight)}
                             numberOfColumns={Number(numberOfColumns)}
                             sortFirstBy={sortFirstByValue}
-                            countryCategory={sortingTaxonomy} />
+                            countryCategory={sortingTaxonomy}
+                            wordpressSourceType={wordpressSourceType}
+                            wordpressSource={wordpressSource}
+                            locale={locale}
+                        />
                     ) : (
                         <NoData noDataMsg={noDataMsg} clearFilterMsg={clearFilterMsg} group={group} />
                     )
