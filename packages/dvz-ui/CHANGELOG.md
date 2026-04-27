@@ -1,5 +1,11 @@
 # @devgateway/dvz-ui-react
 
+## 1.7.15
+
+### Patch Changes
+
+- [#225](https://github.com/devgateway/data-viz-ui/pull/225) [`65170fc`](https://github.com/devgateway/data-viz-ui/commit/65170fc22253bdf801eb3bd2c9ca02681baa5707) Thanks [@timothygachengo](https://github.com/timothygachengo)! - TCDICORE-545 - fix wp content links from being translated
+
 ## 1.7.14
 
 ### Patch Changes
