@@ -445,4 +445,4 @@
   - Configure dvz-ui for release
   - Add home index route and loading fallback component
   - implement default locale constant and enhance routing with loading fallbacks
-  - \enable custom header and footer
+  - enable custom header and footer
