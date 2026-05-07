@@ -782,6 +782,7 @@ const Chart = (props) => {
   }
   const [legendsContainerHeight, setLegendsContainerHeight] = useState(0);
   const [orientation, setOrientation] = useState(getScreenOrientation());
+  const legendsObserverRef = useRef(null);
 
   function getScreenOrientation() {
     return (
@@ -793,115 +794,140 @@ const Chart = (props) => {
   }
 
   useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      if (isMobileOrTablet) {
-        // Function to handle margin adjustment for all charts
-        const adjustDataSourceMargin = () => {
-          // Only target bottom legends, not top legends which can cause issues in iframes
-          const legendsContainer =
-            ref.current.querySelector(
-              ".legends.container.has-standard-12-font-size.bottom",
-            ) ||
-            ref.current.querySelector(
-              ".legends.container.items-section:not(.legends.container.top .items-section)",
-            );
+    if (!isMobileOrTablet) return;
 
-          if (!legendsContainer) return;
+    // Measures the legends container height and corrects any overlap with the chart above
+    const adjustLegendsMargin = () => {
+      // Only target bottom legends, not top legends which can cause issues in iframes
+      const legendsContainer =
+        ref.current?.querySelector(
+          ".legends.container.has-standard-12-font-size.bottom",
+        ) ||
+        ref.current?.querySelector(
+          ".legends.container.items-section:not(.legends.container.top .items-section)",
+        );
 
-          // Skip if this is inside a top legend container
-          if (legendsContainer.closest(".legends.container.top")) return;
+      if (!legendsContainer) return;
 
-          // Get computed style and dimensions of the legends container
-          const { clientHeight: height } = legendsContainer;
-          const styles = window.getComputedStyle(legendsContainer);
-          const marginTop = parseInt(styles.marginTop);
-          const marginBottom = parseInt(styles.marginBottom);
-          const paddingTop = parseInt(styles.paddingTop);
-          const paddingBottom = parseInt(styles.paddingBottom);
-          const totalHeight =
-            height + marginTop + marginBottom + paddingTop + paddingBottom;
+      // Skip if this is inside a top legend container
+      if (legendsContainer.closest(".legends.container.top")) return;
 
-          // Find the closest '.ui.fluid.container.content' ancestor from the legends container
-          const container = legendsContainer.closest(
-            ".ui.fluid.container.content",
-          );
+      // Clear any previously JS-set marginTop so stale values don't persist
+      // across tab activations or remeasurements
+      legendsContainer.style.marginTop = "";
 
-          if (container) {
-            const dataSourceParagraph = container.querySelector(".data-source");
-            if (dataSourceParagraph) {
-              const dataSourceRect =
-                dataSourceParagraph.getBoundingClientRect();
-              const legendsRect = legendsContainer.getBoundingClientRect();
+      // Get computed style and dimensions of the legends container
+      const { clientHeight: height } = legendsContainer;
+      const styles = window.getComputedStyle(legendsContainer);
+      const marginTop = parseInt(styles.marginTop);
+      const marginBottom = parseInt(styles.marginBottom);
+      const paddingTop = parseInt(styles.paddingTop);
+      const paddingBottom = parseInt(styles.paddingBottom);
+      
+      // On mobile, use only content height without margins/padding to avoid excessive bottom spacing
+      // On desktop, include all spacing for proper layout
+      const deviceType = getDeviceType();
+      const isMobileDevice = deviceType === "mobile";
+      const totalHeight = isMobileDevice 
+        ? height 
+        : height + marginTop + marginBottom + paddingTop + paddingBottom;
 
-              // Ensure elements are visible before adjusting margins
-              if (legendsRect.bottom !== 0 && dataSourceRect.top !== 0) {
-                if (legendsContainer.textContent.trim() === "") return;
+      // Check for overlap with the chart container above.
+      // Use isMobileOrTablet (<=1250px) as the guard — consistent with the effect's outer check
+      // and avoids firing on "laptop" devices (1025-1366px per getDeviceType) that are still
+      // within the mobile/tablet layout range.
+      // Also skip if the element is not visible (e.g. inside a hidden tab panel).
+      const legendsRect = legendsContainer.getBoundingClientRect();
+      const isHidden = legendsRect.width === 0;
 
-                const legendsMarginBottom = marginBottom; // Legend margin-bottom is already computed
-                const adjustedLegendsBottom =
-                  legendsRect.bottom + legendsMarginBottom;
-                const dataSourceStyles =
-                  window.getComputedStyle(dataSourceParagraph);
-                const dataSourceMarginTop =
-                  parseFloat(dataSourceStyles.marginTop) || 0;
-                const adjustedDataSourceTop =
-                  dataSourceRect.top - dataSourceMarginTop;
+      if (!isMobileOrTablet && !isHidden) {
+        const chartContainer = legendsContainer.closest(".chart.container");
+        if (chartContainer) {
+          const chartContainerRect = chartContainer.getBoundingClientRect();
+          const chartContainerStyles =
+            window.getComputedStyle(chartContainer);
+          const chartContainerMarginBottom =
+            Number.parseFloat(chartContainerStyles.marginBottom) || 0;
+          const adjustedChartContainerBottom =
+            chartContainerRect.bottom + chartContainerMarginBottom;
 
-                if (adjustedLegendsBottom > adjustedDataSourceTop) {
-                  let overlap = adjustedLegendsBottom - adjustedDataSourceTop;
-                  if (overlap < 5) overlap += 1;
-                  dataSourceParagraph.style.marginTop = `${overlap + 1}px`; // Add padding
-                }
-              } else {
-                // Delay adjustment if elements are not fully visible yet
-                setTimeout(() => {
-                  if (dataSourceRect.top < legendsRect.bottom) {
-                    dataSourceParagraph.style.marginTop = `${legendsRect.bottom - dataSourceRect.top + 1
-                      }px`;
-                  }
-                }, 1000);
-              }
+          const legendsMarginTop = Number.parseFloat(styles.marginTop) || 0;
+          const adjustedLegendsTop = legendsRect.top - legendsMarginTop;
+
+          if (adjustedLegendsTop < adjustedChartContainerBottom) {
+            const overlap = adjustedChartContainerBottom - adjustedLegendsTop;
+            // Cap the margin to prevent excessive values from incorrect measurements in iframes
+            const maxMargin = 200;
+            const marginToApply = Math.min(overlap + 1, maxMargin);
+            // Only apply if the overlap is reasonable (not caused by layout issues)
+            if (overlap > 0 && overlap < maxMargin) {
+              legendsContainer.style.marginTop = `${marginToApply}px`;
             }
           }
-
-          // Check for overlap with the chart container above
-          const chartContainer = legendsContainer.closest(".chart.container");
-          if (chartContainer) {
-            const chartContainerRect = chartContainer.getBoundingClientRect();
-            const chartContainerStyles =
-              window.getComputedStyle(chartContainer);
-            const chartContainerMarginBottom =
-              Number.parseFloat(chartContainerStyles.marginBottom) || 0;
-            const adjustedChartContainerBottom =
-              chartContainerRect.bottom + chartContainerMarginBottom;
-
-            const legendsRect = legendsContainer.getBoundingClientRect();
-            const legendsMarginTop = Number.parseFloat(styles.marginTop) || 0;
-            const adjustedLegendsTop = legendsRect.top - legendsMarginTop;
-
-            if (adjustedLegendsTop < adjustedChartContainerBottom) {
-              const overlap = adjustedChartContainerBottom - adjustedLegendsTop;
-              // Cap the margin to prevent excessive values from incorrect measurements in iframes
-              const maxMargin = 200;
-              const marginToApply = Math.min(overlap + 1, maxMargin);
-              // Only apply if the overlap is reasonable (not caused by layout issues)
-              if (overlap > 0 && overlap < maxMargin) {
-                legendsContainer.style.marginTop = `${marginToApply}px`; // Add padding
-              }
-            }
-          }
-
-          setLegendsContainerHeight(totalHeight);
-        };
-
-        adjustDataSourceMargin();
+        }
       }
-    }, 100);
 
-    // Cleanup observer and timeout
-    return () => {
-      clearTimeout(timeoutId);
+      setLegendsContainerHeight(totalHeight);
     };
+
+    // Use ResizeObserver to watch for legend container height changes instead of setTimeout
+    const setupObserver = () => {
+      const legendsContainer =
+        ref.current?.querySelector(
+          ".legends.container.has-standard-12-font-size.bottom",
+        ) ||
+        ref.current?.querySelector(
+          ".legends.container.items-section:not(.legends.container.top .items-section)",
+        );
+
+      if (!legendsContainer) {
+        // Legend container not found yet, retry after a short delay
+        const timeoutId = setTimeout(setupObserver, 100);
+        return () => clearTimeout(timeoutId);
+      }
+
+      // Create ResizeObserver to trigger adjustment whenever legend height changes
+      const observer = new ResizeObserver(() => {
+        adjustLegendsMargin();
+      });
+
+      observer.observe(legendsContainer);
+      legendsObserverRef.current = observer;
+
+      // IntersectionObserver: re-measure when the chart becomes visible (e.g. tab activation).
+      // Tab components hide panels via display:none or left:-3000px/height:0, both of which
+      // produce zero-width rects, causing measurements taken while hidden to be incorrect.
+      // Firing on intersection ensures we recalculate once the element is actually visible.
+      const intersectionObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              adjustLegendsMargin();
+            }
+          });
+        },
+        { threshold: 0 },
+      );
+      intersectionObserver.observe(legendsContainer);
+
+      // Also listen to window resize to adjust when screen size changes
+      const handleWindowResize = () => {
+        adjustLegendsMargin();
+      };
+      window.addEventListener("resize", handleWindowResize);
+
+      // Trigger initial measurement
+      adjustLegendsMargin();
+
+      return () => {
+        observer.disconnect();
+        intersectionObserver.disconnect();
+        window.removeEventListener("resize", handleWindowResize);
+        legendsObserverRef.current = null;
+      };
+    };
+
+    return setupObserver();
   }, [isMobileOrTablet, ref]);
 
   useEffect(() => {
@@ -930,10 +956,7 @@ const Chart = (props) => {
       <Container
         className={"chart container"}
         style={{
-          minHeight:
-            type === "pie" && window.innerWidth <= 480
-              ? `${parseInt(height) + parseInt(legendsContainerHeight) * 0.5}px`
-              : `${parseInt(height) + parseInt(legendsContainerHeight)}px`,
+          minHeight: `${parseInt(height) + parseInt(legendsContainerHeight)}px`,
         }}
         fluid={true}
       >
