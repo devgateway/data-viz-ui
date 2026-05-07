@@ -271,7 +271,7 @@ const MenuItems = injectIntl(
     }
 );
 
-const Header = ({ intl, settings }) => {
+const Header = ({ intl, settings, logoSmallSrc = "/logo_small.png" }) => {
     const [selected, setSelected] = useState();
     const [isMenuVisible, setMenuVisible] = useState(false);
     const [isSmallScreen, setIsSmallScreen] = useState(false);
@@ -410,7 +410,7 @@ const Header = ({ intl, settings }) => {
                                         <img
                                             className="brand logo small"
                                             size="small"
-                                            src="/wp-media/TCDI-Icon-small_02.png"
+                                            src={logoSmallSrc}
                                         />
                                     )}
                                 </a>

@@ -1,5 +1,4 @@
 import React from "react";
-// TODO: TO BE REMOVED
 import template from "string-template";
 
 
