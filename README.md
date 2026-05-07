@@ -8,7 +8,7 @@ The data-viz-ui submodule offers a set of embeddable React components that can b
 
 - Docker
 - NodeJS v22+
-- PNPM v9+
+- PNPM v10+
 - Intellij IDEA/ Visual Studio Code / WebStorm
 
 ## Setup
@@ -42,10 +42,11 @@ For details about how to send pull requests, please read CONTRIBUTING.md.
 
 ## Contributors
 
-- **Timothy Mugo** - *Refactoring* - [timothygachengo](https://github.com/timothygachengo)
+- **Timothy Gachengo** - *Refactoring* - [timothygachengo](https://github.com/timothygachengo)
 
 ## License
 This project is licensed under the Apache License 2.0 — see [LICENSE](LICENSE) for details.
 
 ## Contact information
-For any comments or suggestions, please contact us
+
+For any comments or suggestions, please [contact us](mailto:info@developmentgateway.org).
