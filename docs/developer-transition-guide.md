@@ -13,9 +13,9 @@ Commit messages must follow [Conventional Commits](https://www.conventionalcommi
 ### Current pattern (stop doing this)
 
 ```
-fix (TCDICORE-545): fix wp content links from being translated
-chore (TOBACCO-1569): fix measures component
-feat (TCDICORE-534): make posts pagination translatable
+fix (PROJ-123): fix wp content links from being translated
+chore (PROJ-456): fix measures component
+feat (PROJ-789): make posts pagination translatable
 chore : exclude some folders from pr testing
 Update .github/workflows/test-pr.yml
 ```
