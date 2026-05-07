@@ -4,7 +4,7 @@
 
 ### Patch Changes
 
-- [#225](https://github.com/devgateway/data-viz-ui/pull/225) [`65170fc`](https://github.com/devgateway/data-viz-ui/commit/65170fc22253bdf801eb3bd2c9ca02681baa5707) Thanks [@timothygachengo](https://github.com/timothygachengo)! - TCDICORE-545 - fix wp content links from being translated
+- [#225](https://github.com/devgateway/data-viz-ui/pull/225) [`65170fc`](https://github.com/devgateway/data-viz-ui/commit/65170fc22253bdf801eb3bd2c9ca02681baa5707) Thanks [@timothygachengo](https://github.com/timothygachengo)! -fix wp content links from being translated
 
 ## 1.7.14
 
@@ -28,7 +28,7 @@
 
 ### Patch Changes
 
-- [#214](https://github.com/devgateway/data-viz-ui/pull/214) [`52b7dd4`](https://github.com/devgateway/data-viz-ui/commit/52b7dd4e22bc985fe3a10568ee6ba881f3106a07) Thanks [@timothygachengo](https://github.com/timothygachengo)! - TCDICORE-539 - Configure posts to work with external wordpress source urls
+- [#214](https://github.com/devgateway/data-viz-ui/pull/214) [`52b7dd4`](https://github.com/devgateway/data-viz-ui/commit/52b7dd4e22bc985fe3a10568ee6ba881f3106a07) Thanks [@timothygachengo](https://github.com/timothygachengo)! -Configure posts to work with external wordpress source urls
 
 ## 1.7.10
 
@@ -38,7 +38,7 @@
 
 - [#210](https://github.com/devgateway/data-viz-ui/pull/210) [`b26eaa7`](https://github.com/devgateway/data-viz-ui/commit/b26eaa7a383bb58fa98702e9a750590f094f9b97) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Fix extra post filters
 
-- [#209](https://github.com/devgateway/data-viz-ui/pull/209) [`23c71bf`](https://github.com/devgateway/data-viz-ui/commit/23c71bf7d2930d48e3db8853f166b249e08f8005) Thanks [@timothygachengo](https://github.com/timothygachengo)! - TOBACCO-1569 - Fix measures component not rendering in the wp editor
+- [#209](https://github.com/devgateway/data-viz-ui/pull/209) [`23c71bf`](https://github.com/devgateway/data-viz-ui/commit/23c71bf7d2930d48e3db8853f166b249e08f8005) Thanks [@timothygachengo](https://github.com/timothygachengo)! -Fix measures component not rendering in the wp editor
 
 ## 1.7.9
 
@@ -63,19 +63,19 @@
 
 ### Patch Changes
 
-- [#195](https://github.com/devgateway/data-viz-ui/pull/195) [`8eb9829`](https://github.com/devgateway/data-viz-ui/commit/8eb9829f0b193ce5a10c00f19835a740047e47e7) Thanks [@timothygachengo](https://github.com/timothygachengo)! - - (TCDICORE-528) - Fix year filter by allowing years to be fetched from wordpress source URL.
-  - (TOBACCO-1575) Fix posts sorting when there is category, year and country filter in the same group
+- [#195](https://github.com/devgateway/data-viz-ui/pull/195) [`8eb9829`](https://github.com/devgateway/data-viz-ui/commit/8eb9829f0b193ce5a10c00f19835a740047e47e7) Thanks [@timothygachengo](https://github.com/timothygachengo)! - - Fix year filter by allowing years to be fetched from wordpress source URL.
+  - Fix posts sorting when there is category, year and country filter in the same group
 
-- [#195](https://github.com/devgateway/data-viz-ui/pull/195) [`1b5c255`](https://github.com/devgateway/data-viz-ui/commit/1b5c25551b29407fd1e9b70474b3f5d86b455cf6) Thanks [@timothygachengo](https://github.com/timothygachengo)! - TCDICORE-533 - Make posts related components translatable
+- [#195](https://github.com/devgateway/data-viz-ui/pull/195) [`1b5c255`](https://github.com/devgateway/data-viz-ui/commit/1b5c25551b29407fd1e9b70474b3f5d86b455cf6) Thanks [@timothygachengo](https://github.com/timothygachengo)! -Make posts related components translatable
 
 ## 1.7.5
 
 ### Patch Changes
 
-- [#189](https://github.com/devgateway/data-viz-ui/pull/189) [`a303060`](https://github.com/devgateway/data-viz-ui/commit/a303060ef23f6a8a49bc086b511541504f961612) Thanks [@timothygachengo](https://github.com/timothygachengo)! - - _(TCDICORE-522)_ Add WordPress source URL to posts components `ComponentWithSettings`
-  - _(TCDICORE-522)_ Add missing blocks and append `/wp-json` to landing URL
-  - _(TCDICORE-522)_ Remove logging
-  - _(TCDICORE-525)_ Make "no data" message configurable
+- [#189](https://github.com/devgateway/data-viz-ui/pull/189) [`a303060`](https://github.com/devgateway/data-viz-ui/commit/a303060ef23f6a8a49bc086b511541504f961612) Thanks [@timothygachengo](https://github.com/timothygachengo)! - - Add WordPress source URL to posts components `ComponentWithSettings`
+  - Add missing blocks and append `/wp-json` to landing URL
+  - Remove logging
+  - Make "no data" message configurable
 
 ## 1.7.3
 
@@ -220,14 +220,14 @@
 
 ### Minor Changes
 
-- [#73](https://github.com/devgateway/data-viz-ui/pull/73) [`32da4c6`](https://github.com/devgateway/data-viz-ui/commit/32da4c6d61811b266a672cddfdcd213ec2404ba1) Thanks [@timothygachengo](https://github.com/timothygachengo)! - - _(TCDICORE-350)_ Sync embeddables from data-viz-front to data-viz-ui
-  - _(TCDICORE-350)_ Sync scss from data-viz-front to daata-viz-ui
-  - _(TCDICORE-350)_ Fix header rendering, fix search control and update example to have a div with id root
-  - _(TCDICORE-350)_ Update example
-  - _(TCDICORE-350)_ Update router config, clean up TypeScript paths, and fix imports to fix build errors
+- [#73](https://github.com/devgateway/data-viz-ui/pull/73) [`32da4c6`](https://github.com/devgateway/data-viz-ui/commit/32da4c6d61811b266a672cddfdcd213ec2404ba1) Thanks [@timothygachengo](https://github.com/timothygachengo)! - - Sync embeddables from data-viz-front to data-viz-ui
+  - Sync scss from data-viz-front to daata-viz-ui
+  - Fix header rendering, fix search control and update example to have a div with id root
+  - Update example
+  - Update router config, clean up TypeScript paths, and fix imports to fix build errors
 
   ## New Change
-  - _(TCDICORE-350)_ Upgrade react router version to 7.9.4. (Upgrade your project to react-router ~v7.9.4)
+  - Upgrade react router version to 7.9.4. (Upgrade your project to react-router ~v7.9.4)
 
 ## 1.4.0
 
@@ -412,37 +412,37 @@
 ### Patch Changes
 
 - [#2](https://github.com/devgateway/data-viz-ui/pull/2) [`e11b6f1`](https://github.com/devgateway/data-viz-ui/commit/e11b6f11596b1311a47478ce354e7786da8e0b18) Thanks [@timothygachengo](https://github.com/timothygachengo)! - ### 🐛 Bug Fixes
-  - _(TCDICORE-258)_ Fix page module component showing mobile styles
-  - _(TCDING-708)_ Fix measures component in data charts
+  - Fix page module component showing mobile styles
+  - Fix measures component in data charts
 
   ### ⚙️ Miscellaneous Tasks
-  - _(TCDICORE-234)_ Merged tree of tcdi official main into main
-  - _(TCDICORE-234)_ Modify nginx dockerfile to make build work
-  - _(TCDICORE-234)_ Update nginx dockerfileg
-  - _(TCDICORE-254)_ Chart rendered in editor and preview but not in UI
-  - _(TCDIKE-722)_ Radar mobile responsiveness
-  - _(TCDIKE-722)_ Radar responsiveness
-  - _(TCDIKE-723)_ Responsive map component
-  - _(TCDIKE-722)_ Remove conflicting has-standard-14-font-size class
-  - _(DVIZ-43)_ Update react-lib submodule path and initialize example project
-  - _(DVIZ-43)_ Update pnpm workspace configuration, modify app styles, and enhance dvz-ui dependencies
-  - _(DVIZ-43)_ Update dvz-ui package configuration and improve component structure
-  - _(DVIZ-43)_ Make dvz-ui build successfully. Add vite configuration and remove unused dependencies
-  - _(DVIZ-43)_ Fix build, typing and linting issues in the dvz-ui. Try to integrate dvz-ui in the example app
-  - _(DVIZ-43)_ Fix build, typing and linting issues in the dvz-ui. Try to integrate dvz-ui in the example app
-  - _(DVIZ-43)_ Fix package exports and minor bug fixes
-  - _(DVIZ-43)_ Update dependencies and enhance example app configuration. Fix some issues in the dvz ui
-  - _(DVIZ-43)_ Update dependencies and clean up example app. Add a loading component, add common css for shared stylines.
-  - _(DVIZ-43)_ Implement locale redirection in root loader and refactor routing structure.
-  - _(DVIZ-43)_ Refactor data and category provider components to use hooks and improve API handling
-  - _(DVIZ-43)_ Enable custom components to be registered in the library
-  - _(DVIZ-43)_ Update lockfile
-  - _(DVIZ-43)_ Fix build issues
-  - _(DVIZ-43)_ Enable SSR
-  - _(DVIZ-43)_ Configure github actions
-  - _(DVIZ-43)_ Configure github actions
-  - _(DVIZ-43)_ Remove old-ui folder
-  - _(DVIZ-43)_ Configure dvz-ui for release
-  - _(DVIZ-43)_ Add home index route and loading fallback component
-  - _(DVIZ-43)_ implement default locale constant and enhance routing with loading fallbacks
-  - \*(DVIZ-43): enable custom header and footer
+  - Merged tree of tcdi official main into main
+  - Modify nginx dockerfile to make build work
+  - Update nginx dockerfileg
+  - Chart rendered in editor and preview but not in UI
+  - Radar mobile responsiveness
+  - Radar responsiveness
+  - Responsive map component
+  - Remove conflicting has-standard-14-font-size class
+  - Update react-lib submodule path and initialize example project
+  - Update pnpm workspace configuration, modify app styles, and enhance dvz-ui dependencies
+  - Update dvz-ui package configuration and improve component structure
+  - Make dvz-ui build successfully. Add vite configuration and remove unused dependencies
+  - Fix build, typing and linting issues in the dvz-ui. Try to integrate dvz-ui in the example app
+  - Fix build, typing and linting issues in the dvz-ui. Try to integrate dvz-ui in the example app
+  - Fix package exports and minor bug fixes
+  - Update dependencies and enhance example app configuration. Fix some issues in the dvz ui
+  - Update dependencies and clean up example app. Add a loading component, add common css for shared stylines.
+  - Implement locale redirection in root loader and refactor routing structure.
+  - Refactor data and category provider components to use hooks and improve API handling
+  - Enable custom components to be registered in the library
+  - Update lockfile
+  - Fix build issues
+  - Enable SSR
+  - Configure github actions
+  - Configure github actions
+  - Remove old-ui folder
+  - Configure dvz-ui for release
+  - Add home index route and loading fallback component
+  - implement default locale constant and enhance routing with loading fallbacks
+  - \enable custom header and footer
