@@ -38,15 +38,6 @@ cd data-viz-ui
 pnpm install
 ```
 
-### Secrets scanning (pre-commit hook)
-
-This project uses [Gitleaks](https://github.com/gitleaks/gitleaks) to prevent secrets from being accidentally committed. Install the hook after cloning:
-
-```bash
-pip install pre-commit
-pre-commit install
-```
-
 ### Build in watch mode
 
 ```bash
