@@ -36,7 +36,6 @@ const CategoricalFilter = (props: CategoricalFilterProps) => {
 
     const [taxonomyOptions, setTaxonomyOptions] = useState([]);
 
-
     const getPostTypeBySlug = async () => {
         if (!taxonomy || taxonomy === "none") {
             setTaxonomyOptions([]);

@@ -124,10 +124,12 @@ const PostsFilter = (props: PostsFilterProps) => {
         () => normalizeFilterValue(postsFilters.countryFilter, isMultiSelectFilter),
         [postsFilters.countryFilter, isMultiSelectFilter]
     );
+
     const normalizedCategoryFilter = useMemo(
         () => normalizeFilterValue(postsFilters.categoryFilter, isMultiSelectFilter),
         [postsFilters.categoryFilter, isMultiSelectFilter]
     );
+
     const normalizedYearFilter = useMemo(
         () => isYearFilterValue ? normalizeFilterValue(postsFilters.yearFilter, isMultiSelectFilter) : undefined,
         [postsFilters.yearFilter, isMultiSelectFilter, isYearFilterValue]
@@ -137,9 +139,11 @@ const PostsFilter = (props: PostsFilterProps) => {
         if (!categories) return [];
         const parsed = parse(categories);
         if (Array.isArray(parsed)) return parsed;
-        return typeof parsed === 'string' ? parsed.split(',').filter(Boolean) : [];
+        if (typeof parsed === 'string' 
+            || typeof parsed === 'number'
+        ) return parsed.toString().split(',').filter(Boolean);
+        return [];
     }, [categories, editing]);
-
 
     const handleYearChange = (value: any) => {
         dispatch({
