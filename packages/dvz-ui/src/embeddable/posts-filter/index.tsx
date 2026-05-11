@@ -61,7 +61,6 @@ const PostsFilter = (props: PostsFilterProps) => {
         "data-wordpress-source": wordpressSource,
         editing = false
     } = props;
-    console.log("PostsFilterProps:", props);
 
     const dispatch = useAppDispatch();
     const { locale } = useIntl();
