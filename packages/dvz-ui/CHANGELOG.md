@@ -1,5 +1,11 @@
 # @devgateway/dvz-ui-react
 
+## 1.7.16
+
+### Patch Changes
+
+- [#233](https://github.com/devgateway/data-viz-ui/pull/233) [`77a0fbf`](https://github.com/devgateway/data-viz-ui/commit/77a0fbfe0150f9cc89533505cbbf3a81d03d659d) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Fix Category Post Filter: support single country/category values in categories parsing so country/category filters with only one configured term still render in the dropdown
+
 ## 1.7.15
 
 ### Patch Changes
