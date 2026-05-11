@@ -140,8 +140,7 @@ const PostsFilter = (props: PostsFilterProps) => {
         const parsed = parse(categories);
         if (Array.isArray(parsed)) return parsed;
         if (typeof parsed === 'string' 
-            || typeof parsed === 'number' 
-            || typeof parsed === 'boolean'
+            || typeof parsed === 'number'
         ) return parsed.toString().split(',').filter(Boolean);
         return [];
     }, [categories, editing]);
