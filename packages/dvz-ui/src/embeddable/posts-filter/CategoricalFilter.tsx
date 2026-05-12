@@ -55,7 +55,7 @@ const CategoricalFilter = (props: CategoricalFilterProps) => {
                 text: taxonomy.name
             }));
             if (categories) {
-                const filteredTaxonomyOptions = taxonomyOptions.filter((option: any) => categories.indexOf(option.value.toString()) > -1);
+                const filteredTaxonomyOptions = taxonomyOptions.filter((option: any) => categories.indexOf(option.value) > -1);
                 setTaxonomyOptions([])
                 setTaxonomyOptions(filteredTaxonomyOptions);
             } else {

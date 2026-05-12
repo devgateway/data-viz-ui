@@ -25,6 +25,8 @@ const PostsFiltersResetButton = (props) => {
         }
     }, [appliedFilters, initialFilters]);
 
+    console.log("initialFilters:", initialFilters);
+
 
     return (
         <Container
@@ -38,6 +40,14 @@ const PostsFiltersResetButton = (props) => {
             onClick={() => {
                 dispatch({
                     type: "SET_INITIAL_POSTS_FILTER",
+                    group,
+                    ...initialFilters,
+                    reset: true,
+                    page: 1
+                });
+
+                dispatch({
+                    type: "SET_POSTS_FILTERS",
                     group,
                     ...initialFilters,
                     reset: true,
