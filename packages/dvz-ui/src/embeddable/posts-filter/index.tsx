@@ -183,17 +183,18 @@ const PostsFilter = (props: PostsFilterProps) => {
     useEffect(() => {
         const hasDefaultValues = defaultValuesArray.length > 0;
         const defaultValue = isMultiSelectFilter ? defaultValuesArray : defaultValuesArray[0];
+        const categoryValues = categoriesArray.map(Number);
 
         const categoryFilter = !isCountryFilterValue
             ? (hasDefaultValues
                 ? defaultValue
-                : (isMultiSelectFilter ? categoriesArray.map(Number) : postsFilters.categoryFilter))
+                : (isMultiSelectFilter ? categoryValues : postsFilters.categoryFilter))
             : postsFilters.categoryFilter;
 
         const countryFilter = isCountryFilterValue
             ? (hasDefaultValues
                 ? defaultValue
-                : (isMultiSelectFilter ? categoriesArray.map(Number) : postsFilters.countryFilter))
+                : (isMultiSelectFilter ? categoryValues : postsFilters.countryFilter))
             : postsFilters.countryFilter;
 
         const yearFilter = isYearFilterValue ?
