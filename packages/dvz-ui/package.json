@@ -25,8 +25,11 @@
     "react-ui-library",
     "react-ui-components"
   ],
-  "author": "Timothy Mugo",
-  "license": "MIT",
+  "author": "Sebastian Dimunzio <sdimunzio@gmail.com>",
+  "contributors": [
+    "Timothy Gachengo (https://github.com/timothygachengo)"
+  ],
+  "license": "Apache-2.0",
   "description": "A modular, embeddable React component library for data visualization and UI, built with TypeScript. Provides reusable components for charts, maps, dashboards, and more, with built-in support for internationalization and Redux integration.",
   "repository": {
     "type": "git",
