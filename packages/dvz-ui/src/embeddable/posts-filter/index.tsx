@@ -143,7 +143,7 @@ const PostsFilter = (props: PostsFilterProps) => {
             || typeof parsed === 'number'
         ) return parsed.toString().split(',').filter(cat => cat.trim() !== '')
         return [];
-    }, [categories]);
+    }, [categories, editing]);
 
 
     const handleYearChange = (value: any) => {
