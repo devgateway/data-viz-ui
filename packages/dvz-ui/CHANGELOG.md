@@ -1,5 +1,15 @@
 # @devgateway/dvz-ui-react
 
+## 1.8.0
+
+### Minor Changes
+
+- [#232](https://github.com/devgateway/data-viz-ui/pull/232) [`fbac6db`](https://github.com/devgateway/data-viz-ui/commit/fbac6db16bbc926713653c7f77180bab804a56f5) Thanks [@sdimunzio](https://github.com/sdimunzio)! - This package is now licensed under the Apache License 2.0 (previously MIT). Versions prior to this release remain under the MIT license.
+
+### Patch Changes
+
+- [#235](https://github.com/devgateway/data-viz-ui/pull/235) [`1e78fee`](https://github.com/devgateway/data-viz-ui/commit/1e78feef88f4e539e82ad0d4a0bb7eede0dd3699) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Fix default filter values for posts filter
+
 ## 1.7.16
 
 ### Patch Changes
