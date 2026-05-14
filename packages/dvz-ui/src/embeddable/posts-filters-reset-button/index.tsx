@@ -79,14 +79,6 @@ const PostsFiltersResetButton = (props) => {
                     reset: true,
                     page: 1
                 });
-
-                dispatch({
-                    type: "SET_POSTS_FILTERS",
-                    group,
-                    ...initialFilters,
-                    reset: true,
-                    page: 1
-                })
             }}>
             <span>{resetLabel}</span>
             <span><Icon disabled={!enabled} name="undo alternate" className="custom-undo-icon" /></span>
