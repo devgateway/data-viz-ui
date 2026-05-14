@@ -141,9 +141,10 @@ const PostsFilter = (props: PostsFilterProps) => {
         if (Array.isArray(parsed)) return parsed;
         if (typeof parsed === 'string' 
             || typeof parsed === 'number'
-        ) return parsed.toString().split(',').filter(Boolean);
+        ) return parsed.toString().split(',').filter(cat => cat.trim() !== '')
         return [];
     }, [categories, editing]);
+
 
     const handleYearChange = (value: any) => {
         dispatch({
@@ -182,24 +183,25 @@ const PostsFilter = (props: PostsFilterProps) => {
     useEffect(() => {
         const hasDefaultValues = defaultValuesArray.length > 0;
         const defaultValue = isMultiSelectFilter ? defaultValuesArray : defaultValuesArray[0];
+        const categoryValues = categoriesArray.map(Number);
 
         const categoryFilter = !isCountryFilterValue
             ? (hasDefaultValues
                 ? defaultValue
-                : (isMultiSelectFilter ? categoriesArray.map(Number) : postsFilters.categoryFilter))
+                : (isMultiSelectFilter ? categoryValues : postsFilters.categoryFilter))
             : postsFilters.categoryFilter;
 
         const countryFilter = isCountryFilterValue
             ? (hasDefaultValues
                 ? defaultValue
-                : (isMultiSelectFilter ? categoriesArray.map(Number) : postsFilters.countryFilter))
+                : (isMultiSelectFilter ? categoryValues : postsFilters.countryFilter))
             : postsFilters.countryFilter;
 
         const yearFilter = isYearFilterValue ?
             (isMultiSelectFilter ? yearOptions.length > 0 ? yearOptions.map((year: any) => year.value) : [] : postsFilters.yearFilter)
             : postsFilters.yearFilter;
 
-        dispatch({
+        const dispatchOptions = {
             type: "SET_INITIAL_POSTS_FILTER",
             group,
             categoryFilter,
@@ -208,12 +210,14 @@ const PostsFilter = (props: PostsFilterProps) => {
             isCountryFilter: isCountryFilterValue,
             sortFirstBy: sortFirstByValue,
             yearFilter: isYearFilterValue ? yearFilter : null,
-            categoryCategory: !isCountryFilterValue ? postsFilters.categoryCategory : null,
+            categoryCategory: !isCountryFilterValue ? categoryFilter : null,
             categoryTaxonomy: !isCountryFilterValue ? taxonomy : null,
             countryCategory: isCountryFilterValue ? taxonomy : null,
             countryTaxonomy: isCountryFilterValue ? taxonomy : null,
             page: 1
-        });
+        }
+
+        dispatch(dispatchOptions);
 
     }, []);
 

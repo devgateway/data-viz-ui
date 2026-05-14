@@ -55,7 +55,12 @@ const CategoricalFilter = (props: CategoricalFilterProps) => {
                 text: taxonomy.name
             }));
             if (categories) {
-                const filteredTaxonomyOptions = taxonomyOptions.filter((option: any) => categories.indexOf(option.value.toString()) > -1);
+                const normalizedCategories = categories
+                    .map((category: any) => Number(category))
+                    .filter((category: number) => !Number.isNaN(category));
+                const filteredTaxonomyOptions = taxonomyOptions.filter(
+                    (option: any) => normalizedCategories.indexOf(Number(option.value)) > -1
+                );
                 setTaxonomyOptions([])
                 setTaxonomyOptions(filteredTaxonomyOptions);
             } else {

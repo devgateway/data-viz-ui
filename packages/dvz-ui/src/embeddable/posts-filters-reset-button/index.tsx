@@ -4,6 +4,39 @@ import { Container, Icon } from "semantic-ui-react";
 import isEqual from 'lodash.isequal'
 import { injectIntl } from 'react-intl';
 
+const normalizeForComparison = (value: any): any => {
+    if (value === null || value === undefined) {
+        return value;
+    }
+
+    if (Array.isArray(value)) {
+        return [...value]
+            .map(normalizeForComparison)
+            .sort((a, b) => {
+                const left = JSON.stringify(a);
+                const right = JSON.stringify(b);
+                if (left < right) return -1;
+                if (left > right) return 1;
+                return 0;
+            });
+    }
+
+    if (typeof value === 'object') {
+        return Object.keys(value)
+            .sort()
+            .reduce((result, key) => {
+                result[key] = normalizeForComparison(value[key]);
+                return result;
+            }, {} as any);
+    }
+
+    if (typeof value === 'number' || typeof value === 'string') {
+        return String(value);
+    }
+
+    return value;
+};
+
 const PostsFiltersResetButton = (props) => {
     const {
         "data-group": group,
@@ -19,7 +52,10 @@ const PostsFiltersResetButton = (props) => {
 
     const enabled = React.useMemo(() => {
         if (appliedFilters && initialFilters) {
-            return !isEqual(appliedFilters, initialFilters);
+            return !isEqual(
+                normalizeForComparison(appliedFilters),
+                normalizeForComparison(initialFilters)
+            );
         } else {
             return false;
         }
@@ -42,7 +78,7 @@ const PostsFiltersResetButton = (props) => {
                     ...initialFilters,
                     reset: true,
                     page: 1
-                })
+                });
             }}>
             <span>{resetLabel}</span>
             <span><Icon disabled={!enabled} name="undo alternate" className="custom-undo-icon" /></span>
