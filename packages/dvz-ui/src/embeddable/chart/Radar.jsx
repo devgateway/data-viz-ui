@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { injectIntl } from "react-intl";
 import { ResponsiveRadar } from "@nivo/radar";
 import Legends from "./Legends.jsx";
+import Tooltip from "./Tooltip.jsx";
 import deviceType from "@/utils/deviceType.js";
 import _ from "lodash";
 
@@ -36,6 +37,9 @@ const Chart = ({
   radarDotSize,
   radarEnableDotLabel,
   radarDotLabelOffset,
+  tooltipEnabled,
+  tooltip,
+  tooltipEnableMarkdown,
   mobileCustomization,
   previewMode,
 }) => {
@@ -115,7 +119,7 @@ const Chart = ({
 
   // ─── radial‐value tick layer ────────────────────────────────────────────
   const customLayer = ({ centerX, centerY, radiusScale }) => {
-    const ticks = radiusScale.ticks(radarGridLevels).filter((t) => t > 0);
+    const ticks = radiusScale.ticks(resolvedGridLevels).filter((t) => t > 0);
     const lineH = isMobileDevice
       ? mobileConfigSettings.mobileYAxisLineHeight ?? 12
       : isTabletDevice
@@ -266,6 +270,45 @@ const Chart = ({
     enabled: !filter.includes(k),
   }));
 
+  const resolvedGridLevels = Number.parseInt(radarGridLevels, 10) || 3;
+  const resolvedGridLabelOffset = Number.parseInt(radarGridLabelOffset, 10) || 0;
+  const resolvedDotSize = Number.parseInt(radarDotSize, 10) || 0;
+  const resolvedDotLabelOffset = Number.parseInt(radarDotLabelOffset, 10) || 0;
+  const resolvedFillOpacity = Number.parseFloat(radarFillOpacity) || 0;
+  const resolvedBorderWidth = Number.parseFloat(radarBorderWidth) || 0;
+  const buildRadarTooltipDatum = React.useCallback(
+    ({ index, data }) => {
+      const sourceDatum = options.data.find(
+        (item) => `${item?.[options.indexBy]}` === `${index}`
+      );
+      const radarValues = Array.isArray(data)
+        ? data.reduce((acc, item) => {
+            acc[item.id] = item.value;
+            acc[`_${item.id}`] = item.value;
+            acc[`${item.id}Formatted`] = item.formattedValue;
+            return acc;
+          }, {})
+        : {};
+
+      return {
+        id: index,
+        value: Array.isArray(data) && data.length === 1 ? data[0]?.value : undefined,
+        data: {
+          ...sourceDatum,
+          variables: {
+            ...(sourceDatum?.variables || {}),
+            ...radarValues,
+            category: index,
+            field: index,
+            value:
+              Array.isArray(data) && data.length === 1 ? data[0]?.value : undefined,
+          },
+        },
+      };
+    },
+    [options.data, options.indexBy]
+  );
+
   return (
     <div style={{ height }} className="radar">
       <ResponsiveRadar
@@ -278,24 +321,40 @@ const Chart = ({
         valueFormat={(v) =>
           intl.formatNumber(format.style === "percent" ? v / 100 : v, format)
         }
+        colors={(datum) => colorGenerator.getColorByKey(datum.key)}
         borderColor={{ from: "color" }}
-        gridLevels={radarGridLevels}
+        gridLevels={resolvedGridLevels}
         gridShape={radarGridShape}
-        gridLabelOffset={Number.parseInt(radarGridLabelOffset, 10)}
+        gridLabelOffset={resolvedGridLabelOffset}
         gridLabel={customGridLabel}
         enableDots={radarEnableDots}
-        dotSize={radarDotSize}
+        dotSize={resolvedDotSize}
         dotBorderWidth={2}
         enableDotLabel={radarEnableDotLabel}
-        dotLabelYOffset={radarDotLabelOffset}
+        dotLabelYOffset={resolvedDotLabelOffset}
         dotLabel={(d) =>
           intl.formatNumber(
             format.style === "percent" ? d.value / 100 : d.value,
             format
           )
         }
-        fillOpacity={radarFillOpacity}
-        borderWidth={radarBorderWidth}
+        sliceTooltip={(datum) => {
+          if (tooltipEnabled && tooltip && tooltip.trim().length > 0) {
+            return (
+              <Tooltip
+                intl={intl}
+                format={format}
+                d={buildRadarTooltipDatum(datum)}
+                tooltip={tooltip}
+                tooltipEnableMarkdown={tooltipEnableMarkdown}
+              />
+            );
+          }
+
+          return null;
+        }}
+        fillOpacity={resolvedFillOpacity}
+        borderWidth={resolvedBorderWidth}
         blendMode="multiply"
         motionConfig="wobbly"
         theme={{

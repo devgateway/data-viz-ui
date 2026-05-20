@@ -1,6 +1,7 @@
 import React, {useState} from 'react'
 import {injectIntl} from 'react-intl';
 import { ResponsiveBump } from '@nivo/bump'
+import Tooltip from "./Tooltip.jsx";
 import {
     colorSchemes,
     isCategoricalColorScheme,
@@ -8,7 +9,6 @@ import {
     sequentialColorInterpolators
 } from "@nivo/colors";
 import * as d3 from "d3";
-import {useTheme} from "@nivo/theming";
 
 const getTextWidth = (text, font) => {
     // re-use canvas object for better performance
@@ -59,12 +59,14 @@ const Chart = ({
                    legendPosition,
                    tickRotation,
                    tickColor,
-                   legendLabel
+                    legendLabel,
+                    tooltipEnabled,
+                    tooltip,
+                    tooltipEnableMarkdown
                }) => {
 
 
     const [filter, setFilter] = useState([]);
-    const theme = useTheme();
 
     const applyFilter = (values) => {
         if (filter) {
@@ -107,9 +109,9 @@ const Chart = ({
                   textAnchor="middle"
                   dominantBaseline="middle"
                   style={{
-                      ...theme.axis.ticks.text,
                       fill: '#FFF',
                       fontSize: "12px",
+                      fontFamily: 'sans-serif',
                   }}
             >
                 {tick.value}
@@ -215,13 +217,20 @@ const Chart = ({
                 animate={true}
                 motionStiffness={130}
                 motionDamping={15}
-                tooltip={(d) => {
-                    return (
-                        <div className={"chart tooltip"} >
+                pointTooltip={(d) => {
+                    if (tooltipEnabled && tooltip && tooltip.trim().length > 0) {
+                        return (
+                            <Tooltip
+                                intl={intl}
+                                format={format}
+                                d={d}
+                                tooltip={tooltip}
+                                tooltipEnableMarkdown={tooltipEnableMarkdown}
+                            />
+                        )
+                    }
 
-
-                        </div>
-                    )
+                    return null
                 }}
 
 

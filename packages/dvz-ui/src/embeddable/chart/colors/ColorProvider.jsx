@@ -30,7 +30,19 @@ class ColorProvider extends React.Component {
       options
     } = this.props;
     let colorManager;
-    const { data, keys, indexBy, dimensionsMetadata, measuresMetadata } = this.props.options;
+    const {
+      data,
+      keys,
+      indexBy,
+      dimensionsMetadata,
+      measuresMetadata,
+      colorData,
+      colorKeys,
+      colorIndexBy,
+    } = this.props.options;
+    const resolvedColorData = colorData || data;
+    const resolvedColorKeys = colorKeys || keys;
+    const resolvedColorIndexBy = colorIndexBy || indexBy;
     if (data) {
       if (scheme === "system") {
         colorManager = new SystemColors(
@@ -38,9 +50,9 @@ class ColorProvider extends React.Component {
           type,
           colorBy,
           scheme,
-          data,
-          keys,
-          indexBy,
+          resolvedColorData,
+          resolvedColorKeys,
+          resolvedColorIndexBy,
           dimensionsMetadata,
           measuresMetadata,
           locale,
@@ -54,11 +66,11 @@ class ColorProvider extends React.Component {
           type,
           colorBy,
           scheme,
-          data,
+          resolvedColorData,
           dimensionsMetadata,
           measuresMetadata,
-          keys,
-          indexBy,
+          resolvedColorKeys,
+          resolvedColorIndexBy,
           manualColors,
           locale,
           overallLabel,
@@ -70,18 +82,18 @@ class ColorProvider extends React.Component {
           colorManager = new SequentialColors(
             colorBy,
             scheme,
-            data,
-            keys,
-            indexBy
+            resolvedColorData,
+            resolvedColorKeys,
+            resolvedColorIndexBy
           );
         }
         if (isCategoricalColorScheme(scheme)) {
           colorManager = new CategoricalColors(
             colorBy,
             scheme,
-            data,
-            keys,
-            indexBy
+            resolvedColorData,
+            resolvedColorKeys,
+            resolvedColorIndexBy
           );
         }
       }

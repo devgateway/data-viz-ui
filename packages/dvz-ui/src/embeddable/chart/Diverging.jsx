@@ -1,8 +1,9 @@
-import React, {useState} from 'react'
-import {ResponsiveBar} from '@nivo/bar'
-import {injectIntl} from 'react-intl';
+import React, { useMemo, useState } from 'react'
+import { ResponsiveBar } from '@nivo/bar'
+import { injectIntl } from 'react-intl';
+import Tooltip from "./Tooltip.jsx";
 
-import {useTheme} from '@nivo/core'
+import { useTheme } from '@nivo/core'
 
 const CustomTick = (tick, colors) => {
     const theme = useTheme()
@@ -30,9 +31,7 @@ const CustomTick = (tick, colors) => {
 }
 
 
-const Chart = ({colors, options, intl, format}) => {
-
-
+const Chart = ({ options, intl, format, colorGenerator, height, tooltipEnabled, tooltip, tooltipEnableMarkdown }) => {
     const [filter, setFilter] = useState([])
 
     const toggle = (id) => {
@@ -57,15 +56,42 @@ const Chart = ({colors, options, intl, format}) => {
     }
 
 
-    if (!options || !options.data) {
+    if (!options || !options.data || !options.keys || options.keys.length < 2) {
         return null
     }
+
+    const transformed = useMemo(() => {
+        const [negativeKey, positiveKey] = options.keys;
+        const data = (options.data || []).map((datum) => ({
+            ...datum,
+            [negativeKey]: Math.abs(Number(datum[negativeKey]) || 0) * -1,
+            [positiveKey]: Math.abs(Number(datum[positiveKey]) || 0),
+        }));
+
+        const absoluteMax = data.reduce((currentMax, datum) => {
+            const values = [Math.abs(Number(datum[negativeKey]) || 0), Math.abs(Number(datum[positiveKey]) || 0)];
+            return Math.max(currentMax, ...values);
+        }, 0);
+
+        return {
+            data,
+            negativeKey,
+            positiveKey,
+            maxValue: absoluteMax,
+        };
+    }, [options]);
+
+    const legendColors = [
+        colorGenerator?.getColorByKey?.(transformed.negativeKey) || '#b45309',
+        colorGenerator?.getColorByKey?.(transformed.positiveKey) || '#2563eb',
+    ];
+
     const divergingCommonProps = {
         margin: {top: 30, right: 10, bottom: 30, left: 120},
         padding: 1,
-        maxValue: options.maxValue,
-        minValue: options.maxValue * -1,
-        data: applyFilter(options.data),
+        maxValue: transformed.maxValue,
+        minValue: transformed.maxValue * -1,
+        data: applyFilter(transformed.data),
         layout: 'horizontal',
         indexBy: options.indexBy,
         colorBy: 'id',
@@ -92,8 +118,8 @@ const Chart = ({colors, options, intl, format}) => {
                 axis: 'x',
                 value: 0,
                 lineStyle: {strokeOpacity: 0},
-                textStyle: {fill: colors.colors[0]},
-                legend: options.keys[0],
+                textStyle: {fill: legendColors[0]},
+                legend: transformed.negativeKey,
 
                 legendPosition: 'top-left',
                 legendOrientation: 'horizontal',
@@ -112,8 +138,8 @@ const Chart = ({colors, options, intl, format}) => {
                 axis: 'x',
                 value: 0,
                 lineStyle: {strokeOpacity: 0},
-                textStyle: {fill: colors.colors[1]},
-                legend: options.keys[1],
+                textStyle: {fill: legendColors[1]},
+                legend: transformed.positiveKey,
                 legendPosition: 'top-right',
                 legendOrientation: 'horizontal',
                 legendOffsetY: -10,
@@ -124,13 +150,28 @@ const Chart = ({colors, options, intl, format}) => {
 
     return (
         <div className="has-interactive-panel">
-            <div className="chart container">
+            <div className="chart container" style={{ height }}>
                 {options.data &&
                 <ResponsiveBar
                     {...divergingCommonProps}
-                    keys={options.keys}
+                    keys={[transformed.negativeKey, transformed.positiveKey]}
                     padding={0.4}
-                    colors={colors.colors}
+                    colors={legendColors}
+                    tooltip={(d) => {
+                        if (tooltipEnabled && tooltip && tooltip.trim().length > 0) {
+                            return (
+                                <Tooltip
+                                    intl={intl}
+                                    format={format}
+                                    d={d}
+                                    tooltip={tooltip}
+                                    tooltipEnableMarkdown={tooltipEnableMarkdown}
+                                />
+                            )
+                        }
+
+                        return null
+                    }}
 
                 />}
             </div>

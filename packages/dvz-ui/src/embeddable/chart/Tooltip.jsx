@@ -46,7 +46,7 @@ export const formatContent = (
 
   // if variables have a property called "field" and another property with the value being _${field},
   // add _value to the variables object with the value of the _${field} property
-  if (variables.field && variables[`_${variables.field}`]) {
+  if (variables.field && variables[`_${variables.field}`] != null) {
     variables._value = variables[`_${variables.field}`];
   }
   //if there is a category prop in the variables and field is not defined, set field to category
@@ -77,8 +77,8 @@ const Tooltip = ({ tooltip, d, intl, tooltipEnableMarkdown }) => {
   const datum = d.datum || d.point || d;
   const { color, data } = datum || {};
   const current =
-    d.value ||
-    (d.datum ? d.datum.value : null) ||
+    d.value ??
+    (d.datum ? d.datum.value : null) ??
     (d.point ? d.point.data.y : null);
 
   if (data) {

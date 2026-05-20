@@ -3,14 +3,14 @@
 # Chart Component
 
 ## Purpose
-An embeddable React component that renders interactive data visualisations (Bar, Line, Pie, Radar, Bump, Diverging, Sunburst) using the Nivo library. Data is fetched from an API or parsed from inline CSV. A Redux-backed `DataProvider` manages fetching, caching, and filter-reactive re-fetching. A `ColorProvider` handles categorical, sequential, manual, and system colour schemes.
+An embeddable React component that renders interactive data visualisations (Bar, Line, Pie, Radar, Bump, Scatter, Heatmap, Interval Plot, Diverging, Sunburst) using the Nivo library plus focused custom SVG rendering where needed. Data is fetched from an API or parsed from inline CSV. A Redux-backed `DataProvider` manages fetching, caching, and filter-reactive re-fetching. A `ColorProvider` handles categorical, sequential, manual, and system colour schemes.
 
 ## Props / Attributes
 
 ### Core
 | Name | Type | Default | Description |
 |------|------|---------|-------------|
-| `data-type` | string | `"bar"` | Chart type: `"bar"`, `"line"`, `"pie"`, `"radar"`, `"bump"`, `"diverging"`, `"sunburst"` |
+| `data-type` | string | `"bar"` | Chart type: `"bar"`, `"line"`, `"pie"`, `"radar"`, `"bump"`, `"scatter"`, `"heatmap"`, `"intervalPlot"`, `"diverging"`, `"sunburst"` |
 | `data-app` | string | `"csv"` | Data source / API identifier |
 | `data-group` | string | `"default"` | Filter group key |
 | `data-height` | number | `500` | Container height in pixels |
@@ -76,6 +76,39 @@ An embeddable React component that renders interactive data visualisations (Bar,
 | `data-radar-enable-dots` | string | `"true"` | Show data-point dots |
 | `data-radar-dot-size` | number | `8` | Dot diameter in pixels |
 
+### Scatter / Bubble / Frontier / Quadrant
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| `data-scatter-min-size` | number | `10` | Minimum node size |
+| `data-scatter-max-size` | number | `30` | Maximum node size when size data exists |
+| `data-scatter-show-labels` | string | `"false"` | Show direct labels next to points |
+| `data-scatter-connect-points` | string | `"false"` | Connect points within each series |
+| `data-scatter-point-opacity` | number | `0.85` | Point opacity |
+| `data-scatter-reference-x` / `data-scatter-reference-y` | string | `""` | Numeric threshold lines |
+| `data-scatter-reference-x-label` / `data-scatter-reference-y-label` | string | `""` | Reference line labels |
+| `data-scatter-quadrant-top-left-label` etc. | string | `""` | Optional quadrant annotations |
+
+### Scatter data mapping
+- **API mode**: selected measures map to `x`, `y`, and optional `size`; `dimension1` becomes the point label; `dimension2` is optional series/grouping.
+- **CSV mode**: columns are read as `label,x,y,size?,series?`.
+- **Tooltip variables**: `{label}`, `{series}`, `{seriesDisplay}`, `{x}`, `{y}`, `{size}`, `{xLabel}`, `{yLabel}`, `{sizeLabel}`.
+
+### Heatmap
+- **API mode**: `dimension1` = row label, `dimension2` = column label, first selected measure = cell value.
+- **CSV mode**: columns are read as `row,column,value`.
+- **Tooltip variables**: `{rowLabel}`, `{columnLabel}`, `{value}`, `{measureLabel}`.
+
+### Interval Plot
+- **API mode**: `dimension1` = item label, first 3 selected measures = `center`, `low`, `high`.
+- **CSV mode**: columns are read as `label,center,low,high`.
+- **Tooltip variables**: `{label}`, `{value}`, `{center}`, `{low}`, `{high}`, `{centerLabel}`, `{lowLabel}`, `{highLabel}`.
+
+### Sunburst tooltip variables
+- `{label}` / `{name}`: current segment label
+- `{value}`: current segment value
+- `{path}`: full hierarchy path
+- `{depth}`: node depth within the hierarchy
+
 ### Colours & Style
 | Name | Type | Default | Description |
 |------|------|---------|-------------|
@@ -101,13 +134,17 @@ import Chart from './embeddable/chart';
 <Chart
   data-app="my-api"
   data-group="default"
-  data-type="bar"
+  data-type="scatter"
   data-height={400}
   data-dimension1="region"
-  data-measures={encodeURIComponent(JSON.stringify({ 'my-api': { total: { selected: true } } }))}
+  data-dimension2="scenario"
+  data-measures={encodeURIComponent(JSON.stringify({ 'my-api': { cost: { selected: true }, impact: { selected: true }, area: { selected: true } } }))}
   data-format={encodeURIComponent(JSON.stringify({ style: 'decimal', minimumFractionDigits: 0, maximumFractionDigits: 0 }))}
-  data-left-legend="Population"
-  data-bottom-legend="Region"
+  data-left-legend="Impact"
+  data-bottom-legend="Cost"
+  data-scatter-connect-points="true"
+  data-scatter-reference-x="100"
+  data-scatter-reference-y="50"
   data-show-legends="true"
   data-scheme="system"
   intl={intl}

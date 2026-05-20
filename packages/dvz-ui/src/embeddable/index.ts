@@ -8,6 +8,19 @@ const PageGallery = lazy(() => import("./pagegallery"));
 const Download = lazy(() => import("./download"));
 const PostsCarousel = lazy(() => import("./postscarousel"));
 const Chart = lazy(() => import("./chart"));
+const BarChart = lazy(() => import("./bar-chart"));
+const LineChart = lazy(() => import("./line-chart"));
+const PieChart = lazy(() => import("./pie-chart"));
+const RadarChart = lazy(() => import("./radar-chart"));
+const BumpChart = lazy(() => import("./bump-chart"));
+const WaterfallChart = lazy(() => import("./waterfall-chart"));
+const DumbbellChart = lazy(() => import("./dumbbell-chart"));
+const HistogramChart = lazy(() => import("./histogram-chart"));
+const ScatterChart = lazy(() => import("./scatter-chart"));
+const HeatmapChart = lazy(() => import("./heatmap-chart"));
+const SunburstChart = lazy(() => import("./sunburst-chart"));
+const IntervalPlot = lazy(() => import("./interval-plot"));
+const DivergingChart = lazy(() => import("./diverging-chart"));
 const Filter = lazy(() => import("./filter"));
 const ShowcaseForm = lazy(() => import("./showcase"));
 const NewsLetter = lazy(() => import("./newsletter"));
@@ -52,6 +65,19 @@ export const components = {
     pageGallery: PageGallery,
     postsCarousel: PostsCarousel,
     chart: Chart,
+    barChart: BarChart,
+    lineChart: LineChart,
+    pieChart: PieChart,
+    radarChart: RadarChart,
+    bumpChart: BumpChart,
+    waterfallChart: WaterfallChart,
+    dumbbellChart: DumbbellChart,
+    histogramChart: HistogramChart,
+    scatterChart: ScatterChart,
+    heatmapChart: HeatmapChart,
+    sunburstChart: SunburstChart,
+    intervalPlot: IntervalPlot,
+    divergingChart: DivergingChart,
     filter: Filter,
     showCaseForm: ShowcaseForm,
     newsLetter: NewsLetter,
