@@ -47,6 +47,7 @@ export const postsApi = createApi({
             queryFn: async (args: GetCustomPostsQueryArgs) => {
                 try {
                     const { postType, taxonomy, category, taxonomyFilters, before, perPage, page, locale, after, ordering, orderingDirection } = args;
+                    //@ts-ignore
                 const response = await getCustomPosts({ postType, taxonomy, category, taxonomyFilters, before, perPage, page, locale, after, ordering, orderingDirection });
                 return { data: response };
                 } catch (error) {
