@@ -1,5 +1,11 @@
 # @devgateway/dvz-ui-react
 
+## 1.8.1
+
+### Patch Changes
+
+- [#239](https://github.com/devgateway/data-viz-ui/pull/239) [`56e6992`](https://github.com/devgateway/data-viz-ui/commit/56e6992f05a4e74a1584cd36f1952cad3c95ba82) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Fix line chart showing NaN when point labels are on top
+
 ## 1.8.0
 
 ### Minor Changes
