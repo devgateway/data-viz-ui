@@ -12,6 +12,20 @@ const boldSearchTerm = (text, searchTerm) => {
   return text.replace(regex, '<strong>$1</strong>');
 };
 
+const isLocaleRootLink = (url, locale) => {
+    const safeLocale = String(locale || 'en').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const localeRootPattern = new RegExp(`^/${safeLocale}/?$`);
+    return localeRootPattern.test(String(url || '').trim());
+};
+
+const getRedirectUrl = (redirectUrl) => {
+    if (Array.isArray(redirectUrl)) {
+        return String(redirectUrl[0] || '').trim();
+    }
+    return String(redirectUrl || '').trim();
+};
+
+
 // ResultRenderer component with highlighting
 const ResultRenderer = injectIntl(({
   ID,
@@ -30,11 +44,20 @@ const ResultRenderer = injectIntl(({
   intl: { locale },
   searchTerm, // Added searchTerm prop
 }) => {
-  let target = parent_link
-    ? utils.replaceLink(parent_link, locale) + `#${slug}`
-    : utils.replaceLink(link, locale);
   const redirect_url = metadata?.redirect_url;
   target = redirect_url ? redirect_url + `#${slug}` : target;
+
+  const parentTarget = utils.replaceLink(parent_link, locale);
+    const directTarget = utils.replaceLink(link, locale);
+    const safeRedirectUrl = getRedirectUrl(redirect_url);
+
+    let target = directTarget;
+    if (parent_link && !isLocaleRootLink(parentTarget, locale)) {
+        target = parentTarget + `#${slug}`;
+    }
+    if (safeRedirectUrl) {
+        target = safeRedirectUrl + `#${slug}`;
+    }
 
   const boldedTitle = boldSearchTerm(String(title), searchTerm);
   const boldedExtract = boldSearchTerm(extract, searchTerm);
