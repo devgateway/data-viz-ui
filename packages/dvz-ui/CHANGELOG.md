@@ -1,5 +1,13 @@
 # @devgateway/dvz-ui-react
 
+## 1.8.2
+
+### Patch Changes
+
+- [#241](https://github.com/devgateway/data-viz-ui/pull/241) [`4761099`](https://github.com/devgateway/data-viz-ui/commit/4761099f537adf6b72143ae60ef2e7433865bae7) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Fix download radio buttons styling
+
+- [#243](https://github.com/devgateway/data-viz-ui/pull/243) [`d0a4f75`](https://github.com/devgateway/data-viz-ui/commit/d0a4f75edfd7c789b237813e6ae3b48b12ba8f5f) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Fix radio button for measures by using the semantic ui radio button over input type radio
+
 ## 1.8.1
 
 ### Patch Changes
