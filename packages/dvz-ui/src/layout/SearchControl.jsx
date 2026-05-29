@@ -45,19 +45,18 @@ const ResultRenderer = injectIntl(({
   searchTerm, // Added searchTerm prop
 }) => {
   const redirect_url = metadata?.redirect_url;
-  target = redirect_url ? redirect_url + `#${slug}` : target;
 
   const parentTarget = utils.replaceLink(parent_link, locale);
-    const directTarget = utils.replaceLink(link, locale);
-    const safeRedirectUrl = getRedirectUrl(redirect_url);
+  const directTarget = utils.replaceLink(link, locale);
+  const safeRedirectUrl = getRedirectUrl(redirect_url);
 
-    let target = directTarget;
-    if (parent_link && !isLocaleRootLink(parentTarget, locale)) {
-        target = parentTarget + `#${slug}`;
-    }
-    if (safeRedirectUrl) {
-        target = safeRedirectUrl + `#${slug}`;
-    }
+  let target = directTarget;
+  if (parent_link && !isLocaleRootLink(parentTarget, locale)) {
+    target = parentTarget + `#${slug}`;
+  }
+  if (safeRedirectUrl) {
+    target = safeRedirectUrl + `#${slug}`;
+  }
 
   const boldedTitle = boldSearchTerm(String(title), searchTerm);
   const boldedExtract = boldSearchTerm(extract, searchTerm);
