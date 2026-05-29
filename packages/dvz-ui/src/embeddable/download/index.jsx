@@ -96,8 +96,7 @@ const DownloadComponent = (props) => {
     domtoimage.cloneNode(componentRef.current).then(function (node) {
       [...node.getElementsByTagName("input")].forEach(e => e.remove());
       [...node.querySelectorAll(".question.circle.icon")].forEach(e => e.remove());
-
-      const addSourceURL = includeSourceURL === "true";
+      const addSourceURL = includeSourceURL === "true" || includeSourceURL === true;
       if (addSourceURL) {
         const urlNode = document.createElement('div');
         urlNode.style.marginLeft = sourceURLMarginLeft + "px";
@@ -107,7 +106,7 @@ const DownloadComponent = (props) => {
         urlNode.style.fontWeight = '400';
         urlNode.style.color = '#66676d';
         urlNode.style.opacity = '0.75';
-        urlNode.innerHTML = window.location.href;
+        urlNode.textContent = window.location.href;
         urlNode.style.maxWidth = "90%";
         urlNode.style.wordWrap = "break-word";
         urlNode.style.overflowWrap = "break-word";
@@ -115,7 +114,10 @@ const DownloadComponent = (props) => {
       }
 
       const PADDING = 50;
-      options.height = componentRef.current.scrollHeight + PADDING;
+      options.height = componentRef.current.scrollHeight + PADDING * 2;
+      if (addSourceURL) {
+        options.height += (Number.parseInt(sourceURLMarginTop, 10) || 0) + (Number.parseInt(sourceURLFontSize, 10) || 0) * 2;
+      }
       options.width = componentRef.current.scrollWidth + (PADDING * 2);
       node.style.padding = `${PADDING}px`;
 
