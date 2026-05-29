@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Container } from "semantic-ui-react";
+import { Container, Radio } from "semantic-ui-react";
 import { cleanMeasures, setMeasures } from "../reducers/data";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 
@@ -67,7 +67,7 @@ const Measures: React.FC<MeasuresProps> = (props) => {
             {label && <span>{label}</span>}
             {items.map(i => {
                 return (<div key={i.idx} className={"inputs lists"} onClick={e => dispatch(actions.onChange({ app, group, mGroup: i }))}>
-                    <input readOnly checked={(selected && selected.idx == i.idx) ? true : false}
+                    <Radio readOnly checked={(selected && selected.idx == i.idx) ? true : false}
                         type="radio" />
                     <span>{i.label}</span>
                 </div>)
