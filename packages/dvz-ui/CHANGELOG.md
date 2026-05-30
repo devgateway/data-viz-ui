@@ -1,5 +1,11 @@
 # @devgateway/dvz-ui-react
 
+## 1.8.3
+
+### Patch Changes
+
+- [#246](https://github.com/devgateway/data-viz-ui/pull/246) [`f407d88`](https://github.com/devgateway/data-viz-ui/commit/f407d8824939175c89c8a54d8f1455838acb0346) Thanks [@timothygachengo](https://github.com/timothygachengo)! - add source url to downloaded image
+
 ## 1.8.2
 
 ### Patch Changes
