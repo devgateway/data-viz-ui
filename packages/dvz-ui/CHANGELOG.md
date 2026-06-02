@@ -1,5 +1,11 @@
 # @devgateway/dvz-ui-react
 
+## 1.8.4
+
+### Patch Changes
+
+- [#248](https://github.com/devgateway/data-viz-ui/pull/248) [`763435b`](https://github.com/devgateway/data-viz-ui/commit/763435b168b528c5b0a3a45552280484d26a11b4) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Fix inline list translations issue
+
 ## 1.8.3
 
 ### Patch Changes
