@@ -1,5 +1,11 @@
 # @devgateway/dvz-ui-react
 
+## 1.8.5
+
+### Patch Changes
+
+- [#250](https://github.com/devgateway/data-viz-ui/pull/250) [`63c63f6`](https://github.com/devgateway/data-viz-ui/commit/63c63f64ab0b56d73dcee4232b84ba2104478f9e) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Fix Inline List back to top
+
 ## 1.8.4
 
 ### Patch Changes
