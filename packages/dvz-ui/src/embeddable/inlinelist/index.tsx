@@ -5,7 +5,7 @@ import PostIntro from "../connected-templates/PostIntro";
 import PostContent from '../connected-templates/PostContent';
 import { injectIntl, WrappedComponentProps, useIntl } from 'react-intl';
 
-interface ListOfPostProps extends WrappedComponentProps {
+interface ListOfPostProps {
     posts: any[],
     showIcons: boolean,
     showContentToggle: boolean,
