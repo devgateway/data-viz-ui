@@ -2,8 +2,8 @@ import React, { RefObject, useEffect, useState } from 'react'
 import { Container, Grid, Label } from 'semantic-ui-react'
 import { MediaConsumer, MediaProvider, PostConsumer, PostIcon, PostProvider, utils } from "@devgateway/wp-react-lib";
 import PostIntro from "../connected-templates/PostIntro";
-import { useParams } from 'react-router';
 import PostContent from '../connected-templates/PostContent';
+import { injectIntl, WrappedComponentProps, useIntl } from 'react-intl';
 
 interface ListOfPostProps {
     posts: any[],
@@ -142,7 +142,7 @@ const ListOfPost: React.FC<ListOfPostProps> = (props) => {
 
 }
 
-interface InlineListProps {
+interface InlineListProps extends WrappedComponentProps {
     "data-width"?: string,
     "data-height"?: string,
     "data-type"?: string,
@@ -162,9 +162,10 @@ interface InlineListProps {
 }
 
 
-const Root: React.FC<InlineListProps> = (props) => {
+const Root = (props: InlineListProps) => {
     const [random, setRandomStore] = useState(Math.random() * (99999 - 1) + 1);
-    const { locale } = useParams();
+    const { locale } = useIntl();
+   
     const {
         "data-width": width,
         "data-height": height,
@@ -183,7 +184,6 @@ const Root: React.FC<InlineListProps> = (props) => {
         component, unique
 
     } = props
-
 
 
     return (
@@ -214,4 +214,4 @@ const Root: React.FC<InlineListProps> = (props) => {
 }
 
 
-export default Root
+export default injectIntl(React.memo(Root))
