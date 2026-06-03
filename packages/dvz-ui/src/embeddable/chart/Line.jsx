@@ -48,6 +48,63 @@ const lightenDarkenColor = (col, amt) => {
   return (usePound ? "#" : "") + (g | (b << 8) | (r << 16)).toString(16);
 };
 
+const normalizeSeriesId = (id) => {
+  if (id === null || id === undefined) {
+    return null;
+  }
+
+  return String(id);
+};
+
+const applyOpacityToColor = (color, opacity) => {
+  if (!color || opacity >= 1) {
+    return color;
+  }
+
+  if (color.startsWith("#")) {
+    let hex = color.slice(1);
+    if (hex.length === 3) {
+      hex = hex
+        .split("")
+        .map((c) => c + c)
+        .join("");
+    }
+
+    if (hex.length === 6) {
+      const r = parseInt(hex.slice(0, 2), 16);
+      const g = parseInt(hex.slice(2, 4), 16);
+      const b = parseInt(hex.slice(4, 6), 16);
+      return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+    }
+  }
+
+  if (color.startsWith("rgba(")) {
+    const parts = color
+      .replace("rgba(", "")
+      .replace(")", "")
+      .split(",")
+      .map((p) => p.trim());
+
+    if (parts.length >= 3) {
+      return `rgba(${parts[0]}, ${parts[1]}, ${parts[2]}, ${opacity})`;
+    }
+  }
+
+  if (color.startsWith("rgb(")) {
+    const parts = color
+      .replace("rgb(", "")
+      .replace(")", "")
+      .split(",")
+      .map((p) => p.trim());
+
+    if (parts.length >= 3) {
+      return `rgba(${parts[0]}, ${parts[1]}, ${parts[2]}, ${opacity})`;
+    }
+  }
+
+  return color;
+};
+
 const Chart = ({
   editing,
   previewMode,
@@ -60,7 +117,6 @@ const Chart = ({
   groupMode,
   reverse,
   marginLeft,
-  lineLabelPosition,
   marginTop,
   marginRight,
   marginBottom,
@@ -119,6 +175,7 @@ const Chart = ({
   const [newMarginBottom, setNewMarginBottom] = useState(marginBottom);
 
   const [filter, setFilter] = useState([]);
+  const [activeSeriesId, setActiveSeriesId] = useState(null);
 
 
 
@@ -451,12 +508,17 @@ const Chart = ({
     );
   };
 
+  const shouldRenderHoverPointLabels = showPoints;
+
   const layers = ["grid", "axes", "lines", "legends"];
   if (enableArea) {
     layers.push(AreaLayer);
   }
   if (showPoints) {
     layers.push("points");
+    if (shouldRenderHoverPointLabels) {
+      layers.push(ActiveSeriesPointLabelsLayer);
+    }
     layers.push("mesh");
   }
   if (highlightXAxisLine) {
@@ -571,6 +633,87 @@ const Chart = ({
   const baseLayers = ["grid", "axes", "lines", "legends"]
   const emptyLayers = ["grid", "axes", "legends"]
 
+  useEffect(() => {
+    if (!activeSeriesId) {
+      return;
+    }
+
+    const isVisible = filtered.some(
+      (seriesItem) => normalizeSeriesId(seriesItem.id) === activeSeriesId
+    );
+
+    if (!isVisible) {
+      setActiveSeriesId(null);
+    }
+  }, [activeSeriesId, filtered]);
+
+  const formatLinePointValue = (value) => {
+    return intl.formatNumber(
+      format.style === "percent" ? value / 100 : value,
+      format
+    );
+  };
+
+  function ActiveSeriesPointLabelsLayer({ series }) {
+    if (!activeSeriesId) {
+      return null;
+    }
+
+    const activeSeries = series.find(
+      (seriesItem) => normalizeSeriesId(seriesItem.id) === activeSeriesId
+    );
+
+    if (!activeSeries || !Array.isArray(activeSeries.data)) {
+      return null;
+    }
+
+    return (
+      <g>
+        {activeSeries.data.map((point, idx) => {
+          const pointValue = point?.data?.y;
+          if (pointValue === null || pointValue === undefined) {
+            return null;
+          }
+
+          const label = formatLinePointValue(pointValue);
+          const labelWidth = Math.max(32, label.length * 7 + 12);
+          const labelHeight = 20;
+
+          return (
+            <g
+              key={`${activeSeries.id}-${idx}`}
+              transform={`translate(${point.x}, ${point.y - 10})`}
+            >
+              <rect
+                x={-labelWidth / 2}
+                y={-labelHeight}
+                width={labelWidth}
+                height={labelHeight}
+                rx={10}
+                ry={10}
+                fill="#111827"
+                fillOpacity={0.92}
+              />
+              <text
+                textAnchor="middle"
+                y={-labelHeight / 2}
+                dominantBaseline="middle"
+                fill="#ffffff"
+                style={{
+                  fontSize: "11px",
+                  fontWeight: 600,
+                  pointerEvents: "none",
+                }}
+              >
+                {label}
+              </text>
+            </g>
+          );
+        })}
+      </g>
+    );
+  }
+
   if (options?.data && hasData > 0) {
     let filteredData = applyFilter(options.data)
     const xDomain = [];
@@ -665,17 +808,21 @@ const Chart = ({
           }
           enableGridY={enableGridY}
           enableGridX={enableGridX}
-          enablePointLabel={lineLabelPosition === 'top'}
+          enablePointLabel={false}
           pointLabel={(l) => {
-            return intl.formatNumber(
-              format.style === "percent" ? l.data.yFormatted / 100 : l.data.yFormatted,
-              format
-            );
+            return formatLinePointValue(l.data.yFormatted);
           }
           }
           lineWidth={3}
           colors={(d) => {
-            return colorGenerator.getColor(d.id, d);
+            const baseColor = colorGenerator.getColor(d.id, d);
+            const seriesId = normalizeSeriesId(d.id);
+
+            if (!activeSeriesId || seriesId === activeSeriesId) {
+              return baseColor;
+            }
+
+            return applyOpacityToColor(baseColor, 0.2);
           }}
           axisBottom={
             (isNotDesktopPreview || isNotEditingAndIsMobileCustomizationEnabled) && mobileConfigSettings?.xAxisDisabled === true ? null : {
@@ -723,6 +870,15 @@ const Chart = ({
           pointSize={10}
           pointBorderWidth={2}
           pointBorderColor={{ from: "serieColor" }}
+          onMouseEnter={(point) => {
+            const hoveredSeriesId = normalizeSeriesId(point?.serieId);
+            if (hoveredSeriesId) {
+              setActiveSeriesId(hoveredSeriesId);
+            }
+          }}
+          onMouseLeave={() => {
+            setActiveSeriesId(null);
+          }}
           useMesh={filteredData.length > 0 && filteredData[0].data.length > 0}
         />
 
