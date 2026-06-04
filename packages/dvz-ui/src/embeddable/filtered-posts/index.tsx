@@ -4,7 +4,6 @@ import { Container, Grid, GridRow, Loader, SemanticWIDTHS } from 'semantic-ui-re
 import PostIntro from "../connected-templates/PostIntro";
 import FilteredPostIntro from './FilteredPostsIntro';
 import { injectIntl, useIntl, WrappedComponentProps } from 'react-intl';
-import { getStartDateAndEndDateFromYear, resolveWpApiBase } from './utils';
 import NoData from './NoData';
 import { useDispatch, useSelector } from 'react-redux';
 import { getCustomPosts } from '../reducers/data-api';
@@ -193,35 +192,23 @@ const FilteredPosts = (props: FilteredPostsProps) => {
         };
     };
 
-    const buildYearRange = (years: number[]) => {
+    const buildYearsFilter = (years: number[]) => {
         if (!years || years.length === 0) {
             return null;
         }
 
-        const uniqueSortedYears = Array.from(new Set(years)).sort((a, b) => a - b);
-        if (uniqueSortedYears.length === 0) {
-            return null;
-        }
+        const uniqueSortedYears = Array.from(new Set(years))
+            .map((year) => Number(year))
+            .filter((year) => Number.isFinite(year) && year > 0)
+            .sort((a, b) => a - b);
 
-        const startYear = uniqueSortedYears[0];
-        const endYear = uniqueSortedYears[uniqueSortedYears.length - 1];
-        const startRange = getStartDateAndEndDateFromYear(startYear);
-        const endRange = getStartDateAndEndDateFromYear(endYear);
-
-        if (!startRange?.startDate || !endRange?.endDate) {
-            return null;
-        }
-
-        return {
-            startDate: startRange.startDate,
-            endDate: endRange.endDate
-        };
+        return uniqueSortedYears.length > 0 ? uniqueSortedYears : null;
     };
 
     const generateFilters = () => {
         const normalizedYearFilter = normalizeFilterValues(postsFilters.yearFilter);
-        const yearFilters = (!normalizedYearFilter.isExplicitNone)
-            ? buildYearRange(normalizedYearFilter.values)
+        const years = (!normalizedYearFilter.isExplicitNone)
+            ? buildYearsFilter(normalizedYearFilter.values)
             : null;
         const countryFilter = postsFilters.countryFilter ?? null;
         const categoryFilter = postsFilters.categoryFilter ?? null;
@@ -231,8 +218,7 @@ const FilteredPosts = (props: FilteredPostsProps) => {
         const countryTaxonomy = postsFilters.countryTaxonomy || null;
 
         return {
-            before: yearFilters?.endDate || null,
-            after: yearFilters?.startDate || null,
+            years,
             categoryFilter,
             categoryTaxonomy,
             countryFilter,
@@ -325,8 +311,9 @@ const FilteredPosts = (props: FilteredPostsProps) => {
 
         const categoryValues = effectiveCategoryValues ? effectiveCategoryValues.join(',') : undefined;
         const args = {
-            after: filters.after,
-            before: filters.before,
+            years: filters.years || undefined,
+            after: undefined,
+            before: undefined,
             perPage: Number(numberOfItemsPerPage || 10),
             page: postsFilters.page || 1,
             locale: locale || "en",
