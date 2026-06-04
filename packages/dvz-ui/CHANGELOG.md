@@ -1,5 +1,13 @@
 # @devgateway/dvz-ui-react
 
+## 1.8.6
+
+### Patch Changes
+
+- [#252](https://github.com/devgateway/data-viz-ui/pull/252) [`937f4b3`](https://github.com/devgateway/data-viz-ui/commit/937f4b3d32d1ab040a080f2c1ba64931d0b3a651) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Fix filtered-posts requests to support discrete multi-year filtering via the years query parameter instead of date-range expansion.
+
+  This prevents unrelated years from being included when users select non-consecutive years, and keeps request argument compatibility for custom posts fetching.
+
 ## 1.8.5
 
 ### Patch Changes
