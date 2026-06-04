@@ -121,14 +121,18 @@ export const getCustomPosts = ({ postType, taxonomy, category, taxonomyFilters, 
     if (page) queryParams.append("page", page.toString());
     if (locale) queryParams.append("lang", locale);
     if (after) queryParams.append("after", after.toISOString());
-    if (years && Array.isArray(years) && years.length > 0) {
-        const normalizedYears = years
-            .map((year) => Number(year))
-            .filter((year) => Number.isFinite(year) && year > 0);
-        if (normalizedYears.length > 0) {
-            queryParams.append("years", normalizedYears.join(','));
-        }
+if (years && Array.isArray(years) && years.length > 0) {
+    const normalizedYears = Array.from(
+        new Set(
+            years
+                .map((year) => Number(year))
+                .filter((year) => Number.isFinite(year) && year > 0)
+        )
+    ).sort((a, b) => a - b);
+    if (normalizedYears.length > 0) {
+        queryParams.append("years", normalizedYears.join(','));
     }
+}
 
     // append ordering
     if (ordering) queryParams.append("orderby", ordering);
