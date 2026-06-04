@@ -68,11 +68,13 @@ export const getData = ({ source, app, params }) => {
     return requestWithDeduplication(finalUrl);
 };
 
-export const getCustomPosts = ({ postType, taxonomy, category, taxonomyFilters, before, perPage, page, locale, after, ordering, orderingDirection, wpApiBase }) => {
+export const getCustomPosts = ({ postType, taxonomy, category, taxonomyFilters, before, perPage, page, locale, after, ordering, orderingDirection, years, wpApiBase }) => {
     const hasApiBase = wpApiBase !== undefined && wpApiBase !== null && wpApiBase !== "";
     const apiBase = hasApiBase ? wpApiBase : Config.REACT_APP_WP_API; 
-    const url = `${apiBase}/wp/v2/${postType}`;
+    const url = `${apiBase}/dg/v1/posts`;
     const queryParams = new URLSearchParams();
+
+    queryParams.append('post_type', postType || 'post');
 
     // Collect taxonomy values per key, then serialize as comma-separated lists
     const taxonomyToValues = new Map();
@@ -119,6 +121,14 @@ export const getCustomPosts = ({ postType, taxonomy, category, taxonomyFilters, 
     if (page) queryParams.append("page", page.toString());
     if (locale) queryParams.append("lang", locale);
     if (after) queryParams.append("after", after.toISOString());
+    if (years && Array.isArray(years) && years.length > 0) {
+        const normalizedYears = years
+            .map((year) => Number(year))
+            .filter((year) => Number.isFinite(year) && year > 0);
+        if (normalizedYears.length > 0) {
+            queryParams.append("years", normalizedYears.join(','));
+        }
+    }
 
     // append ordering
     if (ordering) queryParams.append("orderby", ordering);

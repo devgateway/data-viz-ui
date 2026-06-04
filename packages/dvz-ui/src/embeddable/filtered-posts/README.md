@@ -31,7 +31,7 @@ The component automatically uses the current locale from `react-intl` (`IntlProv
 
 ### Redux filter state
 The component reads from `state.data.posts[group]` and reacts to changes in:
-- `yearFilter` – date range (year → ISO date range via `getStartDateAndEndDateFromYear`)
+- `yearFilter` – explicit year list (sent to API as `years=YYYY,YYYY`), not a min/max date range
 - `categoryFilter` / `categoryTaxonomy` – category term IDs
 - `countryFilter` / `countryTaxonomy` – country term IDs
 - `page` / `itemsPerPage` – pagination
