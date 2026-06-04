@@ -4,7 +4,6 @@ import { Container, Grid, GridRow, Loader, SemanticWIDTHS } from 'semantic-ui-re
 import PostIntro from "../connected-templates/PostIntro";
 import FilteredPostIntro from './FilteredPostsIntro';
 import { injectIntl, useIntl, WrappedComponentProps } from 'react-intl';
-import { resolveWpApiBase } from './utils';
 import NoData from './NoData';
 import { useDispatch, useSelector } from 'react-redux';
 import { getCustomPosts } from '../reducers/data-api';
