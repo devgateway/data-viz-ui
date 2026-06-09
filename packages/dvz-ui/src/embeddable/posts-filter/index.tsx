@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
     Container
 } from "semantic-ui-react";
@@ -7,9 +7,9 @@ import { useAppDispatch } from "@/redux/hooks";
 import { useSelector } from "react-redux";
 import CategoricalFilter from "./CategoricalFilter";
 import YearFilter from "./YearFilter";
+import { injectIntl, useIntl, WrappedComponentProps } from "react-intl";
 
-
-interface PostsFilterProps {
+interface PostsFilterProps extends  WrappedComponentProps {
     "data-alphabetical-sort": boolean | string;
     "data-asc-order": boolean | string;
     "data-group": string;
@@ -31,6 +31,8 @@ interface PostsFilterProps {
     "data-type"?: string;
     "data-sort-first-by"?: string;
     "data-default-values"?: string;
+    "data-wordpress-source-type"?: string;
+    "data-wordpress-source"?: string;
     editing?: boolean;
 }
 const PostsFilter = (props: PostsFilterProps) => {
@@ -55,14 +57,17 @@ const PostsFilter = (props: PostsFilterProps) => {
         "data-type": type,
         "data-sort-first-by": sortFirstBy,
         "data-default-values": defaultValues = "[]",
+        "data-wordpress-source-type": wordpressSourceType,
+        "data-wordpress-source": wordpressSource,
         editing = false
     } = props;
 
     const dispatch = useAppDispatch();
+    const { locale } = useIntl();
     const filters: any = useSelector((state: any) => state.getIn(["data", "posts", group]));
     const postsFilters = filters || {};
     const isMultiSelectFilter = filterType === "multi-select";
-    const resetKey = useRef(0);
+    const [resetKey, setResetKey] = useState(0);
 
     const decode = (value: string) => {
         if (editing) {
@@ -114,74 +119,34 @@ const PostsFilter = (props: PostsFilterProps) => {
         return value || undefined;
     };
 
-    // Helper function to compare filter values
-    const areFilterValuesEqual = (a: any, b: any): boolean => {
-        if (Array.isArray(a) && Array.isArray(b)) {
-            if (a.length !== b.length) return false;
-            return a.every((val, idx) => val === b[idx]);
-        }
-        return a === b;
-    };
-
     // Memoize normalized filter values to prevent unnecessary re-renders
     const normalizedCountryFilter = useMemo(
         () => normalizeFilterValue(postsFilters.countryFilter, isMultiSelectFilter),
         [postsFilters.countryFilter, isMultiSelectFilter]
     );
+
     const normalizedCategoryFilter = useMemo(
         () => normalizeFilterValue(postsFilters.categoryFilter, isMultiSelectFilter),
         [postsFilters.categoryFilter, isMultiSelectFilter]
     );
+
     const normalizedYearFilter = useMemo(
         () => isYearFilterValue ? normalizeFilterValue(postsFilters.yearFilter, isMultiSelectFilter) : undefined,
         [postsFilters.yearFilter, isMultiSelectFilter, isYearFilterValue]
     );
 
-    const [selectedYear, setSelectedYear] = useState<any>(normalizedYearFilter);
-    const [selectedCountry, setSelectedCountry] = useState<any>(normalizedCountryFilter);
-    const [selectedCategory, setSelectedCategory] = useState<any>(normalizedCategoryFilter);
-
-    // Use refs to track previous values to avoid unnecessary updates
-    const prevFiltersRef = useRef({
-        countryFilter: normalizedCountryFilter,
-        categoryFilter: normalizedCategoryFilter,
-        yearFilter: normalizedYearFilter,
-        isMultiSelectFilter
-    });
-
-    useEffect(() => {
-        const prev = prevFiltersRef.current;
-
-        // Check if any filter values actually changed
-        const countryChanged = !areFilterValuesEqual(prev.countryFilter, normalizedCountryFilter);
-        const categoryChanged = !areFilterValuesEqual(prev.categoryFilter, normalizedCategoryFilter);
-        const yearChanged = isYearFilterValue && !areFilterValuesEqual(prev.yearFilter, normalizedYearFilter);
-        const multiSelectChanged = prev.isMultiSelectFilter !== isMultiSelectFilter;
-
-        if (countryChanged || categoryChanged || yearChanged || multiSelectChanged) {
-            if (countryChanged) {
-                setSelectedCountry(normalizedCountryFilter);
-            }
-            if (categoryChanged) {
-                setSelectedCategory(normalizedCategoryFilter);
-            }
-            if (yearChanged) {
-                setSelectedYear(normalizedYearFilter);
-            }
-
-            // Update ref with current values
-            prevFiltersRef.current = {
-                countryFilter: normalizedCountryFilter,
-                categoryFilter: normalizedCategoryFilter,
-                yearFilter: normalizedYearFilter,
-                isMultiSelectFilter
-            };
-        }
-    }, [normalizedCountryFilter, normalizedCategoryFilter, normalizedYearFilter, isMultiSelectFilter, isYearFilterValue]);
+    const categoriesArray = useMemo(() => {
+        if (!categories) return [];
+        const parsed = parse(categories);
+        if (Array.isArray(parsed)) return parsed;
+        if (typeof parsed === 'string' 
+            || typeof parsed === 'number'
+        ) return parsed.toString().split(',').filter(cat => cat.trim() !== '')
+        return [];
+    }, [categories, editing]);
 
 
     const handleYearChange = (value: any) => {
-        setSelectedYear(value);
         dispatch({
             type: "SET_POSTS_FILTER",
             group,
@@ -192,19 +157,10 @@ const PostsFilter = (props: PostsFilterProps) => {
             categoryFilter: postsFilters.categoryFilter,
             countryFilter: postsFilters.countryFilter,
             sortFirstBy: sortFirstByValue,
-            countryCategory: taxonomy,
-            categoryTaxonomy: taxonomy,
-            countryTaxonomy: taxonomy
         });
     }
 
     const handleCategoryChange = (value: string) => {
-        if (isCountryFilterValue) {
-            setSelectedCountry(value);
-        } else {
-            setSelectedCategory(value);
-        }
-
         dispatch({
             type: "SET_POSTS_FILTER",
             group,
@@ -212,9 +168,9 @@ const PostsFilter = (props: PostsFilterProps) => {
             // Preserve both filters so they can work together
             categoryFilter: isCountryFilterValue ? postsFilters.categoryFilter : value,
             countryFilter: isCountryFilterValue ? value : postsFilters.countryFilter,
-            isYearFilter: isYearFilterValue,
+            isYearFilter: postsFilters.isYearFilter,
             yearFilter: postsFilters.yearFilter,
-            isCountryFilter: isCountryFilterValue,
+            isCountryFilter: postsFilters.isCountryFilter,
             sortFirstBy: isCountryFilterValue ? sortFirstByValue : postsFilters.sortFirstBy,
             countryCategory: isCountryFilterValue ? taxonomy : postsFilters.countryCategory,
             categoryCategory: isCountryFilterValue ? postsFilters.categoryCategory : value,
@@ -227,24 +183,25 @@ const PostsFilter = (props: PostsFilterProps) => {
     useEffect(() => {
         const hasDefaultValues = defaultValuesArray.length > 0;
         const defaultValue = isMultiSelectFilter ? defaultValuesArray : defaultValuesArray[0];
+        const categoryValues = categoriesArray.map(Number);
 
         const categoryFilter = !isCountryFilterValue
             ? (hasDefaultValues
                 ? defaultValue
-                : (isMultiSelectFilter ? categories ? categories.split(',').map(Number) : [] : postsFilters.categoryFilter))
+                : (isMultiSelectFilter ? categoryValues : postsFilters.categoryFilter))
             : postsFilters.categoryFilter;
 
         const countryFilter = isCountryFilterValue
             ? (hasDefaultValues
                 ? defaultValue
-                : (isMultiSelectFilter ? categories ? categories.split(',').map(Number) : [] : postsFilters.countryFilter))
+                : (isMultiSelectFilter ? categoryValues : postsFilters.countryFilter))
             : postsFilters.countryFilter;
 
         const yearFilter = isYearFilterValue ?
             (isMultiSelectFilter ? yearOptions.length > 0 ? yearOptions.map((year: any) => year.value) : [] : postsFilters.yearFilter)
             : postsFilters.yearFilter;
 
-        dispatch({
+        const dispatchOptions = {
             type: "SET_INITIAL_POSTS_FILTER",
             group,
             categoryFilter,
@@ -253,32 +210,32 @@ const PostsFilter = (props: PostsFilterProps) => {
             isCountryFilter: isCountryFilterValue,
             sortFirstBy: sortFirstByValue,
             yearFilter: isYearFilterValue ? yearFilter : null,
-            categoryCategory: !isCountryFilterValue ? postsFilters.categoryCategory : null,
+            categoryCategory: !isCountryFilterValue ? categoryFilter : null,
             categoryTaxonomy: !isCountryFilterValue ? taxonomy : null,
-            countryCategory: isCountryFilterValue ? postsFilters.countryCategory : null,
+            countryCategory: isCountryFilterValue ? taxonomy : null,
             countryTaxonomy: isCountryFilterValue ? taxonomy : null,
             page: 1
-        });
+        }
+
+        dispatch(dispatchOptions);
 
     }, []);
 
+    /**
+     * Used for multi-select year filter to set all years as default value once they are loaded, 
+     * if there are no default values provided.
+     * This ensures that the filter shows all data by default and allows users to deselect specific years if needed.
+     */
     useEffect(() => {
-        if (isYearFilterValue && !yearFilterLoading) {
-
-
-            const yearFilter = isYearFilterValue ?
-                (isMultiSelectFilter ? yearOptions.length > 0 ? yearOptions.map((year: any) => year.value) : [] : postsFilters.yearFilter)
-                : postsFilters.yearFilter;
-
+        if (isYearFilterValue && !yearFilterLoading && isMultiSelectFilter && yearOptions.length > 0) {
+            const yearFilter = yearOptions.map((year: any) => year.value);
             dispatch({
                 type: "SET_INITIAL_POSTS_FILTER",
                 group,
-                ...postsFilters,
                 isYearFilter: isYearFilterValue,
-                yearFilter: isYearFilterValue ? yearFilter : null,
+                yearFilter,
             });
         }
-
     }, [yearFilterLoading]);
 
 
@@ -301,7 +258,7 @@ const PostsFilter = (props: PostsFilterProps) => {
                     alphabeticalSort={alphabeticalSortValue}
                     ascOrder={ascOrderValue}
                     options={yearOptions}
-                    value={selectedYear}
+                    value={normalizedYearFilter}
                     yearOptions={yearOptions}
                     setYearOptions={setYearOptions}
                     yearFilterLoading={yearFilterLoading}
@@ -309,7 +266,8 @@ const PostsFilter = (props: PostsFilterProps) => {
                     onChange={(_e, value) => {
                         handleYearChange(value as any);
                     }}
-                    resetKey={resetKey.current}
+                    resetKey={resetKey}
+                    wpApiBase={wordpressSource ?? undefined}
                 />
             )}
             {
@@ -329,15 +287,14 @@ const PostsFilter = (props: PostsFilterProps) => {
                         autoApply={autoApplyValue}
                         taxonomy={taxonomy}
                         type={type}
-                        value={isMultiSelectFilter
-                            ? (isCountryFilterValue ? selectedCountry : selectedCategory)
-                            : (isCountryFilterValue ? selectedCountry : selectedCategory)
-                        }
+                        value={isCountryFilterValue ? normalizedCountryFilter : normalizedCategoryFilter}
                         onChange={(_e, value) => {
                             handleCategoryChange(value as any);
                         }}
-                        categories={categories ? categories.split(',') : []}
-                        resetKey={resetKey.current}
+                        categories={categoriesArray}
+                        resetKey={resetKey}
+                        wpApiBase={wordpressSource ?? undefined}
+                        locale={locale}
                     />
 
                 )
@@ -348,4 +305,4 @@ const PostsFilter = (props: PostsFilterProps) => {
     );
 }
 
-export default PostsFilter;
+export default injectIntl(React.memo(PostsFilter));

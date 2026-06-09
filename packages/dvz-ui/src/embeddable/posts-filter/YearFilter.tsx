@@ -31,12 +31,13 @@ const YearFilter = (props: YearFilterProps) => {
         setYearOptions,
         yearFilterLoading,
         setYearFilterLoading,
+        wpApiBase,
         ...restProps
     } = props;
 
     const fetchYears = async () => {
         setYearFilterLoading(true);
-        const response: any = await getYearRange();
+        const response: any = await getYearRange(wpApiBase);
         const data = response.data;
         const yearOptionsData = data.map((year: any) => ({
             key: year,

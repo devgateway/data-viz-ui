@@ -1,7 +1,8 @@
 import {
     PageProvider,
     PageConsumer,
-    Page
+    Page,
+    Post
 } from "@devgateway/wp-react-lib"
 import React from 'react'
 import {useParams} from 'react-router';

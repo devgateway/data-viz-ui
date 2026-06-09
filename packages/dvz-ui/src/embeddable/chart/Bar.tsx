@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { Fragment, useEffect, useState } from "react";
 import Tooltip from "./Tooltip";
 import { ResponsiveBar } from "@nivo/bar";
@@ -465,11 +466,13 @@ const Chart = ({
 
   const rightLegendDynamicStyle = {
     bottom: `-${bottomSpacing}px`,
+    justifyContent: "flex-start",
   };
 
   const leftLegendDynamicStyle = {
     bottom: `-${bottomSpacing}px`,
     gap: "0px",
+    justifyContent: "flex-start",
     // top: "0px",
   };
 
@@ -1373,10 +1376,10 @@ const Chart = ({
     }
   }
 
-  let newHeight = parseInt(height + "") - newMarginBottom;
+  //let newHeight = parseInt(height + "") - newMarginBottom;
 
   return (
-    <div style={{ height: newHeight + "px" }} className="bar-chart">
+    <div style={{ height: height }}>
       {options?.data && options.data.length > 0 && (
         <>
           <ResponsiveBar
@@ -1609,7 +1612,16 @@ const Chart = ({
               <div
                 className={`legends container has-standard-12-font-size ${legendPosition}`}
                 style={
-                  legendPosition === "bottom" ? { marginBottom: `${newMarginBottom}px` } : {}
+                  legendPosition === "bottom"
+                    ? {
+                        marginBottom: `${newMarginBottom}px`,
+                        marginTop: "25px",
+                        textAlign: "left",
+                        justifyContent: "flex-start",
+                      }
+                    : {
+                        justifyContent: "flex-start",
+                      }
                 }
               >
                 <div className="legend-sections">

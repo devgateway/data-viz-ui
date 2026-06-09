@@ -3,10 +3,9 @@ import type { Route } from "./+types/slug";
 import { getPages } from "@devgateway/wp-react-lib";
 import { getMetaSeo } from "~/utils/meta-seo";
 import { SlugContainer } from '@devgateway/dvz-ui-react/layout'
-import Header from "~/embeddable/Header";
 import { getApiUrl } from "~/utils/api-utils";
 
-export async function loader({ request, params }: Route.LoaderArgs) {
+export async function loader({ request, params}: Route.LoaderArgs) {
   const posts = await getPages({
     slug: params.slug ?? "home",
     locale: params.lan,
@@ -15,9 +14,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 
   const findPost = posts.data.find(post => post.slug === params.slug);
   if (!findPost) {
-    return {
-      post: null,
-    }
+    return new Response("Page not found", { status: 404 });
   }
 
   return {
@@ -30,20 +27,16 @@ export function meta({ data }: Route.MetaArgs): Route.MetaDescriptors {
   const yoastHead = post?.yoast_head_json ?? {};
   if (!post || !yoastHead) {
     return [
-      { title: "" },
-      { name: "description", content: "" },
+      { title: "Page not found" },
+      { name: "description", content: "Page not found" },
     ];
   }
 
   return getMetaSeo(post, yoastHead);
 }
 
-const SlugRoute = ({ loaderData, params }: Route.ComponentProps) => {
-  if (!loaderData.post) {
-    return <div>Page not found</div>;
-  }
-
-  return <SlugContainer pages={loaderData.post} />;
+const SlugRoute = ({ loaderData }: Route.ComponentProps) => {
+  return <SlugContainer pages={loaderData.post}/>;
 };
 
 export default SlugRoute;

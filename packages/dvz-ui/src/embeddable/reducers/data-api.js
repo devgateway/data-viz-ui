@@ -58,8 +58,7 @@ export const getCategories = ({ app, params }) => {
 };
 
 export const getCategory = ({ app, type, params }) => {
-    const finalUrl = `${API_ROOT ? API_ROOT : ''}/api/${app}/categories/${type}${params ? '?' + queryParams(params) : ''}`
-    console.log("categories==>", finalUrl)
+    const finalUrl = `${API_ROOT ? API_ROOT : ''}/api/${app}/categories/${type}${params ? '?' + queryParams(params) : ''}`;
 
     return requestWithDeduplication(finalUrl)
 }
@@ -69,9 +68,13 @@ export const getData = ({ source, app, params }) => {
     return requestWithDeduplication(finalUrl);
 };
 
-export const getCustomPosts = ({ postType, taxonomy, category, taxonomyFilters, before, perPage, page, locale, after, ordering, orderingDirection }) => {
-    const url = `${Config.REACT_APP_WP_API}/wp/v2/${postType}`;
+export const getCustomPosts = ({ postType, taxonomy, category, taxonomyFilters, before, perPage, page, locale, after, ordering, orderingDirection, years, wpApiBase }) => {
+    const hasApiBase = wpApiBase !== undefined && wpApiBase !== null && wpApiBase !== "";
+    const apiBase = hasApiBase ? wpApiBase : Config.REACT_APP_WP_API; 
+    const url = `${apiBase}/dg/v1/posts`;
     const queryParams = new URLSearchParams();
+
+    queryParams.append('post_type', postType || 'post');
 
     // Collect taxonomy values per key, then serialize as comma-separated lists
     const taxonomyToValues = new Map();
@@ -98,7 +101,8 @@ export const getCustomPosts = ({ postType, taxonomy, category, taxonomyFilters, 
     }
 
     // Backwards compatibility: support legacy single taxonomy+category params
-    if (taxonomy && category != null) {
+    // Only add if not already covered by taxonomyFilters to avoid duplicate query params.
+    if (taxonomy && category != null && !taxonomyToValues.has(taxonomy)) {
         addTaxValues(taxonomy, category);
     }
 
@@ -115,8 +119,20 @@ export const getCustomPosts = ({ postType, taxonomy, category, taxonomyFilters, 
     if (before) queryParams.append("before", before.toISOString());
     if (perPage) queryParams.append("per_page", perPage.toString());
     if (page) queryParams.append("page", page.toString());
-    if (locale) queryParams.append("locale", locale);
+    if (locale) queryParams.append("lang", locale);
     if (after) queryParams.append("after", after.toISOString());
+if (years && Array.isArray(years) && years.length > 0) {
+    const normalizedYears = Array.from(
+        new Set(
+            years
+                .map((year) => Number(year))
+                .filter((year) => Number.isFinite(year) && year > 0)
+        )
+    ).sort((a, b) => a - b);
+    if (normalizedYears.length > 0) {
+        queryParams.append("years", normalizedYears.join(','));
+    }
+}
 
     // append ordering
     if (ordering) queryParams.append("orderby", ordering);
@@ -127,8 +143,7 @@ export const getCustomPosts = ({ postType, taxonomy, category, taxonomyFilters, 
     return get(`${url}?${queryString}`, {
         headers: {
             'Content-Type': 'application/json',
-        },
-        credentials: 'include',
+        }, 
     }, true);
 
 };

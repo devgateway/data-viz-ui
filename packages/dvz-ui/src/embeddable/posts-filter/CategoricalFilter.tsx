@@ -6,6 +6,8 @@ interface CategoricalFilterProps extends PostFilterDropdownProps {
     taxonomies?: any[] | null
     type?: string;
     categories?: any[] | null;
+    wpApiBase?: string;
+    locale?: string;
 }
 
 const CategoricalFilter = (props: CategoricalFilterProps) => {
@@ -27,11 +29,12 @@ const CategoricalFilter = (props: CategoricalFilterProps) => {
         type,
         categories,
         onChange,
+        wpApiBase,
+        locale,
         ...restProps
     } = props;
 
     const [taxonomyOptions, setTaxonomyOptions] = useState([]);
-
 
     const getPostTypeBySlug = async () => {
         if (!taxonomy || taxonomy === "none") {
@@ -39,7 +42,10 @@ const CategoricalFilter = (props: CategoricalFilterProps) => {
             return;
         };
 
-        const response: any = await fetch(Config.REACT_APP_WP_API + "/wp/v2/" + taxonomy);
+        const hasApiBase = wpApiBase !== undefined && wpApiBase !== null && wpApiBase !== "";
+        const apiBase = hasApiBase ? wpApiBase : Config.REACT_APP_WP_API; 
+        const langParam = locale ? `?lang=${locale}` : "?lang=en";
+        const response: any = await fetch(apiBase + "/wp/v2/" + taxonomy + langParam);
         const data = await response.json();
 
         if (data) {
@@ -49,7 +55,12 @@ const CategoricalFilter = (props: CategoricalFilterProps) => {
                 text: taxonomy.name
             }));
             if (categories) {
-                const filteredTaxonomyOptions = taxonomyOptions.filter((option: any) => categories.indexOf(option.value.toString()) > -1);
+                const normalizedCategories = categories
+                    .map((category: any) => Number(category))
+                    .filter((category: number) => !Number.isNaN(category));
+                const filteredTaxonomyOptions = taxonomyOptions.filter(
+                    (option: any) => normalizedCategories.indexOf(Number(option.value)) > -1
+                );
                 setTaxonomyOptions([])
                 setTaxonomyOptions(filteredTaxonomyOptions);
             } else {
@@ -69,7 +80,7 @@ const CategoricalFilter = (props: CategoricalFilterProps) => {
         return () => {
             ignore = true;
         }
-    }, [type,taxonomy, categories]);
+    }, [type, taxonomy, categories, wpApiBase, locale]);
 
     return (
         <PostsFilterDropdown

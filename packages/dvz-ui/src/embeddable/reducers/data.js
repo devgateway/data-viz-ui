@@ -21,6 +21,9 @@ const UNSET_FILTER = 'UNSET_FILTER'
 const initialState = Immutable.Map({ mode: 'info' })
 const SET_MEASURES = 'SET_MEASURES'
 const CLEAN_MEASURES = 'CLEAN_MEASURES'
+const SET_POSTS_PAGINATION = 'SET_POSTS_PAGINATION'
+const SET_POSTS_FILTER = 'SET_POSTS_FILTER'
+const SET_INITIAL_POSTS_FILTER = 'SET_INITIAL_POSTS_FILTER'
 export const cleanMeasures = ({ app, group }) => (dispatch, getState) => {
     dispatch({ type: CLEAN_MEASURES, app, group })
 }
@@ -407,6 +410,54 @@ export default (state = initialState, action) => {
             const { app, group, measure } = action
             return state.deleteIn(['measures', app, group])
 
+        }
+
+        case SET_POSTS_PAGINATION: {
+            const { group, totalPages, totalItems } = action;
+            return state.setIn(['postsPagination', group], { totalPages, totalItems });
+        }
+
+        case SET_POSTS_FILTER: {
+            const { type: _type, group, ...data } = action;
+            return state.setIn(['posts', group], data);
+        }
+
+        case SET_INITIAL_POSTS_FILTER: {
+            const { type: _type, group, ...data } = action;
+
+            /* On an explicit reset the incoming data IS the initial snapshot (spread from
+             * initialFilters). We must do a full replace so that null values (e.g.
+             * yearFilter: null) are restored instead of being skipped by the merge below.
+             * Keep the initialFilters snapshot untouched.
+             */
+            if (data.reset) {
+                const { reset: _reset, ...resetData } = data;
+                return state
+                    .setIn(['posts', group], resetData)
+                    .setIn(['posts', 'initialFilters', group], state.getIn(['posts', 'initialFilters', group]));
+            }
+
+            /* Merge with existing state to handle the race condition where multiple
+             * PostsFilter components sharing a group (e.g. category + country) each
+            * dispatch SET_INITIAL_POSTS_FILTER on mount while both read empty Redux
+            * state.  The full-replace strategy meant whichever filter dispatched last
+            * wiped the other filter's taxonomy values (countryTaxonomy / categoryTaxonomy)
+            * to null.  We now merge: incoming non-null values win; existing non-null
+            * values are preserved when the incoming value is null/undefined.  */
+            // */
+            const existing = state.getIn(['posts', group]) || {};
+            const merged = { ...existing };
+            Object.keys(data).forEach(key => {
+                const inVal = data[key];
+                if (inVal !== null && inVal !== undefined) {
+                    merged[key] = inVal;
+                } else if (!(key in merged)) {
+                    merged[key] = inVal;
+                }
+            });
+            return state
+                .setIn(['posts', group], merged)
+                .setIn(['posts', 'initialFilters', group], merged);
         }
 
         default:

@@ -55,7 +55,8 @@ export default defineConfig({
                 'react/jsx-runtime',
                 'react-dom',
                 'react-dom/client',
-                'core-js'
+                'core-js',
+                'clsx'
             ],
             input: {
                 index: resolve(__dirname, 'src/index.ts'),

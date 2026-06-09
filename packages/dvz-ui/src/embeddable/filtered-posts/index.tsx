@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import type { PostType } from '@devgateway/wp-react-lib';
 import { Container, Grid, GridRow, Loader, SemanticWIDTHS } from 'semantic-ui-react';
 import PostIntro from "../connected-templates/PostIntro";
-import { injectIntl, WrappedComponentProps } from 'react-intl';
-import { getStartDateAndEndDateFromYear } from './utils';
+import FilteredPostIntro from './FilteredPostsIntro';
+import { injectIntl, useIntl, WrappedComponentProps } from 'react-intl';
 import NoData from './NoData';
 import { useDispatch, useSelector } from 'react-redux';
 import { getCustomPosts } from '../reducers/data-api';
@@ -17,6 +17,9 @@ interface PostGridContentProps {
     countryCategory: string;
     postWidth: number;
     postHeight: number;
+    wordpressSourceType?: string;
+    wordpressSource?: string;
+    locale: string;
 }
 
 interface NormalizedFilterValues {
@@ -25,7 +28,7 @@ interface NormalizedFilterValues {
 }
 
 const PostGridContent = (props: PostGridContentProps) => {
-    const { posts, numberOfColumns, sortFirstBy, countryCategory, postWidth, postHeight } = props;
+    const { posts, numberOfColumns, sortFirstBy, countryCategory, postWidth, postHeight, locale } = props;
 
     const allPosts: any[] = [];
 
@@ -40,6 +43,8 @@ const PostGridContent = (props: PostGridContentProps) => {
         allPosts.push(...posts);
     }
 
+    const isInternalSource = props.wordpressSourceType === "internal" || !props.wordpressSourceType;
+
     return (
         <Grid className={"filtered-posts"} columns={numberOfColumns as unknown as SemanticWIDTHS}>
             <GridRow>
@@ -47,19 +52,37 @@ const PostGridContent = (props: PostGridContentProps) => {
                     allPosts.map((post) => (
                         <Grid.Column key={post.id}>
                             <div className={"filtered-posts-column"} style={{ width: postWidth, height: postHeight, overflow: 'hidden' }}>
-                                <PostIntro
-                                    style={{
-                                        width: '100%',
-                                        height: '100%',
-                                        overflow: 'hidden',
-                                        margin: 0,
-                                        padding: 0,
-                                    }}
-                                    key={post.id}
-                                    as={Container}
-                                    fluid
-                                    post={post}
-                                />
+                                {isInternalSource ? (
+                                    <PostIntro
+                                        style={{
+                                            width: '100%',
+                                            height: '100%',
+                                            overflow: 'hidden',
+                                            margin: 0,
+                                            padding: 0,
+                                        }}
+                                        key={post.id}
+                                        as={Container}
+                                        fluid
+                                        post={post}
+                                    />
+                                ) : (
+                                    <FilteredPostIntro
+                                        style={{
+                                            width: '100%',
+                                            height: '100%',
+                                            overflow: 'hidden',
+                                            margin: 0,
+                                            padding: 0,
+                                        }}
+                                        key={post.id}
+                                        as={Container}
+                                        fluid
+                                        post={post}
+                                        locale={locale}
+                                    />
+                                )}
+
                             </div>
 
                         </Grid.Column>
@@ -87,6 +110,10 @@ interface FilteredPostsProps extends WrappedComponentProps {
     "data-sort-first-by": number | string;
     "data-sorting-type": string;
     "data-sorting-taxonomy": string;
+    "data-wordpress-source-type"?: string;
+    "data-wordpress-source"?: string;
+    "data-no-data-msg"?: string;
+    "data-clear-filter-msg"?: string;
     editing?: boolean;
 }
 
@@ -98,7 +125,7 @@ const FilteredPosts = (props: FilteredPostsProps) => {
         "data-number-of-columns": numberOfColumns,
         "data-type": type,
         "data-taxonomy": taxonomy,
-        "data-categories": categories,
+        "data-categories": categories = "[]",
         "data-height": _height,
         "data-post-width": postWidth,
         "data-post-height": postHeight,
@@ -106,15 +133,26 @@ const FilteredPosts = (props: FilteredPostsProps) => {
         "data-enable-sorting": enableSorting,
         "data-sort-first-by": sortFirstBy,
         "data-sorting-taxonomy": sortingTaxonomy,
+        "data-wordpress-source-type": wordpressSourceType,
+        "data-wordpress-source": wordpressSource,
+        "data-no-data-msg": noDataMsg,
+        "data-clear-filter-msg": clearFilterMsg,
         editing,
     } = props;
 
+
     const dispatch = useDispatch();
-    const { locale } = useParams();
+    const { locale } = useIntl();
+
 
     const [loading, setLoading] = useState(false);
+    // Tracks the latest getPosts() call so responses from superseded calls are discarded.
+    const requestIdRef = useRef(0);
+
     const postsReducer: any = useSelector((state: any) => state).getIn(["data", "posts", group]);
     const [posts, setPosts] = useState<any>([]);
+    const containerRef = useRef<HTMLDivElement>(null);
+    const [minHeight, setMinHeight] = useState<number | undefined>(undefined);
     const enableSortingValue = toBoolean(enableSorting);
 
     const sortFirstByValue = (enableSortingValue && sortFirstBy !== "none") ? toNumber(sortFirstBy) : null;
@@ -154,35 +192,23 @@ const FilteredPosts = (props: FilteredPostsProps) => {
         };
     };
 
-    const buildYearRange = (years: number[]) => {
+    const buildYearsFilter = (years: number[]) => {
         if (!years || years.length === 0) {
             return null;
         }
 
-        const uniqueSortedYears = Array.from(new Set(years)).sort((a, b) => a - b);
-        if (uniqueSortedYears.length === 0) {
-            return null;
-        }
+        const uniqueSortedYears = Array.from(new Set(years))
+            .map((year) => Number(year))
+            .filter((year) => Number.isFinite(year) && year > 0)
+            .sort((a, b) => a - b);
 
-        const startYear = uniqueSortedYears[0];
-        const endYear = uniqueSortedYears[uniqueSortedYears.length - 1];
-        const startRange = getStartDateAndEndDateFromYear(startYear);
-        const endRange = getStartDateAndEndDateFromYear(endYear);
-
-        if (!startRange?.startDate || !endRange?.endDate) {
-            return null;
-        }
-
-        return {
-            startDate: startRange.startDate,
-            endDate: endRange.endDate
-        };
+        return uniqueSortedYears.length > 0 ? uniqueSortedYears : null;
     };
 
     const generateFilters = () => {
         const normalizedYearFilter = normalizeFilterValues(postsFilters.yearFilter);
-        const yearFilters = (!normalizedYearFilter.isExplicitNone)
-            ? buildYearRange(normalizedYearFilter.values)
+        const years = (!normalizedYearFilter.isExplicitNone)
+            ? buildYearsFilter(normalizedYearFilter.values)
             : null;
         const countryFilter = postsFilters.countryFilter ?? null;
         const categoryFilter = postsFilters.categoryFilter ?? null;
@@ -192,8 +218,7 @@ const FilteredPosts = (props: FilteredPostsProps) => {
         const countryTaxonomy = postsFilters.countryTaxonomy || null;
 
         return {
-            before: yearFilters?.endDate || null,
-            after: yearFilters?.startDate || null,
+            years,
             categoryFilter,
             categoryTaxonomy,
             countryFilter,
@@ -244,6 +269,10 @@ const FilteredPosts = (props: FilteredPostsProps) => {
     };
 
     const getPosts = async () => {
+        const requestId = ++requestIdRef.current;
+        if (containerRef.current) {
+            setMinHeight(containerRef.current.offsetHeight);
+        }
         setLoading(true);
         const filters = generateFilters();
 
@@ -282,8 +311,9 @@ const FilteredPosts = (props: FilteredPostsProps) => {
 
         const categoryValues = effectiveCategoryValues ? effectiveCategoryValues.join(',') : undefined;
         const args = {
-            after: filters.after,
-            before: filters.before,
+            years: filters.years || undefined,
+            after: undefined,
+            before: undefined,
             perPage: Number(numberOfItemsPerPage || 10),
             page: postsFilters.page || 1,
             locale: locale || "en",
@@ -293,9 +323,12 @@ const FilteredPosts = (props: FilteredPostsProps) => {
             taxonomyFilters,
             ordering: "date",
             orderingDirection: "desc",
+            wpApiBase: wordpressSource ?? undefined,
         };
 
         await getCustomPosts(args).then((response: any) => {
+            // Discard responses from superseded requests (stale-request race condition).
+            if (requestId !== requestIdRef.current) return;
             if (response) {
                 let postsData: any[] | null = null;
                 let metaData: any = null;
@@ -315,7 +348,7 @@ const FilteredPosts = (props: FilteredPostsProps) => {
                     const totalPages = metaData['x-wp-totalpages'] ? metaData['x-wp-totalpages'] : 1;
                     const totalItems = metaData['x-wp-total'] ? metaData['x-wp-total'] : 0;
 
-                    if (totalPages && totalItems) {
+                    if (totalPages) {
                         dispatch({
                             type: 'SET_POSTS_PAGINATION',
                             group,
@@ -328,11 +361,17 @@ const FilteredPosts = (props: FilteredPostsProps) => {
                 setPosts([]);
             }
         }).finally(() => {
-            setLoading(false);
+            // Only update loading state if this is still the latest request.
+            if (requestId === requestIdRef.current) {
+                setLoading(false);
+                setMinHeight(undefined);
+            }
         });
     }
 
+
     useEffect(() => {
+        if (!type) return;
         (async () => {
             await getPosts();
         })();
@@ -340,23 +379,31 @@ const FilteredPosts = (props: FilteredPostsProps) => {
 
 
     return (
-        <Container fluid>
-            {
-                loading ? (
-                    <Loader active inline='centered' />
-                ) : !loading && posts && posts.length > 0 ? (
-                    <PostGridContent
-                        posts={posts}
-                        postWidth={Number(postWidth)}
-                        postHeight={Number(postHeight)}
-                        numberOfColumns={Number(numberOfColumns)}
-                        sortFirstBy={sortFirstByValue}
-                        countryCategory={sortingTaxonomy} />
-                ) : (
-                    <NoData noDataMsg="No posts found" group={group} />
-                )
-            }
-        </Container>
+        <div ref={containerRef} id={`filtered-posts-${group}`} style={minHeight !== undefined ? { minHeight, border: '1px solid #e0e0e0', borderRadius: '4px' } : undefined}>
+            <Container fluid>
+                {
+                    loading ? (
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: minHeight ?? '100%' }}>
+                            <Loader active inline='centered' />
+                        </div>
+                    ) : !loading && posts && posts.length > 0 ? (
+                        <PostGridContent
+                            posts={posts}
+                            postWidth={Number(postWidth)}
+                            postHeight={Number(postHeight)}
+                            numberOfColumns={Number(numberOfColumns)}
+                            sortFirstBy={sortFirstByValue}
+                            countryCategory={sortingTaxonomy}
+                            wordpressSourceType={wordpressSourceType}
+                            wordpressSource={wordpressSource}
+                            locale={locale}
+                        />
+                    ) : (
+                        <NoData noDataMsg={noDataMsg} clearFilterMsg={clearFilterMsg} group={group} />
+                    )
+                }
+            </Container>
+        </div>
     )
 }
 

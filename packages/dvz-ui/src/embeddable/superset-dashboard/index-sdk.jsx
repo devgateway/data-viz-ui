@@ -2,16 +2,21 @@ import React, { useEffect } from "react";
 import { embedDashboard } from "@superset-ui/embedded-sdk";
 import { connect } from "react-redux";
 
-async function fetchAccessToken(supersetUrl) {
+async function fetchAccessToken(supersetUrl, username, password) {
   if (!supersetUrl) {
     console.error("Superset URL is missing or blank.");
     return null;
   }
 
+  if (!username || !password) {
+    console.error("Superset credentials are missing.");
+    return null;
+  }
+
   try {
     const body = {
-      username: "token", 
-      password: "token",
+      username,
+      password,
       provider: "db",
       refresh: true,
     };
@@ -38,13 +43,13 @@ async function fetchAccessToken(supersetUrl) {
   }
 }
 
-async function fetchGuestToken(dashboardId, supersetUrl) {
+async function fetchGuestToken(dashboardId, supersetUrl, username, password) {
   if (!dashboardId || !supersetUrl) {
     console.error("Dashboard ID or Superset URL is missing.");
     return null;
   }
 
-  const accessToken = await fetchAccessToken(supersetUrl);
+  const accessToken = await fetchAccessToken(supersetUrl, username, password);
   if (!accessToken) {
     console.error("Access token is missing.");
     return null;
@@ -95,11 +100,12 @@ async function fetchGuestToken(dashboardId, supersetUrl) {
 const Component = (props) => {
   const {
     unique,
-   // "data-selected-dashboard-id": selectedDashboardId = "",
+    "data-selected-dashboard-id": selectedDashboardId = "",
     "data-apache-superset-url": apacheSupersetUrl = "",
+    "data-superset-username": supersetUsername = "",
+    "data-superset-password": supersetPassword = "",
   } = props;
 
-  const selectedDashboardId = "a33a2445-1bd5-46e8-b752-76e2bb72e973";
   useEffect(() => {
     if (!apacheSupersetUrl) {
       console.error("Superset URL is blank in props.");
@@ -108,7 +114,7 @@ const Component = (props) => {
 
     const embed = async () => {
       try {
-        const guestToken = await fetchGuestToken(selectedDashboardId, apacheSupersetUrl);
+        const guestToken = await fetchGuestToken(selectedDashboardId, apacheSupersetUrl, supersetUsername, supersetPassword);
         if (!guestToken) {
           console.error("Failed to fetch guest token.");
           return;
@@ -136,7 +142,7 @@ const Component = (props) => {
     if (document.getElementById(`dashboard-${unique}`)) {
       embed();
     }
-  }, [unique, selectedDashboardId, apacheSupersetUrl]);
+  }, [unique, selectedDashboardId, apacheSupersetUrl, supersetUsername, supersetPassword]);
 
   return <div id={`dashboard-${unique}`}></div>;
 };

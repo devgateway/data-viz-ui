@@ -14,11 +14,17 @@
     "dev": "pnpm --filter @devgateway/* dev"
   },
   "keywords": [],
-  "author": "",
-  "license": "MIT",
+  "author": "Sebastian Dimunzio <sdimunzio@gmail.com>",
+  "contributors": [
+    "Timothy Gachengo (https://github.com/timothygachengo)"
+  ],
+  "license": "Apache-2.0",
   "packageManager": "pnpm@10.10.0",
   "devDependencies": {
     "@changesets/changelog-github": "^0.5.1",
     "@changesets/cli": "^2.29.7"
+  },
+  "dependencies": {
+    "clsx": "^2.1.1"
   }
 }

@@ -1,9 +1,9 @@
-import React, { RefObject, useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Container, Grid, Label } from 'semantic-ui-react'
 import { MediaConsumer, MediaProvider, PostConsumer, PostIcon, PostProvider, utils } from "@devgateway/wp-react-lib";
 import PostIntro from "../connected-templates/PostIntro";
-import { useParams } from 'react-router';
 import PostContent from '../connected-templates/PostContent';
+import { injectIntl, WrappedComponentProps, useIntl } from 'react-intl';
 
 interface ListOfPostProps {
     posts: any[],
@@ -17,8 +17,8 @@ interface ListOfPostProps {
 
 const ListOfPost: React.FC<ListOfPostProps> = (props) => {
     const { posts, showIcons, showContentToggle, contentToggleHPosition, locale, readMoreLabel, readLessLabel } = props
-    const [toggleState, setToggleState] = useState({});
-    const postTopRef: RefObject<HTMLDivElement> = React.createRef();
+    const [toggleState, setToggleState] = useState<Record<string, boolean>>({});
+    const postTopRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
     const getTranslatedLabel = (label?: string, fallback: string = 'Read More') => {
         return label && label.trim() !== '' ? label : fallback;
@@ -52,9 +52,9 @@ const ListOfPost: React.FC<ListOfPostProps> = (props) => {
                                      contentToggleHPosition < 66 ? 'center' : 'flex-end' 
                 }}>
                     <a className="link" onClick={() => {
-                        if (postTopRef.current && show) {
-                            postTopRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
-                            postTopRef.current.scrollTop = 0; // scroll postTopRef back to top
+                        if (show && postTopRefs.current[slug]) {
+                            postTopRefs.current[slug]?.scrollIntoView({ behavior: "smooth", block: "start" });
+                            postTopRefs.current[slug]!.scrollTop = 0; // scroll postTopRef back to top
                         }
                         setToggleState({ ...toggleState, [slug]: !show })
                     }}>
@@ -103,8 +103,9 @@ const ListOfPost: React.FC<ListOfPostProps> = (props) => {
                             </Grid.Column>
                         )}
                         <Grid.Column width={showIcons ? 15 : 16}>
+                            <div ref={(el) => { postTopRefs.current[p.slug] = el; }}>
                             {getIntro(p) && (
-                                <PostIntro as={Container} fluid post={p} ref={postTopRef} />
+                                <PostIntro as={Container} fluid post={p} />
                             )}
                             {!getIntro(p) && (
                                 <PostContent
@@ -134,6 +135,7 @@ const ListOfPost: React.FC<ListOfPostProps> = (props) => {
                                     )}
                                 </Container>
                             )}
+                            </div>
                         </Grid.Column>
                     </Grid>
                 ))}
@@ -142,7 +144,7 @@ const ListOfPost: React.FC<ListOfPostProps> = (props) => {
 
 }
 
-interface InlineListProps {
+interface InlineListProps extends WrappedComponentProps {
     "data-width"?: string,
     "data-height"?: string,
     "data-type"?: string,
@@ -162,9 +164,10 @@ interface InlineListProps {
 }
 
 
-const Root: React.FC<InlineListProps> = (props) => {
+const Root = (props: InlineListProps) => {
     const [random, setRandomStore] = useState(Math.random() * (99999 - 1) + 1);
-    const { locale } = useParams();
+    const { locale } = useIntl();
+   
     const {
         "data-width": width,
         "data-height": height,
@@ -183,7 +186,6 @@ const Root: React.FC<InlineListProps> = (props) => {
         component, unique
 
     } = props
-
 
 
     return (
@@ -214,4 +216,4 @@ const Root: React.FC<InlineListProps> = (props) => {
 }
 
 
-export default Root
+export default injectIntl(React.memo(Root))

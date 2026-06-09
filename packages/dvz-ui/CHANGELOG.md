@@ -1,5 +1,138 @@
 # @devgateway/dvz-ui-react
 
+## 1.8.6
+
+### Patch Changes
+
+- [#252](https://github.com/devgateway/data-viz-ui/pull/252) [`937f4b3`](https://github.com/devgateway/data-viz-ui/commit/937f4b3d32d1ab040a080f2c1ba64931d0b3a651) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Fix filtered-posts requests to support discrete multi-year filtering via the years query parameter instead of date-range expansion.
+
+  This prevents unrelated years from being included when users select non-consecutive years, and keeps request argument compatibility for custom posts fetching.
+
+## 1.8.5
+
+### Patch Changes
+
+- [#250](https://github.com/devgateway/data-viz-ui/pull/250) [`63c63f6`](https://github.com/devgateway/data-viz-ui/commit/63c63f64ab0b56d73dcee4232b84ba2104478f9e) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Fix Inline List back to top
+
+## 1.8.4
+
+### Patch Changes
+
+- [#248](https://github.com/devgateway/data-viz-ui/pull/248) [`763435b`](https://github.com/devgateway/data-viz-ui/commit/763435b168b528c5b0a3a45552280484d26a11b4) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Fix inline list translations issue
+
+## 1.8.3
+
+### Patch Changes
+
+- [#246](https://github.com/devgateway/data-viz-ui/pull/246) [`f407d88`](https://github.com/devgateway/data-viz-ui/commit/f407d8824939175c89c8a54d8f1455838acb0346) Thanks [@timothygachengo](https://github.com/timothygachengo)! - add source url to downloaded image
+
+## 1.8.2
+
+### Patch Changes
+
+- [#241](https://github.com/devgateway/data-viz-ui/pull/241) [`4761099`](https://github.com/devgateway/data-viz-ui/commit/4761099f537adf6b72143ae60ef2e7433865bae7) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Fix download radio buttons styling
+
+- [#243](https://github.com/devgateway/data-viz-ui/pull/243) [`d0a4f75`](https://github.com/devgateway/data-viz-ui/commit/d0a4f75edfd7c789b237813e6ae3b48b12ba8f5f) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Fix radio button for measures by using the semantic ui radio button over input type radio
+
+## 1.8.1
+
+### Patch Changes
+
+- [#239](https://github.com/devgateway/data-viz-ui/pull/239) [`56e6992`](https://github.com/devgateway/data-viz-ui/commit/56e6992f05a4e74a1584cd36f1952cad3c95ba82) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Fix line chart showing NaN when point labels are on top
+
+## 1.8.0
+
+### Minor Changes
+
+- [#232](https://github.com/devgateway/data-viz-ui/pull/232) [`fbac6db`](https://github.com/devgateway/data-viz-ui/commit/fbac6db16bbc926713653c7f77180bab804a56f5) Thanks [@sdimunzio](https://github.com/sdimunzio)! - This package is now licensed under the Apache License 2.0 (previously MIT). Versions prior to this release remain under the MIT license.
+
+### Patch Changes
+
+- [#235](https://github.com/devgateway/data-viz-ui/pull/235) [`1e78fee`](https://github.com/devgateway/data-viz-ui/commit/1e78feef88f4e539e82ad0d4a0bb7eede0dd3699) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Fix default filter values for posts filter
+
+## 1.7.16
+
+### Patch Changes
+
+- [#233](https://github.com/devgateway/data-viz-ui/pull/233) [`77a0fbf`](https://github.com/devgateway/data-viz-ui/commit/77a0fbfe0150f9cc89533505cbbf3a81d03d659d) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Fix Category Post Filter: support single country/category values in categories parsing so country/category filters with only one configured term still render in the dropdown
+
+## 1.7.15
+
+### Patch Changes
+
+- [#225](https://github.com/devgateway/data-viz-ui/pull/225) [`65170fc`](https://github.com/devgateway/data-viz-ui/commit/65170fc22253bdf801eb3bd2c9ca02681baa5707) Thanks [@timothygachengo](https://github.com/timothygachengo)! -fix wp content links from being translated
+
+## 1.7.14
+
+### Patch Changes
+
+- [#221](https://github.com/devgateway/data-viz-ui/pull/221) [`6a32735`](https://github.com/devgateway/data-viz-ui/commit/6a327352498287cb982e2b93f40efa97d30b7bd3) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Hide show content in post intro
+
+## 1.7.13
+
+### Patch Changes
+
+- [#219](https://github.com/devgateway/data-viz-ui/pull/219) [`88378a8`](https://github.com/devgateway/data-viz-ui/commit/88378a85ac43d2141b10faf4ef2868320e5210d6) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Make posts links translatable
+
+## 1.7.12
+
+### Patch Changes
+
+- [#217](https://github.com/devgateway/data-viz-ui/pull/217) [`6eeae0e`](https://github.com/devgateway/data-viz-ui/commit/6eeae0e89bef3f51918ac8c3fedb41832d52941d) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Fix content links for filtered posts
+
+## 1.7.11
+
+### Patch Changes
+
+- [#214](https://github.com/devgateway/data-viz-ui/pull/214) [`52b7dd4`](https://github.com/devgateway/data-viz-ui/commit/52b7dd4e22bc985fe3a10568ee6ba881f3106a07) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Configure posts to work with external wordpress source urls
+
+## 1.7.10
+
+### Patch Changes
+
+- [#210](https://github.com/devgateway/data-viz-ui/pull/210) [`b26eaa7`](https://github.com/devgateway/data-viz-ui/commit/b26eaa7a383bb58fa98702e9a750590f094f9b97) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Fix extra post filter config options to work
+
+- [#210](https://github.com/devgateway/data-viz-ui/pull/210) [`b26eaa7`](https://github.com/devgateway/data-viz-ui/commit/b26eaa7a383bb58fa98702e9a750590f094f9b97) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Fix extra post filters
+
+- [#209](https://github.com/devgateway/data-viz-ui/pull/209) [`23c71bf`](https://github.com/devgateway/data-viz-ui/commit/23c71bf7d2930d48e3db8853f166b249e08f8005) Thanks [@timothygachengo](https://github.com/timothygachengo)! -Fix measures component not rendering in the wp editor
+
+## 1.7.9
+
+### Patch Changes
+
+- [#205](https://github.com/devgateway/data-viz-ui/pull/205) [`af1e3b3`](https://github.com/devgateway/data-viz-ui/commit/af1e3b33f0dc81886ec4d3223f41e43d4275cc39) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Fix single select year filter reset
+  Fix categories loading in the wp editor
+
+## 1.7.8
+
+### Patch Changes
+
+- [#203](https://github.com/devgateway/data-viz-ui/pull/203) [`760dff9`](https://github.com/devgateway/data-viz-ui/commit/760dff9b48a5f9a623975578ab19ee89ac624770) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Fix year filter to prevent resetting taxonomies when values change"
+
+## 1.7.7
+
+### Patch Changes
+
+- [#200](https://github.com/devgateway/data-viz-ui/pull/200) [`eb4e0ac`](https://github.com/devgateway/data-viz-ui/commit/eb4e0ac92201edde1b7d8ff7bbf828bbce81e18c) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Make posts pagination translatable
+
+## 1.7.6
+
+### Patch Changes
+
+- [#195](https://github.com/devgateway/data-viz-ui/pull/195) [`8eb9829`](https://github.com/devgateway/data-viz-ui/commit/8eb9829f0b193ce5a10c00f19835a740047e47e7) Thanks [@timothygachengo](https://github.com/timothygachengo)! - - Fix year filter by allowing years to be fetched from wordpress source URL.
+  - Fix posts sorting when there is category, year and country filter in the same group
+
+- [#195](https://github.com/devgateway/data-viz-ui/pull/195) [`1b5c255`](https://github.com/devgateway/data-viz-ui/commit/1b5c25551b29407fd1e9b70474b3f5d86b455cf6) Thanks [@timothygachengo](https://github.com/timothygachengo)! -Make posts related components translatable
+
+## 1.7.5
+
+### Patch Changes
+
+- [#189](https://github.com/devgateway/data-viz-ui/pull/189) [`a303060`](https://github.com/devgateway/data-viz-ui/commit/a303060ef23f6a8a49bc086b511541504f961612) Thanks [@timothygachengo](https://github.com/timothygachengo)! - - Add WordPress source URL to posts components `ComponentWithSettings`
+  - Add missing blocks and append `/wp-json` to landing URL
+  - Remove logging
+  - Make "no data" message configurable
+
 ## 1.7.3
 
 ### Patch Changes
@@ -143,14 +276,14 @@
 
 ### Minor Changes
 
-- [#73](https://github.com/devgateway/data-viz-ui/pull/73) [`32da4c6`](https://github.com/devgateway/data-viz-ui/commit/32da4c6d61811b266a672cddfdcd213ec2404ba1) Thanks [@timothygachengo](https://github.com/timothygachengo)! - - _(TCDICORE-350)_ Sync embeddables from data-viz-front to data-viz-ui
-  - _(TCDICORE-350)_ Sync scss from data-viz-front to daata-viz-ui
-  - _(TCDICORE-350)_ Fix header rendering, fix search control and update example to have a div with id root
-  - _(TCDICORE-350)_ Update example
-  - _(TCDICORE-350)_ Update router config, clean up TypeScript paths, and fix imports to fix build errors
+- [#73](https://github.com/devgateway/data-viz-ui/pull/73) [`32da4c6`](https://github.com/devgateway/data-viz-ui/commit/32da4c6d61811b266a672cddfdcd213ec2404ba1) Thanks [@timothygachengo](https://github.com/timothygachengo)! - - Sync embeddables from data-viz-front to data-viz-ui
+  - Sync scss from data-viz-front to daata-viz-ui
+  - Fix header rendering, fix search control and update example to have a div with id root
+  - Update example
+  - Update router config, clean up TypeScript paths, and fix imports to fix build errors
 
   ## New Change
-  - _(TCDICORE-350)_ Upgrade react router version to 7.9.4. (Upgrade your project to react-router ~v7.9.4)
+  - Upgrade react router version to 7.9.4. (Upgrade your project to react-router ~v7.9.4)
 
 ## 1.4.0
 
@@ -335,37 +468,37 @@
 ### Patch Changes
 
 - [#2](https://github.com/devgateway/data-viz-ui/pull/2) [`e11b6f1`](https://github.com/devgateway/data-viz-ui/commit/e11b6f11596b1311a47478ce354e7786da8e0b18) Thanks [@timothygachengo](https://github.com/timothygachengo)! - ### 🐛 Bug Fixes
-  - _(TCDICORE-258)_ Fix page module component showing mobile styles
-  - _(TCDING-708)_ Fix measures component in data charts
+  - Fix page module component showing mobile styles
+  - Fix measures component in data charts
 
   ### ⚙️ Miscellaneous Tasks
-  - _(TCDICORE-234)_ Merged tree of tcdi official main into main
-  - _(TCDICORE-234)_ Modify nginx dockerfile to make build work
-  - _(TCDICORE-234)_ Update nginx dockerfileg
-  - _(TCDICORE-254)_ Chart rendered in editor and preview but not in UI
-  - _(TCDIKE-722)_ Radar mobile responsiveness
-  - _(TCDIKE-722)_ Radar responsiveness
-  - _(TCDIKE-723)_ Responsive map component
-  - _(TCDIKE-722)_ Remove conflicting has-standard-14-font-size class
-  - _(DVIZ-43)_ Update react-lib submodule path and initialize example project
-  - _(DVIZ-43)_ Update pnpm workspace configuration, modify app styles, and enhance dvz-ui dependencies
-  - _(DVIZ-43)_ Update dvz-ui package configuration and improve component structure
-  - _(DVIZ-43)_ Make dvz-ui build successfully. Add vite configuration and remove unused dependencies
-  - _(DVIZ-43)_ Fix build, typing and linting issues in the dvz-ui. Try to integrate dvz-ui in the example app
-  - _(DVIZ-43)_ Fix build, typing and linting issues in the dvz-ui. Try to integrate dvz-ui in the example app
-  - _(DVIZ-43)_ Fix package exports and minor bug fixes
-  - _(DVIZ-43)_ Update dependencies and enhance example app configuration. Fix some issues in the dvz ui
-  - _(DVIZ-43)_ Update dependencies and clean up example app. Add a loading component, add common css for shared stylines.
-  - _(DVIZ-43)_ Implement locale redirection in root loader and refactor routing structure.
-  - _(DVIZ-43)_ Refactor data and category provider components to use hooks and improve API handling
-  - _(DVIZ-43)_ Enable custom components to be registered in the library
-  - _(DVIZ-43)_ Update lockfile
-  - _(DVIZ-43)_ Fix build issues
-  - _(DVIZ-43)_ Enable SSR
-  - _(DVIZ-43)_ Configure github actions
-  - _(DVIZ-43)_ Configure github actions
-  - _(DVIZ-43)_ Remove old-ui folder
-  - _(DVIZ-43)_ Configure dvz-ui for release
-  - _(DVIZ-43)_ Add home index route and loading fallback component
-  - _(DVIZ-43)_ implement default locale constant and enhance routing with loading fallbacks
-  - \*(DVIZ-43): enable custom header and footer
+  - Merged tree of tcdi official main into main
+  - Modify nginx dockerfile to make build work
+  - Update nginx dockerfileg
+  - Chart rendered in editor and preview but not in UI
+  - Radar mobile responsiveness
+  - Radar responsiveness
+  - Responsive map component
+  - Remove conflicting has-standard-14-font-size class
+  - Update react-lib submodule path and initialize example project
+  - Update pnpm workspace configuration, modify app styles, and enhance dvz-ui dependencies
+  - Update dvz-ui package configuration and improve component structure
+  - Make dvz-ui build successfully. Add vite configuration and remove unused dependencies
+  - Fix build, typing and linting issues in the dvz-ui. Try to integrate dvz-ui in the example app
+  - Fix build, typing and linting issues in the dvz-ui. Try to integrate dvz-ui in the example app
+  - Fix package exports and minor bug fixes
+  - Update dependencies and enhance example app configuration. Fix some issues in the dvz ui
+  - Update dependencies and clean up example app. Add a loading component, add common css for shared stylines.
+  - Implement locale redirection in root loader and refactor routing structure.
+  - Refactor data and category provider components to use hooks and improve API handling
+  - Enable custom components to be registered in the library
+  - Update lockfile
+  - Fix build issues
+  - Enable SSR
+  - Configure github actions
+  - Configure github actions
+  - Remove old-ui folder
+  - Configure dvz-ui for release
+  - Add home index route and loading fallback component
+  - implement default locale constant and enhance routing with loading fallbacks
+  - enable custom header and footer

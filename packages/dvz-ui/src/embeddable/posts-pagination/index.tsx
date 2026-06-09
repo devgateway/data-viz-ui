@@ -1,5 +1,5 @@
 import * as Immutable from 'immutable';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Container, Dropdown, Icon } from 'semantic-ui-react';
 import { injectIntl, WrappedComponentProps} from 'react-intl';
@@ -7,11 +7,15 @@ import { injectIntl, WrappedComponentProps} from 'react-intl';
 interface PostsPaginationProps extends WrappedComponentProps {
     "data-group": string;
     "data-number-of-items-per-page": number;
+    "data-page-label"?: string;
+    "data-of-label"?: string;
 }
 
 const PostsPagination = (props: PostsPaginationProps) => {
     const {
         "data-group": group,
+        "data-page-label": pageLabel = "Page",
+        "data-of-label": ofLabel = "of",
     } = props;
     const dispatch = useDispatch();
     const postsState: any = useSelector((state: Immutable.Map<string, any>) => state.getIn(['data', "postsPagination", group]));
@@ -20,6 +24,7 @@ const PostsPagination = (props: PostsPaginationProps) => {
     const totalPages: number = postsState && postsState?.totalPages ? postsState.totalPages : 1;
     const [currentPage, setCurrentPage] = useState(postsFilters?.page ?? 1);
     const [options, setOptions] = useState<any[]>([]);
+    const wrapperRef = useRef<HTMLDivElement>(null);
 
     const generateOptions = () => {
         const options: any[] = [];
@@ -40,11 +45,17 @@ const PostsPagination = (props: PostsPaginationProps) => {
             ...postsFilters,
             page: page
         });
+
+        const target = document.getElementById(`filtered-posts-${group}`);
+        if (target) {
+            const top = target.getBoundingClientRect().top + window.scrollY - 50;
+            window.scrollTo({ top, behavior: 'smooth' });
+        }
     }
 
     useEffect(() => {
         generateOptions();
-    }, [postsState?.totalPages]);
+    }, [postsState]);
 
     useEffect(() => {
         const pageFromState = postsFilters?.page ?? 1;
@@ -55,9 +66,10 @@ const PostsPagination = (props: PostsPaginationProps) => {
 
 
     return (
-        <Container fluid className="posts-pagination">
+        <div ref={wrapperRef}>
+            <Container fluid className="posts-pagination">
             <div className="posts-pagination-dropdown">
-                <span>Page</span>
+                <span>{pageLabel}</span>
                 <Dropdown
                     options={options}
                     placeholder='Select Item'
@@ -67,7 +79,7 @@ const PostsPagination = (props: PostsPaginationProps) => {
                     onChange={(e, data) => handlePageChange(Number(data.value))}
                 />
                 <div>
-                    <span>of {postsState && postsState?.totalPages}</span>
+                    <span>{ofLabel} {postsState && postsState?.totalPages}</span>
                 </div>
             </div>
             <div>
@@ -88,6 +100,7 @@ const PostsPagination = (props: PostsPaginationProps) => {
             </div>
 
         </Container>
+        </div>
     )
 }
 

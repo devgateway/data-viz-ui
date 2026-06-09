@@ -668,9 +668,9 @@ const Chart = ({
           enablePointLabel={lineLabelPosition === 'top'}
           pointLabel={(l) => {
             return intl.formatNumber(
-              format.style === "percent" ? l.yFormatted / 100 : l.yFormatted,
+              format.style === "percent" ? l.data.yFormatted / 100 : l.data.yFormatted,
               format
-            )
+            );
           }
           }
           lineWidth={3}

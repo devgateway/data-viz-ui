@@ -40,16 +40,13 @@ const DownloadComponent = (props) => {
   } = props;
 
   const [fileType, setFileType] = useState(defaultFormat);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const isCheckPNG = checkPNG == 'true' || checkPNG === true;
   const isCheckJPG = checkJPG == 'true' || checkJPG === true;
 
   useEffect(() => {
     setFileType(defaultFormat);
   }, [defaultFormat]);
-
-  const handleChange = (e) => {
-    setFileType(e.target.value);
-  };
 
   function filter(node) {
     const attributes = node.attributes;
@@ -99,8 +96,7 @@ const DownloadComponent = (props) => {
     domtoimage.cloneNode(componentRef.current).then(function (node) {
       [...node.getElementsByTagName("input")].forEach(e => e.remove());
       [...node.querySelectorAll(".question.circle.icon")].forEach(e => e.remove());
-
-      const addSourceURL = includeSourceURL === "true";
+      const addSourceURL = includeSourceURL === "true" || includeSourceURL === true;
       if (addSourceURL) {
         const urlNode = document.createElement('div');
         urlNode.style.marginLeft = sourceURLMarginLeft + "px";
@@ -110,7 +106,7 @@ const DownloadComponent = (props) => {
         urlNode.style.fontWeight = '400';
         urlNode.style.color = '#66676d';
         urlNode.style.opacity = '0.75';
-        urlNode.innerHTML = window.location.href;
+        urlNode.textContent = window.location.href;
         urlNode.style.maxWidth = "90%";
         urlNode.style.wordWrap = "break-word";
         urlNode.style.overflowWrap = "break-word";
@@ -118,7 +114,10 @@ const DownloadComponent = (props) => {
       }
 
       const PADDING = 50;
-      options.height = componentRef.current.scrollHeight + PADDING;
+      options.height = componentRef.current.scrollHeight + PADDING * 2;
+      if (addSourceURL) {
+        options.height += (Number.parseInt(sourceURLMarginTop, 10) || 0) + (Number.parseInt(sourceURLFontSize, 10) || 0) * 2;
+      }
       options.width = componentRef.current.scrollWidth + (PADDING * 2);
       node.style.padding = `${PADDING}px`;
 
@@ -182,7 +181,12 @@ const DownloadComponent = (props) => {
               <Button className={"download"} onClick={() => onClickHandler(fileType)}>
                 {buttonLabel} {fileType === 'PNG' ? 'PNG' : 'JPG'}
               </Button>
-              <Dropdown className={"download"} data-tooltip={decodeURIComponent(tooltip)}
+              <Dropdown
+                className={"download"}
+                data-tooltip={decodeURIComponent(tooltip)}
+                open={dropdownOpen}
+                onOpen={() => setDropdownOpen(true)}
+                onClose={() => setDropdownOpen(false)}
                 trigger={(isCheckJPG && isCheckPNG) ?
                   <Icon name={"download"} className='download-icon'></Icon> : null}>
                 <Dropdown.Menu>
@@ -191,18 +195,34 @@ const DownloadComponent = (props) => {
                     <Dropdown.Item onClick={() => {
                       setFileType('PNG');
                       onClickHandler('PNG');
+                      setDropdownOpen(false);
                     }}>
-                      <input type='radio' value='PNG' checked={fileType === 'PNG'} onChange={handleChange} />
-                      <label>{pngText}</label>
+                      <div className="ui radio checkbox">
+                        <input type="radio" className="hidden" readOnly tabIndex={0} checked={fileType === 'PNG'} />
+                        <label onClick={(e) => {
+                          e.stopPropagation();
+                          setFileType('PNG');
+                          onClickHandler('PNG');
+                          setDropdownOpen(false);
+                        }}>{pngText}</label>
+                      </div>
                     </Dropdown.Item>
                   )}
                   {(isCheckJPG === true) && (
                     <Dropdown.Item onClick={() => {
                       setFileType('JPG');
                       onClickHandler('JPG');
+                      setDropdownOpen(false);
                     }}>
-                      <input type='radio' value='JPG' checked={fileType === 'JPG'} onChange={handleChange} />
-                      <label>{jpgText}</label>
+                      <div className="ui radio checkbox">
+                        <input type="radio" className="hidden" readOnly tabIndex={0} checked={fileType === 'JPG'} />
+                        <label onClick={(e) => {
+                          e.stopPropagation();
+                          setFileType('JPG');
+                          onClickHandler('JPG');
+                          setDropdownOpen(false);
+                        }}>{jpgText}</label>
+                      </div>
                     </Dropdown.Item>
                   )}
                 </Dropdown.Menu>
