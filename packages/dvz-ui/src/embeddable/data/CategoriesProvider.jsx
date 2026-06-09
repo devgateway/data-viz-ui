@@ -66,15 +66,11 @@ class DataProvider extends React.Component {
             return <MemoizedCategoriesContextProvider data={data}>{this.props.children}</MemoizedCategoriesContextProvider>
         } else if (error) {
             return <Segment color={"red"}>
-                <h1>500</h1>
                 <p>Wasn't able to load data</p>
             </Segment>
         } else {
             return <Container>
-                <Segment color={"red"}>
-                    <h1>404</h1>
-                    <p>Can't find this page</p>
-                </Segment>
+
             </Container>
         }
 
