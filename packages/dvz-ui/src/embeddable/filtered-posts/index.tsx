@@ -309,7 +309,10 @@ const FilteredPosts = (props: FilteredPostsProps) => {
             taxonomyFilters.set(filters.countryTaxonomy, selectedCountry.values);
         }
 
+
         const categoryValues = effectiveCategoryValues ? effectiveCategoryValues.join(',') : undefined;
+        const hasCategoryFilterTaxonomy = filters.categoryTaxonomy && filters.categoryTaxonomy !== "none";
+      
         const args = {
             years: filters.years || undefined,
             after: undefined,
@@ -318,7 +321,7 @@ const FilteredPosts = (props: FilteredPostsProps) => {
             page: postsFilters.page || 1,
             locale: locale || "en",
             postType: type,
-            taxonomy: filters.categoryTaxonomy || undefined,
+            taxonomy: hasCategoryFilterTaxonomy ? filters.categoryTaxonomy : taxonomy || undefined,
             category: categoryValues || undefined,
             taxonomyFilters,
             ordering: "date",
