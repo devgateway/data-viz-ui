@@ -2,5 +2,4 @@
 "@devgateway/dvz-ui-react": patch
 ---
 
-Added a guard flag to detect whether category taxonomy is actually configured (not "none").
-Updated taxonomy argument selection logic to use filter taxonomy only when valid, otherwise fall back to configured taxonomy.
+Normalized category taxonomy handling to prevent invalid "none" values from being passed to `getCustomPosts`. Both filter-provided and block-configured taxonomy values now exclude "none" before use, ensuring consistent behavior across `taxonomy` arg and `taxonomyFilters` map. Fixes issue where "none" could appear as a query parameter key.
