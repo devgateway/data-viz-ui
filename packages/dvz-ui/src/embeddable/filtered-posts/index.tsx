@@ -299,10 +299,17 @@ const FilteredPosts = (props: FilteredPostsProps) => {
             return;
         }
 
+        // Normalize taxonomy values - exclude "none" which represents "not selected"
+        const normalizedCategoryTaxonomy = filters.categoryTaxonomy && filters.categoryTaxonomy !== "none" ? filters.categoryTaxonomy : null;
+        const normalizedBlockTaxonomy = taxonomy && taxonomy !== "none" ? taxonomy : null;
+        
+        // Use filter taxonomy if available, otherwise fall back to block taxonomy
+        const effectiveTaxonomy = normalizedCategoryTaxonomy || normalizedBlockTaxonomy || undefined;
+
         const taxonomyFilters = new Map<string, any>();
 
-        if (filters.categoryTaxonomy && effectiveCategoryValues && effectiveCategoryValues.length > 0) {
-            taxonomyFilters.set(filters.categoryTaxonomy, effectiveCategoryValues);
+        if (normalizedCategoryTaxonomy && effectiveCategoryValues && effectiveCategoryValues.length > 0) {
+            taxonomyFilters.set(normalizedCategoryTaxonomy, effectiveCategoryValues);
         }
 
         if (filters.countryTaxonomy && selectedCountry.values.length > 0) {
@@ -310,6 +317,7 @@ const FilteredPosts = (props: FilteredPostsProps) => {
         }
 
         const categoryValues = effectiveCategoryValues ? effectiveCategoryValues.join(',') : undefined;
+      
         const args = {
             years: filters.years || undefined,
             after: undefined,
@@ -318,7 +326,7 @@ const FilteredPosts = (props: FilteredPostsProps) => {
             page: postsFilters.page || 1,
             locale: locale || "en",
             postType: type,
-            taxonomy: filters.categoryTaxonomy || undefined,
+            taxonomy: effectiveTaxonomy,
             category: categoryValues || undefined,
             taxonomyFilters,
             ordering: "date",
