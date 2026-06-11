@@ -1,5 +1,11 @@
 # @devgateway/dvz-ui-react
 
+## 1.8.7
+
+### Patch Changes
+
+- [#254](https://github.com/devgateway/data-viz-ui/pull/254) [`791fd0f`](https://github.com/devgateway/data-viz-ui/commit/791fd0f8aeb72753382d5119023497fc41e6789f) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Normalized category taxonomy handling to prevent invalid "none" values from being passed to `getCustomPosts`. Both filter-provided and block-configured taxonomy values now exclude "none" before use, ensuring consistent behavior across `taxonomy` arg and `taxonomyFilters` map. Fixes issue where "none" could appear as a query parameter key.
+
 ## 1.8.6
 
 ### Patch Changes
