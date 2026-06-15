@@ -232,39 +232,39 @@ const Chart = ({
       chartLegends =
         colors.colorBy === "index"
           ? options.data.map((d) => {
-              let theColor;
-              let enabled = true;
-              if (filter.indexOf(d[options.indexBy]) > -1) {
-                enabled = false;
-                theColor = DEFAULT_COLOR;
-              } else {
-                theColor = d[COLOR_VARIABLE]
-                  ? d[COLOR_VARIABLE]
-                  : colorGenerator.getColor(d.id, d);
-              }
-              return {
-                enabled: enabled,
-                color: theColor,
-                id: d[options.indexBy],
-                label: d[options.indexBy],
-              };
-            })
+            let theColor;
+            let enabled = true;
+            if (filter.indexOf(d[options.indexBy]) > -1) {
+              enabled = false;
+              theColor = DEFAULT_COLOR;
+            } else {
+              theColor = d[COLOR_VARIABLE]
+                ? d[COLOR_VARIABLE]
+                : colorGenerator.getColor(d.id, d);
+            }
+            return {
+              enabled: enabled,
+              color: theColor,
+              id: d[options.indexBy],
+              label: d[options.indexBy],
+            };
+          })
           : options.keys.map((k) => {
-              let theColor;
-              let enabled = true;
-              if (filter.indexOf(k) > -1) {
-                enabled = false;
-                theColor = DEFAULT_COLOR;
-              } else {
-                theColor = colorGenerator.getColorByKey(k);
-              }
-              return {
-                enabled: enabled,
-                color: theColor,
-                id: k,
-                label: k,
-              };
-            });
+            let theColor;
+            let enabled = true;
+            if (filter.indexOf(k) > -1) {
+              enabled = false;
+              theColor = DEFAULT_COLOR;
+            } else {
+              theColor = colorGenerator.getColorByKey(k);
+            }
+            return {
+              enabled: enabled,
+              color: theColor,
+              id: k,
+              label: k,
+            };
+          });
     }
 
     return chartLegends;
@@ -457,6 +457,8 @@ const Chart = ({
     };
     adjustBottomForLegends();
   }, [chartLegends]);
+
+
 
   useEffect(() => {
     // Reset margins when legend position changes
@@ -1071,8 +1073,8 @@ const Chart = ({
             const sumOfVariablesToFilterOut =
               colorBy !== "index"
                 ? filter
-                    ?.map((item) => group[item])
-                    ?.reduce((acc, curr) => acc + curr, 0)
+                  ?.map((item) => group[item])
+                  ?.reduce((acc, curr) => acc + curr, 0)
                 : 0;
             total -= sumOfVariablesToFilterOut;
 
@@ -1376,10 +1378,11 @@ const Chart = ({
     }
   }
 
-  //let newHeight = parseInt(height + "") - newMarginBottom;
+  let newHeight = parseInt(height + "") - newMarginBottom;
+
 
   return (
-    <div style={{ height: height }}>
+    <div style={{ height: newHeight }}>
       {options?.data && options.data.length > 0 && (
         <>
           <ResponsiveBar
@@ -1408,8 +1411,8 @@ const Chart = ({
             axisRight={
               showRightAxis
                 ? {
-                    tickSize:
-                      (layout == "horizontal" && showTickLine) ||
+                  tickSize:
+                    (layout == "horizontal" && showTickLine) ||
                       layout === "vertical"
                       ? 5
                       : 0,
@@ -1453,13 +1456,10 @@ const Chart = ({
                     legendOffset: parseInt(offsetBottom),
                     tickPadding: 5,
                     tickRotation: 0,
-                    tickValues: ticks,
-                    legend: legends.right,
-                    legendPosition: "middle",
-                    legendOffset: parseInt(offsetRight),
+                    tickValues: parseInt(xAxisTickValues),
                     format: (value) => {
                       if (!value) return "";
-                      if (layout == "vertical") {
+                      if (layout == "horizontal") {
                         const effectiveFormat = customAxisFormat
                           ? customAxisFormat
                           : format;
@@ -1472,44 +1472,9 @@ const Chart = ({
                           },
                         );
                       }
-
                       return value;
                     },
                   }
-                : null
-            }
-            // @ts-ignore
-            axisBottom={
-              (isNotDesktopPreview ||
-                isNotEditingAndIsMobileCustomizationEnabled) &&
-              mobileConfigSettings?.xAxisDisabled === true
-                ? null
-                : layout === "horizontal"
-                  ? {
-                      legend: legends.bottom,
-                      legendPosition: "middle",
-                      legendOffset: parseInt(offsetBottom),
-                      tickPadding: 5,
-                      tickRotation: 0,
-                      tickValues: parseInt(xAxisTickValues),
-                      format: (value) => {
-                        if (!value) return "";
-                        if (layout == "horizontal") {
-                          const effectiveFormat = customAxisFormat
-                            ? customAxisFormat
-                            : format;
-                          return intl.formatNumber(
-                            effectiveFormat.style === "percent"
-                              ? value / 100
-                              : value,
-                            {
-                              ...effectiveFormat,
-                            },
-                          );
-                        }
-                        return value;
-                      },
-                    }
                   : {
                     legend: legends.bottom,
                     legendPosition: "middle",
@@ -1523,7 +1488,7 @@ const Chart = ({
             axisLeft={{
               tickSize:
                 (layout === "horizontal" && showTickLine) ||
-                layout === "vertical"
+                  layout === "vertical"
                   ? 5
                   : 0,
               tickPadding: 5,
@@ -1569,8 +1534,8 @@ const Chart = ({
               )
             }
             layers={layers as any}
-            onMouseEnter={(_data) => {}}
-            onMouseLeave={(_data) => {}}
+            onMouseEnter={(_data) => { }}
+            onMouseLeave={(_data) => { }}
             // TODO: Check why we are ignoring this
             // @ts-ignore
             motionStiffness={130 as any}
@@ -1614,14 +1579,14 @@ const Chart = ({
                 style={
                   legendPosition === "bottom"
                     ? {
-                        marginBottom: `${newMarginBottom}px`,
-                        marginTop: "25px",
-                        textAlign: "left",
-                        justifyContent: "flex-start",
-                      }
+                      marginBottom: `${newMarginBottom}px`,
+                      marginTop: "25px",
+                      textAlign: "left",
+                      justifyContent: "flex-start",
+                    }
                     : {
-                        justifyContent: "flex-start",
-                      }
+                      justifyContent: "flex-start",
+                    }
                 }
               >
                 <div className="legend-sections">
