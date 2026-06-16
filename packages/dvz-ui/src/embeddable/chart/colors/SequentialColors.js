@@ -1,4 +1,4 @@
-import { sequentialColorInterpolators } from "@nivo/colors";
+import { divergingColorInterpolators, sequentialColorInterpolators } from "@nivo/colors";
 import * as d3 from "d3";
 import Colors from "./Colors";
 
@@ -20,7 +20,10 @@ class SequentialColors extends Colors {
       this._domain = [Math.min(...values), Math.max(...values)];
     }
 
-    const interpolator = sequentialColorInterpolators[this.scheme];
+    const interpolator =
+      sequentialColorInterpolators[this.scheme] ||
+      divergingColorInterpolators[this.scheme] ||
+      sequentialColorInterpolators.reds;
     this._color = d3.scaleSequential(interpolator);
     this._color.domain(this._domain);
   }

@@ -13,6 +13,7 @@ const CONNECTED_LINE_COLOR_OPACITY = 0.55;
 const DEFAULT_SCATTER_TOOLTIP = "<strong>{label}</strong><br/>{xLabel}: #(x)<br/>{yLabel}: #(y)<br/>Series: {seriesDisplay}";
 
 const toNumber = (value, fallback = null) => {
+  if (value === "" || value === null || value === undefined) return fallback;
   const numericValue = Number(value);
   return Number.isFinite(numericValue) ? numericValue : fallback;
 };
@@ -45,7 +46,7 @@ const formatNumericValue = (intl, axisFormat, value) => {
   );
 };
 
-const DefaultScatterTooltip = ({ datum, intl, axisFormat }) => {
+const DefaultScatterTooltip = ({ datum, intl, xAxisFormat, yAxisFormat, sizeFormat, colorFormat }) => {
   const data = datum?.data || {};
   const label = data?.label || datum?.label || datum?.id;
   const showSeries = data?.series && data?.series !== label;
@@ -58,14 +59,19 @@ const DefaultScatterTooltip = ({ datum, intl, axisFormat }) => {
       </div>
       {showSeries ? <div>Series: {data.series}</div> : null}
       <div>
-        {data?.xLabel || "X"}: {formatNumericValue(intl, axisFormat, data?.x)}
+        {data?.xLabel || "X"}: {formatNumericValue(intl, xAxisFormat, data?.x)}
       </div>
       <div>
-        {data?.yLabel || "Y"}: {formatNumericValue(intl, axisFormat, data?.y)}
+        {data?.yLabel || "Y"}: {formatNumericValue(intl, yAxisFormat, data?.y)}
       </div>
       {showSize ? (
         <div>
-          {data?.sizeLabel || "Size"}: {formatNumericValue(intl, axisFormat, data?.size)}
+          {data?.sizeLabel || "Size"}: {formatNumericValue(intl, sizeFormat, data?.size)}
+        </div>
+      ) : null}
+      {Number.isFinite(data?.colorValue) ? (
+        <div>
+          {data?.colorLabel || "Color"}: {formatNumericValue(intl, colorFormat, data?.colorValue)}
         </div>
       ) : null}
     </div>
@@ -78,6 +84,7 @@ const ScatterChart = ({
   intl,
   format,
   customAxisFormat,
+  measureFormats,
   height,
   showLegends,
   legendPosition,
@@ -103,6 +110,9 @@ const ScatterChart = ({
   scatterMinSize,
   scatterMaxSize,
   scatterShowLabels,
+  scatterLabelPosition,
+  scatterLabelColor,
+  scatterLabelSize,
   scatterConnectPoints,
   scatterPointOpacity,
   scatterReferenceX,
@@ -113,15 +123,61 @@ const ScatterChart = ({
   scatterQuadrantTopRightLabel,
   scatterQuadrantBottomLeftLabel,
   scatterQuadrantBottomRightLabel,
+  scatterXAxisLegendOffset,
+  scatterYAxisLegendOffset,
+  offsetBottom,
+  offsetY,
+  tickRotation,
+  tickColor,
+  xLabelColor,
+  overrideTickColor,
+  offsetText,
 }) => {
+  const scatterLabelFontSize = toNumber(scatterLabelSize, 11);
+  const scatterLabelPositionMode = scatterLabelPosition || "top-right";
+  const resolvedScatterLabelColor =
+    typeof scatterLabelColor === "string" && scatterLabelColor.trim().length > 0
+      ? scatterLabelColor.trim()
+      : "";
+
+  const resolveLabelPlacement = (node) => {
+    const offset = 10;
+
+    switch (scatterLabelPositionMode) {
+      case "top-left":
+        return { x: node.x - offset, y: node.y - offset, textAnchor: "end", dominantBaseline: "alphabetic" };
+      case "top":
+        return { x: node.x, y: node.y - offset, textAnchor: "middle", dominantBaseline: "alphabetic" };
+      case "right":
+        return { x: node.x + offset, y: node.y, textAnchor: "start", dominantBaseline: "middle" };
+      case "bottom-right":
+        return { x: node.x + offset, y: node.y + offset, textAnchor: "start", dominantBaseline: "hanging" };
+      case "bottom":
+        return { x: node.x, y: node.y + offset, textAnchor: "middle", dominantBaseline: "hanging" };
+      case "bottom-left":
+        return { x: node.x - offset, y: node.y + offset, textAnchor: "end", dominantBaseline: "hanging" };
+      case "left":
+        return { x: node.x - offset, y: node.y, textAnchor: "end", dominantBaseline: "middle" };
+      case "center":
+        return { x: node.x, y: node.y, textAnchor: "middle", dominantBaseline: "middle" };
+      default:
+        return { x: node.x + offset, y: node.y - offset, textAnchor: "start", dominantBaseline: "alphabetic" };
+    }
+  };
+
   const [filter, setFilter] = useState([]);
+  const colorByValuesMode = Boolean(options?.colorMeasure) && colorBy === "values";
+  const effectiveColorBy =
+    !colorByValuesMode && colorBy === "id" && (options?.data?.length || 0) <= 1
+      ? "index"
+      : colorBy;
 
   const filteredSeries = useMemo(() => {
     if (!options?.data) {
       return [];
     }
 
-    if (colorBy === "index") {
+    if (effectiveColorBy === "index") {
       return options.data
         .map((series) => ({
           ...series,
@@ -131,7 +187,7 @@ const ScatterChart = ({
     }
 
     return options.data.filter((series) => !filter.includes(series.id));
-  }, [colorBy, filter, options?.data]);
+  }, [effectiveColorBy, filter, options?.data]);
 
   const flatPoints = useMemo(
     () =>
@@ -158,15 +214,61 @@ const ScatterChart = ({
   );
 
   const colorIndexBy = options?.colorIndexBy || options?.indexBy || "label";
+  const axisFormat = customAxisFormat || format;
+  const xAxisFormat =
+    measureFormats?.[options?.xMeasure] ||
+    customAxisFormat ||
+    axisFormat;
+  const yAxisFormat =
+    measureFormats?.[options?.yMeasure] ||
+    customAxisFormat ||
+    axisFormat;
+  const sizeFormat =
+    measureFormats?.[options?.sizeMeasure] ||
+    customAxisFormat ||
+    axisFormat;
+  const colorValueFormat =
+    measureFormats?.[options?.colorMeasure] ||
+    customAxisFormat ||
+    axisFormat;
 
   const getPointColor = (point) => {
+    if (!colorGenerator || typeof colorGenerator.getColor !== "function") {
+      return "#9F9F9F";
+    }
+
+    const resolvedColorValue =
+      point?.colorValue ??
+      point?.data?.colorValue ??
+      point?.variables?.colorValue ??
+      point?.data?.variables?.colorValue;
+
+    if (colorByValuesMode && Number.isFinite(resolvedColorValue) && options?.colorMeasure) {
+      const colorDatum = {
+        ...point,
+        [options.colorMeasure]: resolvedColorValue,
+      };
+      return colorGenerator.getColor(options.colorMeasure, colorDatum);
+    }
+
+    const resolvedIndex =
+      point?.[colorIndexBy] ||
+      point?.data?.[colorIndexBy] ||
+      point?.colorKey ||
+      point?.data?.colorKey ||
+      point?.label ||
+      point?.id ||
+      point?.serieId ||
+      DEFAULT_SERIES_LABEL;
+
     const colorDatum = {
       ...point,
-      [colorIndexBy]: point?.label || point?.id,
+      colorKey: resolvedIndex,
+      [colorIndexBy]: resolvedIndex,
     };
 
-    if (colorBy === "index") {
-      return colorGenerator.getColor(point?.label || point?.id, colorDatum);
+    if (effectiveColorBy === "index") {
+      return colorGenerator.getColor(resolvedIndex, colorDatum);
     }
 
     return colorGenerator.getColor(point?.serieId || DEFAULT_SERIES_LABEL, colorDatum);
@@ -193,11 +295,15 @@ const ScatterChart = ({
   }, [flatPoints, scatterMaxSize, scatterMinSize]);
 
   const chartLegends = useMemo(() => {
-    if (colorBy === "index") {
+    if (colorByValuesMode) {
+      return [];
+    }
+
+    if (effectiveColorBy === "index") {
       const seen = new Set();
       return allFlatPoints
         .filter((point) => {
-          const legendId = point.label || point.id;
+          const legendId = point?.colorKey || point?.label || point?.id;
           if (seen.has(legendId)) {
             return false;
           }
@@ -205,8 +311,8 @@ const ScatterChart = ({
           return true;
         })
         .map((point) => ({
-          id: point.label || point.id,
-          label: point.label || point.id,
+            id: point?.colorKey || point?.label || point?.id,
+            label: point?.label || point?.id,
           color: getPointColor(point),
         }));
     }
@@ -220,9 +326,62 @@ const ScatterChart = ({
         label: series.data?.[0]?.label || series.label || series.id,
       }),
     }));
-  }, [allFlatPoints, colorBy, options?.data]);
+  }, [allFlatPoints, effectiveColorBy, colorByValuesMode, options?.data]);
 
-  const axisFormat = customAxisFormat || format;
+  const colorValueExtent = useMemo(() => {
+    if (!colorByValuesMode) {
+      return null;
+    }
+
+    const colorValues = flatPoints
+      .map((point) => point?.colorValue)
+      .filter((value) => Number.isFinite(value));
+
+    if (colorValues.length === 0) {
+      return null;
+    }
+
+    const [minColorValue, maxColorValue] = d3.extent(colorValues);
+    if (!Number.isFinite(minColorValue) || !Number.isFinite(maxColorValue)) {
+      return null;
+    }
+
+    return { min: minColorValue, max: maxColorValue };
+  }, [colorByValuesMode, flatPoints]);
+
+  const GradientLegend = () => {
+    if (!showLegends || !colorByValuesMode || !colorValueExtent || !options?.colorMeasure) {
+      return null;
+    }
+
+    const measureKey = options.colorMeasure;
+    const minColor = colorGenerator.getColor(measureKey, { [measureKey]: colorValueExtent.min });
+    const maxColor = colorGenerator.getColor(measureKey, { [measureKey]: colorValueExtent.max });
+    const gradientLabel = options?.measureLabels?.color || options?.colorMeasure || "Color";
+
+    return (
+      <div className={`legends container has-standard-12-font-size ${legendPosition}`}>
+        <div className="legend item">
+          <label className="legend-title">{gradientLabel}</label>
+        </div>
+        <div className="legend item" style={{ display: "block", width: "220px", maxWidth: "100%" }}>
+          <div
+            style={{
+              height: "12px",
+              borderRadius: "6px",
+              background: `linear-gradient(90deg, ${minColor} 0%, ${maxColor} 100%)`,
+              border: "1px solid rgba(0,0,0,0.15)",
+            }}
+          />
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: "11px", marginTop: "4px" }}>
+            <span>{formatNumericValue(intl, colorValueFormat, colorValueExtent.min)}</span>
+            <span>{formatNumericValue(intl, colorValueFormat, colorValueExtent.max)}</span>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const xDomain = createPaddedDomain(flatPoints.map((point) => point.x));
   const yDomain = createPaddedDomain(flatPoints.map((point) => point.y));
   const resolvedXAxisTicks = Number.parseInt(xAxisTickValues, 10);
@@ -234,6 +393,7 @@ const ScatterChart = ({
     const xLabel = options?.measureLabels?.x || "X";
     const yLabel = options?.measureLabels?.y || "Y";
     const sizeLabel = options?.measureLabels?.size || "Size";
+    const colorLabel = options?.measureLabels?.color || "Color";
     const seriesDisplay = point?.serieId || pointData.series || DEFAULT_SERIES_LABEL;
     const color = getPointColor({
       ...pointData,
@@ -256,9 +416,11 @@ const ScatterChart = ({
         x: pointData.x,
         y: pointData.y,
         size: pointData.size,
+        colorValue: pointData.colorValue,
         xLabel,
         yLabel,
         sizeLabel,
+        colorLabel,
         sizeDisplay: Number.isFinite(pointData.size) ? pointData.size : "",
         seriesDisplay,
         series: point?.serieId || pointData.series || DEFAULT_SERIES_LABEL,
@@ -277,6 +439,50 @@ const ScatterChart = ({
       previous.includes(id)
         ? previous.filter((item) => item !== id)
         : [...previous, id],
+    );
+  };
+
+  const resolvedTickColor = overrideTickColor ? (tickColor || "rgb(92,93,99)") : "rgb(92,93,99)";
+  const resolvedLabelColor = xLabelColor && xLabelColor !== "null" ? xLabelColor : "rgb(92,93,99)";
+  const resolvedTickRotation = Number.isFinite(Number(tickRotation)) ? Number(tickRotation) : 0;
+  const resolvedOffsetText = Number.isFinite(Number(offsetText)) ? Number(offsetText) : 0;
+
+  const CustomXTick = (tick) => {
+    const formatted = tick.format ? tick.format(tick.value) : String(tick.value);
+    return (
+      <g transform={`translate(${tick.x},${tick.y + 16 + resolvedOffsetText})`}>
+        <text
+          textAnchor={resolvedTickRotation !== 0 ? "end" : "middle"}
+          dominantBaseline="middle"
+          transform={`rotate(${resolvedTickRotation})`}
+          style={{
+            fill: resolvedLabelColor,
+            fontSize: "12px",
+            fontFamily: "sans-serif",
+          }}
+        >
+          {formatted}
+        </text>
+      </g>
+    );
+  };
+
+  const CustomYTick = (tick) => {
+    const formatted = tick.format ? tick.format(tick.value) : String(tick.value);
+    return (
+      <g transform={`translate(${tick.x - 12},${tick.y})`}>
+        <text
+          textAnchor="end"
+          dominantBaseline="middle"
+          style={{
+            fill: resolvedLabelColor,
+            fontSize: "12px",
+            fontFamily: "sans-serif",
+          }}
+        >
+          {formatted}
+        </text>
+      </g>
     );
   };
 
@@ -392,7 +598,9 @@ const ScatterChart = ({
           const color = getPointColor({
             ...(serieNodes[0]?.data || {}),
             serieId,
+            colorKey: serieNodes[0]?.data?.colorKey || serieNodes[0]?.data?.label || serieId,
             label: serieNodes[0]?.data?.label || serieId,
+            colorValue: serieNodes[0]?.data?.colorValue,
           });
 
           return (
@@ -410,6 +618,38 @@ const ScatterChart = ({
     );
   };
 
+  const CustomNodesLayer = ({ nodes: layerNodes }) => {
+    const opacity = toNumber(scatterPointOpacity, 0.85);
+    return (
+      <g>
+        {layerNodes.map((node) => {
+          const pointData = node?.data || {};
+          const fill = getPointColor({
+            ...pointData,
+            serieId: node?.serieId,
+            colorKey: pointData?.colorKey || pointData?.label || pointData?.id || node?.serieId,
+            label: pointData?.label || pointData?.id || node?.serieId,
+            colorValue: pointData?.colorValue,
+          });
+          const r = Number.isFinite(node?.size) ? node.size / 2 : 8;
+          const borderColor = d3.color(fill) ? d3.color(fill).darker(0.6).toString() : fill;
+          return (
+            <circle
+              key={node.id}
+              cx={node.x}
+              cy={node.y}
+              r={r}
+              fill={fill}
+              fillOpacity={opacity}
+              stroke={borderColor}
+              strokeWidth={1}
+            />
+          );
+        })}
+      </g>
+    );
+  };
+
   const LabelsLayer = ({ nodes }) => {
     if (!scatterShowLabels) {
       return null;
@@ -417,22 +657,33 @@ const ScatterChart = ({
 
     return (
       <g pointerEvents="none">
-        {nodes.map((node) => (
-          <text
-            key={`${node.serieId}:${node.id}`}
-            x={node.x + 10}
-            y={node.y - 10}
-            fill={getPointColor({
-              ...(node?.data || {}),
-              serieId: node?.serieId,
-              label: node?.data?.label || node?.id,
-            })}
-            fontSize="11px"
-            fontFamily="sans-serif"
-          >
-            {node?.data?.label || node?.id}
-          </text>
-        ))}
+        {nodes.map((node) => {
+          const placement = resolveLabelPlacement(node);
+          const fallbackColor = getPointColor({
+            ...(node?.data || {}),
+            serieId: node?.serieId,
+            colorKey: node?.data?.colorKey || node?.data?.label || node?.id,
+            label: node?.data?.label || node?.id,
+            colorValue: node?.data?.colorValue,
+          });
+
+          return (
+            <text
+              key={`${node.serieId}:${node.id}`}
+              x={placement.x}
+              y={placement.y}
+              textAnchor={placement.textAnchor}
+              dominantBaseline={placement.dominantBaseline}
+              style={{
+                fill: resolvedScatterLabelColor || fallbackColor,
+                fontSize: `${scatterLabelFontSize}px`,
+              }}
+              fontFamily="sans-serif"
+            >
+              {node?.data?.label || node?.id}
+            </text>
+          );
+        })}
       </g>
     );
   };
@@ -465,50 +716,37 @@ const ScatterChart = ({
         enableGridY={enableGridY}
         axisBottom={{
           ...(Number.isFinite(resolvedXAxisTicks) ? { tickValues: resolvedXAxisTicks } : {}),
+          renderTick: CustomXTick,
           legend: legends.bottom || options?.measureLabels?.x || "",
           legendPosition: "middle",
-          legendOffset: 46,
+          legendOffset: toNumber(offsetBottom) ?? toNumber(scatterXAxisLegendOffset, 56),
           format: (value) =>
             intl.formatNumber(
-              axisFormat?.style === "percent" ? value / 100 : value,
-              axisFormat,
+              xAxisFormat?.style === "percent" ? value / 100 : value,
+              xAxisFormat,
             ),
         }}
         axisLeft={{
           ...(Number.isFinite(resolvedYAxisTicks) ? { tickValues: resolvedYAxisTicks } : {}),
+          renderTick: CustomYTick,
           legend: legends.left || options?.measureLabels?.y || "",
           legendPosition: "middle",
-          legendOffset: -46,
+          legendOffset: toNumber(offsetY) ?? -(toNumber(scatterYAxisLegendOffset, 60)),
           format: (value) =>
             intl.formatNumber(
-              axisFormat?.style === "percent" ? value / 100 : value,
-              axisFormat,
+              yAxisFormat?.style === "percent" ? value / 100 : value,
+              yAxisFormat,
             ),
         }}
-        blendMode="multiply"
-        colors={({ serieId, data }) =>
-          getPointColor({
-            ...data,
-            serieId,
-            label: data?.label || data?.id || serieId,
-          })
-        }
+        blendMode="normal"
+        colors={{ scheme: "nivo" }}
         nodeSize={({ data }) => {
           if (Number.isFinite(data?.size) && data.size > 0) {
             return pointSizeScale(data.size);
           }
           return toNumber(scatterMinSize, DEFAULT_MIN_SIZE);
         }}
-        nodeColor={({ serieId, data }) =>
-          getPointColor({
-            ...data,
-            serieId,
-            label: data?.label || data?.id || serieId,
-          })
-        }
-        nodeBorderWidth={1}
-        nodeBorderColor={{ from: "color", modifiers: [["darker", 0.6]] }}
-        nodeOpacity={toNumber(scatterPointOpacity, 0.85)}
+
         tooltip={(node) => {
           if (!tooltipEnabled) {
             return null;
@@ -532,7 +770,10 @@ const ScatterChart = ({
             <DefaultScatterTooltip
               datum={normalizedDatum}
               intl={intl}
-              axisFormat={axisFormat}
+              xAxisFormat={xAxisFormat}
+              yAxisFormat={yAxisFormat}
+              sizeFormat={sizeFormat}
+              colorFormat={colorValueFormat}
             />
           );
         }}
@@ -542,33 +783,45 @@ const ScatterChart = ({
           "axes",
           ReferenceLayer,
           ConnectedLinesLayer,
-          "nodes",
+          CustomNodesLayer,
           LabelsLayer,
           "mesh",
           "legends",
         ]}
         theme={{
+          axis: {
+            ticks: {
+              line: { stroke: resolvedTickColor },
+              text: { fill: resolvedLabelColor },
+            },
+            legend: {
+              text: { fill: resolvedLabelColor },
+            },
+          },
           tooltip: {
             basic: { background: "#EEE", whiteSpace: "pre", display: "flex" },
             tableCell: { padding: "3px 5px" },
           },
         }}
       />
-      <Legends
-        filter={filter}
-        showLegends={showLegends}
-        chartLegends={chartLegends}
-        legendLabel={legendLabel}
-        legendPosition={legendPosition}
-        legendCheckBack={legendCheckBack}
-        legendLabelBack={legendLabelBack}
-        legendLabelColor={legendLabelColor}
-        onToggle={toggle}
-        reverseLegend={reverseLegend}
-      />
+      {colorByValuesMode ? (
+        <GradientLegend />
+      ) : (
+        <Legends
+          filter={filter}
+          showLegends={showLegends}
+          chartLegends={chartLegends}
+          legendLabel={legendLabel}
+          legendPosition={legendPosition}
+          legendCheckBack={legendCheckBack}
+          legendLabelBack={legendLabelBack}
+          legendLabelColor={legendLabelColor}
+          onToggle={toggle}
+          reverseLegend={reverseLegend}
+        />
+      )}
     </div>
   );
 };
 
 export default injectIntl(ScatterChart);
-

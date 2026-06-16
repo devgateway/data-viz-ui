@@ -243,8 +243,15 @@ const ChartEmbeddableRuntime = (props) => {
     "data-scatter-min-size": scatterMinSize = 10,
     "data-scatter-max-size": scatterMaxSize = 30,
     "data-scatter-show-labels": scatterShowLabels = "false",
+    "data-scatter-label-position": scatterLabelPosition = "top-right",
+    "data-scatter-label-color": scatterLabelColor = "",
+    "data-scatter-label-size": scatterLabelSize = 11,
     "data-scatter-connect-points": scatterConnectPoints = "false",
     "data-scatter-point-opacity": scatterPointOpacity = 0.85,
+    "data-scatter-x-measure": scatterXMeasure = "",
+    "data-scatter-y-measure": scatterYMeasure = "",
+    "data-scatter-size-measure": scatterSizeMeasure = "",
+    "data-scatter-color-measure": scatterColorMeasure = "",
     "data-scatter-reference-x": scatterReferenceX = "",
     "data-scatter-reference-y": scatterReferenceY = "",
     "data-scatter-reference-x-label": scatterReferenceXLabel = "",
@@ -253,6 +260,8 @@ const ChartEmbeddableRuntime = (props) => {
     "data-scatter-quadrant-top-right-label": scatterQuadrantTopRightLabel = "",
     "data-scatter-quadrant-bottom-left-label": scatterQuadrantBottomLeftLabel = "",
     "data-scatter-quadrant-bottom-right-label": scatterQuadrantBottomRightLabel = "",
+    "data-scatter-x-axis-legend-offset": scatterXAxisLegendOffset = 56,
+    "data-scatter-y-axis-legend-offset": scatterYAxisLegendOffset = 60,
 
     // Responsive preview
     "data-mobile-customization": mobileCustomization = "{}",
@@ -437,6 +446,27 @@ const ChartEmbeddableRuntime = (props) => {
     return [];
   };
 
+  const getMeasureFormatMap = (measureKeys = []) => {
+    const byMeasure = {};
+    if (!Array.isArray(measureKeys) || !measuresObject?.[app]) {
+      return byMeasure;
+    }
+
+    const appDefaultFormat = measuresObject?.[app]?.format || null;
+
+    measureKeys.forEach((measureKey) => {
+      const selectedMeasureFormat = measuresObject?.[app]?.[measureKey]?.format;
+      if (selectedMeasureFormat || appDefaultFormat) {
+        byMeasure[measureKey] = parseNumberFormat({
+          ...(appDefaultFormat || {}),
+          ...(selectedMeasureFormat || {}),
+        });
+      }
+    });
+
+    return byMeasure;
+  };
+
   let selectedMeasures = getSelectedMeasures();
   let selectedFormat = getSelectedFormat();
   const userMeasures = getUserMeasures();
@@ -521,10 +551,68 @@ const ChartEmbeddableRuntime = (props) => {
         : runtimeFallbackMeasure
         ? [runtimeFallbackMeasure]
         : selectedMeasures;
-  selectedFormat = getSelectedFormat(effectiveSelectedMeasures);
-  const effectiveCustomLabels = getCustomLabels(effectiveSelectedMeasures);
+  const uniqueScatterMeasures = type === "scatter" ? effectiveSelectedMeasures.filter(Boolean) : [];
+  const takeNextUnusedMeasure = (usedMeasureSet) =>
+    uniqueScatterMeasures.find((measure) => !usedMeasureSet.has(measure)) || "";
+
+  const resolveMappedScatterMeasure = (requestedMeasure, fallbackMeasure, usedMeasureSet) => {
+    if (requestedMeasure && uniqueScatterMeasures.includes(requestedMeasure)) {
+      usedMeasureSet.add(requestedMeasure);
+      return requestedMeasure;
+    }
+
+    if (fallbackMeasure && !usedMeasureSet.has(fallbackMeasure)) {
+      usedMeasureSet.add(fallbackMeasure);
+      return fallbackMeasure;
+    }
+
+    const nextMeasure = takeNextUnusedMeasure(usedMeasureSet);
+    if (nextMeasure) {
+      usedMeasureSet.add(nextMeasure);
+    }
+    return nextMeasure;
+  };
+
+  let scatterMeasureMapping = null;
+  let measuresForRuntime = effectiveSelectedMeasures;
+
+  if (type === "scatter") {
+    const used = new Set();
+    const xMeasure = resolveMappedScatterMeasure(scatterXMeasure, uniqueScatterMeasures[0], used);
+    const yMeasure = resolveMappedScatterMeasure(scatterYMeasure, uniqueScatterMeasures[1], used);
+    const sizeMeasure = scatterSizeMeasure && uniqueScatterMeasures.includes(scatterSizeMeasure)
+      ? scatterSizeMeasure
+      : "";
+    const colorMeasure = scatterColorMeasure && uniqueScatterMeasures.includes(scatterColorMeasure)
+      ? scatterColorMeasure
+      : "";
+
+    scatterMeasureMapping = {
+      xMeasure,
+      yMeasure,
+      sizeMeasure,
+      colorMeasure,
+    };
+
+    const prioritizedMeasures = [xMeasure, yMeasure, sizeMeasure, colorMeasure]
+      .filter((measure) => Boolean(measure));
+    measuresForRuntime = Array.from(new Set([...prioritizedMeasures, ...uniqueScatterMeasures]));
+
+    const hasColorIntensityMeasure = Boolean(colorMeasure);
+    if (hasColorIntensityMeasure && colorBy !== "values") {
+      colorBy = "values";
+    } else if (!hasColorIntensityMeasure && colorBy === "values") {
+      colorBy = "index";
+    } else if (!hasColorIntensityMeasure && colorBy !== "index") {
+      colorBy = "index";
+    }
+  }
+
+  selectedFormat = getSelectedFormat(measuresForRuntime);
+  const effectiveCustomLabels = getCustomLabels(measuresForRuntime);
   const numberFormat = parseNumberFormat(selectedFormat);
   const customAxisFormat = getCustomAxisFormat();
+  const measureFormats = getMeasureFormatMap(measuresForRuntime);
   const groupTotalFormatParsed = parseGroupTotalFormat(parse(groupTotalFormat));
   const [mode, setMode] = useState(editMode);
   const viewMode = editing ? editMode : mode;
@@ -650,7 +738,8 @@ const ChartEmbeddableRuntime = (props) => {
         : tooltipForSelectedMeasure.replace(/\r\n/g, "<hr/>").replace(/[\r\n]/g, "<hr/>"),
     format: numberFormat,
     customAxisFormat,
-    selectedMeasures: effectiveSelectedMeasures,
+    measureFormats,
+    selectedMeasures: measuresForRuntime,
     userMeasures,
     locale,
     categories,
@@ -796,6 +885,9 @@ const ChartEmbeddableRuntime = (props) => {
     scatterMinSize,
     scatterMaxSize,
     scatterShowLabels: parseBoolean(scatterShowLabels),
+    scatterLabelPosition,
+    scatterLabelColor: decode(scatterLabelColor),
+    scatterLabelSize: Number.parseFloat(scatterLabelSize) || 11,
     scatterConnectPoints: parseBoolean(scatterConnectPoints),
     scatterPointOpacity,
     scatterReferenceX,
@@ -806,6 +898,8 @@ const ChartEmbeddableRuntime = (props) => {
     scatterQuadrantTopRightLabel: decode(scatterQuadrantTopRightLabel),
     scatterQuadrantBottomLeftLabel: decode(scatterQuadrantBottomLeftLabel),
     scatterQuadrantBottomRightLabel: decode(scatterQuadrantBottomRightLabel),
+    scatterXAxisLegendOffset: Number.parseFloat(scatterXAxisLegendOffset) || 56,
+    scatterYAxisLegendOffset: Number.parseFloat(scatterYAxisLegendOffset) || 60,
   };
 
   const chartProps = {
@@ -841,8 +935,14 @@ const ChartEmbeddableRuntime = (props) => {
   }
 
   const dimensions = [];
-  if (dimension1 !== "none") dimensions.push(dimension1);
-  if (dimension2 !== "none") dimensions.push(dimension2);
+  if (type === "scatter") {
+    const selectedMeasureSet = new Set(measuresForRuntime);
+    if (dimension1 !== "none" && !selectedMeasureSet.has(dimension1)) dimensions.push(dimension1);
+    if (dimension2 !== "none" && !selectedMeasureSet.has(dimension2)) dimensions.push(dimension2);
+  } else {
+    if (dimension1 !== "none") dimensions.push(dimension1);
+    if (dimension2 !== "none") dimensions.push(dimension2);
+  }
 
   const { component: ChartComponent } = definition;
   const { component: ChartDataFrame, runtimeType } = resolveChartDataFrame({ type, app });
@@ -850,7 +950,7 @@ const ChartEmbeddableRuntime = (props) => {
     app,
     dimension1,
     dimension2,
-    selectedMeasures: effectiveSelectedMeasures,
+    selectedMeasures: measuresForRuntime,
   });
 
   const [legendsContainerHeight, setLegendsContainerHeight] = useState(0);
@@ -987,7 +1087,8 @@ const ChartEmbeddableRuntime = (props) => {
         includeTotal={true}
         includeOverall={parseBoolean(includeOverall)}
         overallLabel={overallLabel}
-        measures={effectiveSelectedMeasures}
+        measures={measuresForRuntime}
+        scatterMeasureMapping={scatterMeasureMapping}
         dimensions={[...dimensions]}
         sort={measureAndSortingProps.sort}
         sortReverse={measureAndSortingProps.sortReverse}

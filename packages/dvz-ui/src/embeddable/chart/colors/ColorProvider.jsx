@@ -3,6 +3,7 @@ import SystemColors from "./SystemColors";
 import PlainColor from "./PlainColor";
 import ManualColors from "./ManualColors";
 import {
+  isDivergingColorScheme,
   isCategoricalColorScheme,
   isSequentialColorScheme,
 } from "@nivo/colors";
@@ -78,7 +79,7 @@ class ColorProvider extends React.Component {
           options
         );
       } else {
-        if (isSequentialColorScheme(scheme)) {
+        if (isSequentialColorScheme(scheme) || isDivergingColorScheme(scheme)) {
           colorManager = new SequentialColors(
             colorBy,
             scheme,

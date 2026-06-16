@@ -6,9 +6,10 @@ const toNumber = (value) => {
   return Number.isFinite(numericValue) ? numericValue : null;
 };
 
-const buildVariables = ({ row, pointLabel, seriesLabel, xMeasure, yMeasure, sizeMeasure }) => ({
+const buildVariables = ({ row, pointLabel, seriesLabel, xMeasure, yMeasure, sizeMeasure, colorMeasure }) => ({
   ...row,
   label: pointLabel,
+  colorKey: pointLabel,
   category: pointLabel,
   field: yMeasure,
   x: row?.[xMeasure],
@@ -16,9 +17,10 @@ const buildVariables = ({ row, pointLabel, seriesLabel, xMeasure, yMeasure, size
   value: row?.[yMeasure],
   series: seriesLabel,
   ...(sizeMeasure ? { size: row?.[sizeMeasure] } : {}),
+  ...(colorMeasure ? { colorValue: row?.[colorMeasure] } : {}),
 });
 
-const buildPoint = ({ row, pointLabel, seriesLabel, xMeasure, yMeasure, sizeMeasure }) => {
+const buildPoint = ({ row, pointLabel, seriesLabel, xMeasure, yMeasure, sizeMeasure, colorMeasure }) => {
   const x = toNumber(row?.[xMeasure]);
   const y = toNumber(row?.[yMeasure]);
 
@@ -30,10 +32,12 @@ const buildPoint = ({ row, pointLabel, seriesLabel, xMeasure, yMeasure, sizeMeas
     x,
     y,
     size: sizeMeasure ? toNumber(row?.[sizeMeasure]) : null,
+    colorValue: colorMeasure ? toNumber(row?.[colorMeasure]) : null,
+    colorKey: pointLabel,
     label: pointLabel,
     id: pointLabel,
     value: y,
-    variables: buildVariables({ row, pointLabel, seriesLabel, xMeasure, yMeasure, sizeMeasure }),
+    variables: buildVariables({ row, pointLabel, seriesLabel, xMeasure, yMeasure, sizeMeasure, colorMeasure }),
   };
 };
 
@@ -59,11 +63,30 @@ const ScatterDataFrame = (props) => {
     .filter((measure) => measures.includes(measure.value))
     .sort((left, right) => (left.position || 0) - (right.position || 0));
 
-  const [xMeasure, yMeasure, sizeMeasure] = selectedMeasures.map((measure) => measure.value);
+  const selectedMeasureValues = selectedMeasures.map((measure) => measure.value);
+  const scatterMeasureMapping = props.scatterMeasureMapping || {};
+  const resolveMeasure = (candidateMeasure, fallbackMeasure) =>
+    candidateMeasure && selectedMeasureValues.includes(candidateMeasure)
+      ? candidateMeasure
+      : fallbackMeasure;
+
+  const xMeasure = resolveMeasure(scatterMeasureMapping.xMeasure, selectedMeasureValues[0]);
+  const yMeasure = resolveMeasure(
+    scatterMeasureMapping.yMeasure,
+    selectedMeasureValues.find((measure) => measure !== xMeasure),
+  );
+  const sizeMeasure = resolveMeasure(
+    scatterMeasureMapping.sizeMeasure,
+    selectedMeasureValues.find((measure) => ![xMeasure, yMeasure].includes(measure)),
+  );
+  const colorMeasure = resolveMeasure(
+    scatterMeasureMapping.colorMeasure,
+    "",
+  );
   const options = {
     indexBy: "label",
     keys: [],
-    colorIndexBy: "label",
+    colorIndexBy: "colorKey",
     colorKeys: [],
     colorData: [],
     metadata: data?.metadata,
@@ -108,7 +131,7 @@ const ScatterDataFrame = (props) => {
 
     const series = ensureSeries(seriesId);
     series.data.push(point);
-    flatPoints.push({ label: point.label, seriesId, ...point });
+    flatPoints.push({ label: point.label, colorKey: point.colorKey || point.label, seriesId, ...point });
   };
 
   if (!Array.isArray(data?.children) || data.children.length === 0) {
@@ -120,6 +143,7 @@ const ScatterDataFrame = (props) => {
       xMeasure,
       yMeasure,
       sizeMeasure,
+      colorMeasure,
     });
     addPointToSeries(seriesLabel, point);
   } else if (activeDimensions.length <= 1) {
@@ -137,6 +161,7 @@ const ScatterDataFrame = (props) => {
         xMeasure,
         yMeasure,
         sizeMeasure,
+        colorMeasure,
       });
       addPointToSeries(singleSeriesId, point);
     });
@@ -167,6 +192,7 @@ const ScatterDataFrame = (props) => {
           xMeasure,
           yMeasure,
           sizeMeasure,
+          colorMeasure,
         });
         addPointToSeries(seriesLabel, point);
       });
@@ -186,16 +212,24 @@ const ScatterDataFrame = (props) => {
     .filter((item) => item.data.length > 0);
 
   options.keys = series.map((item) => item.id);
-  options.colorKeys = options.keys;
-  options.colorData = flatPoints;
+  options.colorKeys = colorMeasure ? [colorMeasure] : options.keys;
+  options.colorData = colorMeasure
+    ? flatPoints.map((point) => ({
+      ...point,
+      colorKey: point.colorKey || point.label,
+      [colorMeasure]: point.colorValue,
+    }))
+    : flatPoints.map((point) => ({ ...point, colorKey: point.colorKey || point.label }));
   options.data = series;
   options.xMeasure = xMeasure;
   options.yMeasure = yMeasure;
   options.sizeMeasure = sizeMeasure;
+  options.colorMeasure = colorMeasure;
   options.measureLabels = {
     x: getMeasureLabel(xMeasure),
     y: getMeasureLabel(yMeasure),
     size: sizeMeasure ? getMeasureLabel(sizeMeasure) : null,
+    color: colorMeasure ? getMeasureLabel(colorMeasure) : null,
   };
 
   return React.Children.map(children, (child) =>
