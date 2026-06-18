@@ -76,12 +76,12 @@ export const useInternalTrafficBypass = (redirectTo: string = '/'): BypassStatus
       console.log(successLogMessage);
 
       // // Schedule redirect after 3 seconds
-      // const redirectTimer = setTimeout(() => {
-      //   navigate(redirectTo);
-      // }, 3000);
+      const redirectTimer = setTimeout(() => {
+        navigate(redirectTo);
+      }, 3000);
 
       // Cleanup timer if component unmounts
-      // return () => clearTimeout(redirectTimer);
+      return () => clearTimeout(redirectTimer);
     } catch (error) {
       setStatus('error');
       setMessage(getBypassErrorMessage(error));

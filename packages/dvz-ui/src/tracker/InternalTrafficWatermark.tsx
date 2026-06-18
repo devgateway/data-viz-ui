@@ -78,6 +78,7 @@ const InternalTrafficWatermark: React.FC = () => {
     top: `${position.y}px`,
     zIndex: 999999,
     willChange: isDragging ? 'transform' : 'auto',
+    cursor: isDragging ? 'grabbing' : 'grab',
   };
 
   return (
