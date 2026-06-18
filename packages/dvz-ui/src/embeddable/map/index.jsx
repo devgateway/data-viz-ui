@@ -1,5 +1,5 @@
 import React from 'react';
-import {connect} from "react-redux";
+import { connect } from "react-redux";
 import DataProvider from "../data/DataProvider";
 import DataConsumer from "../data/DataConsumer";
 import Map from './map';
@@ -8,15 +8,15 @@ import MapCSVDataFrame from './MapCSVDataFrame';
 
 
 const countries = [
-    {label: 'KENYA', value: 'KEN', center: [35.8166634, 0.1], scale: 2000},
-    {label: 'Nigeria', value: 'NGA', center: [7.491302, 9.072264], scale: 2000},
-    {label: 'South Africa', value: 'ZAF', center: [24.676997, -28.48322], scale: 2000},
-    {label: 'West Africa', value: 'West Africa', center: [-7.293255, 13.905720], scale: 1500},
-    {label: 'Africa', value: 'Africa', center: [13.134227, -11.523088], scale: 550},
-    {label: 'Ethiopia', value: 'ETH', center: [35.8166634, 1.7], scale: 2000},
-    {label: 'Zambia', value: 'ZMB', center: [26.459455, -14.668135], scale: 2000},
-    {label: 'Democratic Republic of the Congo', value: 'DRC', center: [23.174338, -5.837475], scale: 1250},
-    {label: 'World', value: 'World', center: [0, 20.050043], scale: 150}
+    { label: 'KENYA', value: 'KEN', center: [35.8166634, 0.1], scale: 2000 },
+    { label: 'Nigeria', value: 'NGA', center: [7.491302, 9.072264], scale: 2000 },
+    { label: 'South Africa', value: 'ZAF', center: [24.676997, -28.48322], scale: 2000 },
+    { label: 'West Africa', value: 'West Africa', center: [-7.293255, 13.905720], scale: 1500 },
+    { label: 'Africa', value: 'Africa', center: [13.134227, -11.523088], scale: 550 },
+    { label: 'Ethiopia', value: 'ETH', center: [35.8166634, 1.7], scale: 2000 },
+    { label: 'Zambia', value: 'ZMB', center: [26.459455, -14.668135], scale: 2000 },
+    { label: 'Democratic Republic of the Congo', value: 'DRC', center: [23.174338, -5.837475], scale: 1250 },
+    { label: 'World', value: 'World', center: [0, 20.050043], scale: 150 }
 ]
 
 const MapWrapper = (props) => {
@@ -39,10 +39,10 @@ const MapEntry = (props) => {
         "data-measures": measures = '["prevalenceSmokeAny"]',
         "data-height": height = 600,
         width = 960,
-        "data-data-source-text": dataSourceText = 'NIDS',
+        "data-data-source-text": dataSourceText = '',
         "data-data-source-label": dataSourceLabel = 'Source',
-        "data-national-average-label": nationalAverageLabel = 'National Prevalence Avg',
-        "data-legend-title": legendTitle = 'Tobacco Prevalence Rate',
+        "data-national-average-label": nationalAverageLabel = 'National Average',
+        "data-legend-title": legendTitle = 'Legend Title',
         "data-legend-breaks": legendBreaks = '[]',
         "data-zoom-enabled": zoomEnabled = false,
         "data-show-legend-labels": showLegendLabels = false,
@@ -277,8 +277,8 @@ const MapEntry = (props) => {
             store={[app, unique, ...source.split("/")]} source={source}>
             <DataConsumer>
                 <DataFrame measures={measuresCSV} multipleMeasures={multipleMeasures} mapType={mapType}
-                           aggregationFormula={aggregationFormula} customMeasureLabels={measureLabels}
-                           source={source}>
+                    aggregationFormula={aggregationFormula} customMeasureLabels={measureLabels}
+                    source={source}>
                     <Map  {...mapProps} />
                 </DataFrame>
             </DataConsumer>
