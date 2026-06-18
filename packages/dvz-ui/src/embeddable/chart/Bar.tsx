@@ -29,6 +29,7 @@ export interface BarChartProps {
   colors: any;
   groupMode: any;
   height: number;
+  chartHeight?: number;
   showLegends: boolean;
   legendPosition: string;
   tickRotation: number;
@@ -99,6 +100,7 @@ const Chart = ({
   colors,
   groupMode,
   height,
+  chartHeight,
   showLegends,
   legendPosition,
   tickRotation,
@@ -153,9 +155,14 @@ const Chart = ({
   lineXAxisTickCount = 10,
   lineXAxisTickEvery = 1
 }: BarChartProps) => {
-  const isMobileOrTablet = ["mobile", "tablet", "midTablet"].includes(
-    deviceType(),
-  );
+  // In WordPress edit mode the component renders inside an iframe whose width
+  // reflects the editor canvas, not the real viewport, so deviceType() (which
+  // relies on window.innerWidth) would wrongly report mobile/tablet. While
+  // editing, derive the device context from the WordPress previewMode instead;
+  // only in the live view fall back to the measured device type.
+  const isMobileOrTablet = editing
+    ? previewMode === "Mobile" || previewMode === "Tablet"
+    : ["mobile", "tablet", "midTablet"].includes(deviceType());
   const isTabletDevice = ["tablet", "midTablet"].includes(deviceType());
   const isMobileDevice = deviceType() === "mobile";
   const LABEL_SKIP_WIDTH = 30; // important for vertical layout
@@ -1380,11 +1387,30 @@ const Chart = ({
 
   let newHeight = parseInt(height + "") - newMarginBottom;
 
+  // Explicit chart-area height (opt-in). When set, the chart renders at this
+  // fixed height and the legend flows naturally above/below it (no absolute
+  // positioning, no margin-reservation); the wrapper is a flex column that grows
+  // with its content. When 0, the legacy fixed-height layout is preserved.
+  const useChartHeight = Number(chartHeight) > 0;
+  const chartAreaHeight = useChartHeight ? Number(chartHeight) : newHeight;
 
   return (
-    <div style={{ height: newHeight }}>
+    <div
+      style={
+        useChartHeight
+          ? { display: "flex", flexDirection: "column" }
+          : { height: newHeight }
+      }
+    >
       {options?.data && options.data.length > 0 && (
         <>
+          <div
+            style={
+              useChartHeight
+                ? { height: chartAreaHeight, flexShrink: 0 }
+                : { height: "100%" }
+            }
+          >
           <ResponsiveBar
             colorBy={colors.colorBy}
             animate={true}
@@ -1572,6 +1598,7 @@ const Chart = ({
               },
             }}
           />
+          </div>
           {(legendPosition === "top" || legendPosition === "bottom") &&
             isLegendReady && (
               <div
@@ -1579,19 +1606,27 @@ const Chart = ({
                 style={
                   legendPosition === "bottom"
                     ? {
-                      marginBottom: `${newMarginBottom}px`,
+                      // In chart-height mode the legend flows below the chart;
+                      // the dynamic margin-reservation is only needed in legacy.
+                      marginBottom: useChartHeight ? undefined : `${newMarginBottom}px`,
                       marginTop: "25px",
                       textAlign: "left",
                       justifyContent: "flex-start",
                     }
                     : {
                       justifyContent: "flex-start",
+                      // Top legend: in chart-height mode it flows ABOVE the chart
+                      // (override the legacy `position: absolute`) via flex order.
+                      ...(useChartHeight
+                        ? { position: "static", order: -1 }
+                        : {}),
                     }
                 }
               >
                 <div className="legend-sections">
                   <div className="title-section">{legendTitle()}</div>
                   <FlexWrapDetector
+                    isMobileOrTablet={isMobileOrTablet}
                     onWrapChange={(count) => {
                       if (legendPosition === "top" && isMobileOrTablet) {
                         const newMarginTop = marginTop + (count / 2) * 40;

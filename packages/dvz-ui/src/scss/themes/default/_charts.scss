@@ -277,10 +277,6 @@
         .legend-sections {
             display: flex;
 
-            @media screen and (max-width: 1024px) {
-                flex-direction: column;
-            }
-
             .title-section {
                 display: flex;
                 position: relative;
@@ -290,10 +286,6 @@
                 display: flex;
                 position: relative !important;
                 flex-wrap: wrap !important;
-
-                @media screen and (max-width: 1024px) {
-                    gap: 10px !important;
-                }
             }
         }
 
@@ -303,16 +295,6 @@
             text-align: left;
             display: flex;
             line-height: 28px !important;
-
-            @media screen and (max-width: 1024px) {
-                min-width: 150px;
-                flex-basis: 25%;
-                flex: 1;
-                justify-content: flex-start;
-                padding: 5px !important;
-                box-sizing: border-box;
-                /* Ensure padding doesn't affect overall width */
-            }
 
             input[type="checkbox"],
             input[type="radio"] {
@@ -376,6 +358,61 @@
 
     .radar {
         svg text {}
+    }
+}
+
+// Compact bottom-legend layout.
+//
+// In live view it follows the real viewport width (the historical 1024px
+// breakpoint). Inside the WordPress editor the chart renders in an iframe whose
+// width is the editor canvas — width-based media queries misfire there and would
+// apply the compact layout even when "Desktop" preview is selected. Charts that
+// render through chart/index.jsx add `.legends-managed` and toggle
+// `.is-compact-legends` from JS (driven by the WordPress previewMode), so for
+// them the viewport query is disabled and the class governs the layout instead.
+//
+// Items flow inline: each sizes to its content (`flex: 0 0 auto`) and wraps as
+// needed — as many per row as fit, left-aligned. Spacing comes from the
+// items-section `gap` (the default per-item margin is cleared so it doesn't
+// add up between items).
+
+// Live / unmanaged charts: viewport-driven.
+@media screen and (max-width: 1024px) {
+    .chart.container:not(.legends-managed) .legends.container.bottom {
+        .legend-sections {
+            flex-direction: column;
+
+            .items-section {
+                gap: 10px !important;
+            }
+        }
+
+        .legend.item {
+            margin: 0;
+            flex: 0 0 auto;
+            justify-content: flex-start;
+            padding: 5px !important;
+            box-sizing: border-box;
+        }
+    }
+}
+
+// Managed charts (editor-aware).
+.chart.container.is-compact-legends .legends.container.bottom {
+    .legend-sections {
+        flex-direction: column;
+
+        .items-section {
+            gap: 10px !important;
+        }
+    }
+
+    .legend.item {
+        margin: 0;
+        flex: 0 0 auto;
+        justify-content: flex-start;
+        padding: 5px !important;
+        box-sizing: border-box;
     }
 }
 
