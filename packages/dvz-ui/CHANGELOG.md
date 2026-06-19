@@ -1,5 +1,18 @@
 # @devgateway/dvz-ui-react
 
+## 1.8.8
+
+### Patch Changes
+
+- [#256](https://github.com/devgateway/data-viz-ui/pull/256) [`a82a979`](https://github.com/devgateway/data-viz-ui/commit/a82a9793365e8e517369219569bfe6f3717d7f2f) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Re-implement the Google analytics wrapper to remove the internal token
+  Add watermark component for internal traffic
+
+## 1.8.7
+
+### Patch Changes
+
+- [#254](https://github.com/devgateway/data-viz-ui/pull/254) [`791fd0f`](https://github.com/devgateway/data-viz-ui/commit/791fd0f8aeb72753382d5119023497fc41e6789f) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Normalized category taxonomy handling to prevent invalid "none" values from being passed to `getCustomPosts`. Both filter-provided and block-configured taxonomy values now exclude "none" before use, ensuring consistent behavior across `taxonomy` arg and `taxonomyFilters` map. Fixes issue where "none" could appear as a query parameter key.
+
 ## 1.8.6
 
 ### Patch Changes

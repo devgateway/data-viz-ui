@@ -49,14 +49,3 @@ export const clearInternalTrafficCookie = (): void => {
   document.cookie = `${INTERNAL_TRAFFIC_COOKIE_NAME}=; max-age=0; path=/; SameSite=Lax`;
   console.log('Internal traffic cookie cleared');
 };
-
-/**
- * Validate the token against the expected value
- * @param providedToken - The token from query params
- * @param expectedToken - The expected token from environment
- * @returns true if tokens match, false otherwise
- */
-export const validateToken = (providedToken: string | null, expectedToken: string): boolean => {
-  if (!providedToken) return false;
-  return providedToken === expectedToken;
-};

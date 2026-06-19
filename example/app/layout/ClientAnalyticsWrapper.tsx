@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import ReactGA from "react-ga4";
 import { useLocation } from "react-router";
-import { isInternalTrafficEnabled } from "@devgateway/dvz-ui-react/tracker";
+import { isInternalTrafficEnabled, InternalTrafficWatermark } from "@devgateway/dvz-ui-react/tracker";
 
 /**
  * Type declaration for the runtime env vars injected by the server
@@ -11,7 +11,6 @@ declare global {
   interface Window {
     ENV?: {
       REACT_APP_GA_CODE?: string;
-      INTERNAL_GA_TOKEN?: string;
     };
   }
 }
@@ -22,6 +21,7 @@ let gaInitialized = false;
 
 interface ClientAnalyticsWrapperProps {
   children: React.ReactNode;
+  token?: string; // Optional token prop for future use if needed
 }
 
 /**
@@ -239,5 +239,10 @@ export function ClientAnalyticsWrapper({
     };
   }, [location.pathname, gaCode]);
 
-  return <>{children}</>;
+  return (
+    <>
+      <InternalTrafficWatermark />
+      {children}
+    </>
+  );
 }

@@ -51,7 +51,6 @@ export const links: Route.LinksFunction = () => [
 
 export interface PublicEnv {
   REACT_APP_GA_CODE: string;
-  INTERNAL_GA_TOKEN: string;
 }
 
 /**
@@ -60,10 +59,7 @@ export interface PublicEnv {
  * Falls back to the Docker runtime env var `VITE_REACT_APP_GA_CODE` if the
  * settings endpoint is unreachable.
  */
-async function fetchPublicEnv(wpApiBase: string): Promise<PublicEnv> {
-  const internalGaToken =
-    process.env.VITE_INTERNAL_GA_TOKEN ?? process.env.GA_TOKEN ?? "";
-
+async function fetchPublicEnv(wpApiBase: string): Promise<PublicEnv> { 
   const defaultLocale = process.env.VITE_REACT_APP_DEFAULT_LOCALE ?? "en";
 
   try {
@@ -82,7 +78,6 @@ async function fetchPublicEnv(wpApiBase: string): Promise<PublicEnv> {
 
     return {
       REACT_APP_GA_CODE: gaCode,
-      INTERNAL_GA_TOKEN: internalGaToken,
     };
   } catch (error) {
     console.error(
@@ -91,7 +86,6 @@ async function fetchPublicEnv(wpApiBase: string): Promise<PublicEnv> {
     );
     return {
       REACT_APP_GA_CODE: process.env.VITE_REACT_APP_GA_CODE ?? "",
-      INTERNAL_GA_TOKEN: internalGaToken,
     };
   }
 }
@@ -117,8 +111,6 @@ export async function loader({
     console.error("Failed to fetch favicon:", error);
     const ENV = await envPromise.catch(() => ({
       REACT_APP_GA_CODE: process.env.VITE_REACT_APP_GA_CODE ?? "",
-      INTERNAL_GA_TOKEN:
-        process.env.VITE_INTERNAL_GA_TOKEN ?? process.env.GA_TOKEN ?? "",
     }));
     return {
       faviconUrl: null,
