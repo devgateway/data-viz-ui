@@ -1,5 +1,12 @@
 # @devgateway/dvz-ui-react
 
+## 1.8.8
+
+### Patch Changes
+
+- [#256](https://github.com/devgateway/data-viz-ui/pull/256) [`a82a979`](https://github.com/devgateway/data-viz-ui/commit/a82a9793365e8e517369219569bfe6f3717d7f2f) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Re-implement the Google analytics wrapper to remove the internal token
+  Add watermark component for internal traffic
+
 ## 1.8.7
 
 ### Patch Changes
