@@ -1,5 +1,11 @@
 # @devgateway/dvz-ui-react
 
+## 1.9.0
+
+### Minor Changes
+
+- [#257](https://github.com/devgateway/data-viz-ui/pull/257) [`15c81a5`](https://github.com/devgateway/data-viz-ui/commit/15c81a5ce383d811b4c917dc036db8a6a0e111b0) Thanks [@sdimunzio](https://github.com/sdimunzio)! - Fixing merge issues
+
 ## 1.8.8
 
 ### Patch Changes
