@@ -2,8 +2,7 @@
 
 Component specifications have been migrated to a dedicated repository:
 
-**`alive-dataviz-specs`** — located at `/Volumes/External/projects/alive/alive-dataviz-specs`
-
+**`alive-dataviz-specs`**
 ## What moved
 
 | Old path (here) | New path (alive-dataviz-specs) |
