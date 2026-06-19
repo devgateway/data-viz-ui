@@ -1,10 +1,15 @@
 import React, { MutableRefObject, useCallback, useEffect, useRef, useState } from "react";
 import deviceType from '../utils/deviceType';
 
-const FlexWrapDetector = ({ children, onWrapChange, className }) => {
+const FlexWrapDetector = ({ children, onWrapChange, className, isMobileOrTablet: isMobileOrTabletOverride }) => {
   const containerRef: MutableRefObject<HTMLDivElement | null> = useRef(null);
   const [wrapCount, setWrapCount] = useState(0);
-  const isMobileOrTablet = deviceType() === 'mobile' || deviceType() === 'tablet' || deviceType() === 'midTablet';
+  // Callers rendered inside the WordPress editor iframe can pass an
+  // editing/previewMode-aware value, since deviceType() (window.innerWidth)
+  // reflects the narrow editor canvas rather than the real viewport. When the
+  // prop is omitted, fall back to the measured device type.
+  const isMobileOrTablet = isMobileOrTabletOverride ??
+    (deviceType() === 'mobile' || deviceType() === 'tablet' || deviceType() === 'midTablet');
 
   const makeFlexWrap = useCallback(() => {
     if (containerRef.current) {

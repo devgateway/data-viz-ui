@@ -48,7 +48,7 @@ const Diverging = (props) => {
   );
 };
 
-const Chart = (props) => { 
+const Chart = (props) => {
   let {
     parent,
     editing = false,
@@ -60,6 +60,7 @@ const Chart = (props) => {
     "data-dvz-proxy-dataset-id": dvzProxyDatasetId,
     "data-group": group = "default",
     "data-height": height = 500,
+    "data-chart-height": chartHeight = 0,
     "data-type": type = "bar", //'data-source': source = 'gender/smoke',f
     "data-dimension1": dimension1,
     "data-dimension2": dimension2,
@@ -178,8 +179,6 @@ const Chart = (props) => {
     "data-preview-mode": previewMode = "Desktop",
     "data-wait-for-filters": waitForFilters = "false",
     "data-line-curve": lineCurve = "linear",
-    "data-show-legends-in-columns": showLegendsInColumns = "false",
-    "data-number-of-legend-columns": numberOfLegendColumns = 4,
     "data-line-x-axis-tick-mode": lineXAxisTickMode = "none",
     "data-line-x-axis-tick-count": lineXAxisTickCount = 10,
     "data-line-x-axis-tick-every": lineXAxisTickEvery = 1,
@@ -191,6 +190,12 @@ const Chart = (props) => {
   );
   const [isMobileOrTablet, setIsMobileOrTablet] = useState(
     window.innerWidth <= 1250,
+  );
+  // Tracks the historical 1024px breakpoint used by the compact bottom-legend
+  // layout. Kept separate from isMobileOrTablet (<=1250) to preserve the exact
+  // live-view behavior of the CSS media query it replaces.
+  const [isNarrowViewport, setIsNarrowViewport] = useState(
+    window.innerWidth <= 1024,
   );
   const isMobileConfigEnabled =
     isMobileOrTablet && (mobileConfigSettings?.showCustomization ?? false);
@@ -207,6 +212,22 @@ const Chart = (props) => {
   const isNotDesktopPreview =
     isMobileConfigEnabled && previewMode !== "Desktop";
   const isNotEditingAndIsMobileOrTablet = isMobileConfigEnabled && !editing;
+
+  // Whether the compact bottom-legend layout should apply. While editing the
+  // chart lives in an iframe whose width is the editor canvas, so the real
+  // viewport width is meaningless — follow the WordPress previewMode instead.
+  // In live view fall back to the measured viewport (1024px breakpoint).
+  const isCompactLegends = editing
+    ? previewMode !== "Desktop"
+    : isNarrowViewport;
+
+  // Same iframe caveat as isCompactLegends: while editing, the <=1250 width check
+  // would treat a Desktop preview (narrow editor canvas) as mobile/tablet and run
+  // the legend-spacing adjustment that the live Desktop frontend never runs.
+  // Decide from the previewMode while editing so the editor matches the frontend.
+  const treatAsMobileOrTablet = editing
+    ? previewMode !== "Desktop"
+    : isMobileOrTablet;
 
   const getTickRotation = () => {
     const isTabletViewport = window.matchMedia(
@@ -439,7 +460,20 @@ const Chart = (props) => {
     colorBy: colorBy,
   };
   const child = null;
-  const contentHeight = editing ? height - 80 : height;
+  // Height reserved in the WordPress editor for the edit controls/toolbar so the
+  // chart doesn't overlap them. The live frontend uses the full height.
+  const EDIT_MODE_HEIGHT_OFFSET = 0;
+  const contentHeight = editing ? height - EDIT_MODE_HEIGHT_OFFSET : height;
+
+  // Explicit chart-area height. When > 0 (opt-in), the chart renders at this
+  // height and the legend flows naturally, so the body wrappers must grow with
+  // the content (use minHeight) instead of clamping to a fixed height. When 0,
+  // the legacy fixed-height behavior is preserved.
+  const chartHeightPx = Number.parseInt(chartHeight) || 0;
+  const bodyHeightStyle =
+    chartHeightPx > 0
+      ? { minHeight: `${contentHeight}px` }
+      : { height: `${contentHeight}px` };
 
   const showXAxisTitle = () =>
     (isNotDesktopPreview || isNotEditingAndIsMobileOrTablet) &&
@@ -525,6 +559,7 @@ const Chart = (props) => {
   useEffect(() => {
     const updateDeviceType = () => {
       setIsMobileOrTablet(window.innerWidth <= 1250);
+      setIsNarrowViewport(window.innerWidth <= 1024);
       const rotation = getTickRotation();
       setTickRotation(rotation);
     };
@@ -588,6 +623,8 @@ const Chart = (props) => {
       Number.parseInt(marginBottom),
     ),
     height: `${contentHeight}px`,
+    // Explicit chart-area height (0 = legacy: chart fills `height`, legend shares it).
+    chartHeight: Number.parseInt(chartHeight) || 0,
     legendPosition: determineLegendPosition(),
     legends,
     tooltip:
@@ -702,8 +739,6 @@ const Chart = (props) => {
     dimension1,
     previewMode,
     lineCurve,
-    showLegendsInColumns: showLegendsInColumns == true || showLegendsInColumns == "true",
-    numberOfLegendColumns: parseInt(numberOfLegendColumns) || 4,
   };
 
   const params = {};
@@ -794,7 +829,13 @@ const Chart = (props) => {
   }
 
   useEffect(() => {
-    if (!isMobileOrTablet) return;
+    if (!treatAsMobileOrTablet) {
+      // Desktop layout adds no extra legend spacing; clear any value measured
+      // while previously in a mobile/tablet preview so toggling back to Desktop
+      // doesn't leave stale height behind.
+      setLegendsContainerHeight(0);
+      return;
+    }
 
     // Measures the legends container height and corrects any overlap with the chart above
     const adjustLegendsMargin = () => {
@@ -823,13 +864,13 @@ const Chart = (props) => {
       const marginBottom = parseInt(styles.marginBottom);
       const paddingTop = parseInt(styles.paddingTop);
       const paddingBottom = parseInt(styles.paddingBottom);
-      
+
       // On mobile, use only content height without margins/padding to avoid excessive bottom spacing
       // On desktop, include all spacing for proper layout
       const deviceType = getDeviceType();
       const isMobileDevice = deviceType === "mobile";
-      const totalHeight = isMobileDevice 
-        ? height 
+      const totalHeight = isMobileDevice
+        ? height
         : height + marginTop + marginBottom + paddingTop + paddingBottom;
 
       // Check for overlap with the chart container above.
@@ -928,7 +969,7 @@ const Chart = (props) => {
     };
 
     return setupObserver();
-  }, [isMobileOrTablet, ref]);
+  }, [treatAsMobileOrTablet, ref]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -954,7 +995,8 @@ const Chart = (props) => {
   return (
     <div ref={ref}>
       <Container
-        className={"chart container"}
+        className={`chart container legends-managed${isCompactLegends ? " is-compact-legends" : ""
+          }`}
         style={{
           minHeight: `${parseInt(height) + parseInt(legendsContainerHeight)}px`,
         }}
@@ -962,7 +1004,7 @@ const Chart = (props) => {
       >
         <DataProvider
           editing={editing}
-          style={{ height: `${contentHeight}px` }}
+          style={bodyHeightStyle}
           params={params}
           waitForFilters={waitForFilters === "true"}
           app={app}
@@ -972,7 +1014,7 @@ const Chart = (props) => {
           source={dimensions.join("/")}
         >
           <Container
-            style={{ height: `${contentHeight}px` }}
+            style={bodyHeightStyle}
             className={"body"}
             fluid={true}
           >

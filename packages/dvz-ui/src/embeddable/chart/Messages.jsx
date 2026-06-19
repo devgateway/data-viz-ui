@@ -1,10 +1,10 @@
 import React from "react";
 import { Button, Header, Segment } from "semantic-ui-react";
-import { cleanFilter } from "../reducers/data";
+import { cleanFilter, applyFilter } from "../reducers/data";
 import { connect } from "react-redux";
 
 const Messages = (props) => {
-  const { data, noDataMsg, app, group, onClean, editing } = props;
+  const { data, noDataMsg, app, group, onClean, onApply, editing } = props;
   if (data && data.itemsSize && data.itemsSize > 0) {
     return null;
   }
@@ -39,13 +39,14 @@ const Messages = (props) => {
         )}
         <div className="WPnoDataMsg">{noDataMsg}</div>
       </Header>
-      <Button onClick={(e) => onClean({ app, group })}>Clear Filter</Button>
+      <Button onClick={(e) => { onClean({ app, group }); onApply({ app, group }); }}>Clear Filter</Button>
     </Segment>
   );
 };
 
 const mapActionCreators = {
   onClean: cleanFilter,
+  onApply: applyFilter,
 };
 
 export default connect(null, mapActionCreators)(Messages);

@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { injectIntl } from 'react-intl';
 import { CategoriesContext } from './DataContext'
-import { getCategories, loadFilterItems } from "../reducers/data";
+import { getCategories, loadFilterItems, setData } from "../reducers/data";
 import { Container, Segment } from "semantic-ui-react";
 
 const MemoizedCategoriesContextProvider = ({ data, children }) => {
@@ -22,15 +22,19 @@ class DataProvider extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        const { app, parentSelectedItems, filters, source, store, params, csv, group, editing } = this.props
+        const { app, filters, parentSelectedItems, params, source, csv, store, group } = this.props
 
         if (prevProps.parentSelectedItems && parentSelectedItems && parentSelectedItems.length != prevProps.parentSelectedItems.length) {
             this.props.onReLoadItems(this.props)
         }
 
+        // For CSV apps, filter selection changes require re-processing the in-memory data.
+        // For API apps, filter selections do not change the available category options —
+        // only structural source changes (params, app, source, csv) warrant a reload.
+        const csvFiltersChanged = app === "csv" && filters != prevProps.filters;
 
-        if (filters != prevProps.filters ||
-            JSON.stringify(params) != JSON.stringify(prevProps.params)
+        if (csvFiltersChanged
+            || JSON.stringify(params) != JSON.stringify(prevProps.params)
             || app != prevProps.app
             || prevProps.source != source
             || csv != prevProps.csv) {
@@ -38,12 +42,7 @@ class DataProvider extends React.Component {
             if (app === "csv") {
                 this.props.onSetData({ app, csv, store, params, group })
             } else {
-                if (editing) {
-                    params.v = (Math.random() + 1).toString(36).substring(7)
-                }
-                this.setState({ showLoading: false })
-                this.props.onLoadData(this.props)//this.props.onLoadData({app, source, store, params, group})
-                setTimeout(this.checkLoadingTime, 100);
+                this.props.onLoadData(this.props)
             }
         }
     }
@@ -67,15 +66,11 @@ class DataProvider extends React.Component {
             return <MemoizedCategoriesContextProvider data={data}>{this.props.children}</MemoizedCategoriesContextProvider>
         } else if (error) {
             return <Segment color={"red"}>
-                <h1>500</h1>
                 <p>Wasn't able to load data</p>
             </Segment>
         } else {
             return <Container>
-                <Segment color={"red"}>
-                    <h1>404</h1>
-                    <p>Can't find this page</p>
-                </Segment>
+
             </Container>
         }
 
@@ -95,26 +90,21 @@ const mapStateToProps = (state, ownProps) => {
         path.push(uniqueStorage)
     }
 
-    const itemsJS = state.getIn([...path, 'items'])
-    const items = itemsJS ? itemsJS.toJS() : []
+    // Avoid calling .toJS() here — it creates a new object reference on every Redux
+    // dispatch and causes unnecessary re-renders. The Immutable `data` reference only
+    // changes when categories actually load new data from the API.
     const selectedItems = state.getIn(['data', 'filters', app, group, param])
+    const filters = state.getIn(['data', 'filters', app, group])
 
-    const tmpFilterItems = items.filter(f => f.type == type)
-    const filterItems = tmpFilterItems && tmpFilterItems.length > 0 ? tmpFilterItems[0].items : []
-    const thisFilterSelection = []
-
-    let parentItems = []
-    let parentSelectedItems = []
+    let parentSelectedItems
     if (parentType) {
-
-        parentItems = items.filter(f => f.type == parentType)
         parentSelectedItems = state.getIn(['data', 'filters', app, group, parentParam])
     }
+
     return {
         parentSelectedItems,
         selectedItems,
-        items,
-        parentItems,
+        filters,
         data: state.getIn([...path, 'items']),
         error: state.getIn([...path, 'error']),
         loading: state.getIn([...path, 'loading']),
@@ -123,7 +113,8 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapActionCreators = {
     onLoadData: getCategories,
-    onReLoadItems: loadFilterItems
+    onReLoadItems: loadFilterItems,
+    onSetData: setData
 };
 
 export default connect(mapStateToProps, mapActionCreators)(injectIntl(DataProvider));

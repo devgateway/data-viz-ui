@@ -146,31 +146,46 @@ export const setData = ({ app, group, csv, store, params }) => (dispatch, getSta
 export const getData = (props) => (dispatch, getState) => {
 
     const { app, group, source, store, params, parent } = props
-
-
     let filters = getState().get('data').getIn(['filters', app, group]);
-
-    if (parent)
-        if (params) {
-            const presetFilters = Object.keys(params);
-            presetFilters.forEach(k => {
-                if (filters && filters.has(k)) {
-                    let a = params[k]
-                    let b = filters.get(k)
-                    //[A,B,C,E]
-                    //[C,D]
-                    //We should remove other options from preset filter and turn on off the matching ones
-                    let newB = b.filter(c => a.indexOf(c) > -1);
-                    filters = filters.set(k, newB)
-                }
-            })
-        }
     let newParams = { ...params }
+
+
     if (filters) {
-        newParams = { ...newParams, ...filters.toJS() }
+        //preset filters overrides selected filters
+        /*
+         // Example: If the component has a preset `Gender=Female` filter, 
+        // selecting anything other than "Female" should result in no data being shown.
+
+        dvzProxyDatasetId: "122"
+        meta_source: ['aadgg']
+                sex: ['Female']
+
+        for those components that were using preset filter as default filter, please use the new 
+        default selected filter setting of Filter Component
+        */
+
+        const userFilters = filters.toJS();
+        newParams = { ...userFilters, ...params };
+
+        if (params) {
+
+            Object.keys(params).forEach(key => {
+                if (userFilters[key] !== undefined) {
+                    const presetValues = Array.isArray(params[key]) ? params[key] : [params[key]];
+                    const userValues = Array.isArray(userFilters[key]) ? userFilters[key] : [userFilters[key]];
+
+                    const hasPreset = presetValues.some(val => userValues.includes(val));
+
+                    if (!hasPreset) {
+                        newParams[key] = [Number.MIN_SAFE_INTEGER];
+                    }
+                }
+            });
+        }
     }
 
     dispatch({ type: LOAD_DATA, app, group, params: newParams, store })
+
     api.getData({ app, source, params: newParams })
         .then(data => {
             data.appliedFilters = newParams
@@ -379,9 +394,11 @@ export default (state = initialState, action) => {
 
 
         case CLEAN_FILTER: {
+            const now = Date.now();
             const { app, group } = action
             const initial = state.getIn(['filters', 'initial', app, group])
             return state.setIn(['filters', app, group], initial)
+                .setIn(['filters-settings', app, group, 'lastUserFilterChange'], now)
         }
 
         case SET_MEASURES: {

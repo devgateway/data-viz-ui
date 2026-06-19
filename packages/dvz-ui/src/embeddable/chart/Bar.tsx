@@ -29,6 +29,7 @@ export interface BarChartProps {
   colors: any;
   groupMode: any;
   height: number;
+  chartHeight?: number;
   showLegends: boolean;
   legendPosition: string;
   tickRotation: number;
@@ -80,8 +81,6 @@ export interface BarChartProps {
   customAxisFormat: any;
   previewMode: string;
   editing: boolean;
-  showLegendsInColumns?: boolean;
-  numberOfLegendColumns?: number;
   // X-axis tick mode controls (mirror Line.jsx)
   lineXAxisTickMode?: 'none' | 'count' | 'every';
   lineXAxisTickCount?: number;
@@ -101,6 +100,7 @@ const Chart = ({
   colors,
   groupMode,
   height,
+  chartHeight,
   showLegends,
   legendPosition,
   tickRotation,
@@ -151,15 +151,18 @@ const Chart = ({
   enableGridX,
   customAxisFormat,
   previewMode,
-  showLegendsInColumns = false,
-  numberOfLegendColumns = 4,
   lineXAxisTickMode = 'none',
   lineXAxisTickCount = 10,
   lineXAxisTickEvery = 1
 }: BarChartProps) => {
-  const isMobileOrTablet = ["mobile", "tablet", "midTablet"].includes(
-    deviceType(),
-  );
+  // In WordPress edit mode the component renders inside an iframe whose width
+  // reflects the editor canvas, not the real viewport, so deviceType() (which
+  // relies on window.innerWidth) would wrongly report mobile/tablet. While
+  // editing, derive the device context from the WordPress previewMode instead;
+  // only in the live view fall back to the measured device type.
+  const isMobileOrTablet = editing
+    ? previewMode === "Mobile" || previewMode === "Tablet"
+    : ["mobile", "tablet", "midTablet"].includes(deviceType());
   const isTabletDevice = ["tablet", "midTablet"].includes(deviceType());
   const isMobileDevice = deviceType() === "mobile";
   const LABEL_SKIP_WIDTH = 30; // important for vertical layout
@@ -236,39 +239,39 @@ const Chart = ({
       chartLegends =
         colors.colorBy === "index"
           ? options.data.map((d) => {
-              let theColor;
-              let enabled = true;
-              if (filter.indexOf(d[options.indexBy]) > -1) {
-                enabled = false;
-                theColor = DEFAULT_COLOR;
-              } else {
-                theColor = d[COLOR_VARIABLE]
-                  ? d[COLOR_VARIABLE]
-                  : colorGenerator.getColor(d.id, d);
-              }
-              return {
-                enabled: enabled,
-                color: theColor,
-                id: d[options.indexBy],
-                label: d[options.indexBy],
-              };
-            })
+            let theColor;
+            let enabled = true;
+            if (filter.indexOf(d[options.indexBy]) > -1) {
+              enabled = false;
+              theColor = DEFAULT_COLOR;
+            } else {
+              theColor = d[COLOR_VARIABLE]
+                ? d[COLOR_VARIABLE]
+                : colorGenerator.getColor(d.id, d);
+            }
+            return {
+              enabled: enabled,
+              color: theColor,
+              id: d[options.indexBy],
+              label: d[options.indexBy],
+            };
+          })
           : options.keys.map((k) => {
-              let theColor;
-              let enabled = true;
-              if (filter.indexOf(k) > -1) {
-                enabled = false;
-                theColor = DEFAULT_COLOR;
-              } else {
-                theColor = colorGenerator.getColorByKey(k);
-              }
-              return {
-                enabled: enabled,
-                color: theColor,
-                id: k,
-                label: k,
-              };
-            });
+            let theColor;
+            let enabled = true;
+            if (filter.indexOf(k) > -1) {
+              enabled = false;
+              theColor = DEFAULT_COLOR;
+            } else {
+              theColor = colorGenerator.getColorByKey(k);
+            }
+            return {
+              enabled: enabled,
+              color: theColor,
+              id: k,
+              label: k,
+            };
+          });
     }
 
     return chartLegends;
@@ -461,6 +464,8 @@ const Chart = ({
     };
     adjustBottomForLegends();
   }, [chartLegends]);
+
+
 
   useEffect(() => {
     // Reset margins when legend position changes
@@ -1075,8 +1080,8 @@ const Chart = ({
             const sumOfVariablesToFilterOut =
               colorBy !== "index"
                 ? filter
-                    ?.map((item) => group[item])
-                    ?.reduce((acc, curr) => acc + curr, 0)
+                  ?.map((item) => group[item])
+                  ?.reduce((acc, curr) => acc + curr, 0)
                 : 0;
             total -= sumOfVariablesToFilterOut;
 
@@ -1380,12 +1385,32 @@ const Chart = ({
     }
   }
 
-  //let newHeight = parseInt(height + "") - newMarginBottom;
+  let newHeight = parseInt(height + "") - newMarginBottom;
+
+  // Explicit chart-area height (opt-in). When set, the chart renders at this
+  // fixed height and the legend flows naturally above/below it (no absolute
+  // positioning, no margin-reservation); the wrapper is a flex column that grows
+  // with its content. When 0, the legacy fixed-height layout is preserved.
+  const useChartHeight = Number(chartHeight) > 0;
+  const chartAreaHeight = useChartHeight ? Number(chartHeight) : newHeight;
 
   return (
-    <div style={{ height: height }}>
+    <div
+      style={
+        useChartHeight
+          ? { display: "flex", flexDirection: "column" }
+          : { height: newHeight }
+      }
+    >
       {options?.data && options.data.length > 0 && (
         <>
+          <div
+            style={
+              useChartHeight
+                ? { height: chartAreaHeight, flexShrink: 0 }
+                : { height: "100%" }
+            }
+          >
           <ResponsiveBar
             colorBy={colors.colorBy}
             animate={true}
@@ -1412,8 +1437,8 @@ const Chart = ({
             axisRight={
               showRightAxis
                 ? {
-                    tickSize:
-                      (layout == "horizontal" && showTickLine) ||
+                  tickSize:
+                    (layout == "horizontal" && showTickLine) ||
                       layout === "vertical"
                       ? 5
                       : 0,
@@ -1457,13 +1482,10 @@ const Chart = ({
                     legendOffset: parseInt(offsetBottom),
                     tickPadding: 5,
                     tickRotation: 0,
-                    tickValues: ticks,
-                    legend: legends.right,
-                    legendPosition: "middle",
-                    legendOffset: parseInt(offsetRight),
+                    tickValues: parseInt(xAxisTickValues),
                     format: (value) => {
                       if (!value) return "";
-                      if (layout == "vertical") {
+                      if (layout == "horizontal") {
                         const effectiveFormat = customAxisFormat
                           ? customAxisFormat
                           : format;
@@ -1476,44 +1498,9 @@ const Chart = ({
                           },
                         );
                       }
-
                       return value;
                     },
                   }
-                : null
-            }
-            // @ts-ignore
-            axisBottom={
-              (isNotDesktopPreview ||
-                isNotEditingAndIsMobileCustomizationEnabled) &&
-              mobileConfigSettings?.xAxisDisabled === true
-                ? null
-                : layout === "horizontal"
-                  ? {
-                      legend: legends.bottom,
-                      legendPosition: "middle",
-                      legendOffset: parseInt(offsetBottom),
-                      tickPadding: 5,
-                      tickRotation: 0,
-                      tickValues: parseInt(xAxisTickValues),
-                      format: (value) => {
-                        if (!value) return "";
-                        if (layout == "horizontal") {
-                          const effectiveFormat = customAxisFormat
-                            ? customAxisFormat
-                            : format;
-                          return intl.formatNumber(
-                            effectiveFormat.style === "percent"
-                              ? value / 100
-                              : value,
-                            {
-                              ...effectiveFormat,
-                            },
-                          );
-                        }
-                        return value;
-                      },
-                    }
                   : {
                     legend: legends.bottom,
                     legendPosition: "middle",
@@ -1527,7 +1514,7 @@ const Chart = ({
             axisLeft={{
               tickSize:
                 (layout === "horizontal" && showTickLine) ||
-                layout === "vertical"
+                  layout === "vertical"
                   ? 5
                   : 0,
               tickPadding: 5,
@@ -1573,8 +1560,8 @@ const Chart = ({
               )
             }
             layers={layers as any}
-            onMouseEnter={(_data) => {}}
-            onMouseLeave={(_data) => {}}
+            onMouseEnter={(_data) => { }}
+            onMouseLeave={(_data) => { }}
             // TODO: Check why we are ignoring this
             // @ts-ignore
             motionStiffness={130 as any}
@@ -1611,6 +1598,7 @@ const Chart = ({
               },
             }}
           />
+          </div>
           {(legendPosition === "top" || legendPosition === "bottom") &&
             isLegendReady && (
               <div
@@ -1618,19 +1606,27 @@ const Chart = ({
                 style={
                   legendPosition === "bottom"
                     ? {
-                        marginBottom: `${newMarginBottom}px`,
-                        marginTop: "25px",
-                        textAlign: "left",
-                        justifyContent: "flex-start",
-                      }
+                      // In chart-height mode the legend flows below the chart;
+                      // the dynamic margin-reservation is only needed in legacy.
+                      marginBottom: useChartHeight ? undefined : `${newMarginBottom}px`,
+                      marginTop: "25px",
+                      textAlign: "left",
+                      justifyContent: "flex-start",
+                    }
                     : {
-                        justifyContent: "flex-start",
-                      }
+                      justifyContent: "flex-start",
+                      // Top legend: in chart-height mode it flows ABOVE the chart
+                      // (override the legacy `position: absolute`) via flex order.
+                      ...(useChartHeight
+                        ? { position: "static", order: -1 }
+                        : {}),
+                    }
                 }
               >
                 <div className="legend-sections">
                   <div className="title-section">{legendTitle()}</div>
                   <FlexWrapDetector
+                    isMobileOrTablet={isMobileOrTablet}
                     onWrapChange={(count) => {
                       if (legendPosition === "top" && isMobileOrTablet) {
                         const newMarginTop = marginTop + (count / 2) * 40;

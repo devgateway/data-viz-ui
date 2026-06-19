@@ -39,7 +39,7 @@ A React embeddable that renders an interactive choropleth and/or symbol map usin
 | `data-show-overall-value` | `string` | `"false"` | Set to `"true"` to display a national/overall average annotation. |
 | `data-national-average-label` | `string` | `"National Prevalence Avg"` | Label for the overall value annotation. |
 | `data-data-source-label` | `string` | `"Source"` | Prefix label for the data credit. |
-| `data-data-source-text` | `string` | `"NIDS"` | Data source credit text. |
+| `data-data-source-text` | `string` | `"Source"` | Data source credit text. |
 | `data-label-font-size` | `string` | `"12"` | Font size (px) for admin unit labels. |
 | `data-label-font-weight` | `string` | `"normal"` | Font weight for admin unit labels. |
 | `data-label-font-color` | `string` | `"#595959"` (URL-encoded) | Colour for admin unit labels. |

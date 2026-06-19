@@ -29,8 +29,11 @@ const MapWrapper = (props) => {
         intl
     } = props
 
-    // Measure the real container width so every child uses fluid dimensions
-    const [containerWidth, setContainerWidth] = useState(null);
+    // Layers mount and pre-fetch data at data-width while the tab is hidden.
+    // mapVisible stays false until we have a confirmed measurement while visible,
+    // so the user never sees the map at the wrong size.
+    const [containerWidth, setContainerWidth] = useState(Number(dataWidth));
+    const [mapVisible, setMapVisible] = useState(false);
 
     // Preserve the aspect ratio defined by the data-width / data-height attributes
     const aspectRatio = Number(dataHeight) / Number(dataWidth);
@@ -46,29 +49,46 @@ const MapWrapper = (props) => {
     useEffect(() => {
         if (!ref.current) return;
 
-        // Measure synchronously on mount to avoid placeholder flash
-        const w = ref.current.clientWidth;
-        if (w > 0) setContainerWidth(w);
-
-        // Coalesce resize events to one redraw per animation frame (~60fps max)
-        let rafId = null;
-        const measure = () => {
-            if (rafId) cancelAnimationFrame(rafId);
-            rafId = requestAnimationFrame(() => {
-                if (!ref.current) return;
-                const w = ref.current.clientWidth;
-                if (w > 0) setContainerWidth(w);
-            });
+        // Synchronously measure and reveal the map. Called from MutationObserver
+        // (fires before the browser paints) so there is no blank frame on tab switch.
+        const measureSync = () => {
+            if (!ref.current) return;
+            if (getComputedStyle(ref.current).visibility === 'hidden') return;
+            const w = ref.current.clientWidth;
+            if (w > 0) {
+                setContainerWidth(w);
+                setMapVisible(true);
+            }
         };
 
-        const ro = new ResizeObserver(measure);
+        // RAF-debounced path for window/panel resize events (no paint-timing constraint).
+        let rafId = null;
+        const measureDebounced = () => {
+            if (rafId) cancelAnimationFrame(rafId);
+            rafId = requestAnimationFrame(measureSync);
+        };
+
+        // ResizeObserver: debounced, fine for window/panel resizes.
+        const ro = new ResizeObserver(measureDebounced);
         ro.observe(ref.current);
+
+        // MutationObserver on ancestors: synchronous, catches TabbedPosts toggling
+        // inline styles before the browser paints — eliminates the blank frame.
+        const mo = new MutationObserver(measureSync);
+        let ancestor = ref.current.parentElement;
+        while (ancestor && ancestor !== document.body) {
+            mo.observe(ancestor, { attributes: true, attributeFilter: ['style', 'class'] });
+            ancestor = ancestor.parentElement;
+        }
+
+        measureSync(); // initial measurement
 
         return () => {
             ro.disconnect();
+            mo.disconnect();
             if (rafId) cancelAnimationFrame(rafId);
         };
-    }, []); // run once – the observer handles subsequent changes
+    }, []); // run once – observers handle subsequent changes
     const zoomRef = useRef(null);
     const [transform, setTransform] = useState(null)
 
@@ -133,14 +153,10 @@ const MapWrapper = (props) => {
         }
     }
 
-    // Don't render until we have a real measured width to avoid
-    // building the D3 projection against the wrong number.
-    if (!containerWidth) {
-        return <div ref={ref} className={"d3map-container"} style={{ width: '100%', height: `${dataHeight}px` }} />;
-    }
+
 
     return (
-        <div ref={ref} className={"d3map-container"} style={{ width: '100%' }}>
+        <div ref={ref} className={"d3map-container"} style={{ width: '100%', opacity: mapVisible ? 1 : 0 }}>
             <ProjectedContainer
                 backgroundColor={decode(bgColorParam)}
                 height={height}

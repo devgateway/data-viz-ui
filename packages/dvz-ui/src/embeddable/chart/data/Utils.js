@@ -1,7 +1,7 @@
 const updateItemLabels = (items) => {
   const updatedItems = items?.map((item) => {
     const groupName = item.group.label;
-    debugger;
+
     if (item.label.includes(groupName)) return item;
     return {
       ...item,
