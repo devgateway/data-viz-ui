@@ -65,12 +65,16 @@ const Chart = (props) => {
         notation: (formatObject.style === 'compacted') ? 'compact' : "standard",
         currency: formatObject.currency,
         minimumFractionDigits: parseInt(formatObject.minimumFractionDigits),
-        maximumFractionDigits: parseInt(formatObject.maximumFractionDigits)
+        maximumFractionDigits: parseInt(formatObject.maximumFractionDigits),
+        prefix: formatObject.prefix || '',
+        suffix: formatObject.suffix || ''
     } : {
         notation: "standard",
         currency: "USD",
         minimumFractionDigits: 2,
-        maximumFractionDigits: 2
+        maximumFractionDigits: 2,
+        prefix: '',
+        suffix: ''
     }
 
     const [mode, setMode] = useState(editMode)
@@ -211,8 +215,16 @@ const BigNumber = ({ dataItem, format, measureField, measure, numberColor, numbe
         textAlign: 'center'
     };
 
-    const formatNumber = (val) =>
-        intl.formatNumber(val, { ...format });
+    const formatNumber = (val) => {
+        const formatted = intl.formatNumber(val, { 
+            style: format.style, 
+            notation: format.notation, 
+            currency: format.currency,
+            minimumFractionDigits: format.minimumFractionDigits,
+            maximumFractionDigits: format.maximumFractionDigits
+        });
+        return `${format.prefix}${formatted}${format.suffix}`;
+    };
 
     return (
         <div className="big-number">
