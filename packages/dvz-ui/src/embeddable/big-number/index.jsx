@@ -33,6 +33,7 @@ const Chart = (props) => {
         'data-group-label-font-size': groupLabelFontSize = '',
         "data-wait-for-filters": waitForFilters = "false",
         "data-no-data-text": noDataText = "-",
+        "data-show-zero-values": showZeroValues = "false",
     } = props
 
     const locale = intl.locale
@@ -67,14 +68,16 @@ const Chart = (props) => {
         minimumFractionDigits: parseInt(formatObject.minimumFractionDigits),
         maximumFractionDigits: parseInt(formatObject.maximumFractionDigits),
         prefix: formatObject.prefix || '',
-        suffix: formatObject.suffix || ''
+        suffix: formatObject.suffix || '',
+        none: formatObject.style === 'none'
     } : {
         notation: "standard",
         currency: "USD",
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
         prefix: '',
-        suffix: ''
+        suffix: '',
+        none: false
     }
 
     const [mode, setMode] = useState(editMode)
@@ -129,6 +132,7 @@ const Chart = (props) => {
                         labelFontSize={labelFontSize}
                         labelColor={labelColor}
                         noDataText={noDataText}
+                        showZeroValues={showZeroValues === "true"}
                         groupLabel={groupLabel}
                         groupLabelColor={groupLabelColor}
                         groupLabelFontSize={groupLabelFontSize}
@@ -180,10 +184,11 @@ const Group = (props) => {
 
 
 
-const BigNumber = ({ dataItem, format, measureField, measure, numberColor, numberFontSize, labelColor, labelFontSize, noDataText, label, intl }) => {
+const BigNumber = ({ dataItem, format, measureField, measure, numberColor, numberFontSize, labelColor, labelFontSize, noDataText, label, intl, showZeroValues }) => {
 
     const rawValue = dataItem?.[measureField] ?? null;
-    const value = rawValue ? (format?.style === 'percent' ? rawValue / 100 : rawValue) : null;
+    const hasValue = rawValue !== null && (showZeroValues ? rawValue !== undefined : rawValue != 0);
+    const value = hasValue ? (format?.style === 'percent' ? rawValue / 100 : rawValue) : null;
     const [targetValue, setTargetValue] = useState(value);
 
     useEffect(() => {
@@ -216,8 +221,8 @@ const BigNumber = ({ dataItem, format, measureField, measure, numberColor, numbe
     };
 
     const formatNumber = (val) => {
-        const formatted = intl.formatNumber(val, { 
-            style: format.style, 
+        const formatted = format.style === 'none' ? val : intl.formatNumber(val, {
+            style: format.style,
             notation: format.notation, 
             currency: format.currency,
             minimumFractionDigits: format.minimumFractionDigits,
