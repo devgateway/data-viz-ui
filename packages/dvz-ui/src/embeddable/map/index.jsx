@@ -36,7 +36,7 @@ const MapEntry = (props) => {
         "data-csv": csv = '',
         'data-dimension1': dimension1 = '',
         'data-dimension2': dimension2 = '',
-        "data-measures": measures = '["prevalenceSmokeAny"]',
+        "data-measures": measures = '[]',
         "data-height": height = 600,
         width = 960,
         "data-data-source-text": dataSourceText = '',
