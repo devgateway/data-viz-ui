@@ -9,7 +9,7 @@ import { setPageModuleProps} from '../reducers/data';
 import FloatingNavigator from './FloatingNavigator'
 import { decode } from 'html-entities';
 
-const decodeHtmlEntity = function (str: string) {
+const decodeHtmlEntity = function (str?: string | null) {
   if (str) {
     return decode(str.toString());
   }
