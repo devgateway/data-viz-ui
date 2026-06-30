@@ -1,10 +1,11 @@
 packages:
-- packages/*
-- packages/react-lib/*
-- example
-
+  - packages/*
+  - packages/react-lib/*
+  - example
 catalog:
-  react: '^18.3.1'
-  react-dom: '^18.3.1'
-  "@types/react": '^18.3.11'
-  "@types/react-dom": '^18.3.1'
+  react: ^18.3.1
+  react-dom: ^18.3.1
+  '@types/react': ^18.3.11
+  '@types/react-dom': ^18.3.1
+overrides:
+  '@devgateway/wp-react-lib': link:packages/react-lib/wp-react-lib
