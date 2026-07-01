@@ -7,12 +7,11 @@ import { injectIntl } from "react-intl";
 import { connect } from "react-redux";
 import { setPageModuleProps} from '../reducers/data';
 import FloatingNavigator from './FloatingNavigator'
+import { decode } from 'html-entities';
 
-const decodeHtmlEntity = function (str: string) {
+const decodeHtmlEntity = function (str?: string | null) {
   if (str) {
-    return str.toString().replace(/&#(\d+);/g, function (match, dec) {
-      return String.fromCharCode(dec);
-    });
+    return decode(str.toString());
   }
 
   return "";
@@ -97,7 +96,7 @@ const PageIterator: React.FC<PageIteratorProps> = ({ pages, locale, editing, nav
     const list = childPages.map(p => ({
         active: modules.includes(p.id),
         id: p.id,
-        label: p.meta_fields.label ? p.meta_fields.label : p.title.rendered,
+        label: decodeHtmlEntity(p.meta_fields.label ? p.meta_fields.label : p.title.rendered),
         iconComponent: (
             <MediaProvider id={p.meta_fields?.icon ? p.meta_fields.icon[0] : null}>
                 <MediaConsumer>

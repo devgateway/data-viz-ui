@@ -1,6 +1,6 @@
 import React from 'react'
 import {Image, Label, Menu} from 'semantic-ui-react'
-
+import { decode } from 'html-entities';
 
 function smoothscroll(idx) {
     const offsetTop = 0
@@ -19,9 +19,7 @@ function smoothscroll(idx) {
 
 const decodeHtmlEntity = function(str) {
     if (str) {
-        return str.toString().replace(/&#(\d+);/g, function (match, dec) {
-            return String.fromCharCode(dec);
-        });
+        return decode(str.toString());
     }
 
     return ''
