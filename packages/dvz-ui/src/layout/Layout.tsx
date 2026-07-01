@@ -38,16 +38,56 @@ const RootLayout = () => {
             console.log("----------.env-----------");
         }
 
-
         if (typeof window !== 'undefined') {
-            window.setTimeout(() => {
+            // Handle direct URL navigation with hash (e.g., /page#section)
+            const handleInitialHash = () => {
                 if (window.location.hash) {
-                    const element = document.getElementById(window.location.hash.substring(1));
-                    if (element) {
-                        element.scrollIntoView({ behavior: "auto", block: "start" });
+                    const elementId = window.location.hash.substring(1);
+                    let attempts = 0;
+                    const maxAttempts = 20; // Try for up to 2 seconds
+                    
+                    const tryScroll = () => {
+                        const element = document.getElementById(elementId);
+                        if (element) {
+                            element.scrollIntoView({ behavior: "smooth", block: "start" });
+                        } else if (attempts < maxAttempts) {
+                            attempts++;
+                            setTimeout(tryScroll, 100); // Retry every 100ms
+                        }
+                    };
+                    
+                    tryScroll();
+                }
+            };
+
+            // Handle anchor link clicks
+            const handleAnchorClick = (e: MouseEvent) => {
+                const target = e.target as HTMLElement;
+                if (target.tagName === 'A') {
+                    const href = target.getAttribute('href');
+                    if (href && href.startsWith('#')) {
+                        e.preventDefault();
+                        const elementId = href.substring(1);
+                        const element = document.getElementById(elementId);
+                        if (element) {
+                            // Update URL without triggering navigation
+                            window.history.pushState(null, '', href);
+                            // Scroll to element
+                            element.scrollIntoView({ behavior: "smooth", block: "start" });
+                        }
                     }
                 }
-            }, 2000);
+            };
+
+            // Attach click listener to document
+            document.addEventListener('click', handleAnchorClick as any);
+            
+            // Handle initial page load
+            handleInitialHash();
+
+            return () => {
+                document.removeEventListener('click', handleAnchorClick as any);
+            };
         }
     }, []);
 
