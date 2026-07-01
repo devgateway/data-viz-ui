@@ -1,5 +1,11 @@
 # @devgateway/dvz-ui-react
 
+## 1.9.1
+
+### Patch Changes
+
+- [#263](https://github.com/devgateway/data-viz-ui/pull/263) [`a7b325c`](https://github.com/devgateway/data-viz-ui/commit/a7b325c80e763cdf22abfe32dc4cf5213bfe9f4e) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Fix pagemodules title and subtitle to correctly decode html entities
+
 ## 1.9.0
 
 ### Minor Changes
