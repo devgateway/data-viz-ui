@@ -107,7 +107,8 @@ const Chart = ({
   customLabels,
   lineXAxisTickMode,
   lineXAxisTickCount,
-  lineXAxisTickEvery
+  lineXAxisTickEvery,
+  chartHeight,
 }) => {
   const mobileConfigSettings = JSON.parse(decodeURIComponent(mobileCustomization));
   const isMobileConfigEnabled = isMobileOrTablet && (mobileConfigSettings?.showCustomization ?? false);
@@ -621,8 +622,12 @@ const Chart = ({
       }
     }
 
+    const useChartHeight = Number(chartHeight) > 0;
+    const chartAreaHeight = useChartHeight ? Number(chartHeight) : parseInt(height + "");
+
     return (
-      <div style={{ height: height }}>
+      <div style={useChartHeight ? { display: "flex", flexDirection: "column" } : { height: height }}>
+        <div style={useChartHeight ? { height: chartAreaHeight, flexShrink: 0 } : { height: "100%" }}>
         <ResponsiveLine
           curve={lineCurve}
           key={new Date()}
@@ -725,6 +730,7 @@ const Chart = ({
           pointBorderColor={{ from: "serieColor" }}
           useMesh={filteredData.length > 0 && filteredData[0].data.length > 0}
         />
+        </div>
 
         {(legendPosition === "top" || legendPosition === "bottom") && (
           <div
