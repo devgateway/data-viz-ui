@@ -5,6 +5,7 @@ import { injectIntl } from "react-intl";
 import { connect } from "react-redux";
 import PostIntro from "../connected-templates/PostIntro";
 import { useWindowDimensionsAndDevice } from '@/lib/hooks/window-dimensions';
+import { decode, parse } from '../utils';
 
 const ItemMenu = ({ posts, activeItem, setActive, showLabels }) => {
   return posts
@@ -279,6 +280,8 @@ const Wrapper = (props) => {
   const isMobile = deviceWidth <= 1024;
   const isNotDesktopPreview = previewMode !== 'Desktop' && editing;
   const isMobileRenderMode = isMobile && !editing;
+  debugger;
+
 
   return (
     <Container className={`viz tabbed posts ${editing ? 'editing' : ''} ${scrollable ? 'scrollable' : ''}`} fluid={true}>
@@ -286,7 +289,7 @@ const Wrapper = (props) => {
         locale={locale}
         type={type}
         taxonomy={taxonomy}
-        categories={categories}
+        categories={parse(categories, editing)}
         store={`tabbedposts_${parent}_${unique}`} page={1}
         perPage={items}>
         <PostConsumer>

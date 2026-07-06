@@ -827,11 +827,14 @@ const DataFrame = (props) => {
                     ? allEntries.filter(e => e.name !== mainMeasureName)
                     : allEntries;
 
-                // When sorting by measure, also sort bars within each group by their values
+                // When sorting by measure, pin the sort measure to the top, then sort the rest by value
                 if (sorting === 'measure') {
-                    measureEntries = [...measureEntries].sort((a, b) =>
+                    const sortEntry = sortMeasureName ? measureEntries.find(e => e.name === sortMeasureName) : null;
+                    const restEntries = sortEntry ? measureEntries.filter(e => e.name !== sortMeasureName) : measureEntries;
+                    const sortedRest = [...restEntries].sort((a, b) =>
                         sortDirection === 'asc' ? (a.value - b.value) : (b.value - a.value)
                     );
+                    measureEntries = sortEntry ? [sortEntry, ...sortedRest] : sortedRest;
                 }
 
                 return (
@@ -918,9 +921,15 @@ const Chart = (props) => {
     const formatObject = parseJSON(format, editing);
     const numberFormat = createNumberFormat(formatObject);
     const parsedFilters = parseJSON(filters, editing);
-    const parsedMeasures = parseJSON(measures, editing);    
-    const parsedManualColorsRaw = parseJSON(manualColors, editing);    
-    const selectedMeasures = extractSelectedMeasures(parsedMeasures, numberFormat, app, (props["data-enable-custom-measure-formats"] === "true"));
+    const parsedMeasures = parseJSON(measures, editing);
+    // In preview/editing mode, postMessage may deliver measures as a plain string.
+    // Wrap it as a single-element array so extractSelectedMeasures can handle it.
+    const effectiveMeasures = parsedMeasures !== null ? parsedMeasures
+        : (measures && typeof measures === 'string' && !measures.startsWith('{') && !measures.startsWith('[')
+            ? [measures]
+            : null);
+    const parsedManualColorsRaw = parseJSON(manualColors, editing);
+    const selectedMeasures = extractSelectedMeasures(effectiveMeasures, numberFormat, app, (props["data-enable-custom-measure-formats"] === "true"));
 
     const selectedNames = selectedMeasures.map(sm => sm.name);
     const decodedMain = (typeof mainMeasure === 'string' && mainMeasure.length > 0) ? decodeValue(mainMeasure) : null;

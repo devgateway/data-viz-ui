@@ -163,6 +163,11 @@ const Chart = (props) => {
     }
 
 
+    const parsedMeasures = parse(measures);
+    // In preview/editing mode, postMessage may deliver measures as a plain string (e.g. "linkValue")
+    // instead of a JSON array. Treat the raw string as a single measure ID in that case.
+    const measuresList = parsedMeasures !== null ? parsedMeasures : (measures && !measures.startsWith('{') ? [measures] : []);
+
     const params = {}
     const ff = parse(filters) || {}
 
@@ -187,7 +192,7 @@ const Chart = (props) => {
     }
 
     if (app != 'csv') {
-        if (!dimensions.length || !measures || !parse(measures) || !parse(measures)[0]) {
+        if (!dimensions.length || !measuresList.length || !measuresList[0]) {
             showNotEnoughParameters = true
         }
     } else {
@@ -217,14 +222,14 @@ const Chart = (props) => {
                           sort={sort}
                           csv={csv}
                           app={app}
-                          measure={parse(measures)[0] || null}>
+                          measure={measuresList[0] || null}>
                             <ColorProvider
                               app={app}
                               locale={locale}
                               manualColors={getManualColor()} colorBy={'id'} scheme={scheme}
                               barColor={chartProps.barColor}>
 
-                                <SankeyChart{...chartProps} dimensions={dimensions} measure={parse(measures)[0] || null}></SankeyChart>
+                                <SankeyChart{...chartProps} dimensions={dimensions} measure={measuresList[0] || null}></SankeyChart>
                                 
                             </ColorProvider>
                         </DataFrame>

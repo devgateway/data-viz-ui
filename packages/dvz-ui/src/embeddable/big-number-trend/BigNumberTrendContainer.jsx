@@ -82,6 +82,11 @@ const BigNumberTrendContainer = (props) => {
     const viewMode = editing ? editMode : mode
     const contentHeight = editing ? height - 80 : height - 40
 
+    const parsedMeasures = parse(measures);
+    // In editing/preview mode, postMessage may deliver measures as a plain string (e.g. "vaccinated")
+    // instead of a JSON array. Treat the raw string as a single measure ID in that case.
+    const measuresList = parsedMeasures !== null ? parsedMeasures : (measures && !measures.startsWith('{') ? [measures] : []);
+
     const params = {}
     const ff = parse(filters) || {}
 
@@ -132,7 +137,7 @@ const BigNumberTrendContainer = (props) => {
                             app={app}
                             format={numberFormat}
                             dimension1={dimension1}
-                            measure={parse(measures)[0] || null}
+                            measure={measuresList[0] || null}
                             label={label}
                             bigNumberFontSize={bigNumberFontSize}
                             textColor={textColor}
