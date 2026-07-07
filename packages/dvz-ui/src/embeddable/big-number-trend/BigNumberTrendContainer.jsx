@@ -85,8 +85,11 @@ const BigNumberTrendContainer = (props) => {
     const parsedMeasures = parse(measures);
     // In editing/preview mode, postMessage may deliver measures as a plain string (e.g. "vaccinated")
     // instead of a JSON array. Treat the raw string as a single measure ID in that case.
-    const measuresList = parsedMeasures !== null ? parsedMeasures : (measures && !measures.startsWith('{') ? [measures] : []);
-
+    const measuresList = parsedMeasures !== null
+        ? parsedMeasures
+        : (typeof measures === 'string' && measures && !measures.trim().startsWith('{') && !measures.trim().startsWith('[')
+            ? [measures]
+            : []);
     const params = {}
     const ff = parse(filters) || {}
 
