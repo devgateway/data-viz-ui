@@ -280,7 +280,6 @@ const Wrapper = (props) => {
   const isMobile = deviceWidth <= 1024;
   const isNotDesktopPreview = previewMode !== 'Desktop' && editing;
   const isMobileRenderMode = isMobile && !editing;
-  debugger;
 
 
   return (
