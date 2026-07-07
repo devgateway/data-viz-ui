@@ -95,7 +95,6 @@
     "uuid": "^11.1.0"
   },
   "devDependencies": {
-    "@devgateway/wp-react-lib": "workspace:*",
     "@eslint/js": "^9.37.0",
     "@fullhuman/postcss-purgecss": "^7.0.2",
     "@stylistic/eslint-plugin-js": "^4.2.0",
