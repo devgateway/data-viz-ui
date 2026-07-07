@@ -5,8 +5,7 @@ import { injectIntl } from "react-intl";
 import { connect } from "react-redux";
 import PostIntro from "../connected-templates/PostIntro";
 import { useWindowDimensionsAndDevice } from '@/lib/hooks/window-dimensions';
-import { decode, parse } from '../utils';
-
+import { parse } from '../utils';
 const ItemMenu = ({ posts, activeItem, setActive, showLabels }) => {
   return posts
     ? posts.map((post) => (
