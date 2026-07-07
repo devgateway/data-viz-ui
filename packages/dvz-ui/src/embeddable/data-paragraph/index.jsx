@@ -70,8 +70,11 @@ const Chart = (props) => {
     const minLineHeightPx = Math.max(24, (numberFontSize || 14) * 1.2)
 
     const parsedMeasures = parse(measures);
-    const measuresList = parsedMeasures !== null ? parsedMeasures : (measures && !measures.startsWith('{') ? [measures] : []);
-
+    const measuresList = parsedMeasures !== null
+        ? parsedMeasures
+        : (typeof measures === 'string' && measures && !measures.trim().startsWith('{') && !measures.trim().startsWith('[')
+            ? [measures]
+            : []);
     const params = {}
     const ff = parse(filters) || {}
 
