@@ -1,5 +1,11 @@
 # @devgateway/dvz-ui-react
 
+## 1.9.2
+
+### Patch Changes
+
+- [#264](https://github.com/devgateway/data-viz-ui/pull/264) [`fc2701f`](https://github.com/devgateway/data-viz-ui/commit/fc2701f4e83cf9e56d16d39f0751873e90002e19) Thanks [@sdimunzio](https://github.com/sdimunzio)! - Update showcase and newsletter embeddables to read data-\* props via postMessage. Previously read flat lowercase props from URL querystring; now consistent with all other embeddables. Fixed newsletter submit() to use props["data-list"] and props["data-tag"].
+
 ## 1.9.1
 
 ### Patch Changes
