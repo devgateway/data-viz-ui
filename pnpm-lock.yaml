@@ -8,9 +8,6 @@ importers:
 
   .:
     dependencies:
-      '@devgateway/wp-react-lib':
-        specifier: link:packages/react-lib/wp-react-lib
-        version: link:packages/react-lib/wp-react-lib
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
