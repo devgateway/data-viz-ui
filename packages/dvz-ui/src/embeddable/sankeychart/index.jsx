@@ -166,8 +166,11 @@ const Chart = (props) => {
     const parsedMeasures = parse(measures);
     // In preview/editing mode, postMessage may deliver measures as a plain string (e.g. "linkValue")
     // instead of a JSON array. Treat the raw string as a single measure ID in that case.
-    const measuresList = parsedMeasures !== null ? parsedMeasures : (measures && !measures.startsWith('{') ? [measures] : []);
-
+    const measuresList = parsedMeasures !== null
+        ? parsedMeasures
+        : (typeof measures === 'string' && measures && !measures.trim().startsWith('{') && !measures.trim().startsWith('[')
+            ? [measures]
+            : []);
     const params = {}
     const ff = parse(filters) || {}
 
