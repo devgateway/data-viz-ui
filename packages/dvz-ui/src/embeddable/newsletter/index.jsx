@@ -9,19 +9,21 @@ const expresion = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 const Index = (props) => {
 
     const submit = () => {
-        const {email, list, tag} = props
-        props.onSubmit({email: email, list: list, tag: tag})
+        const list = props["data-list"];
+        const tag = props["data-tag"];
+        const {email} = props;
+        props.onSubmit({email, list, tag})
     }
 
     const {
         status,
         editing,
-        list,
-        placeholder = "enter your email address",
-        successmessage = "Thanks",
-        failuremessage = "Something didn't go well",
-        label = "Send",
-        tag,
+        "data-list": list,
+        "data-placeholder": placeholder = "enter your email address",
+        "data-success-message": successmessage = "Thanks",
+        "data-failure-message": failuremessage = "Something didn't go well",
+        "data-label": label = "Send",
+        "data-tag": tag,
         email,
         onChange
     } = props

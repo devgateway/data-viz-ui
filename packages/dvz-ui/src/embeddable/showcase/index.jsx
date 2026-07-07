@@ -207,15 +207,15 @@ const Index = (props) => {
 
     const {
         status,
-        organization = "Organization",
-        name = "Name",
-        email = "Email",
-        country = "Country",
-        message = "Message",
-        resetlabel = "Reset",
-        submitlabel = "Submit",
-        successmessage = "Thanks for submitting your data",
-        failuremessage = "Something didn't go well, please try again later",
+        "data-organization": organization = "Organization",
+        "data-name": name = "Name",
+        "data-email": email = "Email",
+        "data-country": country = "Country",
+        "data-message": message = "Message",
+        "data-reset-label": resetlabel = "Reset",
+        "data-submit-label": submitlabel = "Submit",
+        "data-success-message": successmessage = "Thanks for submitting your data",
+        "data-failure-message": failuremessage = "Something didn't go well, please try again later",
         editing
     } = props;
     const {showValidation, token, reset: resetState} = state;

@@ -2,7 +2,11 @@ export const decode = (value, editing) => {
     if (editing) {
         return value
     }
-    return decodeURIComponent(value.replace(/%(?![0-9a-fA-F][0-9a-fA-F]+)/g, '%25')) //replaces "%" character before decode URI to avoid errors with URI codes
+    try {
+        return decodeURIComponent(value.replace(/%(?![0-9a-fA-F][0-9a-fA-F]+)/g, '%25')) //replaces "%" character before decode URI to avoid errors with URI codes
+    } catch (error) {
+        console.error("error decoding value:" + value)
+    }
 }
 
 export const parse = (value, editing) => {

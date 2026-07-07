@@ -710,7 +710,11 @@ const Filter = ({
         params["dvzProxyDatasetId"] = dvzProxyDatasetId;
     }
 
-    const hiddenFiltersArr = hiddenFilters ? parse(hiddenFilters) : [];
+    const parsedHiddenFilters = hiddenFilters ? parse(hiddenFilters) : null;
+    // In preview/editing mode, postMessage may deliver hiddenFilters as a plain string (e.g. "Yes")
+    // instead of a JSON array. Split by comma as fallback.
+    const hiddenFiltersArr = parsedHiddenFilters !== null ? parsedHiddenFilters
+        : (hiddenFilters ? hiddenFilters.split(',').filter(Boolean) : []);
     let defaultFilterType;
     if (filterType == null || filterType == "") {
         defaultFilterType = isRange === "true" ? "range" : "multi-select";

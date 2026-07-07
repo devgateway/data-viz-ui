@@ -1,98 +1,77 @@
-import React, { useEffect, useState } from 'react';
-import { Label, Icon, Popup } from 'semantic-ui-react';
+import React, { useEffect, useRef, useState } from 'react';
+import { Icon, Label, Popup } from 'semantic-ui-react';
+import { useNavigate } from 'react-router';
 import { isInternalTrafficEnabled } from './internalTrafficUtils';
 
-/**
- * InternalTrafficWatermark
- *
- * Displays a watermark badge indicating that internal traffic bypassing
- * is enabled. This ensures staff members know they are not contributing
- * to Google Analytics statistics when browsing with this setting enabled.
- *
- * The watermark is only rendered when the _ga_internal_traffic cookie is
- * set to '1', and it updates reactively if the cookie state changes.
- */
 const InternalTrafficWatermark: React.FC = () => {
-  const [isEnabled, setIsEnabled] = useState<boolean>(false);
-  const [isMounted, setIsMounted] = useState<boolean>(false);
-  const [position, setPosition] = useState<{ x: number; y: number }>({ x: -20, y: -20 });
-  const [isDragging, setIsDragging] = useState<boolean>(false);
-  const [dragOffset, setDragOffset] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const navigate = useNavigate();
+  const [isEnabled, setIsEnabled] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const dragOffset = useRef({ x: 0, y: 0 });
+  const hasDragged = useRef(false);
 
   useEffect(() => {
-    // Only run on client-side
-    if (typeof document === 'undefined') return;
-
     setIsMounted(true);
     setIsEnabled(isInternalTrafficEnabled());
-    
-    // Set initial position to bottom-right (20px from edges)
-    // We position from top-left in absolute coordinates
-    if (typeof window !== 'undefined') {
-      setPosition({
-        x: window.innerWidth - 200,
-        y: window.innerHeight - 40,
-      });
-    }
+    setPosition({ x: window.innerWidth - 200, y: window.innerHeight - 40 });
 
-    // Optional: Listen for storage changes to update in real-time
-    // (useful if another tab/window disables the bypass)
-    const handleStorageChange = () => {
-      setIsEnabled(isInternalTrafficEnabled());
-    };
-
+    const handleStorageChange = () => setIsEnabled(isInternalTrafficEnabled());
     window.addEventListener('storage', handleStorageChange);
-    
     return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
-  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-    setIsDragging(true);
-    setDragOffset({
-      x: e.clientX - position.x,
-      y: e.clientY - position.y,
-    });
-  };
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+  // Attach mousemove/mouseup to window so drag works even outside the element
+  useEffect(() => {
     if (!isDragging) return;
 
-    setPosition({
-      x: e.clientX - dragOffset.x,
-      y: e.clientY - dragOffset.y,
-    });
+    const handleMouseMove = (e: MouseEvent) => {
+      hasDragged.current = true;
+      setPosition({ x: e.clientX - dragOffset.current.x, y: e.clientY - dragOffset.current.y });
+    };
+
+    const handleMouseUp = () => setIsDragging(false);
+
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isDragging]);
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    hasDragged.current = false;
+    dragOffset.current = { x: e.clientX - position.x, y: e.clientY - position.y };
+    setIsDragging(true);
   };
 
-  const handleMouseUp = () => {
-    setIsDragging(false);
+  const handleClick = () => {
+    if (!hasDragged.current) {
+      navigate('/__ga/internal');
+    }
   };
 
-  // Don't render on server-side or before client mount
-  if (!isMounted || !isEnabled) {
-    return null;
-  }
-
-  const containerStyles: React.CSSProperties = {
-    position: 'fixed',
-    left: `${position.x}px`,
-    top: `${position.y}px`,
-    zIndex: 999999,
-    willChange: isDragging ? 'transform' : 'auto',
-    cursor: isDragging ? 'grabbing' : 'grab',
-  };
+  if (!isMounted || !isEnabled) return null;
 
   return (
     <div
-      style={containerStyles}
+      style={{
+        position: 'fixed',
+        left: position.x,
+        top: position.y,
+        zIndex: 999999,
+        cursor: isDragging ? 'grabbing' : 'grab',
+        userSelect: 'none',
+      }}
       onMouseDown={handleMouseDown}
-      onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp}
-      onMouseLeave={handleMouseUp}
-      role="status"
-      aria-label="GA bypass enabled. Drag to move this notification."
+      onClick={handleClick}
+      role="button"
+      aria-label="GA bypass enabled — click to manage"
     >
       <Popup
-        content="Drag to move"
+        content="Click to manage bypass settings"
         position="left center"
         trigger={
           <Label color="yellow" image>

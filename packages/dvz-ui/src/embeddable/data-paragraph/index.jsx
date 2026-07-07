@@ -69,6 +69,12 @@ const Chart = (props) => {
     // Let height auto-adjust to content; provide a minimal line height
     const minLineHeightPx = Math.max(24, (numberFontSize || 14) * 1.2)
 
+    const parsedMeasures = parse(measures);
+    const measuresList = parsedMeasures !== null
+        ? parsedMeasures
+        : (typeof measures === 'string' && measures && !measures.trim().startsWith('{') && !measures.trim().startsWith('[')
+            ? [measures]
+            : []);
     const params = {}
     const ff = parse(filters) || {}
 
@@ -102,7 +108,7 @@ const Chart = (props) => {
                           intl={intl}
                           app={app}
                           format={numberFormat}
-                          measure={parse(measures)[0] || null}                            
+                          measure={measuresList[0] || null}                            
                             numberFontSize={numberFontSize}
                             numberColor={numberColor}                         
                                                         noDataText={noDataText}
