@@ -4,9 +4,6 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-overrides:
-  '@devgateway/wp-react-lib': link:packages/react-lib/wp-react-lib
-
 importers:
 
   .:
@@ -31,7 +28,7 @@ importers:
         specifier: workspace:*
         version: link:../packages/dvz-ui
       '@devgateway/wp-react-lib':
-        specifier: link:../packages/react-lib/wp-react-lib
+        specifier: workspace:*
         version: link:../packages/react-lib/wp-react-lib
       '@nivo/colors':
         specifier: ^0.96.0
@@ -281,9 +278,6 @@ importers:
         specifier: ^11.1.0
         version: 11.1.0
     devDependencies:
-      '@devgateway/wp-react-lib':
-        specifier: link:../react-lib/wp-react-lib
-        version: link:../react-lib/wp-react-lib
       '@eslint/js':
         specifier: ^9.37.0
         version: 9.37.0
