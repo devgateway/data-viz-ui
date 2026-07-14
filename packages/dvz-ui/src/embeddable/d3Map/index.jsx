@@ -12,8 +12,12 @@ import FlowLayer from "./FlowLayer";
 import TileBasemapLayer from "./TileBasemapLayer";
 import PixelLayer from "./PixelLayer";
 import MeasureSelector from "../MeasureSelector";
+import { Dimmer, Loader, Segment } from "semantic-ui-react";
 
 const SELECTABLE_LAYER_TYPES = ['data', 'dataPoints', 'flow', 'pixelGrid'];
+// Only these layers currently emit `onReady` reliably.
+const READY_SIGNAL_LAYER_TYPES = ['base', 'data', 'pixelGrid', 'tileBasemap'];
+const DATA_LOADING_LAYER_TYPES = ['data', 'flow', 'dataPoints', 'pixelGrid'];
 
 const getLayerMeasures = (layer) => {
     if (!layer || !layer.measures || !Array.isArray(layer.measures)) {
@@ -117,6 +121,17 @@ const MapWrapper = (props) => {
     const [selectedItem, setSelectedItem] = useState(null)
     const [selectedPoint, setSelectedPoint] = useState(null)
     const [selectedMeasure, setSelectedMeasure] = useState(null)
+    const readySignalLayerIds = layers
+        .filter((layer) => {
+            if (layer?.id == null || !READY_SIGNAL_LAYER_TYPES.includes(layer.type)) {
+                return false;
+            }
+
+            // Data and pixel layers are unmounted while loading, so they cannot emit onReady.
+            return !props.loadingByLayerId?.[`${layer.id}`];
+        })
+        .map((layer) => `${layer.id}`);
+    const readySignalLayerIdsKey = readySignalLayerIds.join('|');
 
     const selectorEnabled = enableMeasureSelector == true || enableMeasureSelector == "true";
     const availableMeasures = getSharedMeasures(layers);
@@ -188,15 +203,51 @@ const MapWrapper = (props) => {
 
         setLayers(newLayers)
     }
-    const [readyToZoom, setReadyToZoom] = useState(false);
-    const readyLayersCount = useRef(0);
-    const totalLayers = layers.length;
-    const handleLayerReady = () => {
-        readyLayersCount.current += 1;
-        if (readyLayersCount.current >= layers.length) {
+    const [readyToZoom, setReadyToZoom] = useState(readySignalLayerIds.length === 0);
+    const [isInitializingLayers, setIsInitializingLayers] = useState(readySignalLayerIds.length > 0);
+    const readyLayerIds = useRef(new Set());
+
+    useEffect(() => {
+        const hasReadySignalLayers = readySignalLayerIds.length > 0;
+        readyLayerIds.current = new Set();
+        setReadyToZoom(!hasReadySignalLayers);
+        setIsInitializingLayers(hasReadySignalLayers);
+    }, [readySignalLayerIdsKey]);
+
+    const handleLayerReady = (layerId) => {
+        if (layerId == null) {
+            return;
+        }
+        const normalizedId = `${layerId}`;
+        if (!readySignalLayerIds.includes(normalizedId)) {
+            return;
+        }
+        if (!readyLayerIds.current.has(normalizedId)) {
+            readyLayerIds.current.add(normalizedId);
+        }
+        if (readyLayerIds.current.size >= readySignalLayerIds.length) {
             setReadyToZoom(true);
+            setIsInitializingLayers(false);
         }
     }
+
+    const visibleReloadableLayerIds = layers
+        .filter((layer) =>
+            layer?.id != null &&
+            DATA_LOADING_LAYER_TYPES.includes(layer.type) &&
+            layer.visible !== false &&
+            layer.app &&
+            layer.app !== 'none' &&
+            layer.app !== 'csv'
+        )
+        .map((layer) => `${layer.id}`);
+
+    const hasVisibleReloadingLayers = visibleReloadableLayerIds.some(
+        (layerId) => !!props.loadingByLayerId?.[layerId]
+    );
+
+    // Spinner is only for layers that fetch data from backend APIs.
+    const showMapLoading = !editing && hasVisibleReloadingLayers;
 
     // Don't render until we have a real measured width to avoid
     // building the D3 projection against the wrong number.
@@ -205,7 +256,23 @@ const MapWrapper = (props) => {
     }
 
     return (
-        <div ref={ref} className={"d3map-container"} style={{ width: '100%' }}>
+        <div ref={ref} className={"d3map-container"} style={{ width: '100%', position: 'relative' }}>
+            {showMapLoading && (
+                <div
+                    style={{
+                        position: 'absolute',
+                        inset: 0,
+                        zIndex: 3,
+                        pointerEvents: 'none'
+                    }}
+                >
+                    <Segment basic padded style={{ height: '100%', margin: 0, background: 'transparent' }}>
+                        <Dimmer active inverted style={{ background: 'transparent' }}>
+                            <Loader size='medium' style={{ background: 'transparent' }} />
+                        </Dimmer>
+                    </Segment>
+                </div>
+            )}
             {selectorEnabled && availableMeasures.length > 1 && (
                 <MeasureSelector
                     label={decode(measureSelectorLabel) || "Measure"}
@@ -232,7 +299,7 @@ const MapWrapper = (props) => {
                                 tileOpacity={layer.tileOpacity != null ? layer.tileOpacity : 1}
                                 transform={transform}
                                 visible={layer.visible !== false}
-                                onReady={handleLayerReady}
+                                onReady={() => handleLayerReady(layer.id)}
                             />
                         );
                     }
@@ -241,28 +308,33 @@ const MapWrapper = (props) => {
 
                 <Map rotationEnabled={parse(rotationEnabled, editing)}>
                     {layers.map((layer, i) => {
+                        const layerIsLoading = !!props.loadingByLayerId?.[`${layer.id}`];
 
 
                         if (layer.type === 'base') {
                             return <BaseLayer
                                 minLabelZoomVisible={layer.minLabelZoomVisible}
-                                onReady={handleLayerReady}
+                                onReady={() => handleLayerReady(layer.id)}
                                 transform={transform} intl={intl} zoom={zoomRef} unique={unique}
                                 key={layer.id} {...layer} />
                         }
                         if (layer.type === 'data') {
+                            if (layerIsLoading) {
+                                return null;
+                            }
                             return <DataLayer
                                 minLabelZoomVisible={layer.minLabelZoomVisible}
                                 editing={editing}
                                 onLayerCreated={e => {
 
                                 }}
-                                onReady={handleLayerReady}
+                                onReady={() => handleLayerReady(layer.id)}
                                 transform={transform}
                                 intl={intl}
                                 group={group} zoom={zoomRef}
                                 unique={unique}
                                 key={layer.id} {...layer}
+                                visible={layer.visible !== false}
                                 settings={props.wordress}
                                 selectedMeasure={selectedMeasure}
                                 togglePatterns={togglePatterns}
@@ -272,31 +344,42 @@ const MapWrapper = (props) => {
 
                         }
                         if (layer.type === 'flow') {
+                            if (layerIsLoading) {
+                                return null;
+                            }
                             return <FlowLayer
 
-                                onReady={handleLayerReady}
+                                onReady={() => handleLayerReady(layer.id)}
                                 transform={transform} intl={intl} group={group} zoom={zoomRef}
                                 unique={unique}
                                 selectedMeasure={selectedMeasure}
                                 key={layer.id} {...layer}
+                                visible={layer.visible !== false}
                                 waitForFilters={waitForFilters == "true" || waitForFilters == true}
                             />
                         }
                         if (layer.type === 'dataPoints') {
+                            if (layerIsLoading) {
+                                return null;
+                            }
                             return <LatLongLayer
-                                onReady={handleLayerReady}
+                                onReady={() => handleLayerReady(layer.id)}
                                 onZoomToPoint={zoomToPoint} selectedItem={selectedItem}
                                 transform={transform} intl={intl}
                                 group={group} zoom={zoomRef}
                                 unique={unique}
                                 selectedMeasure={selectedMeasure}
                                 key={layer.id} {...layer}
+                                visible={layer.visible !== false}
                                 waitForFilters={waitForFilters == "true" || waitForFilters == true}
                             />
                         }
                         if (layer.type === 'pixelGrid') {
+                            if (layerIsLoading) {
+                                return null;
+                            }
                             return <PixelLayer
-                                onReady={handleLayerReady}
+                                onReady={() => handleLayerReady(layer.id)}
                                 transform={transform}
                                 intl={intl}
                                 group={group}
@@ -304,6 +387,7 @@ const MapWrapper = (props) => {
                                 unique={unique}
                                 selectedMeasure={selectedMeasure}
                                 key={layer.id} {...layer}
+                                visible={layer.visible !== false}
                                 waitForFilters={waitForFilters == "true" || waitForFilters == true}
                             />
                         }
@@ -338,7 +422,27 @@ const MapWrapper = (props) => {
 
 
 const mapStateToProps = (state, ownProps) => {
-    return {}
+    const unique = ownProps?.unique;
+    const parsedLayers = parse(ownProps?.["data-layers"]) || [];
+    const loadingByLayerId = {};
+
+    if (Array.isArray(parsedLayers) && unique != null) {
+        parsedLayers.forEach((layer) => {
+            if (!layer || layer.id == null || !DATA_LOADING_LAYER_TYPES.includes(layer.type)) {
+                return;
+            }
+            if (!layer.app || layer.app === 'none' || layer.app === 'csv') {
+                return;
+            }
+
+            const layerLoading = !!state.getIn(['data', layer.app, unique, layer.id, 'loading']);
+            loadingByLayerId[`${layer.id}`] = layerLoading;
+        });
+    }
+
+    return {
+        loadingByLayerId,
+    }
 }
 
 const mapActionCreators = {};

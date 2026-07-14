@@ -172,19 +172,109 @@
 }
 
 .filter-skeleton-placeholder {
-  padding: 0 2px;
-  width: 100%;
-
-  .filter-skeleton-shimmer {
-    height: 38px;
+    padding: 0 2px;
     width: 100%;
-    border-radius: 4px;
-    border: 1px solid #ced0da;
-    background: linear-gradient(90deg,
-        #f5f6f9 25%,
-        #e8eaee 50%,
-        #f5f6f9 75%);
-    background-size: 800px 100%;
-    animation: filter-shimmer 1.4s infinite linear;
-  }
+
+    .filter-skeleton-shimmer {
+        height: 38px;
+        width: 100%;
+        border-radius: 4px;
+        border: 1px solid #ced0da;
+        background: linear-gradient(90deg,
+                #f5f6f9 25%,
+                #e8eaee 50%,
+                #f5f6f9 75%);
+        background-size: 800px 100%;
+        animation: filter-shimmer 1.4s infinite linear;
+    }
+}
+
+/* Filter buttons display for single-select */
+.filter-buttons-container {
+    padding: 0 2px !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+.filter-buttons-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 0;
+
+    .filter-button {
+        flex: 1;
+        min-width: 80px;
+        padding: 8px 12px;
+        border: 1px solid #ced0da;
+        border-radius: 4px;
+        background-color: #f5f6f9;
+        color: $gray;
+        font-size: 14px;
+        font-weight: 400;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+
+        &:hover {
+            border-color: $light-blue;
+            background-color: #f0f7ff;
+        }
+
+        &.active {
+            background-color: $light-blue;
+            color: white;
+            border-color: $light-blue;
+            font-weight: 500;
+        }
+    }
+}
+
+/* Range filter with side-by-side dropdowns */
+.range-filter-container {
+    padding: 0 2px !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+.range-filter-inline-wrapper {
+    display: flex;
+    gap: 12px;
+    align-items: stretch;
+
+    .range-filter-dropdown {
+        flex: 1;
+        min-width: 0;
+
+        .menu {
+            .ui.container {
+                margin: 0;
+                max-height: 220px;
+                padding: 0px 12px 10px 12px;
+            }
+        }
+    }
+}
+
+/* Responsive design for range filter */
+@media (max-width: 768px) {
+    .range-filter-inline-wrapper {
+        flex-direction: column;
+        gap: 8px;
+    }
+}
+
+/* Responsive design for filter buttons */
+@media (max-width: 768px) {
+    .filter-buttons-wrapper {
+        gap: 6px;
+
+        .filter-button {
+            min-width: 60px;
+            padding: 6px 10px;
+            font-size: 13px;
+        }
+    }
 }

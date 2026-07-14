@@ -13,6 +13,7 @@ class DataProvider extends React.Component {
         this.state = {
             showLoading: false
         }
+        this.isUnmounted = false
         this.checkLoadingTime = this.checkLoadingTime.bind(this)
 
         // Timer references
@@ -22,6 +23,7 @@ class DataProvider extends React.Component {
     }
 
     componentDidMount() {
+        this.isUnmounted = false
         const { app, csv, store, params, source, group, editing, waitForFilters = false } = this.props
         console.log("Group & Store ", store, this.props.mySelf)
 
@@ -47,12 +49,17 @@ class DataProvider extends React.Component {
     }
 
     componentWillUnmount() {
+        this.isUnmounted = true
         clearTimeout(this.fallbackTimeout);
         clearTimeout(this.loadingTimeout);
         clearTimeout(this.initialFilterTimeout);
     }
 
     componentDidUpdate(prevProps) {
+        if (this.isUnmounted) {
+            return;
+        }
+
         const {
             app,
             filters,
@@ -118,6 +125,10 @@ class DataProvider extends React.Component {
     }
 
     loadData(params) {
+        if (this.isUnmounted) {
+            return;
+        }
+
         console.log("Loading data for map", params)
         this.setState({ showLoading: false });
         this.props.onLoadData(params);
@@ -127,6 +138,10 @@ class DataProvider extends React.Component {
     }
 
     checkLoadingTime() {
+        if (this.isUnmounted) {
+            return;
+        }
+
         const { loading, time } = this.props
         if (loading && time) {
             const loadingTime = Date.now() - time;

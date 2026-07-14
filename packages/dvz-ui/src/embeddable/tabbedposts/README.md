@@ -16,6 +16,7 @@ An embeddable React component that renders WordPress posts in a tabbed layout. O
 | `data-show-icons` | `string` | — | `"true"` to display the post icon in each tab button. |
 | `data-show-labels` | `string` | — | `"true"` to display the post label in each tab button. |
 | `data-use-scrolls` | `string` | — | `"true"` to allow the content area to scroll. |
+| `data-keep-mounted` | `string` | `"false"` | `"true"` keeps opened tabs mounted after first visit; `"false"` unmounts inactive tabs. |
 | `data-height` | `string \| number` | — | Height of the content area in pixels. |
 | `data-preview-mode` | `string` | `"Desktop"` | Forces a specific render mode in editor: `"Desktop"` or `"Mobile"`. |
 | `editing` | `boolean` | — | `true` when rendered inside the Gutenberg editor. |
@@ -32,6 +33,7 @@ import TabbedPosts from 'dvz-ui/src/embeddable/tabbedposts';
   data-items="5"
   data-theme="light"
   data-show-labels="true"
+  data-keep-mounted="false"
   data-height="700"
   parent="my-page"
   unique="block-1"

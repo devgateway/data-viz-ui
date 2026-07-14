@@ -77,7 +77,11 @@ const RootLayout = () => {
     return (
         <Provider store={store}>
             <IntlProvider key={locale} locale={locale} messages={messages[locale as Locale]}>
-                <AppContextProvider getComponent={getComponentByNameIgnoreCase} store={store} locale={locale}>
+                <AppContextProvider
+                    getComponent={getComponentByNameIgnoreCase}
+                    store={store}
+                    locale={locale}
+                >
                     <SettingProvider locale={locale} changeUUID={null}>
                         <SettingsConsumer>
                             <CustomizerWrapper/>

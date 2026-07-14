@@ -26,11 +26,13 @@ const LOWEST_VALUE = "LOWEST_VALUE";
 const HIGHEST_VALUE = "HIGHEST_VALUE";
 
 const booleanParameter = (val) => {
-    if (val instanceof Boolean) {
+    if (typeof val === "boolean") {
         return val;
-    } else {
-        return val == "true";
     }
+    if (val instanceof Boolean) {
+        return val.valueOf();
+    }
+    return val == "true";
 };
 
 const toOptions = (items, locale) =>
@@ -143,6 +145,7 @@ export interface FilterPros {
     dvzProxyDatasetId?: string;
     defaultTopNEnabled?: boolean;
     defaultTopNCount?: number;
+    showAsButtons?: boolean;
 }
 
 const FilterSelectorBox = connect(
@@ -177,6 +180,7 @@ const FilterSelectorBox = connect(
         dvzProxyDatasetId,
         defaultTopNEnabled,
         defaultTopNCount,
+        showAsButtons,
     } = props;
 
     const [searchFilter, setSearchFilter] = useState("");
@@ -200,7 +204,8 @@ const FilterSelectorBox = connect(
         }
 
         onChange({ app, group, param, value: newValue, autoApply, childFilter, childFilterParam, params, uniqueStorage, dvzProxyDatasetId });
-        if (closeOnSelect && refContainer.current) {
+        // Close dropdown on selection if it's single-select and autoApply is enabled
+        if (((filterType == FILTER_TYPE_SINGLE_SELECT && autoApply) || closeOnSelect) && refContainer.current) {
             refContainer.current.close();
         }
     };
@@ -355,6 +360,39 @@ const FilterSelectorBox = connect(
     const refContainer = useRef<DropdownProps>(null);
     const [searchText, setSearchText] = useState("");
 
+    // Show buttons for single-select when showAsButtons is enabled
+    if (filterType == FILTER_TYPE_SINGLE_SELECT && booleanParameter(showAsButtons)) {
+        return (
+            <Container fluid={true} className="filter filter-buttons-container">
+                <div className="filter-buttons-wrapper">
+                    {options
+                        .filter((o) => {
+                            if (
+                                enableTextSearch &&
+                                searchText &&
+                                searchText.trim().length > 0 &&
+                                o.text
+                            ) {
+                                return o.text.toLowerCase().includes(searchText.toLowerCase());
+                            }
+                            return true;
+                        })
+                        .map(({ value, text }, index) => (
+                            <button
+                                key={index}
+                                className={`filter-button ${
+                                    current && current.indexOf(value) > -1 ? "active" : ""
+                                }`}
+                                onClick={() => changeFilter(value)}
+                            >
+                                {text}
+                            </button>
+                        ))}
+                </div>
+            </Container>
+        );
+    }
+
     return (
         // @ts-ignore
         <Dropdown
@@ -466,6 +504,7 @@ const FilterSelectorBox = connect(
 });
 
 
+
 const RangeFilterSelectorBoxFilter = connect(
     mapStateToProps,
     mapActionCreators
@@ -496,63 +535,89 @@ const RangeFilterSelectorBoxFilter = connect(
             onChange({ app, group, param, value: current, autoApply });
         }, [start, end]);
 
-        const refContainer = useRef<DropdownProps>(null);
+        const getStartText = () => {
+            const startOption = options.find((o) => o.position === start);
+            return startOption ? startOption.text : startLabel;
+        };
+
+        const getEndText = () => {
+            const endOption = options.find((o) => o.position === end);
+            return endOption ? endOption.text : endLabel;
+        };
+
+        const startRef = useRef<DropdownProps>(null);
+        const endRef = useRef<DropdownProps>(null);
 
         return (
-            <Dropdown
-                ref={refContainer as unknown as LegacyRef<HTMLDivElement>}
-                fluid
-                text={`${placeholder} (${current
-                    ? current.filter((v) => v != Number.MIN_SAFE_INTEGER).length
-                    : 0
-                    }/${options.length})`}
-                scrolling={false}
-                button
-                multiple={true}
-                search
-                floating={false}
-                icon="angle down ignore"
-                className={`${current && current.length > 0 ? "applied " : ""} range`}
-            >
-                <Dropdown.Menu>
-                    <Segment>
-                        <Dropdown.Item>
-                            {" "}
-                            <Label basic>{startLabel}</Label>
-                        </Dropdown.Item>
-                    </Segment>
-                    <Container>
-                        {options.map(({ value, text, position }) => (
-                            <Dropdown.Item>
-                                <Radio
-                                    disabled={position > end}
-                                    checked={start === position}
-                                    onChange={(e) => setStart(position)}
-                                    label={text}
-                                />
-                            </Dropdown.Item>
-                        ))}
-                    </Container>
-                    <Segment>
-                        <Dropdown.Item>
-                            {" "}
-                            <Label basic>{endLabel}</Label>
-                        </Dropdown.Item>
-                    </Segment>
-                    <Container>
-                        {options.map(({ value, text, position }) => (
-                            <Dropdown.Item>
-                                <Radio
-                                    disabled={position < start}
-                                    checked={end === position}
-                                    onChange={(e) => setEnd(position)}
-                                    label={text}
-                                />
-                            </Dropdown.Item>
-                        ))}
-                    </Container>
-                </Dropdown.Menu>
-            </Dropdown>
+            <Container fluid={true} className="filter range-filter-container">
+                <div className="range-filter-inline-wrapper">
+                    <Dropdown
+                        ref={startRef as unknown as LegacyRef<HTMLDivElement>}
+                        fluid
+                        text={`${startLabel}: ${getStartText()}`}
+                        scrolling={false}
+                        button
+                        multiple={false}
+                        search
+                        floating={false}
+                        icon="angle down ignore"
+                        className={`range-filter-dropdown start-dropdown ${current && current.length > 0 ? "applied " : ""}`}
+                    >
+                        <Dropdown.Menu>
+                            <Container>
+                                {options.map(({ text, position }, idx) => (
+                                    <Dropdown.Item key={idx}>
+                                        <Radio
+                                            disabled={position > end}
+                                            checked={start === position}
+                                            onChange={() => {
+                                                setStart(position);
+                                                if (autoApply && startRef.current) {
+                                                    startRef.current.close();
+                                                }
+                                            }}
+                                            label={text}
+                                        />
+                                    </Dropdown.Item>
+                                ))}
+                            </Container>
+                        </Dropdown.Menu>
+                    </Dropdown>
+
+                    <Dropdown
+                        ref={endRef as unknown as LegacyRef<HTMLDivElement>}
+                        fluid
+                        text={`${endLabel}: ${getEndText()}`}
+                        scrolling={false}
+                        button
+                        multiple={false}
+                        search
+                        floating={false}
+                        icon="angle down ignore"
+                        className={`range-filter-dropdown end-dropdown ${current && current.length > 0 ? "applied " : ""}`}
+                    >
+                        <Dropdown.Menu>
+                            <Container>
+                                {options.map(({ text, position }, idx) => (
+                                    <Dropdown.Item key={idx}>
+                                        <Radio
+                                            disabled={position < start}
+                                            checked={end === position}
+                                            onChange={() => {
+                                                setEnd(position);
+                                                if (autoApply && endRef.current) {
+                                                    endRef.current.close();
+                                                }
+                                            }}
+                                            label={text}
+                                        />
+                                    </Dropdown.Item>
+                                ))}
+                            </Container>
+                        </Dropdown.Menu>
+                    </Dropdown>
+                </div>
+            </Container>
         );
     }
 );
@@ -596,6 +661,7 @@ const CategoryFilter = (props) => {
                 {...props}
                 options={options}
                 placeholder={props.placeholder ? props.placeholder : value}
+                showAsButtons={props.showAsButtons}
             ></FilterDropDown>
         </Container>
     );
@@ -622,7 +688,11 @@ const BooleanFilter = connect(
     ];
     return (
         <Container fluid={true} className={`filter filter-component`}>
-            <FilterDropDown options={options} {...props} />
+            <FilterDropDown
+                options={options}
+                {...props}
+                showAsButtons={props.showAsButtons}
+            />
         </Container>
     );
 });
@@ -642,7 +712,11 @@ const CSVFilter = (props) => {
 
     return (
         <Container fluid={true} className={`filter filter-component`}>
-            <FilterDropDown options={options} {...props}>
+            <FilterDropDown
+                options={options}
+                {...props}
+                showAsButtons={props.showAsButtons}
+            >
                 {" "}
             </FilterDropDown>
         </Container>
@@ -689,6 +763,7 @@ const Filter = ({
     "data-auto-apply": autoApply = "true",
     "data-default-top-n-enabled": defaultTopNEnabled = "false",
     "data-default-top-n-count": defaultTopNCount = "0",
+    "data-show-as-buttons": showAsButtons = "false",
     intl,
 }) => {
     const params = {};
@@ -740,6 +815,7 @@ const Filter = ({
                 allNoneSameBehaviour={allNoneSameBehaviour === "true"}
                 closeOnSelect={closeOnSelect === "true"}
                 locale={intl.locale}
+                showAsButtons={booleanParameter(showAsButtons)}
             />
         );
     } else {
@@ -776,6 +852,7 @@ const Filter = ({
                                     filterType={defaultFilterType}
                                     defaultValues={defaultValues}
                                     locale={intl.locale}
+                                    showAsButtons={booleanParameter(showAsButtons)}
                                 ></BooleanFilter>
                             )}
                             {type !== "Boolean" && (
@@ -812,6 +889,7 @@ const Filter = ({
                                         locale={intl.locale}
                                         uniqueStorage={ff.length > 0 ? unique : null}
                                         dvzProxyDatasetId={dvzProxyDatasetId}
+                                        showAsButtons={booleanParameter(showAsButtons)}
                                     ></CategoryFilter>
                                 </CategoriesConsumer>
                             )}

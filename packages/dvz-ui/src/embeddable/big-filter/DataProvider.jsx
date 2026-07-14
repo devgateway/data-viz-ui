@@ -11,10 +11,12 @@ class BigFilterDataProvider extends React.Component {
     constructor(props) {
         super(props);
         this.debounces = []
+        this.isUnmounted = false
 
     }
 
     componentDidMount() {
+        this.isUnmounted = false
         const { app, useAncestor, parent, source, store, params, csv, group, editing, waitForFilters = false } = this.props
 
         this.props.onLoadData({ app, source, store, params, group }) //read filters from read group
@@ -22,6 +24,10 @@ class BigFilterDataProvider extends React.Component {
 
 
     componentDidUpdate(prevProps, prevState, snapshot) {
+        if (this.isUnmounted) {
+            return
+        }
+
         const { app, filters, useAncestor, parent, source, store, params, csv, group, editing } = this.props
         if (filters != prevProps.filters || JSON.stringify(params) != JSON.stringify(prevProps.params) || app != prevProps.app || JSON.stringify(prevProps.source) != JSON.stringify(source) || csv != prevProps.csv) {
             //  console.log("loading data", source)
@@ -32,7 +38,7 @@ class BigFilterDataProvider extends React.Component {
 
 
     componentWillUnmount() {
-
+        this.isUnmounted = true
     }
 
     render() {

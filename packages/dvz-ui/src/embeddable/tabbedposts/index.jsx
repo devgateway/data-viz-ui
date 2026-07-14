@@ -81,7 +81,7 @@ const GriNavigator = ({
     : null;
 };
 
-const TabContent = ({ posts, activeItem }) => {
+const TabContent = ({ posts, activeItem, keepMounted, loadedItems = [] }) => {
   useEffect(() => {
     const contentContainer = document.querySelector('.ui.container.content-tab');
     if (contentContainer) {
@@ -89,28 +89,38 @@ const TabContent = ({ posts, activeItem }) => {
     }
   }, [activeItem]);
 
-  return posts ? (
-    posts.map((p) => {
-      let style = {};
-      if (p.slug !== activeItem) {
-        style = {
-          position: 'absolute',
-          left: '-3000px',
-          width: 'auto',
-          height: '0px',
-          overflow: 'hidden',
-          visibility: 'hidden',
-        };
-      } else {
-        style = {
-          visibility: 'visible',
-          position: 'relative',
-          width: 'auto',
-        };
-      }
-      return <PostIntro key={p.slug} as={Container} fluid post={p} style={style} />;
-    })
-  ) : null;
+  if (keepMounted) {
+    const loadedItemsSet = new Set(loadedItems);
+    const postsToRender = posts
+      ? posts.filter((post) => loadedItemsSet.has(post.slug))
+      : [];
+
+    return postsToRender.length ? (
+      postsToRender.map((post) => {
+        const isActive = post.slug === activeItem;
+        const style = isActive
+          ? {
+            visibility: 'visible',
+            position: 'relative',
+            width: 'auto',
+          }
+          : {
+            position: 'absolute',
+            left: '-3000px',
+            width: 'auto',
+            height: '0px',
+            overflow: 'hidden',
+            visibility: 'hidden',
+          };
+
+        return <PostIntro key={post.slug} as={Container} fluid post={post} style={style} />;
+      })
+    ) : null;
+  }
+
+  const activePost = posts?.find((post) => post.slug === activeItem);
+
+  return activePost ? <PostIntro key={activePost.slug} as={Container} fluid post={activePost} /> : null;
 };
 
 const AccordionContent = ({ posts, activeItem, setActive }) => {
@@ -337,22 +347,69 @@ const AccordionContent = ({ posts, activeItem, setActive }) => {
   );
 };
 
-const SingleTabbedView = ({ posts, showLabels, height }) => {
+const SingleTabbedView = ({ posts, showLabels, height, keepMounted }) => {
   const [activeItem, setActive] = useState(posts ? posts[0].slug : null);
+  const [loadedItems, setLoadedItems] = useState(
+    keepMounted && posts?.[0]?.slug ? [posts[0].slug] : []
+  );
+
+
+  const setActiveTab = (slug) => {
+    setActive(slug);
+    if (!keepMounted) {
+      return;
+    }
+
+    setLoadedItems((currentLoadedItems) =>
+      currentLoadedItems.includes(slug)
+        ? currentLoadedItems
+        : [...currentLoadedItems, slug]
+    );
+  };
 
   useEffect(() => {
+    if (!posts?.length) {
+      return;
+    }
+
+    const firstSlug = posts[0].slug;
+    setActive((currentActiveItem) =>
+      currentActiveItem && posts.some((p) => p.slug === currentActiveItem)
+        ? currentActiveItem
+        : firstSlug
+    );
+
+    if (!keepMounted) {
+      setLoadedItems([]);
+      return;
+    }
+
+    setLoadedItems((currentLoadedItems) => {
+      const validLoadedItems = currentLoadedItems.filter((slug) =>
+        posts.some((p) => p.slug === slug)
+      );
+      return validLoadedItems.length ? validLoadedItems : [firstSlug];
+    });
+  }, [posts, keepMounted]);
+
+
+  useEffect(() => {
+    if (!posts?.length) {
+      return;
+    }
+
     setTimeout(() => {
       if (window.location.hash) {
         const slug = window.location.hash.substr(1);
         const element = document.getElementById(slug);
 
         if (element && posts.map((p) => p.slug).indexOf(slug) > -1) {
-          setActive(slug);
+          setActiveTab(slug);
           element.scrollIntoView({ behavior: 'auto', block: 'start' });
         }
       }
     }, 0);
-  }, [posts]);
+  }, [posts, keepMounted]);
 
   return (
     <React.Fragment>
@@ -361,26 +418,69 @@ const SingleTabbedView = ({ posts, showLabels, height }) => {
       ))}
 
       <Menu className="tabbed posts" text>
-        <ItemMenu showLabels={showLabels} posts={posts} setActive={setActive} activeItem={activeItem} />
+        <ItemMenu showLabels={showLabels} posts={posts} setActive={setActiveTab} activeItem={activeItem} />
       </Menu>
       <Container className={'content-tab'} style={{ height: `${height}px` }}>
-        <TabContent posts={posts} activeItem={activeItem} />
+        <TabContent posts={posts} activeItem={activeItem} keepMounted={keepMounted} loadedItems={loadedItems} />
       </Container>
     </React.Fragment>
   );
 };
 
-const GridTabbedView = ({ posts, showLabels, showIcons, height }) => {
+const GridTabbedView = ({ posts, showLabels, showIcons, height, keepMounted }) => {
   const [activeItem, setActive] = useState(posts ? posts[0].slug : null);
+  const [loadedItems, setLoadedItems] = useState(
+    keepMounted && posts?.[0]?.slug ? [posts[0].slug] : []
+  );
+
+
+  const setActiveTab = (slug) => {
+    setActive(slug);
+    if (!keepMounted) {
+      return;
+    }
+
+    setLoadedItems((currentLoadedItems) =>
+      currentLoadedItems.includes(slug)
+        ? currentLoadedItems
+        : [...currentLoadedItems, slug]
+    );
+  };
+
+  useEffect(() => {
+    if (!posts?.length) {
+      return;
+    }
+
+    const firstSlug = posts[0].slug;
+    setActive((currentActiveItem) =>
+      currentActiveItem && posts.some((p) => p.slug === currentActiveItem)
+        ? currentActiveItem
+        : firstSlug
+    );
+
+    if (!keepMounted) {
+      setLoadedItems([]);
+      return;
+    }
+
+    setLoadedItems((currentLoadedItems) => {
+      const validLoadedItems = currentLoadedItems.filter((slug) =>
+        posts.some((p) => p.slug === slug)
+      );
+      return validLoadedItems.length ? validLoadedItems : [firstSlug];
+    });
+  }, [posts, keepMounted]);
+
 
   return (
     <React.Fragment>
       <Grid stackable className="tabbed posts" columns={posts.length} style={{ height: height + "px" }}>
-        <GriNavigator showIcons={showIcons} showLabels={showLabels} posts={posts} activeItem={activeItem} setActive={setActive} />
+        <GriNavigator showIcons={showIcons} showLabels={showLabels} posts={posts} activeItem={activeItem} setActive={setActiveTab} />
         <Grid.Row style={{ height: `${height}px` }}>
           <Grid.Column width={16} className={"content"}>
             <Container className={'content-tab'} style={{ height: `${height}px` }}>
-              <TabContent className={"content-tab"} posts={posts} activeItem={activeItem} />
+              <TabContent className={"content-tab"} posts={posts} activeItem={activeItem} keepMounted={keepMounted} loadedItems={loadedItems} />
             </Container>
           </Grid.Column>
         </Grid.Row>
@@ -398,6 +498,7 @@ const Wrapper = (props) => {
     "data-theme": theme = 'light',
     "data-show-icons": showIcons,
     "data-use-scrolls": useScrolls,
+    "data-keep-mounted": keepMounted,
     "data-show-labels": showLabels,
     "data-height": height,
     "data-preview-mode": previewMode = 'Desktop',
@@ -411,6 +512,7 @@ const Wrapper = (props) => {
   const locale = props.intl.locale;
 
   const scrollable = useScrolls === 'true';
+  const shouldKeepMounted = keepMounted === true || keepMounted === 'true';
   const conditionalHeight = scrollable ? height : undefined;
 
   const { width: deviceWidth } = useWindowDimensionsAndDevice();
@@ -433,12 +535,17 @@ const Wrapper = (props) => {
             {(isMobileRenderMode || isNotDesktopPreview) ? (
               <AccordionContent posts={items} activeItem={items[0]?.slug} setActive={() => { }} />
             ) : theme === 'light' ? (
-              <SingleTabbedView height={conditionalHeight} showLabels={showLabels === 'true'} />
+              <SingleTabbedView
+                height={conditionalHeight}
+                showLabels={showLabels === 'true'}
+                keepMounted={shouldKeepMounted}
+              />
             ) : (
               <GridTabbedView
                 height={conditionalHeight}
                 showLabels={showLabels === 'true'}
                 showIcons={showIcons === 'true'}
+                keepMounted={shouldKeepMounted}
               />
             )}
           </PostConsumer>

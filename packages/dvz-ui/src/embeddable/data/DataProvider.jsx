@@ -13,14 +13,17 @@ class DataProvider extends React.Component {
         this.state = {
             showLoading: false
         }
+        this.isUnmounted = false
         this.checkLoadingTime = this.checkLoadingTime.bind(this)
         this.debounces = []
-
     }
 
 
     debouncedLoadData(time, args) {
         const db = debounce((args) => {
+            if (this.isUnmounted) {
+                return
+            }
 
             console.log(`🔄 [DataProvider] Debounced load triggered (${time}ms delay)`, {
                 args,
@@ -33,11 +36,13 @@ class DataProvider extends React.Component {
             setTimeout(this.checkLoadingTime, 0)
         }, time)
 
-        this.debounces.push(db(args))
+        this.debounces.push(db)
+        db(args)
     }
 
 
     componentDidMount() {
+        this.isUnmounted = false
         const { app, source, store, params, csv, group, editing, waitForFilters = false } = this.props
 
         if (app === "csv") {
@@ -48,7 +53,12 @@ class DataProvider extends React.Component {
             }
 
             this.setState({ showLoading: false })
-            if (!waitForFilters || editing) {
+            // Load immediately when:
+            // - waitForFilters is false (normal case), OR
+            // - we are in editing mode, OR
+            // - filters already exist in Redux (component is remounting after a previous
+            //   filter change; we must not make the user wait the 1-second fallback)
+            if (!waitForFilters || editing || this.props.filters) {
                 console.log('📥 [DataProvider] Initial data load triggered', {
                     app,
                     source,
@@ -56,9 +66,11 @@ class DataProvider extends React.Component {
                     params,
                     group,
                     waitForFilters,
+                    filtersAlreadyExist: !!this.props.filters,
                     editing,
                     timestamp: new Date().toISOString()
                 })
+                this.dataLoaded = true
                 this.props.onLoadData({ app, source, store, params, group })
                 setTimeout(this.checkLoadingTime, 100);
             } else {
@@ -96,12 +108,18 @@ class DataProvider extends React.Component {
     }
 
     componentWillUnmount() {
+        this.isUnmounted = true
         clearTimeout(this.fallbackTimeout);
         clearTimeout(this.debounceTimeout);
         this.debounces.forEach(d => d ? d.cancel() : null)
+        this.debounces = []
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
+        if (this.isUnmounted) {
+            return
+        }
+
         const {
             app,
             filters,
@@ -236,6 +254,10 @@ class DataProvider extends React.Component {
 
 
     checkLoadingTime() {
+        if (this.isUnmounted) {
+            return
+        }
+
         const { data, loading, time, error, verbose = true } = this.props
         const loadingTime = Date.now() - time
 
@@ -324,5 +346,6 @@ const mapStateToProps = (state, ownProps) => {
 const mapActionCreators = {
     onSetData: setData, onLoadData: getData
 };
+
 
 export default connect(mapStateToProps, mapActionCreators)(injectIntl(DataProvider));
