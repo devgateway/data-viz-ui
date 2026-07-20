@@ -3,6 +3,7 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeRaw from 'rehype-raw'
 import template from 'string-template';
+import { useClampTooltipToViewport } from "../chart/Tooltip";
 
 const percentExpresion = /(\+?\%)[\(]([A-z0-9,.,-]+)\)/gi
 const numericExpresion = /(\+?\#)[\(]([A-z0-9,.,-]+)\)/gi
@@ -38,6 +39,7 @@ export const formatContent = (tooltip, variables, intl, tooltipEnableMarkdown) =
 const ChartTooltip = ({tooltip, d, intl, tooltipEnableMarkdown}) => {
     const {color, data} = d.datum || d.point || d
     const current = d.value || (d.datum ? d.datum.value : null) || (d.point ? d.point.data.y : null)
+    let str = ""
     if (data) {
         const vars = data.variables ? (data.variables[d.id] || data.variables) : data
 
@@ -45,17 +47,23 @@ const ChartTooltip = ({tooltip, d, intl, tooltipEnableMarkdown}) => {
         if (data.measureFieldName) {
             params.populationValue = data.variables[data.measureFieldName + "Population"]
         }
-        const str = formatContent(tooltip, params, intl, tooltipEnableMarkdown)
+        str = formatContent(tooltip, params, intl, tooltipEnableMarkdown)
+    }
+
+    // Must run on every render, before any conditional early return.
+    const tooltipRef = useClampTooltipToViewport([str, tooltipEnableMarkdown])
+
+    if (data) {
         if (tooltipEnableMarkdown) {
             return (
-                <div className={"chart tooltip"}>
+                <div ref={tooltipRef} className={"chart tooltip"}>
                     <ReactMarkdown children={str} remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
                     </ReactMarkdown>
                 </div>
             )
         } else {
             return (
-                <div className={"chart tooltip"} >
+                <div ref={tooltipRef} className={"chart tooltip"} >
                     <div dangerouslySetInnerHTML={{ __html: str }}></div>
                 </div>)
         }
