@@ -52,7 +52,13 @@
     padding: 0;
     margin: 0;
     .sixteen.wide.column.content {
-      overflow: hidden;
+      // Was `overflow: hidden`, which clipped absolutely-positioned chart
+      // tooltips (nivo does not portal its tooltip - it renders in place)
+      // whenever they extended past this container's edges, e.g. near the
+      // top/bottom of a tab panel. Visible keeps rounded-corner clipping
+      // from `.row` from being pixel-perfect at the very corners, but that
+      // is a much smaller visual issue than a cut-off tooltip.
+      overflow: visible;
       padding: 0;
       .entry-content {
         padding: 25px 33px 0 33px;

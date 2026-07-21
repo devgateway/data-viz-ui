@@ -50,36 +50,99 @@ export const clampTooltipToViewport = (el) => {
   }
 };
 
+// Number of consecutive frames with an unchanged correction before we
+// consider the tooltip settled and stop the rAF burst.
+const SETTLE_FRAMES = 6;
+// Hard cap on a single burst (~1s at 60fps) as a safety net in case the
+// wrapper's position never truly stabilizes (e.g. a very long animation).
+const MAX_BURST_FRAMES = 60;
+
 // Hook that keeps a tooltip element within the viewport whenever its
-// content (and therefore size/position) changes.
+// content, size or the viewport itself changes.
 //
 // The parent tooltip wrapper (e.g. nivo's TooltipWrapper) animates its
 // position with react-spring, so a single one-off measurement can catch it
 // mid-animation and "freeze" a correction that overshoots once the
-// animation settles. To avoid that, we keep re-measuring on every animation
-// frame for as long as the tooltip is mounted, so the applied correction
-// always matches the wrapper's current (not intermediate) position.
+// animation settles. To handle that without keeping an rAF loop running
+// indefinitely (which would burn main-thread time for as long as any
+// tooltip stays mounted), we only re-measure on every frame for a short
+// "burst" - stopping once the applied correction stops changing for a few
+// consecutive frames. A ResizeObserver on the element (content/size
+// changes) and window scroll/resize listeners restart a fresh burst
+// whenever the tooltip could have moved again afterwards.
 export const useClampTooltipToViewport = (deps = []) => {
   const ref = useRef(null);
 
   useLayoutEffect(() => {
-    if (typeof window === "undefined" || !window.requestAnimationFrame) {
-      clampTooltipToViewport(ref.current);
+    const el = ref.current;
+    if (!el) {
       return undefined;
     }
 
-    let frameId;
-    const tick = () => {
-      clampTooltipToViewport(ref.current);
-      frameId = window.requestAnimationFrame(tick);
-    };
-    frameId = window.requestAnimationFrame(tick);
+    if (typeof window === "undefined" || !window.requestAnimationFrame) {
+      clampTooltipToViewport(el);
+      return undefined;
+    }
 
-    return () => {
-      if (frameId) {
+    let frameId = null;
+    let lastTransform = null;
+    let unchangedFrames = 0;
+    let framesRun = 0;
+
+    const stopBurst = () => {
+      if (frameId != null) {
         window.cancelAnimationFrame(frameId);
+        frameId = null;
       }
     };
+
+    const tick = () => {
+      clampTooltipToViewport(el);
+      framesRun += 1;
+
+      if (el.style.transform === lastTransform) {
+        unchangedFrames += 1;
+      } else {
+        unchangedFrames = 0;
+        lastTransform = el.style.transform;
+      }
+
+      if (unchangedFrames >= SETTLE_FRAMES || framesRun >= MAX_BURST_FRAMES) {
+        frameId = null;
+        return;
+      }
+
+      frameId = window.requestAnimationFrame(tick);
+    };
+
+    const startBurst = () => {
+      stopBurst();
+      lastTransform = null;
+      unchangedFrames = 0;
+      framesRun = 0;
+      frameId = window.requestAnimationFrame(tick);
+    };
+
+    startBurst();
+
+    let resizeObserver;
+    if (typeof ResizeObserver !== "undefined") {
+      resizeObserver = new ResizeObserver(startBurst);
+      resizeObserver.observe(el);
+    }
+
+    // Capture phase so scrolling any ancestor container (not just the
+    // window) also triggers a re-clamp.
+    window.addEventListener("scroll", startBurst, true);
+    window.addEventListener("resize", startBurst);
+
+    return () => {
+      stopBurst();
+      resizeObserver?.disconnect();
+      window.removeEventListener("scroll", startBurst, true);
+      window.removeEventListener("resize", startBurst);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
 
   return ref;
