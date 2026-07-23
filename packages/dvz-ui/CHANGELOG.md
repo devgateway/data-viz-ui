@@ -1,5 +1,11 @@
 # @devgateway/dvz-ui-react
 
+## 1.9.4
+
+### Patch Changes
+
+- [#272](https://github.com/devgateway/data-viz-ui/pull/272) [`4830cdd`](https://github.com/devgateway/data-viz-ui/commit/4830cddb1de7fc7e0123a30aabf2483f85ad98f8) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Fix newsletter props to allow them to be parsed in SSR context
+
 ## 1.9.3
 
 ### Patch Changes
