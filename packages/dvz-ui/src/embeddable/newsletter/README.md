@@ -15,7 +15,6 @@ An embeddable React component that renders a Mailchimp newsletter subscription f
 | `successmessage` | string | `"Thanks"` | Message displayed on successful subscription |
 | `failuremessage` | string | `"Something didn't go well"` | Message displayed on failed subscription |
 | `editing` | boolean | — | When truthy, shows both success and error messages simultaneously (editor preview) |
-| `email` *(Redux)* | string | — | Current email input value (managed via Redux store) |
 | `status` *(Redux)* | string | — | Subscription status: `"OK"` or `"ERROR"` |
 
 ## Usage Example

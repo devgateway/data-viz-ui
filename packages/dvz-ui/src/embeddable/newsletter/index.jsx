@@ -7,14 +7,6 @@ const expresion = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 
 
 const Index = (props) => {
-
-    const submit = () => {
-        const list = props["data-list"];
-        const tag = props["data-tag"];
-        const {email} = props;
-        props.onSubmit({email, list, tag})
-    }
-
     const {
         status,
         editing,
@@ -24,9 +16,15 @@ const Index = (props) => {
         "data-failure-message": failuremessage = "Something didn't go well",
         "data-label": label = "Send",
         "data-tag": tag,
-        email,
-        onChange
-    } = props
+    } = props;
+
+    const [email, setEmail] = React.useState("")
+
+    const submit = () => {
+        if (!expresion.test(email)) return
+        props.onSubmit({email, list, tag})
+    }
+
 
     let message = ""
 
@@ -46,7 +44,7 @@ const Index = (props) => {
     return <div className="viz newsLetter">
         <div className="viz newsLetter form">
             <Input icon='envelope' name="email" value={email}
-                   onChange={(e, target) => onChange(target.value)}
+                   onChange={(e, target) => setEmail(target.value)}
                    iconPosition='left'
                    placeholder={placeholder}/>
             <Button disabled={!valid} primary onClick={e => submit()}>{label}</Button>
