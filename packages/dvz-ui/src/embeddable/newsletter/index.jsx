@@ -21,9 +21,7 @@ const Index = (props) => {
     const [email, setEmail] = React.useState("")
 
     const submit = () => {
-        if (!expresion.test(email)) {
-            alert("Please enter a valid email address")
-        }
+        if (!expresion.test(email)) return
         props.onSubmit({email, list, tag})
     }
 
