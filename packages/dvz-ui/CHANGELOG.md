@@ -1,5 +1,11 @@
 # @devgateway/dvz-ui-react
 
+## 1.9.3
+
+### Patch Changes
+
+- [#270](https://github.com/devgateway/data-viz-ui/pull/270) [`3ab61ae`](https://github.com/devgateway/data-viz-ui/commit/3ab61aedd563a7fc179455cad845eb4b0a739764) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Fix newsletter request body to include the list and tag
+
 ## 1.9.2
 
 ### Patch Changes
