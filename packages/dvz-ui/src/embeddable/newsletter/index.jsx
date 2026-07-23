@@ -10,19 +10,30 @@ const Index = (props) => {
     const {
         status,
         editing,
-        "data-list": list,
+        "data-list": dataList,
+        list: propList,
         "data-placeholder": placeholder = "enter your email address",
         "data-success-message": successmessage = "Thanks",
         "data-failure-message": failuremessage = "Something didn't go well",
         "data-label": label = "Send",
-        "data-tag": tag,
+        "data-tag": dataTag,
+        tag: propTag,
     } = props;
+
+
+    const list = dataList ?? propList
+    const tag = dataTag ?? propTag
 
     const [email, setEmail] = React.useState("")
 
     const submit = () => {
         if (!expresion.test(email)) return
-        props.onSubmit({email, list, tag})
+
+        const payload = {email}
+        if (list != null) payload.list = list
+        if (tag != null) payload.tag = tag
+
+        props.onSubmit(payload)
     }
 
 
@@ -47,7 +58,7 @@ const Index = (props) => {
                    onChange={(e, target) => setEmail(target.value)}
                    iconPosition='left'
                    placeholder={placeholder}/>
-            <Button disabled={!valid} primary onClick={e => submit()}>{label}</Button>
+            <Button disabled={!valid} primary onClick={submit}>{label}</Button>
         </div>
         {message}
     </div>
