@@ -125,19 +125,24 @@ const Line = (
                         intl
                       )
                     );
-                    tooltip
-                      .style(
-                        "top",
-                        event.pageY -
-                          tooltip.node().getBoundingClientRect().height +
-                          "px"
-                      )
-                      .style(
-                        "left",
-                        event.pageX -
-                          tooltip.node().getBoundingClientRect().width +
-                          "px"
-                      );
+                    const rect = tooltip.node().getBoundingClientRect();
+                    const margin = 8;
+                    const minLeft = window.scrollX + margin;
+                    const maxLeft =
+                      window.scrollX + window.innerWidth - rect.width - margin;
+                    const minTop = window.scrollY + margin;
+                    const maxTop =
+                      window.scrollY + window.innerHeight - rect.height - margin;
+                    const left = Math.min(
+                      Math.max(event.pageX - rect.width, minLeft),
+                      Math.max(minLeft, maxLeft)
+                    );
+                    const top = Math.min(
+                      Math.max(event.pageY - rect.height, minTop),
+                      Math.max(minTop, maxTop)
+                    );
+
+                    tooltip.style("top", top + "px").style("left", left + "px")
                   }
                 }}
                 onMouseOut={(event) => tooltip.style("visibility", "hidden")}

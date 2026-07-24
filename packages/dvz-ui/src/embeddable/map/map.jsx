@@ -262,7 +262,8 @@ class Map extends React.Component {
       .select("body")
       .append("div")
       .style("position", "absolute")
-      .style("visibility", "hidden");
+      .style("visibility", "hidden")
+      .style("pointer-events", "none");
 
     console.log("Map props", this.metadataTypes);
   }
@@ -1456,11 +1457,27 @@ class Map extends React.Component {
     }
   }
 
+  positionTooltip(event) {
+    const offset = 8;
+    const node = this.tooltip.node();
+    const tooltipWidth = node ? node.offsetWidth : 0;
+    const viewportRight =
+      window.scrollX + document.documentElement.clientWidth;
+
+    let left = event.pageX;
+    if (tooltipWidth && left + tooltipWidth > viewportRight) {
+      left = event.pageX - tooltipWidth;
+      if (left < window.scrollX) {
+        left = window.scrollX;
+      }
+    }
+
+    this.tooltip.style("top", event.pageY + "px").style("left", left + "px").style("margin-left", offset + "px");
+  }
+
   mousemove(event, d) {
     // The event object contains the mouse coordinates
-    this.tooltip
-      .style("top", event.pageY + "px")
-      .style("left", event.pageX + 5 + "px");
+    this.positionTooltip(event);
   }
 
   mouseout(event, d) {
@@ -1474,10 +1491,8 @@ class Map extends React.Component {
   }
   onClick(event, d) {
     if (d.properties) {
-      this.tooltip
-        .style("visibility", "visible")
-        .style("top", event.pageY + "px")
-        .style("left", event.pageX + 5 + "px");
+      this.tooltip.style("visibility", "visible");
+      this.positionTooltip(event);
     }
     event.stopPropagation();
     event.preventDefault();
@@ -1485,10 +1500,8 @@ class Map extends React.Component {
 
   onPointClick(event, d, i) {
     this.showTooltip(event, d);
-    this.tooltip
-      .style("visibility", "visible")
-      .style("top", event.pageY + "px")
-      .style("left", event.pageX + 5 + "px");
+    this.tooltip.style("visibility", "visible");
+    this.positionTooltip(event);
 
     const svg = d3.select(this.getMapId()).select("svg").select("g");
     svg

@@ -137,6 +137,11 @@ h1.type {
   border-radius: 5px;
   background-color: #f7f7f7 !important;
   min-width: 220px;
+  max-width: 320px;
+  white-space: normal;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  pointer-events: none;
 
   .tooltip-content {
     padding: 5px;
@@ -193,6 +198,11 @@ h1.type {
   border-radius: 5px;
   background-color: #5c5c5c !important;
   min-width: 220px;
+  max-width: 320px;
+  white-space: normal;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  pointer-events: none;
 
   .tooltip-content {
     padding: 5px;
