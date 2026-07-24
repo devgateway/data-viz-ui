@@ -8,150 +8,112 @@ const percentExpresion = /(\+?\%)[\(]([A-z0-9,.,-]+)\)/gi;
 const numericExpresion = /(\+?\#)[\(]([A-z0-9,.,-]+)\)/gi;
 const compactExpresion = /(\+?\#C)[\(]([A-z0-9,.,-]+)\)/gi;
 
-// Minimum distance (in px) to keep between the tooltip and the edge of the viewport.
+// Minimum gap (px) to keep between the tooltip and the viewport edge.
 const VIEWPORT_EDGE_MARGIN = 8;
 
-// Nudges an already-positioned element back within the viewport bounds.
-// Chart libraries (e.g. nivo) position tooltips relative to the data point,
-// which can push them past the left/right/top/bottom edge of the screen -
-// most noticeably on narrow/mobile viewports or when the point is near an edge.
-// This measures the rendered element and applies a corrective local transform,
-// without altering the positioning logic of the chart library itself.
+// Shift needed to bring [start, end] inside [0, viewportSize]; 0 if it already fits.
+const clampShift = (start, end, viewportSize, overshoot = 0) => {
+  if (start < VIEWPORT_EDGE_MARGIN) {
+    return VIEWPORT_EDGE_MARGIN - start;
+  }
+  if (end > viewportSize - VIEWPORT_EDGE_MARGIN) {
+    return viewportSize - VIEWPORT_EDGE_MARGIN - end - overshoot;
+  }
+  return 0;
+};
+
+// Nudges an already-positioned tooltip back inside the viewport via a
+// corrective transform, without touching the chart library's own positioning
+// (chart libraries like nivo can place tooltips past the screen edge).
 export const clampTooltipToViewport = (el) => {
   if (!el || typeof window === "undefined") {
     return;
   }
 
-  // Reset any previous adjustment before measuring so we always compute
-  // the correction relative to the library's original position.
+  // Reset so we measure relative to the library's original position.
   el.style.transform = "";
 
   const rect = el.getBoundingClientRect();
-  const viewportWidth = window.innerWidth;
-  const viewportHeight = window.innerHeight;
-  const isMobile = viewportWidth < 768; // Adjust this threshold as needed
+  const { innerWidth: viewportWidth, innerHeight: viewportHeight } = window;
+  const mobileOvershoot = viewportWidth < 768 ? 12 : 40; // extra room on narrow viewports
 
-  let shiftX = 0;
-  if (rect.left < VIEWPORT_EDGE_MARGIN) {
-    shiftX = VIEWPORT_EDGE_MARGIN - rect.left;
-  } else if (rect.right > viewportWidth - VIEWPORT_EDGE_MARGIN) {
-    shiftX = viewportWidth - VIEWPORT_EDGE_MARGIN - rect.right - (isMobile ? 12 : 40); // Adjust for mobile if needed
-  }
-
-  let shiftY = 0;
-  if (rect.top < VIEWPORT_EDGE_MARGIN) {
-    shiftY = VIEWPORT_EDGE_MARGIN - rect.top;
-  } else if (rect.bottom > viewportHeight - VIEWPORT_EDGE_MARGIN) {
-    shiftY = viewportHeight - VIEWPORT_EDGE_MARGIN - rect.bottom;
-  }
+  const shiftX = clampShift(rect.left, rect.right, viewportWidth, mobileOvershoot);
+  const shiftY = clampShift(rect.top, rect.bottom, viewportHeight);
 
   if (shiftX || shiftY) {
     el.style.transform = `translate(${Math.round(shiftX)}px, ${Math.round(shiftY)}px)`;
   }
 };
 
-// Number of consecutive frames with an unchanged correction before we
-// consider the tooltip settled and stop the rAF burst.
+// Frames with an unchanged correction before we consider the tooltip settled.
 const SETTLE_FRAMES = 6;
-// Hard cap on a single burst (~1s at 60fps) as a safety net in case the
-// wrapper's position never truly stabilizes (e.g. a very long animation).
+// Safety cap on a burst's length (~1s at 60fps) in case position never settles.
 const MAX_BURST_FRAMES = 60;
 
-// Hook that keeps a tooltip element within the viewport whenever its
-// content, size or the viewport itself changes.
-//
-// The parent tooltip wrapper (e.g. nivo's TooltipWrapper) animates its
-// position with react-spring, so a single one-off measurement can catch it
-// mid-animation and "freeze" a correction that overshoots once the
-// animation settles. To handle that without keeping an rAF loop running
-// indefinitely (which would burn main-thread time for as long as any
-// tooltip stays mounted), we only re-measure on every frame for a short
-// "burst" - stopping once the applied correction stops changing for a few
-// consecutive frames. A ResizeObserver on the element (content/size
-// changes) and window scroll/resize listeners restart a fresh burst
-// whenever the tooltip could have moved again afterwards.
+/** 
+ * Keeps a tooltip inside the viewport, re-clamping every frame for a short
+ * burst whenever it might have moved (mount, resize, scroll) and stopping
+ * once the correction settles. The burst is needed because animated wrappers
+ * (e.g. nivo + react-spring) can still be mid-animation when we first measure. 
+ */
 export const useClampTooltipToViewport = (deps = []) => {
   const ref = useRef(null);
 
   useLayoutEffect(() => {
     const el = ref.current;
-    if (!el) {
-      return undefined;
-    }
-
-    if (typeof window === "undefined" || !window.requestAnimationFrame) {
+    if (!el || typeof window === "undefined" || !window.requestAnimationFrame) {
       clampTooltipToViewport(el);
       return undefined;
     }
 
     let frameId = null;
-    let lastTransform = null;
-    let unchangedFrames = 0;
-    let framesRun = 0;
-
-    const stopBurst = () => {
-      if (frameId != null) {
-        window.cancelAnimationFrame(frameId);
-        frameId = null;
-      }
-    };
-
-    const tick = () => {
-      clampTooltipToViewport(el);
-      framesRun += 1;
-
-      if (el.style.transform === lastTransform) {
-        unchangedFrames += 1;
-      } else {
-        unchangedFrames = 0;
-        lastTransform = el.style.transform;
-      }
-
-      if (unchangedFrames >= SETTLE_FRAMES || framesRun >= MAX_BURST_FRAMES) {
-        frameId = null;
-        return;
-      }
-
-      frameId = window.requestAnimationFrame(tick);
-    };
 
     const startBurst = () => {
-      stopBurst();
-      lastTransform = null;
-      unchangedFrames = 0;
-      framesRun = 0;
-      frameId = window.requestAnimationFrame(tick);
+      if (frameId != null) {
+        window.cancelAnimationFrame(frameId);
+      }
+
+      let lastTransform = null;
+      let unchangedFrames = 0;
+
+      const tick = (frame) => {
+        clampTooltipToViewport(el);
+
+        unchangedFrames = el.style.transform === lastTransform ? unchangedFrames + 1 : 0;
+        lastTransform = el.style.transform;
+
+        const settled = unchangedFrames >= SETTLE_FRAMES || frame >= MAX_BURST_FRAMES;
+        frameId = settled ? null : window.requestAnimationFrame(() => tick(frame + 1));
+      };
+
+      tick(0);
     };
 
     startBurst();
 
-    let resizeObserver;
-    if (typeof ResizeObserver !== "undefined") {
-      resizeObserver = new ResizeObserver(startBurst);
-      resizeObserver.observe(el);
-    }
+    const resizeObserver = typeof ResizeObserver !== "undefined" ? new ResizeObserver(startBurst) : null;
+    resizeObserver?.observe(el);
 
-    // Capture phase so scrolling any ancestor container (not just the
-    // window) also triggers a re-clamp.
+    // Capture phase catches scroll on any ancestor, not just the window.
     window.addEventListener("scroll", startBurst, true);
     window.addEventListener("resize", startBurst);
 
     return () => {
-      stopBurst();
+      if (frameId != null) {
+        window.cancelAnimationFrame(frameId);
+      }
       resizeObserver?.disconnect();
       window.removeEventListener("scroll", startBurst, true);
       window.removeEventListener("resize", startBurst);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
 
   return ref;
 };
 
 const applyFormat = (expresion, str, style, isPercent, intl, container) => {
-  // If intl is not available (e.g., during SSR), use a simple fallback formatter
+  // Fall back to the raw string when intl isn't available (e.g. SSR).
   if (!intl || !intl.formatNumber) {
-    // Return string as-is if intl is not available
     return str;
   }
 
@@ -179,17 +141,15 @@ export const formatContent = (
   intl,
   tooltipEnableMarkdown
 ) => {
-  // Guard against undefined/null values
   if (!tooltip || !variables) {
     return "";
   }
 
-  // if variables have a property called "field" and another property with the value being _${field},
-  // add _value to the variables object with the value of the _${field} property
+  // Map the "_${field}" variable to _value when present.
   if (variables.field && variables[`_${variables.field}`]) {
     variables._value = variables[`_${variables.field}`];
   }
-  //if there is a category prop in the variables and field is not defined, set field to category
+  // Fall back to category as the field name.
   if (!variables.field && variables.category) {
     variables.field = variables.category;
   }
@@ -211,7 +171,6 @@ export const formatContent = (
 const Tooltip = ({ tooltip, d, intl, tooltipEnableMarkdown }) => {
   let str = "";
 
-  // Guard against undefined/null values during SSR
   if (d && tooltip) {
     const datum = d.datum || d.point || d;
     const { data } = datum || {};
@@ -246,8 +205,7 @@ const Tooltip = ({ tooltip, d, intl, tooltipEnableMarkdown }) => {
     }
   }
 
-  // Rules of hooks require this to run on every render, before any
-  // conditional early returns based on the computed content.
+  // Must run before any early return below (rules of hooks).
   const tooltipRef = useClampTooltipToViewport([str, tooltipEnableMarkdown]);
 
   if (!str) {
