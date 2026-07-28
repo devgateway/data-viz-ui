@@ -43,10 +43,7 @@ export default class Legend extends React.Component {
             {filteredBreaks && filteredBreaks.length > 0
               ? formattedLegendTitle
               : ""}
-          </span>
-          {filteredBreaks.length > 0 && (
-            <span className="vertical-spacer">|</span>
-          )}
+          </span> 
         </div>
         <div className="legend">
           <ul className="legend-items-container">
@@ -110,7 +107,6 @@ export default class Legend extends React.Component {
               symbols.map((symbol, i) => {
                 return (
                   <li key={"k" + i} className="legend-item">
-                    <span className="vertical-spacer">|</span>
                     {symbol.image && (
                       <img
                         style={{
