@@ -1,5 +1,11 @@
 # @devgateway/dvz-ui-react
 
+## 1.9.6
+
+### Patch Changes
+
+- [#275](https://github.com/devgateway/data-viz-ui/pull/275) [`fd558eb`](https://github.com/devgateway/data-viz-ui/commit/fd558eb30c4a9574a35a509d076e34d1fc475e4a) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Remove vertical spacer in map legend
+
 ## 1.9.5
 
 ### Patch Changes
