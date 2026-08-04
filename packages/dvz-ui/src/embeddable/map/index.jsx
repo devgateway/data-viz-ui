@@ -106,6 +106,7 @@ const MapEntry = (props) => {
         settings
     } = props
 
+    console.log("MapWrapper props", props);
 
     const decode = (value) => {
         if (editing) {

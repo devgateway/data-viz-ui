@@ -1361,6 +1361,7 @@ class Map extends React.Component {
         locationName: this.getTranslatedLocationName(d, mappingField, intl),
         label: this.getTranslatedLocationName(d, mappingField, intl),
         ...dataVars,
+        ...this.getFilters() // expose applied filter params (e.g. {year}) to the tooltip
       };
       this.tooltip
         .attr("class", tooltipTheme)
@@ -1400,6 +1401,8 @@ class Map extends React.Component {
                     measure: this.getSelectedMeasure(),
                     measureLabel: d.properties.measureLabel,
                     ...dataVars,
+                    ...child.variables,
+                     ...this.getFilters(),
                   };
                   if (!html.endsWith("<hr>")) {
                     html += "<hr>";

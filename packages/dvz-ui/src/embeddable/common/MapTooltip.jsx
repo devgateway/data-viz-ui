@@ -88,7 +88,21 @@ const processStringForComparison = (str) => {
 }
 
 export const formatContent = (tooltip, variables, intl) => {
-    let str = template((tooltip), variables).replace(/(?:\r\n|\r|\n)/g, '<br>')
+    const normalizedVariables = {};
+    Object.keys(variables).forEach(key => {
+        normalizedVariables[key] = variables[key];
+        // Also add underscore version
+        normalizedVariables[key.replace(/\s+/g, '_')] = variables[key];
+    });
+
+     // Pre-process tooltip: replace {Variable Name} with {Variable_Name}
+    let processedTooltip = tooltip.replace(/\{([^}]+)\}/g, (match, varName) => {
+        const sanitized = varName.replace(/\s+/g, '_');
+        return `{${sanitized}}`;
+    });
+    
+
+    let str = template((processedTooltip), normalizedVariables).replace(/(?:\r\n|\r|\n)/g, '<br>')
     str = applyFormat(percentExpresion, str, {style: 'percent'}, true, intl)
     str = applyFormat(numericExpresion, str, {style: 'decimal'}, false, intl)
     str = applyFormat(compactExpresion, str, {notation: 'compact'}, false, intl)
