@@ -2,7 +2,6 @@ import React from 'react';
 
 const MapDataFrame = (props) => {
     const {data, measures, customMeasureLabels, children, source, extraDimension} = props;
-    console.log("MapDataframe data", data)
 
     const transformedData = {
         locationsData: [],

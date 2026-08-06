@@ -924,7 +924,6 @@ function Map(props) {
   }
 
   function showTooltip(event, d) {
-    console.log("showTooltip called with d:", d);
     // Always recomputed from device category (the prop is intentionally ignored here,
     // matching the original method's behavior).
     const zoomEnabledForFocusClass = ["mobile", "tablet", "midTablet"].includes(
@@ -1361,9 +1360,7 @@ function Map(props) {
       .append("div")
       .style("position", "absolute")
       .style("visibility", "hidden")
-      .style("pointer-events", "none");
-
-    console.log("Map props", metadataTypes);
+      .style("pointer-events", "none"); 
 
     return () => {
       window.removeEventListener("scroll", scrollHandler);
