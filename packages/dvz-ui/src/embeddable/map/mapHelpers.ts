@@ -88,9 +88,7 @@ export function getTranslatedItemLabel(
 
   // Find by value (name) or by code
   const item =
-    items.find(
-      (it: any) => norm(it.value) === want || it.code.trim().toLowerCase() === want
-    ) ?? null;
+    items.find((it: any) => norm(it.value) === want || norm(it.code) === want) ?? null;
 
   if (!item) return itemNameOrCode;
 
