@@ -36,6 +36,7 @@ const MapEntry = (props) => {
         "data-csv": csv = '',
         'data-dimension1': dimension1 = '',
         'data-dimension2': dimension2 = '',
+        'data-dimension3': dimension3 = '',
         "data-measures": measures = '[]',
         "data-height": height = 600,
         width = 960,
@@ -179,8 +180,8 @@ const MapEntry = (props) => {
 
     const multipleMeasures = hasMultipleMeasures == true || hasMultipleMeasures == "true"
 
-    const levels = [dimension1, dimension2]
-    let source = levels.filter(l => l != 'none' && l != null).join('/')
+    const levels = [dimension1, dimension2, dimension3]
+    let source = levels.filter(l => l !== 'none' && l !== null).join('/')
 
     const mapProps = {
         unique,
@@ -293,7 +294,6 @@ const MapEntry = (props) => {
 };
 
 const mapStateToProps = (state, ownProps) => {
-    return {}
 }
 
 const mapActionCreators = {};

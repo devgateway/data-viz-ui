@@ -12,6 +12,7 @@ A React embeddable that renders an interactive choropleth and/or symbol map usin
 | `data-csv` | `string` | `""` | URL-encoded inline CSV data used when `data-app` is `"csv"`. |
 | `data-dimension1` | `string` | `""` | Primary geographic field (matched against TopoJSON feature IDs). |
 | `data-dimension2` | `string` | `""` | Secondary dimension field for disaggregated data. |
+| `data-dimension3` | `string` | `""` | Addition dimension |
 | `data-measures` | `string` | `'[]'` | URL-encoded JSON array of measure fields to visualise. Must be provided; no measure is pre-selected by default. |
 | `data-filters` | `string` (JSON) | `"{}"` | URL-encoded JSON array/object of active filter values. |
 | `data-height` | `string` | `"600"` | Map container height in pixels. |
