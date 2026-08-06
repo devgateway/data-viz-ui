@@ -1,7 +1,11 @@
 import React from 'react';
 
 const MapDataFrame = (props) => {
-    const {data, measures, customMeasureLabels, children, source, extraDimension} = props;
+    const {data, measures, customMeasureLabels, children, source, extraDimension, allDimensions} = props;
+    console.log("MapDataFrame props:", props);
+
+    const sourceDimensions = (source || '').split('/').filter(Boolean);
+    const primarySourceDimension = sourceDimensions.length > 0 ? sourceDimensions[0] : null;
 
     const transformedData = {
         locationsData: [],
@@ -19,20 +23,205 @@ const MapDataFrame = (props) => {
     // Standard properties to exclude from variables
     const standardProps = ['value', 'count', 'type', 'children', 'label', 'measure'];
 
-    // metadata.types carries the full dimension definitions (labels, code, descriptions) - children only carry the raw type/value pair
+    // allDimensions comes from /categories and contains every dimension in the dataset,
+    // including dimensions not selected in the query breakdown.
+    const dimensionCatalog = allDimensions && allDimensions.length > 0 ? allDimensions : (metadata.types || []);
     const typesByCategory = {};
-    if (metadata.types) {
-        metadata.types.forEach(t => {
-            typesByCategory[t.category] = t.items || [];
-        });
-    }
+    dimensionCatalog.forEach(t => {
+        const category = t.category || t.type;
+        if (category) {
+            typesByCategory[category] = t.items || [];
+        }
+    });
 
     const getTypeMetadata = (type, value) => {
         const items = typesByCategory[type];
         if (!items) {
             return null;
         }
-        return items.find(i => i.value === value || i.id === value) || null;
+        const valueAsString = value != null ? String(value) : value;
+        return items.find(i => {
+            const itemValue = i.value != null ? String(i.value) : i.value;
+            const itemId = i.id != null ? String(i.id) : i.id;
+            const itemCode = i.code != null ? String(i.code) : i.code;
+            return itemValue === valueAsString || itemId === valueAsString || itemCode === valueAsString;
+        }) || null;
+    };
+
+    const getTypeDisplayValue = (type, value) => {
+        const typeMeta = getTypeMetadata(type, value);
+        if (!typeMeta) {
+            return value;
+        }
+        return typeMeta.value ?? typeMeta.label ?? typeMeta.id ?? typeMeta.code ?? value;
+    };
+
+    const getAppliedFilterVariables = (filters = {}) => {
+        const variables = {};
+        Object.keys(filters).forEach((key) => {
+            const selected = filters[key];
+            if (selected == null) {
+                return;
+            }
+
+            if (Array.isArray(selected)) {
+                variables[key] = selected.map(v => getTypeDisplayValue(key, v)).join(' ,');
+            } else {
+                variables[key] = getTypeDisplayValue(key, selected);
+            }
+        });
+        return variables;
+    };
+
+    const getSingleCatalogValue = (type) => {
+        const items = typesByCategory[type] || [];
+        if (items.length === 1) {
+            return getTypeDisplayValue(type, items[0].value ?? items[0].id ?? items[0].code);
+        }
+        return null;
+    };
+
+    const isPopulatedValue = (value) => value !== undefined && value !== null && value !== '';
+
+    const getDimensionItemRawValue = (item) => {
+        if (!item) {
+            return undefined;
+        }
+        if (isPopulatedValue(item.value)) {
+            return item.value;
+        }
+        if (isPopulatedValue(item.id)) {
+            return item.id;
+        }
+        return item.code;
+    };
+
+    const normalizeKey = (key) => {
+        if (key === undefined || key === null) {
+            return '';
+        }
+        return String(key)
+            .trim()
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '_')
+            .replace(/^_+|_+$/g, '');
+    };
+
+    const getValueByNormalizedKey = (obj, targetKey) => {
+        if (!obj) {
+            return undefined;
+        }
+
+        const normalizedTarget = normalizeKey(targetKey);
+        const exact = obj[targetKey];
+        if (exact !== undefined && exact !== null && exact !== '') {
+            return exact;
+        }
+
+        const keys = Object.keys(obj);
+        for (let i = 0; i < keys.length; i++) {
+            const key = keys[i];
+            if (normalizeKey(key) === normalizedTarget) {
+                const value = obj[key];
+                if (value !== undefined && value !== null && value !== '') {
+                    return value;
+                }
+            }
+        }
+
+        return undefined;
+    };
+
+    const findCatalogRowIndex = (rowItem, currentVariables) => {
+        const dimensionAnchors = [
+            primarySourceDimension,
+            'country',
+            rowItem.type,
+        ].filter(Boolean);
+
+        const identityCandidates = [
+            getValueByNormalizedKey(currentVariables, 'country'),
+            getValueByNormalizedKey(rowItem, 'country'),
+            primarySourceDimension ? getValueByNormalizedKey(currentVariables, primarySourceDimension) : undefined,
+            primarySourceDimension ? getValueByNormalizedKey(rowItem, primarySourceDimension) : undefined,
+            rowItem.label,
+            rowItem.value,
+        ].filter(v => isPopulatedValue(v));
+
+        for (let a = 0; a < dimensionAnchors.length; a++) {
+            const anchor = dimensionAnchors[a];
+            const items = typesByCategory[anchor] || [];
+            if (!items.length) {
+                continue;
+            }
+
+            for (let c = 0; c < identityCandidates.length; c++) {
+                const candidate = identityCandidates[c];
+                const candidateNorm = normalizeKey(candidate);
+                const foundIndex = items.findIndex((item) => {
+                    const itemValue = getDimensionItemRawValue(item);
+                    return normalizeKey(itemValue) === candidateNorm;
+                });
+                if (foundIndex >= 0) {
+                    return foundIndex;
+                }
+            }
+        }
+
+        return -1;
+    };
+
+    const getAlignedCatalogValueForRow = (type, rowItem, currentVariables) => {
+        const rowIndex = findCatalogRowIndex(rowItem, currentVariables);
+        if (rowIndex < 0) {
+            return undefined;
+        }
+
+        const items = typesByCategory[type] || [];
+        if (!items.length || rowIndex >= items.length) {
+            return undefined;
+        }
+
+        const rawValue = getDimensionItemRawValue(items[rowIndex]);
+        if (!isPopulatedValue(rawValue)) {
+            return undefined;
+        }
+
+        return getTypeDisplayValue(type, rawValue);
+    };
+
+    const resolveDimensionValueForRow = (type, rowItem, currentVariables) => {
+        const current = getValueByNormalizedKey(currentVariables, type);
+        if (isPopulatedValue(current)) {
+            return current;
+        }
+
+        if (isPopulatedValue(appliedFilterVariables[type])) {
+            return appliedFilterVariables[type];
+        }
+
+        const rowValue = getValueByNormalizedKey(rowItem, type);
+        if (isPopulatedValue(rowValue)) {
+            return rowValue;
+        }
+
+        const alignedCatalogValue = getAlignedCatalogValueForRow(type, rowItem, currentVariables);
+        if (isPopulatedValue(alignedCatalogValue)) {
+            return alignedCatalogValue;
+        }
+
+        const singleCatalogValue = getSingleCatalogValue(type);
+        if (isPopulatedValue(singleCatalogValue)) {
+            return singleCatalogValue;
+        }
+
+        const rowIdentity = rowItem.value;
+        const typeMeta = getTypeMetadata(type, rowIdentity);
+        if (typeMeta) {
+            return getTypeDisplayValue(type, rowIdentity);
+        }
+
+        return '';
     };
 
     // dimension3 isn't part of the query breakdown - it's a global applied filter, so resolve its value once for every row
@@ -40,9 +229,10 @@ const MapDataFrame = (props) => {
     let extraDimensionVariable = null;
     if (extraDimension) {
         const filterValue = appliedFilters[extraDimension] ? appliedFilters[extraDimension][0] : undefined;
-        const typeMeta = getTypeMetadata(extraDimension, filterValue);
-        extraDimensionVariable = typeMeta ? typeMeta.value : filterValue;
+        extraDimensionVariable = getTypeDisplayValue(extraDimension, filterValue);
     }
+
+    const appliedFilterVariables = getAppliedFilterVariables(appliedFilters);
 
     // Extract all dynamic fields as variables
     const extractVariables = (item) => {
@@ -55,8 +245,7 @@ const MapDataFrame = (props) => {
         
         if (item.type && item.value !== undefined) {
             // Key = dimension/category name (item.type), value = its readable name from metadata.types
-            const typeMeta = getTypeMetadata(item.type, item.value);
-            variables[item.type] = typeMeta ? typeMeta.value : item.value;
+            variables[item.type] = getTypeDisplayValue(item.type, item.value);
         }
         return variables;
     };
@@ -102,13 +291,28 @@ const MapDataFrame = (props) => {
     if (data && data.children) {
         data.children.forEach(item => {
             measuresArray.forEach(measure => {
+                const variables = {
+                    ...extractVariablesDeep(item),  // Dynamic fields for both formats, including nested dimensions
+                    ...appliedFilterVariables,
+                };
+
+                dimensionCatalog.forEach((dimension) => {
+                    const dimensionKey = dimension.category || dimension.type;
+                    if (!dimensionKey) {
+                        return;
+                    }
+                    variables[dimensionKey] = resolveDimensionValueForRow(dimensionKey, item, variables);
+                });
+
                 const newItem = {
                     ...item,
                     label: item.value,
                     value: item[measure],
                     measure: measure,
-                    variables: extractVariablesDeep(item)  // Dynamic fields for both formats, including nested dimensions
+                    variables
                 }
+
+                newItem.variables.selectedDataFrameTooltipValue = item[measure];
 
                 // Surface the applied dimension3 filter value as an extra tooltip variable, not part of the query breakdown
                 if (extraDimension) {

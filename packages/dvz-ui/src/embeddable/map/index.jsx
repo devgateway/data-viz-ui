@@ -1,7 +1,8 @@
-import React from 'react';
-import { connect } from "react-redux";
+import React, { useEffect, useMemo } from 'react';
+import { connect, useDispatch, useSelector } from "react-redux";
 import DataProvider from "../data/DataProvider";
 import DataConsumer from "../data/DataConsumer";
+import { getCategories } from "../reducers/data";
 import Map from './map';
 import MapDataFrame from './MapDataFrame';
 import MapCSVDataFrame from './MapCSVDataFrame';
@@ -270,6 +271,18 @@ const MapEntry = (props) => {
         params.dvzProxyDatasetId = dvzProxyDatasetId;
     }
 
+    const dispatch = useDispatch();
+    // /categories is fetched independently of applied filters so it always holds the full, unfiltered dimension catalog
+    const categoriesPath = ['data', 'categories', app, ...(dvzProxyDatasetId ? [dvzProxyDatasetId] : []), 'items'];
+    const categoriesItems = useSelector(state => state.getIn(categoriesPath));
+    const allDimensions = useMemo(() => categoriesItems ? categoriesItems.toJS() : [], [categoriesItems]);
+
+    useEffect(() => {
+        if (app && app !== 'csv') {
+            dispatch(getCategories({ app, dvzProxyDatasetId }));
+        }
+    }, [app, dvzProxyDatasetId]);
+
     return (
 
         <DataProvider
@@ -282,7 +295,7 @@ const MapEntry = (props) => {
             <DataConsumer>
                 <DataFrame measures={measuresCSV} multipleMeasures={multipleMeasures} mapType={mapType}
                     aggregationFormula={aggregationFormula} customMeasureLabels={measureLabels}
-                    source={source} extraDimension={extraDimension}>
+                    source={source} extraDimension={extraDimension} allDimensions={allDimensions}>
                     <Map  {...mapProps} />
                 </DataFrame>
             </DataConsumer>
@@ -290,8 +303,7 @@ const MapEntry = (props) => {
         </DataProvider>
 
 
-    )
-        ;
+    );
 
 };
 

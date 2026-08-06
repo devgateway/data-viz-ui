@@ -104,6 +104,8 @@ function Map(props) {
     showTooltip: showTooltipProp,
   } = props;
 
+  console.log("Map props:", props);
+
   // ----- state (was `this.state`) -----
   const [selectedMeasure, setSelectedMeasure] = useState(() =>
     transformedData &&
@@ -924,6 +926,7 @@ function Map(props) {
   }
 
   function showTooltip(event, d) {
+    console.log("Showing tooltip for data:", d);
     // Always recomputed from device category (the prop is intentionally ignored here,
     // matching the original method's behavior).
     const zoomEnabledForFocusClass = ["mobile", "tablet", "midTablet"].includes(
