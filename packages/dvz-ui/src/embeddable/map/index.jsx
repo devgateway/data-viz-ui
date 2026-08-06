@@ -180,8 +180,10 @@ const MapEntry = (props) => {
 
     const multipleMeasures = hasMultipleMeasures == true || hasMultipleMeasures == "true"
 
-    const levels = [dimension1, dimension2, dimension3]
+    // dimension3 is excluded from the source/query breakdown - it's only surfaced as an extra tooltip variable
+    const levels = [dimension1, dimension2]
     let source = levels.filter(l => l !== 'none' && l !== null).join('/')
+    const extraDimension = (dimension3 && dimension3 !== 'none') ? dimension3 : null
 
     const mapProps = {
         unique,
@@ -280,7 +282,7 @@ const MapEntry = (props) => {
             <DataConsumer>
                 <DataFrame measures={measuresCSV} multipleMeasures={multipleMeasures} mapType={mapType}
                     aggregationFormula={aggregationFormula} customMeasureLabels={measureLabels}
-                    source={source}>
+                    source={source} extraDimension={extraDimension}>
                     <Map  {...mapProps} />
                 </DataFrame>
             </DataConsumer>

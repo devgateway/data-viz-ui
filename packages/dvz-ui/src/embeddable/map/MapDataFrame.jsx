@@ -1,7 +1,8 @@
 import React from 'react';
 
 const MapDataFrame = (props) => {
-    const {data, measures, customMeasureLabels, children, source} = props;
+    const {data, measures, customMeasureLabels, children, source, extraDimension} = props;
+    console.log("MapDataframe data", data)
 
     const transformedData = {
         locationsData: [],
@@ -19,6 +20,31 @@ const MapDataFrame = (props) => {
     // Standard properties to exclude from variables
     const standardProps = ['value', 'count', 'type', 'children', 'label', 'measure'];
 
+    // metadata.types carries the full dimension definitions (labels, code, descriptions) - children only carry the raw type/value pair
+    const typesByCategory = {};
+    if (metadata.types) {
+        metadata.types.forEach(t => {
+            typesByCategory[t.category] = t.items || [];
+        });
+    }
+
+    const getTypeMetadata = (type, value) => {
+        const items = typesByCategory[type];
+        if (!items) {
+            return null;
+        }
+        return items.find(i => i.value === value || i.id === value) || null;
+    };
+
+    // dimension3 isn't part of the query breakdown - it's a global applied filter, so resolve its value once for every row
+    const appliedFilters = data.appliedFilters || {};
+    let extraDimensionVariable = null;
+    if (extraDimension) {
+        const filterValue = appliedFilters[extraDimension] ? appliedFilters[extraDimension][0] : undefined;
+        const typeMeta = getTypeMetadata(extraDimension, filterValue);
+        extraDimensionVariable = typeMeta ? typeMeta.value : filterValue;
+    }
+
     // Extract all dynamic fields as variables
     const extractVariables = (item) => {
         const variables = {};
@@ -29,9 +55,36 @@ const MapDataFrame = (props) => {
         });
         
         if (item.type && item.value !== undefined) {
-            variables[item.type] = item.value;
+            // Key = dimension/category name (item.type), value = its readable name from metadata.types
+            const typeMeta = getTypeMetadata(item.type, item.value);
+            variables[item.type] = typeMeta ? typeMeta.value : item.value;
         }
         return variables;
+    };
+
+    // Recurses into every nesting level (dimension2, dimension3, ...) so their type/value pairs reach the top-level variables
+    const extractVariablesDeep = (item) => {
+        let variables = extractVariables(item);
+        if (item.children && Array.isArray(item.children)) {
+            item.children.forEach(child => {
+                variables = { ...variables, ...extractVariablesDeep(child) };
+            });
+        }
+        return variables;
+    };
+
+    // Recursively normalizes children at every dimension depth (not just the first level)
+    const buildChildren = (item, measure) => {
+        if (!item.children || !Array.isArray(item.children)) {
+            return undefined;
+        }
+        return item.children.map(child => ({
+            ...child,
+            label: child.value,
+            value: child[measure],
+            variables: extractVariablesDeep(child),
+            children: buildChildren(child, measure),
+        }));
     };
 
     // Build measure label map from metadata
@@ -55,21 +108,16 @@ const MapDataFrame = (props) => {
                     label: item.value,
                     value: item[measure],
                     measure: measure,
-                    variables: extractVariables(item)  // Dynamic fields for both formats
+                    variables: extractVariablesDeep(item)  // Dynamic fields for both formats, including nested dimensions
                 }
 
-                // Handle nested children (Superset format)
-                if (item.children && Array.isArray(item.children)) {
-                    newItem.children = []
-                    item.children.forEach(child => {
-                        newItem.children.push({
-                            ...child, 
-                            label: child.value, 
-                            value: child[measure],
-                            variables: extractVariables(child)
-                        });
-                    })
+                // Surface the applied dimension3 filter value as an extra tooltip variable, not part of the query breakdown
+                if (extraDimension) {
+                    newItem.variables[extraDimension] = extraDimensionVariable;
                 }
+
+                // Handle nested children (Superset format), at any dimension depth
+                newItem.children = buildChildren(item, measure);
 
                 transformedData.locationsData.push(newItem);
             })

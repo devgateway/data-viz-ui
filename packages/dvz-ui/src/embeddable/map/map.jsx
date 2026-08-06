@@ -924,6 +924,7 @@ function Map(props) {
   }
 
   function showTooltip(event, d) {
+    console.log("showTooltip called with d:", d);
     // Always recomputed from device category (the prop is intentionally ignored here,
     // matching the original method's behavior).
     const zoomEnabledForFocusClass = ["mobile", "tablet", "midTablet"].includes(
@@ -931,7 +932,7 @@ function Map(props) {
     );
 
     if (
-      (showTooltipProp && d.properties.value != null) ||
+      (showTooltipProp && d.properties.value !== null) ||
       (showTooltipProp && showNoDataTooltip)
     ) {
       const svg = d3.select(getMapId()).select("svg");
@@ -1369,7 +1370,6 @@ function Map(props) {
       window.removeEventListener("touchmove", scrollHandler);
       tooltipRef.current?.remove();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // ----- runs after every update (was componentDidUpdate) -----
