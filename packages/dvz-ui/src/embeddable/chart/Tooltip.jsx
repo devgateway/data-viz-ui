@@ -22,6 +22,18 @@ const clampShift = (start, end, viewportSize, overshoot = 0) => {
   return 0;
 };
 
+const isNivoTooltipWrapper = (el) => {
+  if (!el) {
+    return false;
+  }
+
+  const inlineStyle = (el.getAttribute("style") || "").toLowerCase();
+  return (
+    inlineStyle.includes("position: absolute") &&
+    inlineStyle.includes("pointer-events: none")
+  );
+};
+
 // Nudges an already-positioned tooltip back inside the viewport via a
 // corrective transform, without touching the chart library's own positioning
 // (chart libraries like nivo can place tooltips past the screen edge).
@@ -30,18 +42,33 @@ export const clampTooltipToViewport = (el) => {
     return;
   }
 
+  const wrapper = isNivoTooltipWrapper(el.parentElement) ? el.parentElement : null;
+
   // Reset so we measure relative to the library's original position.
   el.style.transform = "";
+  if (wrapper) {
+    // Keep the library transform untouched; only reset our corrective translate.
+    wrapper.style.translate = "0px 0px";
+  }
 
   const rect = el.getBoundingClientRect();
   const { innerWidth: viewportWidth, innerHeight: viewportHeight } = window;
   const mobileOvershoot = viewportWidth < 768 ? 12 : 40; // extra room on narrow viewports
+  const isSmallDevice = viewportWidth < 768;
 
-  const shiftX = clampShift(rect.left, rect.right, viewportWidth, mobileOvershoot);
+  // On small devices, anchor the tooltip from the left edge so it grows to the
+  // right and never expands the page width.
+  const shiftX = isSmallDevice
+    ? VIEWPORT_EDGE_MARGIN - rect.left
+    : clampShift(rect.left, rect.right, viewportWidth, mobileOvershoot);
   const shiftY = clampShift(rect.top, rect.bottom, viewportHeight);
 
   if (shiftX || shiftY) {
-    el.style.transform = `translate(${Math.round(shiftX)}px, ${Math.round(shiftY)}px)`;
+    if (wrapper) {
+      wrapper.style.translate = `${Math.round(shiftX)}px ${Math.round(shiftY)}px`;
+    } else {
+      el.style.transform = `translate(${Math.round(shiftX)}px, ${Math.round(shiftY)}px)`;
+    }
   }
 };
 
@@ -79,8 +106,13 @@ export const useClampTooltipToViewport = (deps = []) => {
       const tick = (frame) => {
         clampTooltipToViewport(el);
 
-        unchangedFrames = el.style.transform === lastTransform ? unchangedFrames + 1 : 0;
-        lastTransform = el.style.transform;
+        const wrapper = isNivoTooltipWrapper(el.parentElement) ? el.parentElement : null;
+        const activeTransform = wrapper
+          ? `${wrapper.style.transform}|${wrapper.style.translate}`
+          : el.style.transform;
+
+        unchangedFrames = activeTransform === lastTransform ? unchangedFrames + 1 : 0;
+        lastTransform = activeTransform;
 
         const settled = unchangedFrames >= SETTLE_FRAMES || frame >= MAX_BURST_FRAMES;
         frameId = settled ? null : window.requestAnimationFrame(() => tick(frame + 1));
@@ -206,7 +238,7 @@ const Tooltip = ({ tooltip, d, intl, tooltipEnableMarkdown }) => {
   }
 
   // Must run before any early return below (rules of hooks).
-  const tooltipRef = useClampTooltipToViewport([str, tooltipEnableMarkdown]);
+  const tooltipRef = useClampTooltipToViewport([d, str, tooltipEnableMarkdown]);
 
   if (!str) {
     return <div></div>;
