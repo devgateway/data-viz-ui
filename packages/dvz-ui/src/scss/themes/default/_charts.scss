@@ -417,7 +417,10 @@
 }
 
 .chart.tooltip {
-    max-width: 500px !important;
+    max-width: min(500px, calc(100vw - 16px)) !important;
+    z-index: 2001 !important;
+    overflow-wrap: anywhere;
+    word-break: break-word;
     padding: 15px;
     border-radius: 4px;
     opacity: 1;

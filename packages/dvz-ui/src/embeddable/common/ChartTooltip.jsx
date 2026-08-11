@@ -51,7 +51,7 @@ const ChartTooltip = ({tooltip, d, intl, tooltipEnableMarkdown}) => {
     }
 
     // Must run on every render, before any conditional early return.
-    const tooltipRef = useClampTooltipToViewport([str, tooltipEnableMarkdown])
+    const tooltipRef = useClampTooltipToViewport([d, str, tooltipEnableMarkdown])
 
     if (data) {
         if (tooltipEnableMarkdown) {
