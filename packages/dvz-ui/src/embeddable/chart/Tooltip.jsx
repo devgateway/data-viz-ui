@@ -49,7 +49,7 @@ export const useTooltipPosition = () => {
   // is compiled scoped under `#root`/`.edit-post-visual-editor`. FloatingPortal
   // defaults to `document.body`, which escapes that scope and drops the
   // styling, so anchor the portal to whichever of those ancestors we find.
-  const [portalRoot, setPortalRoot] = useState(undefined);
+  const [portalRoot, setPortalRoot] = useState(null);
 
   const anchorRef = useCallback(
     (node) => {
@@ -58,7 +58,7 @@ export const useTooltipPosition = () => {
       }
       const wrapper = isNivoTooltipWrapper(node.parentElement) ? node.parentElement : node;
       refs.setReference(wrapper);
-      setPortalRoot(wrapper.closest("#root, .edit-post-visual-editor") || undefined);
+      setPortalRoot(wrapper.closest("#root, .edit-post-visual-editor") || wrapper.ownerDocument.body);
     },
     [refs]
   );
