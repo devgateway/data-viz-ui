@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useRef } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
@@ -143,6 +143,37 @@ export const useClampTooltipToViewport = (deps = []) => {
   return ref;
 };
 
+// Hides sticky/touch-triggered tooltips when the user scrolls.
+export const useHideTooltipOnScroll = (resetDeps = []) => {
+  const [isHidden, setIsHidden] = useState(false);
+
+  useEffect(() => {
+    setIsHidden(false);
+  }, resetDeps);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return undefined;
+    }
+
+    const hide = () => setIsHidden(true);
+    const show = () => setIsHidden(false);
+
+    // Capture phase catches scrolling on nested containers too.
+    window.addEventListener("scroll", hide, true);
+    window.addEventListener("touchmove", hide, { passive: true });
+    window.addEventListener("pointerdown", show, true);
+
+    return () => {
+      window.removeEventListener("scroll", hide, true);
+      window.removeEventListener("touchmove", hide);
+      window.removeEventListener("pointerdown", show, true);
+    };
+  }, []);
+
+  return isHidden;
+};
+
 const applyFormat = (expresion, str, style, isPercent, intl, container) => {
   // Fall back to the raw string when intl isn't available (e.g. SSR).
   if (!intl || !intl.formatNumber) {
@@ -239,8 +270,9 @@ const Tooltip = ({ tooltip, d, intl, tooltipEnableMarkdown }) => {
 
   // Must run before any early return below (rules of hooks).
   const tooltipRef = useClampTooltipToViewport([d, str, tooltipEnableMarkdown]);
+  const hideOnScroll = useHideTooltipOnScroll([d, str]);
 
-  if (!str) {
+  if (!str || hideOnScroll) {
     return <div></div>;
   }
 

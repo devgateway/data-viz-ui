@@ -3,7 +3,7 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeRaw from 'rehype-raw'
 import template from 'string-template';
-import { useClampTooltipToViewport } from "../chart/Tooltip";
+import { useClampTooltipToViewport, useHideTooltipOnScroll } from "../chart/Tooltip";
 
 const percentExpresion = /(\+?\%)[\(]([A-z0-9,.,-]+)\)/gi
 const numericExpresion = /(\+?\#)[\(]([A-z0-9,.,-]+)\)/gi
@@ -52,8 +52,9 @@ const ChartTooltip = ({tooltip, d, intl, tooltipEnableMarkdown}) => {
 
     // Must run on every render, before any conditional early return.
     const tooltipRef = useClampTooltipToViewport([d, str, tooltipEnableMarkdown])
+    const hideOnScroll = useHideTooltipOnScroll([d, str])
 
-    if (data) {
+    if (data && !hideOnScroll) {
         if (tooltipEnableMarkdown) {
             return (
                 <div ref={tooltipRef} className={"chart tooltip"}>
