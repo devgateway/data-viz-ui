@@ -1,7 +1,8 @@
-import React from 'react';
-import { connect } from "react-redux";
+import React, { useEffect, useMemo } from 'react';
+import { connect, useDispatch, useSelector } from "react-redux";
 import DataProvider from "../data/DataProvider";
 import DataConsumer from "../data/DataConsumer";
+import { getCategories } from "../reducers/data";
 import Map from './map';
 import MapDataFrame from './MapDataFrame';
 import MapCSVDataFrame from './MapCSVDataFrame';
@@ -36,6 +37,7 @@ const MapEntry = (props) => {
         "data-csv": csv = '',
         'data-dimension1': dimension1 = '',
         'data-dimension2': dimension2 = '',
+        'data-dimension3': dimension3 = '',
         "data-measures": measures = '[]',
         "data-height": height = 600,
         width = 960,
@@ -106,6 +108,7 @@ const MapEntry = (props) => {
         settings
     } = props
 
+    console.log("MapWrapper props", props);
 
     const decode = (value) => {
         if (editing) {
@@ -178,8 +181,10 @@ const MapEntry = (props) => {
 
     const multipleMeasures = hasMultipleMeasures == true || hasMultipleMeasures == "true"
 
+    // dimension3 is excluded from the source/query breakdown - it's only surfaced as an extra tooltip variable
     const levels = [dimension1, dimension2]
-    let source = levels.filter(l => l != 'none' && l != null).join('/')
+    let source = levels.filter(l => l !== 'none' && l !== null).join('/')
+    const extraDimension = (dimension3 && dimension3 !== 'none') ? dimension3 : null
 
     const mapProps = {
         unique,
@@ -266,6 +271,18 @@ const MapEntry = (props) => {
         params.dvzProxyDatasetId = dvzProxyDatasetId;
     }
 
+    const dispatch = useDispatch();
+    // /categories is fetched independently of applied filters so it always holds the full, unfiltered dimension catalog
+    const categoriesPath = ['data', 'categories', app, ...(dvzProxyDatasetId ? [dvzProxyDatasetId] : []), 'items'];
+    const categoriesItems = useSelector(state => state.getIn(categoriesPath));
+    const allDimensions = useMemo(() => categoriesItems ? categoriesItems.toJS() : [], [categoriesItems]);
+
+    useEffect(() => {
+        if (app && app !== 'csv') {
+            dispatch(getCategories({ app, dvzProxyDatasetId }));
+        }
+    }, [app, dvzProxyDatasetId]);
+
     return (
 
         <DataProvider
@@ -278,7 +295,7 @@ const MapEntry = (props) => {
             <DataConsumer>
                 <DataFrame measures={measuresCSV} multipleMeasures={multipleMeasures} mapType={mapType}
                     aggregationFormula={aggregationFormula} customMeasureLabels={measureLabels}
-                    source={source}>
+                    source={source} extraDimension={extraDimension} allDimensions={allDimensions}>
                     <Map  {...mapProps} />
                 </DataFrame>
             </DataConsumer>
@@ -286,13 +303,11 @@ const MapEntry = (props) => {
         </DataProvider>
 
 
-    )
-        ;
+    );
 
 };
 
 const mapStateToProps = (state, ownProps) => {
-    return {}
 }
 
 const mapActionCreators = {};

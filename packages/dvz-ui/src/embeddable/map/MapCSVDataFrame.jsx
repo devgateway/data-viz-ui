@@ -15,7 +15,7 @@ const pointsMap = (props) => {
         locationsData: [],
         nationalData: {},
         measures: [],
-        measureLabelMap: {}
+        measureLabelMap: {},
     }
 
     const indexOfValueColumn = data.meta.fields.findIndex((f, i) => {
