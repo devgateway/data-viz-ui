@@ -10,1574 +10,182 @@ import {
   Segment,
   Message,
 } from "semantic-ui-react";
-import React from "react";
-import * as topojson from "topojson-client";
+import React, { useEffect, useRef, useState } from "react";
 import Legend from "./legend";
 import { formatContent } from "../common/MapTooltip";
 import getDeviceCategory from "../../utils/deviceType";
-import geostats from "geostats";
-
+import {
+  getTranslatedItemLabel,
+  classColor as classColorHelper,
+  generateBreaks as generateBreaksHelper,
+  fillColor as fillColorHelper,
+  getLabelBoxWidth as getLabelBoxWidthHelper,
+  getLabelBoxHeight as getLabelBoxHeightHelper,
+  getCollectionField as getCollectionFieldHelper,
+  extractFeatures as extractFeaturesHelper,
+  getTranslatedLocationName as getTranslatedLocationNameHelper,
+  createLabel as createLabelHelper,
+  getFilters as getFiltersHelper,
+  getHighlightedLocationColor as getHighlightedLocationColorHelper,
+  LOCATION,
+  SHOW_ALL,
+  SHOW_IF_HAS_DATA,
+  deviceTranslateMap,
+  deviceMapHeight,
+  deviceMapWidth,
+} from "./mapHelpers";
 import { Config } from "@/conf";
 
-export function getTranslatedItemLabel(
-  data,
-  itemNameOrCode,
-  locale
-) {
-  if (!data?.length) return itemNameOrCode;
+export { getTranslatedItemLabel };
 
-  const items = data[0]?.items ?? [];
-  const norm = (s) => s?.trim().toLowerCase() ?? "";
-  const want = norm(itemNameOrCode);
-  const localeKey = norm(locale).toUpperCase(); // e.g. "am" -> "AM"
-
-  // Find by value (name) or by code
-  const item =
-    items.find(
-      (it) => norm(it.value) === want || it.code.trim().toLowerCase() === want
-    ) ?? null;
-
-  if (!item) return itemNameOrCode;
-
-  // Prefer translated label if present; otherwise fallback to the canonical value
-  const label =
-    localeKey && item.labels && item.labels[localeKey]
-      ? item.labels[localeKey]
-      : item.value;
-
-  return label?.trim() || item.value.trim();
-}
-
-const COLOR_VARIABLE = "_Color_";
-const LOCATION = "location";
-const SHOW_ALL = "showAll";
-const SHOW_IF_HAS_DATA = "ifUnitHasData";
-const MAX_LABEL_LEN = 10;
-
-const breakpoints = {
-  mobile: {
-    min: 320,
-    max: 480,
-  },
-  tablet: {
-    min: 481,
-    max: 768,
-  },
-  midTablet: {
-    min: 769,
-    max: 852,
-  },
-  laptop: {
-    min: 852,
-    max: 1024,
-  },
-  desktop: {
-    min: 1025,
-    max: 1365,
-  },
-  wide: {
-    min: 1366,
-    max: Infinity,
-  },
-};
-
-const deviceTranslateMap = {
-  mobile: 4,
-  tablet: 4,
-  midTablet: 2,
-  laptop: 2,
-  desktop: 2,
-  wide: 2,
-};
-
-const deviceMapHeight = {
-  mobile: 330,
-  tablet: 250,
-  midTablet: 250,
-  laptop: 200,
-  desktop: 100,
-  wide: 100,
-};
-
-const deviceMapWidth = {
-  mobile: 250,
-  tablet: 250,
-  midTablet: 250,
-  laptop: 0,
-  desktop: 0,
-  wide: 0,
-};
-
-const colorSchemes = {
-  greens: [
-    "#ccffdd",
-    "#b3ffcc",
-    "#99ffbb",
-    "#80ffaa",
-    "#66ff99",
-    "#4dff88",
-    "#33ff77",
-    "#1aff66",
-    "#00ff55",
-    "#00e64d",
-  ],
-  greys: [
-    "#f2f2f2",
-    "#e6e6e6",
-    "#d9d9d9",
-    "#cccccc",
-    "#bfbfbf",
-    "#b3b3b3",
-    "#a6a6a6",
-    "#999999",
-    "#8c8c8c",
-    "#808080",
-  ],
-  oranges: [
-    "#fff0e6",
-    "#ffe0cc",
-    "#ffd1b3",
-    "#ffc299",
-    "#ffb380",
-    "#ffa366",
-    "#ff944d",
-    "#ff8533",
-    "#ff751a",
-    "#ff6600",
-  ],
-  purples: [
-    "#ffe6ff",
-    "#ffccff",
-    "#ffb3ff",
-    "#ff99ff",
-    "#ff80ff",
-    "#ff66ff",
-    "#ff4dff",
-    "#ff33ff",
-    "#ff1aff",
-    "#ff00ff",
-  ],
-  reds: [
-    "#ffe6e6",
-    "#ffcccc",
-    "#ffb3b3",
-    "#ff9999",
-    "#ff8080",
-    "#ff6666",
-    "#ff4d4d",
-    "#ff3333",
-    "#ff1a1a",
-    "#ff0000",
-  ],
-  blues: [
-    "#e6eeff",
-    "#ccddff",
-    "#b3ccff",
-    "#99bbff",
-    "#80aaff",
-    "#6699ff",
-    "#4d88ff",
-    "#3377ff",
-    "#1a66ff",
-    "#0055ff",
-  ],
-};
-
+// Computed once at module load (matches original behavior - not reactive to viewport resize).
 const isMobile = ["mobile", "tablet", "midTablet"].includes(
   getDeviceCategory()
 );
 const isMobileOrTablet = ["mobile", "tablet"].includes(getDeviceCategory());
 
-class Map extends React.Component {
-  constructor(props) {
-    super(props);
-    this.mapContainer = React.createRef();
+function Map(props) {
+  const {
+    unique,
+    editing,
+    source,
+    center,
+    scale,
+    height,
+    width,
+    topoJSONField,
+    mappingField,
+    transformedData,
+    legendBreaks,
+    mapLabelField,
+    mapLabelShowValue,
+    showOverallValue,
+    measureSelectorLabel,
+    valueFormat,
+    autoGenerateBreaks,
+    showNoDataLabel,
+    numberOfBreaks,
+    colorScheme,
+    symbols,
+    tooltipTheme,
+    labelFontSize,
+    labelFontColor,
+    labelFontWeight,
+    legendFontSize,
+    customTooltips,
+    tooltipFontSize,
+    showAdminUnitLabel,
+    mapNoDataColor,
+    mapBoundaryColor,
+    mapFocusBoundaryColor,
+    highlightedLocation,
+    tooltipFormat,
+    showNoDataTooltip,
+    fields,
+    mapContainerBgColor,
+    mapPosition,
+    mainLayerId,
+    enabledLayers,
+    pointLabelColor,
+    pointLabelFormat,
+    highlightedLocLabelFormat,
+    mapType,
+    defaultPointColor,
+    zoomOnFilter,
+    zoomOnFilterField,
+    noDataText,
+    labelsExclusionList,
+    showShadingLayerLabels,
+    appliedFilters,
+    intl,
+    legendTitle,
+    nationalAverageLabel,
+    zoomEnabled,
+    showTooltip: showTooltipProp,
+  } = props;
 
-    this.state = { mainLayer: null, layers: null };
+  console.log("Map props:", props);
 
-    this.classColor = this.classColor.bind(this);
+  // ----- state (was `this.state`) -----
+  const [selectedMeasure, setSelectedMeasure] = useState(() =>
+    transformedData &&
+    transformedData.measures &&
+    transformedData.measures.length > 1
+      ? transformedData.measures[0]
+      : null
+  );
+  const [selectedPolygon, setSelectedPolygon] = useState(null);
+  const [layersLoading, setLayersLoading] = useState(false);
+  const [layers, setLayers] = useState(null);
 
-    this.featuresZoom = this.featuresZoom.bind(this);
-    this.fullView = this.fullView.bind(this);
+  // ----- refs (DOM nodes / mutable D3 objects / instance-style fields) -----
+  const mapContainerRef = useRef(null);
+  const tooltipRef = useRef(null);
+  const projectionRef = useRef(null);
+  const pathRef = useRef(null);
+  const zoomRef = useRef(null);
+  const translateValueRef = useRef(null);
+  const mapPositionRef = useRef(null); // equivalent of the old `this.mapPosition`
+  const hasMountedRef = useRef(false);
+  const prevPropsRef = useRef(null);
+  const prevStateRef = useRef(null);
+  const latestHandlersRef = useRef({});
+  const handleScrollRef = useRef(null);
 
-    this.onZoomIn = this.onZoomIn.bind(this);
-    this.onZoomOut = this.onZoomOut.bind(this);
-    this.onReset = this.onReset.bind(this);
+  // Recomputed every render from current props (fixes a staleness bug in the original,
+  // which captured `this.metadataTypes` once in the constructor and never updated it).
+  const metadataTypes = transformedData?.types || [];
 
-    this.onClick = this.onClick.bind(this);
-    this.showTooltip = this.showTooltip.bind(this);
-    this.mousemove = this.mousemove.bind(this);
-    this.mouseout = this.mouseout.bind(this);
-    this.updateFeatures = this.updateFeatures.bind(this);
-    this.d3Map = this.d3Map.bind(this);
-    this.getFeatures = this.getFeatures.bind(this);
-    this.boundingExtent = this.boundingExtent.bind(this);
-    this.getMapId = this.getMapId.bind(this);
-    this.zoomed = this.zoomed.bind(this);
-    this.zoomEnd = this.zoomEnd.bind(this);
-    this.drawPoints = this.drawPoints.bind(this);
-    this.extractFeatures = this.extractFeatures.bind(this);
-    this.getLayers = this.getLayers.bind(this);
+  function getWidth() {
+    if (mapContainerRef.current) {
+      return mapContainerRef.current.offsetWidth;
+    }
+    return width;
+  }
 
-    this.onPointClick = this.onPointClick.bind(this);
-    this.onPolygonClick = this.onPolygonClick.bind(this);
-    this.getCenter = this.getCenter.bind(this);
+  function getHeight() {
+    return height;
+  }
 
-    //map variables
-    this.mapPosition = null;
-    this.zooming = false;
-    this.translateValue = deviceTranslateMap[getDeviceCategory()];
-    this.projection = d3
-      .geoMercator()
-      .scale(props.scale)
-      .center(props.center) // centers map at given coordinates
-      .translate([this.getWidth() / this.translateValue, this.getHeight() / 2]);
-    this.path = d3.geoPath().projection(this.projection);
-    this.zoom = d3
+  // One-time setup (mirrors the constructor), computed during render via lazy refs so it
+  // runs before the container ref is attached to the DOM - matching the original timing
+  // where `this.mapContainer.current` was still null at construction time.
+  if (zoomRef.current === null) {
+    zoomRef.current = d3
       .zoom()
       .scaleExtent([1, 16])
-      .on("zoom", this.zoomed)
-      .on("end", this.zoomEnd);
-
-    this.centered = null;
-    this.state = {
-      selectedMeasure:
-        props.transformedData &&
-        props.transformedData.measures &&
-        props.transformedData.measures.length > 1
-          ? props.transformedData.measures[0]
-          : null,
-      generatedBreaks: [],
-      selectedPolygon: null,
-      layersLoading: false,
-    };
-    this.metadataTypes = props.transformedData?.types || [];
+      .on("zoom", (event) => latestHandlersRef.current.zoomed(event))
+      .on("end", (event) => latestHandlersRef.current.zoomEnd(event));
   }
 
-  componentDidMount() {
-    window.addEventListener("scroll", this.handleScroll, { passive: true });
-    window.addEventListener("touchmove", this.handleScroll, { passive: true });
-    this.loadLayers();
-    this.tooltip = d3
-      .select("body")
-      .append("div")
-      .style("position", "absolute")
-      .style("visibility", "hidden")
-      .style("pointer-events", "none");
-
-    console.log("Map props", this.metadataTypes);
+  if (projectionRef.current === null) {
+    translateValueRef.current = deviceTranslateMap[getDeviceCategory()];
+    projectionRef.current = d3
+      .geoMercator()
+      .scale(scale)
+      .center(center) // centers map at given coordinates
+      .translate([getWidth() / translateValueRef.current, getHeight() / 2]);
+    pathRef.current = d3.geoPath().projection(projectionRef.current);
   }
 
-  componentDidCatch(error, info) {
-    console.log(error);
+  function getMapId() {
+    return ".map.wrapper." + unique;
   }
 
-  handleScroll = () => {
-    // adds debounce to scroll to prevent event from rerendering the map too often
-    let scrollTimeout = null;
-    clearTimeout(scrollTimeout);
-    scrollTimeout = setTimeout(() => {
-      const labelsExist =
-        d3.select(this.getMapId()).selectAll(".map-labels-container").size() >
-        0;
-      if (!labelsExist) {
-        this.updateFeatures(this.getFeatures(), false);
-      }
-    }, 300);
-  };
-
-  componentWillUnmount() {
-    window.removeEventListener("scroll", this.handleScroll);
-  }
-
-  loadLayers() {
-    const { source, mainLayerId, enabledLayers } = this.props;
-    this.setState({
-      layers: [],
-      layersLoading: true,
-    });
-    if (enabledLayers && enabledLayers.length > 0) {
-      const metadataFuncs = [];
-      enabledLayers.forEach((l) => {
-        metadataFuncs.push(
-          new Promise((resolve, reject) => {
-            d3.json(Config.REACT_APP_WP_API + "/wp/v2/media/" + l.id)
-              .then((data) => {
-                resolve({
-                  id: l.id,
-                  url: data.source_url,
-                  index: l.index,
-                  layerMappingField: l.layerMappingField,
-                  layerDatasource: l.datasource,
-                  layerApiField: l.apiField,
-                  layerLocale: l.locale,
-                  displayLayerLabels: l.displayLayerLabels,
-                });
-              })
-              .catch(function (error) {
-                resolve({
-                  id: l.id,
-                  url: null,
-                  index: l.index,
-                  layerMappingField: l.layerMappingField,
-                  layerDatasource: l.datasource,
-                  layerApiField: l.apiField,
-                  layerLocale: l.locale,
-                  displayLayerLabels: l.displayLayerLabels,
-                });
-              });
-          })
-        );
-      });
-
-      Promise.all(metadataFuncs).then((metadata) => {
-        const layerFuncs = [];
-        metadata.forEach((m) => {
-          if (m.url) {
-            layerFuncs.push(
-              new Promise((resolve, reject) => {
-                d3.json(m.url).then((data) => {
-                  resolve({
-                    id: m.id,
-                    data,
-                    index: m.index,
-                    layerMappingField: m.layerMappingField,
-                    layerDatasource: m.layerDatasource,
-                    layerApiField: m.layerApiField,
-                    layerLocale: m.layerLocale,
-                    displayLayerLabels: m.displayLayerLabels,
-                  });
-                });
-              })
-            );
-          }
-        });
-
-        Promise.all(layerFuncs).then((layers) => {
-          this.setState({
-            layers: layers,
-            layersLoading: false,
-          });
-        });
-      });
-    } else {
-      d3.json(source).then((data) => {
-        this.setState({
-          layers: [
-            {
-              id: null,
-              url: source,
-              data,
-              index: 0,
-              layerMappingField: null,
-              layerDatasource: null,
-              layerApiField: null,
-              layerLocale: null,
-              displayLayerLabels: false,
-            },
-          ],
-          layersLoading: false,
-        });
-      });
-    }
-  }
-
-  getMainLayer() {
-    const layers = this.getLayers();
-    const { mainLayerId, enabledLayers } = this.props;
-    let layer;
-    if (layers) {
-      layer =
-        layers.filter(
-          (layer) => layer.id == mainLayerId || layer.id == null
-        )[0] || layers[0];
-    }
-    return layer ? layer.data : null;
-  }
-
-  componentDidUpdate(prevProps, prevState, snapshot) {
-    const { selectedMeasure, layers, selectedPolygon } = this.state;
-    const mainLayer = this.getMainLayer();
-    const { transformedData, intl, zoomOnFilterField, appliedFilters } =
-      this.props;
-
-    const { appliedFilters: prevAppliedFilters } = prevProps;
-
-    if (zoomOnFilterField) {
-      const prevAppliedItems = [];
-      const appliedItems = [];
-      //Reset zoom when filters is applied
-      if (prevAppliedFilters) {
-        Object.keys(prevAppliedFilters).forEach((k) => {
-          if (
-            prevAppliedFilters[k] != null &&
-            prevAppliedFilters[k] instanceof Array
-          ) {
-            prevAppliedItems.push(
-              ...prevAppliedFilters[k].filter(
-                (v) => v != Number.MIN_SAFE_INTEGER
-              )
-            );
-          }
-        });
-      }
-      if (appliedFilters) {
-        Object.keys(appliedFilters).forEach((k) => {
-          if (appliedFilters[k] != null && appliedFilters[k] instanceof Array) {
-            appliedItems.push(
-              ...appliedFilters[k].filter((v) => v != Number.MIN_SAFE_INTEGER)
-            );
-          }
-        });
-      }
-      //filters reset
-      if (prevAppliedItems.length > 0 && appliedItems.length == 0) {
-        this.onReset();
-      }
-    }
-
-    this.tooltip.style("visibility", "hidden");
-
-    if (prevProps.enabledLayers.length != this.props.enabledLayers.length) {
-      this.loadLayers();
-    }
-
-    const features = this.getFeatures();
-    if (prevProps.center !== this.props.center) {
-      this.mapPosition = null;
-      this.projection
-        .scale(this.props.scale)
-        .center(this.props.center) // centers map at given coordinates
-        .translate([this.getWidth() / 2, this.getHeight() / 2]);
-    }
-
-    const filterUpdated = this.filterUpdated(prevProps, prevState);
-    this.d3Map(features, filterUpdated);
-    if (
-      layers &&
-      transformedData &&
-      (transformedData != prevProps.transformedData ||
-        layers != prevState.layers ||
-        selectedMeasure != prevState.selectedMeasure ||
-        selectedPolygon != prevState.selectedPolygon ||
-        mainLayer != prevState.mainLayer ||
-        prevProps.mainLayerId !== this.props.mainLayerId ||
-        JSON.stringify(prevProps.enabledLayers) !=
-          JSON.stringify(this.props.enabledLayers))
-    ) {
-      this.updateFeatures(this.getFeatures(), filterUpdated);
-    }
-  }
-
-  getHeight() {
-    return this.props.height;
-  }
-
-  getWidth() {
-    if (this.mapContainer.current) {
-      return this.mapContainer.current.offsetWidth;
-    }
-    return this.props.width;
-  }
-
-  boundingExtent(features) {
-    let x0, x1, y0, y1;
-    for (const x in features) {
-      const [[xx0, yy0], [xx1, yy1]] = this.path.bounds(features[x]);
-      if (xx0 < x0 || x0 == null) {
-        x0 = xx0;
-      }
-
-      if (xx1 > x1 || x1 == null) {
-        x1 = xx1;
-      }
-
-      if (yy0 < y0 || y0 == null) {
-        y0 = yy0;
-      }
-
-      if (yy1 > y1 || y1 == null) {
-        y1 = yy1;
-      }
-    }
-    return [
-      [x0, y0],
-      [x1, y1],
-    ];
-  }
-
-  onReset() {
-    this.mapPosition = null;
-    this.tooltip.style("visibility", "hidden");
-    this.fullView();
-  }
-
-  resizeLabels(transform) {
-    const { labelFontSize, mapLabelField } = this.props;
-
-    d3.select(this.getMapId())
-      .selectAll(".map-labels-container")
-      .each((d, i, nodes) => {
-        const fo = d3.select(nodes[i]);
-        const div = fo.select("div");
-        const scale = transform.k > 1 ? transform.k : 1;
-        const newSize = labelFontSize / scale;
-
-        div.style("font-size", `${newSize}px`);
-
-        const position = this.getLabelPosition(d);
-        const boxWidth = this.getLabelBoxWidth(d) / scale;
-        const x = position[0] - boxWidth / 2;
-        const yOffset = transform.k > 1 ? 10 / transform.k : 10;
-        const y = position[1] - yOffset;
-
-        fo.attr("x", x)
-          .attr("y", y)
-          .attr("width", this.getLabelBoxWidth(d) / scale)
-          .attr("height", this.getLabelBoxHeight(d) / scale);
-      });
-  }
-
-  resizePointLabels(transform) {
-    const { labelFontSize } = this.props;
-    d3.select(this.getMapId())
-      .selectAll(".point-labels-container")
-      .each((d, i, nodes) => {
-        const fo = d3.select(nodes[i]);
-        const div = fo.select("div");
-        const scale = transform.k > 1 ? transform.k : 1;
-        const newSize = labelFontSize / scale;
-        div.style("font-size", `${newSize}px`);
-
-        const pos = this.projection([
-          d.geometry.coordinates[1],
-          d.geometry.coordinates[0],
-        ]);
-        const width = (this.getLabelBoxWidth(d) + 20) / scale;
-        const height = this.getLabelBoxHeight(d) / scale;
-        const x = pos[0] - width / 2;
-        const y = pos[1] - height / 2;
-        fo.attr("x", x)
-          .attr("y", y)
-          .attr("width", width)
-          .attr("height", height);
-      });
-  }
-
-  resizeCircles(transform) {
-    // Invert the radius of circles based on the zoom scale
-    const circles = d3
-      .select(this.getMapId())
-      .select("svg")
-      .selectAll("circle");
-    circles.attr("r", transform.k > 1 ? 6 / transform.k : 6);
-  }
-
-  zoomed(event) {
-    this.tooltip.style("visibility", "hidden");
-    const transform = event.transform; // Accessing transform from the event
-    const g = d3.select(this.getMapId()).select("svg").select("g");
-    g.attr("transform", transform);
-
-    this.resizeCircles(transform); // Pass the transform to resizeCircles
-    this.resizeLabels(transform); // Pass the transform to resizeLabels
-    this.resizePointLabels(transform); // Pass the transform to resizePointLabels
-  }
-
-  zoomEnd(event) {
-    const { editing } = this.props;
-    const transform = event.transform;
-    this.mapPosition = { k: transform.k, x: transform.x, y: transform.y };
-    if (editing) {
-      const parentWindow = window.parent;
-      parentWindow.postMessage(
-        { type: "map", value: JSON.stringify(this.mapPosition) },
-        "*"
-      );
-    }
-  }
-
-  classColor(d) {
-    let { zoomEnabled } = this.props;
-    if (!zoomEnabled) {
-      zoomEnabled = ["mobile", "tablet", "midTablet"].includes(
-        getDeviceCategory()
-      )
-        ? true
-        : false;
-    }
-    if (zoomEnabled) {
-      return "active zoom-enabled";
-    } else {
-      return "active";
-    }
-  }
-
-  generateBreaks(data) {
-    const { autoGenerateBreaks, numberOfBreaks, colorScheme } = this.props;
-    const generatedBreaks = [];
-    if (autoGenerateBreaks && data && data.length > 0) {
-      const parsedData = data
-        .filter((d) => d.properties && d.properties.value != null)
-        .map((d) => {
-          return d.properties.value.toFixed(2);
-        });
-
-      const values = [];
-      parsedData.forEach((item) => {
-        if (item > 0) {
-          const floor = item * 0.99;
-          const ceil = item * 1.01;
-          if (values.indexOf(floor) === -1) {
-            values.push(floor);
-          }
-          if (values.indexOf(ceil) === -1) {
-            values.push(ceil);
-          }
-        }
-      });
-
-      const colors = colorSchemes[colorScheme];
-      if (values.length > 0) {
-        const serie = new geostats(values);
-        serie.setPrecision(2);
-        const numberOfRanges =
-          values.length > 1 ? values.length - 1 : values.length;
-        serie.getJenks(Math.min(numberOfBreaks, numberOfRanges));
-        serie.ranges.forEach((range, i) => {
-          const legendBreak = {};
-          const adjustment = 0.01;
-          legendBreak.min =
-            parseFloat(range.substr(0, range.indexOf("-") - 1)) +
-            (i > 0 ? adjustment : 0);
-          legendBreak.max = parseFloat(
-            range.substr(range.indexOf("-") + 2, range.length)
-          );
-          legendBreak.color = colors[i];
-          generatedBreaks.push(legendBreak);
-        });
-
-        return generatedBreaks;
-      }
-    }
-
-    return generatedBreaks;
-  }
-
-  getBreaks() {
-    const { legendBreaks, autoGenerateBreaks } = this.props;
-    if (autoGenerateBreaks) {
-      const features = this.getFeatures();
-      return this.generateBreaks(features);
-    } else {
-      let filteredBreaks = legendBreaks;
-      if (this.getSelectedMeasure()) {
-        filteredBreaks = legendBreaks
-          .filter((b) => b.measure === this.getSelectedMeasure())
-          .filter((f) => {
-            const result = true;
-            if (f.filters && f.filters.length > 0) {
-              if (
-                this.props.appliedFilters &&
-                JSON.stringify(this.props.appliedFilters) !== "{}"
-              ) {
-                const keys = Object.keys(this.props.appliedFilters);
-                const found = f.filters.filter((filter) => {
-                  if (keys.indexOf(filter.field) != -1) {
-                    const appliedFieldValues =
-                      this.props.appliedFilters[filter.field];
-                    const breaksFilterValues = filter.values;
-                    return (
-                      appliedFieldValues
-                        .join(",")
-                        .indexOf(breaksFilterValues) != -1
-                    );
-                  }
-                  return false;
-                });
-
-                return found.length > 0;
-              }
-            }
-            return result;
-          });
-      }
-      return filteredBreaks;
-    }
-  }
-
-  fillColor(d, breaks) {
-    const { mapNoDataColor, mainLayerId } = this.props;
-    let overrideColor;
-    if (
-      d.properties &&
-      d.properties.variables &&
-      this.state.selectedMeasure &&
-      d.properties.value != null
-    ) {
-      const key = COLOR_VARIABLE + this.state.selectedMeasure;
-      overrideColor = d.properties.variables[key.trim()];
-      if (overrideColor) {
-        return overrideColor;
-      }
-    }
-    if (
-      d.properties.value != null &&
-      ((mainLayerId && d.properties.layerId === mainLayerId) || !mainLayerId)
-    ) {
-      const breakItem = breaks.find((item) => {
-        if (item.min != null && item.max != null) {
-          return (
-            d.properties.value >= item.min && d.properties.value <= item.max
-          );
-        }
-
-        if (item.min != null) {
-          return d.properties.value >= item.min;
-        }
-
-        if (item.max != null) {
-          return d.properties.value <= item.max;
-        }
-      });
-
-      return breakItem && breakItem.color ? breakItem.color : mapNoDataColor;
-    }
-
-    const layerProps = this.props.enabledLayers.filter(
-      (l) => l.id === d.properties.layerId
-    )[0];
-    if (layerProps && layerProps.bgColor && layerProps.bgColor != "undefined") {
-      return layerProps.bgColor;
-    }
-
-    return mapNoDataColor;
-  }
-
-  setValues() {
-    const features = this.getFeatures();
-    const group = d3.select(this.getMapId()).select("svg").select("g");
-    group.selectAll("path").data(features).join("path").attr("d", this.path);
-  }
-
-  getLabelPosition(d) {
-    if (d.properties.LABEL_LATITUDE && d.properties.LABEL_LONGITUDE) {
-      return this.projection([
-        d.properties.LABEL_LONGITUDE,
-        d.properties.LABEL_LATITUDE,
-      ]);
-    } else {
-      return this.path.centroid(d);
-    }
-  }
-
-  updateFeatures(features, filterUpdated) {
-    const { mapLabelField, symbols, highlightedLocation } = this.props;
-
-    const sortedFeatures = [
-      ...features.filter((f) => {
-        return highlightedLocation != f.properties[mapLabelField];
-      }),
-      ...features.filter((f) => {
-        return highlightedLocation == f.properties[mapLabelField];
-      }),
-    ];
-
-    this.drawPolygons(sortedFeatures);
-    this.drawLabels(sortedFeatures);
-    this.drawPoints(sortedFeatures, filterUpdated);
-    if (symbols.length > 0) {
-      this.addSymbols(symbols, sortedFeatures);
-    }
-  }
-
-  drawLabels(sortedFeatures) {
-    const {
-      mapLabelField,
-      mapLabelShowValue,
-      intl,
-      valueFormat,
-      showNoDataLabel,
-      labelFontColor,
-      labelFontWeight,
-      labelFontSize,
-      showAdminUnitLabel,
-      mapType,
-      noDataText,
-      labelsExclusionList,
-    } = this.props;
-    const group = d3.select(this.getMapId()).select("svg").select("g");
-    const labelsExist = group.selectAll(".map-labels-container").size() > 0;
-    if (labelsExist) {
-      console.log("Labels already exist, skipping redraw...");
-      return; // Skip redrawing if labels are already present
-    }
-
-    group
-      .selectAll(".map-labels")
-      .data(
-        sortedFeatures.filter((f) => {
-          if (labelsExclusionList && labelsExclusionList.length > 0) {
-            return !labelsExclusionList.includes(f.properties[mapLabelField]);
-          }
-          return true;
-        })
-      )
-      .enter()
-      .append("foreignObject")
-      .attr("class", "map-labels-container")
-      .attr("x", (d) => {
-        const position = this.getLabelPosition(d);
-        if (d.properties[mapLabelField]) {
-          const boxWidth = this.getLabelBoxWidth(d);
-          return position[0] - boxWidth / 2;
-        }
-        return position[0];
-      })
-      .attr("y", (d) => {
-        const position = this.getLabelPosition(d);
-        return position[1] - 10;
-      })
-      .attr("width", (d) => this.getLabelBoxWidth(d))
-      .attr("height", (d) => this.getLabelBoxHeight(d))
-      .attr("font-size", (d, i) => `${labelFontSize}px`)
-      .attr("overflow", "visible")
-      .attr("opacity", 1)
-      .style("display", (d) => {
-        if (
-          showAdminUnitLabel === SHOW_ALL ||
-          (showAdminUnitLabel === SHOW_IF_HAS_DATA && d.properties.hasDataRow) ||
-          d.properties.displayLayerLabels
-        ) {
-          return "block";
-        }
-        return "none";
-      })
-      .attr("pointer-events", mapType == "POINTS_MAP" ? "none" : "all")
-      .on("mouseover", this.showTooltip)
-      .on("mousemove", this.mousemove)
-      .on("mouseout", this.mouseout)
-      .append("xhtml:div")
-      .style("font-size", (d) => `${labelFontSize}px`)
-      .style("color", (d, i) => labelFontColor)
-      .style("font-weight", (d) => labelFontWeight)
-      .style("background-color", (d) => {
-        if (d.properties.hasDataRow && mapLabelShowValue) {
-          if (
-            d.properties.value != null ||
-            (d.properties.value == null && showNoDataLabel)
-          ) {
-            return "#fff6e1";
-          }
-        }
-
-        return "none";
-      })
-      .style("border-radius", (d) => "4px")
-      .style("line-height", "95%")
-      .style("text-align", "center")
-      .html((d, i) => {
-        return this.createLabel(d);
-      });
-  }
-
-  getTranslatedLocationName(d, mappingField, intl) {
-    // Check if we should use translated labels for this layer
-    if (d.properties.displayLayerLabels && d.properties.layerLocale) {
-      // Use the layer's mapping field if available, otherwise fall back to the default mappingField
-      const labelField = d.properties.layerMappingField || mappingField;
-      const rawLabel = d.properties[labelField];
-
-      // Get translated label using the layer's locale
-      const translatedLabel = getTranslatedItemLabel(this.metadataTypes, rawLabel, d.properties.layerLocale);
-      return translatedLabel;
-    }
-
-    // Fall back to the default behavior
-    return d.properties[mappingField];
-  }
-
-  createLabel(d) {
-    const {
-      mapLabelField,
-      mapLabelShowValue,
-      intl,
-      valueFormat,
-      showNoDataLabel,
-      showAdminUnitLabel,
-      noDataText,
-    } = this.props;
-
-    let label = "";
-    if (
-      showAdminUnitLabel == SHOW_ALL ||
-      (showAdminUnitLabel == SHOW_IF_HAS_DATA && d.properties.hasDataRow) ||
-      d.properties.displayLayerLabels
-    ) {
-      // Get the raw label from properties
-      // If displayLayerLabels is true, use the layer's mapping field, otherwise use the default mapLabelField
-      const labelField = d.properties.displayLayerLabels && d.properties.layerMappingField
-        ? d.properties.layerMappingField
-        : mapLabelField;
-      const rawLabel = d.properties[labelField];
-
-      // Use getTranslatedItemLabel to get translated label if available
-      const locale = d.properties.layerLocale || intl?.locale;
-      label = getTranslatedItemLabel(this.metadataTypes, rawLabel, locale);
-      const abbrev = d.properties["abbrev"];
-      if (label && label.length > MAX_LABEL_LEN && abbrev) {
-        label = abbrev;
-      }
-
-      if (mapLabelShowValue) {
-        if (d.properties.value != null) {
-          const variables = d.properties.variables || {};
-          label +=
-            "<br><span class='map-label-value'>" +
-            formatContent(
-              valueFormat,
-              {
-                value: d.properties.value,
-                measure: this.getSelectedMeasure(),
-                ...variables,
-              },
-              intl
-            ) +
-            "</span>";
-        } else {
-          if (
-            showNoDataLabel == true &&
-            d.properties.value == null &&
-            d.properties.hasDataRow
-          ) {
-            label +=
-              "<br><span class='map-label-value'>" + noDataText + "</span>";
-          }
-        }
-      }
-    }
-
-    return label;
-  }
-
-  drawPolygons(sortedFeatures) {
-    const {
-      mapLabelField,
-      mapBoundaryColor,
-      mapFocusBoundaryColor,
-      highlightedLocation,
-    } = this.props;
-
-    const breaks = this.getBreaks();
-    const group = d3.select(this.getMapId()).select("svg").select("g");
-
-    const polygons = sortedFeatures.filter(
-      (f) =>
-        f.geometry &&
-        f.geometry &&
-        (f.geometry.type == "Polygon" || f.geometry.type == "MultiPolygon")
-    );
-
-    if (polygons.length > 0) {
-      group
-        .selectAll("path")
-        .data(polygons)
-        .join("path")
-        .attr("d", this.path)
-        .attr("fill", (d) => this.fillColor(d, breaks))
-        .attr("stroke-width", (d) => {
-          if (highlightedLocation == d.properties[mapLabelField]) {
-            return 1.2;
-          } else {
-            return 0.4;
-          }
-        })
-        .attr("stroke", (d) => {
-          if (highlightedLocation == d.properties[mapLabelField]) {
-            return mapFocusBoundaryColor;
-          } else {
-            return mapBoundaryColor;
-          }
-        })
-        .on("click", this.onPolygonClick);
-    }
-  }
-
-  drawPoints(sortedFeatures, filterUpdated) {
-    const {
-      intl,
-      pointLabelColor,
-      pointLabelFormat,
-      transformedData,
-      defaultPointColor,
-      appliedFilters,
-      zoomOnFilterField,
-      noDataText,
-      showShadingLayerLabels,
-    } = this.props;
-
-    const group = d3.select(this.getMapId()).select("svg").select("g");
-    let pointsFromData = [];
-    if (transformedData.pointsData) {
-      let selectedLocation = this.state.selectedPolygon;
-      if (
-        filterUpdated &&
-        appliedFilters &&
-        appliedFilters[zoomOnFilterField]
-      ) {
-        selectedLocation = appliedFilters[zoomOnFilterField];
-      }
-
-      pointsFromData = transformedData.pointsData
-        .filter((p) => p.lat && p.lng && p.label == selectedLocation)
-        .map((p) => {
-          return {
-            properties: {
-              label: p.label,
-              lat: p.lat,
-              lng: p.lng,
-              value: p.value,
-              variables: p.variables,
-            },
-          };
-        });
-
-      group
-        .selectAll(".circle")
-        .data(pointsFromData)
-        .enter()
-        .append("circle")
-        .attr("id", (d, i) => {
-          return "circle" + i;
-        })
-        .attr("cx", (d) => {
-          const position = this.projection([
-            d.properties.lng,
-            d.properties.lat,
-          ]);
-          return position[0];
-        })
-        .attr("cy", (d) => {
-          const position = this.projection([
-            d.properties.lng,
-            d.properties.lat,
-          ]);
-          return position[1];
-        })
-        .attr("r", (d, i) => {
-          return 2;
-        })
-        .style("stroke-width", 0.5)
-        .style("fill", (d, i) => {
-          return defaultPointColor;
-        })
-        .on("mouseover", (d, i) => this.onPointClick(d, i))
-        .on("mouseout", this.mouseout);
-    }
-
-    const breaks = this.getBreaks();
-    let points = [];
-    if (showShadingLayerLabels == SHOW_ALL) {
-      points = sortedFeatures.filter(
-        (f) => f.geometry && f.geometry.type == "Point"
-      );
-    } else if (showShadingLayerLabels == SHOW_IF_HAS_DATA) {
-      points = sortedFeatures.filter(
-        (p) =>
-          p.geometry && p.geometry.type == "Point" && p.properties.hasDataRow
-      );
-    }
-
-    if (points.length > 0) {
-      group
-        .selectAll(".point-labels")
-        .data(points)
-        .enter()
-        .append("foreignObject")
-        .attr("id", (d, i) => {
-          return "point-label" + i;
-        })
-        .attr("class", "point-labels-container")
-        .attr("x", (d) => {
-          const width = this.getLabelBoxWidth(d) + 20;
-          const position = this.projection([
-            d.geometry.coordinates[1],
-            d.geometry.coordinates[0],
-          ]);
-          return position[0] - width / 2;
-        })
-        .attr("y", (d) => {
-          const position = this.projection([
-            d.geometry.coordinates[1],
-            d.geometry.coordinates[0],
-          ]);
-          return position[1] - this.getLabelBoxHeight(d) / 2;
-        })
-        .attr("width", (d) => this.getLabelBoxWidth(d) + 20)
-        .attr("height", (d) => "1px")
-        .attr("overflow", "visible")
-        .attr("font-size", "12px")
-        .style("opacity", 1)
-        .append("xhtml:div")
-        .style("color", (d, i) => pointLabelColor)
-        .style("font-weight", (d) => "bold")
-        .style("background-color", (d) => this.fillColor(d, breaks))
-        .style("padding", (d) => "5px 3px 5px 3px")
-        .style("border-radius", (d) => "4px")
-        .style("line-height", "100%")
-        .style("text-align", "center")
-        .html((d, i) => {
-          return formatContent(
-            pointLabelFormat,
-            {
-              value: d.properties.value,
-              locationName: d.properties[this.props.mapLabelField],
-            },
-            intl,
-            noDataText
-          );
-        })
-        .on("mouseover", (event, d, i) => {
-          d3.select(this.getMapId())
-            .select("svg")
-            .select("g")
-            .select("#point-label" + i)
-            .raise();
-          this.showTooltip(event, d);
-        })
-        .on("mousemove", this.mousemove)
-        .on("mouseout", this.mouseout);
-    }
-  }
-
-  addSymbols(symbols, features) {
-    const { mappingField } = this.props;
-    const group = d3.select(this.getMapId()).select("svg").select("g");
-    symbols.forEach((symbol) => {
-      if (symbol.field && symbol.image && symbol.values) {
-        const filteredFeaturesWithGpsCoords = features.filter((f) => {
-          const fieldName = LOCATION == symbol.field ? mappingField : "value";
-          const fiedValue =
-            (f.properties[fieldName] ||
-              (f.properties.variables
-                ? f.properties.variables[fieldName]
-                : "")) + "";
-          const valuesToMatch = symbol.values + "";
-          const valuesToMatchArr = valuesToMatch.split(",");
-          return (
-            f.properties.LATITUDE &&
-            f.properties.LONGITUDE &&
-            valuesToMatchArr.filter(
-              (v) => v.trim().toLowerCase() == fiedValue.trim().toLowerCase()
-            ).length > 0
-          );
-        });
-
-        const filteredFeaturesNoCoords = features.filter((f) => {
-          const fieldName = LOCATION == symbol.field ? mappingField : "value";
-          const fiedValue =
-            (f.properties[fieldName] ||
-              (f.properties.variables
-                ? f.properties.variables[fieldName]
-                : "")) + "";
-          const valuesToMatch = symbol.values + "";
-          const valuesToMatchArr = valuesToMatch.split(",");
-          return (
-            !f.properties.LATITUDE &&
-            !f.properties.LONGITUDE &&
-            valuesToMatchArr.filter(
-              (v) => v.trim().toLowerCase() == fiedValue.trim().toLowerCase()
-            ).length > 0
-          );
-        });
-
-        // if feature has lat and long, use that to position the symbol
-        group
-          .selectAll("image")
-          .data(filteredFeaturesWithGpsCoords)
-          .enter()
-          .append("image")
-          .attr("width", 40)
-          .attr("height", 40)
-          .attr("class", "map-symbol")
-          .attr("xlink:href", "/" + symbol.image)
-          .attr("transform", (d) => {
-            return (
-              "translate(" +
-              this.projection([d.properties.LONGITUDE, d.properties.LATITUDE]) +
-              ")"
-            );
-          })
-          .on("mouseover", this.showTooltip)
-          .on("mousemove", this.mousemove)
-          .on("mouseout", this.mouseout);
-
-        // if feature does not have lat and long, use the centroid to position the symbol
-        group
-          .selectAll("image")
-          .data(filteredFeaturesNoCoords)
-          .enter()
-          .append("image")
-          .attr("width", 40)
-          .attr("height", 40)
-          .attr("class", "map-symbol")
-          .attr("xlink:href", "/" + symbol.image)
-          .attr("x", (d) => {
-            return this.path.centroid(d)[0] - 20;
-          })
-          .attr("y", (d) => {
-            return this.path.centroid(d)[1];
-          })
-          .on("mouseover", this.showTooltip)
-          .on("mousemove", this.mousemove)
-          .on("mouseout", this.mouseout);
-      }
-    });
-  }
-
-  getLabelBoxHeight() {
-    const { mapLabelShowValue } = this.props;
-    if (mapLabelShowValue) {
-      return 30;
-    }
-
-    return 25;
-  }
-
-  getLabelBoxWidth(d) {
-    const { mapLabelField } = this.props;
-    const defaultLength = 80;
-    if (d.properties[mapLabelField]) {
-      const textLength = d.properties[mapLabelField].length;
-      if (textLength < 10) {
-        return defaultLength;
-      }
-      return textLength * 8;
-    }
-
-    return 0;
-  }
-
-  featuresZoom(fs, immediate, callback) {
-    const svg = d3.select(this.getMapId()).select("svg");
-    const bounds = this.boundingExtent(fs);
-    const [[x0, y0], [x1, y1]] = bounds;
-    const width = this.getWidth();
-    const height = this.getHeight();
-    const scale = Math.min(
-      8,
-      0.9 / Math.max((x1 - x0) / width, (y1 - y0) / height)
-    );
-    const translate = [width / 2 - (x0 + x1) / 2, height / 2 - (y0 + y1) / 2];
-
-    if (immediate) {
-      svg.call(
-        this.zoom.transform,
-        d3.zoomIdentity.translate(translate[0], translate[1]).scale(scale)
-      );
-    } else {
-      svg
-        .transition()
-        .duration(450)
-        .call(
-          this.zoom.transform,
-          d3.zoomIdentity.translate(translate[0], translate[1]).scale(scale)
-        )
-        .on("end", callback);
-    }
-  }
-
-  fullView() {
-    const { mapPosition, editing } = this.props;
-    const svg = d3.select(this.getMapId()).select("svg");
-
-    // Clear 'background' class from active paths
-    const paths = svg.select("g").selectAll(".active");
-    paths.attr("class", function () {
-      return d3
-        .select(this)
-        .attr("class")
-        .replace(/background/gi, "");
-    });
-
-    // Determine the transform based on whether mapPosition is defined and editing is false
-    let targetTransform = d3.zoomIdentity;
-    if (mapPosition && !editing) {
-      targetTransform = targetTransform
-        .translate(mapPosition.x, mapPosition.y)
-        .scale(mapPosition.k);
-    } else {
-      targetTransform = targetTransform.translate(0, 0).scale(1);
-    }
-
-    svg.transition().duration(300).call(this.zoom.transform, targetTransform);
-  }
-
-  showTooltip(event, d) {
-    let {
-      showTooltip,
-      zoomEnabled,
-      tooltipTheme,
-      customTooltips,
-      tooltipFontSize,
-      tooltipFormat,
-      intl,
-      mappingField,
-      showNoDataTooltip,
-      fields,
-      mapType,
-      noDataText,
-    } = this.props;
-
-    zoomEnabled = ["mobile", "tablet", "midTablet"].includes(
-      getDeviceCategory()
-    )
-      ? true
-      : false;
-
-    if (
-      (showTooltip && d.properties.value != null) ||
-      (showTooltip && showNoDataTooltip)
-    ) {
-      const svg = d3.select(this.getMapId()).select("svg");
-      const elements = svg.select("g").selectAll(".active");
-      elements.attr("class", (p) => {
-        if (p.properties[mappingField] === d.properties[mappingField]) {
-          return "focus" + (zoomEnabled ? " zoom-enabled" : "");
-        } else {
-          return "active" + (zoomEnabled ? " zoom-enabled" : "");
-        }
-      });
-
-      const format =
-        tooltipFormat || "{locationName} %({value},2) \n {label}: %({value},2)";
-      const dataVars = d.properties.variables || {};
-
-      const variables = {
-        ...d.properties,
-        value: d.properties.value,
-        measure: this.getSelectedMeasure(),
-        measureLabel: d.properties.measureLabel,
-        locationName: this.getTranslatedLocationName(d, mappingField, intl),
-        label: this.getTranslatedLocationName(d, mappingField, intl),
-        ...dataVars,
-      };
-      this.tooltip
-        .attr("class", tooltipTheme)
-        .style("position", "absolute")
-        .style("visibility", "hidden")
-        .style("visibility", "visible")
-        .html((e) => {
-          let html = `<div style='font-size:${tooltipFontSize}px;' class='tooltip-content' >`;
-          if (d.properties.value != null) {
-            const lines = format.split("\n");
-            const headerFormat = lines[0];
-            const overallFormat = lines.length > 1 ? lines[1] : null;
-            let breakdownLineIndex = 1;
-            let breakdownFormat;
-            if (fields.length > 1 && mapType != "POINTS_MAP") {
-              breakdownLineIndex = lines.length > 2 ? 2 : 1;
-              breakdownFormat = lines[breakdownLineIndex];
-            } else {
-              breakdownFormat = null;
-            }
-
-            if (headerFormat) {
-              html += formatContent(headerFormat, variables, intl, noDataText);
-            }
-            if (overallFormat) {
-              if (!html.endsWith("<hr>")) {
-                html += "<hr>";
-              }
-              html += formatContent(overallFormat, variables, intl, noDataText);
-            }
-            if (breakdownFormat) {
-              if (d.properties.children) {
-                d.properties.children.forEach((child, index) => {
-                  const vars = {
-                    value: child.value,
-                    label: child.label,
-                    measure: this.getSelectedMeasure(),
-                    measureLabel: d.properties.measureLabel,
-                    ...dataVars,
-                  };
-                  if (!html.endsWith("<hr>")) {
-                    html += "<hr>";
-                  }
-                  html += formatContent(
-                    breakdownFormat,
-                    vars,
-                    intl,
-                    noDataText
-                  );
-                });
-              }
-            }
-
-            if (lines.length > breakdownLineIndex + 1) {
-              if (!html.endsWith("<hr>")) {
-                html += "<hr>";
-              }
-              lines.forEach((line, index) => {
-                if (index > breakdownLineIndex) {
-                  if (!html.endsWith("<hr>")) {
-                    html += "<hr>";
-                  }
-                  html += formatContent(line, variables, intl, noDataText);
-                }
-              });
-            }
-
-            const tooltips = customTooltips.filter(
-              (t) => t.location === d.properties[mappingField]
-            );
-            tooltips.forEach((t) => {
-              if (!html.endsWith("<hr>")) {
-                html += "<hr>";
-              }
-              html += t.tooltip;
-            });
-          } else {
-            const format =
-              tooltipFormat ||
-              "{locationName} %({value},2) \n {label}: %({value},2)";
-            const variables = {
-              value: null,
-              measure: this.getSelectedMeasure(),
-              measureLabel: d.properties.measureLabel,
-              locationName: this.getTranslatedLocationName(d, mappingField, intl),
-              ...dataVars,
-            };
-            html += formatContent(format, variables, intl, noDataText);
-            html += "</div>";
-          }
-
-          return html;
-        });
-    }
-  }
-
-  positionTooltip(event) {
-    const offset = 8;
-    const node = this.tooltip.node();
-    const tooltipWidth = node ? node.offsetWidth : 0;
-    const viewportRight =
-      window.scrollX + document.documentElement.clientWidth;
-
-    let left = event.pageX;
-    if (tooltipWidth && left + tooltipWidth > viewportRight) {
-      left = event.pageX - tooltipWidth;
-      if (left < window.scrollX) {
-        left = window.scrollX;
-      }
-    }
-
-    this.tooltip.style("top", event.pageY + "px").style("left", left + "px").style("margin-left", offset + "px");
-  }
-
-  mousemove(event, d) {
-    // The event object contains the mouse coordinates
-    this.positionTooltip(event);
-  }
-
-  mouseout(event, d) {
-    const { showTooltip } = this.props;
-    if (showTooltip) {
-      const svg = d3.select(this.getMapId()).select("svg");
-      const paths = svg.select("g").selectAll(".focus");
-      paths.attr("class", "active");
-      this.tooltip.style("visibility", "hidden");
-    }
-  }
-  onClick(event, d) {
-    if (d.properties) {
-      this.tooltip.style("visibility", "visible");
-      this.positionTooltip(event);
-    }
-    event.stopPropagation();
-    event.preventDefault();
-  }
-
-  onPointClick(event, d, i) {
-    this.showTooltip(event, d);
-    this.tooltip.style("visibility", "visible");
-    this.positionTooltip(event);
-
-    const svg = d3.select(this.getMapId()).select("svg").select("g");
-    svg
-      .selectAll("circle")
-      .style("fill", this.props.defaultPointColor)
-      .style("stroke", "none");
-
-    svg
-      .select("#circle" + i)
-      .raise()
-      .style("fill", "#fff");
-  }
-
-  onPolygonClick(event, d) {
-    const { mappingField } = this.props;
-    if (
-      this.state.selectedPolygon !== d.properties[mappingField] &&
-      d.properties.value !== null
-    ) {
-      this.setState({ selectedPolygon: d.properties[mappingField] });
-    }
-  }
-
-  onZoomIn(e) {
-    const svg = d3.select(this.getMapId()).select("svg");
-    svg.transition().call(this.zoom.scaleBy, 1.5);
-  }
-
-  onZoomOut() {
-    const svg = d3.select(this.getMapId()).select("svg");
-    svg.transition().call(this.zoom.scaleBy, 0.6667);
-  }
-
-  getSelectedMeasure() {
-    let measure = this.state.selectedMeasure;
+  function getSelectedMeasure() {
+    let measure = selectedMeasure;
     if (
       !measure &&
-      this.props.transformedData &&
-      this.props.transformedData.measures &&
-      this.props.transformedData.measures.length > 1
+      transformedData &&
+      transformedData.measures &&
+      transformedData.measures.length > 1
     ) {
-      measure = this.props.transformedData.measures[0];
+      measure = transformedData.measures[0];
     }
-
     return measure;
   }
 
-  getCollectionField(mainLayer) {
-    const { topoJSONField } = this.props;
-    if (mainLayer && mainLayer.objects) {
-      const fields = Object.keys(mainLayer.objects);
-      for (const index in fields) {
-        const field = fields[index];
-        if (mainLayer.objects[field].type == "GeometryCollection") {
-          return field;
-        }
-      }
-    }
-
-    return topoJSONField;
-  }
-
-  extractFeatures(mainLayer) {
-    const collectionField = this.getCollectionField(mainLayer);
-    if (mainLayer && mainLayer.objects && mainLayer.objects[collectionField]) {
-      return topojson.feature(mainLayer, mainLayer.objects[collectionField])
-        .features;
-    } else if (mainLayer && mainLayer.features) {
-      return mainLayer.features;
-    }
-    return [];
-  }
-
-  getLayers() {
-    const { layers } = this.state;
-    const { enabledLayers } = this.props;
+  function getLayers() {
     if (layers && layers.length > 0) {
       const updatedLayers = layers.map((layer) => {
         const found = enabledLayers.find((l) => l.id == layer.id);
@@ -1589,11 +197,9 @@ class Map extends React.Component {
         if (parseInt(a.index) < parseInt(b.index)) {
           return 1;
         }
-
         if (parseInt(a.index) > parseInt(b.index)) {
           return -1;
         }
-
         return 0;
       });
     }
@@ -1601,21 +207,39 @@ class Map extends React.Component {
     return [];
   }
 
-  getFeatures() {
-    const mainLayer = this.getMainLayer();
-    const layers = this.getLayers();
+  function getMainLayer() {
+    const resolvedLayers = getLayers();
+    let layer;
+    if (resolvedLayers) {
+      layer =
+        resolvedLayers.filter((l) => l.id == mainLayerId || l.id == null)[0] ||
+        resolvedLayers[0];
+    }
+    return layer ? layer.data : null;
+  }
+
+  function getCollectionField(mainLayer) {
+    return getCollectionFieldHelper(mainLayer, topoJSONField);
+  }
+
+  function extractFeatures(mainLayer) {
+    return extractFeaturesHelper(mainLayer, topoJSONField);
+  }
+
+  function getFeatures() {
+    const mainLayer = getMainLayer();
+    const resolvedLayers = getLayers();
     if (mainLayer) {
-      const { transformedData, mappingField, app, mainLayerId, enabledLayers } =
-        this.props;
       let features = [];
       try {
-        features = this.extractFeatures(mainLayer);
+        features = extractFeatures(mainLayer);
         features.map((f) => {
           f.properties.layerId = mainLayerId;
-          // Add layer properties from the resolved metadata in this.state.layers
-          const layerMetadata = layers.find(layer => String(layer.id) === String(mainLayerId));
+          // Add layer properties from the resolved metadata in `layers` state
+          const layerMetadata = resolvedLayers.find(
+            (layer) => String(layer.id) === String(mainLayerId)
+          );
           if (layerMetadata) {
-            // Add the resolved layer properties
             f.properties.layerMappingField = layerMetadata.layerMappingField;
             f.properties.layerDatasource = layerMetadata.layerDatasource;
             f.properties.layerApiField = layerMetadata.layerApiField;
@@ -1632,13 +256,12 @@ class Map extends React.Component {
           });
           return f;
         });
-        if (layers) {
-          layers.forEach((layer) => {
+        if (resolvedLayers) {
+          resolvedLayers.forEach((layer) => {
             if (layer.id != mainLayerId) {
-              let tt = this.extractFeatures(layer.data);
+              let tt = extractFeatures(layer.data);
               tt = tt.map((f) => {
                 f.properties.layerId = layer.id;
-                // Add the resolved layer properties
                 f.properties.layerMappingField = layer.layerMappingField;
                 f.properties.layerDatasource = layer.layerDatasource;
                 f.properties.layerApiField = layer.layerApiField;
@@ -1659,7 +282,7 @@ class Map extends React.Component {
 
       if (transformedData.measures && transformedData.measures.length > 1) {
         filterLocationsData = transformedData.locationsData.filter(
-          (d) => d.measure === this.getSelectedMeasure()
+          (d) => d.measure === getSelectedMeasure()
         );
       }
 
@@ -1708,40 +331,794 @@ class Map extends React.Component {
     return [];
   }
 
-  getMapId() {
-    const { unique } = this.props;
-    return ".map.wrapper." + unique;
+  function loadLayers() {
+    setLayers([]);
+    setLayersLoading(true);
+    if (enabledLayers && enabledLayers.length > 0) {
+      const metadataFuncs = [];
+      enabledLayers.forEach((l) => {
+        metadataFuncs.push(
+          new Promise((resolve) => {
+            d3.json(Config.REACT_APP_WP_API + "/wp/v2/media/" + l.id)
+              .then((data) => {
+                resolve({
+                  id: l.id,
+                  url: data.source_url,
+                  index: l.index,
+                  layerMappingField: l.layerMappingField,
+                  layerDatasource: l.datasource,
+                  layerApiField: l.apiField,
+                  layerLocale: l.locale,
+                  displayLayerLabels: l.displayLayerLabels,
+                });
+              })
+              .catch(function () {
+                resolve({
+                  id: l.id,
+                  url: null,
+                  index: l.index,
+                  layerMappingField: l.layerMappingField,
+                  layerDatasource: l.datasource,
+                  layerApiField: l.apiField,
+                  layerLocale: l.locale,
+                  displayLayerLabels: l.displayLayerLabels,
+                });
+              });
+          })
+        );
+      });
+
+      Promise.all(metadataFuncs).then((metadata) => {
+        const layerFuncs = [];
+        metadata.forEach((m) => {
+          if (m.url) {
+            layerFuncs.push(
+              new Promise((resolve) => {
+                d3.json(m.url).then((data) => {
+                  resolve({
+                    id: m.id,
+                    data,
+                    index: m.index,
+                    layerMappingField: m.layerMappingField,
+                    layerDatasource: m.layerDatasource,
+                    layerApiField: m.layerApiField,
+                    layerLocale: m.layerLocale,
+                    displayLayerLabels: m.displayLayerLabels,
+                  });
+                });
+              })
+            );
+          }
+        });
+
+        Promise.all(layerFuncs).then((resolvedLayers) => {
+          setLayers(resolvedLayers);
+          setLayersLoading(false);
+        });
+      });
+    } else {
+      d3.json(source).then((data) => {
+        setLayers([
+          {
+            id: null,
+            url: source,
+            data,
+            index: 0,
+            layerMappingField: null,
+            layerDatasource: null,
+            layerApiField: null,
+            layerLocale: null,
+            displayLayerLabels: false,
+          },
+        ]);
+        setLayersLoading(false);
+      });
+    }
   }
 
-  filterUpdated(prevProps, prevState) {
-    const { zoomOnFilterField } = this.props;
-    const prevFilters = (prevProps && prevProps.appliedFilters) || {};
-    const appliedFilters = this.props.appliedFilters || {};
-    let filterUpdated = false;
-    if (prevFilters[zoomOnFilterField] != appliedFilters[zoomOnFilterField]) {
-      filterUpdated = true;
+  function resizeCircles(transform) {
+    // Invert the radius of circles based on the zoom scale
+    const circles = d3.select(getMapId()).select("svg").selectAll("circle");
+    circles.attr("r", transform.k > 1 ? 6 / transform.k : 6);
+  }
+
+  function getLabelBoxWidth(d) {
+    return getLabelBoxWidthHelper(d, mapLabelField);
+  }
+
+  function getLabelBoxHeight() {
+    return getLabelBoxHeightHelper(mapLabelShowValue);
+  }
+
+  function getLabelPosition(d) {
+    if (d.properties.LABEL_LATITUDE && d.properties.LABEL_LONGITUDE) {
+      return projectionRef.current([
+        d.properties.LABEL_LONGITUDE,
+        d.properties.LABEL_LATITUDE,
+      ]);
+    } else {
+      return pathRef.current.centroid(d);
+    }
+  }
+
+  function resizeLabels(transform) {
+    d3.select(getMapId())
+      .selectAll(".map-labels-container")
+      .each((d, i, nodes) => {
+        const fo = d3.select(nodes[i]);
+        const div = fo.select("div");
+        const scaleFactor = transform.k > 1 ? transform.k : 1;
+        const newSize = labelFontSize / scaleFactor;
+
+        div.style("font-size", `${newSize}px`);
+
+        const position = getLabelPosition(d);
+        const boxWidth = getLabelBoxWidth(d) / scaleFactor;
+        const x = position[0] - boxWidth / 2;
+        const yOffset = transform.k > 1 ? 10 / transform.k : 10;
+        const y = position[1] - yOffset;
+
+        fo.attr("x", x)
+          .attr("y", y)
+          .attr("width", getLabelBoxWidth(d) / scaleFactor)
+          .attr("height", getLabelBoxHeight(d) / scaleFactor);
+      });
+  }
+
+  function resizePointLabels(transform) {
+    d3.select(getMapId())
+      .selectAll(".point-labels-container")
+      .each((d, i, nodes) => {
+        const fo = d3.select(nodes[i]);
+        const div = fo.select("div");
+        const scaleFactor = transform.k > 1 ? transform.k : 1;
+        const newSize = labelFontSize / scaleFactor;
+        div.style("font-size", `${newSize}px`);
+
+        const pos = projectionRef.current([
+          d.geometry.coordinates[1],
+          d.geometry.coordinates[0],
+        ]);
+        const boxWidth = (getLabelBoxWidth(d) + 20) / scaleFactor;
+        const boxHeight = getLabelBoxHeight(d) / scaleFactor;
+        const x = pos[0] - boxWidth / 2;
+        const y = pos[1] - boxHeight / 2;
+        fo.attr("x", x).attr("y", y).attr("width", boxWidth).attr("height", boxHeight);
+      });
+  }
+
+  function zoomed(event) {
+    tooltipRef.current.style("visibility", "hidden");
+    const transform = event.transform;
+    const g = d3.select(getMapId()).select("svg").select("g");
+    g.attr("transform", transform);
+
+    resizeCircles(transform);
+    resizeLabels(transform);
+    resizePointLabels(transform);
+  }
+
+  function zoomEnd(event) {
+    const transform = event.transform;
+    mapPositionRef.current = { k: transform.k, x: transform.x, y: transform.y };
+    if (editing) {
+      const parentWindow = window.parent;
+      parentWindow.postMessage(
+        { type: "map", value: JSON.stringify(mapPositionRef.current) },
+        "*"
+      );
+    }
+  }
+
+  function fullView() {
+    const svg = d3.select(getMapId()).select("svg");
+
+    const paths = svg.select("g").selectAll(".active");
+    paths.attr("class", function () {
+      return d3.select(this).attr("class").replace(/background/gi, "");
+    });
+
+    let targetTransform = d3.zoomIdentity;
+    if (mapPosition && !editing) {
+      targetTransform = targetTransform
+        .translate(mapPosition.x, mapPosition.y)
+        .scale(mapPosition.k);
+    } else {
+      targetTransform = targetTransform.translate(0, 0).scale(1);
     }
 
-    return filterUpdated;
+    svg.transition().duration(300).call(zoomRef.current.transform, targetTransform);
   }
 
-  getCenter(features, filterUpdated) {
-    const { zoomOnFilter, zoomOnFilterField, mappingField, appliedFilters } =
-      this.props;
-    let center = null;
+  function onReset() {
+    mapPositionRef.current = null;
+    tooltipRef.current.style("visibility", "hidden");
+    fullView();
+  }
+
+  function onZoomIn() {
+    const svg = d3.select(getMapId()).select("svg");
+    svg.transition().call(zoomRef.current.scaleBy, 1.5);
+  }
+
+  function onZoomOut() {
+    const svg = d3.select(getMapId()).select("svg");
+    svg.transition().call(zoomRef.current.scaleBy, 0.6667);
+  }
+
+  function getBreaks() {
+    if (autoGenerateBreaks) {
+      const features = getFeatures();
+      return generateBreaksHelper(features, {
+        autoGenerateBreaks,
+        numberOfBreaks,
+        colorScheme,
+      });
+    } else {
+      let filteredBreaks = legendBreaks;
+      if (getSelectedMeasure()) {
+        filteredBreaks = legendBreaks
+          .filter((b) => b.measure === getSelectedMeasure())
+          .filter((f) => {
+            const result = true;
+            if (f.filters && f.filters.length > 0) {
+              if (appliedFilters && JSON.stringify(appliedFilters) !== "{}") {
+                const keys = Object.keys(appliedFilters);
+                const found = f.filters.filter((filter) => {
+                  if (keys.indexOf(filter.field) != -1) {
+                    const appliedFieldValues = appliedFilters[filter.field];
+                    const breaksFilterValues = filter.values;
+                    return (
+                      appliedFieldValues
+                        .join(",")
+                        .indexOf(breaksFilterValues) != -1
+                    );
+                  }
+                  return false;
+                });
+
+                return found.length > 0;
+              }
+            }
+            return result;
+          });
+      }
+      return filteredBreaks;
+    }
+  }
+
+  function fillColor(d, breaks) {
+    return fillColorHelper(d, breaks, {
+      mapNoDataColor,
+      mainLayerId,
+      enabledLayers,
+      selectedMeasure,
+    });
+  }
+
+  function createLabel(d) {
+    return createLabelHelper(
+      d,
+      {
+        mapLabelField,
+        mapLabelShowValue,
+        intl,
+        valueFormat,
+        showNoDataLabel,
+        showAdminUnitLabel,
+        noDataText,
+        selectedMeasure: getSelectedMeasure(),
+      },
+      metadataTypes,
+      formatContent
+    );
+  }
+
+  function updateFeatures(features, filterUpdatedFlag) {
+    const sortedFeatures = [
+      ...features.filter((f) => highlightedLocation != f.properties[mapLabelField]),
+      ...features.filter((f) => highlightedLocation == f.properties[mapLabelField]),
+    ];
+
+    drawPolygons(sortedFeatures);
+    drawLabels(sortedFeatures);
+    drawPoints(sortedFeatures, filterUpdatedFlag);
+    if (symbols.length > 0) {
+      addSymbols(symbols, sortedFeatures);
+    }
+  }
+
+  function drawLabels(sortedFeatures) {
+    const group = d3.select(getMapId()).select("svg").select("g");
+    const labelsExist = group.selectAll(".map-labels-container").size() > 0;
+    if (labelsExist) {
+      console.log("Labels already exist, skipping redraw...");
+      return; // Skip redrawing if labels are already present
+    }
+
+    group
+      .selectAll(".map-labels")
+      .data(
+        sortedFeatures.filter((f) => {
+          if (labelsExclusionList && labelsExclusionList.length > 0) {
+            return !labelsExclusionList.includes(f.properties[mapLabelField]);
+          }
+          return true;
+        })
+      )
+      .enter()
+      .append("foreignObject")
+      .attr("class", "map-labels-container")
+      .attr("x", (d) => {
+        const position = getLabelPosition(d);
+        if (d.properties[mapLabelField]) {
+          const boxWidth = getLabelBoxWidth(d);
+          return position[0] - boxWidth / 2;
+        }
+        return position[0];
+      })
+      .attr("y", (d) => {
+        const position = getLabelPosition(d);
+        return position[1] - 10;
+      })
+      .attr("width", (d) => getLabelBoxWidth(d))
+      .attr("height", (d) => getLabelBoxHeight(d))
+      .attr("font-size", () => `${labelFontSize}px`)
+      .attr("overflow", "visible")
+      .attr("opacity", 1)
+      .style("display", (d) => {
+        if (
+          showAdminUnitLabel === SHOW_ALL ||
+          (showAdminUnitLabel === SHOW_IF_HAS_DATA && d.properties.hasDataRow) ||
+          d.properties.displayLayerLabels
+        ) {
+          return "block";
+        }
+        return "none";
+      })
+      .attr("pointer-events", mapType == "POINTS_MAP" ? "none" : "all")
+      .on("mouseover", showTooltip)
+      .on("mousemove", mousemove)
+      .on("mouseout", mouseout)
+      .append("xhtml:div")
+      .style("font-size", () => `${labelFontSize}px`)
+      .style("color", () => labelFontColor)
+      .style("font-weight", () => labelFontWeight)
+      .style("background-color", (d) => {
+        if (d.properties.hasDataRow && mapLabelShowValue) {
+          if (
+            d.properties.value != null ||
+            (d.properties.value == null && showNoDataLabel)
+          ) {
+            return "#fff6e1";
+          }
+        }
+        return "none";
+      })
+      .style("border-radius", () => "4px")
+      .style("line-height", "95%")
+      .style("text-align", "center")
+      .html((d) => createLabel(d));
+  }
+
+  function drawPolygons(sortedFeatures) {
+    const breaks = getBreaks();
+    const group = d3.select(getMapId()).select("svg").select("g");
+
+    const polygons = sortedFeatures.filter(
+      (f) =>
+        f.geometry &&
+        f.geometry &&
+        (f.geometry.type == "Polygon" || f.geometry.type == "MultiPolygon")
+    );
+
+    if (polygons.length > 0) {
+      group
+        .selectAll("path")
+        .data(polygons)
+        .join("path")
+        .attr("d", pathRef.current)
+        .attr("fill", (d) => fillColor(d, breaks))
+        .attr("stroke-width", (d) => {
+          if (highlightedLocation == d.properties[mapLabelField]) {
+            return 1.2;
+          } else {
+            return 0.4;
+          }
+        })
+        .attr("stroke", (d) => {
+          if (highlightedLocation == d.properties[mapLabelField]) {
+            return mapFocusBoundaryColor;
+          } else {
+            return mapBoundaryColor;
+          }
+        })
+        .on("click", onPolygonClick);
+    }
+  }
+
+  function drawPoints(sortedFeatures, filterUpdatedFlag) {
+    const group = d3.select(getMapId()).select("svg").select("g");
+    let pointsFromData = [];
+    if (transformedData.pointsData) {
+      let selectedLocation = selectedPolygon;
+      if (filterUpdatedFlag && appliedFilters && appliedFilters[zoomOnFilterField]) {
+        selectedLocation = appliedFilters[zoomOnFilterField];
+      }
+
+      pointsFromData = transformedData.pointsData
+        .filter((p) => p.lat && p.lng && p.label == selectedLocation)
+        .map((p) => ({
+          properties: {
+            label: p.label,
+            lat: p.lat,
+            lng: p.lng,
+            value: p.value,
+            variables: p.variables,
+          },
+        }));
+
+      group
+        .selectAll(".circle")
+        .data(pointsFromData)
+        .enter()
+        .append("circle")
+        .attr("id", (d, i) => "circle" + i)
+        .attr("cx", (d) => {
+          const position = projectionRef.current([d.properties.lng, d.properties.lat]);
+          return position[0];
+        })
+        .attr("cy", (d) => {
+          const position = projectionRef.current([d.properties.lng, d.properties.lat]);
+          return position[1];
+        })
+        .attr("r", () => 2)
+        .style("stroke-width", 0.5)
+        .style("fill", () => defaultPointColor)
+        .on("mouseover", (d, i) => onPointClick(d, i))
+        .on("mouseout", mouseout);
+    }
+
+    const breaks = getBreaks();
+    let points = [];
+    if (showShadingLayerLabels == SHOW_ALL) {
+      points = sortedFeatures.filter((f) => f.geometry && f.geometry.type == "Point");
+    } else if (showShadingLayerLabels == SHOW_IF_HAS_DATA) {
+      points = sortedFeatures.filter(
+        (p) => p.geometry && p.geometry.type == "Point" && p.properties.hasDataRow
+      );
+    }
+
+    if (points.length > 0) {
+      group
+        .selectAll(".point-labels")
+        .data(points)
+        .enter()
+        .append("foreignObject")
+        .attr("id", (d, i) => "point-label" + i)
+        .attr("class", "point-labels-container")
+        .attr("x", (d) => {
+          const boxWidth = getLabelBoxWidth(d) + 20;
+          const position = projectionRef.current([
+            d.geometry.coordinates[1],
+            d.geometry.coordinates[0],
+          ]);
+          return position[0] - boxWidth / 2;
+        })
+        .attr("y", (d) => {
+          const position = projectionRef.current([
+            d.geometry.coordinates[1],
+            d.geometry.coordinates[0],
+          ]);
+          return position[1] - getLabelBoxHeight(d) / 2;
+        })
+        .attr("width", (d) => getLabelBoxWidth(d) + 20)
+        .attr("height", () => "1px")
+        .attr("overflow", "visible")
+        .attr("font-size", "12px")
+        .style("opacity", 1)
+        .append("xhtml:div")
+        .style("color", () => pointLabelColor)
+        .style("font-weight", () => "bold")
+        .style("background-color", (d) => fillColor(d, breaks))
+        .style("padding", () => "5px 3px 5px 3px")
+        .style("border-radius", () => "4px")
+        .style("line-height", "100%")
+        .style("text-align", "center")
+        .html((d) =>
+          formatContent(
+            pointLabelFormat,
+            {
+              value: d.properties.value,
+              locationName: d.properties[mapLabelField],
+            },
+            intl,
+            noDataText
+          )
+        )
+        .on("mouseover", (event, d, i) => {
+          d3.select(getMapId())
+            .select("svg")
+            .select("g")
+            .select("#point-label" + i)
+            .raise();
+          showTooltip(event, d);
+        })
+        .on("mousemove", mousemove)
+        .on("mouseout", mouseout);
+    }
+  }
+
+  function addSymbols(symbolsList, features) {
+    const group = d3.select(getMapId()).select("svg").select("g");
+    symbolsList.forEach((symbol) => {
+      if (symbol.field && symbol.image && symbol.values) {
+        const filteredFeaturesWithGpsCoords = features.filter((f) => {
+          const fieldName = LOCATION == symbol.field ? mappingField : "value";
+          const fiedValue =
+            (f.properties[fieldName] ||
+              (f.properties.variables ? f.properties.variables[fieldName] : "")) + "";
+          const valuesToMatch = symbol.values + "";
+          const valuesToMatchArr = valuesToMatch.split(",");
+          return (
+            f.properties.LATITUDE &&
+            f.properties.LONGITUDE &&
+            valuesToMatchArr.filter(
+              (v) => v.trim().toLowerCase() == fiedValue.trim().toLowerCase()
+            ).length > 0
+          );
+        });
+
+        const filteredFeaturesNoCoords = features.filter((f) => {
+          const fieldName = LOCATION == symbol.field ? mappingField : "value";
+          const fiedValue =
+            (f.properties[fieldName] ||
+              (f.properties.variables ? f.properties.variables[fieldName] : "")) + "";
+          const valuesToMatch = symbol.values + "";
+          const valuesToMatchArr = valuesToMatch.split(",");
+          return (
+            !f.properties.LATITUDE &&
+            !f.properties.LONGITUDE &&
+            valuesToMatchArr.filter(
+              (v) => v.trim().toLowerCase() == fiedValue.trim().toLowerCase()
+            ).length > 0
+          );
+        });
+
+        // if feature has lat and long, use that to position the symbol
+        group
+          .selectAll("image")
+          .data(filteredFeaturesWithGpsCoords)
+          .enter()
+          .append("image")
+          .attr("width", 40)
+          .attr("height", 40)
+          .attr("class", "map-symbol")
+          .attr("xlink:href", "/" + symbol.image)
+          .attr(
+            "transform",
+            (d) =>
+              "translate(" +
+              projectionRef.current([d.properties.LONGITUDE, d.properties.LATITUDE]) +
+              ")"
+          )
+          .on("mouseover", showTooltip)
+          .on("mousemove", mousemove)
+          .on("mouseout", mouseout);
+
+        // if feature does not have lat and long, use the centroid to position the symbol
+        group
+          .selectAll("image")
+          .data(filteredFeaturesNoCoords)
+          .enter()
+          .append("image")
+          .attr("width", 40)
+          .attr("height", 40)
+          .attr("class", "map-symbol")
+          .attr("xlink:href", "/" + symbol.image)
+          .attr("x", (d) => pathRef.current.centroid(d)[0] - 20)
+          .attr("y", (d) => pathRef.current.centroid(d)[1])
+          .on("mouseover", showTooltip)
+          .on("mousemove", mousemove)
+          .on("mouseout", mouseout);
+      }
+    });
+  }
+
+  function showTooltip(event, d) {
+    console.log("Showing tooltip for data:", d);
+    // Always recomputed from device category (the prop is intentionally ignored here,
+    // matching the original method's behavior).
+    const zoomEnabledForFocusClass = ["mobile", "tablet", "midTablet"].includes(
+      getDeviceCategory()
+    );
+
+    if (
+      (showTooltipProp && d.properties.value !== null) ||
+      (showTooltipProp && showNoDataTooltip)
+    ) {
+      const svg = d3.select(getMapId()).select("svg");
+      const elements = svg.select("g").selectAll(".active");
+      elements.attr("class", (p) => {
+        if (p.properties[mappingField] === d.properties[mappingField]) {
+          return "focus" + (zoomEnabledForFocusClass ? " zoom-enabled" : "");
+        } else {
+          return "active" + (zoomEnabledForFocusClass ? " zoom-enabled" : "");
+        }
+      });
+
+      const format =
+        tooltipFormat || "{locationName} %({value},2) \n {label}: %({value},2)";
+      const dataVars = d.properties.variables || {};
+
+      const variables = {
+        ...d.properties,
+        value: d.properties.value,
+        measure: getSelectedMeasure(),
+        measureLabel: d.properties.measureLabel,
+        locationName: getTranslatedLocationNameHelper(d, mappingField, metadataTypes),
+        label: getTranslatedLocationNameHelper(d, mappingField, metadataTypes),
+        ...dataVars,
+        ...getFiltersHelper(appliedFilters), // expose applied filter params (e.g. {year}) to the tooltip
+      };
+
+      tooltipRef.current
+        .attr("class", tooltipTheme)
+        .style("position", "absolute")
+        .style("visibility", "hidden")
+        .style("visibility", "visible")
+        .html(() => {
+          let html = `<div style='font-size:${tooltipFontSize}px;' class='tooltip-content' >`;
+          if (d.properties.value != null) {
+            const lines = format.split("\n");
+            const headerFormat = lines[0];
+            const overallFormat = lines.length > 1 ? lines[1] : null;
+            let breakdownLineIndex = 1;
+            let breakdownFormat;
+            if (fields.length > 1 && mapType != "POINTS_MAP") {
+              breakdownLineIndex = lines.length > 2 ? 2 : 1;
+              breakdownFormat = lines[breakdownLineIndex];
+            } else {
+              breakdownFormat = null;
+            }
+
+            if (headerFormat) {
+              html += formatContent(headerFormat, variables, intl, noDataText);
+            }
+            if (overallFormat) {
+              if (!html.endsWith("<hr>")) {
+                html += "<hr>";
+              }
+              html += formatContent(overallFormat, variables, intl, noDataText);
+            }
+            if (breakdownFormat) {
+              if (d.properties.children) {
+                d.properties.children.forEach((child) => {
+                  const vars = {
+                    value: child.value,
+                    label: child.label,
+                    measure: getSelectedMeasure(),
+                    measureLabel: d.properties.measureLabel,
+                    ...dataVars,
+                    ...child.variables,
+                    ...getFiltersHelper(appliedFilters),
+                  };
+                  if (!html.endsWith("<hr>")) {
+                    html += "<hr>";
+                  }
+                  html += formatContent(breakdownFormat, vars, intl, noDataText);
+                });
+              }
+            }
+
+            if (lines.length > breakdownLineIndex + 1) {
+              if (!html.endsWith("<hr>")) {
+                html += "<hr>";
+              }
+              lines.forEach((line, index) => {
+                if (index > breakdownLineIndex) {
+                  if (!html.endsWith("<hr>")) {
+                    html += "<hr>";
+                  }
+                  html += formatContent(line, variables, intl, noDataText);
+                }
+              });
+            }
+
+            const tooltips = customTooltips.filter(
+              (t) => t.location === d.properties[mappingField]
+            );
+            tooltips.forEach((t) => {
+              if (!html.endsWith("<hr>")) {
+                html += "<hr>";
+              }
+              html += t.tooltip;
+            });
+          } else {
+            const fallbackFormat =
+              tooltipFormat || "{locationName} %({value},2) \n {label}: %({value},2)";
+            const fallbackVariables = {
+              value: null,
+              measure: getSelectedMeasure(),
+              measureLabel: d.properties.measureLabel,
+              locationName: getTranslatedLocationNameHelper(d, mappingField, metadataTypes),
+              ...dataVars,
+            };
+            html += formatContent(fallbackFormat, fallbackVariables, intl, noDataText);
+            html += "</div>";
+          }
+
+          return html;
+        });
+    }
+  }
+
+  function positionTooltip(event) {
+    const offset = 8;
+    const node = tooltipRef.current.node();
+    const tooltipWidth = node ? node.offsetWidth : 0;
+    const viewportRight = window.scrollX + document.documentElement.clientWidth;
+
+    let left = event.pageX;
+    if (tooltipWidth && left + tooltipWidth > viewportRight) {
+      left = event.pageX - tooltipWidth;
+      if (left < window.scrollX) {
+        left = window.scrollX;
+      }
+    }
+
+    tooltipRef.current
+      .style("top", event.pageY + "px")
+      .style("left", left + "px")
+      .style("margin-left", offset + "px");
+  }
+
+  function mousemove(event) {
+    positionTooltip(event);
+  }
+
+  function mouseout() {
+    if (showTooltipProp) {
+      const svg = d3.select(getMapId()).select("svg");
+      const paths = svg.select("g").selectAll(".focus");
+      paths.attr("class", "active");
+      tooltipRef.current.style("visibility", "hidden");
+    }
+  }
+
+  function onPointClick(event, d, i) {
+    showTooltip(event, d);
+    tooltipRef.current.style("visibility", "visible");
+    positionTooltip(event);
+
+    const svg = d3.select(getMapId()).select("svg").select("g");
+    svg.selectAll("circle").style("fill", defaultPointColor).style("stroke", "none");
+
+    svg.select("#circle" + i).raise().style("fill", "#fff");
+  }
+
+  function onPolygonClick(event, d) {
+    if (selectedPolygon !== d.properties[mappingField] && d.properties.value !== null) {
+      setSelectedPolygon(d.properties[mappingField]);
+    }
+  }
+
+  function filterUpdated(prevProps) {
+    const prevFilters = (prevProps && prevProps.appliedFilters) || {};
+    const currentAppliedFilters = appliedFilters || {};
+    return prevFilters[zoomOnFilterField] != currentAppliedFilters[zoomOnFilterField];
+  }
+
+  function getCenter(features, filterUpdatedFlag) {
+    let centerFeature = null;
     if (zoomOnFilter && zoomOnFilterField) {
-      let selectedLocation = this.state.selectedPolygon;
-      if (
-        filterUpdated &&
-        appliedFilters &&
-        appliedFilters[zoomOnFilterField]
-      ) {
+      let selectedLocation = selectedPolygon;
+      if (filterUpdatedFlag && appliedFilters && appliedFilters[zoomOnFilterField]) {
         selectedLocation = appliedFilters[zoomOnFilterField];
       }
 
       const featureToCenterOn = features.filter(
-        (d) =>
-          d.properties != null && d.properties[mappingField] == selectedLocation
+        (d) => d.properties != null && d.properties[mappingField] == selectedLocation
       )[0];
 
       if (
@@ -1749,67 +1126,32 @@ class Map extends React.Component {
         featureToCenterOn.properties != null &&
         featureToCenterOn.properties.value
       ) {
-        center = featureToCenterOn;
+        centerFeature = featureToCenterOn;
       }
     }
 
-    return center;
+    return centerFeature;
   }
 
-  area(poly) {
-    let s = 0.0;
-    const coordinates =
-      poly.coordinates.length > 1
-        ? poly.coordinates[0][0]
-        : poly.coordinates[0];
-    for (let i = 0; i < coordinates.length - 1; i++) {
-      s +=
-        coordinates[i][0] * coordinates[i + 1][1] -
-        coordinates[i + 1][0] * coordinates[i][1];
-    }
-    return 0.5 * s;
+  function classColor() {
+    return classColorHelper(zoomEnabled);
   }
 
-  centroid(poly) {
-    const c = [0, 0];
-    const coordinates =
-      poly.coordinates.length > 1
-        ? poly.coordinates[0][0]
-        : poly.coordinates[0];
-    for (let i = 0; i < coordinates.length - 1; i++) {
-      c[0] +=
-        (coordinates[i][0] + coordinates[i + 1][0]) *
-        (coordinates[i][0] * coordinates[i + 1][1] -
-          coordinates[i + 1][0] * coordinates[i][1]);
-      c[1] +=
-        (coordinates[i][1] + coordinates[i + 1][1]) *
-        (coordinates[i][0] * coordinates[i + 1][1] -
-          coordinates[i + 1][0] * coordinates[i][1]);
+  function d3Map(features, filterUpdatedFlag) {
+    let zoomEnabledForZoomBinding = zoomEnabled;
+    if (!zoomEnabledForZoomBinding) {
+      zoomEnabledForZoomBinding = ["mobile", "tablet"].includes(getDeviceCategory());
     }
-    const a = this.area(poly);
-    c[0] /= a * 6;
-    c[1] /= a * 6;
-    return c;
-  }
-
-  d3Map(features, filterUpdated) {
-    let { zoomEnabled, mapContainerBgColor, mapPosition, editing, mapType } =
-      this.props;
-    if (!zoomEnabled) {
-      zoomEnabled = ["mobile", "tablet"].includes(getDeviceCategory())
-        ? true
-        : false;
-    }
-    const breaks = this.getBreaks();
-    const container = d3.select(this.getMapId());
+    const breaks = getBreaks();
+    const container = d3.select(getMapId());
     let svg = container.select("svg");
-    let containerWidth = this.getWidth();
+    let containerWidth = getWidth();
     if (containerWidth === 0) {
       containerWidth = window.innerWidth + deviceMapWidth[getDeviceCategory()];
     } else {
       containerWidth += deviceMapWidth[getDeviceCategory()];
     }
-    const containerHeight = this.getHeight() - 100;
+    const containerHeight = getHeight() - 100;
 
     if (svg.empty()) {
       svg = container.append("svg");
@@ -1828,27 +1170,27 @@ class Map extends React.Component {
       .data(features)
       .enter()
       .append("path")
-      .attr("fill", (d) => this.fillColor(d, breaks))
-      .attr("d", d3.geoPath().projection(this.projection))
-      .attr("class", (d) => this.classColor(d))
-      .on("mouseover", mapType !== "POINTS_MAP" ? this.showTooltip : null)
-      .on("mousemove", mapType !== "POINTS_MAP" ? this.mousemove : null)
-      .on("mouseout", mapType !== "POINTS_MAP" ? this.mouseout : null);
+      .attr("fill", (d) => fillColor(d, breaks))
+      .attr("d", d3.geoPath().projection(projectionRef.current))
+      .attr("class", () => classColor())
+      .on("mouseover", mapType !== "POINTS_MAP" ? showTooltip : null)
+      .on("mousemove", mapType !== "POINTS_MAP" ? mousemove : null)
+      .on("mouseout", mapType !== "POINTS_MAP" ? mouseout : null);
 
-    if (this.mapPosition) {
+    if (mapPositionRef.current) {
       svg
         .transition()
         .duration(300)
         .call(
-          this.zoom.transform,
+          zoomRef.current.transform,
           d3.zoomIdentity
-            .translate(this.mapPosition.x, this.mapPosition.y)
-            .scale(this.mapPosition.k)
+            .translate(mapPositionRef.current.x, mapPositionRef.current.y)
+            .scale(mapPositionRef.current.k)
         );
     }
 
     if (
-      !this.mapPosition &&
+      !mapPositionRef.current &&
       mapPosition &&
       mapPosition.x &&
       mapPosition.y &&
@@ -1858,10 +1200,8 @@ class Map extends React.Component {
         .transition()
         .duration(300)
         .call(
-          this.zoom.transform,
-          d3.zoomIdentity
-            .translate(mapPosition.x, mapPosition.y)
-            .scale(mapPosition.k)
+          zoomRef.current.transform,
+          d3.zoomIdentity.translate(mapPosition.x, mapPosition.y).scale(mapPosition.k)
         );
       if (mapType === "POINTS_MAP") {
         const deviceTranslates = {
@@ -1877,7 +1217,7 @@ class Map extends React.Component {
           .transition()
           .duration(300)
           .call(
-            this.zoom.transform,
+            zoomRef.current.transform,
             d3.zoomIdentity
               .translate(mapPosition.x + translateVal, mapPosition.y)
               .scale(mapPosition.k)
@@ -1885,15 +1225,15 @@ class Map extends React.Component {
       }
     }
 
-    if (zoomEnabled || editing) {
-      svg.call(this.zoom);
+    if (zoomEnabledForZoomBinding || editing) {
+      svg.call(zoomRef.current);
     } else {
       svg.on("dblclick.zoom", null);
     }
 
-    const center = this.getCenter(features, filterUpdated);
-    if (center) {
-      const bounds = this.path.bounds(center);
+    const centerFeature = getCenter(features, filterUpdatedFlag);
+    if (centerFeature) {
+      const bounds = pathRef.current.bounds(centerFeature);
       const centerx = [
         (bounds[0][0] + bounds[1][0]) / 2,
         (bounds[0][1] + bounds[1][1]) / 2,
@@ -1902,7 +1242,7 @@ class Map extends React.Component {
         .transition()
         .duration(750)
         .call(
-          this.zoom.transform,
+          zoomRef.current.transform,
           d3.zoomIdentity
             .translate(containerWidth / 2, containerHeight / 2)
             .scale(12)
@@ -1911,108 +1251,61 @@ class Map extends React.Component {
     }
   }
 
-  getAvg() {
-    const { transformedData } = this.props;
+  function getAvg() {
     return transformedData.nationalData.value;
   }
 
-  selectedMeasureChanged(selected) {
-    if (this.state.selectedMeasure != selected) {
-      this.setState({ selectedMeasure: selected });
+  function selectedMeasureChanged(selected) {
+    if (selectedMeasure != selected) {
+      setSelectedMeasure(selected);
     }
   }
 
-  getFilters() {
-    const { appliedFilters } = this.props;
-    const results = {};
-    if (appliedFilters) {
-      const keys = Object.keys(appliedFilters);
-      keys.forEach((k) => {
-        const selected = appliedFilters[k];
-        if (selected) {
-          results[k] = Array.isArray(selected) ? selected.join(" ,") : selected;
-        }
-      });
-    }
-    return results;
-  }
-
-  getHighlightedLocationData() {
-    const { highlightedLocation, transformedData } = this.props;
+  function getHighlightedLocationData() {
     let filterLocationsData = transformedData.locationsData;
     if (transformedData.measures && transformedData.measures.length > 1) {
       filterLocationsData = transformedData.locationsData.filter(
-        (d) => d.measure === this.getSelectedMeasure()
+        (d) => d.measure === getSelectedMeasure()
       );
     }
-
-    const dataItem = filterLocationsData.find(
-      (d) => d.label === highlightedLocation
-    );
-    return dataItem;
+    return filterLocationsData.find((d) => d.label === highlightedLocation);
   }
 
-  getTranslatedHighlightedLocationName() {
-    const { highlightedLocation, mapLabelField, intl } = this.props;
-
+  function getTranslatedHighlightedLocationName() {
     if (!highlightedLocation) {
       return null;
     }
 
-    // Find the feature that matches the highlighted location
-    const features = this.getFeatures();
+    const features = getFeatures();
     const matchingFeature = features.find(
       (f) => f.properties[mapLabelField] === highlightedLocation
     );
 
-    if (matchingFeature && matchingFeature.properties.displayLayerLabels && matchingFeature.properties.layerLocale) {
-      // Use the layer's mapping field if available, otherwise fall back to mapLabelField
+    if (
+      matchingFeature &&
+      matchingFeature.properties.displayLayerLabels &&
+      matchingFeature.properties.layerLocale
+    ) {
       const labelField = matchingFeature.properties.layerMappingField || mapLabelField;
       const rawLabel = matchingFeature.properties[labelField];
-
-      // Get translated label using the layer's locale
-      const translatedLabel = getTranslatedItemLabel(this.metadataTypes, rawLabel, matchingFeature.properties.layerLocale);
-      return translatedLabel;
+      return getTranslatedItemLabel(
+        metadataTypes,
+        rawLabel,
+        matchingFeature.properties.layerLocale
+      );
     }
 
-    // Fall back to the original highlighted location name
     return highlightedLocation;
   }
 
-  getHighlightedLocationColor(data) {
-    const breaks = this.getBreaks();
-    const { mapNoDataColor } = this.props;
-    const value = data ? data.value : null;
-    if (value != null) {
-      const breakItem = breaks.find((item) => {
-        if (item.min != null && item.max != null) {
-          return value >= item.min && value <= item.max;
-        }
-
-        if (item.min != null) {
-          return value >= item.min;
-        }
-
-        if (item.max != null) {
-          return value <= item.max;
-        }
-      });
-
-      return breakItem && breakItem.color ? breakItem.color : mapNoDataColor;
-    }
-
-    return mapNoDataColor;
+  function getHighlightedLocationColor(data) {
+    return getHighlightedLocationColorHelper(data, getBreaks(), mapNoDataColor);
   }
 
-  renderLoader() {
+  function renderLoader() {
     return (
       <Container className={"loading"}>
-        <Segment
-          basic={true}
-          padded={true}
-          textAlign={"center"}
-          style={{ margin: "30px" }}
-        >
+        <Segment basic={true} padded={true} textAlign={"center"} style={{ margin: "30px" }}>
           <Dimmer active inverted>
             <Loader size="medium"></Loader>
           </Dimmer>
@@ -2021,7 +1314,7 @@ class Map extends React.Component {
     );
   }
 
-  noMapSelected() {
+  function noMapSelected() {
     return (
       <Message icon warning>
         <Icon name="map outline" />
@@ -2033,181 +1326,267 @@ class Map extends React.Component {
     );
   }
 
-  render() {
-    let {
-      app,
-      legendTitle,
-      nationalAverageLabel,
-      intl,
-      zoomEnabled,
-      transformedData,
-      measureSelectorLabel,
-      valueFormat,
-      showOverallValue,
-      unique,
-      highlightedLocation,
-      labelFontColor,
-      legendFontSize,
-      editing,
-      highlightedLocLabelFormat,
-      noDataText,
-    } = this.props;
+  // Keep the D3 handlers that were bound once (on the zoom behavior / scroll listener)
+  // pointing at the latest closures so they never see stale props/state.
+  latestHandlersRef.current.zoomed = zoomed;
+  latestHandlersRef.current.zoomEnd = zoomEnd;
+  latestHandlersRef.current.getFeatures = getFeatures;
+  latestHandlersRef.current.updateFeatures = updateFeatures;
+  latestHandlersRef.current.getMapId = getMapId;
 
-    if (!zoomEnabled) {
-      zoomEnabled = !!["mobile", "tablet", "midTablet"].includes(
-        getDeviceCategory()
-      );
-    }
-    const nationalAverage = this.getAvg();
-    const filters = this.getFilters();
-    const highlightedLocData = this.getHighlightedLocationData();
-
-    const highlightedLocStyle = {
-      backgroundColor: this.getHighlightedLocationColor(highlightedLocData),
-      color: labelFontColor,
-      fontSize: legendFontSize + "px",
-    };
-    if (editing) {
-      highlightedLocStyle.marginTop = "25px";
-    }
-
-    const MapLegendComponent = () => (
-      <Container fluid className={"footnote "}>
-        {
-          <Grid columns={2}>
-            {app !== "csv" && showOverallValue && (
-              <Grid.Column textAlign={"left"} width={4}>
-                <div className="national-average-div">
-                  <span className="national-avg-label">
-                    {nationalAverageLabel}
-                  </span>
-                  <span className="national-avg-value">
-                    {formatContent(
-                      valueFormat,
-                      { value: nationalAverage },
-                      intl,
-                      noDataText
-                    )}
-                  </span>
-                </div>
-              </Grid.Column>
-            )}
-            <Grid.Column
-              textAlign={"right"}
-              width={app !== "csv" && showOverallValue ? 12 : 16}
-            >
-              <Legend
-                filteredBreaks={this.getBreaks()}
-                formattedLegendTitle={formatContent(
-                  legendTitle,
-                  { ...filters },
-                  intl,
-                  noDataText
-                )}
-                selectedMeasure={this.state.selectedMeasure}
-                {...this.props}
-              />
-            </Grid.Column>
-          </Grid>
+  if (!handleScrollRef.current) {
+    handleScrollRef.current = () => {
+      // adds debounce to scroll to prevent event from rerendering the map too often
+      let scrollTimeout = null;
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        const labelsExist =
+          d3
+            .select(latestHandlersRef.current.getMapId())
+            .selectAll(".map-labels-container")
+            .size() > 0;
+        if (!labelsExist) {
+          latestHandlersRef.current.updateFeatures(latestHandlersRef.current.getFeatures(), false);
         }
-        <div className="measure-selector">
-          <ul>
-            {measureSelectorLabel && (
-              <li>
-                <span className="label">{measureSelectorLabel}</span>
-              </li>
-            )}
-            {transformedData &&
-              transformedData.measures &&
-              transformedData.measures.length > 1 &&
-              transformedData.measures.map((measure) => {
-                return (
-                  <li onClick={this.selectedMeasureChanged.bind(this, measure)}>
-                    <input
-                      checked={this.getSelectedMeasure() === measure}
-                      type="radio"
-                      value={measure}
-                    />
-                    <label>
-                      {transformedData.measureLabelMap[measure] || measure}
-                    </label>
-                  </li>
-                );
-              })}
-          </ul>
-        </div>
-      </Container>
-    );
+      }, 300);
+    };
+  }
 
-    return (
-      <div className="map component wp-data-viz-map" ref={this.mapContainer}>
-        {this.state.layersLoading &&
-          (editing ? this.noMapSelected() : this.renderLoader())}
-        {!this.state.layersLoading && (
-          <>
-            {!isMobileOrTablet && <MapLegendComponent />}
-            <div
-              className={"map wrapper scaling-svg-container " + unique}
-              style={{
-                height:
-                  this.props.height -
-                  deviceMapHeight[getDeviceCategory()] +
-                  "px",
-              }}
-            >
-              {highlightedLocData ? (
-                <div
-                  className="highlighted-loc-info"
-                  style={highlightedLocStyle}
-                >
-                  <span>
-                    {" "}
-                    {formatContent(
-                      highlightedLocLabelFormat,
-                      {
-                        value: highlightedLocData.value,
-                        locationName: this.getTranslatedHighlightedLocationName() || highlightedLocData.label,
-                        measureName: highlightedLocData.measure,
-                      },
-                      intl,
-                      noDataText
-                    )}
-                  </span>
-                </div>
-              ) : (
-                <> </>
-              )}
+  // ----- mount-only effect (was componentDidMount / componentWillUnmount) -----
+  useEffect(() => {
+    const scrollHandler = handleScrollRef.current;
+    window.addEventListener("scroll", scrollHandler, { passive: true });
+    window.addEventListener("touchmove", scrollHandler, { passive: true });
+    loadLayers();
+    tooltipRef.current = d3
+      .select("body")
+      .append("div")
+      .style("position", "absolute")
+      .style("visibility", "hidden")
+      .style("pointer-events", "none"); 
 
-              {(editing || zoomEnabled) && !isMobile && (
-                <div className="control panel ignore">
-                  <div className="zoom plus" onClick={this.onZoomIn}>
-                    <Icon name="plus" size="large" />
-                  </div>
-                  <div className="zoom minus" onClick={this.onZoomOut}>
-                    <Icon name="minus" size="large" />
-                  </div>
-                  <Popup
-                    content={
-                      <FormattedMessage
-                        id="map.reset.tooltip"
-                        defaultMessage="Reset zoom"
-                      />
-                    }
-                    trigger={
-                      <div className="reset" onClick={this.onReset}>
-                        <Icon name="repeat" size="large" />
-                      </div>
-                    }
-                  />
-                </div>
-              )}
-            </div>
-            {isMobileOrTablet && <MapLegendComponent />}
-          </>
-        )}
-      </div>
+    return () => {
+      window.removeEventListener("scroll", scrollHandler);
+      window.removeEventListener("touchmove", scrollHandler);
+      tooltipRef.current?.remove();
+    };
+  }, []);
+
+  // ----- runs after every update (was componentDidUpdate) -----
+  // This mirrors the original class lifecycle exactly: componentDidUpdate ran after every
+  // re-render (regardless of what changed) and internally diffed against prevProps/prevState.
+  // Splitting this into several dependency-driven effects would risk reordering the
+  // prevProps/prevState comparisons that d3Map/updateFeatures/filterUpdated rely on, so a
+  // single "run after every render, skip the first" effect is the most faithful translation.
+  useEffect(() => {
+    if (!hasMountedRef.current) {
+      hasMountedRef.current = true;
+      prevPropsRef.current = props;
+      prevStateRef.current = { selectedMeasure, layers, selectedPolygon };
+      return;
+    }
+
+    const prevProps = prevPropsRef.current;
+    const prevState = prevStateRef.current;
+
+    if (zoomOnFilterField) {
+      const prevAppliedItems = [];
+      const appliedItems = [];
+      const prevAppliedFiltersSnapshot = prevProps.appliedFilters;
+      if (prevAppliedFiltersSnapshot) {
+        Object.keys(prevAppliedFiltersSnapshot).forEach((k) => {
+          if (
+            prevAppliedFiltersSnapshot[k] != null &&
+            prevAppliedFiltersSnapshot[k] instanceof Array
+          ) {
+            prevAppliedItems.push(
+              ...prevAppliedFiltersSnapshot[k].filter((v) => v != Number.MIN_SAFE_INTEGER)
+            );
+          }
+        });
+      }
+      if (appliedFilters) {
+        Object.keys(appliedFilters).forEach((k) => {
+          if (appliedFilters[k] != null && appliedFilters[k] instanceof Array) {
+            appliedItems.push(
+              ...appliedFilters[k].filter((v) => v != Number.MIN_SAFE_INTEGER)
+            );
+          }
+        });
+      }
+      // filters reset
+      if (prevAppliedItems.length > 0 && appliedItems.length == 0) {
+        onReset();
+      }
+    }
+
+    tooltipRef.current.style("visibility", "hidden");
+
+    if (prevProps.enabledLayers.length != enabledLayers.length) {
+      loadLayers();
+    }
+
+    const features = getFeatures();
+    if (prevProps.center !== center) {
+      mapPositionRef.current = null;
+      projectionRef.current
+        .scale(scale)
+        .center(center) // centers map at given coordinates
+        .translate([getWidth() / 2, getHeight() / 2]);
+    }
+
+    const filterUpdatedFlag = filterUpdated(prevProps);
+    d3Map(features, filterUpdatedFlag);
+
+    if (
+      layers &&
+      transformedData &&
+      (transformedData != prevProps.transformedData ||
+        layers != prevState.layers ||
+        selectedMeasure != prevState.selectedMeasure ||
+        selectedPolygon != prevState.selectedPolygon ||
+        prevProps.mainLayerId !== mainLayerId ||
+        JSON.stringify(prevProps.enabledLayers) != JSON.stringify(enabledLayers))
+    ) {
+      updateFeatures(getFeatures(), filterUpdatedFlag);
+    }
+
+    prevPropsRef.current = props;
+    prevStateRef.current = { selectedMeasure, layers, selectedPolygon };
+  });
+
+  let zoomEnabledForControls = zoomEnabled;
+  if (!zoomEnabledForControls) {
+    zoomEnabledForControls = !!["mobile", "tablet", "midTablet"].includes(
+      getDeviceCategory()
     );
   }
+
+  const nationalAverage = getAvg();
+  const filters = getFiltersHelper(appliedFilters);
+  const highlightedLocData = getHighlightedLocationData();
+
+  const highlightedLocStyle = {
+    backgroundColor: getHighlightedLocationColor(highlightedLocData),
+    color: labelFontColor,
+    fontSize: legendFontSize + "px",
+  };
+  if (editing) {
+    highlightedLocStyle.marginTop = "25px";
+  }
+
+  const MapLegendComponent = () => (
+    <Container fluid className={"footnote "}>
+      {
+        <Grid columns={2}>
+          {props.app !== "csv" && showOverallValue && (
+            <Grid.Column textAlign={"left"} width={4}>
+              <div className="national-average-div">
+                <span className="national-avg-label">{nationalAverageLabel}</span>
+                <span className="national-avg-value">
+                  {formatContent(valueFormat, { value: nationalAverage }, intl, noDataText)}
+                </span>
+              </div>
+            </Grid.Column>
+          )}
+          <Grid.Column
+            textAlign={"right"}
+            width={props.app !== "csv" && showOverallValue ? 12 : 16}
+          >
+            <Legend
+              filteredBreaks={getBreaks()}
+              formattedLegendTitle={formatContent(legendTitle, { ...filters }, intl, noDataText)}
+              selectedMeasure={selectedMeasure}
+              {...props}
+            />
+          </Grid.Column>
+        </Grid>
+      }
+      <div className="measure-selector">
+        <ul>
+          {measureSelectorLabel && (
+            <li>
+              <span className="label">{measureSelectorLabel}</span>
+            </li>
+          )}
+          {transformedData &&
+            transformedData.measures &&
+            transformedData.measures.length > 1 &&
+            transformedData.measures.map((measure) => {
+              return (
+                <li key={measure} onClick={() => selectedMeasureChanged(measure)}>
+                  <input
+                    checked={getSelectedMeasure() === measure}
+                    type="radio"
+                    value={measure}
+                    readOnly
+                  />
+                  <label>{transformedData.measureLabelMap[measure] || measure}</label>
+                </li>
+              );
+            })}
+        </ul>
+      </div>
+    </Container>
+  );
+
+  return (
+    <div className="map component wp-data-viz-map" ref={mapContainerRef}>
+      {layersLoading && (editing ? noMapSelected() : renderLoader())}
+      {!layersLoading && (
+        <>
+          {!isMobileOrTablet && <MapLegendComponent />}
+          <div
+            className={"map wrapper scaling-svg-container " + unique}
+            style={{ height: height - deviceMapHeight[getDeviceCategory()] + "px" }}
+          >
+            {highlightedLocData ? (
+              <div className="highlighted-loc-info" style={highlightedLocStyle}>
+                <span>
+                  {" "}
+                  {formatContent(
+                    highlightedLocLabelFormat,
+                    {
+                      value: highlightedLocData.value,
+                      locationName:
+                        getTranslatedHighlightedLocationName() || highlightedLocData.label,
+                      measureName: highlightedLocData.measure,
+                    },
+                    intl,
+                    noDataText
+                  )}
+                </span>
+              </div>
+            ) : (
+              <> </>
+            )}
+
+            {(editing || zoomEnabledForControls) && !isMobile && (
+              <div className="control panel ignore">
+                <div className="zoom plus" onClick={onZoomIn}>
+                  <Icon name="plus" size="large" />
+                </div>
+                <div className="zoom minus" onClick={onZoomOut}>
+                  <Icon name="minus" size="large" />
+                </div>
+                <Popup
+                  content={
+                    <FormattedMessage id="map.reset.tooltip" defaultMessage="Reset zoom" />
+                  }
+                  trigger={
+                    <div className="reset" onClick={onReset}>
+                      <Icon name="repeat" size="large" />
+                    </div>
+                  }
+                />
+              </div>
+            )}
+          </div>
+          {isMobileOrTablet && <MapLegendComponent />}
+        </>
+      )}
+    </div>
+  );
 }
 
 export default injectIntl(Map);
