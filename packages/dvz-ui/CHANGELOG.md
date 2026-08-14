@@ -1,5 +1,15 @@
 # @devgateway/dvz-ui-react
 
+## 1.9.7
+
+### Patch Changes
+
+- [#277](https://github.com/devgateway/data-viz-ui/pull/277) [`690c866`](https://github.com/devgateway/data-viz-ui/commit/690c8663fd948f76919f63f3d6aaa56dcb45f41e) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Improve map tooltip and data transformation behavior by:
+  - implementing dynamic tooltip variables
+  - refactoring the map component from class-based to functional
+  - adding support for an extra tooltip-only dimension (dimension3) while keeping query source dimensions unchanged
+  - enhancing API-backed variable extraction using metadata types and flat key/value variables for tooltips
+
 ## 1.9.6
 
 ### Patch Changes
