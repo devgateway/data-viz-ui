@@ -1,5 +1,11 @@
 # @devgateway/dvz-ui-react
 
+## 1.9.8
+
+### Patch Changes
+
+- [#280](https://github.com/devgateway/data-viz-ui/pull/280) [`4a6893f`](https://github.com/devgateway/data-viz-ui/commit/4a6893f383b9dc53ef69be65dfa1fd28f0d59462) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Fix line chart colors not being applied
+
 ## 1.9.7
 
 ### Patch Changes
