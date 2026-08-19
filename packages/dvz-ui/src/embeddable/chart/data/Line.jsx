@@ -162,11 +162,17 @@ const LineOneDimension = (props) => {
       );
     }
 
-    measures.forEach(measure => {
+    selectedMeasures.forEach(m => {
+      const measure = m.value;
       const serie = { variables: {} };
-      serie.id = getTranslatedValue(mMap[measure], locale);
+      const label = customLabels[measure] || getTranslatedValue(mMap[measure], locale);
+      serie.id = label;
+      serie.label = label;
+      serie.measure = measure;
+      serie.measureFieldName = measure;
+      measuresMetadata.add(mMap[measure]);
+      keys.add(label);
 
-      serie.label = customLabels[measure] || getTranslatedValue(mMap[measure], locale);
       const serieData = [];
       firstDimensionItems.forEach(fdi => {// first dimension
         const itemData = data.children.find(c => c.value === fdi.value)
@@ -217,6 +223,7 @@ const Line2Dimensions = (props) => {
     hiddenBars,
     colorBy,
     locale,
+    customLabels = {},
   } = props;
   const selectedDimensions = dimensions.filter((f) => f != "");
   let options = {};
@@ -253,26 +260,32 @@ const Line2Dimensions = (props) => {
 
     secondDimensionItems.forEach(sdi => {
       const serie = { variables: {} };
-      serie.id = sdi.value;
-      serie.label = sdi.value;
+      const label = (customLabels && customLabels[sdi.value]) || getTranslatedValue(sdi, locale) || sdi.value;
+      serie.id = label;
+      serie.label = label;
+      serie.code = sdi.code || sdi.value;
+      serie.value = sdi.value;
+      keys.push(label);
       const serieData = [];
       firstDimensionItems.forEach(fdi => {
         const itemData = data.children.find(c => c.value === fdi.value)
-        dimensionsMetadata.add(tMap[itemData?.type]);
-        const childItemData = itemData?.children.find(c => c.value === sdi.value)
-        if (childItemData) {
-          dimensionsMetadata.add(tMap[childItemData?.type]);
-          const variables = {};
-          Object.keys(childItemData).forEach((k) => {
-            variables[k] = childItemData[k];
-          });
-          variables["value"] = childItemData[measures[0]];
-          variables[itemData.type] = itemData.value.toString();
-          variables[childItemData.type] = childItemData.value.toString();
-          serieData.push({ x: itemData.value, y: childItemData[measures[0]], variables });
+        if (itemData) {
+          dimensionsMetadata.add(tMap[itemData?.type]);
+          const childItemData = itemData?.children?.find(c => c.value === sdi.value)
+          if (childItemData) {
+            dimensionsMetadata.add(tMap[childItemData?.type]);
+            const variables = {};
+            Object.keys(childItemData).forEach((k) => {
+              variables[k] = childItemData[k];
+            });
+            variables["value"] = childItemData[measures[0]];
+            variables[itemData.type] = itemData.value.toString();
+            variables[childItemData.type] = childItemData.value.toString();
+            serieData.push({ x: itemData.value, y: childItemData[measures[0]], variables });
 
-          if (keys.indexOf(itemData.value) == -1) {
-            keys.push(itemData.value);
+            if (keys.indexOf(itemData.value) == -1) {
+              keys.push(itemData.value);
+            }
           }
         }
       })
