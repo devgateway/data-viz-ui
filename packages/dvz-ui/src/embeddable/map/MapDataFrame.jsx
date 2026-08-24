@@ -369,10 +369,11 @@ const MapDataFrame = (props) => {
                     ...item,
                     label: locationLabel,
                     value: getMeasureValue(item, measure),
-                    measure: measure
+                    measure: measure,
+                    variables,
                 }
 
-                newItem.variables.selectedDataFrameTooltipValue = item[measure];
+                newItem.variables.selectedDataFrameTooltipValue = getMeasureValue(item, measure);
 
                 if (item.children) {
                     newItem.children = []
