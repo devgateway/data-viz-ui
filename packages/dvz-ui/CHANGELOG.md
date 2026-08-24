@@ -1,5 +1,11 @@
 # @devgateway/dvz-ui-react
 
+## 1.9.9
+
+### Patch Changes
+
+- [#282](https://github.com/devgateway/data-viz-ui/pull/282) [`e601735`](https://github.com/devgateway/data-viz-ui/commit/e60173512494dc911dac4e457cdb0d590c69fa14) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Fix map data parsing for Superset and Spring Boot payload compatibility
+
 ## 1.9.8
 
 ### Patch Changes
