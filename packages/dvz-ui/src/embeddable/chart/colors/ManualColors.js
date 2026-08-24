@@ -18,28 +18,49 @@ class CustomColors extends Colors {
     options
   ) {
     super(colorBy, scheme, data, keys, indexBy);
+    this.type = type;
 
     this._manualColor = {};
 
-    this._manualColor[overallLabel] = manualColors
-      ? manualColors["Overall"]
-      : null;
+    if (overallLabel) {
+      this._manualColor[overallLabel] = manualColors
+        ? manualColors["Overall"]
+        : null;
+    }
 
-    if (app != "csv") {
+    if (app !== "csv") {
       const mapByDimension = (whichDimension) => {
-        items = [...dimensionsMetadata][whichDimension] ? [...dimensionsMetadata][whichDimension].items : [];
+        const dimsArray = dimensionsMetadata ? [...dimensionsMetadata] : [];
+        const items = dimsArray[whichDimension] ? dimsArray[whichDimension].items || [] : [];
         if (manualColors != null && manualColors != undefined) {
           Object.keys(manualColors).forEach((k) => {
-            const vals = items.filter((i) => i.code === k);
-            if (vals.length > 0 && vals[0].labels) {
-              let translated;
-              if (locale) {
-                translated = vals[0].labels[locale.toUpperCase()];
+            const vals = items.filter((i) => i.code === k || i.value === k || i.id === k || i.label === k);
+            const color = manualColors[k];
+            this._manualColor[k] = color;
+
+            if (vals.length > 0) {
+              const val = vals[0];
+              if (val.value !== undefined) this._manualColor[val.value] = color;
+              if (val.label !== undefined) this._manualColor[val.label] = color;
+              if (val.code !== undefined) this._manualColor[val.code] = color;
+              if (val.id !== undefined) this._manualColor[val.id] = color;
+
+              const customLabel = customLabels && (customLabels[k] || (val.value && customLabels[val.value]) || (val.code && customLabels[val.code]));
+              if (customLabel) {
+                this._manualColor[customLabel] = color;
               }
-              if (translated) {
-                this._manualColor[translated] = manualColors[k];
-              } else {
-                this._manualColor[vals[0].value] = manualColors[k];
+
+              if (val.labels) {
+                let translated;
+                if (locale) {
+                  translated = val.labels[locale.toUpperCase()];
+                }
+                if (translated) {
+                  this._manualColor[translated] = color;
+                }
+                Object.values(val.labels).forEach((l) => {
+                  if (l) this._manualColor[l] = color;
+                });
               }
             }
           });
@@ -48,8 +69,8 @@ class CustomColors extends Colors {
 
       const updateItemLabels = (items) => {
         const updatedItems = items?.map((item) => {
-          const groupName = item.group.label;
-          if (item.label.includes(groupName)) return item;
+          const groupName = item.group?.label;
+          if (!groupName || item.label?.includes(groupName)) return item;
           return {
             ...item,
             label: `${groupName} - ${item.label}`,
@@ -60,8 +81,8 @@ class CustomColors extends Colors {
 
       const ifNoMeasuresUseOptionMeasures = () => {
         if (measuresMetadata && measuresMetadata.size > 0) {
-          return measuresMetadata;
-        } else if (options?.metadata?.measures.length > 0) {
+          return [...measuresMetadata];
+        } else if (options?.metadata?.measures && options.metadata.measures.length > 0) {
           options.metadata.measures = updateItemLabels(
             options.metadata.measures
           );
@@ -71,31 +92,44 @@ class CustomColors extends Colors {
       };
 
       const mapByMeasure = () => {
-        items = ifNoMeasuresUseOptionMeasures();
-        Object.keys(manualColors).forEach((k) => {
-          const vals = [...items].filter((i) => i.value === k);
-          if (vals.length > 0 && vals[0].labels) {
-            const customLabel = customLabels[k];
-            if (customLabels && customLabel) {
-              this._manualColor[customLabel] = manualColors[k];
-            }
+        const items = ifNoMeasuresUseOptionMeasures();
+        if (manualColors != null && manualColors != undefined) {
+          Object.keys(manualColors).forEach((k) => {
+            const vals = [...items].filter((i) => i.value === k || i.code === k || i.id === k || i.label === k);
+            const color = manualColors[k];
+            this._manualColor[k] = color;
 
-            let translated;
-            if (locale) {
-              translated = vals[0].labels[locale.toUpperCase()];
+            if (vals.length > 0) {
+              const val = vals[0];
+              if (val.value !== undefined) this._manualColor[val.value] = color;
+              if (val.label !== undefined) this._manualColor[val.label] = color;
+              if (val.code !== undefined) this._manualColor[val.code] = color;
+              if (val.id !== undefined) this._manualColor[val.id] = color;
+
+              const customLabel = customLabels && (customLabels[k] || (val.value && customLabels[val.value]) || (val.code && customLabels[val.code]));
+              if (customLabel) {
+                this._manualColor[customLabel] = color;
+              }
+
+              if (val.labels) {
+                let translated;
+                if (locale) {
+                  translated = val.labels[locale.toUpperCase()];
+                }
+                if (translated) {
+                  this._manualColor[translated] = color;
+                }
+                Object.values(val.labels).forEach((l) => {
+                  if (l) this._manualColor[l] = color;
+                });
+              }
             }
-            if (translated) {
-              this._manualColor[translated] = manualColors[k];
-            } else {
-              this._manualColor[vals[0].label] = manualColors[k];
-            }
-          }
-        });
+          });
+        }
       };
 
-      let items = [];
-      const whichDimension = type === 'line' ? 1: colorBy === "index" ? 0 : 1;
-      if (!dimensionsMetadata) {
+      const whichDimension = type === 'line' ? 1 : colorBy === "index" ? 0 : 1;
+      if (!dimensionsMetadata || dimensionsMetadata.size === 0) {
         mapByMeasure();
       } else if (dimensionsMetadata.size == 1 && whichDimension == 1) {
         //single dimension color by measures
@@ -104,6 +138,8 @@ class CustomColors extends Colors {
         } else {
           mapByMeasure();
         }
+      } else if (dimensionsMetadata.size == 1 && whichDimension == 0) {
+        mapByDimension(0);
       } else {
         mapByDimension(whichDimension);
       }
@@ -115,9 +151,35 @@ class CustomColors extends Colors {
   }
 
   getColor(id, datum) {
+    if (this._manualColor[id]) {
+      return this._manualColor[id];
+    }
+    if (datum) {
+      if (this.indexBy && datum[this.indexBy] && this._manualColor[datum[this.indexBy]]) {
+        return this._manualColor[datum[this.indexBy]];
+      }
+      if (datum.id && this._manualColor[datum.id]) {
+        return this._manualColor[datum.id];
+      }
+      if (datum.label && this._manualColor[datum.label]) {
+        return this._manualColor[datum.label];
+      }
+      if (datum.value && this._manualColor[datum.value]) {
+        return this._manualColor[datum.value];
+      }
+      if (datum.code && this._manualColor[datum.code]) {
+        return this._manualColor[datum.code];
+      }
+      if (datum.measure && this._manualColor[datum.measure]) {
+        return this._manualColor[datum.measure];
+      }
+      if (datum.measureFieldName && this._manualColor[datum.measureFieldName]) {
+        return this._manualColor[datum.measureFieldName];
+      }
+    }
     if (this.colorBy === "index") {
       const color =
-        this._manualColor[id] || this._manualColor[datum[this.indexBy]];
+        this._manualColor[id] || (datum && this.indexBy && this._manualColor[datum[this.indexBy]]);
       return color ? color : "#555555";
     }
     if (this.colorBy === "id") {
@@ -126,7 +188,9 @@ class CustomColors extends Colors {
     return "#555555";
   }
 
-  getColorByIndex(value) {}
+  getColorByIndex(value) {
+    return this._manualColor[value] ? this._manualColor[value] : "#555555";
+  }
 
   getColorByKey(value) {
     return this._manualColor[value] ? this._manualColor[value] : "#555555";
