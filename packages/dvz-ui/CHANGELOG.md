@@ -1,5 +1,13 @@
 # @devgateway/dvz-ui-react
 
+## 1.9.10
+
+### Patch Changes
+
+- [#285](https://github.com/devgateway/data-viz-ui/pull/285) [`a900199`](https://github.com/devgateway/data-viz-ui/commit/a9001990b7a0be0de6148d0b9e13cde791179a46) Thanks [@timothygachengo](https://github.com/timothygachengo)! - implement ability to select extra columns for tooltips
+
+- [#284](https://github.com/devgateway/data-viz-ui/pull/284) [`8baa37b`](https://github.com/devgateway/data-viz-ui/commit/8baa37b840484ca3d945453a2be555f14f916e95) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Fix tabbed posts categories in the wp-editor
+
 ## 1.9.9
 
 ### Patch Changes
