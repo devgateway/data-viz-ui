@@ -132,6 +132,13 @@ const MapDataFrame = (props) => {
         return undefined;
     };
 
+    const getFirstSelectedValue = (selected) => {
+        if (Array.isArray(selected)) {
+            return selected.length > 0 ? selected[0] : undefined;
+        }
+        return selected;
+    };
+
     const findCatalogRowIndex = (rowItem, currentVariables) => {
         const dimensionAnchors = [
             primarySourceDimension,
@@ -226,10 +233,11 @@ const MapDataFrame = (props) => {
 
     // dimension3 isn't part of the query breakdown - it's a global applied filter, so resolve its value once for every row
     const appliedFilters = data.appliedFilters || {};
-    let extraDimensionVariable = null;
+    let extraDimensionVariable = '';
     if (extraDimension) {
-        const filterValue = appliedFilters[extraDimension] ? appliedFilters[extraDimension][0] : undefined;
-        extraDimensionVariable = getTypeDisplayValue(extraDimension, filterValue);
+        const selectedFilterValue = getValueByNormalizedKey(appliedFilters, extraDimension);
+        const filterValue = getFirstSelectedValue(selectedFilterValue);
+        extraDimensionVariable = getTypeDisplayValue(extraDimension, filterValue) || '';
     }
 
     const appliedFilterVariables = getAppliedFilterVariables(appliedFilters);
@@ -364,6 +372,14 @@ const MapDataFrame = (props) => {
                     }
                     variables[dimensionKey] = resolveDimensionValueForRow(dimensionKey, item, variables);
                 });
+
+                if (extraDimension) {
+                    const resolvedExtraValue = resolveDimensionValueForRow(extraDimension, item, variables);
+                    variables[extraDimension] = isPopulatedValue(resolvedExtraValue) ? resolvedExtraValue : extraDimensionVariable;
+                    // Stable aliases for tooltip templates that reference {dimension3} instead of the actual key.
+                    variables.dimension3 = variables[extraDimension];
+                    variables.additionalDimension = variables[extraDimension];
+                }
 
                 const newItem = {
                     ...item,

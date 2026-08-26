@@ -38,6 +38,7 @@ const MapEntry = (props) => {
         'data-dimension1': dimension1 = '',
         'data-dimension2': dimension2 = '',
         'data-dimension3': dimension3 = '',
+        'data-extra-tooltip-columns': extraTooltipColumns = '[]',
         "data-measures": measures = '[]',
         "data-height": height = 600,
         width = 960,
@@ -117,6 +118,31 @@ const MapEntry = (props) => {
         return decodeURIComponent(value)
     }
 
+    const normalizeKey = (key) => {
+        if (key === undefined || key === null) {
+            return '';
+        }
+        return String(key)
+            .trim()
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '_')
+            .replace(/^_+|_+$/g, '');
+    }
+
+    const getParamValueByKey = (paramsObj, targetKey) => {
+        if (!paramsObj || !targetKey) {
+            return undefined;
+        }
+
+        if (Object.prototype.hasOwnProperty.call(paramsObj, targetKey)) {
+            return paramsObj[targetKey];
+        }
+
+        const targetNorm = normalizeKey(targetKey);
+        const matchedKey = Object.keys(paramsObj).find(k => normalizeKey(k) === targetNorm);
+        return matchedKey ? paramsObj[matchedKey] : undefined;
+    }
+
     const parse = (value) => {
         try {
             if (value) {
@@ -152,8 +178,11 @@ const MapEntry = (props) => {
         let params = {};
         if (ff && ff.forEach) {
             ff.forEach(f => {
-                if (f.value != null && f.value.filter(v => v != null && v.toString().trim() != "").length > 0)
+                const values = Array.isArray(f.value) ? f.value : [f.value]
+                const hasValue = values.filter(v => v != null && v.toString().trim() != "").length > 0
+                if (hasValue) {
                     params[f.param] = f.value
+                }
             })
         } else {
             params = ff;
@@ -267,6 +296,21 @@ const MapEntry = (props) => {
     const measuresCSV = editing ? (parse(measures) || []).join(',') : measures
 
     const params = getFilters(filters)
+    if (extraDimension) {
+        const dimension3Value = getParamValueByKey(params, extraDimension);
+        if (dimension3Value !== undefined && dimension3Value !== null && dimension3Value !== '') {
+            params[extraDimension] = dimension3Value;
+        }
+    }
+
+    // Ask the API to return these dimensions' real per-row values (via includeColumns) without
+    // adding them to the query breakdown, so they can be shown in tooltips for every row.
+    const extraTooltipColumnsList = (parse(extraTooltipColumns) || []).filter(c => c && c !== 'none');
+    const includeColumns = Array.from(new Set([extraDimension, ...extraTooltipColumnsList].filter(Boolean)));
+    if (includeColumns.length > 0) {
+        params.includeColumns = includeColumns.join(',');
+    }
+
     if (dvzProxyDatasetId) {
         params.dvzProxyDatasetId = dvzProxyDatasetId;
     }
