@@ -5,7 +5,7 @@ import { injectIntl } from "react-intl";
 import { connect } from "react-redux";
 import PostIntro from "../connected-templates/PostIntro";
 import { useWindowDimensionsAndDevice } from '@/lib/hooks/window-dimensions';
-import { parse } from '../utils';
+
 const ItemMenu = ({ posts, activeItem, setActive, showLabels }) => {
   return posts
     ? posts.map((post) => (
@@ -270,6 +270,9 @@ const Wrapper = (props) => {
     editing = pageModuleProps.editing;
   }
   const locale = props.intl.locale;
+  const normalizedCategories = Array.isArray(categories)
+    ? categories.join(',')
+    : categories;
 
   const scrollable = useScrolls === 'true';
   const conditionalHeight = scrollable ? height : undefined;
@@ -287,7 +290,7 @@ const Wrapper = (props) => {
         locale={locale}
         type={type}
         taxonomy={taxonomy}
-        categories={parse(categories, editing)}
+        categories={normalizedCategories}
         store={`tabbedposts_${parent}_${unique}`} page={1}
         perPage={items}>
         <PostConsumer>
