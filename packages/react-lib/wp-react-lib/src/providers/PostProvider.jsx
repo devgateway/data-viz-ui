@@ -30,11 +30,11 @@ const PostProvider = (props) => {
     const error = useSelector(state => state.getIn(['wordpress', store, 'error']));
     const loading = useSelector(state => state.getIn(['wordpress', store, 'loading']));
 
-    const prevProps = useRef({categories, locale, slug, taxonomy, page, perPage, search}).current;
+    const prevProps = useRef({type, categories, locale, slug, taxonomy, page, perPage, search}).current;
 
     useEffect(() => {
 
-        if (categories != prevProps.categories || locale != prevProps.locale || slug != prevProps.slug ||
+        if (type != prevProps.type || categories != prevProps.categories || locale != prevProps.locale || slug != prevProps.slug ||
             taxonomy != prevProps.taxonomy || page != prevProps.page || perPage != prevProps.perPage || search != prevProps.search
         ) {
             dispatch(getPosts({
@@ -54,7 +54,7 @@ const PostProvider = (props) => {
             }));
         }
 
-    }, [categories, locale, slug, taxonomy, page, perPage, search]);
+    }, [type, categories, locale, slug, taxonomy, page, perPage, search]);
 
     useEffect(() => {
         dispatch(getPosts({
