@@ -1,5 +1,11 @@
 # @devgateway/dvz-ui-react
 
+## 1.9.11
+
+### Patch Changes
+
+- [#289](https://github.com/devgateway/data-viz-ui/pull/289) [`38faf9d`](https://github.com/devgateway/data-viz-ui/commit/38faf9d2f6d0ad33773319f4420715aaeed52312) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Fix tabbed posts to not display in editing mode if type is not loaded
+
 ## 1.9.10
 
 ### Patch Changes
