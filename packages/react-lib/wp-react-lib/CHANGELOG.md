@@ -1,5 +1,11 @@
 # @devgateway/wp-react-lib
 
+## 0.7.1
+
+### Patch Changes
+
+- [#287](https://github.com/devgateway/data-viz-ui/pull/287) [`a73dba2`](https://github.com/devgateway/data-viz-ui/commit/a73dba23e4805f0a6c5574c00855dfd2e09f9eac) Thanks [@timothygachengo](https://github.com/timothygachengo)! - Include the type prop change in the post provider
+
 ## 0.7.0
 
 ### Minor Changes
