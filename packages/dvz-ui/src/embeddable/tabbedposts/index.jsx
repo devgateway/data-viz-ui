@@ -283,6 +283,10 @@ const Wrapper = (props) => {
   const isNotDesktopPreview = previewMode !== 'Desktop' && editing;
   const isMobileRenderMode = isMobile && !editing;
 
+  if (editing && !type)  {
+    return <Container className={`viz tabbed posts ${editing ? 'editing' : ''} ${scrollable ? 'scrollable' : ''}`} fluid={true}/>;
+  }
+
 
   return (
     <Container className={`viz tabbed posts ${editing ? 'editing' : ''} ${scrollable ? 'scrollable' : ''}`} fluid={true}>
