@@ -30,9 +30,7 @@ import {
   LOCATION,
   SHOW_ALL,
   SHOW_IF_HAS_DATA,
-  deviceTranslateMap,
   deviceMapHeight,
-  deviceMapWidth,
 } from "./mapHelpers";
 import { Config } from "@/conf";
 
@@ -104,8 +102,6 @@ function Map(props) {
     showTooltip: showTooltipProp,
   } = props;
 
-  console.log("Map props:", props);
-
   // ----- state (was `this.state`) -----
   const [selectedMeasure, setSelectedMeasure] = useState(() =>
     transformedData &&
@@ -119,12 +115,10 @@ function Map(props) {
   const [layers, setLayers] = useState(null);
 
   // ----- refs (DOM nodes / mutable D3 objects / instance-style fields) -----
-  const mapContainerRef = useRef(null);
   const tooltipRef = useRef(null);
   const projectionRef = useRef(null);
   const pathRef = useRef(null);
   const zoomRef = useRef(null);
-  const translateValueRef = useRef(null);
   const mapPositionRef = useRef(null); // equivalent of the old `this.mapPosition`
   const hasMountedRef = useRef(false);
   const prevPropsRef = useRef(null);
@@ -136,20 +130,15 @@ function Map(props) {
   // which captured `this.metadataTypes` once in the constructor and never updated it).
   const metadataTypes = transformedData?.types || [];
 
-  function getWidth() {
-    if (mapContainerRef.current) {
-      return mapContainerRef.current.offsetWidth;
-    }
+  function getMapWidth() {
     return width;
   }
 
-  function getHeight() {
-    return height;
+  function getMapHeight() {
+    return height - 100;
   }
 
-  // One-time setup (mirrors the constructor), computed during render via lazy refs so it
-  // runs before the container ref is attached to the DOM - matching the original timing
-  // where `this.mapContainer.current` was still null at construction time.
+  // One-time setup (mirrors the constructor), computed during render via lazy refs.
   if (zoomRef.current === null) {
     zoomRef.current = d3
       .zoom()
@@ -159,12 +148,11 @@ function Map(props) {
   }
 
   if (projectionRef.current === null) {
-    translateValueRef.current = deviceTranslateMap[getDeviceCategory()];
     projectionRef.current = d3
       .geoMercator()
       .scale(scale)
       .center(center) // centers map at given coordinates
-      .translate([getWidth() / translateValueRef.current, getHeight() / 2]);
+      .translate([getMapWidth() / 2, getMapHeight() / 2]);
     pathRef.current = d3.geoPath().projection(projectionRef.current);
   }
 
@@ -447,21 +435,35 @@ function Map(props) {
       .each((d, i, nodes) => {
         const fo = d3.select(nodes[i]);
         const div = fo.select("div");
+        const isMobileOrTabletDevice =
+          getDeviceCategory() === "mobile" || getDeviceCategory() === "tablet";
         const scaleFactor = transform.k > 1 ? transform.k : 1;
-        const newSize = labelFontSize / scaleFactor;
+
+        // Desktop divides by the zoom scale to hold the on-screen text size roughly constant
+        // while zooming. On mobile/tablet we want the larger label size to stay fixed instead -
+        // dividing it by scaleFactor too was cancelling out the 2x boost as soon as any zoom
+        // happened, so the label would visibly shrink back down while zooming in.
+        const newSize = isMobileOrTabletDevice
+          ? labelFontSize * 0.6
+          : labelFontSize / scaleFactor;
+        const boxScaleFactor = isMobileOrTabletDevice ? 1 : scaleFactor;
 
         div.style("font-size", `${newSize}px`);
 
         const position = getLabelPosition(d);
-        const boxWidth = getLabelBoxWidth(d) / scaleFactor;
+        const boxWidth = getLabelBoxWidth(d) / boxScaleFactor;
         const x = position[0] - boxWidth / 2;
-        const yOffset = transform.k > 1 ? 10 / transform.k : 10;
+        const yOffset = isMobileOrTabletDevice
+          ? 10
+          : transform.k > 1
+          ? 10 / transform.k
+          : 10;
         const y = position[1] - yOffset;
 
         fo.attr("x", x)
           .attr("y", y)
-          .attr("width", getLabelBoxWidth(d) / scaleFactor)
-          .attr("height", getLabelBoxHeight(d) / scaleFactor);
+          .attr("width", getLabelBoxWidth(d) / boxScaleFactor)
+          .attr("height", getLabelBoxHeight(d) / boxScaleFactor);
       });
   }
 
@@ -1145,13 +1147,8 @@ function Map(props) {
     const breaks = getBreaks();
     const container = d3.select(getMapId());
     let svg = container.select("svg");
-    let containerWidth = getWidth();
-    if (containerWidth === 0) {
-      containerWidth = window.innerWidth + deviceMapWidth[getDeviceCategory()];
-    } else {
-      containerWidth += deviceMapWidth[getDeviceCategory()];
-    }
-    const containerHeight = getHeight() - 100;
+    const containerWidth = getMapWidth();
+    const containerHeight = getMapHeight();
 
     if (svg.empty()) {
       svg = container.append("svg");
@@ -1201,28 +1198,10 @@ function Map(props) {
         .duration(300)
         .call(
           zoomRef.current.transform,
-          d3.zoomIdentity.translate(mapPosition.x, mapPosition.y).scale(mapPosition.k)
+          d3.zoomIdentity
+          .translate(mapPosition.x, mapPosition.y)
+          .scale(mapPosition.k)
         );
-      if (mapType === "POINTS_MAP") {
-        const deviceTranslates = {
-          mobile: 100,
-          tablet: 0,
-          midTablet: 0,
-          desktop: 0,
-          laptop: 0,
-          wide: 0,
-        };
-        const translateVal = deviceTranslates[getDeviceCategory()];
-        svg
-          .transition()
-          .duration(300)
-          .call(
-            zoomRef.current.transform,
-            d3.zoomIdentity
-              .translate(mapPosition.x + translateVal, mapPosition.y)
-              .scale(mapPosition.k)
-          );
-      }
     }
 
     if (zoomEnabledForZoomBinding || editing) {
@@ -1428,11 +1407,12 @@ function Map(props) {
 
     const features = getFeatures();
     if (prevProps.center !== center) {
+      // Applies translation to center the map at the given coordinates
       mapPositionRef.current = null;
       projectionRef.current
         .scale(scale)
         .center(center) // centers map at given coordinates
-        .translate([getWidth() / 2, getHeight() / 2]);
+        .translate([getMapWidth() / 2, getMapHeight() / 2]);
     }
 
     const filterUpdatedFlag = filterUpdated(prevProps);
@@ -1531,7 +1511,7 @@ function Map(props) {
   );
 
   return (
-    <div className="map component wp-data-viz-map" ref={mapContainerRef}>
+    <div className="map component wp-data-viz-map">
       {layersLoading && (editing ? noMapSelected() : renderLoader())}
       {!layersLoading && (
         <>
