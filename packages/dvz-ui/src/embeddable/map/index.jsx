@@ -67,7 +67,7 @@ const MapEntry = (props) => {
         "data-group": group = "default",
         "data-map-symbols": mapSymbols = '[]',
         "data-tooltip-theme": tooltipTheme = "map-tooltip-dark",
-        "data-label-font-size": labelFontSize = 12,
+        "data-label-font-size": labelFontSize = 14,
         "data-label-font-weight": labelFontWeight = "normal",
         "data-label-font-color": labelFontColor = "#595959",
         "data-legend-font-size": legendFontSize = 12,

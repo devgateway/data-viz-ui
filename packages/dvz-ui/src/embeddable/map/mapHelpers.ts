@@ -29,15 +29,6 @@ export const deviceMapHeight: Record<string, number> = {
   wide: 100,
 };
 
-export const deviceMapWidth: Record<string, number> = {
-  mobile: 250,
-  tablet: 250,
-  midTablet: 250,
-  laptop: 0,
-  desktop: 0,
-  wide: 0,
-};
-
 const colorSchemes: Record<string, string[]> = {
   greens: [
     "#ccffdd", "#b3ffcc", "#99ffbb", "#80ffaa", "#66ff99",

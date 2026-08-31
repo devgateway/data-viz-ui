@@ -7,6 +7,12 @@ body {
   background-color: transparent;
   overflow: hidden;
 
+  .map.wrapper.scaling-svg-container svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
   .legend-title-container {
     @media screen and (max-width: 768px) {
       display: flex;
