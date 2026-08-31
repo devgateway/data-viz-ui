@@ -20,15 +20,6 @@ export const SHOW_ALL = "showAll";
 export const SHOW_IF_HAS_DATA = "ifUnitHasData";
 export const MAX_LABEL_LEN = 10;
 
-export const deviceTranslateMap: Record<string, number> = {
-  mobile: 4,
-  tablet: 4,
-  midTablet: 2,
-  laptop: 2,
-  desktop: 2,
-  wide: 2,
-};
-
 export const deviceMapHeight: Record<string, number> = {
   mobile: 330,
   tablet: 250,

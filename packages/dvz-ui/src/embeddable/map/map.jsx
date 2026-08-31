@@ -30,7 +30,6 @@ import {
   LOCATION,
   SHOW_ALL,
   SHOW_IF_HAS_DATA,
-  deviceTranslateMap,
   deviceMapHeight,
   deviceMapWidth,
 } from "./mapHelpers";
@@ -124,7 +123,6 @@ function Map(props) {
   const projectionRef = useRef(null);
   const pathRef = useRef(null);
   const zoomRef = useRef(null);
-  const translateValueRef = useRef(null);
   const mapPositionRef = useRef(null); // equivalent of the old `this.mapPosition`
   const hasMountedRef = useRef(false);
   const prevPropsRef = useRef(null);
@@ -159,14 +157,13 @@ function Map(props) {
   }
 
   if (projectionRef.current === null) {
-    translateValueRef.current = deviceTranslateMap[getDeviceCategory()];
     projectionRef.current = d3
       .geoMercator()
       .scale(scale)
       .center(center) // centers map at given coordinates
-      .translate([getWidth() / translateValueRef.current, getHeight() / 2]);
+      .translate([getWidth() / 2, getHeight() / 2]);
     pathRef.current = d3.geoPath().projection(projectionRef.current);
-  }
+  }d
 
   function getMapId() {
     return ".map.wrapper." + unique;
@@ -1201,7 +1198,9 @@ function Map(props) {
         .duration(300)
         .call(
           zoomRef.current.transform,
-          d3.zoomIdentity.translate(mapPosition.x, mapPosition.y).scale(mapPosition.k)
+          d3.zoomIdentity
+          .translate(mapPosition.x, mapPosition.y)
+          .scale(mapPosition.k)
         );
       if (mapType === "POINTS_MAP") {
         const deviceTranslates = {
@@ -1428,6 +1427,7 @@ function Map(props) {
 
     const features = getFeatures();
     if (prevProps.center !== center) {
+      // Applies translation to center the map at the given coordinates
       mapPositionRef.current = null;
       projectionRef.current
         .scale(scale)

@@ -214,13 +214,14 @@ const MapEntry = (props) => {
     const levels = [dimension1, dimension2]
     let source = levels.filter(l => l !== 'none' && l !== null).join('/')
     const extraDimension = (dimension3 && dimension3 !== 'none') ? dimension3 : null
+    const scale = country ? country.scale : 2000;
 
     const mapProps = {
         unique,
         editing,
         source: `/${mapFile}`,
         center: country.center,
-        scale: country.scale,
+        scale: scale,
         measures,
         legendTitle,
         height,
