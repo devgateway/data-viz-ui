@@ -6,6 +6,7 @@ import * as d3 from "d3";
 import { injectIntl } from "react-intl";
 import * as ReactDOM from "react-dom";
 import Tooltip from "./Tooltip";
+import { extractVariablesDeep } from "./Utils";
 
 
 const getFilters = (filters) => {
@@ -132,7 +133,7 @@ class DataLayer extends React.Component {
                     }
                 }
                 return {
-                    x: latLong[0], y: latLong[1], value, metadata: d, pointStyle
+                    x: latLong[0], y: latLong[1], value, metadata: { ...d, ...extractVariablesDeep(d) }, pointStyle
                 }
             })
 
@@ -147,7 +148,7 @@ class DataLayer extends React.Component {
             points = data.data.map((d) => {
                 let pointStyle = { color: markFillColor, size: markSizeScale, border: markBorderColor }
                 return {
-                    x: d[latField], y: d[longField], value: d[valueField], meta: d, pointStyle
+                    x: d[latField], y: d[longField], value: d[valueField], metadata: d, pointStyle
                 }
             })
 
@@ -303,6 +304,7 @@ const DataWrapper = (props) => {
         dimension2,
         pointStyleBy,
         dvzProxyDatasetId,
+        extraTooltipColumns,
         settings,
         waitForFilters
     } = props
@@ -318,6 +320,15 @@ const DataWrapper = (props) => {
 
     if (dvzProxyDatasetId) {
         params.dvzProxyDatasetId = dvzProxyDatasetId;
+    }
+
+    if (extraTooltipColumns && extraTooltipColumns.length > 0) {
+        // A column already part of the query breakdown (apiJoinAttribute/dimension2)
+        // can't also be requested via includeColumns - the API returns a 500 if included both ways.
+        const includeColumns = extraTooltipColumns.filter(c => c && c !== apiJoinAttribute && c !== dimension2);
+        if (includeColumns.length > 0) {
+            params.includeColumns = includeColumns.join(',');
+        }
     }
 
 

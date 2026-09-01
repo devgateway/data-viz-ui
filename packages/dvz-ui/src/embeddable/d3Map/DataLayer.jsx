@@ -8,6 +8,7 @@ import { injectIntl } from "react-intl";
 
 import BreaksStyles from "./BreaksStyles.js";
 import GradientColors from "@/embeddable/d3Map/GradientColors.js";
+import { resolveOverrideColor, extractVariablesDeep } from "./Utils";
 
 
 const toGenericID = (key) => {
@@ -313,13 +314,16 @@ class DataLayer extends BaseLayer {
                     if (!d || !d.properties || !d.properties._value) {
                         return fillColor
                     }
-                    return useGradients ? gradientColors.getColor(d.properties._value) : brStyles.getColor(d.properties._value)
+                    return resolveOverrideColor(d.properties.meta, measures[0])
+                        || (useGradients ? gradientColors.getColor(d.properties._value) : brStyles.getColor(d.properties._value))
                 })
                 .attr("stroke", borderColor)
                 .attr("id", "state-borders")
                 .attr("d", path).on("mouseenter", (d, p) => {
                     if (p.properties._value) {
-                        this.showToolTip(tooltip, this.getTooltipVariables(p), useGradients ? gradientColors.getColor(p.properties._value) : brStyles.getColor(p.properties._value), p)
+                        const color = resolveOverrideColor(p.properties.meta, measures[0])
+                            || (useGradients ? gradientColors.getColor(p.properties._value) : brStyles.getColor(p.properties._value))
+                        this.showToolTip(tooltip, this.getTooltipVariables(p), color, p)
                     }
                 })
                 .on("mouseleave", (d) => {
@@ -427,7 +431,8 @@ class DataLayer extends BaseLayer {
 
 
             pointsGroup.append("circle")
-                .attr("fill", d => useGradients === true ? getGradientColors(data).getColor(d.properties._value) : brStyles.getColor(d.properties._value, true))
+                .attr("fill", d => resolveOverrideColor(d.properties.meta, measures[0])
+                    || (useGradients === true ? getGradientColors(data).getColor(d.properties._value) : brStyles.getColor(d.properties._value, true)))
                 .attr("stroke", markBorderColor)
                 .attr("class", "point")
                 .attr("stroke-width", 2)
@@ -446,7 +451,9 @@ class DataLayer extends BaseLayer {
                             }
                         }
 
-                        this.showToolTip(tooltip, variables, useGradients === true ? getGradientColors(data).getColor(p.properties._value) : brStyles.getColor(p.properties._value))
+                        const color = resolveOverrideColor(p.properties.meta, measures[0])
+                            || (useGradients === true ? getGradientColors(data).getColor(p.properties._value) : brStyles.getColor(p.properties._value))
+                        this.showToolTip(tooltip, variables, color)
                     }
                 })
                 .on("mouseleave", (d) => {
@@ -669,7 +676,9 @@ class DataLayer extends BaseLayer {
                                         return "none;fill:url(#" + toId(p) + ");"
                                     })
                                     .on("mouseenter", () => {
-                                        this.showToolTip(tooltip, this.getTooltipVariables(d), useGradients === true ? getGradientColors(data).getColor(d.properties._value) : brStyles.getColor(d.properties._value))
+                                        const color = resolveOverrideColor(d.properties.meta, measures[0])
+                                            || (useGradients === true ? getGradientColors(data).getColor(d.properties._value) : brStyles.getColor(d.properties._value))
+                                        this.showToolTip(tooltip, this.getTooltipVariables(d), color)
                                     }).on("mousemove", (d) => {
                                         this.moveToolTip()
                                     }).on("mouseleave", (d) => {
@@ -831,7 +840,7 @@ class DataLayer extends BaseLayer {
                 })
                 if (values.length > 0) {
                     const measureValue = (values[0][measures[0]])
-                    d.properties.meta = values[0]
+                    d.properties.meta = { ...values[0], ...extractVariablesDeep(values[0]) }
                     d.properties._value = measureValue
                     if (patternDiscriminator && patternDiscriminator != 'none') {
                         const patternsValues = values[0] && values[0].children ? values[0].children.filter(f => f.type == patternDiscriminator).map(d => d.value) : []
@@ -970,6 +979,7 @@ const DataWrapper = (props) => {
         editing,
         patternDiscriminator,
         dvzProxyDatasetId,
+        extraTooltipColumns,
         intl,
         settings,
         waitForFilters
@@ -989,6 +999,13 @@ const DataWrapper = (props) => {
         params.dvzProxyDatasetId = dvzProxyDatasetId;
     }
 
+    if (extraTooltipColumns && extraTooltipColumns.length > 0) {
+        const includeColumns = extraTooltipColumns.filter(c => c && c !== apiJoinAttribute && c !== patternDiscriminator);
+        if (includeColumns.length > 0) {
+            params.includeColumns = includeColumns.join(',');
+        }
+    }
+
 
     return (<DataProvider
         waitForFilters={true}
@@ -996,6 +1013,7 @@ const DataWrapper = (props) => {
         params={params}
         app={app}
         csv={decodeURIComponent(csv)}
+        extraTooltipColumns={extraTooltipColumns}
         group={group}
         ignoreErrors={true}
         isSvg={true}

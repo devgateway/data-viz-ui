@@ -55,5 +55,22 @@ import D3Map from '@devgateway/dvz-ui/embeddable/d3Map';
 />
 ```
 
+## Tooltip templates & data variables
+Each `data` and `dataPoints` layer's `tooltip` config is a template string that is rendered against the row currently being hovered. Every column present on the joined CSV row (or, in API mode, every measure/key on the matched dimension item) is available as a `{ColumnName}` variable — including column names containing spaces, e.g. `{GDP Growth}`.
+
+Numeric and currency values can be formatted inline with these markers, wrapped around the variable's already-substituted value:
+| Marker | Formats as | Example |
+|---|---|---|
+| `%(field)` | Percent | `%({value},2)` |
+| `#(field)` | Decimal | `#({value},1)` |
+| `#C(field)` | Compact notation | `#C({value},0)` |
+| `$(codeOrName)` | Currency symbol lookup | `$(USD)` → `$`, `$(ZMW)` → `ZK` |
+
+### Row-level color override
+A `data` layer's choropleth/centroid/pattern fill is normally computed from the active break scale or gradient. A row can override its own computed color by including a column named `_Color_<measureName>` (matching the layer's active `measures[0]`), e.g. a column `_Color_gdp` with value `#ff0000` forces that row's shape/marker to render red regardless of which break or gradient bucket its value falls into.
+
+### Extra tooltip columns (API mode)
+In API mode, the stats endpoint only returns the field(s) implied by the layer's configured dimension(s)/measure(s) — it will not include an arbitrary extra column just because it exists in the dataset. A layer config's `extraTooltipColumns` field (an array of API field/column names, defaulting to `[]`) requests additional fields purely for tooltip display, without adding them as query dimensions: they're sent to the backend as `includeColumns=field1,field2` and, once returned, are available the same way as any other joined-row column, i.e. as `{ColumnName}`.
+
 ## Related
 - WordPress Block: `d3Map` (`wp-react-blocks-plugin/blocks/d3Map`)

@@ -460,6 +460,17 @@ const Legends = (props) => {
                         params.dvzProxyDatasetId = l.dvzProxyDatasetId;
                     }
 
+                    /*
+                     * Ensure that extra tooltip columns are included in the request to avoid clobbering
+                     * by other DataProviders sharing the same Redux store slot.
+                     */
+                    if (l.extraTooltipColumns && l.extraTooltipColumns.length > 0) {
+                        const includeColumns = l.extraTooltipColumns.filter(c => c && c !== l.apiJoinAttribute && c !== l.patternDiscriminator);
+                        if (includeColumns.length > 0) {
+                            params.includeColumns = includeColumns.join(',');
+                        }
+                    }
+
                     return (<div key={l.id}>
 
                         {l.type == "base" && <BaseLayerLegend {...l} group={group} onItemClick={onItemClick} />}
