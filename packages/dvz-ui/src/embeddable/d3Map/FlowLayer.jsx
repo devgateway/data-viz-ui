@@ -6,6 +6,7 @@ import * as d3 from "d3";
 import { injectIntl } from "react-intl";
 import Papa from "papaparse";
 import BreaksStyles from "./BreaksStyles.js";
+import { extractVariablesDeep } from "./Utils";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 class DataLayer extends BaseLayer {
@@ -56,20 +57,6 @@ class DataLayer extends BaseLayer {
 
         const filteredData = json.features.filter(f => f.properties._value != null)
 
-
-        const getTooltipVariables = (d) => {
-            if (d.properties._value) {
-                const variables = {
-                    ...d.properties, meta: {
-                        [apiJoinAttribute]: d.properties.meta ? d.properties.meta.value : '', ...d.properties.meta,
-                        value: d.properties._value
-                    }
-                }
-                return variables
-            }
-            return {}
-
-        }
         this.g = d3.select(this.gRef.current)
 
         this.g.attr("class", "base-layer zoomable flow") //add unique name
@@ -96,7 +83,7 @@ class DataLayer extends BaseLayer {
                 const value = child[measure] //value by target country
                 json.features.filter(feature => feature.properties[featureJoinAttribute] == child.value)
                     .forEach(d2 => {
-                        d2.properties.meta = child
+                        d2.properties.meta = { ...child, ...extractVariablesDeep(child) }
                         const originID = d1.properties[featureJoinAttribute]
                         const id = d1.properties[featureJoinAttribute] + "--" + d2.properties[featureJoinAttribute];
 
@@ -243,7 +230,7 @@ class DataLayer extends BaseLayer {
                 })
                 .on("mouseenter", d => {
 
-                    this.showToolTip("{name_en}", d1.properties, "")
+                    this.showToolTip(tooltip, { ...d1.properties, ...d1.properties.meta }, markFillColor)
 
                 })
                 .on("mouseout", d => {
@@ -272,7 +259,7 @@ class DataLayer extends BaseLayer {
                 const values = data.children.filter(d => d.value.indexOf(joinValue) > -1)
                 if (values.length > 0) {
                     const measureValue = (values[0][measures[0]])
-                    d.properties.meta = values[0]
+                    d.properties.meta = { ...values[0], ...extractVariablesDeep(values[0]) }
                     d.properties._value = measureValue
                     d.properties.destinations = values[0].children
                 }
@@ -354,6 +341,7 @@ const DataWrapper = (props) => {
         editing,
         flowDestination,
         dvzProxyDatasetId,
+        extraTooltipColumns,
         waitForFilters
     } = props
 
@@ -366,6 +354,15 @@ const DataWrapper = (props) => {
             if (f.value != null && f.value.filter(v => v != null && v.toString().trim() != "").length > 0)
                 params[f.param] = f.value
         })
+    }
+
+    if (extraTooltipColumns && extraTooltipColumns.length > 0) {
+        // A column already part of the query breakdown (flowOrigin/flowDestination)
+        // can't also be requested via includeColumns - the API returns a 500 if included both ways.
+        const includeColumns = extraTooltipColumns.filter(c => c && c !== flowOrigin && c !== flowDestination);
+        if (includeColumns.length > 0) {
+            params.includeColumns = includeColumns.join(',');
+        }
     }
 
     return (<DataProvider

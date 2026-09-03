@@ -23,8 +23,6 @@ class DataProvider extends React.Component {
 
     componentDidMount() {
         const { app, csv, store, params, source, group, editing, waitForFilters = false } = this.props
-        console.log("Group & Store ", store, this.props.mySelf)
-
         if (app === "csv") {
             this.props.onSetData({ app, csv, store, params, group })
         } else {
@@ -32,14 +30,14 @@ class DataProvider extends React.Component {
 
             if (!waitForFilters || editing) {
                 console.log('📥 [D3 Map DataProvider] Initial data load triggered', { app, editing, waitForFilters });
-                this.loadData({ app, source, store, params, group });
+                this.loadData({ app, source, store, params, group, includeColumns: extraTooltipColumns });
             }
 
             if (!editing && waitForFilters) {
                 this.fallbackTimeout = setTimeout(() => {
                     if (!this.props.data && !this.props.loading) {
                         console.warn('⚠️ [D3 Map DataProvider] Fallback loading triggered');
-                        this.loadData({ app, source, store, params, group });
+                        this.loadData({ app, source, store, params, group, includeColumns: extraTooltipColumns });
                     }
                 }, 2000);
             }
@@ -65,8 +63,10 @@ class DataProvider extends React.Component {
             autoApply,
             lastInitialFilterChange,
             lastUserFilterChange,
-            waitForFilters
+            waitForFilters,
+            editing
         } = this.props
+        console.log("Current props in d3MapDataProvider", this.props);
 
         // 1. Manual Apply
         if (apply !== undefined && apply !== null && apply !== prevProps.apply) {
@@ -106,10 +106,11 @@ class DataProvider extends React.Component {
                         this.loadData({ app, source, store, params, group });
                     } else if (!initialChanged && !userChanged) {
                         // Fallback for prop changes that aren't explicitly filter timestamps
-                        // Only load if we are not waiting for initial filters
-                        if (!waitForFilters) {
-                            // console.log('ℹ️ [DataProvider] Props changed, loading data');
-                            //this.loadData({ app, source, store, params, group });
+                        // (e.g. extraTooltipColumns edited in the block editor, changing params).
+                        // Only load if we are not waiting for initial filters, or we're in the editor.
+                        if (!waitForFilters || editing) {
+                            console.log('[DataProvider] Props changed, loading data');
+                            this.loadData({ app, source, store, params, group });
                         }
                     }
                 }
@@ -141,6 +142,7 @@ class DataProvider extends React.Component {
 
     render() {
         const { data, } = this.props
+        console.log('[DataProvider] Rendering with data:', this.props)
 
         return <DataContext.Provider value={data}>{this.props.children}</DataContext.Provider>
 

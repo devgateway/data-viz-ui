@@ -271,7 +271,7 @@ const Wrapper = (props) => {
   }
   const locale = props.intl.locale;
   const normalizedCategories = Array.isArray(categories)
-    ? categories.join(',')
+    ? categories.join(',').toString()
     : categories;
 
   const scrollable = useScrolls === 'true';

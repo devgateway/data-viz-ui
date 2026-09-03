@@ -306,7 +306,10 @@ const MapEntry = (props) => {
 
     // Ask the API to return these dimensions' real per-row values (via includeColumns) without
     // adding them to the query breakdown, so they can be shown in tooltips for every row.
-    const extraTooltipColumnsList = (parse(extraTooltipColumns) || []).filter(c => c && c !== 'none');
+    // A column already part of the query breakdown (dimension1/dimension2) can't also be
+    // requested via includeColumns - the API returns a 500 if it's included both ways.
+    const extraTooltipColumnsList = (parse(extraTooltipColumns) || [])
+        .filter(c => c && c !== 'none' && c !== dimension1 && c !== dimension2);
     const includeColumns = Array.from(new Set([extraDimension, ...extraTooltipColumnsList].filter(Boolean)));
     if (includeColumns.length > 0) {
         params.includeColumns = includeColumns.join(',');
