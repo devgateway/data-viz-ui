@@ -4,7 +4,7 @@ import template from "string-template";
 const percentExpresion = /(\+?\%)[\(]([A-z0-9,.,-]+)\)/gi
 const numericExpresion = /(\+?\#)[\(]([A-z0-9,.,-]+)\)/gi
 const compactExpresion = /(\+?\#C)[\(]([A-z0-9,.,-]+)\)/gi
-const currencyExpresion = /(\$)[\(]([A-z0-9,.]+)\)/gi
+const currencyExpresion = /(\$)[\(]([A-Za-z0-9,.]+)\)/gi
 
 const currencies = [
     {
