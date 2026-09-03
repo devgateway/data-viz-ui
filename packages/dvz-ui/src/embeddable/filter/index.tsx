@@ -259,8 +259,11 @@ const FilterSelectorBox = connect(
     };
 
     useEffect(() => {
-        if (!current) {
-            const filterItems = options.map((o) => o.value);
+        if (current || options.length === 0) {
+            return;
+        }
+
+        const filterItems = options.map((o) => o.value);
             if (filterType == FILTER_TYPE_MULTI_SELECT || filterType == "") {
                 if (defaultTopNEnabled) {
                     const n = defaultTopNCount && defaultTopNCount > 0 ? defaultTopNCount : 0;
@@ -319,8 +322,7 @@ const FilterSelectorBox = connect(
                     }
                 }
             }
-        }
-    }, []);
+    }, [app, defaultTopNCount, defaultTopNEnabled, defaultValueCriteria, defaultValues, filterType, group, onInit, options, param, current]);
 
     const getSelected = () => {
         if (filterType == FILTER_TYPE_SINGLE_SELECT) {
