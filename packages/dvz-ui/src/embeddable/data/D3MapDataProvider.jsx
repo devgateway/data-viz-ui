@@ -22,9 +22,7 @@ class DataProvider extends React.Component {
     }
 
     componentDidMount() {
-        const { app, csv, store, params, source, group, editing, waitForFilters = false, extraTooltipColumns } = this.props
-        console.log("Group & Store ", store, this.props)
-
+        const { app, csv, store, params, source, group, editing, waitForFilters = false } = this.props
         if (app === "csv") {
             this.props.onSetData({ app, csv, store, params, group })
         } else {
