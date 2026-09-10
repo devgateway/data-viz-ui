@@ -28,7 +28,9 @@ const PreviewComponentParameterParser = () => {
             const newParams: Record<string, string> = { ...paramPropsRef.current };
             Object.keys(data).forEach(k => {
                 newParams["data-" + k.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()] =
-                    typeof data[k] === 'object' ? JSON.stringify(data[k]) : data[k];
+                    typeof data[k] === 'object'
+                        ? (Array.isArray(data[k]) ? data[k].join(',') : JSON.stringify(data[k]))
+                        : data[k];
             });
             setParamProps(newParams);
         }
