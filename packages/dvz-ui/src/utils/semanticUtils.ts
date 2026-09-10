@@ -1,5 +1,3 @@
-import _ from 'lodash'
-
 export const htmlInputAttrs = [
   // REACT
   'selected',
@@ -97,9 +95,9 @@ export const partitionHTMLProps = (props: object, options: { htmlProps?: string[
   const inputProps = {}
   const rest = {}
 
-  _.forEach(props, (val, prop) => {
+  Object.entries(props).forEach(([prop, val]) => {
     const possibleAria = includeAria && (/^aria-.*$/.test(prop) || prop === 'role')
-    const target = _.includes(htmlProps, prop) || possibleAria ? inputProps : rest
+    const target = htmlProps.includes(prop) || possibleAria ? inputProps : rest
     target[prop] = val
   })
 

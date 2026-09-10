@@ -3,7 +3,8 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeRaw from 'rehype-raw'
 import template from 'string-template';
-import { useClampTooltipToViewport } from "../chart/Tooltip";
+import { FloatingPortal } from "@floating-ui/react";
+import { useTooltipPosition, useHideTooltipOnScroll } from "../chart/Tooltip";
 
 const percentExpresion = /(\+?\%)[\(]([A-z0-9,.,-]+)\)/gi
 const numericExpresion = /(\+?\#)[\(]([A-z0-9,.,-]+)\)/gi
@@ -51,24 +52,23 @@ const ChartTooltip = ({tooltip, d, intl, tooltipEnableMarkdown}) => {
     }
 
     // Must run on every render, before any conditional early return.
-    const tooltipRef = useClampTooltipToViewport([str, tooltipEnableMarkdown])
+    const { anchorRef, floatingRef, floatingStyles, portalRoot } = useTooltipPosition()
+    const hideOnScroll = useHideTooltipOnScroll([d, str])
 
-    if (data) {
-        if (tooltipEnableMarkdown) {
-            return (
-                <div ref={tooltipRef} className={"chart tooltip"}>
-                    <ReactMarkdown children={str} remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
-                    </ReactMarkdown>
-                </div>
-            )
-        } else {
-            return (
-                <div ref={tooltipRef} className={"chart tooltip"} >
-                    <div dangerouslySetInnerHTML={{ __html: str }}></div>
-                </div>)
-        }
+    if (data && !hideOnScroll) {
+        const content = tooltipEnableMarkdown
+            ? <ReactMarkdown children={str} remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}></ReactMarkdown>
+            : <div dangerouslySetInnerHTML={{ __html: str }}></div>
 
-
+        return (
+            <div ref={anchorRef}>
+                <FloatingPortal root={portalRoot}>
+                    <div ref={floatingRef} style={floatingStyles} className={"chart tooltip"} role="tooltip">
+                        {content}
+                    </div>
+                </FloatingPortal>
+            </div>
+        )
     } else {
         return <div></div>
     }
