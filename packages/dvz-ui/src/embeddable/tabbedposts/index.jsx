@@ -270,9 +270,26 @@ const Wrapper = (props) => {
     editing = pageModuleProps.editing;
   }
   const locale = props.intl.locale;
-  const normalizedCategories = Array.isArray(categories)
-    ? categories.join(',').toString()
-    : categories;
+  // `categories` is a WP array attribute (e.g. [5, 7]). PostProvider/the REST API
+  // expects a comma-separated string ("5,7"), matching BlockSave.js's
+  // `categories.toString()` on the front end.
+  // In the block-editor preview, attributes are postMessage'd through
+  // PreviewComponent, which JSON-stringifies arrays/objects, so `categories`
+  // arrives here as the string "[5,7]" rather than a real array. Detect that
+  // JSON-array-shaped string and normalize it the same way.
+  let normalizedCategories = categories;
+  if (Array.isArray(categories)) {
+    normalizedCategories = categories.join(',');
+  } else if (typeof categories === 'string') {
+    try {
+      const parsedCategories = JSON.parse(categories);
+      if (Array.isArray(parsedCategories)) {
+        normalizedCategories = parsedCategories.join(',');
+      }
+    } catch (e) {
+      // Not JSON — already a plain string (e.g. "5,7"), use as-is.
+    }
+  }
 
   const scrollable = useScrolls === 'true';
   const conditionalHeight = scrollable ? height : undefined;
