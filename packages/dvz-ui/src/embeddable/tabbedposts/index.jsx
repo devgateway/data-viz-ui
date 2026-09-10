@@ -269,10 +269,20 @@ const Wrapper = (props) => {
     previewMode = pageModuleProps.previewMode;
     editing = pageModuleProps.editing;
   }
-  const locale = props.intl.locale;
-  const normalizedCategories = Array.isArray(categories)
-    ? categories.join(',').toString()
-    : categories;
+  const locale = props.intl.locale; 
+  let normalizedCategories = categories;
+  if (Array.isArray(categories)) {
+    normalizedCategories = categories.join(',');
+  } else if (typeof categories === 'string') {
+    try {
+      const parsedCategories = JSON.parse(categories);
+      if (Array.isArray(parsedCategories)) {
+        normalizedCategories = parsedCategories.join(',');
+      }
+    } catch (e) {
+      // Not JSON — already a plain string (e.g. "5,7"), use as-is.
+    }
+  }
 
   const scrollable = useScrolls === 'true';
   const conditionalHeight = scrollable ? height : undefined;
