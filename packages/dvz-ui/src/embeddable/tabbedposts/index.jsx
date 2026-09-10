@@ -269,14 +269,7 @@ const Wrapper = (props) => {
     previewMode = pageModuleProps.previewMode;
     editing = pageModuleProps.editing;
   }
-  const locale = props.intl.locale;
-  // `categories` is a WP array attribute (e.g. [5, 7]). PostProvider/the REST API
-  // expects a comma-separated string ("5,7"), matching BlockSave.js's
-  // `categories.toString()` on the front end.
-  // In the block-editor preview, attributes are postMessage'd through
-  // PreviewComponent, which JSON-stringifies arrays/objects, so `categories`
-  // arrives here as the string "[5,7]" rather than a real array. Detect that
-  // JSON-array-shaped string and normalize it the same way.
+  const locale = props.intl.locale; 
   let normalizedCategories = categories;
   if (Array.isArray(categories)) {
     normalizedCategories = categories.join(',');
