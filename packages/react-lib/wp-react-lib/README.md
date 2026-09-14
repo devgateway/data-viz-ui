@@ -1,6 +1,8 @@
 # WordPress React Lib
 An easy way to integrate your react application with the world's **most popular** content management system. **wp-react-lib** uses the [Wordpress REST API](https://developer.wordpress.org/rest-api/) to load content into your classic React.js stack, it also allows embedding your own React.js components within pages and posts.
 
+> **New to this library?** A pure TypeScript, SSR-friendly rewrite is available under `@devgateway/wp-react-lib/v2` alongside the API documented below (which is unaffected and still fully supported). See [`src/v2/README.md`](src/v2/README.md) for how to use it.
+
 # Building
 Run npm install to install all dependencies and npm run dist to build the library.
 
