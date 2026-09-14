@@ -12,20 +12,22 @@
   "types": "dist/types/index.d.ts",
   "license": "MIT",
   "dependencies": {
-    "immutable": "^5.1.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-intl": "^7.1.14",
-    "react-redux": "^9.2.0",
     "semantic-ui-react": "^3.0.0-beta.2"
   },
   "devDependencies": {
     "@changesets/cli": "^2.29.7",
+    "@reduxjs/toolkit": "^2",
+    "@tanstack/react-query": "^5",
     "@types/node": "^22.15.19",
     "@types/react": "18.3.11",
     "@types/react-dom": "18.3.1",
     "@vitejs/plugin-react": "^4.4.1",
+    "immutable": "^5.1.3",
     "jsdom": "^30.0.1",
+    "react-intl": "^7.1.14",
+    "react-redux": "^9.2.0",
     "rollup-plugin-preserve-directives": "^0.4.0",
     "typescript": "^5.9.3",
     "vite": "^6.3.6",
@@ -34,12 +36,34 @@
     "vitest": "^3.2.7"
   },
   "peerDependencies": {
+    "@reduxjs/toolkit": "^2.0.0",
+    "@tanstack/react-query": "^5.0.0",
     "immutable": "^5.1.3",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
+    "react": "^18.3.1 || ^19.0.0",
+    "react-dom": "^18.3.1 || ^19.0.0",
     "react-intl": "^7.1.14",
     "react-redux": "^9.2.0",
     "semantic-ui-react": "^3.0.0-beta.2"
+  },
+  "peerDependenciesMeta": {
+    "@reduxjs/toolkit": {
+      "optional": true
+    },
+    "@tanstack/react-query": {
+      "optional": true
+    },
+    "immutable": {
+      "optional": true
+    },
+    "react-intl": {
+      "optional": true
+    },
+    "react-redux": {
+      "optional": true
+    },
+    "semantic-ui-react": {
+      "optional": true
+    }
   },
   "scripts": {
     "dist": "vite build && npm link",
@@ -85,6 +109,16 @@
       "types": "./dist/types/v2/index.d.ts",
       "import": "./dist/esm/v2/index.js",
       "require": "./dist/cjs/v2/index.js"
+    },
+    "./v2/query": {
+      "types": "./dist/types/v2/query/index.d.ts",
+      "import": "./dist/esm/v2/query/index.js",
+      "require": "./dist/cjs/v2/query/index.js"
+    },
+    "./v2/rtk-query": {
+      "types": "./dist/types/v2/rtk-query/index.d.ts",
+      "import": "./dist/esm/v2/rtk-query/index.js",
+      "require": "./dist/cjs/v2/rtk-query/index.js"
     }
   }
 }

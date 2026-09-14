@@ -30,19 +30,31 @@ export default defineConfig({
             exclude: ['node_modules'],
         },
         rollupOptions: {
-            external: [
-                ...Object.keys(packageJson.dependencies || {}),
-                ...Object.keys(packageJson.devDependencies || {}),
-                'react',
-                'react-dom',
-                'react-dom/client',
-                'react/jsx-runtime',
-            ],
+            // A plain string in `external` only matches an exact module
+            // specifier, not a subpath - '@reduxjs/toolkit' would NOT
+            // externalize an import of '@reduxjs/toolkit/query/react',
+            // silently bundling it (and its own deps, e.g. immer/reselect)
+            // into the output instead of leaving it to the consumer's own
+            // copy. Match by prefix so scoped-package subpath imports
+            // (RTK Query, `@tanstack/react-query/*`, etc.) externalize too.
+            external: (id: string) => {
+                const externalDeps = [
+                    ...Object.keys(packageJson.dependencies || {}),
+                    ...Object.keys(packageJson.devDependencies || {}),
+                    'react',
+                    'react-dom',
+                    'react-dom/client',
+                    'react/jsx-runtime',
+                ];
+                return externalDeps.some((dep) => id === dep || id.startsWith(`${dep}/`));
+            },
             input: {
                 index: resolve(__dirname, 'src/index.js'),
                 'api/index': resolve(__dirname, 'src/api/index.js'),
                 'hooks/index': resolve(__dirname, 'src/hooks/index.js'),
                 'v2/index': resolve(__dirname, 'src/v2/index.ts'),
+                'v2/query/index': resolve(__dirname, 'src/v2/query/index.ts'),
+                'v2/rtk-query/index': resolve(__dirname, 'src/v2/rtk-query/index.ts'),
             },
             plugins: [preserveDirectives()],
             output: [
