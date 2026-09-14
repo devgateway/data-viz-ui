@@ -25,11 +25,13 @@
     "@types/react": "18.3.11",
     "@types/react-dom": "18.3.1",
     "@vitejs/plugin-react": "^4.4.1",
+    "jsdom": "^30.0.1",
     "rollup-plugin-preserve-directives": "^0.4.0",
     "typescript": "^5.9.3",
     "vite": "^6.3.6",
     "vite-plugin-dts": "^4.5.4",
-    "vite-tsconfig-paths": "^5.1.4"
+    "vite-tsconfig-paths": "^5.1.4",
+    "vitest": "^3.2.7"
   },
   "peerDependencies": {
     "immutable": "^5.1.3",
@@ -44,6 +46,7 @@
     "dev": "vite build --watch",
     "build": "vite build",
     "typecheck": "tsc --noEmit",
+    "test": "vitest run",
     "version": "changeset version"
   },
   "repository": {
@@ -77,6 +80,11 @@
       "types": "./dist/types/hooks/index.d.ts",
       "import": "./dist/esm/hooks/index.js",
       "require": "./dist/cjs/hooks/index.js"
+    },
+    "./v2": {
+      "types": "./dist/types/v2/index.d.ts",
+      "import": "./dist/esm/v2/index.js",
+      "require": "./dist/cjs/v2/index.js"
     }
   }
 }

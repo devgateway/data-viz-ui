@@ -19,6 +19,8 @@ export interface Post {
     comment_status:  string;
     ping_status:     string;
     sticky:          boolean;
+    /** Hierarchical post types only (e.g. pages). */
+    parent?:         number;
     template:        string;
     format:          string;
     meta:            Meta;

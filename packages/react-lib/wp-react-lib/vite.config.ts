@@ -15,6 +15,7 @@ export default defineConfig({
             outDir: 'dist/types',
             tsconfigPath: './tsconfig.json',
             include: ['./src/**/*'],
+            exclude: ['./src/**/*.test.ts', './src/**/*.test.tsx'],
         }),
         tsconfigPaths(),
     ],
@@ -41,6 +42,7 @@ export default defineConfig({
                 index: resolve(__dirname, 'src/index.js'),
                 'api/index': resolve(__dirname, 'src/api/index.js'),
                 'hooks/index': resolve(__dirname, 'src/hooks/index.js'),
+                'v2/index': resolve(__dirname, 'src/v2/index.ts'),
             },
             plugins: [preserveDirectives()],
             output: [
