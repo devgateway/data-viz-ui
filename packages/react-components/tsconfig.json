@@ -3,6 +3,7 @@
     "target": "ESNext",
     "useDefineForClassFields": true,
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "types": ["node", "react", "@testing-library/jest-dom"],
     "module": "ESNext",
     "skipLibCheck": true,
 
@@ -25,7 +26,7 @@
       "@/*": ["./src/*"] 
     }
   },
-  "include": ["src"],
+  "include": ["src", "vitest.setup.ts"],
   "exclude": [
     "node_modules",
     "dist"

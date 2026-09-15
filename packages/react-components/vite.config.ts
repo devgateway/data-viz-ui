@@ -4,6 +4,7 @@ import { resolve } from 'path';
 import packageJson from './package.json' with { type: 'json'};
 import preserveDirectives from 'rollup-preserve-directives';
 import dts from 'vite-plugin-dts';
+import tailwindcss from '@tailwindcss/vite';
 
 // const __dirname = resolve();
 
@@ -11,6 +12,7 @@ import dts from 'vite-plugin-dts';
 export default defineConfig({
   plugins: [
     react(),
+    tailwindcss(),
     dts({
       insertTypesEntry: true,
       outDirs: {
@@ -18,12 +20,13 @@ export default defineConfig({
       },
       tsconfigPath: './tsconfig.json',
       include: ['./src/**/*'],
-      exclude: ['./src/**/*.test.ts', './src/**/*.test.tsx'],
+      exclude: ['./src/**/*.test.ts', './src/**/*.test.tsx', './src/vitest-globals.d.ts'],
     }),
     preserveDirectives()
   ],
   build: {
     copyPublicDir: false,
+    cssCodeSplit: true,
     lib: {
       entry: resolve(__dirname, 'src/index.ts'),
       name: '@devgateway/dvz-react-components'
@@ -43,7 +46,8 @@ export default defineConfig({
         return externalDeps.some((dep) => id === dep || id.startsWith(`${dep}/`));
       },
       input: {
-        index: resolve(__dirname, 'src/index.ts')
+        index: resolve(__dirname, 'src/index.ts'),
+        styles: resolve(__dirname, 'src/styles.css')
       },
       output: [
         {
