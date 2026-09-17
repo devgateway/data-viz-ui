@@ -1,8 +1,23 @@
 import { describe, expect, it, vi, type Mock } from 'vitest';
 import { WPClient, createWordPressClient } from './WPClient';
-import { WPConfigError } from './errors';
+import { WPApiError, WPConfigError } from './errors';
 
 const fetchMock = (): Mock => vi.fn(async () => new Response(JSON.stringify([]), { status: 200 }));
+
+const fetchMockWithStatus = (status: number, body: unknown): Mock =>
+    vi.fn(async () => new Response(JSON.stringify(body), { status }));
+
+const rejection = async (promise: Promise<unknown>): Promise<WPApiError> => {
+    try {
+        await promise;
+    } catch (error) {
+        if (error instanceof WPApiError) {
+            return error;
+        }
+        throw error;
+    }
+    throw new Error('expected promise to reject');
+};
 
 const asFetch = (fetchImpl: Mock): typeof fetch => fetchImpl as unknown as typeof fetch;
 
@@ -51,6 +66,76 @@ describe('WPClient#getPosts', () => {
         await client.getPosts({ type: 'news', slug: 'launch' });
 
         expect(calledUrl(fetchImpl)).toBe('https://example.com/wp/wp/v2/news?slug=launch');
+    });
+});
+
+describe('WPClient#getPost', () => {
+    it('fetches a single post by id', async () => {
+        const fetchImpl = fetchMock();
+        const client = createWordPressClient({ baseUrl: 'https://example.com/wp', fetch: asFetch(fetchImpl) });
+
+        await client.getPost('42');
+
+        expect(calledUrl(fetchImpl)).toBe('https://example.com/wp/wp/v2/posts/42');
+    });
+
+    it('rejects with a 401 WPApiError when the post is not published', async () => {
+        const forbidden = { code: 'rest_forbidden', message: 'Sorry, you are not allowed to do that.', data: { status: 401 } };
+        const fetchImpl = fetchMockWithStatus(401, forbidden);
+        const client = createWordPressClient({ baseUrl: 'https://example.com/wp', fetch: asFetch(fetchImpl) });
+
+        const error = await rejection(client.getPost('42'));
+
+        expect(error).toBeInstanceOf(WPApiError);
+        expect(error.status).toBe(401);
+        expect(error.body).toEqual(forbidden);
+    });
+
+    it('rejects with a 404 WPApiError when the post does not exist', async () => {
+        const notFound = { code: 'rest_post_invalid_id', message: 'Invalid post ID.', data: { status: 404 } };
+        const fetchImpl = fetchMockWithStatus(404, notFound);
+        const client = createWordPressClient({ baseUrl: 'https://example.com/wp', fetch: asFetch(fetchImpl) });
+
+        const error = await rejection(client.getPost('999'));
+
+        expect(error).toBeInstanceOf(WPApiError);
+        expect(error.status).toBe(404);
+        expect(error.body).toEqual(notFound);
+    });
+});
+
+describe('WPClient#getPage', () => {
+    it('fetches a single page by id', async () => {
+        const fetchImpl = fetchMock();
+        const client = createWordPressClient({ baseUrl: 'https://example.com/wp', fetch: asFetch(fetchImpl) });
+
+        await client.getPage('7');
+
+        expect(calledUrl(fetchImpl)).toBe('https://example.com/wp/wp/v2/pages/7');
+    });
+
+    it('rejects with a 401 WPApiError when the page is not published', async () => {
+        const forbidden = { code: 'rest_forbidden', message: 'Sorry, you are not allowed to do that.', data: { status: 401 } };
+        const fetchImpl = fetchMockWithStatus(401, forbidden);
+        const client = createWordPressClient({ baseUrl: 'https://example.com/wp', fetch: asFetch(fetchImpl) });
+
+        const error = await rejection(client.getPage('7'));
+
+        expect(error).toBeInstanceOf(WPApiError);
+        expect(error.status).toBe(401);
+        expect(error.body).toEqual(forbidden);
+    });
+
+    it('rejects with a 404 WPApiError when the page does not exist', async () => {
+        const notFound = { code: 'rest_post_invalid_id', message: 'Invalid post ID.', data: { status: 404 } };
+        const fetchImpl = fetchMockWithStatus(404, notFound);
+        const client = createWordPressClient({ baseUrl: 'https://example.com/wp', fetch: asFetch(fetchImpl) });
+
+        const error = await rejection(client.getPage('999'));
+
+        expect(error).toBeInstanceOf(WPApiError);
+        expect(error.status).toBe(404);
+        expect(error.body).toEqual(notFound);
     });
 });
 

@@ -10,59 +10,59 @@ const DEFAULT_HEADERS = {
 };
 
 export interface GetPostsParams {
-    type?: string;
-    slug?: string;
-    taxonomy?: string;
-    categories?: string;
-    before?: Date | string;
-    after?: Date | string;
-    perPage?: number;
-    page?: number;
-    fields?: string;
-    locale?: string;
-    search?: string;
-    previewId?: string;
-    previewNonce?: string;
+    type?: string | null;
+    slug?: string | null;
+    taxonomy?: string | null;
+    categories?: string | null;
+    before?: Date | string | null;
+    after?: Date | string | null;
+    perPage?: number | null;
+    page?: number | null;
+    fields?: string | null;
+    locale?: string | null;
+    search?: string | null;
+    previewId?: string | null;
+    previewNonce?: string | null;
 }
 
 export interface GetPagesParams {
-    slug?: string;
-    parent?: string;
-    before?: Date | string;
-    perPage?: number;
-    page?: number;
-    fields?: string;
-    locale?: string;
-    search?: string;
-    previewId?: string;
-    previewNonce?: string;
-    noCache?: boolean;
+    slug?: string | null;
+    parent?: string | null;
+    before?: Date | string | null;
+    perPage?: number | null;
+    page?: number | null;
+    fields?: string | null;
+    locale?: string | null;
+    search?: string | null;
+    previewId?: string | null;
+    previewNonce?: string | null;
+    noCache?: boolean | null;
 }
 
 export interface GetCategoriesParams {
-    context?: string;
-    page?: number;
-    perPage?: number;
-    search?: string;
-    exclude?: string;
-    include?: string;
-    order?: string;
-    orderby?: string;
-    hideEmpty?: boolean;
-    parent?: string;
-    post?: string;
-    slug?: string;
-    locale?: string;
+    context?: string | null;
+    page?: number | null;
+    perPage?: number | null;
+    search?: string | null;
+    exclude?: string | null;
+    include?: string | null;
+    order?: string | null;
+    orderby?: string | null;
+    hideEmpty?: boolean | null;
+    parent?: string | null;
+    post?: string | null;
+    slug?: string | null;
+    locale?: string | null;
 }
 
 export interface SearchParams {
-    context?: string;
-    page?: number;
-    perPage?: number;
-    search?: string;
-    type?: string;
-    subtype?: string;
-    locale?: string;
+    context?: string | null;
+    page?: number | null;
+    perPage?: number | null;
+    search?: string | null;
+    type?: string | null;
+    subtype?: string | null;
+    locale?: string | null;
 }
 
 /**
@@ -117,6 +117,14 @@ export class WPClient {
         return this.get<Post[]>(`/wp/v2/${type}`, query);
     }
 
+    getPost(id: string): Promise<WPResponse<Post>> {
+        return this.get<Post>(`/wp/v2/posts/${id}`);
+    }
+
+    getPage(id: string): Promise<WPResponse<Post>> {
+        return this.get<Post>(`/wp/v2/pages/${id}`);
+    }
+
     getPages(params: GetPagesParams = {}): Promise<WPResponse<Post[]>> {
         const { slug, parent, before, perPage, page, fields, locale, search, previewId, previewNonce, noCache } = params;
 
@@ -140,11 +148,11 @@ export class WPClient {
         return this.get<Post[]>('/wp/v2/pages', query);
     }
 
-    getMedia(slug: string, locale?: string): Promise<WPResponse<Media>> {
+    getMedia(slug: string, locale?: string | null): Promise<WPResponse<Media>> {
         return this.get<Media>(`/wp/v2/media/${slug}`, { lang: locale });
     }
 
-    getSettings(locale?: string, changesetUuid?: string): Promise<WPResponse<DgSettings>> {
+    getSettings(locale?: string | null, changesetUuid?: string | null): Promise<WPResponse<DgSettings>> {
         return this.get<DgSettings>('/dg/v1/settings', {
             cacheBust: randomCacheBust(),
             lang: locale,
@@ -153,7 +161,7 @@ export class WPClient {
     }
 
     /** WP Menus plugin response shape is plugin-specific; type it at the call site. */
-    getMenu<T = unknown>(name: string, locale?: string): Promise<WPResponse<T>> {
+    getMenu<T = unknown>(name: string, locale?: string | null): Promise<WPResponse<T>> {
         return this.get<T>(`/menus/v1/menus/${name}`, { lang: locale });
     }
 
@@ -178,7 +186,7 @@ export class WPClient {
     }
 
     /** Returns the terms of an arbitrary taxonomy (e.g. "categories", "tags"); type it at the call site. */
-    getTaxonomy<T = WPTerm[]>(name: string, locale?: string): Promise<WPResponse<T>> {
+    getTaxonomy<T = WPTerm[]>(name: string, locale?: string | null): Promise<WPResponse<T>> {
         return this.get<T>(`/wp/v2/${name}`, { lang: locale, per_page: 100 });
     }
 
