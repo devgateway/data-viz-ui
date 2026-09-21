@@ -28,7 +28,7 @@ export interface Post {
     tags:            any[];
     bread_crumbs:    any[];
     class_list:      string[];
-    acf:             any[];
+    acf?:             Record<string, any>[];
     yoast_head:      string;
     yoast_head_json: PostYoastHeadJSON;
     meta_fields:     { [key: string]: string[] };
