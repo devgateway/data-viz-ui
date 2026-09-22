@@ -21,6 +21,14 @@ const randomSuffix = (): string => (Math.random() + 1).toString(36).substring(7)
  * degrades to a no-op (placeholders render as static HTML) when there's no
  * EmbedProvider above it.
  *
+ * Every placeholder is replaced with a brand-new element before mounting,
+ * even when it's already a <div>: the original node is still "owned" by the
+ * SSR-hydrated tree above it (it came from that tree's own
+ * dangerouslySetInnerHTML), so calling createRoot() directly on it creates
+ * two React roots fighting over the same DOM node - the new root's render
+ * silently never commits. A freshly created node was never part of any
+ * React tree, so there's no such conflict.
+ *
  * `display: contents` on the wrapper keeps it invisible to layout/CSS while
  * still giving `querySelectorAll` a scope to search - a global
  * `document.querySelectorAll` (as in v1) would double-process elements
@@ -41,24 +49,22 @@ export function EmbeddedGateway({ children, parent, parentUnique }: EmbeddedGate
         const elements = Array.from(allVizComponents).filter((el) => !el.closest('self-render-component'));
 
         elements.forEach((element, index) => {
-            let container: HTMLElement = element;
             const componentName = element.getAttribute('data-component');
-            element.removeAttribute('data-component');
-
-            if (element.nodeName !== 'DIV') {
-                const div = document.createElement('div');
-                element.replaceWith(div);
-                element.getAttributeNames().forEach((name) => {
-                    div.setAttribute(name, element.getAttribute(name)!);
-                });
-                container = div;
-            }
 
             if (!componentName) {
                 return;
             }
 
             const Component = registry[componentName];
+
+            const container = document.createElement('div');
+            element.getAttributeNames().forEach((name) => {
+                if (name !== 'data-component') {
+                    container.setAttribute(name, element.getAttribute(name)!);
+                }
+            });
+            const childContent = element.innerHTML;
+            element.replaceWith(container);
 
             if (!Component) {
                 container.innerHTML = `<h1>Data Viz Error</h1><h4>Component <i>${componentName}</i> not found</h4>`;
@@ -67,11 +73,8 @@ export function EmbeddedGateway({ children, parent, parentUnique }: EmbeddedGate
 
             const props: Record<string, string> = {};
             Array.from(element.attributes).forEach((attr) => {
-                props[attr.name] = attr.value;
-            });
-            element.getAttributeNames().forEach((name) => {
-                if (name.startsWith('data-')) {
-                    element.removeAttribute(name);
+                if (attr.name !== 'data-component') {
+                    props[attr.name] = attr.value;
                 }
             });
 
@@ -79,7 +82,7 @@ export function EmbeddedGateway({ children, parent, parentUnique }: EmbeddedGate
             roots.push(root);
 
             const embeddedElement = (
-                <Component unique={`${parentUnique ?? ''}_embeddable_${index}${randomSuffix()}`} {...props} childContent={element.innerHTML} />
+                <Component unique={`${parentUnique ?? ''}_embeddable_${index}${randomSuffix()}`} {...props} childContent={childContent} />
             );
 
             root.render(wrapper ? wrapper(embeddedElement) : embeddedElement);

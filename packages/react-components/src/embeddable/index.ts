@@ -5,9 +5,11 @@ export interface ComponentsProp {
 }
 
 const download = lazy(() => import('./download'));
+const search = lazy(() => import('./search'));
 
 export const components: ComponentsProp = {
-    download: download
+    download: download,
+    search: search
 }
 
 export const customizer = {
