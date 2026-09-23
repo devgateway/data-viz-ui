@@ -58,4 +58,19 @@ describe('DatasetLicense', () => {
     expect(screen.getByText('You may use, share, and adapt this data.')).toBeInTheDocument();
     expect(fetch).toHaveBeenCalledWith('https://example.com/datasets/2');
   });
+
+  it('renders the license name badge but no text paragraph when licenseText is absent', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({ licenseName: 'CC BY 4.0' }),
+      })
+    );
+
+    const { container } = render(<DatasetLicense apiUrl="https://example.com/datasets/1" />);
+
+    await waitFor(() => expect(screen.getByText('CC BY 4.0')).toBeInTheDocument());
+    expect(container.querySelector('p')).not.toBeInTheDocument();
+  });
 });
