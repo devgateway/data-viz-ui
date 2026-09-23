@@ -1,5 +1,7 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import ThemeCard, { type Theme } from './ThemeCard'
+import { joinApiUrl } from '../shared/url'
+import { useJsonFetch } from '../shared/useJsonFetch'
 
 export type ThemeListColumns = 2 | 3 | 4
 
@@ -25,37 +27,11 @@ const isValidColumns = (value: number): value is ThemeListColumns => value === 2
 
 const ThemeList = (props: ThemeListProps) => {
   const apiUrl = (props['data-api-url'] as string) ?? props.apiUrl
-  const parsedColumns = Number(props["data-columns"] ?? props.columns)
+  const parsedColumns = Number(props['data-columns'] ?? props.columns)
   const columns = isValidColumns(parsedColumns) ? parsedColumns : 4
   const { themes: providedThemes = [], onSelect } = props
 
-  const [fetchedThemes, setFetchedThemes] = useState<Theme[]>([])
-
-  useEffect(() => {
-    if (!apiUrl) {
-      return
-    }
-
-    let cancelled = false
-
-    fetch(`${apiUrl}/`)
-      .then((response) => (response.ok ? response.json() : Promise.reject(new Error(`Request failed: ${response.status}`))))
-      .then((data: Theme[]) => {
-        if (!cancelled) {
-          setFetchedThemes(data)
-        }
-      })
-      .catch(() => {
-        if (!cancelled) {
-          setFetchedThemes([])
-        }
-      })
-
-    return () => {
-      cancelled = true
-    }
-  }, [apiUrl])
-
+  const fetchedThemes = useJsonFetch<Theme[]>(apiUrl ? joinApiUrl(apiUrl) : undefined, [])
   const themes = apiUrl ? fetchedThemes : providedThemes
 
   return (

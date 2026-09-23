@@ -56,7 +56,7 @@ describe('ThemeList', () => {
 
     await waitFor(() => expect(screen.getByRole('button', { name: /From API/ })).toBeInTheDocument());
     expect(screen.queryByRole('button', { name: /Adolescent data/ })).not.toBeInTheDocument();
-    expect(fetch).toHaveBeenCalledWith('https://example.com/themes/');
+    expect(fetch).toHaveBeenCalledWith('https://example.com/themes');
   });
 
   it('renders nothing extra when the fetch fails', async () => {

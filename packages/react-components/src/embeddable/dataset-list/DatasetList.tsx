@@ -1,5 +1,7 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import DatasetListItem, { type Dataset } from './DatasetListItem'
+import { joinApiUrl } from '../shared/url'
+import { useJsonFetch } from '../shared/useJsonFetch'
 
 export interface DatasetListProps {
   datasets?: Dataset[]
@@ -18,33 +20,7 @@ const DatasetList = (props: DatasetListProps) => {
   const viewAllUrl = (props['data-view-all-url'] as string) ?? props.viewAllUrl
   const { datasets: providedDatasets = [] } = props
 
-  const [fetchedDatasets, setFetchedDatasets] = useState<Dataset[]>([])
-
-  useEffect(() => {
-    if (!apiUrl) {
-      return
-    }
-
-    let cancelled = false
-
-    fetch(apiUrl)
-      .then((response) => (response.ok ? response.json() : Promise.reject(new Error(`Request failed: ${response.status}`))))
-      .then((data: Dataset[]) => {
-        if (!cancelled) {
-          setFetchedDatasets(data)
-        }
-      })
-      .catch(() => {
-        if (!cancelled) {
-          setFetchedDatasets([])
-        }
-      })
-
-    return () => {
-      cancelled = true
-    }
-  }, [apiUrl])
-
+  const fetchedDatasets = useJsonFetch<Dataset[]>(apiUrl ? joinApiUrl(apiUrl) : undefined, [])
   const datasets = apiUrl ? fetchedDatasets : providedDatasets
 
   return (
