@@ -83,4 +83,10 @@ describe('DatasetCitation', () => {
     await waitFor(() => expect(screen.getByText('APA text')).toBeInTheDocument());
     expect(fetch).toHaveBeenCalledWith('https://example.com/datasets/2');
   });
+
+  it('renders nothing when neither apiUrl nor data-api-url prop is provided', async () => {
+    const { container } = render(<DatasetCitation />);
+
+    expect(container).toBeEmptyDOMElement();
+  });
 });
