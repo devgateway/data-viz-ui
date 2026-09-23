@@ -48,4 +48,18 @@ describe('DatasetResources', () => {
 
     await waitFor(() => expect(screen.getByRole('link', { name: /Google/ })).toBeInTheDocument());
   });
+
+  it('renders a resource without type field and omits the type label', async () => {
+    const resourcesWithoutType: DatasetResource[] = [
+      { id: 2, title: 'Wikipedia', url: 'https://wikipedia.org' },
+    ];
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => resourcesWithoutType }));
+
+    render(<DatasetResources apiUrl="https://example.com/datasets/1" />);
+
+    await waitFor(() => expect(screen.getByRole('link', { name: /Wikipedia/ })).toBeInTheDocument());
+    expect(screen.getByRole('link', { name: /Wikipedia/ })).toHaveAttribute('href', 'https://wikipedia.org');
+    // Verify that no type label paragraph is rendered
+    expect(screen.queryByText(/type/i)).not.toBeInTheDocument();
+  });
 });
