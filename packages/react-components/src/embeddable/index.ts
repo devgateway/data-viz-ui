@@ -15,18 +15,21 @@ export const loaders: Record<string, () => Promise<{ default: React.ComponentTyp
     search: () => import('./search'),
     themeList: () => import('./theme-list'),
     datasetList: () => import('./dataset-list'),
+    datasetFiles: () => import('./dataset-files'),
 }
 
 const download = lazy(loaders.download);
 const search = lazy(loaders.search);
 const themeList = lazy(loaders.themeList);
 const datasetList = lazy(loaders.datasetList);
+const datasetFiles = lazy(loaders.datasetFiles);
 
 export const components: ComponentsProp = {
     download: download,
     search: search,
     themeList: themeList,
-    datasetList: datasetList
+    datasetList: datasetList,
+    datasetFiles: datasetFiles
 }
 
 export const customizer = {
