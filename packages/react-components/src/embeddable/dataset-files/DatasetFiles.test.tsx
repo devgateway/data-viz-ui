@@ -36,6 +36,18 @@ describe('DatasetFiles', () => {
     expect(screen.getByText('Survey')).toBeInTheDocument();
   });
 
+  it('falls back to "Files" group label when both categoryValueName and type are missing', async () => {
+    const filesWithoutCategory: DatasetFile[] = [
+      { id: 'd', name: 'unclassified.txt', sizeBytes: 1024 },
+    ];
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => filesWithoutCategory }));
+
+    render(<DatasetFiles apiUrl="https://example.com/datasets/1" />);
+
+    await waitFor(() => expect(screen.getByText('unclassified.txt')).toBeInTheDocument());
+    expect(screen.getByText('Files')).toBeInTheDocument();
+  });
+
   it('renders a human-readable file size', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => files }));
 
