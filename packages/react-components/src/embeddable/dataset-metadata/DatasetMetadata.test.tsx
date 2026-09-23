@@ -59,4 +59,14 @@ describe('DatasetMetadata', () => {
     await waitFor(() => expect(fetch).toHaveBeenCalled());
     expect(screen.queryByText('Empty field')).not.toBeInTheDocument();
   });
+
+  it('reads apiUrl from data-api-url, as passed by the embed gateway', async () => {
+    const entries: DatasetMetadataEntry[] = [{ label: 'Collection dates', value: 'Jan-Mar 2024' }];
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => entries }));
+
+    render(<DatasetMetadata {...{ 'data-api-url': 'https://example.com/datasets/1' }} />);
+
+    await waitFor(() => expect(screen.getByText('Collection dates')).toBeInTheDocument());
+    expect(fetch).toHaveBeenCalledWith('https://example.com/datasets/1/metadata');
+  });
 });
