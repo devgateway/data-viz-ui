@@ -1,4 +1,5 @@
 import React from 'react'
+import { Form } from 'react-router'
 
 export type SearchWidth = 'sm' | 'normal' | 'lg'
 
@@ -30,6 +31,10 @@ const Search = (props: SearchProps) => {
 
   const editing = props.editing ?? false
 
+  // React Router's <Form> intercepts the submit itself for client-side navigation;
+  // calling preventDefault here (before it gets there) is the documented way to
+  // cancel a submission outright - used when there's nowhere configured to go, or
+  // when rendering inside the block-editor preview where navigating makes no sense.
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     if (editing || !redirectUrl) {
       e.preventDefault()
@@ -37,7 +42,7 @@ const Search = (props: SearchProps) => {
   }
 
   return (
-    <form method="get" action={redirectUrl} onSubmit={handleSubmit} className={`flex gap-2 ${WIDTH_CLASSES[width]}`}>
+    <Form method="get" action={redirectUrl} onSubmit={handleSubmit} className={`flex gap-2 ${WIDTH_CLASSES[width]}`}>
       <div className="relative flex-1">
         <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/40" width="16" height="16" viewBox="0 0 16 16" fill="none">
           <circle cx="7" cy="7" r="4.5" stroke="currentColor" strokeWidth="1.4" />
@@ -57,7 +62,7 @@ const Search = (props: SearchProps) => {
       >
         Search
       </button>
-    </form>
+    </Form>
   )
 }
 

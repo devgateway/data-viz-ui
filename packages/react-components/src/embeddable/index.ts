@@ -4,12 +4,29 @@ export interface ComponentsProp {
     [key: string]: React.ComponentType<any>
 }
 
-const download = lazy(() => import('./download'));
-const search = lazy(() => import('./search'));
+// The same loader functions back both maps below: `lazy()` wraps them for
+// client-side code-splitting, but `React.lazy` components can't be rendered
+// by synchronous SSR APIs like `renderToStaticMarkup` (they throw "A
+// component suspended..." since there's no Suspense boundary to resolve
+// against). Server-side rendering (see front's wp-embeddables.server.ts)
+// needs the plain, awaited module instead - hence exposing `loaders` too.
+export const loaders: Record<string, () => Promise<{ default: React.ComponentType<any> }>> = {
+    download: () => import('./download'),
+    search: () => import('./search'),
+    themeList: () => import('./theme-list'),
+    datasetList: () => import('./dataset-list'),
+}
+
+const download = lazy(loaders.download);
+const search = lazy(loaders.search);
+const themeList = lazy(loaders.themeList);
+const datasetList = lazy(loaders.datasetList);
 
 export const components: ComponentsProp = {
     download: download,
-    search: search
+    search: search,
+    themeList: themeList,
+    datasetList: datasetList
 }
 
 export const customizer = {
