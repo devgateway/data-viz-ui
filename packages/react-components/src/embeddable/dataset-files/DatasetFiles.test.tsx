@@ -12,24 +12,26 @@ const files: DatasetFile[] = [
   { id: 'c', name: 'photo.png', sizeBytes: 448386, type: 'Survey' },
 ];
 
+const detail = { id: 1, name: 'Test', createdAt: '2024-01-01', status: 'Published', metadata: [], resources: [], files };
+
 afterEach(() => {
   vi.unstubAllGlobals();
 });
 
 describe('DatasetFiles', () => {
-  it('fetches files from {apiUrl}/files and groups them by category', async () => {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify(files), { status: 200 })));
+  it('fetches the dataset detail and groups files by category', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify(detail), { status: 200 })));
 
     renderWithProvider(<DatasetFiles apiUrl="https://example.com/datasets/1" />);
 
     await waitFor(() => expect(screen.getByText('individual.csv')).toBeInTheDocument());
     expect(screen.getByText('Individual Dataset')).toBeInTheDocument();
     expect(screen.getByText('Household Dataset')).toBeInTheDocument();
-    expect((vi.mocked(fetch).mock.lastCall![0] as Request).url).toBe('https://example.com/datasets/1/files');
+    expect((vi.mocked(fetch).mock.lastCall![0] as Request).url).toBe('https://example.com/datasets/1');
   });
 
   it('falls back to the type field as a group label when categoryValueName is missing', async () => {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify(files), { status: 200 })));
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify(detail), { status: 200 })));
 
     renderWithProvider(<DatasetFiles apiUrl="https://example.com/datasets/1" />);
 
@@ -38,10 +40,8 @@ describe('DatasetFiles', () => {
   });
 
   it('falls back to "Files" group label when both categoryValueName and type are missing', async () => {
-    const filesWithoutCategory: DatasetFile[] = [
-      { id: 'd', name: 'unclassified.txt', sizeBytes: 1024 },
-    ];
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify(filesWithoutCategory), { status: 200 })));
+    const unclassified: DatasetFile[] = [{ id: 'd', name: 'unclassified.txt', sizeBytes: 1024 }];
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify({ ...detail, files: unclassified }), { status: 200 })));
 
     renderWithProvider(<DatasetFiles apiUrl="https://example.com/datasets/1" />);
 
@@ -50,7 +50,7 @@ describe('DatasetFiles', () => {
   });
 
   it('renders a human-readable file size', async () => {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify(files), { status: 200 })));
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify(detail), { status: 200 })));
 
     renderWithProvider(<DatasetFiles apiUrl="https://example.com/datasets/1" />);
 
@@ -68,7 +68,7 @@ describe('DatasetFiles', () => {
   });
 
   it('renders a "download all" link built from apiUrl when a label is given', async () => {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify([]), { status: 200 })));
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify({ ...detail, files: [] }), { status: 200 })));
 
     renderWithProvider(<DatasetFiles apiUrl="https://example.com/datasets/1" downloadAllLabel="Download all files (.zip)" />);
 
@@ -80,7 +80,7 @@ describe('DatasetFiles', () => {
   });
 
   it('does not render a "download all" link when no label is given', async () => {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify([]), { status: 200 })));
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify({ ...detail, files: [] }), { status: 200 })));
 
     renderWithProvider(<DatasetFiles apiUrl="https://example.com/datasets/1" />);
 
@@ -89,7 +89,7 @@ describe('DatasetFiles', () => {
   });
 
   it('reads apiUrl and downloadAllLabel from data-* attribute props, as passed by the embed gateway', async () => {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify(files), { status: 200 })));
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify(detail), { status: 200 })));
 
     renderWithProvider(
       <DatasetFiles

@@ -8,8 +8,8 @@ import type { Theme } from './ThemeCard';
 import { renderWithProvider } from '../shared/testUtils';
 
 const themes: Theme[] = [
-  { id: 'adolescent-data', title: 'Adolescent data', description: 'Tobacco use', countries: 3, datasets: 6, active: true },
-  { id: 'illicit-trade', title: 'Illicit trade', description: 'DRC · South Africa', active: false },
+  { id: 1, value: 'Adolescent data', description: 'Tobacco use', countries: [{ id: 10, value: 'Kenya' }, { id: 11, value: 'Zambia' }, { id: 12, value: 'DRC' }], datasetCount: 6, status: 'Active' },
+  { id: 2, value: 'Illicit trade', description: 'DRC · South Africa', countries: [], datasetCount: 0, status: 'Coming soon' },
 ];
 
 afterEach(() => {
@@ -46,14 +46,14 @@ describe('ThemeList', () => {
 
     fireEvent.click(screen.getByRole('button', { name: /Adolescent data/ }));
 
-    expect(onSelect).toHaveBeenCalledWith('adolescent-data');
+    expect(onSelect).toHaveBeenCalledWith(1);
   });
 
   it('fetches themes from apiUrl instead of using the themes prop', async () => {
-    const fetched: Theme[] = [{ id: 'from-api', title: 'From API', description: 'Fetched theme', active: true }];
+    const fetched: Theme[] = [{ id: 3, value: 'From API', description: 'Fetched theme', countries: [], datasetCount: 0, status: 'Active' }];
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify(fetched), { status: 200 })));
 
-    renderWithProvider(<ThemeList apiUrl="https://example.com/themes" themes={themes} />);
+    renderWithProvider(<ThemeList apiUrl="https://example.com" themes={themes} />);
 
     await waitFor(() => expect(screen.getByRole('button', { name: /From API/ })).toBeInTheDocument());
     expect(screen.queryByRole('button', { name: /Adolescent data/ })).not.toBeInTheDocument();
@@ -63,7 +63,7 @@ describe('ThemeList', () => {
   it('renders nothing extra when the fetch fails', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(null, { status: 500 })));
 
-    renderWithProvider(<ThemeList apiUrl="https://example.com/themes" />);
+    renderWithProvider(<ThemeList apiUrl="https://example.com" />);
 
     await waitFor(() => expect(fetch).toHaveBeenCalled());
     expect(screen.queryByRole('button')).not.toBeInTheDocument();
@@ -71,10 +71,10 @@ describe('ThemeList', () => {
   });
 
   it('reads the api url and columns from data-* attribute props, as passed by the embed gateway', async () => {
-    const fetched: Theme[] = [{ id: 'from-api', title: 'From API', description: 'Fetched theme', active: true }];
+    const fetched: Theme[] = [{ id: 3, value: 'From API', description: 'Fetched theme', countries: [], datasetCount: 0, status: 'Active' }];
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify(fetched), { status: 200 })));
 
-    const { container } = renderWithProvider(<ThemeList {...{ 'data-api-url': 'https://example.com/themes', 'data-columns': '2' }} />);
+    const { container } = renderWithProvider(<ThemeList {...{ 'data-api-url': 'https://example.com', 'data-columns': '2' }} />);
 
     await waitFor(() => expect(screen.getByRole('button', { name: /From API/ })).toBeInTheDocument());
     expect(container.firstElementChild).toHaveClass('grid-cols-1', 'sm:grid-cols-2');

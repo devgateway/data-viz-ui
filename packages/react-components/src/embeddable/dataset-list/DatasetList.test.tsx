@@ -3,12 +3,12 @@ import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { screen, waitFor } from '@testing-library/react';
 import DatasetList from './DatasetList';
-import type { Dataset } from './DatasetListItem';
+import type { LatestDatasetItem } from './DatasetListItem';
 import { renderWithProvider } from '../shared/testUtils';
 
-const datasets: Dataset[] = [
-  { id: 'drc', surveyTitle: 'DaYTA DRC, 2023–2024', sampleSize: 4218, numFiles: 12, license: 'CC BY 4.0', releaseDate: '2024-06-01', doi: '10.5281/zenodo.11234567' },
-  { id: 'kenya', surveyTitle: 'DaYTA Kenya, 2023–2024', sampleSize: 3000, numFiles: 8, license: 'CC BY 4.0', releaseDate: '2024-05-01', doi: '10.5281/zenodo.11234568' },
+const datasets: LatestDatasetItem[] = [
+  { id: 1, name: 'DaYTA DRC, 2023–2024', createdAt: '2024-06-01', recordCount: 4218, fileCount: 12, licenseName: 'CC BY 4.0', doi: '10.5281/zenodo.11234567', countries: [] },
+  { id: 2, name: 'DaYTA Kenya, 2023–2024', createdAt: '2024-05-01', recordCount: 3000, fileCount: 8, licenseName: 'CC BY 4.0', doi: '10.5281/zenodo.11234568', countries: [] },
 ];
 
 afterEach(() => {
@@ -37,33 +37,33 @@ describe('DatasetList', () => {
   });
 
   it('fetches datasets from apiUrl instead of using the datasets prop', async () => {
-    const fetched: Dataset[] = [{ id: 'from-api', surveyTitle: 'From API' }];
+    const fetched: LatestDatasetItem[] = [{ id: 3, name: 'From API', createdAt: '2024-01-01', fileCount: 0, countries: [] }];
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify(fetched), { status: 200 })));
 
-    renderWithProvider(<DatasetList apiUrl="https://example.com/datasets" datasets={datasets} />);
+    renderWithProvider(<DatasetList apiUrl="https://example.com" datasets={datasets} />);
 
     await waitFor(() => expect(screen.getByText('From API')).toBeInTheDocument());
     expect(screen.queryByText('DaYTA DRC, 2023–2024')).not.toBeInTheDocument();
-    expect((vi.mocked(fetch).mock.lastCall![0] as Request).url).toBe('https://example.com/datasets');
+    expect((vi.mocked(fetch).mock.lastCall![0] as Request).url).toBe('https://example.com/datasets/latest');
   });
 
   it('renders nothing extra when the fetch fails', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(null, { status: 500 })));
 
-    renderWithProvider(<DatasetList apiUrl="https://example.com/datasets" />);
+    renderWithProvider(<DatasetList apiUrl="https://example.com" />);
 
     await waitFor(() => expect(fetch).toHaveBeenCalled());
     expect(screen.queryByText(/DaYTA/)).not.toBeInTheDocument();
   });
 
   it('reads api url and view-all fields from data-* attribute props, as passed by the embed gateway', async () => {
-    const fetched: Dataset[] = [{ id: 'from-api', surveyTitle: 'From API' }];
+    const fetched: LatestDatasetItem[] = [{ id: 3, name: 'From API', createdAt: '2024-01-01', fileCount: 0, countries: [] }];
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify(fetched), { status: 200 })));
 
     renderWithProvider(
       <DatasetList
         {...{
-          'data-api-url': 'https://example.com/datasets',
+          'data-api-url': 'https://example.com',
           'data-view-all-label': 'See everything',
           'data-view-all-url': '/all-data',
         }}

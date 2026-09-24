@@ -11,4 +11,4 @@ const DatasetList = (props: DatasetListProps) => (
 
 export default DatasetList
 export type { DatasetListProps } from './DatasetList'
-export type { Dataset, DatasetListItemProps } from './DatasetListItem'
+export type { LatestDatasetItem, DatasetListItemProps } from './DatasetListItem'

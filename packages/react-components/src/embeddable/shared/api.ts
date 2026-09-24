@@ -1,16 +1,38 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+import { joinApiUrl } from './url'
+import type { DatasetDetail, DatasetResource, LatestDatasetItem, Theme } from './types'
 
-export const embeddableApi = createApi({
-  reducerPath: 'embeddableApi',
+export const portalApi = createApi({
+  reducerPath: 'portalApi',
   baseQuery: fetchBaseQuery({ baseUrl: '' }),
+  tagTypes: ['DatasetDetail', 'DatasetResources', 'LatestDatasets', 'Themes'],
   endpoints: (builder) => ({
-    getJson: builder.query<unknown, string>({
-      query: (url) => {
-        console.log("fetching URL:", url)
-        return url;
-      }
+    // GET /datasets/latest
+    getLatestDatasets: builder.query<LatestDatasetItem[], string>({
+      query: (baseUrl) => joinApiUrl(baseUrl, '/datasets/latest'),
+      providesTags: (_result, _error, baseUrl) => [{ type: 'LatestDatasets', id: baseUrl }],
+    }),
+    // GET /themes
+    getThemes: builder.query<Theme[], string>({
+      query: (baseUrl) => joinApiUrl(baseUrl, '/themes'),
+      providesTags: (_result, _error, baseUrl) => [{ type: 'Themes', id: baseUrl }],
+    }),
+    // GET /datasets/{id} — full detail: doi, license, citation, files, metadata
+    getDatasetDetail: builder.query<DatasetDetail, string>({
+      query: (url) => url,
+      providesTags: (_result, _error, url) => [{ type: 'DatasetDetail', id: url }],
+    }),
+    // GET /datasets/{id}/resources
+    getDatasetResources: builder.query<DatasetResource[], string>({
+      query: (url) => joinApiUrl(url, 'resources'),
+      providesTags: (_result, _error, url) => [{ type: 'DatasetResources', id: url }],
     }),
   }),
 })
 
-export const { useGetJsonQuery } = embeddableApi
+export const {
+  useGetLatestDatasetsQuery,
+  useGetThemesQuery,
+  useGetDatasetDetailQuery,
+  useGetDatasetResourcesQuery,
+} = portalApi

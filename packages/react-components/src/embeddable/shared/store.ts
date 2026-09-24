@@ -1,11 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit'
-import { embeddableApi } from './api'
+import { portalApi } from './api'
 
 export const createEmbeddableStore = () =>
   configureStore({
     reducer: {
-      [embeddableApi.reducerPath]: embeddableApi.reducer,
+      [portalApi.reducerPath]: portalApi.reducer,
     },
     middleware: (getDefaultMiddleware) =>
-      getDefaultMiddleware().concat(embeddableApi.middleware),
+      getDefaultMiddleware().concat(portalApi.middleware),
   })

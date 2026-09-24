@@ -1,12 +1,11 @@
 "use client"
 import React from 'react'
 import { skipToken } from '@reduxjs/toolkit/query/react'
-import DatasetListItem, { type Dataset } from './DatasetListItem'
-import { joinApiUrl } from '../shared/url'
-import { useGetJsonQuery } from '../shared/api'
+import DatasetListItem, { type LatestDatasetItem } from './DatasetListItem'
+import { useGetLatestDatasetsQuery } from '../shared/api'
 
 export interface DatasetListProps {
-  datasets?: Dataset[]
+  datasets?: LatestDatasetItem[]
   apiUrl?: string
   viewAllLabel?: string
   viewAllUrl?: string
@@ -22,9 +21,8 @@ const DatasetList = (props: DatasetListProps) => {
   const viewAllUrl = (props['data-view-all-url'] as string) ?? props.viewAllUrl
   const { datasets: providedDatasets = [] } = props;
 
-  const finalUrl = apiUrl ? joinApiUrl(apiUrl, "/datasets/latest") : undefined;
-  const { data: fetchedDatasets } = useGetJsonQuery(finalUrl ? finalUrl : skipToken)
-  const datasets = apiUrl ? ((fetchedDatasets as Dataset[]) ?? []) : providedDatasets
+  const { data: fetchedDatasets } = useGetLatestDatasetsQuery(apiUrl ?? skipToken)
+  const datasets = apiUrl ? (fetchedDatasets ?? []) : providedDatasets
 
   return (
     <div>

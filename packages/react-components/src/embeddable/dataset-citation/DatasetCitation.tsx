@@ -1,9 +1,7 @@
 import React, { useId } from 'react'
 import { skipToken } from '@reduxjs/toolkit/query/react'
-import { joinApiUrl } from '../shared/url'
-import { useGetJsonQuery } from '../shared/api'
+import { useGetDatasetDetailQuery } from '../shared/api'
 import CopyButton from '../shared/CopyButton'
-import type { DatasetDetail } from '../shared/types'
 
 export interface DatasetCitationProps {
   apiUrl?: string
@@ -17,11 +15,10 @@ const TAB_CLASS =
 const DatasetCitation = (props: DatasetCitationProps) => {
   const apiUrl = (props['data-api-url'] as string) ?? props.apiUrl
 
-  const { data } = useGetJsonQuery(apiUrl ? joinApiUrl(apiUrl) : skipToken)
-  const dataset = (data as DatasetDetail) ?? {}
+  const { data: dataset } = useGetDatasetDetailQuery(apiUrl ?? skipToken)
   const groupId = useId()
 
-  if (!dataset.citationApa && !dataset.citationBibtex) {
+  if (!dataset?.citationApa && !dataset?.citationBibtex) {
     return null
   }
 

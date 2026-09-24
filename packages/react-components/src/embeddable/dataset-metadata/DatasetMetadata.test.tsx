@@ -6,35 +6,27 @@ import DatasetMetadata from './DatasetMetadata';
 import type { DatasetMetadataEntry } from './DatasetMetadata';
 import { renderWithProvider } from '../shared/testUtils';
 
+const detail = (metadata: DatasetMetadataEntry[]) => ({
+  id: 1, name: 'Test', createdAt: '2024-01-01', status: 'Published', files: [], resources: [], metadata,
+});
+
 afterEach(() => {
   vi.unstubAllGlobals();
 });
 
 describe('DatasetMetadata', () => {
-  it('fetches metadata from {apiUrl}/metadata and renders label/value pairs', async () => {
-    const entries: DatasetMetadataEntry[] = [{ label: 'Collection dates', value: 'Jan-Mar 2024' }];
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify(entries), { status: 200 })));
+  it('fetches the dataset detail and renders metadata label/value pairs', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify(detail([{ label: 'Collection dates', value: 'Jan-Mar 2024' }])), { status: 200 })));
 
     renderWithProvider(<DatasetMetadata apiUrl="https://example.com/datasets/1" />);
 
     await waitFor(() => expect(screen.getByText('Collection dates')).toBeInTheDocument());
     expect(screen.getByText('Jan-Mar 2024')).toBeInTheDocument();
-    expect((vi.mocked(fetch).mock.lastCall![0] as Request).url).toBe('https://example.com/datasets/1/metadata');
+    expect((vi.mocked(fetch).mock.lastCall![0] as Request).url).toBe('https://example.com/datasets/1');
   });
 
-  it('accepts "key" as an alias for "label"', async () => {
-    const entries: DatasetMetadataEntry[] = [{ key: 'Version', value: '1.2' }];
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify(entries), { status: 200 })));
-
-    renderWithProvider(<DatasetMetadata apiUrl="https://example.com/datasets/1" />);
-
-    await waitFor(() => expect(screen.getByText('Version')).toBeInTheDocument());
-    expect(screen.getByText('1.2')).toBeInTheDocument();
-  });
-
-  it('skips an entry with no label or key', async () => {
-    const entries: DatasetMetadataEntry[] = [{ value: 'orphan value' } as DatasetMetadataEntry];
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify(entries), { status: 200 })));
+  it('skips an entry with no label', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify(detail([{ value: 'orphan value' } as DatasetMetadataEntry])), { status: 200 })));
 
     renderWithProvider(<DatasetMetadata apiUrl="https://example.com/datasets/1" />);
 
@@ -52,8 +44,7 @@ describe('DatasetMetadata', () => {
   });
 
   it('skips an entry with a label but no value', async () => {
-    const entries: DatasetMetadataEntry[] = [{ label: 'Empty field', value: undefined } as unknown as DatasetMetadataEntry];
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify(entries), { status: 200 })));
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify(detail([{ label: 'Empty field', value: undefined } as unknown as DatasetMetadataEntry])), { status: 200 })));
 
     renderWithProvider(<DatasetMetadata apiUrl="https://example.com/datasets/1" />);
 
@@ -62,12 +53,11 @@ describe('DatasetMetadata', () => {
   });
 
   it('reads apiUrl from data-api-url, as passed by the embed gateway', async () => {
-    const entries: DatasetMetadataEntry[] = [{ label: 'Collection dates', value: 'Jan-Mar 2024' }];
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify(entries), { status: 200 })));
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify(detail([{ label: 'Collection dates', value: 'Jan-Mar 2024' }])), { status: 200 })));
 
     renderWithProvider(<DatasetMetadata {...{ 'data-api-url': 'https://example.com/datasets/1' }} />);
 
     await waitFor(() => expect(screen.getByText('Collection dates')).toBeInTheDocument());
-    expect((vi.mocked(fetch).mock.lastCall![0] as Request).url).toBe('https://example.com/datasets/1/metadata');
+    expect((vi.mocked(fetch).mock.lastCall![0] as Request).url).toBe('https://example.com/datasets/1');
   });
 });

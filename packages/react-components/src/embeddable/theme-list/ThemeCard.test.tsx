@@ -6,19 +6,21 @@ import ThemeCard from './ThemeCard';
 import type { Theme } from './ThemeCard';
 
 const activeTheme: Theme = {
-  id: 'adolescent-data',
-  title: 'Adolescent data',
+  id: 1,
+  value: 'Adolescent data',
   description: 'Tobacco and nicotine use among adolescents',
-  countries: 3,
-  datasets: 6,
-  active: true,
+  countries: [{ id: 10, value: 'Kenya' }, { id: 11, value: 'Zambia' }, { id: 12, value: 'DRC' }],
+  datasetCount: 6,
+  status: 'Active',
 };
 
 const inactiveTheme: Theme = {
-  id: 'illicit-trade',
-  title: 'Illicit trade',
+  id: 2,
+  value: 'Illicit trade',
   description: 'DRC · South Africa',
-  active: false,
+  countries: [],
+  datasetCount: 0,
+  status: 'Coming soon',
 };
 
 describe('ThemeCard', () => {
@@ -32,8 +34,8 @@ describe('ThemeCard', () => {
     expect(screen.getByText('6 datasets')).toBeInTheDocument();
   });
 
-  it('renders an active theme with a url as a link to that url', () => {
-    render(<ThemeCard theme={{ ...activeTheme, url: '/themes/adolescent-data' }} />);
+  it('renders an active theme with a wordpressUrl as a link to that url', () => {
+    render(<ThemeCard theme={{ ...activeTheme, wordpressUrl: '/themes/adolescent-data' }} />);
 
     const card = screen.getByRole('link', { name: /Adolescent data/ });
     expect(card).toHaveAttribute('href', '/themes/adolescent-data');
@@ -55,16 +57,16 @@ describe('ThemeCard', () => {
 
     fireEvent.click(screen.getByRole('button', { name: /Adolescent data/ }));
 
-    expect(onSelect).toHaveBeenCalledWith('adolescent-data');
+    expect(onSelect).toHaveBeenCalledWith(1);
   });
 
   it('calls onSelect with the theme id when a link-variant card is clicked', () => {
     const onSelect = vi.fn();
-    render(<ThemeCard theme={{ ...activeTheme, url: '/themes/adolescent-data' }} onSelect={onSelect} />);
+    render(<ThemeCard theme={{ ...activeTheme, wordpressUrl: '/themes/adolescent-data' }} onSelect={onSelect} />);
 
     fireEvent.click(screen.getByRole('link', { name: /Adolescent data/ }));
 
-    expect(onSelect).toHaveBeenCalledWith('adolescent-data');
+    expect(onSelect).toHaveBeenCalledWith(1);
   });
 
   it('does not require onSelect to render an active card', () => {
