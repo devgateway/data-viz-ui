@@ -1,6 +1,7 @@
 import React from 'react'
+import { skipToken } from '@reduxjs/toolkit/query/react'
 import { joinApiUrl } from '../shared/url'
-import { useJsonFetch } from '../shared/useJsonFetch'
+import { useGetJsonQuery } from '../shared/api'
 
 export interface DatasetFile {
   id: string
@@ -56,7 +57,8 @@ const DatasetFiles = (props: DatasetFilesProps) => {
   const apiUrl = (props['data-api-url'] as string) ?? props.apiUrl
   const downloadAllLabel = (props['data-download-all-label'] as string) ?? props.downloadAllLabel
 
-  const files = useJsonFetch<DatasetFile[]>(apiUrl ? joinApiUrl(apiUrl, 'files') : undefined, [])
+  const { data } = useGetJsonQuery(apiUrl ? joinApiUrl(apiUrl, 'files') : skipToken)
+  const files = (data as DatasetFile[]) ?? []
   const groups = groupFiles(files)
 
   return (

@@ -1,7 +1,8 @@
 import React from 'react'
+import { skipToken } from '@reduxjs/toolkit/query/react'
 import DatasetListItem, { type Dataset } from './DatasetListItem'
 import { joinApiUrl } from '../shared/url'
-import { useJsonFetch } from '../shared/useJsonFetch'
+import { useGetJsonQuery } from '../shared/api'
 
 export interface DatasetListProps {
   datasets?: Dataset[]
@@ -20,8 +21,8 @@ const DatasetList = (props: DatasetListProps) => {
   const viewAllUrl = (props['data-view-all-url'] as string) ?? props.viewAllUrl
   const { datasets: providedDatasets = [] } = props
 
-  const fetchedDatasets = useJsonFetch<Dataset[]>(apiUrl ? joinApiUrl(apiUrl) : undefined, [])
-  const datasets = apiUrl ? fetchedDatasets : providedDatasets
+  const { data: fetchedDatasets } = useGetJsonQuery(apiUrl ? joinApiUrl(apiUrl) : skipToken)
+  const datasets = apiUrl ? ((fetchedDatasets as Dataset[]) ?? []) : providedDatasets
 
   return (
     <div>

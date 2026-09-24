@@ -1,6 +1,7 @@
 import React from 'react'
+import { skipToken } from '@reduxjs/toolkit/query/react'
 import { joinApiUrl } from '../shared/url'
-import { useJsonFetch } from '../shared/useJsonFetch'
+import { useGetJsonQuery } from '../shared/api'
 
 export interface DatasetResource {
   id: string | number
@@ -18,7 +19,8 @@ export interface DatasetResourcesProps {
 const DatasetResources = (props: DatasetResourcesProps) => {
   const apiUrl = (props['data-api-url'] as string) ?? props.apiUrl
 
-  const resources = useJsonFetch<DatasetResource[]>(apiUrl ? joinApiUrl(apiUrl, 'resources') : undefined, [])
+  const { data } = useGetJsonQuery(apiUrl ? joinApiUrl(apiUrl, 'resources') : skipToken)
+  const resources = (data as DatasetResource[]) ?? []
 
   return (
     <ul className="divide-y divide-border border border-border rounded">

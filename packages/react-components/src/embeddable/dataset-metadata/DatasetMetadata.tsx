@@ -1,6 +1,7 @@
 import React from 'react'
+import { skipToken } from '@reduxjs/toolkit/query/react'
 import { joinApiUrl } from '../shared/url'
-import { useJsonFetch } from '../shared/useJsonFetch'
+import { useGetJsonQuery } from '../shared/api'
 
 export interface DatasetMetadataEntry {
   label?: string
@@ -17,7 +18,8 @@ export interface DatasetMetadataProps {
 const DatasetMetadata = (props: DatasetMetadataProps) => {
   const apiUrl = (props['data-api-url'] as string) ?? props.apiUrl
 
-  const entries = useJsonFetch<DatasetMetadataEntry[]>(apiUrl ? joinApiUrl(apiUrl, 'metadata') : undefined, [])
+  const { data } = useGetJsonQuery(apiUrl ? joinApiUrl(apiUrl, 'metadata') : skipToken)
+  const entries = (data as DatasetMetadataEntry[]) ?? []
 
   return (
     <dl className="space-y-2">

@@ -1,6 +1,7 @@
 import React from 'react'
+import { skipToken } from '@reduxjs/toolkit/query/react'
 import { joinApiUrl } from '../shared/url'
-import { useJsonFetch } from '../shared/useJsonFetch'
+import { useGetJsonQuery } from '../shared/api'
 import type { DatasetDetail } from '../shared/types'
 
 export interface DatasetLicenseProps {
@@ -12,7 +13,8 @@ export interface DatasetLicenseProps {
 const DatasetLicense = (props: DatasetLicenseProps) => {
   const apiUrl = (props['data-api-url'] as string) ?? props.apiUrl
 
-  const dataset = useJsonFetch<DatasetDetail>(apiUrl ? joinApiUrl(apiUrl) : undefined, {})
+  const { data } = useGetJsonQuery(apiUrl ? joinApiUrl(apiUrl) : skipToken)
+  const dataset = (data as DatasetDetail) ?? {}
 
   if (!dataset.licenseName) {
     return null

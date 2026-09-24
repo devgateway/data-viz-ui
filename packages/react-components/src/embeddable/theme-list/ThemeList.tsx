@@ -1,7 +1,8 @@
 import React from 'react'
+import { skipToken } from '@reduxjs/toolkit/query/react'
 import ThemeCard, { type Theme } from './ThemeCard'
 import { joinApiUrl } from '../shared/url'
-import { useJsonFetch } from '../shared/useJsonFetch'
+import { useGetJsonQuery } from '../shared/api'
 
 export type ThemeListColumns = 2 | 3 | 4
 
@@ -31,8 +32,8 @@ const ThemeList = (props: ThemeListProps) => {
   const columns = isValidColumns(parsedColumns) ? parsedColumns : 4
   const { themes: providedThemes = [], onSelect } = props
 
-  const fetchedThemes = useJsonFetch<Theme[]>(apiUrl ? joinApiUrl(apiUrl) : undefined, [])
-  const themes = apiUrl ? fetchedThemes : providedThemes
+  const { data: fetchedThemes } = useGetJsonQuery(apiUrl ? joinApiUrl(apiUrl) : skipToken)
+  const themes = apiUrl ? ((fetchedThemes as Theme[]) ?? []) : providedThemes
 
   return (
     <div className={`grid ${COLUMN_CLASSES[columns]} gap-3 auto-rows-fr`}>
