@@ -16,6 +16,12 @@ export const loaders: Record<string, () => Promise<{ default: React.ComponentTyp
     themeList: () => import('./theme-list'),
     datasetList: () => import('./dataset-list'),
     datasetFiles: () => import('./dataset-files'),
+    datasetResources: () => import('./dataset-resources'),
+    datasetMetadata: () => import('./dataset-metadata'),
+    datasetDoi: () => import('./dataset-doi'),
+    datasetLicense: () => import('./dataset-license'),
+    datasetCitation: () => import('./dataset-citation'),
+    datasetPage: () => import('./dataset-page'),
 }
 
 const download = lazy(loaders.download);
@@ -23,13 +29,25 @@ const search = lazy(loaders.search);
 const themeList = lazy(loaders.themeList);
 const datasetList = lazy(loaders.datasetList);
 const datasetFiles = lazy(loaders.datasetFiles);
+const datasetResources = lazy(loaders.datasetResources);
+const datasetMetadata = lazy(loaders.datasetMetadata);
+const datasetDoi = lazy(loaders.datasetDoi);
+const datasetLicense = lazy(loaders.datasetLicense);
+const datasetCitation = lazy(loaders.datasetCitation);
+const datasetPage = lazy(loaders.datasetPage);
 
 export const components: ComponentsProp = {
     download: download,
     search: search,
     themeList: themeList,
     datasetList: datasetList,
-    datasetFiles: datasetFiles
+    datasetFiles: datasetFiles,
+    datasetResources: datasetResources,
+    datasetMetadata: datasetMetadata,
+    datasetDoi: datasetDoi,
+    datasetLicense: datasetLicense,
+    datasetCitation: datasetCitation,
+    datasetPage: datasetPage,
 }
 
 export const customizer = {

@@ -1,4 +1,5 @@
 export { default as Test } from './test';
+export { default as DatasetPage, type DatasetPageProps } from './embeddable/dataset-page';
 export * from './embeddable';
 
 // Non-lazy exports for consumers that want to render these directly (e.g. a

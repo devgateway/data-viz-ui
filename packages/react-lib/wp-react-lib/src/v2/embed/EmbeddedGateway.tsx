@@ -44,6 +44,11 @@ export function EmbeddedGateway({ children, parent, parentUnique }: EmbeddedGate
         }
         const { registry, wrapper } = embed;
         const roots: Root[] = [];
+        // Track replacements so cleanup can restore originals for a potential
+        // re-run (React StrictMode intentionally runs effects twice; without
+        // this the second run finds no [data-component] elements and nothing
+        // ever mounts).
+        const replacements: Array<{ container: HTMLElement; original: HTMLElement }> = [];
 
         const allVizComponents = containerRef.current.querySelectorAll<HTMLElement>('.viz-component');
         const elements = Array.from(allVizComponents).filter((el) => !el.closest('self-render-component'));
@@ -65,6 +70,7 @@ export function EmbeddedGateway({ children, parent, parentUnique }: EmbeddedGate
             });
             const childContent = element.innerHTML;
             element.replaceWith(container);
+            replacements.push({ container, original: element });
 
             if (!Component) {
                 container.innerHTML = `<h1>Data Viz Error</h1><h4>Component <i>${componentName}</i> not found</h4>`;
@@ -90,6 +96,11 @@ export function EmbeddedGateway({ children, parent, parentUnique }: EmbeddedGate
 
         return () => {
             roots.forEach((root) => root.unmount());
+            // Restore original placeholder elements so a re-run of this effect
+            // (e.g. StrictMode's second mount) can find and remount them.
+            replacements.forEach(({ container, original }) => {
+                container.replaceWith(original);
+            });
         };
         // `embed` is referentially stable for the life of an EmbedProvider
         // instance (see EmbedContext's lazy useState init), so listing it

@@ -5,7 +5,10 @@ export const embeddableApi = createApi({
   baseQuery: fetchBaseQuery({ baseUrl: '' }),
   endpoints: (builder) => ({
     getJson: builder.query<unknown, string>({
-      query: (url) => url,
+      query: (url) => {
+        console.log("fetching URL:", url)
+        return url;
+      }
     }),
   }),
 })

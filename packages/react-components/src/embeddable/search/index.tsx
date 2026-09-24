@@ -1,5 +1,5 @@
 import React from 'react'
-import { Form } from 'react-router'
+import { Form, useInRouterContext } from 'react-router'
 
 export type SearchWidth = 'sm' | 'normal' | 'lg'
 
@@ -30,11 +30,12 @@ const Search = (props: SearchProps) => {
   } = props;
 
   const editing = props.editing ?? false
+  // Use React Router's <Form> when inside a router (client-side navigation);
+  // fall back to a plain <form> when mounted in an isolated root (e.g.
+  // EmbeddedGateway's createRoot) that has no router context.
+  const inRouter = useInRouterContext()
+  const FormTag = inRouter ? Form : 'form'
 
-  // React Router's <Form> intercepts the submit itself for client-side navigation;
-  // calling preventDefault here (before it gets there) is the documented way to
-  // cancel a submission outright - used when there's nowhere configured to go, or
-  // when rendering inside the block-editor preview where navigating makes no sense.
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     if (editing || !redirectUrl) {
       e.preventDefault()
@@ -42,7 +43,7 @@ const Search = (props: SearchProps) => {
   }
 
   return (
-    <Form method="get" action={redirectUrl} onSubmit={handleSubmit} className={`flex gap-2 ${WIDTH_CLASSES[width]}`}>
+    <FormTag method="get" action={redirectUrl} onSubmit={handleSubmit} className={`flex gap-2 ${WIDTH_CLASSES[width]}`}>
       <div className="relative flex-1">
         <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/40" width="16" height="16" viewBox="0 0 16 16" fill="none">
           <circle cx="7" cy="7" r="4.5" stroke="currentColor" strokeWidth="1.4" />
@@ -62,7 +63,7 @@ const Search = (props: SearchProps) => {
       >
         Search
       </button>
-    </Form>
+    </FormTag>
   )
 }
 

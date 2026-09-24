@@ -1,3 +1,4 @@
+"use client"
 import React from 'react'
 import { skipToken } from '@reduxjs/toolkit/query/react'
 import DatasetListItem, { type Dataset } from './DatasetListItem'
@@ -19,26 +20,15 @@ const DatasetList = (props: DatasetListProps) => {
   const apiUrl = (props['data-api-url'] as string) ?? props.apiUrl
   const viewAllLabel = (props['data-view-all-label'] as string) ?? props.viewAllLabel
   const viewAllUrl = (props['data-view-all-url'] as string) ?? props.viewAllUrl
-  const { datasets: providedDatasets = [] } = props
+  const { datasets: providedDatasets = [] } = props;
 
-  const { data: fetchedDatasets } = useGetJsonQuery(apiUrl ? joinApiUrl(apiUrl) : skipToken)
+  const finalUrl = apiUrl ? joinApiUrl(apiUrl, "/datasets/latest") : undefined;
+  const { data: fetchedDatasets } = useGetJsonQuery(finalUrl ? finalUrl : skipToken)
   const datasets = apiUrl ? ((fetchedDatasets as Dataset[]) ?? []) : providedDatasets
 
   return (
     <div>
-      {viewAllLabel && (
-        <div className="flex justify-end mb-5">
-          {viewAllUrl ? (
-            <a href={viewAllUrl} className="text-xs text-primary hover:text-primary-dark underline underline-offset-2">
-              {viewAllLabel}
-            </a>
-          ) : (
-            <span className="text-xs text-primary underline underline-offset-2">{viewAllLabel}</span>
-          )}
-        </div>
-      )}
-
-      <div className="border border-border rounded divide-y divide-border">
+      <div className="border border-border rounded divide-y divide-border pt-2 mb-6">
         {datasets.map((dataset) => (
           <DatasetListItem key={dataset.id} dataset={dataset} />
         ))}
