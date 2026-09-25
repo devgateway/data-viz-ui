@@ -1,5 +1,13 @@
 # @devgateway/dvz-ui-react
 
+## 1.9.16
+
+### Patch Changes
+
+- [#301](https://github.com/devgateway/data-viz-ui/pull/301) [`6e71426`](https://github.com/devgateway/data-viz-ui/commit/6e714263e17df18e6988f54f3c5339b5570a442a) Thanks [@timothy-mugo](https://github.com/timothy-mugo)! - Fix reset filters button to be enabled when filters change
+
+- [#300](https://github.com/devgateway/data-viz-ui/pull/300) [`0eb088a`](https://github.com/devgateway/data-viz-ui/commit/0eb088a1bb6b46288e8860c571e6502a8b59a26b) Thanks [@timothy-mugo](https://github.com/timothy-mugo)! - Add Senegal to list of map center
+
 ## 1.9.15
 
 ### Patch Changes
