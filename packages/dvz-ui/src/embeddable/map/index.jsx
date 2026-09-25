@@ -17,7 +17,9 @@ const countries = [
     { label: 'Ethiopia', value: 'ETH', center: [35.8166634, 1.7], scale: 2000 },
     { label: 'Zambia', value: 'ZMB', center: [26.459455, -14.668135], scale: 2000 },
     { label: 'Democratic Republic of the Congo', value: 'DRC', center: [23.174338, -5.837475], scale: 1250 },
+    { label: 'Senegal', value: 'SEN', center: [-14.452362, 14.497401], scale: 2000 },
     { label: 'World', value: 'World', center: [0, 20.050043], scale: 150 }
+
 ]
 
 const MapWrapper = (props) => {
