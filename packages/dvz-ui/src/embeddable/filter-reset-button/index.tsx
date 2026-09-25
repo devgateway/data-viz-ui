@@ -35,10 +35,8 @@ const FiltersResetComponent = (props) => {
             }
 
             // Check if arrays have different lengths or different values
-            const res = initialValues.length !== filteredApplied.length &&
+            return initialValues.length !== filteredApplied.length ||
                 !initialValues.every(v => filteredApplied.includes(v));
-            console.log("res", res)
-            return res;
         });
     }, [initialFilters, appliedFilters]);
 
