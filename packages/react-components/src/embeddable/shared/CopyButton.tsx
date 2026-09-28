@@ -28,9 +28,16 @@ const COPY_SCRIPT = `(function () {
 })();`
 
 const CopyButton = ({ text, label = DEFAULT_LABEL, className }: CopyButtonProps) => {
+  const handleClick = () => {
+    if (navigator && navigator.clipboard) {
+      navigator.clipboard.writeText(text).then(() => {
+        alert('Copied to clipboard'); 
+      });
+    }
+  };
   return (
     <>
-      <button type="button" className={className} data-copy-text={text}>
+      <button onClick={handleClick} type="button" className={className} data-copy-text={text}>
         {label}
       </button>
       <script dangerouslySetInnerHTML={{ __html: COPY_SCRIPT }} />

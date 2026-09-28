@@ -27,7 +27,7 @@ const DatasetDoi = (props: DatasetDoiProps) => {
       </a>
       <CopyButton
         text={doiUrl}
-        className="shrink-0 text-xs text-primary hover:text-primary-dark font-medium focus-visible:outline-2 focus-visible:outline-primary rounded"
+        className="shrink-0 cursor-pointer text-xs text-primary hover:text-primary-dark font-medium focus-visible:outline-2 focus-visible:outline-primary rounded"
       />
     </div>
   )

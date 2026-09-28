@@ -31,17 +31,6 @@ const DatasetList = (props: DatasetListProps) => {
           <DatasetListItem key={dataset.id} dataset={dataset} />
         ))}
       </div>
-      {viewAllLabel && (
-        viewAllUrl ? (
-          <a href={viewAllUrl} className="block text-center text-sm font-medium py-3 text-primary hover:text-primary-dark">
-            {viewAllLabel}
-          </a>
-        ) : (
-          <span className="block text-center text-sm font-medium py-3 text-muted-foreground">
-            {viewAllLabel}
-          </span>
-        )
-      )}
     </div>
   )
 }

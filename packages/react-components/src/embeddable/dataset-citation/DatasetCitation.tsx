@@ -67,7 +67,7 @@ const DatasetCitation = (props: DatasetCitationProps) => {
       <CopyButton
         text={citationText ?? ''}
         label="Copy citation"
-        className="text-xs text-primary hover:text-primary-dark font-medium focus-visible:outline-2 focus-visible:outline-primary rounded"
+        className="text-xs cursor-pointer text-primary hover:text-primary-dark font-medium focus-visible:outline-2 focus-visible:outline-primary rounded"
       />
     </div>
   )
