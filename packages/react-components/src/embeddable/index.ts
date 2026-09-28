@@ -22,6 +22,7 @@ export const loaders: Record<string, () => Promise<{ default: React.ComponentTyp
     datasetLicense: () => import('./dataset-license'),
     datasetCitation: () => import('./dataset-citation'),
     datasetPage: () => import('./dataset-page'),
+    variableBrowser: () => import('./variable-browser'),
 }
 
 const download = lazy(loaders.download);
@@ -35,6 +36,7 @@ const datasetDoi = lazy(loaders.datasetDoi);
 const datasetLicense = lazy(loaders.datasetLicense);
 const datasetCitation = lazy(loaders.datasetCitation);
 const datasetPage = lazy(loaders.datasetPage);
+const variableBrowser = lazy(loaders.variableBrowser);
 
 export const components: ComponentsProp = {
     download: download,
@@ -48,6 +50,7 @@ export const components: ComponentsProp = {
     datasetLicense: datasetLicense,
     datasetCitation: datasetCitation,
     datasetPage: datasetPage,
+    variableBrowser: variableBrowser,
 }
 
 export const customizer = {

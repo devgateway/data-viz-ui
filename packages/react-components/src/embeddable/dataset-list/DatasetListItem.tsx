@@ -40,7 +40,7 @@ const DatasetListItem = (props: DatasetListItemProps) => {
     </div>
   )
 
-  const className = "group w-full text-left px-4 py-3.5 hover:bg-muted transition-colors focus-visible:outline-2 focus-visible:outline-primary"
+  const className = "group w-full text-left px-4 py-3.5 hover:bg-transparent transition-colors focus-visible:outline-2 focus-visible:outline-primary"
 
   return (
     <a href={href} className={className}>{content}</a>

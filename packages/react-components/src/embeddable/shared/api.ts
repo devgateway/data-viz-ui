@@ -1,11 +1,11 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { joinApiUrl } from './url'
-import type { DatasetDetail, DatasetResource, LatestDatasetItem, Theme } from './types'
+import type { DatasetDetail, DatasetResource, FileVariable, LatestDatasetItem, Theme } from './types'
 
 export const portalApi = createApi({
   reducerPath: 'portalApi',
   baseQuery: fetchBaseQuery({ baseUrl: '' }),
-  tagTypes: ['DatasetDetail', 'DatasetResources', 'LatestDatasets', 'Themes'],
+  tagTypes: ['DatasetDetail', 'DatasetResources', 'FileVariables', 'LatestDatasets', 'Themes'],
   endpoints: (builder) => ({
     // GET /datasets/latest
     getLatestDatasets: builder.query<LatestDatasetItem[], string>({
@@ -27,6 +27,11 @@ export const portalApi = createApi({
       query: (url) => joinApiUrl(url, 'resources'),
       providesTags: (_result, _error, url) => [{ type: 'DatasetResources', id: url }],
     }),
+    // GET /files/{id}/variables
+    getFileVariables: builder.query<FileVariable[], string>({
+      query: (url) => joinApiUrl(url, 'variables'),
+      providesTags: (_result, _error, url) => [{ type: 'FileVariables', id: url }],
+    }),
   }),
 })
 
@@ -35,4 +40,5 @@ export const {
   useGetThemesQuery,
   useGetDatasetDetailQuery,
   useGetDatasetResourcesQuery,
+  useGetFileVariablesQuery,
 } = portalApi

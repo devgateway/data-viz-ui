@@ -55,6 +55,22 @@ export interface DatasetMetadataEntry {
   sortOrder?: number
 }
 
+export interface FileVariableCategory {
+  value: string
+  frequency: number
+}
+
+export interface FileVariable {
+  ordinal: number
+  name: string
+  label: string | null
+  section: string | null
+  type: 'Numeric' | 'Categorical' | 'String' | 'Date'
+  validCases: number
+  missingCases: number
+  categories: FileVariableCategory[]
+}
+
 export interface DatasetDetail {
   id: number
   name: string
