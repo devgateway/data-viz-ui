@@ -30,6 +30,8 @@ export interface LatestDatasetItem {
 export interface DatasetFile {
   id: string
   name: string
+  displayName?: string | null
+  language?: string | null
   type?: string
   contentType?: string
   sizeBytes?: number

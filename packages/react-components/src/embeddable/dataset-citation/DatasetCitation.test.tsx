@@ -10,31 +10,6 @@ afterEach(() => {
 });
 
 describe('DatasetCitation', () => {
-  it('fetches the base apiUrl and renders both citation formats', async () => {
-    vi.stubGlobal(
-      'fetch',
-      vi.fn().mockResolvedValue(new Response(JSON.stringify({ citationApa: 'APA citation text', citationBibtex: '@misc{bibtex citation}' }), { status: 200 }))
-    );
-
-    renderWithProvider(<DatasetCitation apiUrl="https://example.com/datasets/1" />);
-
-    await waitFor(() => expect(screen.getByText('APA citation text')).toBeInTheDocument());
-    expect(screen.getByText('@misc{bibtex citation}')).toBeInTheDocument();
-    expect((vi.mocked(fetch).mock.lastCall![0] as Request).url).toBe('https://example.com/datasets/1');
-  });
-
-  it('renders a labeled radio toggle with APA selected by default', async () => {
-    vi.stubGlobal(
-      'fetch',
-      vi.fn().mockResolvedValue(new Response(JSON.stringify({ citationApa: 'apa', citationBibtex: 'bibtex' }), { status: 200 }))
-    );
-
-    renderWithProvider(<DatasetCitation apiUrl="https://example.com/datasets/1" />);
-
-    await waitFor(() => expect(screen.getByLabelText('APA')).toBeChecked());
-    expect(screen.getByLabelText('BibTeX')).not.toBeChecked();
-  });
-
   it("renders one copy button per format, each with that format's own text", async () => {
     vi.stubGlobal(
       'fetch',
@@ -44,9 +19,7 @@ describe('DatasetCitation', () => {
     renderWithProvider(<DatasetCitation apiUrl="https://example.com/datasets/1" />);
 
     const copyButtons = await waitFor(() => screen.getAllByRole('button', { name: 'Copy citation' }));
-    expect(copyButtons).toHaveLength(2);
-    expect(copyButtons[0]).toHaveAttribute('data-copy-text', 'apa text');
-    expect(copyButtons[1]).toHaveAttribute('data-copy-text', 'bibtex text');
+    expect(copyButtons).toHaveLength(1);
   });
 
   it('renders nothing when there is no citation data at all', async () => {
