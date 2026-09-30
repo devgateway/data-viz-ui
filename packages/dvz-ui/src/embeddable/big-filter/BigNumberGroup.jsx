@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { Container, Grid } from "semantic-ui-react";
 import { BigNumberItem } from './BigNumberItem';
 import { decode } from '../utils/parseUtils';
-import _ from 'lodash';
+import debounce from 'lodash.debounce';
 
 const BigNumberGroup = (props) => {
     const {
@@ -74,7 +74,7 @@ const BigNumberGroup = (props) => {
     }
 
     const debouncedApplyFilter = useRef(
-        _.debounce((newFilters, type) => {
+        debounce((newFilters, type) => {
             if (newFilters.length == 0) {
                 onSetFilter({ app, group, parent, param: type, value: [] });
                 onUnSetFilter({ app, group: blockName, parent, param: type });

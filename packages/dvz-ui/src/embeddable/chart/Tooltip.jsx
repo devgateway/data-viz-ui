@@ -1,8 +1,9 @@
-import React, { useLayoutEffect, useRef } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
 import template from 'string-template';
+import { useFloating, autoUpdate, offset, flip, shift, FloatingPortal } from "@floating-ui/react";
 
 const percentExpresion = /(\+?\%)[\(]([A-z0-9,.,-]+)\)/gi;
 const numericExpresion = /(\+?\#)[\(]([A-z0-9,.,-]+)\)/gi;
@@ -11,104 +12,90 @@ const compactExpresion = /(\+?\#C)[\(]([A-z0-9,.,-]+)\)/gi;
 // Minimum gap (px) to keep between the tooltip and the viewport edge.
 const VIEWPORT_EDGE_MARGIN = 8;
 
-// Shift needed to bring [start, end] inside [0, viewportSize]; 0 if it already fits.
-const clampShift = (start, end, viewportSize, overshoot = 0) => {
-  if (start < VIEWPORT_EDGE_MARGIN) {
-    return VIEWPORT_EDGE_MARGIN - start;
+// Chart libraries like nivo render our tooltip inside their own
+// absolutely-positioned wrapper div, placed near the hovered point.
+const isNivoTooltipWrapper = (el) => {
+  if (!el) {
+    return false;
   }
-  if (end > viewportSize - VIEWPORT_EDGE_MARGIN) {
-    return viewportSize - VIEWPORT_EDGE_MARGIN - end - overshoot;
-  }
-  return 0;
+
+  const inlineStyle = (el.getAttribute("style") || "").toLowerCase();
+  return (
+    inlineStyle.includes("position: absolute") &&
+    inlineStyle.includes("pointer-events: none")
+  );
 };
 
-// Nudges an already-positioned tooltip back inside the viewport via a
-// corrective transform, without touching the chart library's own positioning
-// (chart libraries like nivo can place tooltips past the screen edge).
-export const clampTooltipToViewport = (el) => {
-  if (!el || typeof window === "undefined") {
-    return;
-  }
-
-  // Reset so we measure relative to the library's original position.
-  el.style.transform = "";
-
-  const rect = el.getBoundingClientRect();
-  const { innerWidth: viewportWidth, innerHeight: viewportHeight } = window;
-  const mobileOvershoot = viewportWidth < 768 ? 12 : 40; // extra room on narrow viewports
-
-  const shiftX = clampShift(rect.left, rect.right, viewportWidth, mobileOvershoot);
-  const shiftY = clampShift(rect.top, rect.bottom, viewportHeight);
-
-  if (shiftX || shiftY) {
-    el.style.transform = `translate(${Math.round(shiftX)}px, ${Math.round(shiftY)}px)`;
-  }
-};
-
-// Frames with an unchanged correction before we consider the tooltip settled.
-const SETTLE_FRAMES = 6;
-// Safety cap on a burst's length (~1s at 60fps) in case position never settles.
-const MAX_BURST_FRAMES = 60;
-
-/** 
- * Keeps a tooltip inside the viewport, re-clamping every frame for a short
- * burst whenever it might have moved (mount, resize, scroll) and stopping
- * once the correction settles. The burst is needed because animated wrappers
- * (e.g. nivo + react-spring) can still be mid-animation when we first measure. 
+/**
+ * Positions a tooltip bubble with floating-ui: anchored to wherever the host
+ * chart library already placed its wrapper, and kept clear of the viewport
+ * edges via the `shift`/`flip` middleware. Render the bubble through
+ * <FloatingPortal> so its `fixed` positioning escapes the host wrapper's own
+ * transform (nivo animates that transform with react-spring).
  */
-export const useClampTooltipToViewport = (deps = []) => {
-  const ref = useRef(null);
+export const useTooltipPosition = () => {
+  const { refs, floatingStyles } = useFloating({
+    placement: "top",
+    strategy: "fixed",
+    // The reference (nivo's wrapper) moves via a transform, not a resize/
+    // layout change, so we need frame-by-frame tracking rather than the
+    // default scroll/resize-only observers.
+    whileElementsMounted: (referenceEl, floatingEl, update) =>
+      autoUpdate(referenceEl, floatingEl, update, { animationFrame: true }),
+    middleware: [offset(8), flip(), shift({ padding: VIEWPORT_EDGE_MARGIN })],
+  });
 
-  useLayoutEffect(() => {
-    const el = ref.current;
-    if (!el || typeof window === "undefined" || !window.requestAnimationFrame) {
-      clampTooltipToViewport(el);
+  // The theme's `.chart.tooltip` styling (background, border, padding, ...)
+  // is compiled scoped under `#root`/`.edit-post-visual-editor`. FloatingPortal
+  // defaults to `document.body`, which escapes that scope and drops the
+  // styling, so anchor the portal to whichever of those ancestors we find.
+  const [portalRoot, setPortalRoot] = useState(null);
+
+  const anchorRef = useCallback(
+    (node) => {
+      if (!node) {
+        return;
+      }
+      const wrapper = isNivoTooltipWrapper(node.parentElement) ? node.parentElement : node;
+      refs.setReference(wrapper);
+      setPortalRoot(wrapper.closest("#root, .edit-post-visual-editor") || wrapper.ownerDocument.body);
+    },
+    [refs]
+  );
+
+  return { anchorRef, floatingRef: refs.setFloating, floatingStyles, portalRoot };
+};
+
+// Hides sticky/touch-triggered tooltips the instant the user scrolls, touches
+// to scroll, or taps anywhere (used to dismiss the tooltip). Listeners are
+// passive/capturing so they never block scrolling and fire on nested
+// scroll containers, not just the window.
+export const useHideTooltipOnScroll = (resetDeps = []) => {
+  const [isHidden, setIsHidden] = useState(false);
+
+  useEffect(() => {
+    setIsHidden(false);
+  }, resetDeps);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
       return undefined;
     }
 
-    let frameId = null;
+    const hide = () => setIsHidden(true);
 
-    const startBurst = () => {
-      if (frameId != null) {
-        window.cancelAnimationFrame(frameId);
-      }
-
-      let lastTransform = null;
-      let unchangedFrames = 0;
-
-      const tick = (frame) => {
-        clampTooltipToViewport(el);
-
-        unchangedFrames = el.style.transform === lastTransform ? unchangedFrames + 1 : 0;
-        lastTransform = el.style.transform;
-
-        const settled = unchangedFrames >= SETTLE_FRAMES || frame >= MAX_BURST_FRAMES;
-        frameId = settled ? null : window.requestAnimationFrame(() => tick(frame + 1));
-      };
-
-      tick(0);
-    };
-
-    startBurst();
-
-    const resizeObserver = typeof ResizeObserver !== "undefined" ? new ResizeObserver(startBurst) : null;
-    resizeObserver?.observe(el);
-
-    // Capture phase catches scroll on any ancestor, not just the window.
-    window.addEventListener("scroll", startBurst, true);
-    window.addEventListener("resize", startBurst);
+    window.addEventListener("scroll", hide, { capture: true, passive: true });
+    window.addEventListener("touchmove", hide, { capture: true, passive: true });
+    window.addEventListener("pointerdown", hide, { capture: true, passive: true });
 
     return () => {
-      if (frameId != null) {
-        window.cancelAnimationFrame(frameId);
-      }
-      resizeObserver?.disconnect();
-      window.removeEventListener("scroll", startBurst, true);
-      window.removeEventListener("resize", startBurst);
+      window.removeEventListener("scroll", hide, { capture: true });
+      window.removeEventListener("touchmove", hide, { capture: true });
+      window.removeEventListener("pointerdown", hide, { capture: true });
     };
-  }, deps);
+  }, []);
 
-  return ref;
+  return isHidden;
 };
 
 const applyFormat = (expresion, str, style, isPercent, intl, container) => {
@@ -206,29 +193,67 @@ const Tooltip = ({ tooltip, d, intl, tooltipEnableMarkdown }) => {
   }
 
   // Must run before any early return below (rules of hooks).
-  const tooltipRef = useClampTooltipToViewport([str, tooltipEnableMarkdown]);
+  const hideOnScroll = useHideTooltipOnScroll([d, str]);
+  // Explicit, event-driven visibility -- independent of nivo's own hover
+  // detection -- so the tooltip reacts to mouse/touch events on itself
+  // instead of relying solely on the chart library re-rendering it.
+  const [isHovered, setIsHovered] = useState(true);
+  const { anchorRef, floatingRef, floatingStyles, portalRoot } = useTooltipPosition();
+
+  // A new/changed data point should always start out visible.
+  useEffect(() => {
+    setIsHovered(true);
+  }, [d, str]);
 
   if (!str) {
-    return <div></div>;
+    return <div ref={anchorRef}></div>;
   }
 
-  if (tooltipEnableMarkdown) {
-    return (
-      <div ref={tooltipRef} className={"chart tooltip"}>
-        <ReactMarkdown
-          children={str}
-          remarkPlugins={[remarkGfm]}
-          rehypePlugins={[rehypeRaw]}
-        ></ReactMarkdown>
-      </div>
-    );
-  } else {
-    return (
-      <div ref={tooltipRef} className={"chart tooltip"}>
-        <div dangerouslySetInnerHTML={{ __html: str }}></div>
-      </div>
-    );
-  }
+  const isVisible = isHovered && !hideOnScroll;
+
+  const show = () => setIsHovered(true);
+  const hide = () => setIsHovered(false);
+  const handleTouchStart = () => setIsHovered(true);
+  const handleTouchEnd = (event) => {
+    // Prevent the emulated mouse events that follow a tap from immediately
+    // hiding the tooltip we just opened via touch.
+    event.preventDefault();
+  };
+
+  const content = tooltipEnableMarkdown ? (
+    <ReactMarkdown
+      children={str}
+      remarkPlugins={[remarkGfm]}
+      rehypePlugins={[rehypeRaw]}
+    ></ReactMarkdown>
+  ) : (
+    <div dangerouslySetInnerHTML={{ __html: str }}></div>
+  );
+
+  return (
+    <div ref={anchorRef}>
+      <FloatingPortal root={portalRoot}>
+        <div
+          ref={floatingRef}
+          className={"chart tooltip"}
+          role="tooltip"
+          aria-hidden={!isVisible}
+          style={{
+            ...floatingStyles,
+            visibility: isVisible ? "visible" : "hidden",
+            pointerEvents: isVisible ? "auto" : "none",
+          }}
+          onMouseEnter={show}
+          onMouseLeave={hide}
+          onMouseOut={hide}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+        >
+          {content}
+        </div>
+      </FloatingPortal>
+    </div>
+  );
 };
 
 export default Tooltip;
