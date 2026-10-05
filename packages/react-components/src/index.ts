@@ -2,6 +2,8 @@ export { default as Test } from './test';
 export { default as DatasetPage, type DatasetPageProps } from './embeddable/dataset-page';
 export { default as VariableBrowser, type VariableBrowserProps } from './embeddable/variable-browser';
 export * from './embeddable';
+export { portalApi, useGetCategoriesQuery, useGetCategoryValuesQuery } from './embeddable/shared/api';
+export { createEmbeddableStore } from './embeddable/shared/store';
 
 // Non-lazy exports for consumers that want to render these directly (e.g. a
 // static page), rather than through the `embeddable` name-lookup registry.

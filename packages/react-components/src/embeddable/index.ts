@@ -23,6 +23,8 @@ export const loaders: Record<string, () => Promise<{ default: React.ComponentTyp
     datasetCitation: () => import('./dataset-citation'),
     datasetPage: () => import('./dataset-page'),
     variableBrowser: () => import('./variable-browser'),
+    searchFiltersContainer: () => import('./search-filters-container'),
+    categoryFilter: () => import('./category-filter'),
 }
 
 const download = lazy(loaders.download);
@@ -37,6 +39,8 @@ const datasetLicense = lazy(loaders.datasetLicense);
 const datasetCitation = lazy(loaders.datasetCitation);
 const datasetPage = lazy(loaders.datasetPage);
 const variableBrowser = lazy(loaders.variableBrowser);
+const searchFiltersContainer = lazy(loaders.searchFiltersContainer);
+const categoryFilter = lazy(loaders.categoryFilter);
 
 export const components: ComponentsProp = {
     download: download,
@@ -51,6 +55,8 @@ export const components: ComponentsProp = {
     datasetCitation: datasetCitation,
     datasetPage: datasetPage,
     variableBrowser: variableBrowser,
+    searchFiltersContainer: searchFiltersContainer,
+    categoryFilter: categoryFilter,
 }
 
 export const customizer = {

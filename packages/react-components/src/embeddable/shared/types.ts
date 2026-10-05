@@ -1,3 +1,19 @@
+export interface Category {
+  id: number
+  name: string
+}
+
+export interface CategoryValue {
+  id: number
+  categoryId: number
+  parentCategoryValueId: number | null
+  value: string
+  sortOrder: number
+  description: string | null
+  wordpressUrl: string | null
+  children: CategoryValue[]
+}
+
 export interface ThemeCountry {
   id: number
   value: string
