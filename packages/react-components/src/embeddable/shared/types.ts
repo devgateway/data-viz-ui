@@ -87,6 +87,43 @@ export interface FileVariable {
   categories: FileVariableCategory[]
 }
 
+export interface DatasetSearchItem {
+  id: number
+  name: string
+  description: string
+  createdAt: string
+  periodStart: string | null
+  periodEnd: string | null
+  doi: string
+  licenseName: string
+  fileCount: number
+  recordCount: number
+  themes: Array<{ id: number; value: string }>
+  countries: Array<{ id: number; value: string }>
+  resourceTypes: Array<{ id: number; value: string }>
+  languages: Array<{ id: number; value: string }>
+  formats: string[]
+}
+
+export interface DatasetSearchFacetItem {
+  id: number
+  value: string
+  count: number
+}
+
+export interface DatasetSearchResponse {
+  items: DatasetSearchItem[]
+  page: number
+  size: number
+  totalElements: number
+  facets: {
+    resourceTypes: DatasetSearchFacetItem[]
+    countries: DatasetSearchFacetItem[]
+    languages: DatasetSearchFacetItem[]
+    years: DatasetSearchFacetItem[]
+  }
+}
+
 export interface DatasetDetail {
   id: number
   name: string

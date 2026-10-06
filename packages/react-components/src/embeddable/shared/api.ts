@@ -1,11 +1,11 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { joinApiUrl } from './url'
-import type { Category, CategoryValue, DatasetDetail, DatasetResource, FileVariable, LatestDatasetItem, Theme } from './types'
+import type { Category, CategoryValue, DatasetDetail, DatasetResource, DatasetSearchResponse, FileVariable, LatestDatasetItem, Theme } from './types'
 
 export const portalApi = createApi({
   reducerPath: 'portalApi',
   baseQuery: fetchBaseQuery({ baseUrl: '' }),
-  tagTypes: ['DatasetDetail', 'DatasetResources', 'FileVariables', 'LatestDatasets', 'Themes', 'Categories', 'CategoryValues'],
+  tagTypes: ['DatasetDetail', 'DatasetResources', 'FileVariables', 'LatestDatasets', 'Themes', 'Categories', 'CategoryValues', 'DatasetSearch'],
   endpoints: (builder) => ({
     // GET /datasets/latest
     getLatestDatasets: builder.query<LatestDatasetItem[], string>({
@@ -42,6 +42,14 @@ export const portalApi = createApi({
       query: ({ baseUrl, categoryId }) => joinApiUrl(baseUrl, `/categories/${categoryId}/values`),
       providesTags: (_result, _error, { baseUrl, categoryId }) => [{ type: 'CategoryValues', id: `${baseUrl}/${categoryId}` }],
     }),
+    // GET /datasets/search
+    searchDatasets: builder.query<DatasetSearchResponse, { baseUrl: string; params: string }>({
+      query: ({ baseUrl, params }) => {
+        const url = joinApiUrl(baseUrl, '/datasets/search')
+        return params ? `${url}?${params}` : url
+      },
+      providesTags: (_result, _error, { baseUrl, params }) => [{ type: 'DatasetSearch', id: `${baseUrl}?${params}` }],
+    }),
   }),
 })
 
@@ -53,4 +61,5 @@ export const {
   useGetFileVariablesQuery,
   useGetCategoriesQuery,
   useGetCategoryValuesQuery,
+  useSearchDatasetsQuery,
 } = portalApi

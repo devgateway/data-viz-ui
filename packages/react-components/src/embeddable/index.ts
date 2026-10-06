@@ -25,6 +25,8 @@ export const loaders: Record<string, () => Promise<{ default: React.ComponentTyp
     variableBrowser: () => import('./variable-browser'),
     searchFiltersContainer: () => import('./search-filters-container'),
     categoryFilter: () => import('./category-filter'),
+    searchBox: () => import('./search-box'),
+    datasetSearchResults: () => import('./dataset-search-results'),
 }
 
 const download = lazy(loaders.download);
@@ -41,6 +43,8 @@ const datasetPage = lazy(loaders.datasetPage);
 const variableBrowser = lazy(loaders.variableBrowser);
 const searchFiltersContainer = lazy(loaders.searchFiltersContainer);
 const categoryFilter = lazy(loaders.categoryFilter);
+const searchBox = lazy(loaders.searchBox);
+const datasetSearchResults = lazy(loaders.datasetSearchResults);
 
 export const components: ComponentsProp = {
     download: download,
@@ -57,6 +61,8 @@ export const components: ComponentsProp = {
     variableBrowser: variableBrowser,
     searchFiltersContainer: searchFiltersContainer,
     categoryFilter: categoryFilter,
+    searchBox: searchBox,
+    datasetSearchResults: datasetSearchResults,
 }
 
 export const customizer = {

@@ -22,7 +22,6 @@ function CategoryFilterInner(props: CategoryFilterProps) {
   const categoryId = Number((props['data-category-id'] as string) ?? props.categoryId)
   const categoryName = (props['data-category-name'] as string) ?? props.categoryName ?? ''
   const valueIdsRaw = (props['data-value-ids'] as string) ?? props.valueIds ?? ''
-
   const allowedIds: number[] = valueIdsRaw ? (JSON.parse(valueIdsRaw) as number[]) : []
 
   const { data: allValues = [] } = useGetCategoryValuesQuery(
@@ -33,24 +32,26 @@ function CategoryFilterInner(props: CategoryFilterProps) {
     ? allValues.filter((v) => allowedIds.includes(v.id))
     : allValues
 
-  const [checked, setChecked] = useState<Set<number>>(() => readCheckedFromUrl(categoryId))
+  // All selected value IDs across ALL filters share the same `categoryValueId` param.
+  // Each CategoryFilter reads the full set and renders checkmarks only for its own values.
+  const [checked, setChecked] = useState<Set<number>>(readCheckedFromUrl)
 
   useEffect(() => {
-    const sync = () => setChecked(readCheckedFromUrl(categoryId))
+    const sync = () => setChecked(readCheckedFromUrl())
     window.addEventListener(FILTER_CHANGE_EVENT, sync)
     window.addEventListener('popstate', sync)
     return () => {
       window.removeEventListener(FILTER_CHANGE_EVENT, sync)
       window.removeEventListener('popstate', sync)
     }
-  }, [categoryId])
+  }, [])
 
   const toggle = (id: number) => {
     const next = new Set(checked)
     if (next.has(id)) next.delete(id)
     else next.add(id)
     setChecked(next)
-    writeCheckedToUrl(categoryId, next)
+    writeCheckedToUrl(next)
   }
 
   if (values.length === 0) return null
