@@ -1,3 +1,28 @@
+export interface WpSettingsLanguage {
+  enable: number
+  locale: string
+  name: string
+  translation: string
+  date: string
+  time: string
+  flag: string
+}
+
+export interface WpSettings {
+  react_ui_url: string
+  react_api_url: string
+  dataset_repository_url: string
+  react_search_type: string
+  react_menu_type: string
+  languages: Record<string, WpSettingsLanguage>
+  landing_page_url: string
+  google_analytics_code: string
+  name: string
+  description: string
+  site_logo: number
+  site_icon: number
+}
+
 export interface Category {
   id: number
   name: string

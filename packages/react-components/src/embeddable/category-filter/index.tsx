@@ -9,10 +9,12 @@ export interface CategoryFilterProps {
   apiUrl?: string
   categoryId?: string | number
   categoryName?: string
+  showAll?: string | boolean
   valueIds?: string
   'data-api-url'?: string
   'data-category-id'?: string
   'data-category-name'?: string
+  'data-show-all'?: string
   'data-value-ids'?: string
   [key: string]: unknown
 }
@@ -21,6 +23,8 @@ function CategoryFilterInner(props: CategoryFilterProps) {
   const apiUrl = (props['data-api-url'] as string) ?? props.apiUrl
   const categoryId = Number((props['data-category-id'] as string) ?? props.categoryId)
   const categoryName = (props['data-category-name'] as string) ?? props.categoryName ?? ''
+  const showAllRaw = (props['data-show-all'] as string) ?? String(props.showAll ?? 'true')
+  const showAll = showAllRaw !== 'false'
   const valueIdsRaw = (props['data-value-ids'] as string) ?? props.valueIds ?? ''
   const allowedIds: number[] = valueIdsRaw ? (JSON.parse(valueIdsRaw) as number[]) : []
 
@@ -28,7 +32,7 @@ function CategoryFilterInner(props: CategoryFilterProps) {
     apiUrl && categoryId ? { baseUrl: apiUrl, categoryId } : skipToken
   )
 
-  const values = allowedIds.length > 0
+  const values = (!showAll && allowedIds.length > 0)
     ? allValues.filter((v) => allowedIds.includes(v.id))
     : allValues
 

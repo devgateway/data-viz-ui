@@ -4,6 +4,8 @@ export { default as VariableBrowser, type VariableBrowserProps } from './embedda
 export * from './embeddable';
 export { portalApi, useGetCategoriesQuery, useGetCategoryValuesQuery } from './embeddable/shared/api';
 export { createEmbeddableStore } from './embeddable/shared/store';
+export { configureWpSettings, useWpSettings } from './embeddable/shared/useWpSettings';
+export type { WpSettings, WpSettingsLanguage } from './embeddable/shared/types';
 
 // Non-lazy exports for consumers that want to render these directly (e.g. a
 // static page), rather than through the `embeddable` name-lookup registry.

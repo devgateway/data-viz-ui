@@ -5,35 +5,9 @@ import { useSearchDatasetsQuery } from '../shared/api'
 import EmbeddableProvider from '../shared/EmbeddableProvider'
 import { FILTER_CHANGE_EVENT } from '../shared/filterParams'
 import { SEARCH_CHANGE_EVENT } from '../search-box'
+import { useWpSettings } from '../shared/useWpSettings'
 import type { DatasetSearchItem } from '../shared/types'
 
-let _wpSettingsCache: Record<string, string> | null = null
-let _wpSettingsInflight: Promise<Record<string, string>> | null = null
-
-function fetchWpSettings(): Promise<Record<string, string>> {
-  if (_wpSettingsCache) return Promise.resolve(_wpSettingsCache)
-  if (_wpSettingsInflight) return _wpSettingsInflight
-  _wpSettingsInflight = fetch('/wp-json/dg/v1/settings')
-    .then((r) => r.json())
-    .then((data) => { _wpSettingsCache = data; return data })
-    .catch(() => { _wpSettingsInflight = null; return {} })
-  return _wpSettingsInflight
-}
-
-function useRepositoryUrl(propsApiUrl?: string): string {
-  const [url, setUrl] = useState(() => propsApiUrl ?? _wpSettingsCache?.dataset_repository_url ?? '')
-  useEffect(() => {
-    if (propsApiUrl) { setUrl(propsApiUrl); return }
-    if (_wpSettingsCache?.dataset_repository_url) { setUrl(_wpSettingsCache.dataset_repository_url); return }
-    if (typeof window === 'undefined') return
-    fetchWpSettings().then((data) => {
-      if (data?.dataset_repository_url) setUrl(data.dataset_repository_url)
-    })
-  }, [propsApiUrl])
-  return url
-}
-
-// Deterministic color assignment by hashing the type string
 const BADGE_PALETTES = [
   'bg-blue-50 text-blue-800 border-blue-200',
   'bg-purple-50 text-purple-800 border-purple-200',
@@ -67,19 +41,48 @@ function formatPeriod(item: DatasetSearchItem): string {
   return new Date(d).getFullYear().toString()
 }
 
-function readSearchParams(limit: number): string {
-  if (typeof window === 'undefined') return `size=${limit}`
+const PAGE_SIZE_OPTIONS = [10, 20, 50, 100]
+
+function readSearchParams(defaultSize: number): string {
+  if (typeof window === 'undefined') return `size=${defaultSize}`
   const params = new URLSearchParams(window.location.search)
-  params.set('size', String(limit))
+  if (!params.has('size')) params.set('size', String(defaultSize))
   return params.toString()
 }
 
-function navigatePage(delta: number): void {
+function goToPage(pageIndex: number): void {
   const params = new URLSearchParams(window.location.search)
-  const current = parseInt(params.get('page') ?? '0', 10)
-  const next = Math.max(0, current + delta)
-  if (next === 0) params.delete('page')
-  else params.set('page', String(next))
+  if (pageIndex === 0) params.delete('page')
+  else params.set('page', String(pageIndex))
+  const qs = params.toString()
+  window.history.pushState({}, '', `${window.location.pathname}${qs ? '?' + qs : ''}`)
+  window.dispatchEvent(new CustomEvent(SEARCH_CHANGE_EVENT))
+}
+
+// Returns 1-indexed page numbers and '…' placeholders for gaps
+function buildPageWindows(current: number, total: number): (number | '…')[] {
+  const s = new Set<number>()
+  s.add(1)
+  if (total >= 2) s.add(2)
+  if (current > 1) s.add(current - 1)
+  s.add(current)
+  if (current < total) s.add(current + 1)
+  if (total >= 2) s.add(total - 1)
+  s.add(total)
+
+  const sorted = Array.from(s).filter((p) => p >= 1 && p <= total).sort((a, b) => a - b)
+  const result: (number | '…')[] = []
+  for (let i = 0; i < sorted.length; i++) {
+    if (i > 0 && sorted[i] - sorted[i - 1] > 1) result.push('…')
+    result.push(sorted[i])
+  }
+  return result
+}
+
+function changePageSize(newSize: number): void {
+  const params = new URLSearchParams(window.location.search)
+  params.set('size', String(newSize))
+  params.delete('page')
   const qs = params.toString()
   window.history.pushState({}, '', `${window.location.pathname}${qs ? '?' + qs : ''}`)
   window.dispatchEvent(new CustomEvent(SEARCH_CHANGE_EVENT))
@@ -95,13 +98,14 @@ export interface DatasetSearchResultsProps {
 
 function DatasetSearchResultsInner(props: DatasetSearchResultsProps) {
   const rawApiUrl = (props['data-api-url'] as string) ?? props.apiUrl
-  const apiUrl = useRepositoryUrl(rawApiUrl || undefined)
-  const limit = parseInt(String((props['data-limit'] as string) ?? props.limit ?? '20'), 10)
+  const { settings } = useWpSettings()
+  const apiUrl = rawApiUrl || settings?.dataset_repository_url || ''
+  const defaultSize = parseInt(String((props['data-limit'] as string) ?? props.limit ?? '20'), 10)
 
-  const [searchParams, setSearchParams] = useState(() => readSearchParams(limit))
+  const [searchParams, setSearchParams] = useState(() => readSearchParams(defaultSize))
 
   useEffect(() => {
-    const sync = () => setSearchParams(readSearchParams(limit))
+    const sync = () => setSearchParams(readSearchParams(defaultSize))
     window.addEventListener(SEARCH_CHANGE_EVENT, sync)
     window.addEventListener(FILTER_CHANGE_EVENT, sync)
     window.addEventListener('popstate', sync)
@@ -110,7 +114,7 @@ function DatasetSearchResultsInner(props: DatasetSearchResultsProps) {
       window.removeEventListener(FILTER_CHANGE_EVENT, sync)
       window.removeEventListener('popstate', sync)
     }
-  }, [limit])
+  }, [defaultSize])
 
   const { data, isFetching } = useSearchDatasetsQuery(
     apiUrl ? { baseUrl: apiUrl, params: searchParams } : skipToken
@@ -119,8 +123,10 @@ function DatasetSearchResultsInner(props: DatasetSearchResultsProps) {
   const items = data?.items ?? []
   const totalElements = data?.totalElements ?? 0
   const page = data?.page ?? 0
-  const size = data?.size ?? limit
+  const size = data?.size ?? defaultSize
   const totalPages = Math.ceil(totalElements / size)
+
+  const currentSize = parseInt(new URLSearchParams(searchParams).get('size') ?? String(defaultSize), 10)
 
   const query = typeof window !== 'undefined'
     ? (new URLSearchParams(window.location.search).get('q') ?? '')
@@ -154,83 +160,145 @@ function DatasetSearchResultsInner(props: DatasetSearchResultsProps) {
         </div>
       ) : (
         <div className="border border-border rounded divide-y divide-border">
-          {items.map((item) => (
-            <div
+          {items.map((item) => {
+            const period = formatPeriod(item)
+            const tags = item.themes.length > 0 || item.countries.length > 0 || item.languages.length > 0
+            return (
+              <div
                 key={item.id}
                 className="px-4 py-3.5 hover:bg-muted/50 transition-colors cursor-pointer"
                 onClick={() => { window.location.href = `/datasets/${item.id}` }}
               >
-              <div className="flex items-start gap-3">
-                <div className="mt-0.5 flex items-center gap-1.5 shrink-0 flex-wrap">
-                  {item.resourceTypes.map((rt) => (
-                    <TypeBadge key={rt.id} type={rt.value} />
-                  ))}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-start justify-between gap-3 flex-wrap">
-                    <p className="text-sm font-medium text-foreground leading-snug">{item.name}</p>
-                    <div className="flex items-center gap-2 shrink-0">
-                      <span className="text-xs font-mono text-muted-foreground">{formatPeriod(item)}</span>
-                      {item.formats.map((f) => (
-                        <span key={f} className="text-[10px] font-mono text-muted-foreground border border-border rounded px-1.5 py-0.5 bg-white">
-                          {f}
-                        </span>
+                <div className="flex items-start gap-3">
+                  {/* Desktop: type badges in left column */}
+                  {item.resourceTypes.length > 0 && (
+                    <div className="hidden sm:flex mt-0.5 items-center gap-1.5 shrink-0 flex-wrap">
+                      {item.resourceTypes.map((rt) => (
+                        <TypeBadge key={rt.id} type={rt.value} />
                       ))}
                     </div>
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed line-clamp-2">
-                    {item.description}
-                  </p>
-                  <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-                    {item.themes.map((t, i) => (
-                      <React.Fragment key={t.id}>
-                        {i > 0 && <span className="text-[10px] text-muted-foreground">·</span>}
-                        <span className="text-[10px] text-muted-foreground">{t.value}</span>
-                      </React.Fragment>
-                    ))}
-                    {item.countries.length > 0 && (
-                      <>
-                        {item.themes.length > 0 && <span className="text-[10px] text-muted-foreground">·</span>}
-                        <span className="text-[10px] text-muted-foreground">
-                          {item.countries.map((c) => c.value).join(', ')}
-                        </span>
-                      </>
+                  )}
+
+                  <div className="min-w-0 flex-1">
+                    {/* Title + year + formats */}
+                    <div className="flex items-start justify-between gap-3 flex-wrap">
+                      <p className="text-sm font-medium text-foreground leading-snug">{item.name}</p>
+                      <div className="flex items-center gap-2 shrink-0">
+                        {period && <span className="text-xs font-mono text-muted-foreground">{period}</span>}
+                        {item.formats.map((f) => (
+                          <span key={f} className="text-[10px] font-mono text-muted-foreground border border-border rounded px-1.5 py-0.5 bg-white">
+                            {f}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Mobile: type badges below title */}
+                    {item.resourceTypes.length > 0 && (
+                      <div className="flex sm:hidden flex-wrap items-center gap-1.5 mt-1.5">
+                        {item.resourceTypes.map((rt) => (
+                          <TypeBadge key={rt.id} type={rt.value} />
+                        ))}
+                      </div>
                     )}
-                    {item.languages.length > 0 && (
-                      <>
-                        <span className="text-[10px] text-muted-foreground">·</span>
-                        <span className="text-[10px] text-muted-foreground">
-                          {item.languages.map((l) => l.value).join(', ')}
-                        </span>
-                      </>
+
+                    {/* Description */}
+                    {item.description && (
+                      <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed line-clamp-2">
+                        {item.description}
+                      </p>
+                    )}
+
+                    {/* Themes · countries · languages */}
+                    {tags && (
+                      <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                        {item.themes.map((t, i) => (
+                          <React.Fragment key={t.id}>
+                            {i > 0 && <span className="text-[10px] text-muted-foreground">·</span>}
+                            <span className="text-[10px] text-muted-foreground">{t.value}</span>
+                          </React.Fragment>
+                        ))}
+                        {item.countries.length > 0 && (
+                          <>
+                            {item.themes.length > 0 && <span className="text-[10px] text-muted-foreground">·</span>}
+                            <span className="text-[10px] text-muted-foreground">
+                              {item.countries.map((c) => c.value).join(', ')}
+                            </span>
+                          </>
+                        )}
+                        {item.languages.length > 0 && (
+                          <>
+                            <span className="text-[10px] text-muted-foreground">·</span>
+                            <span className="text-[10px] text-muted-foreground">
+                              {item.languages.map((l) => l.value).join(', ')}
+                            </span>
+                          </>
+                        )}
+                      </div>
                     )}
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       )}
 
-      {totalPages > 1 && (
-        <div className="flex items-center justify-between mt-4">
-          <button
-            disabled={page === 0}
-            onClick={() => navigatePage(-1)}
-            className="text-xs text-primary disabled:text-muted-foreground disabled:cursor-not-allowed"
-          >
-            ← Previous
-          </button>
-          <span className="text-xs text-muted-foreground">
-            Page {page + 1} of {totalPages}
-          </span>
-          <button
-            disabled={page >= totalPages - 1}
-            onClick={() => navigatePage(1)}
-            className="text-xs text-primary disabled:text-muted-foreground disabled:cursor-not-allowed"
-          >
-            Next →
-          </button>
+      {items.length > 0 && (
+        <div className="flex items-center justify-between mt-4 gap-3 flex-wrap">
+          <label className="flex items-center gap-2 text-xs text-muted-foreground">
+            Results per page
+            <select
+              value={currentSize}
+              onChange={(e) => changePageSize(Number(e.target.value))}
+              className="border border-border rounded px-2 py-1 text-xs text-foreground bg-background focus:outline-none focus:ring-1 focus:ring-primary"
+            >
+              {PAGE_SIZE_OPTIONS.map((n) => (
+                <option key={n} value={n}>{n}</option>
+              ))}
+            </select>
+          </label>
+
+          {totalPages > 1 ? (
+            <div className="flex items-center gap-0.5 flex-wrap">
+              <button
+                disabled={page === 0 || isFetching}
+                onClick={() => goToPage(page - 1)}
+                className="px-3 py-1.5 text-xs border border-border rounded hover:bg-muted/50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              >
+                Previous
+              </button>
+
+              {buildPageWindows(page + 1, totalPages).map((p, i) =>
+                p === '…' ? (
+                  <span key={`ellipsis-${i}`} className="px-2 py-1.5 text-xs text-muted-foreground select-none">…</span>
+                ) : (
+                  <button
+                    key={p}
+                    onClick={() => goToPage((p as number) - 1)}
+                    disabled={isFetching}
+                    className={`px-3 py-1.5 text-xs border rounded transition-colors disabled:cursor-not-allowed ${
+                      p === page + 1
+                        ? 'bg-primary text-primary-foreground border-primary'
+                        : 'border-border text-primary hover:bg-muted/50'
+                    }`}
+                  >
+                    {p}
+                  </button>
+                )
+              )}
+
+              <button
+                disabled={page >= totalPages - 1 || isFetching}
+                onClick={() => goToPage(page + 1)}
+                className="px-3 py-1.5 text-xs border border-border rounded hover:bg-muted/50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              >
+                Next
+              </button>
+            </div>
+          ) : (
+            <div />
+          )}
         </div>
       )}
     </div>

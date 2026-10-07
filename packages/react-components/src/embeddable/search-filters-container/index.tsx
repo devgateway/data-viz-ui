@@ -13,12 +13,30 @@ export interface SearchFiltersProps {
   [key: string]: unknown
 }
 
+function ChevronIcon({ open }: { open: boolean }) {
+  return (
+    <svg
+      className={`w-4 h-4 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+      viewBox="0 0 20 20"
+      fill="currentColor"
+      aria-hidden="true"
+    >
+      <path
+        fillRule="evenodd"
+        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+        clipRule="evenodd"
+      />
+    </svg>
+  )
+}
+
 function SearchFilters(props: SearchFiltersProps) {
   const title = (props['data-title'] as string) ?? props.title ?? 'Filters'
   const clearAllLabel = (props['data-clear-all-label'] as string) ?? props.clearAllLabel ?? 'Clear all'
   const childContent = (props.childContent as string) ?? ''
 
   const [showClear, setShowClear] = useState(() => hasActiveFilters())
+  const [open, setOpen] = useState(false)
   const innerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -71,20 +89,39 @@ function SearchFilters(props: SearchFiltersProps) {
   }, [childContent])
 
   return (
-    <aside className="w-48 shrink-0">
-      <div className="flex items-center justify-between mb-3">
+    <aside className="w-full">
+      {/* Header row — always visible */}
+      <div className="flex items-center justify-between py-2 md:py-0 md:mb-3 border-b border-border md:border-none">
         <p className="text-xs font-semibold text-foreground uppercase tracking-wide">{title}</p>
-        {showClear && (
-          <button onClick={clearAllFilters} className="text-xs text-primary hover:text-primary-dark">
-            {clearAllLabel}
+        <div className="flex items-center gap-3">
+          {showClear && (
+            <button
+              onClick={clearAllFilters}
+              className="text-xs text-primary hover:text-primary/80 transition-colors"
+            >
+              {clearAllLabel}
+            </button>
+          )}
+          {/* Mobile-only toggle */}
+          <button
+            className="md:hidden p-1 -mr-1 text-muted-foreground hover:text-foreground transition-colors"
+            onClick={() => setOpen((o) => !o)}
+            aria-expanded={open}
+            aria-label={open ? 'Hide filters' : 'Show filters'}
+          >
+            <ChevronIcon open={open} />
           </button>
+        </div>
+      </div>
+
+      {/* Filter list — toggleable on mobile, always visible on md+ */}
+      <div className={`pt-3 ${open ? 'block' : 'hidden'} md:block`}>
+        {childContent ? (
+          <div ref={innerRef} dangerouslySetInnerHTML={{ __html: childContent }} />
+        ) : (
+          <div ref={innerRef}>{props.children}</div>
         )}
       </div>
-      {childContent ? (
-        <div ref={innerRef} dangerouslySetInnerHTML={{ __html: childContent }} />
-      ) : (
-        <div ref={innerRef}>{props.children}</div>
-      )}
     </aside>
   )
 }
