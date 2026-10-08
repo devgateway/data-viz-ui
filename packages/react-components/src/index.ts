@@ -14,3 +14,4 @@ export { default as ThemeCard, type Theme, type ThemeCardProps } from './embedda
 export { default as DatasetList, type DatasetListProps } from './embeddable/dataset-list/DatasetList';
 export { default as DatasetListItem, type LatestDatasetItem, type DatasetListItemProps } from './embeddable/dataset-list/DatasetListItem';
 export { default as Header, type HeaderProps } from './layout/Header';
+export { default as Footer, type FooterProps } from './layout/Footer';
