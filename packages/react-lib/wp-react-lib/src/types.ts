@@ -389,8 +389,29 @@ export interface Menu {
     parent:           number;
     count:            number;
     filter:           string;
-    term_order:       string;
+    term_order?:      string;
     icon_media_id?:    number;
+    items?:           MenuItem[];
+}
+
+export interface MenuItem {
+    ID:               number;
+    db_id:            number;
+    title:            string;
+    url:              string;
+    target:           string;
+    attr_title:       string;
+    description:      string;
+    classes:          string[];
+    xfn:              string;
+    menu_order:       number;
+    menu_item_parent: string;
+    object_id:        string;
+    object:           string;
+    type:             string;
+    type_label:       string;
+    slug?:            string;
+    child_items?:     MenuItem[];
 }
 
 export interface SearchResult {

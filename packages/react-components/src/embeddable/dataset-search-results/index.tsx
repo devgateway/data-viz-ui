@@ -230,7 +230,7 @@ function DatasetSearchResultsInner(props: DatasetSearchResultsProps) {
                           <>
                             <span className="text-[10px] text-muted-foreground">·</span>
                             <span className="text-[10px] text-muted-foreground">
-                              {item.languages.map((l) => l.value).join(', ')}
+                              {item.languages.join(', ')}
                             </span>
                           </>
                         )}

@@ -386,6 +386,9 @@ importers:
 
   packages/react-components:
     dependencies:
+      '@devgateway/wp-react-lib':
+        specifier: workspace:*
+        version: link:../react-lib/wp-react-lib
       '@reduxjs/toolkit':
         specifier: ^2.12.0
         version: 2.12.0(react-redux@9.3.0(@types/react@19.3.0)(react@19.3.0)(redux@5.0.1))(react@19.3.0)

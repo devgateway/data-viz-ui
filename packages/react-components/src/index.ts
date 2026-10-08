@@ -13,3 +13,4 @@ export { default as ThemeList, type ThemeListProps, type ThemeListColumns } from
 export { default as ThemeCard, type Theme, type ThemeCardProps } from './embeddable/theme-list/ThemeCard';
 export { default as DatasetList, type DatasetListProps } from './embeddable/dataset-list/DatasetList';
 export { default as DatasetListItem, type LatestDatasetItem, type DatasetListItemProps } from './embeddable/dataset-list/DatasetListItem';
+export { default as Header, type HeaderProps } from './layout/Header';

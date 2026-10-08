@@ -126,7 +126,7 @@ export interface DatasetSearchItem {
   themes: Array<{ id: number; value: string }>
   countries: Array<{ id: number; value: string }>
   resourceTypes: Array<{ id: number; value: string }>
-  languages: Array<{ id: number; value: string }>
+  languages: string[]
   formats: string[]
 }
 
@@ -144,8 +144,8 @@ export interface DatasetSearchResponse {
   facets: {
     resourceTypes: DatasetSearchFacetItem[]
     countries: DatasetSearchFacetItem[]
-    languages: DatasetSearchFacetItem[]
-    years: DatasetSearchFacetItem[]
+    languages: Array<{ value: string; count: number }>
+    years: Array<{ value: number; count: number }>
   }
 }
 
