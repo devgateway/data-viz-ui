@@ -79,4 +79,12 @@ describe('ThemeList', () => {
     await waitFor(() => expect(screen.getByRole('button', { name: /From API/ })).toBeInTheDocument());
     expect(container.firstElementChild).toHaveClass('grid-cols-1', 'sm:grid-cols-2');
   });
+
+  it('links an active theme to its portal path, not the WordPress URL', () => {
+    const withLink: Theme[] = [{ ...themes[0], wordpressUrl: 'http://localhost/wp/adolescent-data/' }];
+
+    renderWithProvider(<ThemeList themes={withLink} />);
+
+    expect(screen.getByRole('link', { name: /Adolescent data/ })).toHaveAttribute('href', '/adolescent-data/');
+  });
 });

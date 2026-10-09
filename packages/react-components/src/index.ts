@@ -4,6 +4,7 @@ export { default as VariableBrowser, type VariableBrowserProps } from './embedda
 export * from './embeddable';
 export { portalApi, useGetCategoriesQuery, useGetCategoryValuesQuery } from './embeddable/shared/api';
 export { createEmbeddableStore } from './embeddable/shared/store';
+export { default as EmbeddableProvider } from './embeddable/shared/EmbeddableProvider';
 export { configureWpSettings, useWpSettings } from './embeddable/shared/useWpSettings';
 export type { WpSettings, WpSettingsLanguage } from './embeddable/shared/types';
 

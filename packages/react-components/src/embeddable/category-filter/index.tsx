@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react'
 import { skipToken } from '@reduxjs/toolkit/query/react'
 import { useGetCategoryValuesQuery } from '../shared/api'
-import EmbeddableProvider from '../shared/EmbeddableProvider'
 import { FILTER_CHANGE_EVENT, readCheckedFromUrl, writeCheckedToUrl } from '../shared/filterParams'
 
 export interface CategoryFilterProps {
@@ -19,7 +18,7 @@ export interface CategoryFilterProps {
   [key: string]: unknown
 }
 
-function CategoryFilterInner(props: CategoryFilterProps) {
+function CategoryFilter(props: CategoryFilterProps) {
   const apiUrl = (props['data-api-url'] as string) ?? props.apiUrl
   const categoryId = Number((props['data-category-id'] as string) ?? props.categoryId)
   const categoryName = (props['data-category-name'] as string) ?? props.categoryName ?? ''
@@ -81,11 +80,5 @@ function CategoryFilterInner(props: CategoryFilterProps) {
     </div>
   )
 }
-
-const CategoryFilter = (props: CategoryFilterProps) => (
-  <EmbeddableProvider>
-    <CategoryFilterInner {...props} />
-  </EmbeddableProvider>
-)
 
 export default CategoryFilter

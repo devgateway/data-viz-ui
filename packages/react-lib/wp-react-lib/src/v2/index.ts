@@ -2,6 +2,7 @@ export { WPClient, createWordPressClient } from './client/WPClient';
 export type { GetPostsParams, GetPagesParams, GetCategoriesParams, SearchParams } from './client/WPClient';
 export type { WPClientConfig, ResponseMeta, WPResponse, WPTerm } from './client/types';
 export type { Menu, MenuItem } from '../types';
+export type { PostType } from '../post-type';
 export { WPConfigError, WPApiError, WPTimeoutError } from './client/errors';
 
 export { WordPressContext, WordPressProvider, useWordPress, useWPClient } from './context/WordPressContext';

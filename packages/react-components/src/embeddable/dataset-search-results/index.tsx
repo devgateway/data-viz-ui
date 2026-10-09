@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react'
 import { skipToken } from '@reduxjs/toolkit/query/react'
 import { useSearchDatasetsQuery } from '../shared/api'
-import EmbeddableProvider from '../shared/EmbeddableProvider'
 import { FILTER_CHANGE_EVENT } from '../shared/filterParams'
 import { SEARCH_CHANGE_EVENT } from '../search-box'
 import { useWpSettings } from '../shared/useWpSettings'
@@ -96,7 +95,7 @@ export interface DatasetSearchResultsProps {
   [key: string]: unknown
 }
 
-function DatasetSearchResultsInner(props: DatasetSearchResultsProps) {
+function DatasetSearchResults(props: DatasetSearchResultsProps) {
   const rawApiUrl = (props['data-api-url'] as string) ?? props.apiUrl
   const { settings } = useWpSettings()
   const apiUrl = rawApiUrl || settings?.dataset_repository_url || ''
@@ -304,11 +303,5 @@ function DatasetSearchResultsInner(props: DatasetSearchResultsProps) {
     </div>
   )
 }
-
-const DatasetSearchResults = (props: DatasetSearchResultsProps) => (
-  <EmbeddableProvider>
-    <DatasetSearchResultsInner {...props} />
-  </EmbeddableProvider>
-)
 
 export default DatasetSearchResults

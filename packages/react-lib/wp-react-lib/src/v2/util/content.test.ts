@@ -27,8 +27,23 @@ describe('replaceLink', () => {
         expect(replaceLink('https://example.com/wp/about?x=1', 'fr')).toBe('/fr/about?x=1');
     });
 
-    it('defaults to "en" when no locale is given', () => {
-        expect(replaceLink('/wp/about')).toBe('/en/about');
+    it('only strips the /wp prefix when no locale is given', () => {
+        expect(replaceLink('/wp/about')).toBe('/about');
+        expect(replaceLink('http://localhost/wp/about/?x=1#top')).toBe('/about/?x=1#top');
+    });
+
+    it('maps the bare WP root to the portal root', () => {
+        expect(replaceLink('http://localhost/wp')).toBe('/');
+        expect(replaceLink('http://localhost/wp', 'fr')).toBe('/fr/');
+    });
+
+    it('leaves WP admin/API paths unchanged', () => {
+        expect(replaceLink('/wp/wp-admin/load-styles.php', 'fr')).toBe('/wp/wp-admin/load-styles.php');
+        expect(replaceLink('http://localhost/wp/wp-json/wp/v2/pages', 'fr')).toBe('http://localhost/wp/wp-json/wp/v2/pages');
+    });
+
+    it('rewrites day-and-name post permalinks', () => {
+        expect(replaceLink('http://localhost/wp/2026/10/09/sample-post/')).toBe('/2026/10/09/sample-post/');
     });
 });
 
@@ -36,6 +51,11 @@ describe('replaceHTMLinks', () => {
     it('rewrites every WP href in the HTML', () => {
         const html = '<a href="/wp/about">About</a> and <a href="https://example.com/wp/contact">Contact</a>';
         expect(replaceHTMLinks(html, 'fr')).toBe('<a href="/fr/about">About</a> and <a href="/fr/contact">Contact</a>');
+    });
+
+    it('rewrites embeddable url attributes (data-*-url) too, but not other data attributes', () => {
+        const html = '<div data-redirect-url="http://localhost/wp/search/" data-api-url="http://localhost:8080" data-label="/wp/x"></div>';
+        expect(replaceHTMLinks(html, 'fr')).toBe('<div data-redirect-url="/fr/search/" data-api-url="http://localhost:8080" data-label="/wp/x"></div>');
     });
 
     it('leaves non-WP hrefs untouched', () => {

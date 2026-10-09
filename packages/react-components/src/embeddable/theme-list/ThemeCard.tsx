@@ -1,5 +1,6 @@
 import React from 'react'
 import type { Theme } from '../shared/types'
+import { replaceLink } from '@devgateway/wp-react-lib/v2'
 
 export type { Theme }
 
@@ -47,7 +48,7 @@ const ThemeCard = (props: ThemeCardProps) => {
   // A plain anchor, not a router <Link>, so the card still works when mounted
   // without any Router context (e.g. via the WordPress EmbeddedGateway).
   return wordpressUrl ? (
-    <a href={wordpressUrl} onClick={onClick} className={className}>{content}</a>
+    <a href={replaceLink(wordpressUrl)} onClick={onClick} className={className}>{content}</a>
   ) : (
     <button onClick={onClick} className={className}>{content}</button>
   )

@@ -1,23 +1,21 @@
 // @vitest-environment jsdom
 import React from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 
 const mocks = vi.hoisted(() => ({
   useMenu: vi.fn(),
   useWpSettings: vi.fn(),
   useMedia: vi.fn(),
-  useWPClient: vi.fn(),
 }))
 
-vi.mock('@devgateway/wp-react-lib/v2', () => ({
-  useMenu: mocks.useMenu,
-  useMedia: mocks.useMedia,
-  useWPClient: mocks.useWPClient,
-}))
+vi.mock('@devgateway/wp-react-lib/v2', async () => {
+  const actual = await vi.importActual<typeof import('@devgateway/wp-react-lib/v2')>('@devgateway/wp-react-lib/v2')
+  return { replaceLink: actual.replaceLink, useMenu: mocks.useMenu, useMedia: mocks.useMedia }
+})
 vi.mock('../embeddable/shared/useWpSettings', () => ({ useWpSettings: mocks.useWpSettings }))
 
-import Header, { toPortalHref } from './Header'
+import Header from './Header'
 
 const item = (ID: number, title: string, url: string, extra: Record<string, unknown> = {}) => ({
   ID, title, url, target: '', ...extra,
@@ -27,7 +25,7 @@ const menu = {
   items: [
     item(122, 'Home', 'http://localhost/wp'),
     item(126, 'Research Themes', '/themes', { child_items: [item(133, 'Adolescent data', 'http://localhost/wp/adolescent-data/')] }),
-    item(124, 'Search', 'http://localhost/wp/?page_id=15', { object: 'page', object_id: '15' }),
+    item(124, 'Search', 'http://localhost/wp/search/'),
   ],
 }
 
@@ -35,25 +33,11 @@ beforeEach(() => {
   mocks.useMenu.mockReturnValue({ data: menu })
   mocks.useWpSettings.mockReturnValue({ settings: { name: 'Development Gateway', description: 'Primary Research Portal', site_logo: 7 } })
   mocks.useMedia.mockReturnValue({ data: { source_url: 'http://localhost/wp/uploads/logo.png' } })
-  mocks.useWPClient.mockReturnValue({ getPage: vi.fn().mockResolvedValue({ data: { slug: 'search' } }) })
   window.history.pushState({}, '', '/themes')
 })
 
 afterEach(() => {
   vi.clearAllMocks()
-})
-
-describe('toPortalHref', () => {
-  it.each([
-    ['http://localhost/wp', '/'],
-    ['http://localhost/wp/search/', '/search/'],
-    ['/themes', '/themes'],
-    ['http://localhost/wp/?page_id=15', 'http://localhost/wp/?page_id=15'],
-    ['https://example.org/about', 'https://example.org/about'],
-    ['', '#'],
-  ])('maps %s to %s', (input, expected) => {
-    expect(toPortalHref(input)).toBe(expected)
-  })
 })
 
 describe('Header', () => {
@@ -78,20 +62,16 @@ describe('Header', () => {
     const nav = screen.getByRole('navigation', { name: 'Primary navigation' })
 
     expect(nav.querySelector('a[href="/"]')).toHaveTextContent('Home')
-    expect(nav.querySelector('a[href="http://localhost/wp/?page_id=15"]')).toHaveTextContent('Search')
-  })
-
-  it('rewrites ?page_id= page links to /{slug} once it is looked up', async () => {
-    render(<Header />)
-    const link = await screen.findByRole('link', { name: 'Search' })
-    await waitFor(() => expect(link).toHaveAttribute('href', '/search'))
-    expect(mocks.useWPClient().getPage).toHaveBeenCalledWith('15')
+    expect(nav.querySelector('a[href="/search/"]')).toHaveTextContent('Search')
     expect(screen.getByRole('button', { name: /Research Themes/ })).toHaveAttribute('aria-expanded', 'false')
   })
 
-  it('uses the locale prop in page links', async () => {
+  it('prefixes WordPress links with the locale prop', () => {
     render(<Header locale="fr" />)
-    await waitFor(() => expect(screen.getByRole('link', { name: 'Search' })).toHaveAttribute('href', '/fr/search'))
+    const nav = screen.getByRole('navigation', { name: 'Primary navigation' })
+
+    expect(nav.querySelector('a[href="/fr/"]')).toHaveTextContent('Home')
+    expect(nav.querySelector('a[href="/fr/search/"]')).toHaveTextContent('Search')
   })
 
   it('opens the dropdown with child items and closes it on Escape', () => {

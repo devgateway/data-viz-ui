@@ -4,7 +4,7 @@ export interface ComponentsProp {
     [key: string]: React.ComponentType<any>
 }
 
-// The same loader functions back both maps below: `lazy()` wraps them for
+// `components` below is derived from these loaders: `lazy()` wraps them for
 // client-side code-splitting, but `React.lazy` components can't be rendered
 // by synchronous SSR APIs like `renderToStaticMarkup` (they throw "A
 // component suspended..." since there's no Suspense boundary to resolve
@@ -29,41 +29,10 @@ export const loaders: Record<string, () => Promise<{ default: React.ComponentTyp
     datasetSearchResults: () => import('./dataset-search-results'),
 }
 
-const download = lazy(loaders.download);
-const search = lazy(loaders.search);
-const themeList = lazy(loaders.themeList);
-const datasetList = lazy(loaders.datasetList);
-const datasetFiles = lazy(loaders.datasetFiles);
-const datasetResources = lazy(loaders.datasetResources);
-const datasetMetadata = lazy(loaders.datasetMetadata);
-const datasetDoi = lazy(loaders.datasetDoi);
-const datasetLicense = lazy(loaders.datasetLicense);
-const datasetCitation = lazy(loaders.datasetCitation);
-const datasetPage = lazy(loaders.datasetPage);
-const variableBrowser = lazy(loaders.variableBrowser);
-const searchFiltersContainer = lazy(loaders.searchFiltersContainer);
-const categoryFilter = lazy(loaders.categoryFilter);
-const searchBox = lazy(loaders.searchBox);
-const datasetSearchResults = lazy(loaders.datasetSearchResults);
 
-export const components: ComponentsProp = {
-    download: download,
-    search: search,
-    themeList: themeList,
-    datasetList: datasetList,
-    datasetFiles: datasetFiles,
-    datasetResources: datasetResources,
-    datasetMetadata: datasetMetadata,
-    datasetDoi: datasetDoi,
-    datasetLicense: datasetLicense,
-    datasetCitation: datasetCitation,
-    datasetPage: datasetPage,
-    variableBrowser: variableBrowser,
-    searchFiltersContainer: searchFiltersContainer,
-    categoryFilter: categoryFilter,
-    searchBox: searchBox,
-    datasetSearchResults: datasetSearchResults,
-}
+export const components: ComponentsProp = Object.fromEntries(
+    Object.entries(loaders).map(([name, load]) => [name, lazy(load)]),
+)
 
 export const customizer = {
     components: {},

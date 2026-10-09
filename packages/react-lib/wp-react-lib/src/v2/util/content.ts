@@ -1,39 +1,24 @@
 // Pure string manipulation - no DOM/window dependency, so this is already
 // safe to run during SSR as-is.
 
+/**
+ * Rewrites a WordPress URL to the portal's own path: strips the `/wp` prefix and, when a
+ * `locale` is given, prefixes `/<locale>`. Media/admin/API paths (`/wp/wp-...`) and
+ * non-WordPress URLs are left alone.
+ */
 const localReplaceLink = (url: string, locale?: string): string => {
-    if (!url) {
-        return '';
-    }
-    const safeLocale = locale || 'en';
-
-    try {
-        let pathname = url;
-
-        // If absolute URL, extract pathname and ignore origin
-        if (/^https?:\/\//i.test(url)) {
-            const parsed = new URL(url);
-            pathname = parsed.pathname + (parsed.search || '') + (parsed.hash || '');
-        }
-
-        if (!pathname.startsWith('/wp/')) {
-            return url; // Not a WordPress path, leave unchanged
-        }
-        // ensuring access to media library files
-        if (pathname.startsWith('/wp/wp-content')) {
-            return url;
-        }
-
-        const afterWp = pathname.slice(3); // remove '/wp'
-
-        if (!afterWp.startsWith('/' + safeLocale)) {
-            return '/' + safeLocale + afterWp;
-        }
-
-        return afterWp;
-    } catch {
+    const match = url.match(/^(?:https?:\/\/[^/]+)?\/wp(\/[^?#]*)?([?#].*)?$/i);
+    if (!match) {
         return url;
     }
+
+    const [, path = '/', rest = ''] = match;
+    if (path.startsWith('/wp-')) {
+        return url;
+    }
+
+    const prefix = locale && !(path === `/${locale}` || path.startsWith(`/${locale}/`)) ? `/${locale}` : '';
+    return `${prefix}${path}${rest}`;
 };
 
 export const replaceLink = (url: string | undefined, locale?: string): string => {
@@ -43,21 +28,12 @@ export const replaceLink = (url: string | undefined, locale?: string): string =>
     return localReplaceLink(url, locale);
 };
 
-export const replaceHTMLinks = (html: string, locale?: string): string => {
-    // Match both absolute (http/https) and relative WP links in a single pass
-    const linkRegex = /href\s*=\s*(['"])(https?:\/\/.*?|\/wp\/.*?)\1/gi;
-
-    let newHtml = html;
-    let match: RegExpExecArray | null;
-    while ((match = linkRegex.exec(html)) !== null) {
-        const href = match[2];
-        const newLink = localReplaceLink(href, locale);
-        if (newLink !== href) {
-            newHtml = newHtml.replaceAll(href, newLink);
-        }
-    }
-    return newHtml;
-};
+/** Rewrites every `href` and `data-*-url` attribute (embeddable props) that points at WordPress. */
+export const replaceHTMLinks = (html: string, locale?: string): string =>
+    html.replace(
+        /(\b(?:href|data-[\w-]*url)\s*=\s*)(['"])(https?:\/\/.*?|\/wp(?:\/.*?)?)\2/gi,
+        (_match, attr: string, quote: string, url: string) => `${attr}${quote}${localReplaceLink(url, locale)}${quote}`,
+    );
 
 export const removePatternBrackets = (html: string | null | undefined): string | null => {
     if (!html) {

@@ -1,73 +1,22 @@
 "use client"
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { useMedia, useMenu, useSettings, useWPClient } from '@devgateway/wp-react-lib/v2'
+import { replaceLink, useMedia, useMenu, useSettings } from '@devgateway/wp-react-lib/v2'
 import type { Menu, MenuItem } from '@devgateway/wp-react-lib/v2'
 import { useWpSettings } from '../embeddable/shared/useWpSettings'
 
 export interface HeaderProps {
   menuName?: string
   homeUrl?: string
-  /** When set, page links are `/{locale}/{slug}`; otherwise `/{slug}`. */
+  /** When set, menu links are `/{locale}/{path}`; otherwise `/{path}`. */
   locale?: string
 }
 
-// WP returns absolute URLs under its own `/wp` path (e.g. http://localhost/wp/search/);
-// the portal serves the same pages from the site root. `?page_id=` links have no portal
-// equivalent, so they stay pointed at WP.
-export function toPortalHref(url: string): string {
-  if (!url || url === '#') return '#'
-  if (url.startsWith('/')) return url
-  let parsed: URL
-  try {
-    parsed = new URL(url)
-  } catch {
-    return url
-  }
-  if (parsed.searchParams.has('page_id') || parsed.searchParams.has('p')) return url
-  const match = parsed.pathname.match(/^\/wp(\/.*)?$/)
-  if (!match) return url
-  return `${match[1] ?? '/'}${parsed.search}${parsed.hash}`
-}
-
-const needsSlugLookup = (item: MenuItem) =>
-  item.object === 'page' && !!item.object_id && !toPortalHref(item.url).startsWith('/')
-
-function collectPageIds(items: MenuItem[]): string[] {
-  return items.flatMap((item) => [
-    ...(needsSlugLookup(item) ? [item.object_id] : []),
-    ...collectPageIds(item.child_items ?? []),
-  ])
-}
-
-function withPortalUrls(items: MenuItem[], slugs: Record<string, string>, locale?: string): MenuItem[] {
+function toPortalItems(items: MenuItem[], locale?: string): MenuItem[] {
   return items.map((item) => ({
     ...item,
-    url: needsSlugLookup(item) && slugs[item.object_id] ? `${locale ? `/${locale}` : ''}/${slugs[item.object_id]}` : item.url,
-    child_items: item.child_items && withPortalUrls(item.child_items, slugs, locale),
+    url: replaceLink(item.url, locale),
+    child_items: item.child_items && toPortalItems(item.child_items, locale),
   }))
-}
-
-// The menu response only carries WP's plain-permalink `?page_id=X` URL for pages, which has
-// no portal route, so the page's slug is looked up by id and linked as `/{slug}` or `/{locale}/{slug}`.
-function usePortalMenuItems(items: MenuItem[], locale?: string): MenuItem[] {
-  const client = useWPClient()
-  const [slugs, setSlugs] = useState<Record<string, string>>({})
-  const ids = useMemo(() => Array.from(new Set(collectPageIds(items))), [items])
-
-  useEffect(() => {
-    let cancelled = false
-    ids.filter((id) => !slugs[id]).forEach(async (id) => {
-      try {
-        const { data } = await client.getPage(id)
-        if (!cancelled && data?.slug) setSlugs((prev) => ({ ...prev, [id]: data.slug }))
-      } catch {
-        // leave this item pointing at its WP URL
-      }
-    })
-    return () => { cancelled = true }
-  }, [client, ids])
-
-  return useMemo(() => withPortalUrls(items, slugs, locale), [items, slugs, locale])
 }
 
 function normalizePath(path: string): string {
@@ -77,11 +26,11 @@ function normalizePath(path: string): string {
 const LOCALE_ROOT = /^\/[a-z]{2}(-[a-z]{2})?$/i
 
 function isActive(item: MenuItem, pathname: string): boolean {
-  const href = toPortalHref(item.url)
-  if (!href.startsWith('/')) return false
-  const target = normalizePath(href.split(/[?#]/)[0])
+  if (!item.url.startsWith('/')) return false
+  const target = normalizePath(item.url.split(/[?#]/)[0])
   const current = normalizePath(pathname)
   if (target === '/') return current === '/' || LOCALE_ROOT.test(current)
+  if (LOCALE_ROOT.test(target)) return current === target
   return current === target || current.startsWith(`${target}/`)
 }
 
@@ -99,7 +48,7 @@ const MenuLink = ({
   item, className, onClick, children,
 }: { item: MenuItem; className: string; onClick: () => void; children?: React.ReactNode }) => (
   <a
-    href={toPortalHref(item.url)}
+    href={item.url}
     target={item.target || undefined}
     rel={item.target === '_blank' ? 'noopener noreferrer' : undefined}
     onClick={onClick}
@@ -148,8 +97,7 @@ function Header({ menuName = 'main', homeUrl = '/', locale }: HeaderProps) {
     }
   }, [])
 
-  const rawItems = useMemo(() => menu?.items ?? [], [menu])
-  const items = usePortalMenuItems(rawItems, locale)
+  const items = useMemo(() => toPortalItems(menu?.items ?? [], locale), [menu, locale])
   const siteName = settings?.name
   const logoId = settings?.site_icon || settings?.site_logo || 0
   const siteDescription = settings?.description
@@ -230,7 +178,7 @@ function Header({ menuName = 'main', homeUrl = '/', locale }: HeaderProps) {
                           </MenuLink>
                         ))}
                       </div>
-                      {toPortalHref(item.url) !== '#' && (
+                      {item.url && item.url !== '#' && (
                         <>
                           <div className="my-2 border-t border-border" />
                           <div className="px-3">

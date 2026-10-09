@@ -21,15 +21,23 @@ describe('Footer', () => {
     mocks.usePages.mockReturnValue({ data: [{ slug: 'footer', content: { rendered: 'Footer content' } }] })
     render(<Footer />)
 
-    expect(mocks.usePages).toHaveBeenCalledWith({ slug: 'footer', locale: undefined })
+    expect(mocks.usePages).toHaveBeenCalledWith({ slug: 'footer', locale: undefined, initialData: undefined })
     expect(screen.getByText('Footer content')).toBeInTheDocument()
+  })
+
+  it('uses a page loaded up front as the initial data', () => {
+    const page = { slug: 'footer', content: { rendered: 'Loaded footer' } }
+    mocks.usePages.mockReturnValue({ data: [page] })
+    render(<Footer page={page as any} />)
+
+    expect(mocks.usePages).toHaveBeenCalledWith({ slug: 'footer', locale: undefined, initialData: [page] })
   })
 
   it('passes the locale and a custom slug through', () => {
     mocks.usePages.mockReturnValue({ data: null })
     render(<Footer slug="site-footer" locale="fr" />)
 
-    expect(mocks.usePages).toHaveBeenCalledWith({ slug: 'site-footer', locale: 'fr' })
+    expect(mocks.usePages).toHaveBeenCalledWith({ slug: 'site-footer', locale: 'fr', initialData: undefined })
   })
 
   it('renders nothing while loading or when no page has the slug', () => {
