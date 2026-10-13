@@ -1,5 +1,5 @@
 "use client"
-import React, { useEffect, useId, useState } from 'react'
+import React, { useEffect, useId, useMemo, useState } from 'react'
 import { Content, PostIcon, PostLabel, useMedia, usePosts } from '@devgateway/wp-react-lib/v2'
 import type { PostType } from '@devgateway/wp-react-lib/v2'
 
@@ -13,6 +13,7 @@ export interface TabbedPostsProps {
   showIcons?: boolean | string
   useScrolls?: boolean | string
   locale?: string
+  postOrder?: string | number[]
   'data-type'?: string
   'data-taxonomy'?: string
   'data-categories'?: string
@@ -22,6 +23,7 @@ export interface TabbedPostsProps {
   'data-show-icons'?: string
   'data-use-scrolls'?: string
   'data-locale'?: string
+  'data-post-order'?: string
   [key: string]: unknown
 }
 
@@ -39,6 +41,27 @@ function normalizeCategories(value: string | string[] | undefined): string | und
   }
   return value
 }
+
+// Post ids in tab order: "3,1,2" from the saved block, "[3,1,2]" from the editor preview.
+function parseIds(value: string | number[] | undefined): number[] {
+  if (Array.isArray(value)) return value.map(Number)
+  if (!value) return []
+  const parts = value.replace(/[[\]\s]/g, '').split(',').filter(Boolean)
+  const ids = parts.map(Number)
+  return ids.every(Number.isInteger) ? ids : []
+}
+
+// Array.prototype.sort is stable, so posts that are not in `order` keep the API's order after the ordered ones.
+const sortByOrder = (posts: PostType[], order: number[]): PostType[] => {
+  const rank = (post: PostType) => {
+    const index = order.indexOf(post.id)
+    return index === -1 ? order.length : index
+  }
+  return [...posts].sort((a, b) => rank(a) - rank(b))
+}
+
+// The most posts one REST request returns.
+const MAX_PER_PAGE = 100
 
 const TabIcon = ({ post, locale }: { post: PostType; locale?: string }) => {
   const { data: media } = useMedia({ slug: post.meta_fields.icon[0], locale })
@@ -64,15 +87,25 @@ function TabbedPosts(props: TabbedPostsProps) {
   const locale = (props['data-locale'] as string) ?? props.locale
 
   const categories = normalizeCategories(rawCategories)
+  const postOrder = parseIds((props['data-post-order'] as string) ?? props.postOrder)
 
-  const { data: posts } = usePosts({
+  // With a manual order the posts to show may fall outside the API's first `items`, so fetch
+  // them all, then order and cut down to `items` here.
+  const { data: fetched } = usePosts({
     type,
     // The block saves "none" when no taxonomy is chosen; sent as-is it would become a `?none=` query param.
     taxonomy: taxonomy === 'none' ? undefined : taxonomy,
     categories,
-    perPage: items,
+    perPage: postOrder.length ? MAX_PER_PAGE : items,
     locale,
   })
+
+  const orderKey = postOrder.join(',')
+  const posts = useMemo(() => {
+    if (!fetched || !orderKey) return fetched
+    const ordered = sortByOrder(fetched, orderKey.split(',').map(Number))
+    return items ? ordered.slice(0, items) : ordered
+  }, [fetched, orderKey, items])
 
   const [selected, setSelected] = useState<string>()
   const baseId = useId()

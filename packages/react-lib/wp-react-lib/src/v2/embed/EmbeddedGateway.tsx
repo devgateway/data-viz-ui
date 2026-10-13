@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, type ReactNode } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
-import { useEmbedRegistry } from './EmbedContext';
+import { EmbedContext, useEmbedRegistry } from './EmbedContext';
 
 export interface EmbeddedGatewayProps {
     children: ReactNode;
@@ -91,7 +91,9 @@ export function EmbeddedGateway({ children, parent, parentUnique }: EmbeddedGate
                 <Component unique={`${parentUnique ?? ''}_embeddable_${index}${randomSuffix()}`} {...props} childContent={childContent} />
             );
 
-            root.render(wrapper ? wrapper(embeddedElement) : embeddedElement);
+            // The registry is re-provided here, outside `wrapper`, so an embedded component that itself
+            // renders WP content (a tab, a card) can mount the embeddables inside it.
+            root.render(<EmbedContext.Provider value={embed}>{wrapper ? wrapper(embeddedElement) : embeddedElement}</EmbedContext.Provider>);
         });
 
         return () => {

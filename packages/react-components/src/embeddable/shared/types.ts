@@ -166,3 +166,12 @@ export interface DatasetDetail {
   files: DatasetFile[]
   resources: DatasetResource[]
 }
+
+export interface FileListItem {
+  id: number
+  url: string
+  filename: string
+  mimeType?: string
+  sizeBytes?: number
+  displayName?: string
+}

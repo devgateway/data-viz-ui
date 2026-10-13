@@ -76,6 +76,26 @@ describe('EmbeddedGateway', () => {
         expect(container.querySelector('.rewrapped [data-testid="marker"]')).not.toBeNull();
     });
 
+    it('lets an embedded component mount embeddables inside the content it renders itself', () => {
+        function Outer() {
+            return (
+                <EmbeddedGateway>
+                    <div dangerouslySetInnerHTML={{ __html: '<div class="viz-component" data-component="Widget" label="nested"></div>' }} />
+                </EmbeddedGateway>
+            );
+        }
+
+        const { container } = mount(
+            <EmbedProvider registry={{ Outer, Widget }}>
+                <EmbeddedGateway>
+                    <div dangerouslySetInnerHTML={{ __html: '<div class="viz-component" data-component="Outer"></div>' }} />
+                </EmbeddedGateway>
+            </EmbedProvider>
+        );
+
+        expect(container.querySelector('[data-testid="widget"]')?.textContent).toBe('Widget: nested');
+    });
+
     it('degrades to a no-op (static HTML stays as-is) when there is no EmbedProvider', () => {
         expect(() =>
             mount(

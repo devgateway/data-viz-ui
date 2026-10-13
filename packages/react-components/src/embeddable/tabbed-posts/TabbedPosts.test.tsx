@@ -111,4 +111,61 @@ describe('TabbedPosts', () => {
     rerender(<TabbedPosts {...{ 'data-height': '500', 'data-use-scrolls': 'true' }} />)
     expect(screen.getAllByRole('tabpanel', { hidden: true })[0].parentElement).toHaveStyle({ height: '500px' })
   })
+
+  describe('manual post order', () => {
+    const three = [
+      ...posts,
+      { id: 3, slug: 'extra', title: { rendered: 'Extra' }, content: { rendered: 'Extra body' }, meta_fields: { label: ['Extra label'] } },
+    ]
+    const tabNames = () => screen.getAllByRole('tab').map((t) => t.textContent)
+
+    it('orders the tabs by the given post ids, putting posts missing from the order last', () => {
+      mocks.usePosts.mockReturnValue({ data: three })
+      render(<TabbedPosts {...{ 'data-post-order': '3,2' }} />)
+
+      expect(tabNames()).toEqual(['Extra', 'Data ’s', 'About'])
+      expect(screen.getByRole('tab', { name: 'Extra' })).toHaveAttribute('aria-selected', 'true')
+    })
+
+    it('accepts the order as a JSON array string, as sent by the editor preview', () => {
+      mocks.usePosts.mockReturnValue({ data: three })
+      render(<TabbedPosts {...{ 'data-post-order': '[2,1,3]' }} />)
+
+      expect(tabNames()).toEqual(['Data ’s', 'About', 'Extra'])
+    })
+
+    it('fetches the most posts the API allows when ordered, then keeps only `items` of them', () => {
+      mocks.usePosts.mockReturnValue({ data: three })
+      render(<TabbedPosts {...{ 'data-post-order': '3,2,1', 'data-items': '2' }} />)
+
+      expect(mocks.usePosts).toHaveBeenCalledWith(expect.objectContaining({ perPage: 100 }))
+      expect(tabNames()).toEqual(['Extra', 'Data ’s'])
+    })
+
+    it('keeps the API order and page size when there is no manual order', () => {
+      mocks.usePosts.mockReturnValue({ data: three })
+      render(<TabbedPosts {...{ 'data-items': '2' }} />)
+
+      expect(mocks.usePosts).toHaveBeenCalledWith(expect.objectContaining({ perPage: 2 }))
+      expect(tabNames()).toEqual(['About', 'Data ’s', 'Extra'])
+    })
+
+    it.each(['', '[]', 'abc'])('treats an empty or invalid order %j as no manual order', (bad) => {
+      mocks.usePosts.mockReturnValue({ data: three })
+      render(<TabbedPosts {...{ 'data-post-order': bad, 'data-items': '2' }} />)
+
+      expect(mocks.usePosts).toHaveBeenCalledWith(expect.objectContaining({ perPage: 2 }))
+    })
+
+    it('keeps the tab the reader chose across re-renders', () => {
+      window.location.hash = '#about'
+      mocks.usePosts.mockReturnValue({ data: three })
+      const { rerender } = render(<TabbedPosts {...{ 'data-post-order': '3,2,1' }} />)
+
+      fireEvent.click(screen.getByRole('tab', { name: /Data/ }))
+      rerender(<TabbedPosts {...{ 'data-post-order': '3,2,1' }} />)
+
+      expect(screen.getByRole('tab', { name: /Data/ })).toHaveAttribute('aria-selected', 'true')
+    })
+  })
 })
