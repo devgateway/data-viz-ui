@@ -38,9 +38,9 @@ const ThemeCard = (props: ThemeCardProps) => {
       </div>
       <p className="text-xs text-muted-foreground leading-relaxed mb-3">{description}</p>
       <div className="flex items-center gap-3 text-xs text-muted-foreground">
-        <span>{countries.length} countries</span>
+        <span>{countries.length === 1 ? '1 country' : `${countries.length} countries`}</span>
         <span>·</span>
-        <span>{datasetCount} datasets</span>
+        <span>{datasetCount === 1 ? '1 dataset' : `${datasetCount} datasets`}</span>
       </div>
     </>
   )
