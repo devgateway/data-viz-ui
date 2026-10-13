@@ -28,6 +28,7 @@ export const loaders: Record<string, () => Promise<{ default: React.ComponentTyp
     searchBox: () => import('./search-box'),
     datasetSearchResults: () => import('./dataset-search-results'),
     tabbedPosts: () => import('./tabbed-posts'),
+    fileList: () => import('./file-list'),
 }
 
 
