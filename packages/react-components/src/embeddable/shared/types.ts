@@ -112,6 +112,11 @@ export interface FileVariable {
   categories: FileVariableCategory[]
 }
 
+export interface CategoryItem {
+  id: number
+  value: string
+}
+
 export interface DatasetSearchItem {
   id: number
   name: string
@@ -126,7 +131,7 @@ export interface DatasetSearchItem {
   themes: Array<{ id: number; value: string }>
   countries: Array<{ id: number; value: string }>
   resourceTypes: Array<{ id: number; value: string }>
-  languages: string[]
+  languages: CategoryItem[]
   formats: string[]
 }
 
@@ -174,4 +179,9 @@ export interface FileListItem {
   mimeType?: string
   sizeBytes?: number
   displayName?: string
+}
+
+export interface CategoryValueSummary {
+  countries: number
+  datasets: number
 }

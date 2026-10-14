@@ -2,6 +2,8 @@ import React, { useRef, useEffect, Suspense, useState } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { components } from '../index'
 import { FILTER_CHANGE_EVENT, hasActiveFilters, clearAllFilters } from '../shared/filterParams'
+import EmbeddableProvider from '../shared/EmbeddableProvider'
+import { createEmbeddableStore } from '../shared/store'
 
 export interface SearchFiltersProps {
   title?: string
@@ -38,6 +40,7 @@ function SearchFilters(props: SearchFiltersProps) {
   const [showClear, setShowClear] = useState(() => hasActiveFilters())
   const [open, setOpen] = useState(false)
   const innerRef = useRef<HTMLDivElement>(null)
+  const storeRef = useRef(createEmbeddableStore())
 
   useEffect(() => {
     const sync = () => setShowClear(hasActiveFilters())
@@ -76,9 +79,11 @@ function SearchFilters(props: SearchFiltersProps) {
       const root = createRoot(container)
       roots.push(root)
       root.render(
-        <Suspense fallback={null}>
-          <Component {...elementProps} />
-        </Suspense>
+        <EmbeddableProvider store={storeRef.current}>
+          <Suspense fallback={null}>
+            <Component {...elementProps} />
+          </Suspense>
+        </EmbeddableProvider>
       )
     })
 

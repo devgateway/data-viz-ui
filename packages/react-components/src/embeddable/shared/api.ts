@@ -1,11 +1,11 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { joinApiUrl } from './url'
-import type { Category, CategoryValue, DatasetDetail, DatasetResource, DatasetSearchResponse, FileVariable, LatestDatasetItem, Theme } from './types'
+import type { Category, CategoryValue, CategoryValueSummary, DatasetDetail, DatasetResource, DatasetSearchResponse, FileVariable, LatestDatasetItem, Theme } from './types'
 
 export const portalApi = createApi({
   reducerPath: 'portalApi',
   baseQuery: fetchBaseQuery({ baseUrl: '' }),
-  tagTypes: ['DatasetDetail', 'DatasetResources', 'FileVariables', 'LatestDatasets', 'Themes', 'Categories', 'CategoryValues', 'DatasetSearch'],
+  tagTypes: ['DatasetDetail', 'DatasetResources', 'FileVariables', 'LatestDatasets', 'Themes', 'Categories', 'CategoryValues', 'CategoryValueSummary', 'DatasetSearch'],
   endpoints: (builder) => ({
     // GET /datasets/latest
     getLatestDatasets: builder.query<LatestDatasetItem[], string>({
@@ -42,6 +42,16 @@ export const portalApi = createApi({
       query: ({ baseUrl, categoryId }) => joinApiUrl(baseUrl, `/categories/${categoryId}/values`),
       providesTags: (_result, _error, { baseUrl, categoryId }) => [{ type: 'CategoryValues', id: `${baseUrl}/${categoryId}` }],
     }),
+    // GET /category-values/{id}/summary
+    getCategoryValueSummary: builder.query<CategoryValueSummary, { baseUrl: string; valueId: number }>({
+      query: ({ baseUrl, valueId }) => joinApiUrl(baseUrl, `/category-values/${valueId}/summary`),
+      providesTags: (_result, _error, { baseUrl, valueId }) => [{ type: 'CategoryValueSummary', id: `${baseUrl}/${valueId}` }],
+    }),
+    // GET /datasets/category-values/{id}/list
+    getDatasetsByValueId: builder.query<LatestDatasetItem[], { baseUrl: string; valueId: number }>({
+      query: ({ baseUrl, valueId }) => joinApiUrl(baseUrl, `/datasets/category-values/${valueId}/list`),
+      providesTags: (_result, _error, { baseUrl, valueId }) => [{ type: 'LatestDatasets', id: `${baseUrl}/cv/${valueId}` }],
+    }),
     // GET /datasets/search
     searchDatasets: builder.query<DatasetSearchResponse, { baseUrl: string; params: string }>({
       query: ({ baseUrl, params }) => {
@@ -55,11 +65,13 @@ export const portalApi = createApi({
 
 export const {
   useGetLatestDatasetsQuery,
+  useGetDatasetsByValueIdQuery,
   useGetThemesQuery,
   useGetDatasetDetailQuery,
   useGetDatasetResourcesQuery,
   useGetFileVariablesQuery,
   useGetCategoriesQuery,
   useGetCategoryValuesQuery,
+  useGetCategoryValueSummaryQuery,
   useSearchDatasetsQuery,
 } = portalApi

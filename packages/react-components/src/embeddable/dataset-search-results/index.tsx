@@ -133,7 +133,7 @@ function DatasetSearchResults(props: DatasetSearchResultsProps) {
 
   return (
     <div className="flex-1 min-w-0">
-      <div className="flex items-center justify-between mb-3">
+      <div className="flex items-center justify-between mb-3 gap-3 flex-wrap">
         <p className="text-xs text-muted-foreground">
           {isFetching ? (
             <span>Loading…</span>
@@ -146,6 +146,18 @@ function DatasetSearchResults(props: DatasetSearchResultsProps) {
             </>
           )}
         </p>
+        <label className="flex items-center gap-2 text-xs text-muted-foreground shrink-0">
+          Results per page
+          <select
+            value={currentSize}
+            onChange={(e) => changePageSize(Number(e.target.value))}
+            className="border border-border rounded px-2 py-1 text-xs text-foreground bg-background focus:outline-none focus:ring-1 focus:ring-primary"
+          >
+            {PAGE_SIZE_OPTIONS.map((n) => (
+              <option key={n} value={n}>{n}</option>
+            ))}
+          </select>
+        </label>
       </div>
 
       {!isFetching && items.length === 0 ? (
@@ -168,74 +180,63 @@ function DatasetSearchResults(props: DatasetSearchResultsProps) {
                 className="px-4 py-3.5 hover:bg-muted/50 transition-colors cursor-pointer"
                 onClick={() => { window.location.href = `/datasets/${item.id}` }}
               >
-                <div className="flex items-start gap-3">
-                  {/* Desktop: type badges in left column */}
+                <div className="min-w-0">
+                  {/* Type badges */}
                   {item.resourceTypes.length > 0 && (
-                    <div className="hidden sm:flex mt-0.5 items-center gap-1.5 shrink-0 flex-wrap">
+                    <div className="flex flex-wrap items-center gap-1.5 mb-1.5">
                       {item.resourceTypes.map((rt) => (
                         <TypeBadge key={rt.id} type={rt.value} />
                       ))}
                     </div>
                   )}
 
-                  <div className="min-w-0 flex-1">
-                    {/* Title + year + formats */}
-                    <div className="flex items-start justify-between gap-3 flex-wrap">
-                      <p className="text-sm font-medium text-foreground leading-snug">{item.name}</p>
-                      <div className="flex items-center gap-2 shrink-0">
-                        {period && <span className="text-xs font-mono text-muted-foreground">{period}</span>}
-                        {item.formats.map((f) => (
-                          <span key={f} className="text-[10px] font-mono text-muted-foreground border border-border rounded px-1.5 py-0.5 bg-white">
-                            {f}
-                          </span>
-                        ))}
-                      </div>
+                  {/* Title + year + formats */}
+                  <div className="flex items-start justify-between gap-3 flex-wrap">
+                    <p className="text-sm font-medium text-foreground leading-snug">{item.name}</p>
+                    <div className="flex items-center gap-2 shrink-0">
+                      {period && <span className="text-xs font-mono text-muted-foreground">{period}</span>}
+                      {item.formats.map((f) => (
+                        <span key={f} className="text-[10px] font-mono text-muted-foreground border border-border rounded px-1.5 py-0.5 bg-white">
+                          {f}
+                        </span>
+                      ))}
                     </div>
-
-                    {/* Mobile: type badges below title */}
-                    {item.resourceTypes.length > 0 && (
-                      <div className="flex sm:hidden flex-wrap items-center gap-1.5 mt-1.5">
-                        {item.resourceTypes.map((rt) => (
-                          <TypeBadge key={rt.id} type={rt.value} />
-                        ))}
-                      </div>
-                    )}
-
-                    {/* Description */}
-                    {item.description && (
-                      <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed line-clamp-2">
-                        {item.description}
-                      </p>
-                    )}
-
-                    {/* Themes · countries · languages */}
-                    {tags && (
-                      <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-                        {item.themes.map((t, i) => (
-                          <React.Fragment key={t.id}>
-                            {i > 0 && <span className="text-[10px] text-muted-foreground">·</span>}
-                            <span className="text-[10px] text-muted-foreground">{t.value}</span>
-                          </React.Fragment>
-                        ))}
-                        {item.countries.length > 0 && (
-                          <>
-                            {item.themes.length > 0 && <span className="text-[10px] text-muted-foreground">·</span>}
-                            <span className="text-[10px] text-muted-foreground">
-                              {item.countries.map((c) => c.value).join(', ')}
-                            </span>
-                          </>
-                        )}
-                        {item.languages.length > 0 && (
-                          <>
-                            <span className="text-[10px] text-muted-foreground">·</span>
-                            <span className="text-[10px] text-muted-foreground">
-                              {item.languages.join(', ')}
-                            </span>
-                          </>
-                        )}
-                      </div>
-                    )}
                   </div>
+
+                  {/* Description */}
+                  {item.description && (
+                    <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed line-clamp-2">
+                      {item.description}
+                    </p>
+                  )}
+
+                  {/* Themes · countries · languages */}
+                  {tags && (
+                    <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                      {item.themes.map((t, i) => (
+                        <React.Fragment key={t.id}>
+                          {i > 0 && <span className="text-[10px] text-muted-foreground">·</span>}
+                          <span className="text-[10px] text-muted-foreground">{t.value}</span>
+                        </React.Fragment>
+                      ))}
+                      {item.countries.length > 0 && (
+                        <>
+                          {item.themes.length > 0 && <span className="text-[10px] text-muted-foreground">·</span>}
+                          <span className="text-[10px] text-muted-foreground">
+                            {item.countries.map((c) => c.value).join(', ')}
+                          </span>
+                        </>
+                      )}
+                      {item.languages.length > 0 && (
+                        <>
+                          <span className="text-[10px] text-muted-foreground">·</span>
+                          <span className="text-[10px] text-muted-foreground">
+                            {item.languages.map((l) => l.value).join(', ')}
+                          </span>
+                        </>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             )
@@ -243,61 +244,42 @@ function DatasetSearchResults(props: DatasetSearchResultsProps) {
         </div>
       )}
 
-      {items.length > 0 && (
-        <div className="flex items-center justify-between mt-4 gap-3 flex-wrap">
-          <label className="flex items-center gap-2 text-xs text-muted-foreground">
-            Results per page
-            <select
-              value={currentSize}
-              onChange={(e) => changePageSize(Number(e.target.value))}
-              className="border border-border rounded px-2 py-1 text-xs text-foreground bg-background focus:outline-none focus:ring-1 focus:ring-primary"
-            >
-              {PAGE_SIZE_OPTIONS.map((n) => (
-                <option key={n} value={n}>{n}</option>
-              ))}
-            </select>
-          </label>
+      {items.length > 0 && totalPages > 1 && (
+        <div className="flex items-center justify-end mt-4 gap-0.5 flex-wrap">
+          <button
+            disabled={page === 0 || isFetching}
+            onClick={() => goToPage(page - 1)}
+            className="px-3 py-1.5 text-xs border border-border rounded hover:bg-muted/50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          >
+            Previous
+          </button>
 
-          {totalPages > 1 ? (
-            <div className="flex items-center gap-0.5 flex-wrap">
+          {buildPageWindows(page + 1, totalPages).map((p, i) =>
+            p === '…' ? (
+              <span key={`ellipsis-${i}`} className="px-2 py-1.5 text-xs text-muted-foreground select-none">…</span>
+            ) : (
               <button
-                disabled={page === 0 || isFetching}
-                onClick={() => goToPage(page - 1)}
-                className="px-3 py-1.5 text-xs border border-border rounded hover:bg-muted/50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                key={p}
+                onClick={() => goToPage((p as number) - 1)}
+                disabled={isFetching}
+                className={`px-3 py-1.5 text-xs border rounded transition-colors disabled:cursor-not-allowed ${
+                  p === page + 1
+                    ? 'bg-primary text-primary-foreground border-primary'
+                    : 'border-border text-primary hover:bg-muted/50'
+                }`}
               >
-                Previous
+                {p}
               </button>
-
-              {buildPageWindows(page + 1, totalPages).map((p, i) =>
-                p === '…' ? (
-                  <span key={`ellipsis-${i}`} className="px-2 py-1.5 text-xs text-muted-foreground select-none">…</span>
-                ) : (
-                  <button
-                    key={p}
-                    onClick={() => goToPage((p as number) - 1)}
-                    disabled={isFetching}
-                    className={`px-3 py-1.5 text-xs border rounded transition-colors disabled:cursor-not-allowed ${
-                      p === page + 1
-                        ? 'bg-primary text-primary-foreground border-primary'
-                        : 'border-border text-primary hover:bg-muted/50'
-                    }`}
-                  >
-                    {p}
-                  </button>
-                )
-              )}
-
-              <button
-                disabled={page >= totalPages - 1 || isFetching}
-                onClick={() => goToPage(page + 1)}
-                className="px-3 py-1.5 text-xs border border-border rounded hover:bg-muted/50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-              >
-                Next
-              </button>
-            </div>
-          ) : (
-            <div />
+            )
           )}
+
+          <button
+            disabled={page >= totalPages - 1 || isFetching}
+            onClick={() => goToPage(page + 1)}
+            className="px-3 py-1.5 text-xs border border-border rounded hover:bg-muted/50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          >
+            Next
+          </button>
         </div>
       )}
     </div>

@@ -29,6 +29,7 @@ export const loaders: Record<string, () => Promise<{ default: React.ComponentTyp
     datasetSearchResults: () => import('./dataset-search-results'),
     tabbedPosts: () => import('./tabbed-posts'),
     fileList: () => import('./file-list'),
+    categoryValueSummary: () => import('./category-value-summary'),
 }
 
 
