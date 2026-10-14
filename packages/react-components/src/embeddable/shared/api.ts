@@ -1,11 +1,11 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { joinApiUrl } from './url'
-import type { Category, CategoryValue, CategoryValueSummary, DatasetDetail, DatasetResource, DatasetSearchResponse, FileVariable, LatestDatasetItem, Theme } from './types'
+import type { Category, CategoryValue, CategoryValueMetadata, CategoryValueSummary, DatasetDetail, DatasetResource, DatasetSearchResponse, FileVariable, LatestDatasetItem, Theme } from './types'
 
 export const portalApi = createApi({
   reducerPath: 'portalApi',
   baseQuery: fetchBaseQuery({ baseUrl: '' }),
-  tagTypes: ['DatasetDetail', 'DatasetResources', 'FileVariables', 'LatestDatasets', 'Themes', 'Categories', 'CategoryValues', 'CategoryValueSummary', 'DatasetSearch'],
+  tagTypes: ['DatasetDetail', 'DatasetResources', 'FileVariables', 'LatestDatasets', 'Themes', 'Categories', 'CategoryValues', 'CategoryValueSummary', 'CategoryValueMetadata', 'DatasetSearch'],
   endpoints: (builder) => ({
     // GET /datasets/latest
     getLatestDatasets: builder.query<LatestDatasetItem[], string>({
@@ -47,6 +47,11 @@ export const portalApi = createApi({
       query: ({ baseUrl, valueId }) => joinApiUrl(baseUrl, `/category-values/${valueId}/summary`),
       providesTags: (_result, _error, { baseUrl, valueId }) => [{ type: 'CategoryValueSummary', id: `${baseUrl}/${valueId}` }],
     }),
+    // GET /category-values/{id}/metadata
+    getCategoryValueMetadata: builder.query<CategoryValueMetadata, { baseUrl: string; valueId: number }>({
+      query: ({ baseUrl, valueId }) => joinApiUrl(baseUrl, `/category-values/${valueId}/metadata`),
+      providesTags: (_result, _error, { baseUrl, valueId }) => [{ type: 'CategoryValueMetadata', id: `${baseUrl}/${valueId}` }],
+    }),
     // GET /datasets/category-values/{id}/list
     getDatasetsByValueId: builder.query<LatestDatasetItem[], { baseUrl: string; valueId: number }>({
       query: ({ baseUrl, valueId }) => joinApiUrl(baseUrl, `/datasets/category-values/${valueId}/list`),
@@ -73,5 +78,6 @@ export const {
   useGetCategoriesQuery,
   useGetCategoryValuesQuery,
   useGetCategoryValueSummaryQuery,
+  useGetCategoryValueMetadataQuery,
   useSearchDatasetsQuery,
 } = portalApi

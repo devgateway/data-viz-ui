@@ -185,3 +185,23 @@ export interface CategoryValueSummary {
   countries: number
   datasets: number
 }
+
+export interface CategoryValueMetadataEntry {
+  id: number
+  key: string
+  value: string
+  sortOrder: number
+}
+
+export interface CategoryValueMetadata {
+  // The category value's own name, e.g. the theme the card describes.
+  value: string
+  // Calculated by the API from the datasets under the value, never stored.
+  defaults: {
+    // CSV records across those datasets; 0 when there are none.
+    totalSample: number
+    countries: ThemeCountry[]
+  }
+  // Stored key/value pairs, already in display order.
+  entries: CategoryValueMetadataEntry[]
+}

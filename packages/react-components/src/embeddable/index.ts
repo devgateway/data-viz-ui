@@ -30,6 +30,7 @@ export const loaders: Record<string, () => Promise<{ default: React.ComponentTyp
     tabbedPosts: () => import('./tabbed-posts'),
     fileList: () => import('./file-list'),
     categoryValueSummary: () => import('./category-value-summary'),
+    categoryValueMetadata: () => import('./category-value-metadata'),
 }
 
 
