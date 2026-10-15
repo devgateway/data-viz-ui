@@ -126,10 +126,7 @@ function DatasetSearchResults(props: DatasetSearchResultsProps) {
   const totalPages = Math.ceil(totalElements / size)
 
   const currentSize = parseInt(new URLSearchParams(searchParams).get('size') ?? String(defaultSize), 10)
-
-  const query = typeof window !== 'undefined'
-    ? (new URLSearchParams(window.location.search).get('q') ?? '')
-    : ''
+  const query = new URLSearchParams(searchParams).get('q') ?? ''
 
   return (
     <div className="flex-1 min-w-0">
