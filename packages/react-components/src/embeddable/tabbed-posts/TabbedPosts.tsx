@@ -121,7 +121,7 @@ function TabbedPosts(props: TabbedPostsProps) {
 
   return (
     <div className="viz tabbed posts">
-      <div className="flex overflow-x-auto border-b border-border mb-8" role="tablist">
+      <div className="flex overflow-x-auto overflow-y-hidden border-b border-border mb-8" role="tablist">
         {posts.map((post) => (
           <button
             key={post.id}
