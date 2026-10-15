@@ -44,14 +44,22 @@ function SearchBox(props: SearchBoxProps) {
   useEffect(() => {
     const sync = () => setQuery(readQuery())
     window.addEventListener('popstate', sync)
-    return () => window.removeEventListener('popstate', sync)
+    window.addEventListener(SEARCH_CHANGE_EVENT, sync)
+    return () => {
+      window.removeEventListener('popstate', sync)
+      window.removeEventListener(SEARCH_CHANGE_EVENT, sync)
+    }
   }, [])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
     setQuery(value)
     if (debounceRef.current) clearTimeout(debounceRef.current)
-    debounceRef.current = setTimeout(() => replaceQuery(value), 300)
+    if (!value) {
+      replaceQuery('')
+    } else {
+      debounceRef.current = setTimeout(() => replaceQuery(value), 300)
+    }
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
