@@ -245,7 +245,6 @@ const Tooltip = ({ tooltip, d, intl, tooltipEnableMarkdown }) => {
           }}
           onMouseEnter={show}
           onMouseLeave={hide}
-          onMouseOut={hide}
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
         >
