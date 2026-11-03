@@ -1,3 +1,4 @@
+import { getPointConfig } from "./point-config";
 import { PostConsumer, PostProvider } from "@devgateway/wp-react-lib";
 import PostIntro from "../connected-templates/PostIntro";
 import React, { useCallback, useLayoutEffect, useRef, useState } from "react";
@@ -51,7 +52,7 @@ const TimeLine = (props) => {
   const getCircleId = useCallback((idx) => `circle${unique}${idx}`, [unique]);
   const getTitleId = useCallback((idx) => `title${unique}${idx}`, [unique]);
 
-  const size = (idx) => config[idx]?.size || 10;
+  const size = (idx) => getPointConfig(config, idx).size || 10;
 
   const TooltipModal = ({ content, isOpen, style }) => {
     const addInlineStylesToHTML = (html) => {
@@ -94,23 +95,23 @@ const TimeLine = (props) => {
   };
 
   const circleColor = (idx) => {
-    return config[idx]?.circleColor;
+    return getPointConfig(config, idx).circleColor;
   };
 
   const titleColor = (idx) => {
-    return config[idx].titleColor;
+    return getPointConfig(config, idx).titleColor;
   };
 
   const pointLineColor = (idx) => {
-    return config[idx].lineColor;
+    return getPointConfig(config, idx).lineColor;
   };
 
   const tooltipFontColor = (idx) => {
-    return config[idx].tooltipFontColor || "#fff";
+    return getPointConfig(config, idx).tooltipFontColor || "#fff";
   };
 
   const readMoreLabel = (idx) => {
-    return config[idx].readMoreLabel;
+    return getPointConfig(config, idx).readMoreLabel;
   };
 
   const isTouchDevice = () => {
@@ -243,7 +244,7 @@ const TimeLine = (props) => {
       .attr("class", "timeline-circle")
       .attr("cy", (d, i) => yScale(i))
       .attr("r", (d, i) => size(i))
-      .style("fill", (d, i) => config[i]?.circleColor || "#000")
+      .style("fill", (d, i) => getPointConfig(config, i).circleColor || "#000")
       .style("cursor", enableCirclePopup ? "pointer" : "default")
       .on("click", (event, d) => {
         event.preventDefault();
@@ -334,7 +335,7 @@ const TimeLine = (props) => {
       .style("line-height", "1em")
       .style("font-weight", "400")
       .style("color", "#4C4D50")
-      .html((d) => d.meta_fields.subtitle);
+      .html((d) => d?.meta_fields?.subtitle ?? "");
   }, [deviceType, orientation, height]);
 
   return (
