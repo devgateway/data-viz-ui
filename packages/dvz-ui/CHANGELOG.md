@@ -1,5 +1,11 @@
 # @devgateway/dvz-ui-react
 
+## 1.9.17
+
+### Patch Changes
+
+- [#303](https://github.com/devgateway/data-viz-ui/pull/303) [`043a521`](https://github.com/devgateway/data-viz-ui/commit/043a5211476c0ea622e5d24e9da2348386eb13b8) Thanks [@timothy-mugo](https://github.com/timothy-mugo)! - Fix timeline crashing when more posts exist than saved per-point configs by falling back to the last configured point and defaults
+
 ## 1.9.16
 
 ### Patch Changes
