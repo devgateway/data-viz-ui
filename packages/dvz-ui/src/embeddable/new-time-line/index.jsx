@@ -1,6 +1,6 @@
 import {PostConsumer, PostProvider} from "@devgateway/wp-react-lib";
 import PostIntro from "../connected-templates/PostIntro";
-import React, {useState} from "react";
+import React, {useMemo, useState} from "react";
 import {Container} from "semantic-ui-react";
 import {CarouselProvider, Slide, Slider} from "pure-react-carousel";
 import TimeLine from "./timeline";
@@ -54,10 +54,22 @@ const Component = (props) => {
         }
         return decodeURIComponent(value)
     }
-
+ 
     const parse = (value) => {
-        return JSON.parse(decode(value))
+        if (value === undefined || value === null || value === "") {
+            return []
+        }
+        const decoded = decode(value)
+        try {
+            return JSON.parse(decoded)
+        } catch (e) {
+            return decoded.split(",").map(v => v.trim()).filter(Boolean)
+        }
     }
+
+    // keep the same object between renders so the timeline's effect (which
+    // depends on `config`) only re-runs when the config actually changes
+    const parsedConfig = useMemo(() => JSON.parse(decodeURIComponent(config)), [config])
 
     const timeProps = {
         marginLeft,
@@ -68,7 +80,7 @@ const Component = (props) => {
         height: 150,
         position,
         lineColor: decode(lineColor),
-        config: JSON.parse(decodeURIComponent(config)),
+        config: parsedConfig,
         fontSize,
         titleWidth,
         subtitleWidth

@@ -107,6 +107,8 @@ const TimeLine = ({
         /*making svg take available width*/
         const svgElement = d3.select(ref.current)
         svgElement.attr("width", svgWidth).attr("height", svgHeight)
+        /* redraw from scratch when settings or posts change */
+        svgElement.selectAll("*").remove()
 
 
         const onclick=(i)=>{
@@ -273,7 +275,8 @@ const TimeLine = ({
 
 
 
-    }, [])
+    }, [config, position, lineWidth, lineColor, height, marginLeft, marginTop, marginRight,
+        marginBottom, fontSize, titleWidth, subtitleWidth, posts])
 
 
 
