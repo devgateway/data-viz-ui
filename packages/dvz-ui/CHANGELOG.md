@@ -1,5 +1,11 @@
 # @devgateway/dvz-ui-react
 
+## 1.10.1
+
+### Patch Changes
+
+- [#308](https://github.com/devgateway/data-viz-ui/pull/308) [`934f388`](https://github.com/devgateway/data-viz-ui/commit/934f3885b2811fa379ffaa0d685b42ee88571298) Thanks [@timothy-mugo](https://github.com/timothy-mugo)! - Fix new timeline crashing on missing categories and re-drawing on every render by memoizing the parsed config
+
 ## 1.10.0
 
 ### Minor Changes
