@@ -276,7 +276,7 @@ const TimeLine = ({
 
 
     }, [config, position, lineWidth, lineColor, height, marginLeft, marginTop, marginRight,
-        marginBottom, fontSize, titleWidth, subtitleWidth, posts])
+        marginBottom, fontSize, titleWidth, subtitleWidth, posts, currentSlide])
 
 
 
