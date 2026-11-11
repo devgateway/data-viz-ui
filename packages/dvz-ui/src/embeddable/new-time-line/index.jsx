@@ -57,7 +57,7 @@ const Component = (props) => {
  
     const parse = (value) => {
         if (value === undefined || value === null || value === "") {
-            return []
+            return undefined
         }
         const decoded = decode(value)
         try {
