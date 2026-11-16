@@ -1,5 +1,11 @@
 # @devgateway/dvz-ui-react
 
+## 1.10.2
+
+### Patch Changes
+
+- [#311](https://github.com/devgateway/data-viz-ui/pull/311) [`a2063a5`](https://github.com/devgateway/data-viz-ui/commit/a2063a5f623df5ca23a9ee6e1e205512f31a37f5) Thanks [@timothy-mugo](https://github.com/timothy-mugo)! - Fix body component hover error (`selectAll(...).transition is not a function`) by importing `d3-transition` explicitly so its selection patch is always bundled.
+
 ## 1.10.1
 
 ### Patch Changes
