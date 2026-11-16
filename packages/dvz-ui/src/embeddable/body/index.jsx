@@ -13,6 +13,7 @@ import Brain from "./Brain";
 import Heart from "./Heart";
 import Erectile from "./Erectile";
 import * as d3 from "d3"; // d3 plugin
+import "d3-transition";
 
 import Ectopic from "./Ectopic";
 import { injectIntl, FormattedMessage } from "react-intl";
