@@ -1,5 +1,11 @@
 # @devgateway/dvz-ui-react
 
+## 1.10.3
+
+### Patch Changes
+
+- [#313](https://github.com/devgateway/data-viz-ui/pull/313) [`7f2392e`](https://github.com/devgateway/data-viz-ui/commit/7f2392ef5b09ca67b6bddbffab48288aa213067a) Thanks [@timothy-mugo](https://github.com/timothy-mugo)! - Fix filter dropdown values disappearing on reload when a map and a filter share a superset-proxy dataset, by sending `dvzProxyDatasetId` in the map's categories request.
+
 ## 1.10.2
 
 ### Patch Changes
