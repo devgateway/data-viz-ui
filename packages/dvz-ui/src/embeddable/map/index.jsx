@@ -329,7 +329,11 @@ const MapEntry = (props) => {
 
     useEffect(() => {
         if (app && app !== 'csv') {
-            dispatch(getCategories({ app, dvzProxyDatasetId }));
+            dispatch(getCategories({
+                app,
+                dvzProxyDatasetId,
+                params: dvzProxyDatasetId ? { dvzProxyDatasetId } : undefined,
+            }));
         }
     }, [app, dvzProxyDatasetId]);
 
