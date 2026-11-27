@@ -6,6 +6,7 @@ import { FILTER_CHANGE_EVENT } from '../shared/filterParams'
 import { SEARCH_CHANGE_EVENT } from '../search-box'
 import { useWpSettings } from '../shared/useWpSettings'
 import type { DatasetSearchItem } from '../shared/types'
+import CountryFlag from '../shared/CountryFlag'
 
 const BADGE_PALETTES = [
   'bg-blue-50 text-blue-800 border-blue-200',
@@ -191,6 +192,9 @@ function DatasetSearchResults(props: DatasetSearchResultsProps) {
                   <div className="flex items-start justify-between gap-3 flex-wrap">
                     <p className="text-sm font-medium text-foreground leading-snug">{item.name}</p>
                     <div className="flex items-center gap-2 shrink-0">
+                      {item.countries.map((c) => (
+                        <CountryFlag key={c.id} country={c.value} />
+                      ))}
                       {period && <span className="text-xs font-mono text-muted-foreground">{period}</span>}
                       {item.formats.map((f) => (
                         <span key={f} className="text-[10px] font-mono text-muted-foreground border border-border rounded px-1.5 py-0.5 bg-white">
