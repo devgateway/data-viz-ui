@@ -1,3 +1,4 @@
+import { getPointConfig } from "./point-config";
 import { PostConsumer, PostProvider } from "@devgateway/wp-react-lib";
 import PostIntro from "../connected-templates/PostIntro";
 import React, { useEffect, useRef, useState } from "react";
@@ -48,46 +49,46 @@ const TimeLine = (props) => {
   const [tooltipData, setTooltipData] = useState(null);
 
   const pointPosition = (idx) => {
-    return config[idx].position;
+    return getPointConfig(config, idx).position;
   };
 
   const tickLength = (idx) => {
-    return config[idx].connectorLineHeight;
+    return getPointConfig(config, idx).connectorLineHeight;
   };
   const subtitleOffset = (idx) => {
-    return config[idx].subtitleOffset;
+    return getPointConfig(config, idx).subtitleOffset;
   };
   const connectorLineHeight = (idx) => {
-    return config[idx].connectorLineHeight;
+    return getPointConfig(config, idx).connectorLineHeight;
   };
   const titleOffset = (idx) => {
-    return config[idx].titleOffset;
+    return getPointConfig(config, idx).titleOffset;
   };
   const circleColor = (idx) => {
-    return config[idx]?.circleColor;
+    return getPointConfig(config, idx).circleColor;
   };
   const pointLineColor = (idx) => {
-    return config[idx].lineColor;
+    return getPointConfig(config, idx).lineColor;
   };
 
   const titleColor = (idx) => {
-    return config[idx].titleColor;
+    return getPointConfig(config, idx).titleColor;
   };
 
   const labelColor = (idx) => {
-    return config[idx].labelColor;
+    return getPointConfig(config, idx).labelColor;
   };
 
   const tooltipFontColor = (idx) => {
-    return config[idx].tooltipFontColor || "#fff";
+    return getPointConfig(config, idx).tooltipFontColor || "#fff";
   };
 
   const size = (idx) => {
-    return config[idx].size;
+    return getPointConfig(config, idx).size;
   };
 
   const readMoreLabel = (idx) => {
-    return config[idx].readMoreLabel;
+    return getPointConfig(config, idx).readMoreLabel;
   };
 
   const getCircleId = (idx) => {
@@ -276,7 +277,7 @@ const TimeLine = (props) => {
       .style("line-height", "100%")
       .style("text-align", "center")
       .html((d, i) => {
-        return d["meta_fields"]["subtitle"];
+        return d?.meta_fields?.subtitle ?? "";
       })
       .on("mouseover", (event, d, i) => {
         //onMouseOver(d, i)

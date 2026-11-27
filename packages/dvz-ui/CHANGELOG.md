@@ -1,5 +1,52 @@
 # @devgateway/dvz-ui-react
 
+## 1.10.3
+
+### Patch Changes
+
+- [#313](https://github.com/devgateway/data-viz-ui/pull/313) [`7f2392e`](https://github.com/devgateway/data-viz-ui/commit/7f2392ef5b09ca67b6bddbffab48288aa213067a) Thanks [@timothy-mugo](https://github.com/timothy-mugo)! - Fix filter dropdown values disappearing on reload when a map and a filter share a superset-proxy dataset, by sending `dvzProxyDatasetId` in the map's categories request.
+
+## 1.10.2
+
+### Patch Changes
+
+- [#311](https://github.com/devgateway/data-viz-ui/pull/311) [`a2063a5`](https://github.com/devgateway/data-viz-ui/commit/a2063a5f623df5ca23a9ee6e1e205512f31a37f5) Thanks [@timothy-mugo](https://github.com/timothy-mugo)! - Fix body component hover error (`selectAll(...).transition is not a function`) by importing `d3-transition` explicitly so its selection patch is always bundled.
+
+## 1.10.1
+
+### Patch Changes
+
+- [#308](https://github.com/devgateway/data-viz-ui/pull/308) [`934f388`](https://github.com/devgateway/data-viz-ui/commit/934f3885b2811fa379ffaa0d685b42ee88571298) Thanks [@timothy-mugo](https://github.com/timothy-mugo)! - Fix new timeline crashing on missing categories and re-drawing on every render by memoizing the parsed config
+
+## 1.10.0
+
+### Minor Changes
+
+- [#278](https://github.com/devgateway/data-viz-ui/pull/278) [`80c7bff`](https://github.com/devgateway/data-viz-ui/commit/80c7bff955d40035d5b2d0d8f750c26eb2c16e8b) Thanks [@timothy-mugo](https://github.com/timothy-mugo)! - Fix chart tooltips: migrate to floating-ui for proper scroll detection and positioning
+  - Implemented `useTooltipPosition()` hook using @floating-ui/react with automatic viewport boundary detection (flip/shift middleware)
+  - Added `useHideTooltipOnScroll()` hook for instant tooltip dismissal on scroll/touch events
+  - Fixed theme scope styling by anchoring FloatingPortal to nearest `#root` or `.edit-post-visual-editor` ancestor
+  - Enabled frame-by-frame position tracking via autoUpdate with animationFrame option (required for Nivo's react-spring animations)
+  - Added independent hover/touch state management for better control over tooltip visibility
+  - Applied changes to Tooltip.jsx (Bar, Line, Pie charts) and ChartTooltip.jsx (Sankey, GroupedBars)
+
+  **Breaking changes:** None. Internal implementation detail; public API unchanged.
+  **Related:** Addresses off-screen tooltips, scroll persistence
+
+## 1.9.17
+
+### Patch Changes
+
+- [#303](https://github.com/devgateway/data-viz-ui/pull/303) [`043a521`](https://github.com/devgateway/data-viz-ui/commit/043a5211476c0ea622e5d24e9da2348386eb13b8) Thanks [@timothy-mugo](https://github.com/timothy-mugo)! - Fix timeline crashing when more posts exist than saved per-point configs by falling back to the last configured point and defaults
+
+## 1.9.16
+
+### Patch Changes
+
+- [#301](https://github.com/devgateway/data-viz-ui/pull/301) [`6e71426`](https://github.com/devgateway/data-viz-ui/commit/6e714263e17df18e6988f54f3c5339b5570a442a) Thanks [@timothy-mugo](https://github.com/timothy-mugo)! - Fix reset filters button to be enabled when filters change
+
+- [#300](https://github.com/devgateway/data-viz-ui/pull/300) [`0eb088a`](https://github.com/devgateway/data-viz-ui/commit/0eb088a1bb6b46288e8860c571e6502a8b59a26b) Thanks [@timothy-mugo](https://github.com/timothy-mugo)! - Add Senegal to list of map center
+
 ## 1.9.15
 
 ### Patch Changes
