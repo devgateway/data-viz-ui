@@ -167,6 +167,7 @@ export interface DatasetDetail {
   licenseText?: string
   citationApa?: string
   citationBibtex?: string
+  categoryValues?: Array<{ id: number; categoryId: number; value: string }>
   metadata: DatasetMetadataEntry[]
   files: DatasetFile[]
   resources: DatasetResource[]
