@@ -22,11 +22,10 @@ describe('getCountryCode', () => {
 })
 
 describe('CountryFlag', () => {
-  it('renders the flag from the flag-icons CDN', () => {
+  it('renders the flag emoji with the country name as its label', () => {
     render(<CountryFlag country="Kenya" />)
 
-    const flag = screen.getByAltText('Kenya')
-    expect(flag).toHaveAttribute('src', 'https://cdn.jsdelivr.net/gh/lipis/flag-icons/flags/4x3/ke.svg')
+    expect(screen.getByRole('img', { name: 'Kenya' })).toHaveTextContent('🇰🇪')
   })
 
   it('renders nothing for an unknown country', () => {
