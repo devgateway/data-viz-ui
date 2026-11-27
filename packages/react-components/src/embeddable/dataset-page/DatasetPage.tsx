@@ -1,7 +1,8 @@
 import React from 'react'
 import { skipToken } from '@reduxjs/toolkit/query/react'
 import { useGetDatasetDetailQuery, useGetDatasetResourcesQuery } from '../shared/api'
-import type { DatasetFile } from '../shared/types'
+import type { DatasetDetail, DatasetFile } from '../shared/types'
+import { COUNTRY_MAP_BY_NAME } from '../../layout/CountryMaps'
 import DatasetFiles from '../dataset-files/DatasetFiles'
 import DatasetDoi from '../dataset-doi/DatasetDoi'
 import DatasetCitation, { CitationFormatTabs } from '../dataset-citation/DatasetCitation'
@@ -12,6 +13,27 @@ export interface DatasetPageProps {
   apiUrl?: string
   'data-api-url'?: string
   [key: string]: unknown
+}
+
+export function DatasetCountryMaps({ categoryValues = [] }: Pick<DatasetDetail, 'categoryValues'>) {
+  return (
+    <>
+      {categoryValues.map(({ id, value }) => {
+        const CountryMap = COUNTRY_MAP_BY_NAME[value]
+        return CountryMap ? (
+          <span
+            key={id}
+            role="img"
+            aria-label={value}
+            title={value}
+            className="block h-10 w-10 shrink-0 [&>svg]:h-full [&>svg]:w-full"
+          >
+            <CountryMap />
+          </span>
+        ) : null
+      })}
+    </>
+  )
 }
 
 function formatFileSize(bytes?: number): string {
@@ -171,9 +193,12 @@ const DatasetPage = (props: DatasetPageProps) => {
     <div>
       {dataset && (
         <div className="mb-6">
-          <h1 className="text-xl md:text-2xl font-serif font-semibold text-foreground leading-tight mb-2">
-            {dataset.name}
-          </h1>
+          <div className="flex items-center gap-3 mb-2">
+            <DatasetCountryMaps categoryValues={dataset.categoryValues} />
+            <h1 className="text-xl md:text-2xl font-serif font-semibold text-foreground leading-tight">
+              {dataset.name}
+            </h1>
+          </div>
           {dataset.description && (
             <p className="text-sm text-muted-foreground leading-relaxed max-w-2xl">{dataset.description}</p>
           )}
